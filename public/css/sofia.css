@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Sofia';
+    src: url('../fonts/sofia-webfont.eot');
+    src: url('../fonts/sofia-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/sofia-webfont.woff') format('woff'),
+         url('../fonts/sofia-webfont.ttf') format('truetype'),
+         url('../fonts/sofia-webfont.svg#sofia_pro_mediumregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
