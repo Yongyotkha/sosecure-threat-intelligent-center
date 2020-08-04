@@ -3,7 +3,7 @@
 /storage/*.key
 /storage/*
 /storage/framework/cache/data/
-storage/framework/cache/.gitignore
+/storage/framework/cache/
 /vendor/*
 .phpunit.result.cache
 Homestead.json
