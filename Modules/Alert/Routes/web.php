@@ -10,7 +10,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::prefix('alert')->group(function() {
-    Route::get('/', 'AlertController@index');
-});
+Route::group(
+    ['middleware' => 'web', 'prefix' => 'alert'],
+    function () {
+        Route::get('/', 'AlertController@index')->name('alert.index')->middleware('can:menu_items');
+    }
+);

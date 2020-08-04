@@ -33,7 +33,13 @@ class IndicatorsController extends Controller
     public function index()
     {
         $data['page'] = langapp('indicators');
-        return view('blog::index')->with($data);
+        return view('indicators::index')->with($data);
+    }
+
+    public function show_detail_indicators()
+    {
+        $data['page'] = langapp('indicators');
+        return view('indicators::detail_indicators')->with($data);
     }
 
     /**

@@ -92,15 +92,14 @@
                 </a>
                 <ul class="dropdown-menu animated fadeInRight">
                     <li class="arrow top"></li>
-                    <li><a href="#">Assets</a></li>
                     <li><a href="{{ route('users.profile') }}">@langapp('settings')</a></li>
-                    {{-- <li><a href="{{ route('tell.friend') }}" data-toggle="ajaxModal">@langapp('tell_friend')  </a></li>
+                    <li><a href="{{ route('tell.friend') }}" data-toggle="ajaxModal">@langapp('tell_friend')  </a></li>
                     <li><a href="{{ route('users.reminders') }}">@langapp('reminders')</a></li>
                     <li><a href="{{ route('users.notifications') }}">@langapp('notifications') </a></li>
                     <li><a href="{{ route('extras.user.templates') }}">@langapp('canned_responses')</a></li>
                     @admin
                     <li><a href="{{ route('support.ticket') }}" data-toggle="ajaxModal">Need Help?</a></li>
-                    @endadmin --}}
+                    @endadmin
                     <li class="divider"></li>
                     @if(Auth::user()->isImpersonating())
                     <li><a href="{{ route('users.stopimpersonate') }}">@langapp('stop_impersonate')</a></li>

@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/darkweb",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\DarkWeb\\Providers\\DarkWebServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\DarkWeb\\": ""
+        }
+    }
+}
