@@ -12,8 +12,6 @@
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
                         <section class="padder">
                             
-                            
-                            
                             @if (get_option('valid_license') != 'TRUE' && get_option('demo_mode') != 'TRUE')
                             <div class="alert alert-danger" role="alert">
                                 <strong>@langapp('fo_not_validated')</strong><br/>
@@ -21,9 +19,7 @@
                             </div>                            
                             @endif
 
-                            
-                            @include('dashboard::_includes.'.$dashboard)
-                            
+                            @include('dashboard::_includes.'.$dashboard)           
                             
                         </section>
                     </div>
