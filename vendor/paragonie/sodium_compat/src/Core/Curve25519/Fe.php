@@ -12,7 +12,7 @@ if (class_exists('ParagonIE_Sodium_Core_Curve25519_Fe', false)) {
 class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
 {
     /**
-     * @var array<int, int>
+     * @var array
      */
     protected $container = array();
 
@@ -24,7 +24,7 @@ class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
     /**
      * @internal You should not use this directly from another application
      *
-     * @param array<int, int> $array
+     * @param array $array
      * @param bool $save_indexes
      * @return self
      */
@@ -37,7 +37,6 @@ class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
             $keys = range(0, $count - 1);
         }
         $array = array_values($array);
-        /** @var array<int, int> $keys */
 
         $obj = new ParagonIE_Sodium_Core_Curve25519_Fe();
         if ($save_indexes) {
@@ -55,8 +54,8 @@ class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
     /**
      * @internal You should not use this directly from another application
      *
-     * @param int|null $offset
-     * @param int $value
+     * @param mixed $offset
+     * @param mixed $value
      * @return void
      * @psalm-suppress MixedArrayOffset
      */
@@ -75,7 +74,7 @@ class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
     /**
      * @internal You should not use this directly from another application
      *
-     * @param int $offset
+     * @param mixed $offset
      * @return bool
      * @psalm-suppress MixedArrayOffset
      */
@@ -87,7 +86,7 @@ class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
     /**
      * @internal You should not use this directly from another application
      *
-     * @param int $offset
+     * @param mixed $offset
      * @return void
      * @psalm-suppress MixedArrayOffset
      */
@@ -99,16 +98,15 @@ class ParagonIE_Sodium_Core_Curve25519_Fe implements ArrayAccess
     /**
      * @internal You should not use this directly from another application
      *
-     * @param int $offset
-     * @return int
+     * @param mixed $offset
+     * @return mixed|null
      * @psalm-suppress MixedArrayOffset
      */
     public function offsetGet($offset)
     {
-        if (!isset($this->container[$offset])) {
-            $this->container[$offset] = 0;
-        }
-        return (int) ($this->container[$offset]);
+        return isset($this->container[$offset])
+            ? $this->container[$offset]
+            : null;
     }
 
     /**

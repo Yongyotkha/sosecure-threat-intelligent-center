@@ -8,9 +8,8 @@ use Illuminate\Queue\SerializesModels;
 
 class OneTimePasswordRequested
 {
-    use Dispatchable;
-    use InteractsWithSockets;
-    use SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
     public $user;
 
     /**

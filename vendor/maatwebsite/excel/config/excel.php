@@ -18,10 +18,10 @@ return [
         'chunk_size'             => 1000,
 
         /*
-        |--------------------------------------------------------------------------
-        | Pre-calculate formulas during export
-        |--------------------------------------------------------------------------
-        */
+       |--------------------------------------------------------------------------
+       | Pre-calculate formulas during export
+       |--------------------------------------------------------------------------
+       */
         'pre_calculate_formulas' => false,
 
         /*
@@ -71,9 +71,10 @@ return [
         'csv'         => [
             'delimiter'              => ',',
             'enclosure'              => '"',
-            'escape_character'       => '\\',
-            'contiguous'             => false,
-            'input_encoding'         => 'UTF-8',
+            'line_ending'            => PHP_EOL,
+            'use_bom'                => false,
+            'include_separator_line' => false,
+            'excel_compatibility'    => false,
         ],
     ],
 
@@ -179,24 +180,7 @@ return [
         | in conjunction with queued imports and exports.
         |
         */
-        'remote_disk'   => null,
-        'remote_prefix' => null,
+        'remote_disk' => null,
 
-        /*
-        |--------------------------------------------------------------------------
-        | Force Resync
-        |--------------------------------------------------------------------------
-        |
-        | When dealing with a multi server setup as above, it's possible
-        | for the clean up that occurs after entire queue has been run to only
-        | cleanup the server that the last AfterImportJob runs on. The rest of the server
-        | would still have the local temporary file stored on it. In this case your
-        | local storage limits can be exceeded and future imports won't be processed.
-        | To mitigate this you can set this config value to be true, so that after every
-        | queued chunk is processed the local temporary file is deleted on the server that
-        | processed it.
-        |
-        */
-        'force_resync_remote' => null,
     ],
 ];

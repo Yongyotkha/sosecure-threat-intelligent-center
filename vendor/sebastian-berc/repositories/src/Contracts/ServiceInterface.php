@@ -6,9 +6,10 @@ use Illuminate\Contracts\Container\Container as Application;
 use SebastianBerc\Repositories\Repository;
 
 /**
- * Interface ServiceInterface.
+ * Interface ServiceInterface
  *
  * @author  Sebastian Berć <sebastian.berc@gmail.com>
+ * @package SebastianBerc\Repositories\Contracts
  */
 interface ServiceInterface
 {

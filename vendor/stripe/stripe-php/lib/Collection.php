@@ -14,6 +14,7 @@ namespace Stripe;
  */
 class Collection extends StripeObject implements \IteratorAggregate
 {
+
     const OBJECT_NAME = "list";
 
     use ApiOperations\Request;

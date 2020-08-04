@@ -12,6 +12,7 @@ class LithuanianNumberTransformerTest extends NumberTransformerTest
     public function providerItConvertsNumbersToWords()
     {
         return [
+            [726, 'septyni šimtai dvidešimt šeši'],
             [0, 'nulis'],
             [1, 'vienas'],
             [9, 'devyni'],
@@ -27,7 +28,6 @@ class LithuanianNumberTransformerTest extends NumberTransformerTest
             [111, 'šimtas vienuolika'],
             [120, 'šimtas dvidešimt'],
             [121, 'šimtas dvidešimt vienas'],
-            [726, 'septyni šimtai dvidešimt šeši'],
             [900, 'devyni šimtai'],
             [909, 'devyni šimtai devyni'],
             [919, 'devyni šimtai devyniolika'],

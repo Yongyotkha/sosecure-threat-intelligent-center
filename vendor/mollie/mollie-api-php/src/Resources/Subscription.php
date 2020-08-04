@@ -42,7 +42,7 @@ class Subscription extends BaseResource
     public $status;
 
     /**
-     * @var \stdClass
+     * @var object
      */
     public $amount;
 
@@ -72,11 +72,6 @@ class Subscription extends BaseResource
     public $mandateId;
 
     /**
-     * @var array|null
-     */
-    public $metadata;
-
-    /**
      * UTC datetime the subscription canceled in ISO-8601 format.
      *
      * @var string|null
@@ -93,12 +88,12 @@ class Subscription extends BaseResource
     /**
      * Contains an optional 'webhookUrl'.
      *
-     * @var \stdClass|null
+     * @var object|null
      */
     public $webhookUrl;
 
     /**
-     * @var \stdClass
+     * @var object[]
      */
     public $_links;
 
@@ -119,8 +114,6 @@ class Subscription extends BaseResource
             "webhookUrl" => $this->webhookUrl,
             "description" => $this->description,
             "mandateId" => $this->mandateId,
-            "metadata" => $this->metadata,
-            "interval" => $this->interval,
         ]);
 
         $result = $this->client->performHttpCallToFullUrl(
@@ -208,24 +201,5 @@ class Subscription extends BaseResource
         );
 
         return ResourceFactory::createFromApiResult($result, new Subscription($this->client));
-    }
-
-    public function payments()
-    {
-        if (!isset($this->_links->payments->href)) {
-            return new PaymentCollection($this->client, 0, null);
-        }
-
-        $result = $this->client->performHttpCallToFullUrl(
-            MollieApiClient::HTTP_GET,
-            $this->_links->payments->href
-        );
-
-        return ResourceFactory::createCursorResourceCollection(
-            $this->client,
-            $result->_embedded->payments,
-            Payment::class,
-            $result->_links
-        );
     }
 }

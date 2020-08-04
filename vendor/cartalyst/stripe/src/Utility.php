@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.4.2
+ * @version    2.2.0
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2020, Cartalyst LLC
- * @link       https://cartalyst.com
+ * @copyright  (c) 2011-2019, Cartalyst LLC
+ * @link       http://cartalyst.com
  */
 
 namespace Cartalyst\Stripe;
@@ -48,7 +48,7 @@ class Utility
             return is_bool($parameter) ? ($parameter === true ? 'true' : 'false') : $parameter;
         }, $parameters);
 
-        return http_build_query($parameters);
+        return preg_replace('/\%5B\d+\%5D/', '%5B%5D', http_build_query($parameters));;
     }
 
     protected static function needsAmountConversion(array $parameters)

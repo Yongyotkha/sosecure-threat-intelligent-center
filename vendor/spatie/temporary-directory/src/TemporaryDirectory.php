@@ -3,7 +3,6 @@
 namespace Spatie\TemporaryDirectory;
 
 use Exception;
-use FilesystemIterator;
 use InvalidArgumentException;
 
 class TemporaryDirectory
@@ -29,7 +28,7 @@ class TemporaryDirectory
         }
 
         if (empty($this->name)) {
-            $this->name = mt_rand().'-'.str_replace([' ', '.'], '', microtime());
+            $this->name = str_replace([' ', '.'], '', microtime());
         }
 
         if ($this->forceCreate && file_exists($this->getFullPath())) {
@@ -86,7 +85,7 @@ class TemporaryDirectory
     public function empty(): self
     {
         $this->deleteDirectory($this->getFullPath());
-        mkdir($this->getFullPath(), 0777, true);
+        mkdir($this->getFullPath());
 
         return $this;
     }
@@ -143,10 +142,6 @@ class TemporaryDirectory
 
     protected function deleteDirectory(string $path): bool
     {
-        if (is_link($path)) {
-            return unlink($path);
-        }
-
         if (! file_exists($path)) {
             return true;
         }
@@ -155,8 +150,12 @@ class TemporaryDirectory
             return unlink($path);
         }
 
-        foreach (new FilesystemIterator($path) as $item) {
-            if (! $this->deleteDirectory($item)) {
+        foreach (scandir($path) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (! $this->deleteDirectory($path.DIRECTORY_SEPARATOR.$item)) {
                 return false;
             }
         }

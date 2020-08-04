@@ -24,6 +24,9 @@ final class RawExpression implements ConditionInterface
         $this->expression = $expression;
     }
 
+    /**
+     * @return string
+     */
     public function toString(): string
     {
         return $this->expression;

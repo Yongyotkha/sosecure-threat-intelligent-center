@@ -2,14 +2,15 @@
 
 namespace SebastianBerc\Repositories\Exceptions;
 
-use SebastianBerc\Repositories\Contracts\CriteriaInterface;
 use SebastianBerc\Repositories\Criteria;
+use SebastianBerc\Repositories\Contracts\CriteriaInterface;
 
 /**
- * Class InvalidCriteria.
+ * Class InvalidCriteria
  *
  * @author  Sebastian Berć <sebastian.berc@gmail.com>
  * @copyright Copyright (c) Sebastian Berć
+ * @package SebastianBerc\Repositories\Exceptions
  */
 class InvalidCriteria extends \Exception
 {

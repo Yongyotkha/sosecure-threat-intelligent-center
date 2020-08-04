@@ -8,6 +8,8 @@ interface MessageIteratorInterface extends \Iterator
 {
     /**
      * Get current message.
+     *
+     * @return MessageInterface
      */
     public function current(): MessageInterface;
 }

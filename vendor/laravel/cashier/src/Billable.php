@@ -3,19 +3,19 @@
 namespace Laravel\Cashier;
 
 use Exception;
-use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Stripe\BankAccount as StripeBankAccount;
 use Stripe\Card as StripeCard;
-use Stripe\Charge as StripeCharge;
-use Stripe\Customer as StripeCustomer;
-use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
-use Stripe\Invoice as StripeInvoice;
-use Stripe\InvoiceItem as StripeInvoiceItem;
-use Stripe\Refund as StripeRefund;
 use Stripe\Token as StripeToken;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Support\Collection;
+use Stripe\Charge as StripeCharge;
+use Stripe\Refund as StripeRefund;
+use Stripe\Invoice as StripeInvoice;
+use Stripe\Customer as StripeCustomer;
+use Stripe\BankAccount as StripeBankAccount;
+use Stripe\InvoiceItem as StripeInvoiceItem;
+use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 trait Billable
 {
@@ -379,10 +379,6 @@ trait Billable
      */
     public function defaultCard()
     {
-        if (! $this->hasStripeId()) {
-            return;
-        }
-
         $customer = $this->asStripeCustomer();
 
         foreach ($customer->sources->data as $card) {

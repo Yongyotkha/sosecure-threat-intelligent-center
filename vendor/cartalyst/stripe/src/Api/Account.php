@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.4.2
+ * @version    2.2.0
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2020, Cartalyst LLC
- * @link       https://cartalyst.com
+ * @copyright  (c) 2011-2019, Cartalyst LLC
+ * @link       http://cartalyst.com
  */
 
 namespace Cartalyst\Stripe\Api;
@@ -91,6 +91,31 @@ class Account extends Api
     }
 
     /**
+     * Updates an existing account.
+     *
+     * @param  string  $accountId
+     * @param  string  $file
+     * @param  array  $parameters
+     * @return array
+     */
+    public function verify($accountId, $file, $purpose)
+    {
+        $upload = (new FileUploads($this->config))->create(
+            $file, $purpose, [ 'Stripe-Account' => $accountId ]
+        );
+
+        $this->update($accountId, [
+            'legal_entity' => [
+                'verification' => [
+                    'document' => $upload['id'],
+                ],
+            ],
+        ]);
+
+        return $this->_get('accounts/'.$accountId);
+    }
+
+    /**
      * Returns a list of all the connected accounts.
      *
      * @param  array  $parameters
@@ -123,25 +148,5 @@ class Account extends Api
     public function persons()
     {
         return new Account\Persons($this->config);
-    }
-
-    /**
-     * Returns an account links api instance.
-     *
-     * @return \Cartalyst\Stripe\Api\Account\Persons
-     */
-    public function accountLinks()
-    {
-        return new Account\AccountLink($this->config);
-    }
-
-    /**
-     * Returns an account capabilities api instance.
-     *
-     * @return \Cartalyst\Stripe\Api\Account\Capabilities
-     */
-    public function capabilities()
-    {
-        return new Account\Capabilities($this->config);
     }
 }

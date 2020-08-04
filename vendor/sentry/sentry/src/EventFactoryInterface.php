@@ -12,14 +12,18 @@ interface EventFactoryInterface
     /**
      * Create an {@see Event} with a stacktrace attached to it.
      *
-     * @param array<string, mixed> $payload The data to be attached to the Event
+     * @param array $payload The data to be attached to the Event
+     *
+     * @return Event
      */
     public function createWithStacktrace(array $payload): Event;
 
     /**
      * Create an {@see Event} from a data payload.
      *
-     * @param array<string, mixed> $payload The data to be attached to the Event
+     * @param array $payload The data to be attached to the Event
+     *
+     * @return Event
      */
     public function create(array $payload): Event;
 }

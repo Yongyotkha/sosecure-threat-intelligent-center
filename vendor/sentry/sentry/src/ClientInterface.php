@@ -16,6 +16,8 @@ interface ClientInterface
 {
     /**
      * Returns the options of the client.
+     *
+     * @return Options
      */
     public function getOptions(): Options;
 
@@ -25,6 +27,8 @@ interface ClientInterface
      * @param string     $message The message (primary description) for the event
      * @param Severity   $level   The level of the message to be sent
      * @param Scope|null $scope   An optional scope keeping the state
+     *
+     * @return string|null
      */
     public function captureMessage(string $message, ?Severity $level = null, ?Scope $scope = null): ?string;
 
@@ -33,6 +37,8 @@ interface ClientInterface
      *
      * @param \Throwable $exception The exception object
      * @param Scope|null $scope     An optional scope keeping the state
+     *
+     * @return string|null
      */
     public function captureException(\Throwable $exception, ?Scope $scope = null): ?string;
 
@@ -40,27 +46,27 @@ interface ClientInterface
      * Logs the most recent error (obtained with {@link error_get_last}).
      *
      * @param Scope|null $scope An optional scope keeping the state
+     *
+     * @return string|null
      */
     public function captureLastError(?Scope $scope = null): ?string;
 
     /**
      * Captures a new event using the provided data.
      *
-     * @param array<string, mixed> $payload The data of the event being captured
-     * @param Scope|null           $scope   An optional scope keeping the state
+     * @param array      $payload The data of the event being captured
+     * @param Scope|null $scope   An optional scope keeping the state
+     *
+     * @return string|null
      */
     public function captureEvent(array $payload, ?Scope $scope = null): ?string;
 
     /**
-     * Returns the integration instance if it is installed on the client.
+     * Returns the integration instance if it is installed on the Client.
      *
-     * @param string $className The FQCN of the integration
+     * @param string $className the classname of the integration
      *
-     * @psalm-template T of IntegrationInterface
-     *
-     * @psalm-param class-string<T> $className
-     *
-     * @psalm-return T|null
+     * @return IntegrationInterface|null
      */
     public function getIntegration(string $className): ?IntegrationInterface;
 }

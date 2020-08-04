@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Loader\Configurator;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouteCompiler;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -42,7 +41,7 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix, bool $trailingSlashOnRoot = true): self
+    final public function prefix($prefix, bool $trailingSlashOnRoot = true)
     {
         if (!\is_array($prefix)) {
             $this->route->addPrefix($prefix);
@@ -64,7 +63,6 @@ class ImportConfigurator
                     foreach ($prefix as $locale => $localePrefix) {
                         $localizedRoute = clone $route;
                         $localizedRoute->setDefault('_locale', $locale);
-                        $localizedRoute->setRequirement('_locale', preg_quote($locale, RouteCompiler::REGEX_DELIMITER));
                         $localizedRoute->setDefault('_canonical_route', $name);
                         $localizedRoute->setPath($localePrefix.(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
                         $this->route->add($name.'.'.$locale, $localizedRoute);
@@ -86,7 +84,7 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function namePrefix(string $namePrefix): self
+    final public function namePrefix(string $namePrefix)
     {
         $this->route->addNamePrefix($namePrefix);
 

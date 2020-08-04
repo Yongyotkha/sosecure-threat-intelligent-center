@@ -58,7 +58,7 @@ class Profile extends BaseResource
     public $status;
 
     /**
-     * @var \stdClass
+     * @var object
      */
     public $review;
 
@@ -71,7 +71,7 @@ class Profile extends BaseResource
     public $createdAt;
 
     /**
-     * @var \stdClass
+     * @var object[]
      */
     public $_links;
 

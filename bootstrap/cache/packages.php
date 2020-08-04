@@ -11,17 +11,6 @@
       'AsyncWidget' => 'Arrilot\\Widgets\\AsyncFacade',
     ),
   ),
-  'barryvdh/laravel-debugbar' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Barryvdh\\Debugbar\\ServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Debugbar' => 'Barryvdh\\Debugbar\\Facade',
-    ),
-  ),
   'barryvdh/laravel-dompdf' => 
   array (
     'providers' => 
@@ -38,13 +27,6 @@
     'providers' => 
     array (
       0 => 'Bepsvpt\\SecureHeaders\\SecureHeadersServiceProvider',
-    ),
-  ),
-  'beyondcode/laravel-self-diagnosis' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'BeyondCode\\SelfDiagnosis\\SelfDiagnosisServiceProvider',
     ),
   ),
   'cartalyst/stripe-laravel' => 
@@ -172,20 +154,6 @@
     'providers' => 
     array (
       0 => 'Carbon\\Laravel\\ServiceProvider',
-    ),
-  ),
-  'nunomaduro/collision' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    ),
-  ),
-  'nunomaduro/larastan' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'NunoMaduro\\Larastan\\LarastanServiceProvider',
     ),
   ),
   'nwidart/laravel-modules' => 

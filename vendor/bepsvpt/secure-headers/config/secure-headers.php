@@ -53,14 +53,6 @@ return [
     'x-permitted-cross-domain-policies' => 'none',
 
     /*
-     * X-Power-By
-     *
-     * Note: it will not add to response header if the value is empty string.
-     */
-
-    'x-power-by' => '',
-
-    /*
      * X-XSS-Protection
      *
      * Reference: https://blogs.msdn.microsoft.com/ieinternals/2011/01/31/controlling-the-xss-filter
@@ -115,8 +107,6 @@ return [
         'max-age' => 15552000,
 
         'include-sub-domains' => false,
-
-        'preload' => true,
     ],
 
     /*
@@ -175,42 +165,12 @@ return [
          * the priority is 'none' > '*' > 'self allow'.
          */
 
-        'accelerometer' => [
-            'none' => false,
-
-            '*' => false,
-
-            'self' => true,
-
-            'src' => false,
-
-            'allow' => [
-                // 'url',
-            ],
-        ],
-
-        'ambient-light-sensor' => [
-            'none' => false,
-
-            '*' => false,
-
-            'self' => true,
-
-            'src' => false,
-
-            'allow' => [
-                // 'url',
-            ],
-        ],
-
         'autoplay' => [
             'none' => false,
 
             '*' => false,
 
             'self' => true,
-
-            'src' => false,
 
             'allow' => [
                 // 'url',
@@ -224,36 +184,6 @@ return [
 
             'self' => true,
 
-            'src' => false,
-
-            'allow' => [
-                // 'url',
-            ],
-        ],
-
-        'display-capture' => [
-            'none' => false,
-
-            '*' => false,
-
-            'self' => true,
-
-            'src' => false,
-
-            'allow' => [
-                // 'url',
-            ],
-        ],
-
-        'document-domain' => [
-            'none' => false,
-
-            '*' => true,
-
-            'self' => false,
-
-            'src' => false,
-
             'allow' => [
                 // 'url',
             ],
@@ -265,8 +195,6 @@ return [
             '*' => false,
 
             'self' => true,
-
-            'src' => false,
 
             'allow' => [
                 // 'url',
@@ -280,8 +208,6 @@ return [
 
             'self' => true,
 
-            'src' => false,
-
             'allow' => [
                 // 'url',
             ],
@@ -293,36 +219,6 @@ return [
             '*' => false,
 
             'self' => true,
-
-            'src' => false,
-
-            'allow' => [
-                // 'url',
-            ],
-        ],
-
-        'gyroscope' => [
-            'none' => false,
-
-            '*' => false,
-
-            'self' => true,
-
-            'src' => false,
-
-            'allow' => [
-                // 'url',
-            ],
-        ],
-
-        'magnetometer' => [
-            'none' => false,
-
-            '*' => false,
-
-            'self' => true,
-
-            'src' => false,
 
             'allow' => [
                 // 'url',
@@ -336,8 +232,6 @@ return [
 
             'self' => true,
 
-            'src' => false,
-
             'allow' => [
                 // 'url',
             ],
@@ -349,8 +243,6 @@ return [
             '*' => false,
 
             'self' => true,
-
-            'src' => false,
 
             'allow' => [
                 // 'url',
@@ -364,8 +256,6 @@ return [
 
             'self' => true,
 
-            'src' => false,
-
             'allow' => [
                 // 'url',
             ],
@@ -378,7 +268,53 @@ return [
 
             'self' => false,
 
-            'src' => false,
+            'allow' => [
+                // 'url',
+            ],
+        ],
+
+        'accelerometer' => [
+            'none' => false,
+
+            '*' => false,
+
+            'self' => true,
+
+            'allow' => [
+                // 'url',
+            ],
+        ],
+
+        'ambient-light-sensor' => [
+            'none' => false,
+
+            '*' => false,
+
+            'self' => true,
+
+            'allow' => [
+                // 'url',
+            ],
+        ],
+
+        'gyroscope' => [
+            'none' => false,
+
+            '*' => false,
+
+            'self' => true,
+
+            'allow' => [
+                // 'url',
+            ],
+        ],
+
+        'magnetometer' => [
+            'none' => false,
+
+            '*' => false,
+
+            'self' => true,
 
             'allow' => [
                 // 'url',
@@ -392,8 +328,6 @@ return [
 
             'self' => true,
 
-            'src' => false,
-
             'allow' => [
                 // 'url',
             ],
@@ -405,8 +339,6 @@ return [
             '*' => true,
 
             'self' => false,
-
-            'src' => false,
 
             'allow' => [
                 // 'url',
@@ -420,8 +352,6 @@ return [
 
             'self' => true,
 
-            'src' => false,
-
             'allow' => [
                 // 'url',
             ],
@@ -433,8 +363,6 @@ return [
             '*' => false,
 
             'self' => true,
-
-            'src' => false,
 
             'allow' => [
                 // 'url',

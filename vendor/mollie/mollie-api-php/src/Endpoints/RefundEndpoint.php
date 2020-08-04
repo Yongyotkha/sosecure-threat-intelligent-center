@@ -6,7 +6,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Resources\RefundCollection;
 
-class RefundEndpoint extends CollectionEndpointAbstract
+class RefundEndpoint extends EndpointAbstract
 {
     protected $resourcePath = "refunds";
 
@@ -24,7 +24,7 @@ class RefundEndpoint extends CollectionEndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      *
      * @return RefundCollection
      */

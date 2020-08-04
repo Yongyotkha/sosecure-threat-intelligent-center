@@ -141,7 +141,7 @@ abstract class EndpointAbstract
      * @return BaseCollection
      * @throws ApiException
      */
-    protected function rest_list($from = null, $limit = null, array $filters = [])
+    protected function rest_list($from = null, $limit = null, array $filters)
     {
         $filters = array_merge(["from" => $from, "limit" => $limit], $filters);
 
@@ -165,6 +165,16 @@ abstract class EndpointAbstract
      * @return BaseResource
      */
     abstract protected function getResourceObject();
+
+    /**
+     * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
+     *
+     * @param int $count
+     * @param object[] $_links
+     *
+     * @return BaseCollection
+     */
+    abstract protected function getResourceCollectionObject($count, $_links);
 
     /**
      * @param string $resourcePath

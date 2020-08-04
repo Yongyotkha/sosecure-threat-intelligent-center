@@ -53,14 +53,14 @@ class Settlement extends BaseResource
     /**
      * Total settlement amount in euros.
      *
-     * @var \stdClass
+     * @var object
      */
     public $amount;
 
     /**
      * Revenues and costs nested per year, per month, and per payment method.
      *
-     * @var \stdClass
+     * @var object
      */
     public $periods;
 
@@ -72,7 +72,7 @@ class Settlement extends BaseResource
     public $invoiceId;
 
     /**
-     * @var \stdClass
+     * @var object[]
      */
     public $_links;
 

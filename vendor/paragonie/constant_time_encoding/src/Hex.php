@@ -125,7 +125,7 @@ abstract class Hex implements EncoderInterface
             }
         }
 
-        /** @var array<int, int> $chunk */
+        /** @var array<int, ing> $chunk */
         $chunk = \unpack('C*', $hexString);
         while ($hex_pos < $hex_len) {
             ++$hex_pos;
