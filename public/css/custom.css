@@ -17,3 +17,44 @@
     margin-left: 1rem;
     border-radius: 100%;
 }
+
+.panel .table td, .panel .table th {
+    padding: 15px 15px !important;
+    border-top: 1px solid #f1f1f1;
+}
+
+.switch input:checked+span:after {
+    right: 0 !important;
+    left: unset;
+}
+
+.switch span:after {
+    content: "";
+    position: absolute;
+    background-color: #fff;
+    width: 15px !important;
+    top: 1px;
+    bottom: 1px;
+    border-radius: 30px;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,.25);
+    box-shadow: 1px 1px 3px rgba(0,0,0,.25);
+    -webkit-transition: left .2s;
+    transition: left .2s;
+}
+
+.switch span {
+    position: relative;
+    width: 40px !important;
+    height: 20px !important;
+    border-radius: 30px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-color: rgba(0,0,0,.1);
+    display: inline-block;
+    -webkit-transition: background-color .2s;
+    transition: background-color .2s;
+}
+
+.nav-primary ul.nav>li>a{
+    text-transform: unset !important;
+}

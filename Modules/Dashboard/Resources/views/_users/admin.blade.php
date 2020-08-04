@@ -1,5 +1,5 @@
 <aside class="b-l bg" id="">
-            <ul class="dashmenu text-uc text-muted no-border no-radius">
+            <ul class="dashmenu text-muted no-border no-radius">
                 <li class="{{ $dashboard == 'invoicing' ? 'active' : '' }}"><a href="{{ route('dashboard.index', ['dashboard' => 'invoicing']) }}">@icon('solid/file-alt') @langapp('invoicing')</a></li>
                 <li class="{{ $dashboard == 'sales' ? 'active' : '' }}"><a href="{{ route('dashboard.index', ['dashboard' => 'sales']) }}">@svg('solid/chart-line') @langapp('sales')</a></li>
                 <li class="{{ $dashboard == 'expenses' ? 'active' : '' }}"><a href="{{ route('dashboard.index', ['dashboard' => 'expenses']) }}">@icon('solid/shopping-basket') @langapp('expenses')</a></li>
@@ -18,8 +18,7 @@
                             <div class="alert alert-danger" role="alert">
                                 <strong>@langapp('fo_not_validated')</strong><br/>
                                 To validate your purchase enter your purchase code in Settings or buy Workice CRM at <a href="{{ config('system.saleurl') }}">Envato Market</a>
-                            </div>
-                            
+                            </div>                            
                             @endif
 
                             

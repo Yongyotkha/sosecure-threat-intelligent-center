@@ -151,20 +151,19 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="">
-                                <i class="fas fa-user icon"><b class="bg-info"></b></i>
+                            <a href="{{ site_url('/users') }}">
+                                <i class="fas fa-users icon"><b class="bg-info"></b></i>
                                 <span> Users </span>
                             </a>
                         </li>
                         <li>
-                            <a href="">
+                            <a href="{{ site_url('/settings') }}">
                                 <i class="fas fa-cog icon"><b class="bg-info"></b></i>
                                 <span> Setting </span>
                             </a>
                         </li>
                     </ul>
                 </nav>
-
 
                 {{-- <div class="wrapper clearfix small p-10">
                     @foreach (quickAccess() as $key => $entity)
@@ -185,7 +184,8 @@
         </section>
         <footer class="footer lt hidden-xs b-t b-dark website-by" id="changeLanguages">
             <span>
-                Powered By <a href="">Sosecure</a>
+                Powered By <a href="">Sosecure</a> v1.0.1
+                {{-- {{ getCurrentVersion()['version']  }} --}}
             </span>
             {{-- <a class="pull-right btn btn-sm btn-dark btn-icon" data-toggle="class:nav-xs" href="#nav">
                 
