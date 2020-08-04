@@ -2,7 +2,8 @@
 /public/storage
 /storage/*.key
 /storage/*
-/storage/framework/cache/data/*
+/storage/framework/cache/data/
+storage/framework/cache/.gitignore
 /vendor/*
 .phpunit.result.cache
 Homestead.json
