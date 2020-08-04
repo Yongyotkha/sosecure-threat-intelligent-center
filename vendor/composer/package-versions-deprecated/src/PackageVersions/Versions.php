@@ -240,7 +240,7 @@ final class Versions
   'symfony/yaml' => 'v5.1.3@ea342353a3ef4f453809acc4ebc55382231d4d23',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'webmozart/assert' => '1.8.0@ab2cb0b3b559010b75981b1bdce728da3ee90ad6',
-  'laravel/laravel' => 'dev-master@66e819c12a9d08b9e84f93e551ef980875027442',
+  'laravel/laravel' => 'dev-NewJame@85c34287985096ecc8abfc578528039ac0935f3d',
 );
 
     private function __construct()
