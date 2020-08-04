@@ -116,17 +116,17 @@
     },
     {
         "name": "aws/aws-sdk-php",
-        "version": "3.147.10",
-        "version_normalized": "3.147.10.0",
+        "version": "3.147.11",
+        "version_normalized": "3.147.11.0",
         "source": {
             "type": "git",
             "url": "https://github.com/aws/aws-sdk-php.git",
-            "reference": "b259aad35203d262c02be9b6353597fd62484374"
+            "reference": "3ec07169c15bb05f587be47bf6f393df5ebf8f75"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b259aad35203d262c02be9b6353597fd62484374",
-            "reference": "b259aad35203d262c02be9b6353597fd62484374",
+            "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3ec07169c15bb05f587be47bf6f393df5ebf8f75",
+            "reference": "3ec07169c15bb05f587be47bf6f393df5ebf8f75",
             "shasum": ""
         },
         "require": {
@@ -162,7 +162,7 @@
             "ext-openssl": "Allows working with CloudFront private distributions and verifying received SNS messages",
             "ext-sockets": "To use client-side monitoring"
         },
-        "time": "2020-07-31T18:32:20+00:00",
+        "time": "2020-08-03T21:12:57+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2549,7 +2549,8 @@
                 "name": "Jakub Onderka",
                 "email": "jakub.onderka@gmail.com"
             }
-        ]
+        ],
+        "abandoned": "php-parallel-lint/php-console-color"
     },
     {
         "name": "jakub-onderka/php-console-highlighter",
@@ -2597,7 +2598,8 @@
                 "homepage": "http://www.acci.cz/"
             }
         ],
-        "description": "Highlight PHP code in terminal"
+        "description": "Highlight PHP code in terminal",
+        "abandoned": "php-parallel-lint/php-console-highlighter"
     },
     {
         "name": "jean85/pretty-package-versions",
