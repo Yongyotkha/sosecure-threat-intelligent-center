@@ -9,7 +9,7 @@
 
 This package allows you to quickly create, use and delete a temporary directory in the system's temporary directory.
 
-Here's a quick example on how to create a temporary file and delete it:
+Here's a quick example on how to create a temporary directory and delete it:
 
 ```php
 use Spatie\TemporaryDirectory\TemporaryDirectory;
@@ -23,6 +23,16 @@ $temporaryDirectory->path('temporaryfile.txt');
 $temporaryDirectory->delete();
 ```
 
+## Support us
+
+Learn how to create a package like this one, by watching our premium video course:
+
+[![Laravel Package training](https://spatie.be/github/package-training.jpg)](https://laravelpackage.training)
+
+We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+
+We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+
 ## Installation
 
 You can install the package via composer:
@@ -35,7 +45,7 @@ composer require spatie/temporary-directory
 
 ### Creating a temporary directory
 
-To create a temporary directory simply call the `create` method of the `TemporaryDirectory`. By default the temporary directory will be created in a timestamped directory in your system's temporary directory (usually `/tmp`).
+To create a temporary directory simply call the `create` method on a `TemporaryDirectory` object. By default the temporary directory will be created in a timestamped directory in your system's temporary directory (usually `/tmp`).
 
 ```php
 (new TemporaryDirectory())->create();
@@ -43,29 +53,29 @@ To create a temporary directory simply call the `create` method of the `Temporar
 
 ### Naming your temporary directory
 
-If you want to use a custom name for your temporary directory instead of the timestamp call the `name` method before the `create` method.
+If you want to use a custom name for your temporary directory instead of the timestamp call the `name` method with a string `$name` argument before the `create` method.
 
 ```php
 (new TemporaryDirectory())
-   ->name(string $name)
+   ->name($name)
    ->create();
 ```
 
-By default an exception will be thrown when if a directory already exists with the given `$name`. You can override this behaviour by calling the `force` method in combination with the `name` method.
+By default an exception will be thrown if a directory already exists with the given argument. You can override this behaviour by calling the `force` method in combination with the `name` method.
 
 ```php
 (new TemporaryDirectory())
-   ->name(string $name)
+   ->name($name)
    ->force()
    ->create();
 ```
 
 ### Setting a custom location for a temporary directory
 
-You can set a custom location in which your temporary directory will be created by passing the `$location` argument to the `TemporaryDirectory` constructor.
+You can set a custom location in which your temporary directory will be created by passing a string `$location` argument to the `TemporaryDirectory` constructor.
 
 ```php
-(new TemporaryDirectory(string $location))
+(new TemporaryDirectory($location))
    ->create();
 ```
 
@@ -73,7 +83,7 @@ Optionally you can call the `location` method with a `$location` argument.
 
 ```php
 (new TemporaryDirectory())
-   ->location(string $location)
+   ->location($location)
    ->create();
 ```
 
@@ -86,7 +96,7 @@ $temporaryDirectory = (new TemporaryDirectory())->create();
 $temporaryDirectory->path('dumps/datadump.dat'); // return  /tmp/1485941876276/dumps/datadump.dat
 ```
 
-### Emptying a temporary folder
+### Emptying a temporary directory
 
 Use the `empty` method to delete all the files inside the temporary directory.
 
@@ -94,7 +104,7 @@ Use the `empty` method to delete all the files inside the temporary directory.
 $temporaryDirectory->empty();
 ```
 
-### Deleting a temporary folder
+### Deleting a temporary directory
 
 Once you're done processing your temporary data you can delete the entire temporary directory using the `delete` method. All files inside of it will be deleted.
 
@@ -104,7 +114,7 @@ $temporaryDirectory->delete();
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Testing
 
@@ -132,13 +142,6 @@ We publish all received postcards [on our company website](https://spatie.be/en/
 
 - [Alex Vanderbist](https://github.com/AlexVanderbist)
 - [All Contributors](../../contributors)
-
-## Support us
-
-Spatie is a webdesign agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
-
-Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie). 
-All pledges will be dedicated to allocating workforce on maintenance and new awesome stuff.
 
 ## License
 

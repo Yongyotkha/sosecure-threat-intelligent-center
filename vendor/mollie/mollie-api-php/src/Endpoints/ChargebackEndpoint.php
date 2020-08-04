@@ -6,7 +6,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Chargeback;
 use Mollie\Api\Resources\ChargebackCollection;
 
-class ChargebackEndpoint extends EndpointAbstract
+class ChargebackEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "chargebacks";
 
@@ -24,7 +24,7 @@ class ChargebackEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return ChargebackCollection
      */

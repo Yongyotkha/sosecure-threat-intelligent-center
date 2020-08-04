@@ -41,13 +41,13 @@ You can scan the QR code on [this (old) demo page](https://antoniocarlosribeiro.
 |---------|-----------|-------------------|
 | 4.2     | <= 1.0.1  |                   |
 | 5.0-5.1 | <= 1.0.1  |                   |
-| 5.2-5.6 | >= 2.0.0  | >= 0.2.0          |
+| 5.2-6.x | >= 2.0.0  | >= 0.2.0          |
 
 Before Google2FA 2.0 (Laravel 5.1) you have to install `pragmarx/google2fa:~1.0`, because this package was both a Laravel package and a PHP (agnostic).   
 
 ## Demo
 
-Click [here](https://pragmarx.com/google2fa/middleware) to see the middleware demo:
+Click [here](https://pragmarx.com/playground/google2fa/middleware) to see the middleware demo:
 
 ![middleware](docs/middleware.jpg)
 
@@ -57,13 +57,10 @@ Use Composer to install it:
 
     composer require pragmarx/google2fa-laravel
 
-If you prefer inline QRCodes instead of a Google generated url, you'll need to install [BaconQrCode](https://github.com/Bacon/BaconQrCode):
-
-    composer require bacon/bacon-qr-code
 
 ## Installing on Laravel
 
-### Laravel 5.5
+### Laravel 5.5 and above
 
 You don't have to do anything else, this package autoloads the Service Provider and create the Alias, using the new Auto-Discovery feature.
 
@@ -120,6 +117,27 @@ protected $routeMiddleware = [
 Route::get('/admin', function () {
     return view('admin.index');
 })->middleware(['auth', '2fa']);
+```
+
+### QRCode Backend
+
+There are three available: **imagemagick** (default), **svg** and **eps**. 
+
+You can change it via config:
+
+``` php
+/*
+ * Which image backend to use for generating QR codes?
+ *
+ * Supports imagemagick, svg and eps
+ */
+'qrcode_image_backend' => \PragmaRX\Google2FALaravel\Support\Constants::QRCODE_IMAGE_BACKEND_IMAGEMAGICK,
+```
+ 
+Or runtime:
+
+``` php
+Google2FA::setQRCodeBackend('svg');
 ```
 
 ### Configuring the view
@@ -193,7 +211,7 @@ use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 ## Throttling / Lockout after X attempts
 
-Unless you need somethig really fancy, you can probably use Laravel's [route throttle middleware](https://laravel.com/docs/5.8/middleware) for that:
+Unless you need something really fancy, you can probably use Laravel's [route throttle middleware](https://laravel.com/docs/6.x/middleware) for that:
  
 ```php
 Route::get('/admin', function () {

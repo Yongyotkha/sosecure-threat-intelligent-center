@@ -12,6 +12,7 @@ use Mollie\Api\Endpoints\CustomerPaymentsEndpoint;
 use Mollie\Api\Endpoints\InvoiceEndpoint;
 use Mollie\Api\Endpoints\MandateEndpoint;
 use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\Endpoints\OnboardingEndpoint;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\Endpoints\OrderLineEndpoint;
 use Mollie\Api\Endpoints\OrderPaymentEndpoint;
@@ -28,6 +29,7 @@ use Mollie\Api\Endpoints\RefundEndpoint;
 use Mollie\Api\Endpoints\SettlementsEndpoint;
 use Mollie\Api\Endpoints\ShipmentEndpoint;
 use Mollie\Api\Endpoints\SubscriptionEndpoint;
+use Mollie\Api\Endpoints\WalletEndpoint;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\IncompatiblePlatform;
 use Psr\Http\Message\ResponseInterface;
@@ -38,7 +40,7 @@ class MollieApiClient
     /**
      * Version of our client.
      */
-    const CLIENT_VERSION = "2.8.3";
+    const CLIENT_VERSION = "2.21.0";
 
     /**
      * Endpoint of the remote API.
@@ -157,6 +159,13 @@ class MollieApiClient
     public $invoices;
 
     /**
+     * RESTful Onboarding resource.
+     *
+     * @var OnboardingEndpoint
+     */
+    public $onboarding;
+
+    /**
      * RESTful Order resource.
      *
      * @var OrderEndpoint
@@ -227,6 +236,13 @@ class MollieApiClient
     public $orderRefunds;
 
     /**
+     * Manages Wallet requests
+     *
+     * @var WalletEndpoint
+     */
+    public $wallets;
+
+    /**
      * @var string
      */
     protected $apiKey;
@@ -242,7 +258,6 @@ class MollieApiClient
      * @var array
      */
     protected $versionStrings = [];
-
     /**
      * @var int
      */
@@ -269,7 +284,12 @@ class MollieApiClient
 
         $this->addVersionString("Mollie/" . self::CLIENT_VERSION);
         $this->addVersionString("PHP/" . phpversion());
-        $this->addVersionString("Guzzle/" . ClientInterface::VERSION);
+
+        if(defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) { // Guzzle 7
+            $this->addVersionString("Guzzle/" . ClientInterface::MAJOR_VERSION);
+        } elseif (defined('\GuzzleHttp\ClientInterface::VERSION')) { // Before Guzzle 7
+            $this->addVersionString("Guzzle/" . ClientInterface::VERSION);
+        }
     }
 
     public function initializeEndpoints()
@@ -285,6 +305,7 @@ class MollieApiClient
         $this->invoices = new InvoiceEndpoint($this);
         $this->permissions = new PermissionEndpoint($this);
         $this->profiles = new ProfileEndpoint($this);
+        $this->onboarding = new OnboardingEndpoint($this);
         $this->organizations = new OrganizationEndpoint($this);
         $this->orders = new OrderEndpoint($this);
         $this->orderLines = new OrderLineEndpoint($this);
@@ -296,6 +317,7 @@ class MollieApiClient
         $this->paymentCaptures = new PaymentCaptureEndpoint($this);
         $this->chargebacks = new ChargebackEndpoint($this);
         $this->paymentChargebacks = new PaymentChargebackEndpoint($this);
+        $this->wallets = new WalletEndpoint($this);
     }
 
     /**
@@ -384,7 +406,7 @@ class MollieApiClient
      * @param string $apiMethod
      * @param string|null|resource|StreamInterface $httpBody
      *
-     * @return object
+     * @return \stdClass
      * @throws ApiException
      *
      * @codeCoverageIgnore
@@ -406,7 +428,7 @@ class MollieApiClient
      * @param string $url
      * @param string|null|resource|StreamInterface $httpBody
      *
-     * @return object|null
+     * @return \stdClass|null
      * @throws ApiException
      *
      * @codeCoverageIgnore
@@ -452,7 +474,7 @@ class MollieApiClient
      * Parse the PSR-7 Response body
      *
      * @param ResponseInterface $response
-     * @return object|null
+     * @return \stdClass|null
      * @throws ApiException
      */
     private function parseResponseBody(ResponseInterface $response)

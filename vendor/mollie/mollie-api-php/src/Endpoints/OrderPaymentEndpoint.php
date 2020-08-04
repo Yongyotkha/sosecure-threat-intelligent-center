@@ -6,7 +6,7 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 
-class OrderPaymentEndpoint extends EndpointAbstract
+class OrderPaymentEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "orders_payments";
 
@@ -31,7 +31,7 @@ class OrderPaymentEndpoint extends EndpointAbstract
      * endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return \Mollie\Api\Resources\PaymentCollection
      */
