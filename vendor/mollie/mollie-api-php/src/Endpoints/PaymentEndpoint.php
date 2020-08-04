@@ -8,7 +8,7 @@ use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Resources\ResourceFactory;
 
-class PaymentEndpoint extends EndpointAbstract
+class PaymentEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "payments";
 
@@ -29,7 +29,7 @@ class PaymentEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return PaymentCollection
      */

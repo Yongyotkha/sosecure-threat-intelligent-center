@@ -4,13 +4,13 @@ namespace Maatwebsite\Excel;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
-use Maatwebsite\Excel\Files\Filesystem;
-use Maatwebsite\Excel\Mixins\StoreCollection;
+use Laravel\Lumen\Application as LumenApplication;
 use Maatwebsite\Excel\Console\ExportMakeCommand;
 use Maatwebsite\Excel\Console\ImportMakeCommand;
-use Maatwebsite\Excel\Mixins\DownloadCollection;
+use Maatwebsite\Excel\Files\Filesystem;
 use Maatwebsite\Excel\Files\TemporaryFileFactory;
-use Laravel\Lumen\Application as LumenApplication;
+use Maatwebsite\Excel\Mixins\DownloadCollection;
+use Maatwebsite\Excel\Mixins\StoreCollection;
 use Maatwebsite\Excel\Transactions\TransactionHandler;
 use Maatwebsite\Excel\Transactions\TransactionManager;
 
@@ -22,6 +22,15 @@ class ExcelServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/Console/stubs/export.model.stub'       => base_path('stubs/export.model.stub'),
+                __DIR__ . '/Console/stubs/export.plain.stub'       => base_path('stubs/export.plain.stub'),
+                __DIR__ . '/Console/stubs/export.query.stub'       => base_path('stubs/export.query.stub'),
+                __DIR__ . '/Console/stubs/export.query-model.stub' => base_path('stubs/export.query-model.stub'),
+                __DIR__ . '/Console/stubs/import.collection.stub'  => base_path('stubs/import.collection.stub'),
+                __DIR__ . '/Console/stubs/import.model.stub'       => base_path('stubs/import.model.stub'),
+            ], 'stubs');
+
             if ($this->app instanceof LumenApplication) {
                 $this->app->configure('excel');
             } else {

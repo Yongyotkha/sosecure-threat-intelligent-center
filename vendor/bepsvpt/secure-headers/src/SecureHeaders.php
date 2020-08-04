@@ -159,13 +159,15 @@ class SecureHeaders
             return [];
         }
 
-        $hsts = "max-age={$this->config['hsts']['max-age']};";
+        $hsts = "max-age={$this->config['hsts']['max-age']}";
 
         if ($this->config['hsts']['include-sub-domains']) {
-            $hsts .= ' includeSubDomains;';
+            $hsts .= '; includeSubDomains';
         }
 
-        $hsts .= ' preload';
+        if ($this->config['hsts']['preload'] ?? true) {
+            $hsts .= '; preload';
+        }
 
         return [
             'Strict-Transport-Security' => $hsts,
@@ -242,6 +244,7 @@ class SecureHeaders
             'X-Download-Options' => $this->config['x-download-options'],
             'X-Frame-Options' => $this->config['x-frame-options'],
             'X-Permitted-Cross-Domain-Policies' => $this->config['x-permitted-cross-domain-policies'],
+            'X-Power-By' => $this->config['x-power-by'] ?? '',
             'X-XSS-Protection' => $this->config['x-xss-protection'],
             'Referrer-Policy' => $this->config['referrer-policy'],
             'Server' => $this->config['server'] ?? '',
