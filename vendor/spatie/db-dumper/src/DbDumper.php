@@ -2,11 +2,11 @@
 
 namespace Spatie\DbDumper;
 
-use Symfony\Component\Process\Process;
-use Spatie\DbDumper\Exceptions\DumpFailed;
 use Spatie\DbDumper\Compressors\Compressor;
 use Spatie\DbDumper\Compressors\GzipCompressor;
 use Spatie\DbDumper\Exceptions\CannotSetParameter;
+use Spatie\DbDumper\Exceptions\DumpFailed;
+use Symfony\Component\Process\Process;
 
 abstract class DbDumper
 {
@@ -42,6 +42,9 @@ abstract class DbDumper
 
     /** @var array */
     protected $extraOptions = [];
+
+    /** @var array */
+    protected $extraOptionsAfterDbName = [];
 
     /** @var object */
     protected $compressor = null;
@@ -238,6 +241,20 @@ abstract class DbDumper
         return $this;
     }
 
+    /**
+     * @param string $extraOptionAtEnd
+     *
+     * @return $this
+     */
+    public function addExtraOptionAfterDbName(string $extraOptionAfterDbName)
+    {
+        if (! empty($extraOptionAfterDbName)) {
+            $this->extraOptionsAfterDbName[] = $extraOptionAfterDbName;
+        }
+
+        return $this;
+    }
+
     abstract public function dumpToFile(string $dumpFile);
 
     protected function checkIfDumpWasSuccessFul(Process $process, string $outputFile)
@@ -255,14 +272,35 @@ abstract class DbDumper
         }
     }
 
+    protected function getCompressCommand(string $command, string $dumpFile): string
+    {
+        $compressCommand = $this->compressor->useCommand();
+
+        if ($this->isWindows()) {
+            return "{$command} | {$compressCommand} > {$dumpFile}";
+        }
+
+        return "(((({$command}; echo \$? >&3) | {$compressCommand} > {$dumpFile}) 3>&1) | (read x; exit \$x))";
+    }
+
     protected function echoToFile(string $command, string $dumpFile): string
     {
-        $compressor = $this->compressor
-            ? ' | '.$this->compressor->useCommand()
-            : '';
-
         $dumpFile = '"'.addcslashes($dumpFile, '\\"').'"';
 
-        return $command.$compressor.' > '.$dumpFile;
+        if ($this->compressor) {
+            return $this->getCompressCommand($command, $dumpFile);
+        }
+
+        return $command.' > '.$dumpFile;
+    }
+
+    protected function determineQuote(): string
+    {
+        return $this->isWindows() ? '"' : "'";
+    }
+
+    protected function isWindows(): bool
+    {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
     }
 }

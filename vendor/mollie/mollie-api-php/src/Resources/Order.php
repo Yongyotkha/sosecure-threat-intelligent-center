@@ -38,21 +38,21 @@ class Order extends BaseResource
     /**
      * Amount object containing the value and currency
      *
-     * @var object
+     * @var \stdClass
      */
     public $amount;
 
     /**
      * The total amount captured, thus far.
      *
-     * @var object
+     * @var \stdClass
      */
     public $amountCaptured;
 
     /**
      * The total amount refunded, thus far.
      *
-     * @var object
+     * @var \stdClass
      */
     public $amountRefunded;
 
@@ -66,7 +66,7 @@ class Order extends BaseResource
     /**
      * The person and the address the order is billed to.
      *
-     * @var object
+     * @var \stdClass
      */
     public $billingAddress;
 
@@ -87,7 +87,7 @@ class Order extends BaseResource
     /**
      * The person and the address the order is billed to.
      *
-     * @var object
+     * @var \stdClass
      */
     public $shippingAddress;
 
@@ -111,7 +111,7 @@ class Order extends BaseResource
      * During creation of the order you can set custom metadata that is stored with
      * the order, and given back whenever you retrieve that order.
      *
-     * @var object|mixed|null
+     * @var \stdClass|mixed|null
      */
     public $metadata;
 
@@ -145,6 +145,54 @@ class Order extends BaseResource
     public $createdAt;
 
     /**
+     * UTC datetime the order the order will expire in ISO-8601 format.
+     *
+     * @example "2013-12-25T10:30:54+00:00"
+     * @var string|null
+     */
+    public $expiresAt;
+
+    /**
+     * UTC datetime if the order is expired, the time of expiration will be present in ISO-8601 format.
+     *
+     * @example "2013-12-25T10:30:54+00:00"
+     * @var string|null
+     */
+    public $expiredAt;
+
+    /**
+     * UTC datetime if the order has been paid, the time of payment will be present in ISO-8601 format.
+     *
+     * @example "2013-12-25T10:30:54+00:00"
+     * @var string|null
+     */
+    public $paidAt;
+
+    /**
+     * UTC datetime if the order has been authorized, the time of authorization will be present in ISO-8601 format.
+     *
+     * @example "2013-12-25T10:30:54+00:00"
+     * @var string|null
+     */
+    public $authorizedAt;
+
+    /**
+     * UTC datetime if the order has been canceled, the time of cancellation will be present in ISO 8601 format.
+     *
+     * @example "2013-12-25T10:30:54+00:00"
+     * @var string|null
+     */
+    public $canceledAt;
+
+    /**
+     * UTC datetime if the order is completed, the time of completion will be present in ISO 8601 format.
+     *
+     * @example "2013-12-25T10:30:54+00:00"
+     * @var string|null
+     */
+    public $completedAt;
+
+    /**
      * The order lines contain the actual things the customer bought.
      *
      * @var array|object[]
@@ -154,9 +202,14 @@ class Order extends BaseResource
     /**
      * An object with several URL objects relevant to the customer. Every URL object will contain an href and a type field.
      *
-     * @var object[]
+     * @var \stdClass
      */
     public $_links;
+
+    /**
+     * @var \stdClass
+     */
+    public $_embedded;
 
     /**
      * Is this order created?
@@ -261,7 +314,7 @@ class Order extends BaseResource
      */
     public function cancel()
     {
-        return $this->client->orders->cancel($this->id);
+        return $this->client->orders->cancel($this->id, $this->getPresetOptions());
     }
 
     /**
@@ -300,7 +353,11 @@ class Order extends BaseResource
      */
     public function lines()
     {
-        return ResourceFactory::createBaseResourceCollection($this->client, $this->lines, OrderLine::class);
+        return ResourceFactory::createBaseResourceCollection(
+            $this->client,
+            OrderLine::class,
+            $this->lines
+        );
     }
 
     /**
@@ -313,7 +370,7 @@ class Order extends BaseResource
      */
     public function createShipment(array $options = [])
     {
-        return $this->client->shipments->createFor($this, $options);
+        return $this->client->shipments->createFor($this, $this->withPresetOptions($options));
     }
 
     /**
@@ -339,7 +396,7 @@ class Order extends BaseResource
      */
     public function getShipment($shipmentId, array $parameters = [])
     {
-        return $this->client->shipments->getFor($this, $shipmentId, $parameters);
+        return $this->client->shipments->getFor($this, $shipmentId, $this->withPresetOptions($parameters));
     }
 
     /**
@@ -351,7 +408,7 @@ class Order extends BaseResource
      */
     public function shipments(array $parameters = [])
     {
-        return $this->client->shipments->listFor($this, $parameters);
+        return $this->client->shipments->listFor($this, $this->withPresetOptions($parameters));
     }
 
     /**
@@ -376,7 +433,7 @@ class Order extends BaseResource
      */
     public function refund(array $data)
     {
-        return $this->client->orderRefunds->createFor($this, $data);
+        return $this->client->orderRefunds->createFor($this, $this->withPresetOptions($data));
     }
 
     /**
@@ -388,6 +445,7 @@ class Order extends BaseResource
     public function refundAll(array $data = [])
     {
         $data['lines'] = [];
+
         return $this->refund($data);
     }
 
@@ -428,6 +486,7 @@ class Order extends BaseResource
         $body = json_encode(array(
             "billingAddress" => $this->billingAddress,
             "shippingAddress" => $this->shippingAddress,
+            "orderNumber" => $this->orderNumber,
         ));
 
         $result = $this->client->performHttpCallToFullUrl(MollieApiClient::HTTP_PATCH, $this->_links->self->href, $body);
@@ -465,5 +524,31 @@ class Order extends BaseResource
             $this->_embedded->payments,
             Payment::class
         );
+    }
+
+    /**
+     * When accessed by oAuth we want to pass the testmode by default
+     *
+     * @return array
+     */
+    private function getPresetOptions()
+    {
+        $options = [];
+        if($this->client->usesOAuth()) {
+            $options["testmode"] = $this->mode === "test" ? true : false;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Apply the preset options.
+     *
+     * @param array $options
+     * @return array
+     */
+    private function withPresetOptions(array $options)
+    {
+        return array_merge($this->getPresetOptions(), $options);
     }
 }

@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.2.0
+ * @version    2.4.2
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2019, Cartalyst LLC
- * @link       http://cartalyst.com
+ * @copyright  (c) 2011-2020, Cartalyst LLC
+ * @link       https://cartalyst.com
  */
 
 namespace Cartalyst\Stripe;
@@ -58,25 +58,46 @@ class Config implements ConfigInterface
     protected $accountId;
 
     /**
+     * The application's information.
+     *
+     * @var array|null
+     */
+    protected $appInfo;
+
+    /**
      * Constructor.
      *
      * @param  string  $version
      * @param  string  $apiKey
      * @param  string  $apiVersion
      * @return void
-     * @throws \RuntimeException
      */
     public function __construct($version, $apiKey, $apiVersion)
     {
         $this->setVersion($version);
 
-        $this->setApiKey($apiKey ?: getenv('STRIPE_API_KEY'));
+        $this->setApiKey($apiKey ?: self::getEnvVariable('STRIPE_API_KEY', ''));
 
-        $this->setApiVersion($apiVersion ?: getenv('STRIPE_API_VERSION') ?: '2017-06-05');
+        $this->setApiVersion($apiVersion ?: self::getEnvVariable('STRIPE_API_VERSION', '2017-06-05'));
+    }
 
-        if (! $this->apiKey) {
-            throw new \RuntimeException('The Stripe API key is not defined!');
+    /**
+     * @param string      $name
+     * @param string|null $default
+     *
+     * @return string|null
+     */
+    private static function getEnvVariable($name, $default = null)
+    {
+        if (isset($_SERVER[$name])) {
+            return (string) $_SERVER[$name];
         }
+
+        if (PHP_SAPI === 'cli' && ($value = getenv($name)) !== false) {
+            return (string) $value;
+        }
+
+        return $default;
     }
 
     /**
@@ -170,6 +191,37 @@ class Config implements ConfigInterface
     public function setAccountId($accountId)
     {
         $this->accountId = $accountId;
+
+        return $this;
+    }
+
+    /**
+     * Returns the application's information.
+     *
+     * @return array|null
+     */
+    public function getAppInfo()
+    {
+        return $this->appInfo;
+    }
+
+    /**
+     * Sets the application's information.
+     *
+     * @param string $appName
+     * @param string $appVersion
+     * @param string $appUrl
+     * @param string $appPartnerId
+     * @return $this
+     */
+    public function setAppInfo($appName, $appVersion = null, $appUrl = null, $appPartnerId = null)
+    {
+        $this->appInfo = [
+            'name'       => $appName,
+            'version'    => $appVersion,
+            'url'        => $appUrl,
+            'partner_id' => $appPartnerId,
+        ];
 
         return $this;
     }

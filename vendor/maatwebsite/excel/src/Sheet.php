@@ -2,50 +2,55 @@
 
 namespace Maatwebsite\Excel;
 
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToArray;
-use Maatwebsite\Excel\Concerns\ToModel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Events\AfterSheet;
-use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\OnEachRow;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Events\BeforeSheet;
-use Maatwebsite\Excel\Helpers\CellHelper;
-use PhpOffice\PhpSpreadsheet\Chart\Chart;
-use PhpOffice\PhpSpreadsheet\Reader\Html;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Maatwebsite\Excel\Concerns\WithCharts;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Helpers\ArrayHelper;
 use Illuminate\Contracts\Support\Arrayable;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Imports\EndRowFinder;
-use Maatwebsite\Excel\Concerns\FromIterator;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithDrawings;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Imports\ModelImporter;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromGenerator;
+use Maatwebsite\Excel\Concerns\FromIterator;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithMappedCells;
-use Maatwebsite\Excel\Concerns\WithProgressBar;
+use Maatwebsite\Excel\Concerns\ToArray;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithCharts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Files\TemporaryFileFactory;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Maatwebsite\Excel\Imports\HeadingRowExtractor;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithColumnLimit;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
-use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
-use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMappedCells;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithProgressBar;
 use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
-use Maatwebsite\Excel\Exceptions\SheetNotFoundException;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Exceptions\ConcernConflictException;
+use Maatwebsite\Excel\Exceptions\RowSkippedException;
+use Maatwebsite\Excel\Exceptions\SheetNotFoundException;
+use Maatwebsite\Excel\Files\TemporaryFileFactory;
+use Maatwebsite\Excel\Helpers\ArrayHelper;
+use Maatwebsite\Excel\Helpers\CellHelper;
+use Maatwebsite\Excel\Imports\EndRowFinder;
+use Maatwebsite\Excel\Imports\HeadingRowExtractor;
+use Maatwebsite\Excel\Imports\ModelImporter;
+use Maatwebsite\Excel\Validators\RowValidator;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class Sheet
 {
@@ -85,9 +90,10 @@ class Sheet
      * @param Spreadsheet $spreadsheet
      * @param string|int  $index
      *
-     * @throws SheetNotFoundException
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @return Sheet
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws SheetNotFoundException
      */
     public static function make(Spreadsheet $spreadsheet, $index)
     {
@@ -102,9 +108,10 @@ class Sheet
      * @param Spreadsheet $spreadsheet
      * @param int         $index
      *
-     * @throws SheetNotFoundException
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @return Sheet
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws SheetNotFoundException
      */
     public static function byIndex(Spreadsheet $spreadsheet, int $index): Sheet
     {
@@ -119,8 +126,9 @@ class Sheet
      * @param Spreadsheet $spreadsheet
      * @param string      $name
      *
-     * @throws SheetNotFoundException
      * @return Sheet
+     *
+     * @throws SheetNotFoundException
      */
     public static function byName(Spreadsheet $spreadsheet, string $name): Sheet
     {
@@ -207,6 +215,10 @@ class Sheet
             if ($sheetExport instanceof FromIterator) {
                 $this->fromIterator($sheetExport);
             }
+
+            if ($sheetExport instanceof FromGenerator) {
+                $this->fromGenerator($sheetExport);
+            }
         }
 
         $this->close($sheetExport);
@@ -222,13 +234,14 @@ class Sheet
             $this->registerListeners($import->registerEvents());
         }
 
-        $this->raise(new BeforeSheet($this, $this->exportable));
+        $this->raise(new BeforeSheet($this, $import));
 
         if ($import instanceof WithProgressBar && !$import instanceof WithChunkReading) {
             $import->getConsoleOutput()->progressStart($this->worksheet->getHighestRow());
         }
 
         $calculatesFormulas = $import instanceof WithCalculatedFormulas;
+        $endColumn          = $import instanceof WithColumnLimit ? $import->endColumn() : null;
 
         if ($import instanceof WithMappedCells) {
             app(MappedReader::class)->map($import, $this->worksheet);
@@ -238,18 +251,44 @@ class Sheet
             }
 
             if ($import instanceof ToCollection) {
-                $import->collection($this->toCollection($import, $startRow, null, $calculatesFormulas));
+                $rows = $this->toCollection($import, $startRow, null, $calculatesFormulas, $endColumn);
+
+                if ($import instanceof WithValidation) {
+                    $this->validate($import, $startRow, $rows);
+                }
+
+                $import->collection($rows);
             }
 
             if ($import instanceof ToArray) {
-                $import->array($this->toArray($import, $startRow, null, $calculatesFormulas));
+                $rows = $this->toArray($import, $startRow, null, $calculatesFormulas);
+
+                if ($import instanceof WithValidation) {
+                    $this->validate($import, $startRow, $rows);
+                }
+
+                $import->array($rows);
             }
         }
 
         if ($import instanceof OnEachRow) {
             $headingRow = HeadingRowExtractor::extract($this->worksheet, $import);
+            $endColumn  = $import instanceof WithColumnLimit ? $import->endColumn() : null;
+
             foreach ($this->worksheet->getRowIterator()->resetStart($startRow ?? 1) as $row) {
-                $import->onRow(new Row($row, $headingRow));
+                $sheetRow = new Row($row, $headingRow);
+
+                if ($import instanceof WithValidation) {
+                    $toValidate = [$sheetRow->getIndex() => $sheetRow->toArray(null, $import instanceof WithCalculatedFormulas, $endColumn)];
+
+                    try {
+                        app(RowValidator::class)->validate($toValidate, $import);
+                        $import->onRow($sheetRow);
+                    } catch (RowSkippedException $e) {
+                    }
+                } else {
+                    $import->onRow($sheetRow);
+                }
 
                 if ($import instanceof WithProgressBar) {
                     $import->getConsoleOutput()->progressAdvance();
@@ -257,7 +296,7 @@ class Sheet
             }
         }
 
-        $this->raise(new AfterSheet($this, $this->exportable));
+        $this->raise(new AfterSheet($this, $import));
 
         if ($import instanceof WithProgressBar && !$import instanceof WithChunkReading) {
             $import->getConsoleOutput()->progressFinish();
@@ -275,12 +314,17 @@ class Sheet
      */
     public function toArray($import, int $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false)
     {
-        $endRow     = EndRowFinder::find($import, $startRow);
+        if ($startRow > $this->worksheet->getHighestRow()) {
+            return [];
+        }
+
+        $endRow     = EndRowFinder::find($import, $startRow, $this->worksheet->getHighestRow());
         $headingRow = HeadingRowExtractor::extract($this->worksheet, $import);
+        $endColumn  = $import instanceof WithColumnLimit ? $import->endColumn() : null;
 
         $rows = [];
         foreach ($this->worksheet->getRowIterator($startRow, $endRow) as $row) {
-            $row = (new Row($row, $headingRow))->toArray($nullValue, $calculateFormulas, $formatData);
+            $row = (new Row($row, $headingRow))->toArray($nullValue, $calculateFormulas, $formatData, $endColumn);
 
             if ($import instanceof WithMapping) {
                 $row = $import->map($row);
@@ -307,9 +351,11 @@ class Sheet
      */
     public function toCollection($import, int $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false): Collection
     {
+        $rows = $this->toArray($import, $startRow, $nullValue, $calculateFormulas, $formatData);
+
         return new Collection(array_map(function (array $row) {
             return new Collection($row);
-        }, $this->toArray($import, $startRow, $nullValue, $calculateFormulas, $formatData)));
+        }, $rows));
     }
 
     /**
@@ -336,10 +382,11 @@ class Sheet
 
     /**
      * @param FromView $sheetExport
+     * @param int|null $sheetIndex
      *
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function fromView(FromView $sheetExport)
+    public function fromView(FromView $sheetExport, $sheetIndex = null)
     {
         $temporaryFile = $this->temporaryFileFactory->makeLocal();
         $temporaryFile->put($sheetExport->view()->render());
@@ -349,8 +396,8 @@ class Sheet
         /** @var Html $reader */
         $reader = IOFactory::createReader('Html');
 
-        // Insert content into the last sheet
-        $reader->setSheetIndex($spreadsheet->getSheetCount() - 1);
+        // If no sheetIndex given, insert content into the last sheet
+        $reader->setSheetIndex($sheetIndex ?? $spreadsheet->getSheetCount() - 1);
         $reader->loadIntoExisting($temporaryFile->getLocalPath(), $spreadsheet);
 
         $temporaryFile->delete();
@@ -392,6 +439,14 @@ class Sheet
     }
 
     /**
+     * @param FromGenerator $sheetExport
+     */
+    public function fromGenerator(FromGenerator $sheetExport)
+    {
+        $this->appendRows($sheetExport->generator(), $sheetExport);
+    }
+
+    /**
      * @param array       $rows
      * @param string|null $startCell
      * @param bool        $strictNullComparison
@@ -409,9 +464,6 @@ class Sheet
         $this->worksheet->fromArray($rows, null, $startCell, $strictNullComparison);
     }
 
-    /**
-     * @return void
-     */
     public function autoSize()
     {
         foreach ($this->buildColumnRange('A', $this->worksheet->getHighestDataColumn()) as $col) {
@@ -498,6 +550,10 @@ class Sheet
                 $row = $sheetExport->map($row);
             }
 
+            if ($sheetExport instanceof WithCustomValueBinder) {
+                SpreadsheetCell::setValueBinder($sheetExport);
+            }
+
             return ArrayHelper::ensureMultipleRows(
                 static::mapArraybleRow($row)
             );
@@ -552,6 +608,18 @@ class Sheet
     {
         $this->worksheet->disconnectCells();
         unset($this->worksheet);
+    }
+
+    protected function validate(WithValidation $import, int $startRow, $rows)
+    {
+        $toValidate = (new Collection($rows))->mapWithKeys(function ($row, $index) use ($startRow) {
+            return [($startRow + $index) => $row];
+        });
+
+        try {
+            app(RowValidator::class)->validate($toValidate->toArray(), $import);
+        } catch (RowSkippedException $e) {
+        }
     }
 
     /**

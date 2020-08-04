@@ -11,17 +11,24 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.2.0
+ * @version    2.4.2
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2019, Cartalyst LLC
- * @link       http://cartalyst.com
+ * @copyright  (c) 2011-2020, Cartalyst LLC
+ * @link       https://cartalyst.com
  */
 
 namespace Cartalyst\Stripe\Exception;
 
 class StripeException extends \Exception
 {
+    /**
+     * The response headers sent by Stripe.
+     *
+     * @var array
+     */
+    protected $headers = [];
+
     /**
      * The error code returned by Stripe.
      *
@@ -49,6 +56,29 @@ class StripeException extends \Exception
      * @var string
      */
     protected $rawOutput;
+
+    /**
+     * Returns the response headers sent by Stripe.
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Sets the response headers sent by Stripe.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
 
     /**
      * Returns the error type returned by Stripe.

@@ -1,7 +1,7 @@
 <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav">
     <section class="vbox">
         
-        <header class="header bg-dark text-center clearfix">
+        {{-- <header class="header bg-dark text-center clearfix">
 
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-{{ get_option('theme_color') }}" title="Language">@icon('solid/lightbulb')</button>
@@ -33,17 +33,15 @@
               </div>
 
            
-        </header>
+        </header> --}}
+
         <section class="w-f scrollable">
             <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="5px">
                 
                 <nav class="nav-primary hidden-xs">
-                    <ul class="nav">
+                    {{-- <ul class="nav">
 
                         @foreach (mainMenu() as $menu)
-
-
-
                     @if (count($menu['children']) > 0)
 
                         <li class="nav-w-children {{ $page == langapp($menu['name']) && (in_array($menu['module'], array_pluck($menu['children'], 'parent'))) ? 'active'  : '' }}" id="{{ $menu['module'] }}">
@@ -89,12 +87,86 @@
                             </a>
                         </li>
                         @endif
-                        
-                        
                         @endforeach
+                    </ul> --}}
+
+                    <ul class="nav">
+                        <li class="active">
+                            <a href="{{ site_url('/dashboard') }}">
+                                <i class="fas fa-home icon"><b class="bg-info"></b></i>
+                                <span> Dashboard </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fas fa-exclamation-triangle icon"><b class="bg-info"></b></i>
+                                <span> Alert </span>
+                                <span class="count-alert"> 1 </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fas fa-newspaper icon"><b class="bg-info"></b></i>
+                                <span> News </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fab fa-searchengin icon"><b class="bg-info"></b></i>
+                                <span> Indicators </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fas fa-lock icon"><b class="bg-info"></b></i>
+                                <span> Volnerability </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fas fa-bug icon"><b class="bg-info"></b></i>
+                                <span> Compromised </span>
+                            </a>
+                        </li>
+                        <li class="nav-w-children" id="menu_sales">
+                            <a href="#" class="">
+                                <i class="fas fa-database icon"><b class="bg-info"></b></i>
+                                <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                <i class="fas fa-angle-up text-active"></i></span>
+                                <span> Data Leak </span>
+                            </a>
+                            <ul class="nav lt" style="display: none;">
+                                <li class="">
+                                    <a href="">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> Darkweb </span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> Social </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fas fa-user icon"><b class="bg-info"></b></i>
+                                <span> Users </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fas fa-cog icon"><b class="bg-info"></b></i>
+                                <span> Setting </span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
-                <div class="wrapper clearfix small p-10">
+
+
+                {{-- <div class="wrapper clearfix small p-10">
                     @foreach (quickAccess() as $key => $entity)
                     <div class="text-center-folded">
                         <span class="hidden-folded">
@@ -108,14 +180,17 @@
                         </div>
                     </div>
                     @endforeach
-                </div>
+                </div> --}}
             </div>
         </section>
-        <footer class="footer lt hidden-xs b-t b-dark" id="changeLanguages">
+        <footer class="footer lt hidden-xs b-t b-dark website-by" id="changeLanguages">
+            <span>
+                Powered By <a href="">Sosecure</a>
+            </span>
             {{-- <a class="pull-right btn btn-sm btn-dark btn-icon" data-toggle="class:nav-xs" href="#nav">
                 
             </a> --}}
-            @if (settingEnabled('enable_languages'))
+            {{-- @if (settingEnabled('enable_languages'))
             <div class="btn-group dropup pull-right">
                           <button class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                             @icon('solid/globe')
@@ -130,7 +205,7 @@
                     @endforeach
                           </ul>
                         </div>
-            @endif
+            @endif --}}
             <div class="btn-group hidden-nav-xs">
             </div>
         </footer>

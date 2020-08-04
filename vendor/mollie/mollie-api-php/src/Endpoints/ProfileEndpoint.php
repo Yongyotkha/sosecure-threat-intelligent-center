@@ -7,7 +7,7 @@ use Mollie\Api\Resources\CurrentProfile;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\ProfileCollection;
 
-class ProfileEndpoint extends EndpointAbstract
+class ProfileEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "profiles";
     protected $resourceClass = Profile::class;
@@ -26,7 +26,7 @@ class ProfileEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return ProfileCollection
      */

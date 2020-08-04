@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.2.0
+ * @version    2.4.2
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2019, Cartalyst LLC
- * @link       http://cartalyst.com
+ * @copyright  (c) 2011-2020, Cartalyst LLC
+ * @link       https://cartalyst.com
  */
 
 namespace Cartalyst\Stripe\Exception;
@@ -74,6 +74,8 @@ class Handler
     {
         $response = $exception->getResponse();
 
+        $headers = $response->getHeaders();
+
         $statusCode = $response->getStatusCode();
 
         $rawOutput = json_decode($response->getBody(true), true);
@@ -89,7 +91,7 @@ class Handler
         $missingParameter = isset($error['param']) ? $error['param'] : null;
 
         $this->handleException(
-            $message, $statusCode, $errorType, $errorCode, $missingParameter, $rawOutput
+            $message, $headers, $statusCode, $errorType, $errorCode, $missingParameter, $rawOutput
         );
     }
 
@@ -104,7 +106,7 @@ class Handler
      * @return void
      * @throws \Cartalyst\Stripe\Exception\StripeException
      */
-    protected function handleException($message, $statusCode, $errorType, $errorCode, $missingParameter, $rawOutput)
+    protected function handleException($message, $headers, $statusCode, $errorType, $errorCode, $missingParameter, $rawOutput)
     {
         if ($statusCode === 400 && $errorCode === 'rate_limit') {
             $class = 'ApiLimitExceeded';
@@ -122,6 +124,7 @@ class Handler
 
         $instance = new $class($message, $statusCode);
 
+        $instance->setHeaders($headers);
         $instance->setErrorCode($errorCode);
         $instance->setErrorType($errorType);
         $instance->setMissingParameter($missingParameter);

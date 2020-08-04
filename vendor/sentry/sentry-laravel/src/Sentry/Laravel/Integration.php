@@ -2,12 +2,13 @@
 
 namespace Sentry\Laravel;
 
+use Sentry\FlushableClientInterface;
+use Sentry\SentrySdk;
 use function Sentry\addBreadcrumb;
 use function Sentry\configureScope;
 use Sentry\Breadcrumb;
 use Sentry\Event;
 use Sentry\Integration\IntegrationInterface;
-use Sentry\State\Hub;
 use Sentry\State\Scope;
 
 class Integration implements IntegrationInterface
@@ -23,7 +24,7 @@ class Integration implements IntegrationInterface
     public function setupOnce(): void
     {
         Scope::addGlobalEventProcessor(function (Event $event): Event {
-            $self = Hub::getCurrent()->getIntegration(self::class);
+            $self = SentrySdk::getCurrentHub()->getIntegration(self::class);
 
             if (!$self instanceof self) {
                 return $event;
@@ -42,7 +43,7 @@ class Integration implements IntegrationInterface
      */
     public static function addBreadcrumb(Breadcrumb $breadcrumb): void
     {
-        $self = Hub::getCurrent()->getIntegration(self::class);
+        $self = SentrySdk::getCurrentHub()->getIntegration(self::class);
 
         if (!$self instanceof self) {
             return;
@@ -58,7 +59,7 @@ class Integration implements IntegrationInterface
      */
     public static function configureScope(callable $callback): void
     {
-        $self = Hub::getCurrent()->getIntegration(self::class);
+        $self = SentrySdk::getCurrentHub()->getIntegration(self::class);
 
         if (!$self instanceof self) {
             return;
@@ -81,5 +82,20 @@ class Integration implements IntegrationInterface
     public static function setTransaction($transaction): void
     {
         self::$transaction = $transaction;
+    }
+
+    /**
+     * Block until all async events are processed for the HTTP transport.
+     *
+     * @internal This is not part of the public API and is here temporarily until
+     *  the underlying issue can be resolved, this method will be removed.
+     */
+    public static function flushEvents(): void
+    {
+        $client = SentrySdk::getCurrentHub()->getClient();
+
+        if ($client instanceof FlushableClientInterface) {
+            $client->flush();
+        }
     }
 }
