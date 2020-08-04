@@ -4,6 +4,7 @@ namespace PragmaRX\Google2FALaravel;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request as IlluminateRequest;
+use PragmaRX\Google2FA\Support\Constants as Google2FAConstants;
 use PragmaRX\Google2FALaravel\Events\LoggedOut;
 use PragmaRX\Google2FALaravel\Events\OneTimePasswordExpired;
 use PragmaRX\Google2FALaravel\Exceptions\InvalidSecretKey;
@@ -16,46 +17,7 @@ use PragmaRX\Google2FAQRCode\Google2FA as Google2FAService;
 
 class Google2FA extends Google2FAService
 {
-    use Auth;
-    use Config;
-    use Request;
-    use Session;
-    protected $qrCodeBackend;
-
-    /**
-     * Construct the correct backend.
-     */
-    protected function constructBackend(): void
-    {
-        switch ($this->getQRCodeBackend()) {
-            case Constants::QRCODE_IMAGE_BACKEND_SVG:
-                parent::__construct(new \BaconQrCode\Renderer\Image\SvgImageBackEnd());
-                break;
-
-            case Constants::QRCODE_IMAGE_BACKEND_EPS:
-                parent::__construct(new \BaconQrCode\Renderer\Image\EpsImageBackEnd());
-                break;
-
-            case Constants::QRCODE_IMAGE_BACKEND_IMAGEMAGICK:
-            default:
-                parent::__construct();
-                break;
-        }
-    }
-
-    /**
-     * Set the QRCode Backend.
-     *
-     * @param string $qrCodeBackend
-     *
-     * @return self
-     */
-    public function setQrCodeBackend(string $qrCodeBackend)
-    {
-        $this->qrCodeBackend = $qrCodeBackend;
-
-        return $this;
-    }
+    use Auth, Config, Request, Session;
 
     /**
      * Authenticator constructor.
@@ -66,7 +28,7 @@ class Google2FA extends Google2FAService
     {
         $this->boot($request);
 
-        $this->constructBackend();
+        parent::__construct();
     }
 
     /**
@@ -81,17 +43,6 @@ class Google2FA extends Google2FAService
         $this->setRequest($request);
 
         return $this;
-    }
-
-    /**
-     * The QRCode Backend.
-     *
-     * @return mixed
-     */
-    public function getQRCodeBackend()
-    {
-        return $this->qrCodeBackend
-            ?: $this->config('qrcode_image_backend', Constants::QRCODE_IMAGE_BACKEND_IMAGEMAGICK);
     }
 
     /**
@@ -245,7 +196,7 @@ class Google2FA extends Google2FAService
      */
     protected function updateCurrentAuthTime()
     {
-        $this->sessionPut(Constants::SESSION_AUTH_TIME, Carbon::now()->toIso8601String());
+        $this->sessionPut(Constants::SESSION_AUTH_TIME, Carbon::now());
     }
 
     /**
@@ -259,11 +210,11 @@ class Google2FA extends Google2FAService
     public function verifyGoogle2FA($secret, $one_time_password)
     {
         return $this->verifyKey(
-            $secret,
-            $one_time_password,
-            $this->config('window'),
-            null, // $timestamp
-                $this->getOldTimestamp() ?: null
+                $secret,
+                $one_time_password,
+                $this->config('window'),
+                null, // $timestamp
+                $this->getOldTimestamp() ?: Google2FAConstants::ARGUMENT_NOT_SET
         );
     }
 

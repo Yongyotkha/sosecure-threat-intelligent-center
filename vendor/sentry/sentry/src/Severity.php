@@ -14,43 +14,31 @@ final class Severity
 {
     /**
      * This constant represents the "debug" severity level.
-     *
-     * @internal
      */
     public const DEBUG = 'debug';
 
     /**
      * This constant represents the "info" severity level.
-     *
-     * @internal
      */
     public const INFO = 'info';
 
     /**
      * This constant represents the "warning" severity level.
-     *
-     * @internal
      */
     public const WARNING = 'warning';
 
     /**
      * This constant represents the "error" severity level.
-     *
-     * @internal
      */
     public const ERROR = 'error';
 
     /**
      * This constant represents the "fatal" severity level.
-     *
-     * @internal
      */
     public const FATAL = 'fatal';
 
     /**
      * This constant contains the list of allowed enum values.
-     *
-     * @internal
      */
     public const ALLOWED_SEVERITIES = [
         self::DEBUG,
@@ -93,6 +81,7 @@ final class Severity
              case E_USER_DEPRECATED:
              case E_WARNING:
              case E_USER_WARNING:
+             case E_RECOVERABLE_ERROR:
                  return self::warning();
              case E_ERROR:
              case E_PARSE:
@@ -101,7 +90,6 @@ final class Severity
              case E_COMPILE_ERROR:
              case E_COMPILE_WARNING:
                  return self::fatal();
-             case E_RECOVERABLE_ERROR:
              case E_USER_ERROR:
                  return self::error();
              case E_NOTICE:
@@ -115,6 +103,8 @@ final class Severity
 
     /**
      * Creates a new instance of this enum for the "debug" value.
+     *
+     * @return self
      */
     public static function debug(): self
     {
@@ -123,6 +113,8 @@ final class Severity
 
     /**
      * Creates a new instance of this enum for the "info" value.
+     *
+     * @return self
      */
     public static function info(): self
     {
@@ -131,6 +123,8 @@ final class Severity
 
     /**
      * Creates a new instance of this enum for the "warning" value.
+     *
+     * @return self
      */
     public static function warning(): self
     {
@@ -139,6 +133,8 @@ final class Severity
 
     /**
      * Creates a new instance of this enum for the "error" value.
+     *
+     * @return self
      */
     public static function error(): self
     {
@@ -147,6 +143,8 @@ final class Severity
 
     /**
      * Creates a new instance of this enum for the "fatal" value.
+     *
+     * @return self
      */
     public static function fatal(): self
     {
@@ -157,6 +155,8 @@ final class Severity
      * Returns whether two object instances of this class are equal.
      *
      * @param self $other The object to compare
+     *
+     * @return bool
      */
     public function isEqualTo(self $other): bool
     {
@@ -164,7 +164,7 @@ final class Severity
     }
 
     /**
-     * @see https://www.php.net/manual/en/language.oop5.magic.php#object.tostring
+     * {@inheritdoc}
      */
     public function __toString(): string
     {

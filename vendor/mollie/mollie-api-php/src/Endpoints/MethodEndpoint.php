@@ -7,7 +7,7 @@ use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\MethodCollection;
 use Mollie\Api\Resources\ResourceFactory;
 
-class MethodEndpoint extends CollectionEndpointAbstract
+class MethodEndpoint extends EndpointAbstract
 {
     protected $resourcePath = "methods";
 
@@ -63,8 +63,8 @@ class MethodEndpoint extends CollectionEndpointAbstract
 
         return ResourceFactory::createBaseResourceCollection(
             $this->client,
-            Method::class,
             $result->_embedded->methods,
+            Method::class,
             $result->_links
         );
     }
@@ -73,7 +73,7 @@ class MethodEndpoint extends CollectionEndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      *
      * @return MethodCollection
      */

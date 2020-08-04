@@ -6,7 +6,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderCollection;
 
-class OrderEndpoint extends CollectionEndpointAbstract
+class OrderEndpoint extends EndpointAbstract
 {
     protected $resourcePath = "orders";
 
@@ -31,7 +31,7 @@ class OrderEndpoint extends CollectionEndpointAbstract
      * endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      *
      * @return OrderCollection
      */
@@ -85,13 +85,12 @@ class OrderEndpoint extends CollectionEndpointAbstract
      *
      * @param string $orderId
      *
-     * @param array $parameters
      * @return Order
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
-    public function cancel($orderId, $parameters = [])
+    public function cancel($orderId)
     {
-        return $this->rest_delete($orderId, $parameters);
+        return $this->rest_delete($orderId);
     }
 
     /**

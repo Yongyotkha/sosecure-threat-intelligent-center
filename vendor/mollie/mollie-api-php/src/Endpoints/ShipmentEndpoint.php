@@ -6,7 +6,7 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Shipment;
 use Mollie\Api\Resources\ShipmentCollection;
 
-class ShipmentEndpoint extends CollectionEndpointAbstract
+class ShipmentEndpoint extends EndpointAbstract
 {
     protected $resourcePath = "orders_shipments";
 
@@ -30,13 +30,13 @@ class ShipmentEndpoint extends CollectionEndpointAbstract
      * endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      *
      * @return ShipmentCollection
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new ShipmentCollection($count, $_links);
+        return new ShipmentCollection($this->client, $count, $_links);
     }
 
     /**

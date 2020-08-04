@@ -1,13 +1,13 @@
 <?php
 /**
  * @see       https://github.com/zendframework/zend-diactoros for the canonical source repository
- * @copyright Copyright (c) 2015-2018 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2017 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types=1);
-
 namespace Zend\Diactoros;
+
+use InvalidArgumentException;
 
 use function get_class;
 use function gettype;
@@ -52,8 +52,10 @@ final class HeaderSecurity
      * lossy.
      *
      * @see http://en.wikipedia.org/wiki/HTTP_response_splitting
+     * @param string $value
+     * @return string
      */
-    public static function filter(string $value) : string
+    public static function filter($value)
     {
         $value  = (string) $value;
         $length = strlen($value);
@@ -98,10 +100,11 @@ final class HeaderSecurity
      * tabs are allowed in values; header continuations MUST consist of
      * a single CRLF sequence followed by a space or horizontal tab.
      *
-     * @param string|int|float $value
      * @see http://en.wikipedia.org/wiki/HTTP_response_splitting
+     * @param string $value
+     * @return bool
      */
-    public static function isValid($value) : bool
+    public static function isValid($value)
     {
         $value  = (string) $value;
 
@@ -130,19 +133,19 @@ final class HeaderSecurity
     /**
      * Assert a header value is valid.
      *
-     * @param mixed $value Value to be tested. This method asserts it is a string or number.
-     * @throws Exception\InvalidArgumentException for invalid values
+     * @param string $value
+     * @throws InvalidArgumentException for invalid values
      */
     public static function assertValid($value)
     {
         if (! is_string($value) && ! is_numeric($value)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid header value type; must be a string or numeric; received %s',
                 (is_object($value) ? get_class($value) : gettype($value))
             ));
         }
         if (! self::isValid($value)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 '"%s" is not valid header value',
                 $value
             ));
@@ -154,18 +157,18 @@ final class HeaderSecurity
      *
      * @see http://tools.ietf.org/html/rfc7230#section-3.2
      * @param mixed $name
-     * @throws Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function assertValidName($name)
     {
         if (! is_string($name)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid header name type; expected string; received %s',
                 (is_object($name) ? get_class($name) : gettype($name))
             ));
         }
         if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 '"%s" is not valid header name',
                 $name
             ));

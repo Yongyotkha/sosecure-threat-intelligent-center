@@ -1,16 +1,14 @@
 <?php
 /**
  * @see       https://github.com/zendframework/zend-diactoros for the canonical source repository
- * @copyright Copyright (c) 2015-2018 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2017 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types=1);
-
 namespace Zend\Diactoros\Response;
 
+use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
-use Zend\Diactoros\Exception;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Stream;
 
@@ -39,11 +37,11 @@ class XmlResponse extends Response
      * @param string|StreamInterface $xml String or stream for the message body.
      * @param int $status Integer status code for the response; 200 by default.
      * @param array $headers Array of headers to use at initialization.
-     * @throws Exception\InvalidArgumentException if $text is neither a string or stream.
+     * @throws InvalidArgumentException if $text is neither a string or stream.
      */
     public function __construct(
         $xml,
-        int $status = 200,
+        $status = 200,
         array $headers = []
     ) {
         parent::__construct(
@@ -57,16 +55,17 @@ class XmlResponse extends Response
      * Create the message body.
      *
      * @param string|StreamInterface $xml
-     * @throws Exception\InvalidArgumentException if $xml is neither a string or stream.
+     * @return StreamInterface
+     * @throws InvalidArgumentException if $xml is neither a string or stream.
      */
-    private function createBody($xml) : StreamInterface
+    private function createBody($xml)
     {
         if ($xml instanceof StreamInterface) {
             return $xml;
         }
 
         if (! is_string($xml)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid content (%s) provided to %s',
                 (is_object($xml) ? get_class($xml) : gettype($xml)),
                 __CLASS__

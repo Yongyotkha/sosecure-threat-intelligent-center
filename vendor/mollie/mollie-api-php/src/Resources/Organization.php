@@ -35,7 +35,7 @@ class Organization extends BaseResource
     /**
      * The address of the organization.
      *
-     * @var \stdClass
+     * @var object
      */
     public $address;
 
@@ -56,7 +56,7 @@ class Organization extends BaseResource
     public $vatNumber;
 
     /**
-     * @var \stdClass
+     * @var object[]
      */
     public $_links;
 }

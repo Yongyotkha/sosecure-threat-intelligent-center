@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Sentry\Integration;
 
 use Sentry\ErrorHandler;
-use Sentry\Exception\FatalErrorException;
 use Sentry\Exception\SilencedErrorException;
 use Sentry\Options;
-use Sentry\SentrySdk;
+use Sentry\State\Hub;
 
 /**
  * This integration hooks into the global error handlers and emits events to
@@ -17,33 +16,18 @@ use Sentry\SentrySdk;
 final class ErrorListenerIntegration implements IntegrationInterface
 {
     /**
-     * @var Options|null The options, to know which error level to use
+     * @var Options The options, to know which error level to use
      */
     private $options;
 
     /**
-     * @var bool Whether to handle fatal errors or not
-     */
-    private $handleFatalErrors;
-
-    /**
-     * Constructor.
+     * ErrorListenerIntegration constructor.
      *
-     * @param Options|null $options           The options to be used with this integration
-     * @param bool         $handleFatalErrors Whether to handle fatal errors or not
+     * @param Options $options The options to be used with this integration
      */
-    public function __construct(?Options $options = null, bool $handleFatalErrors = true)
+    public function __construct(Options $options)
     {
-        if (null !== $options) {
-            @trigger_error(sprintf('Passing the options as argument of the constructor of the "%s" class is deprecated since version 2.1 and will not work in 3.0.', self::class), E_USER_DEPRECATED);
-        }
-
-        if ($handleFatalErrors) {
-            @trigger_error(sprintf('Handling fatal errors with the "%s" class is deprecated since version 2.1. Use the "%s" integration instead.', self::class, FatalErrorListenerIntegration::class), E_USER_DEPRECATED);
-        }
-
         $this->options = $options;
-        $this->handleFatalErrors = $handleFatalErrors;
     }
 
     /**
@@ -51,34 +35,14 @@ final class ErrorListenerIntegration implements IntegrationInterface
      */
     public function setupOnce(): void
     {
-        /** @psalm-suppress DeprecatedMethod */
-        $errorHandler = ErrorHandler::registerOnce(ErrorHandler::DEFAULT_RESERVED_MEMORY_SIZE, false);
-        $errorHandler->addErrorHandlerListener(function (\ErrorException $exception): void {
-            if (!$this->handleFatalErrors && $exception instanceof FatalErrorException) {
+        ErrorHandler::addErrorListener(function (\ErrorException $error): void {
+            if ($error instanceof SilencedErrorException && !$this->options->shouldCaptureSilencedErrors()) {
                 return;
             }
 
-            $currentHub = SentrySdk::getCurrentHub();
-            $integration = $currentHub->getIntegration(self::class);
-            $client = $currentHub->getClient();
-
-            // The client bound to the current hub, if any, could not have this
-            // integration enabled. If this is the case, bail out
-            if (null === $integration || null === $client) {
-                return;
+            if ($this->options->getErrorTypes() & $error->getSeverity()) {
+                Hub::getCurrent()->captureException($error);
             }
-
-            $options = $this->options ?? $client->getOptions();
-
-            if ($exception instanceof SilencedErrorException && !$options->shouldCaptureSilencedErrors()) {
-                return;
-            }
-
-            if (!($options->getErrorTypes() & $exception->getSeverity())) {
-                return;
-            }
-
-            $currentHub->captureException($exception);
         });
     }
 }

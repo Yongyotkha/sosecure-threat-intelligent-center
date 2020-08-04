@@ -60,11 +60,11 @@ abstract class Dimension
      *
      * @param bool $pValue
      *
-     * @return $this
+     * @return Dimension
      */
     public function setVisible($pValue)
     {
-        $this->visible = (bool) $pValue;
+        $this->visible = $pValue;
 
         return $this;
     }
@@ -85,7 +85,9 @@ abstract class Dimension
      *
      * @param int $pValue
      *
-     * @return $this
+     * @throws PhpSpreadsheetException
+     *
+     * @return Dimension
      */
     public function setOutlineLevel($pValue)
     {
@@ -113,11 +115,11 @@ abstract class Dimension
      *
      * @param bool $pValue
      *
-     * @return $this
+     * @return Dimension
      */
     public function setCollapsed($pValue)
     {
-        $this->collapsed = (bool) $pValue;
+        $this->collapsed = $pValue;
 
         return $this;
     }
@@ -137,7 +139,7 @@ abstract class Dimension
      *
      * @param int $pValue
      *
-     * @return $this
+     * @return Dimension
      */
     public function setXfIndex($pValue)
     {

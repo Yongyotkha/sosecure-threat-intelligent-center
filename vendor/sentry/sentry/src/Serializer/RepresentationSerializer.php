@@ -12,23 +12,10 @@ class RepresentationSerializer extends AbstractSerializer implements Representat
 {
     /**
      * {@inheritdoc}
-     *
-     * @psalm-suppress InvalidReturnType
-     * @psalm-suppress InvalidReturnStatement
      */
     public function representationSerialize($value)
     {
-        $value = $this->serializeRecursively($value);
-
-        if (is_numeric($value)) {
-            return (string) $value;
-        }
-
-        if (\is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        return $value;
+        return $this->serializeRecursively($value);
     }
 
     /**
@@ -60,6 +47,6 @@ class RepresentationSerializer extends AbstractSerializer implements Representat
             return (string) $value;
         }
 
-        return (string) parent::serializeValue($value);
+        return parent::serializeValue($value);
     }
 }

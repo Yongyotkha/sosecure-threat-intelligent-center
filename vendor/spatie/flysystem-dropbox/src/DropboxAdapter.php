@@ -2,12 +2,12 @@
 
 namespace Spatie\FlysystemDropbox;
 
-use League\Flysystem\Adapter\AbstractAdapter;
-use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
+use Spatie\Dropbox\Client;
 use League\Flysystem\Config;
 use League\Flysystem\Util\MimeType;
-use Spatie\Dropbox\Client;
 use Spatie\Dropbox\Exceptions\BadRequest;
+use League\Flysystem\Adapter\AbstractAdapter;
+use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
 
 class DropboxAdapter extends AbstractAdapter
 {
@@ -245,24 +245,9 @@ class DropboxAdapter extends AbstractAdapter
         return $this->client->getTemporaryLink($path);
     }
 
-    public function getTemporaryUrl(string $path): string
-    {
-        return $this->getTemporaryLink($path);
-    }
-
-    public function getUrl(string $path): string
-    {
-        return $this->getTemporaryLink($path);
-    }
-
     public function getThumbnail(string $path, string $format = 'jpeg', string $size = 'w64h64')
     {
         return $this->client->getThumbnail($path, $format, $size);
-    }
-
-    public function createSharedLinkWithSettings($path, $settings)
-    {
-        return $this->client->createSharedLinkWithSettings($path, $settings);
     }
 
     /**

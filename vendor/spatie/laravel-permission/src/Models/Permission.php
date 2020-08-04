@@ -142,8 +142,6 @@ class Permission extends Model implements PermissionContract
      */
     protected static function getPermissions(array $params = []): Collection
     {
-        return app(PermissionRegistrar::class)
-            ->setPermissionClass(static::class)
-            ->getPermissions($params);
+        return app(PermissionRegistrar::class)->getPermissions($params);
     }
 }

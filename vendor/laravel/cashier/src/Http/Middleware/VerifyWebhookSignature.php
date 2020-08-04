@@ -3,12 +3,12 @@
 namespace Laravel\Cashier\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Foundation\Application;
-use Stripe\Error\SignatureVerification;
 use Stripe\WebhookSignature;
+use Stripe\Error\SignatureVerification;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Config\Repository as Config;
 
-class VerifyWebhookSignature
+final class VerifyWebhookSignature
 {
     /**
      * The application instance.

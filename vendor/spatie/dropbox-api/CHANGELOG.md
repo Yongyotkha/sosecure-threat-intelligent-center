@@ -2,38 +2,6 @@
 
 All notable changes to `dropbox-api` will be documented in this file
 
-## 1.15.0 - 2020-07-09
-
-- allow Guzzle 7 (#70)
-
-## 1.14.0 - 2020-05-11
-
-- add support for app authentication and no authentication
-
-## 1.13.0 - 2020-05-03
-
-- added `downloadZip` (#66)
-
-## 1.12.0 - 2020-02-04
-
-- add `search` method
-
-## 1.11.1 - 2019-12-12
-
-- make compatible with PHP 7.4
-
-## 1.11.0 - 2019-07-04
-
-- add `$response` to `BadRequest`
-
-## 1.10.0 - 2019-07-01
-
-- move retry stuff to package
-
-## 1.9.0 - 2019-05-21
-
-- make guzzle retry 5xx and 429 responses
-
 ## 1.8.0 - 2019-04-13
 
 - add `getEndpointUrl`

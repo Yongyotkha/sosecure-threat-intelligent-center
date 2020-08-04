@@ -1,20 +1,13 @@
-<p align="center">
-    <img width="400" src="https://raw.githubusercontent.com/renatomarinho/laravel-page-speed/master/art/logo.png" alt="Laravel Page Speed logo" />
-</p>
-
-<p align="center">
-<a href="https://gitscrum.com"><img src="https://gitscrum.com/badges/project.svg?project=gitscrum/bulls-eye-gitscrum-37" alt="Git Scrum"></a>
-<a href="https://travis-ci.org/renatomarinho/laravel-page-speed"><img src="https://travis-ci.org/renatomarinho/laravel-page-speed.svg?branch=master" alt="Build Status"></a>
-<a href="https://packagist.org/packages/renatomarinho/laravel-page-speed"><img src="https://poser.pugx.org/renatomarinho/laravel-page-speed/license" alt="License"></a>
-<a href="https://packagist.org/packages/renatomarinho/laravel-page-speed"><img src="https://poser.pugx.org/renatomarinho/laravel-page-speed/version" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/renatomarinho/laravel-page-speed"><img src="https://poser.pugx.org/renatomarinho/laravel-page-speed/downloads" alt="Total Downloads"></a>
-</p>
-
 # Laravel Page Speed
+[![Project on GitScrum](https://gitscrum.com/badges/project.svg?project=gitscrum/bulls-eye-gitscrum-37)](https://gitscrum.com)
+[![Build Status](https://travis-ci.org/renatomarinho/laravel-page-speed.svg?branch=master)](https://travis-ci.org/renatomarinho/laravel-page-speed)
+[![License](https://poser.pugx.org/renatomarinho/laravel-page-speed/license)](https://packagist.org/packages/renatomarinho/laravel-page-speed)
+[![Latest Stable Version](https://poser.pugx.org/renatomarinho/laravel-page-speed/version)](https://packagist.org/packages/renatomarinho/laravel-page-speed)
+[![Total Downloads][icon-downloads]][link-downloads]
 
 ### Simple package to minify HTML output on demand which results in a 35%+ optimization.
 
-## Installation
+## Installation is easy
 
 You can install the package via composer:
 
@@ -22,22 +15,20 @@ You can install the package via composer:
 $ composer require renatomarinho/laravel-page-speed
 ```
 ### Laravel 5.5 and up
-
-Laravel 5.5 and up uses Package Auto-Discovery, so doesn't require you to manually add the ServiceProvider.
+ 
+You don't have to do anything else, this package uses the Package Auto-Discovery feature, and should be available as soon as you install it via Composer.
 
 ### Laravel 5.4 or 5.3
 
-Add the Service Provider to the providers array in **config/app.php**:
+Add the Service Provider to your **config/app.php**: `RenatoMarinho\LaravelPageSpeed\ServiceProvider::class`
 
-`RenatoMarinho\LaravelPageSpeed\ServiceProvider::class`
-
- *This is required for publishing the configuration file:*
-
-### Publish configuration file
+ *This is required for publishing the configuration file:* 
+ 
+#### Publish configuration file
 
  `php artisan vendor:publish --provider="RenatoMarinho\LaravelPageSpeed\ServiceProvider"`
 
-## Do not forget to register middlewares
+#### Register Middlewares
 
 Next, the `\RenatoMarinho\LaravelPageSpeed\Middleware\CollapseWhitespace::class` and other middleware must be registered in the kernel:
 
@@ -116,7 +107,7 @@ protected $middleware = [
         <td>combine_heads</td>
         <td>Combines multiple <head> elements into one</td>
         <td>NO</td>
-    </tr>
+    </tr> 
     <tr>
         <td>combine_javascript</td>
         <td>Combines multiple JavaScript files into one</td>
@@ -214,12 +205,12 @@ protected $middleware = [
     </tr>
     <tr>
         <td>outline_css</td>
-        <td>Moves large inline 'style' tags into external files for cacheability</td>
+        <td>Moves large inline <style> tags into external files for cacheability</td>
         <td>NO</td>
     </tr>
     <tr>
         <td>outline_javascript</td>
-        <td>Moves large inline 'script' tags into external files for cacheability</td>
+        <td>Moves large inline <script> tags into external files for cacheability</td>
         <td>NO</td>
     </tr>
     <tr>
@@ -272,7 +263,7 @@ protected $middleware = [
         <td>Sprites images</td>
         <td>NO</td>
     </tr>
-
+    
 </table>
 
 <hr />
@@ -308,7 +299,7 @@ You would probably like to configure the package to skip some routes.
 
 By default this field comes configured with some options, so feel free to configure according to your needs...
 
-> *Notice*: This package skip automatically 'binary' and 'streamed' responses. See [File Downloads][link-file-download].
+*Notice*: This package skip automatically binary response. See [File Downloads][link-file-download].
 
 ## Warning
 
@@ -328,10 +319,9 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 - [Renato Marinho][link-author]
 - [João Roberto P. Borges][link-maintainer]
-- [Caneco](https://twitter.com/caneco) (for the logo)
 - [All Contributors][link-contributors]
 
-## Inspiration
+## Inspiration 
 
 #### Mod Page Speed (https://www.modpagespeed.com/)
 
@@ -339,9 +329,13 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
+[icon-downloads]: https://poser.pugx.org/renatomarinho/laravel-page-speed/downloads
+
+[link-laravel]: https://laravel.com
+[link-downloads]: https://packagist.org/packages/renatomarinho/laravel-page-speed
 [link-before]: https://i.imgur.com/cN3MWYh.png
 [link-after]: https://i.imgur.com/IKWKLkL.png
 [link-author]: https://github.com/renatomarinho
 [link-maintainer]: https://github.com/joaorobertopb
 [link-contributors]: ../../contributors
-[link-file-download]: https://laravel.com/docs/6.0/responses#file-downloads
+[link-file-download]: https://laravel.com/docs/5.5/responses#file-downloads

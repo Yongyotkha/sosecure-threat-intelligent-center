@@ -31,7 +31,7 @@ class Requests_Exception_HTTP extends Requests_Exception {
 	 * There is no mechanism to pass in the status code, as this is set by the
 	 * subclass used. Reason phrases can vary, however.
 	 *
-	 * @param string|null $reason Reason phrase
+	 * @param string $reason Reason phrase
 	 * @param mixed $data Associated data
 	 */
 	public function __construct($reason = null, $data = null) {
@@ -53,14 +53,10 @@ class Requests_Exception_HTTP extends Requests_Exception {
 	/**
 	 * Get the correct exception class for a given error code
 	 *
-	 * @param int|bool $code HTTP status code, or false if unavailable
+	 * @param int $code HTTP status code
 	 * @return string Exception class name to use
 	 */
 	public static function get_class($code) {
-		if (!$code) {
-			return 'Requests_Exception_HTTP_Unknown';
-		}
-
 		$class = sprintf('Requests_Exception_HTTP_%d', $code);
 		if (class_exists($class)) {
 			return $class;

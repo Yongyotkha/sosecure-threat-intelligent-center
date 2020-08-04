@@ -28,17 +28,12 @@ final class Scope
     private $user;
 
     /**
-     * @var array<string, array<string, mixed>> The list of contexts associated to this scope
-     */
-    private $contexts = [];
-
-    /**
      * @var TagsContext The list of tags associated to this scope
      */
     private $tags;
 
     /**
-     * @var Context<mixed> A set of extra data associated to this scope
+     * @var Context A set of extra data associated to this scope
      */
     private $extra;
 
@@ -72,7 +67,6 @@ final class Scope
         $this->user = new UserContext();
         $this->tags = new TagsContext();
         $this->extra = new Context();
-        $this->contexts = [];
     }
 
     /**
@@ -91,46 +85,15 @@ final class Scope
     }
 
     /**
-     * Merges the given tags into the current tags context.
+     * Gets the tags contained in the tags context.
      *
-     * @param array<string, string> $tags The tags to merge into the current context
+     * @return array<string, string>
      *
-     * @return $this
+     * @internal
      */
-    public function setTags(array $tags): self
+    public function getTags(): array
     {
-        $this->tags->merge($tags);
-
-        return $this;
-    }
-
-    /**
-     * Sets context data with the given name.
-     *
-     * @param string               $name  The name that uniquely identifies the context
-     * @param array<string, mixed> $value The value
-     *
-     * @return $this
-     */
-    public function setContext(string $name, array $value): self
-    {
-        $this->contexts[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Removes the context from the scope.
-     *
-     * @param string $name The name that uniquely identifies the context
-     *
-     * @return $this
-     */
-    public function removeContext(string $name): self
-    {
-        unset($this->contexts[$name]);
-
-        return $this;
+        return $this->tags->toArray();
     }
 
     /**
@@ -149,40 +112,41 @@ final class Scope
     }
 
     /**
-     * Merges the given data into the current extras context.
+     * Gets the information contained in the extra context.
      *
-     * @param array<string, mixed> $extras Data to merge into the current context
+     * @return array<string, mixed>
      *
-     * @return $this
+     * @internal
      */
-    public function setExtras(array $extras): self
+    public function getExtra(): array
     {
-        $this->extra->merge($extras);
-
-        return $this;
+        return $this->extra->toArray();
     }
 
     /**
      * Sets the given data in the user context.
      *
-     * @param array<string, mixed> $data  The data
-     * @param bool                 $merge If true, $data will be merged into user context instead of replacing it
+     * @param array $data The data
      *
      * @return $this
      */
-    public function setUser(array $data, bool $merge = false): self
+    public function setUser(array $data): self
     {
-        if ($merge) {
-            $this->user->merge($data);
-
-            return $this;
-        }
-
-        @trigger_error('Replacing the data is deprecated since version 2.3 and will stop working from version 3.0. Set the second argument to `true` to merge the data instead.', E_USER_DEPRECATED);
-
         $this->user->replaceData($data);
 
         return $this;
+    }
+
+    /**
+     * Gets the information contained in the user context.
+     *
+     * @return array<string, mixed>
+     *
+     * @internal
+     */
+    public function getUser(): array
+    {
+        return $this->user->toArray();
     }
 
     /**
@@ -200,6 +164,18 @@ final class Scope
     }
 
     /**
+     * Gets the list of strings used to dictate the deduplication of this event.
+     *
+     * @return string[]
+     *
+     * @internal
+     */
+    public function getFingerprint(): array
+    {
+        return $this->fingerprint;
+    }
+
+    /**
      * Sets the severity to apply to all events captured in this scope.
      *
      * @param Severity|null $level The severity
@@ -211,6 +187,18 @@ final class Scope
         $this->level = $level;
 
         return $this;
+    }
+
+    /**
+     * Gets the severity to apply to all events captured in this scope.
+     *
+     * @return Severity|null
+     *
+     * @internal
+     */
+    public function getLevel(): ?Severity
+    {
+        return $this->level;
     }
 
     /**
@@ -230,15 +218,15 @@ final class Scope
     }
 
     /**
-     * Clears all the breadcrumbs.
+     * Gets the breadcrumbs.
      *
-     * @return $this
+     * @return Breadcrumb[]
+     *
+     * @internal
      */
-    public function clearBreadcrumbs(): self
+    public function getBreadcrumbs(): array
     {
-        $this->breadcrumbs = [];
-
-        return $this;
+        return $this->breadcrumbs;
     }
 
     /**
@@ -281,7 +269,6 @@ final class Scope
         $this->level = null;
         $this->fingerprint = [];
         $this->breadcrumbs = [];
-        $this->contexts = [];
 
         return $this;
     }
@@ -290,8 +277,10 @@ final class Scope
      * Applies the current context and fingerprint to the event. If the event has
      * already some breadcrumbs on it, the ones from this scope won't get merged.
      *
-     * @param Event                $event   The event object that will be enriched with scope data
-     * @param array<string, mixed> $payload The raw payload of the event that will be propagated to the event processors
+     * @param Event $event   The event object that will be enriched with scope data
+     * @param array $payload The raw payload of the event that will be propagated to the event processors
+     *
+     * @return Event|null
      */
     public function applyToEvent(Event $event, array $payload): ?Event
     {
@@ -311,12 +300,8 @@ final class Scope
         $event->getExtraContext()->merge($this->extra->toArray());
         $event->getUserContext()->merge($this->user->toArray());
 
-        foreach (array_merge($this->contexts, $event->getContexts()) as $name => $data) {
-            $event->setContext($name, $data);
-        }
-
         foreach (array_merge(self::$globalEventProcessors, $this->eventProcessors) as $processor) {
-            $event = $processor($event, $payload);
+            $event = \call_user_func($processor, $event, $payload);
 
             if (null === $event) {
                 return null;

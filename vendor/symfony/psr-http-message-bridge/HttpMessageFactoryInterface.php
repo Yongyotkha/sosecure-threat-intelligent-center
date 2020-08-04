@@ -26,12 +26,16 @@ interface HttpMessageFactoryInterface
     /**
      * Creates a PSR-7 Request instance from a Symfony one.
      *
+     * @param Request $symfonyRequest
+     *
      * @return ServerRequestInterface
      */
     public function createRequest(Request $symfonyRequest);
 
     /**
      * Creates a PSR-7 Response instance from a Symfony one.
+     *
+     * @param Response $symfonyResponse
      *
      * @return ResponseInterface
      */

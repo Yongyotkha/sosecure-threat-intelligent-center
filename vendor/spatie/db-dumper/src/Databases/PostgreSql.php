@@ -3,16 +3,13 @@
 namespace Spatie\DbDumper\Databases;
 
 use Spatie\DbDumper\DbDumper;
-use Spatie\DbDumper\Exceptions\CannotStartDump;
 use Symfony\Component\Process\Process;
+use Spatie\DbDumper\Exceptions\CannotStartDump;
 
 class PostgreSql extends DbDumper
 {
     /** @var bool */
     protected $useInserts = false;
-
-    /** @var bool */
-    protected $createTables = true;
 
     public function __construct()
     {
@@ -65,10 +62,8 @@ class PostgreSql extends DbDumper
      */
     public function getDumpCommand(string $dumpFile): string
     {
-        $quote = $this->determineQuote();
-
         $command = [
-            "{$quote}{$this->dumpBinaryPath}pg_dump{$quote}",
+            "'{$this->dumpBinaryPath}pg_dump'",
             "-U {$this->userName}",
             '-h '.($this->socket === '' ? $this->host : $this->socket),
             "-p {$this->port}",
@@ -76,10 +71,6 @@ class PostgreSql extends DbDumper
 
         if ($this->useInserts) {
             $command[] = '--inserts';
-        }
-
-        if (! $this->createTables) {
-            $command[] = '--data-only';
         }
 
         foreach ($this->extraOptions as $extraOption) {
@@ -125,15 +116,5 @@ class PostgreSql extends DbDumper
             'PGPASSFILE' => $temporaryCredentialsFile,
             'PGDATABASE' => $this->dbName,
         ];
-    }
-
-    /**
-     * @return $this
-     */
-    public function doNotCreateTables()
-    {
-        $this->createTables = false;
-
-        return $this;
     }
 }

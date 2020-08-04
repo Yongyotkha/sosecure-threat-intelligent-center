@@ -39,7 +39,7 @@ class SubscriptionBuilder
     /**
      * The date and time the trial will expire.
      *
-     * @var \Carbon\Carbon|\Carbon\CarbonInterface
+     * @var \Carbon\Carbon
      */
     protected $trialExpires;
 
@@ -115,10 +115,10 @@ class SubscriptionBuilder
     /**
      * Specify the ending date of the trial.
      *
-     * @param  \Carbon\Carbon|\Carbon\CarbonInterface  $trialUntil
+     * @param  \Carbon\Carbon  $trialUntil
      * @return $this
      */
-    public function trialUntil($trialUntil)
+    public function trialUntil(Carbon $trialUntil)
     {
         $this->trialExpires = $trialUntil;
 
