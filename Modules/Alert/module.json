@@ -1,0 +1,14 @@
+{
+    "name": "Alert",
+    "alias": "alert",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\Alert\\Providers\\AlertServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
