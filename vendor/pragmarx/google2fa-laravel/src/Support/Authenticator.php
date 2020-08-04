@@ -11,16 +11,21 @@ use PragmaRX\Google2FALaravel\Google2FA;
 
 class Authenticator extends Google2FA
 {
-    use ErrorBag;
-    use Input;
-    use Response;
-    use Session;
+    use ErrorBag, Input, Response;
+
     /**
      * The current password.
      *
      * @var
      */
     protected $password;
+
+    /**
+     * Flag to disable the session for API usage.
+     *
+     * @var
+     */
+    protected $stateless = false;
 
     /**
      * Authenticator constructor.
@@ -87,17 +92,23 @@ class Authenticator extends Google2FA
      */
     protected function getOneTimePassword()
     {
-        $password = $this->getInputOneTimePassword();
-
-        if (is_null($password) || empty($password)) {
+        if (is_null($password = $this->getInputOneTimePassword()) || empty($password)) {
             event(new EmptyOneTimePasswordReceived());
 
             if ($this->config('throw_exceptions', true)) {
-                throw new InvalidOneTimePassword(config('google2fa.error_messages.cannot_be_empty'));
+                throw new InvalidOneTimePassword('One Time Password cannot be empty.');
             }
         }
 
         return $password;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStateless()
+    {
+        return $this->stateless;
     }
 
     /**
@@ -107,7 +118,9 @@ class Authenticator extends Google2FA
      */
     public function isAuthenticated()
     {
-        return $this->canPassWithoutCheckingOTP() || ($this->checkOTP() === Constants::OTP_VALID);
+        return $this->canPassWithoutCheckingOTP()
+            ? true
+            : $this->checkOTP();
     }
 
     /**
@@ -125,29 +138,33 @@ class Authenticator extends Google2FA
     }
 
     /**
-     * Check if the input OTP is valid. Returns one of the possible OTP_STATUS codes:
-     * 'empty', 'valid' or 'invalid'.
+     * Check if the input OTP is valid.
      *
-     * @return string
+     * @return bool
      */
     protected function checkOTP()
     {
-        if (!$this->inputHasOneTimePassword() || empty($this->getInputOneTimePassword())) {
-            return Constants::OTP_EMPTY;
+        if (!$this->inputHasOneTimePassword()) {
+            return false;
         }
 
-        $isValid = $this->verifyOneTimePassword();
-
-        if ($isValid) {
+        if ($isValid = $this->verifyOneTimePassword()) {
             $this->login();
-            $this->fireLoginEvent($isValid);
-
-            return Constants::OTP_VALID;
         }
 
-        $this->fireLoginEvent($isValid);
+        return $this->fireLoginEvent($isValid);
+    }
 
-        return Constants::OTP_INVALID;
+    /**
+     * @param mixed $stateless
+     *
+     * @return Authenticator
+     */
+    public function setStateless($stateless = true)
+    {
+        $this->stateless = $stateless;
+
+        return $this;
     }
 
     /**

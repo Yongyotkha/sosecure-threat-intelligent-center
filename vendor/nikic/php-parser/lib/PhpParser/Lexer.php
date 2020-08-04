@@ -16,13 +16,7 @@ class Lexer
     protected $tokenMap;
     protected $dropTokens;
 
-    private $attributeStartLineUsed;
-    private $attributeEndLineUsed;
-    private $attributeStartTokenPosUsed;
-    private $attributeEndTokenPosUsed;
-    private $attributeStartFilePosUsed;
-    private $attributeEndFilePosUsed;
-    private $attributeCommentsUsed;
+    protected $usedAttributes;
 
     /**
      * Creates a Lexer.
@@ -34,42 +28,21 @@ class Lexer
      *                       first three. For more info see getNextToken() docs.
      */
     public function __construct(array $options = []) {
-        // Compatibility define for PHP < 7.4.
-        if (!defined('T_BAD_CHARACTER')) {
-            \define('T_BAD_CHARACTER', -1);
-        }
-
-        // Compatibility defines for PHP < 8.0.
-        if (!defined('T_NAME_QUALIFIED')) {
-            \define('T_NAME_QUALIFIED', -2);
-        }
-        if (!defined('T_NAME_FULLY_QUALIFIED')) {
-            \define('T_NAME_FULLY_QUALIFIED', -3);
-        }
-        if (!defined('T_NAME_RELATIVE')) {
-            \define('T_NAME_RELATIVE', -4);
-        }
-
-        // Create Map from internal tokens to PhpParser tokens.
+        // map from internal tokens to PhpParser tokens
         $this->tokenMap = $this->createTokenMap();
 
         // map of tokens to drop while lexing (the map is only used for isset lookup,
         // that's why the value is simply set to 1; the value is never actually used.)
         $this->dropTokens = array_fill_keys(
-            [\T_WHITESPACE, \T_OPEN_TAG, \T_COMMENT, \T_DOC_COMMENT, \T_BAD_CHARACTER], 1
+            [\T_WHITESPACE, \T_OPEN_TAG, \T_COMMENT, \T_DOC_COMMENT], 1
         );
 
-        $defaultAttributes = ['comments', 'startLine', 'endLine'];
-        $usedAttributes = array_fill_keys($options['usedAttributes'] ?? $defaultAttributes, true);
-
-        // Create individual boolean properties to make these checks faster.
-        $this->attributeStartLineUsed = isset($usedAttributes['startLine']);
-        $this->attributeEndLineUsed = isset($usedAttributes['endLine']);
-        $this->attributeStartTokenPosUsed = isset($usedAttributes['startTokenPos']);
-        $this->attributeEndTokenPosUsed = isset($usedAttributes['endTokenPos']);
-        $this->attributeStartFilePosUsed = isset($usedAttributes['startFilePos']);
-        $this->attributeEndFilePosUsed = isset($usedAttributes['endFilePos']);
-        $this->attributeCommentsUsed = isset($usedAttributes['comments']);
+        // the usedAttributes member is a map of the used attribute names to a dummy
+        // value (here "true")
+        $options += [
+            'usedAttributes' => ['comments', 'startLine', 'endLine'],
+        ];
+        $this->usedAttributes = array_fill_keys($options['usedAttributes'], true);
     }
 
     /**
@@ -100,7 +73,7 @@ class Lexer
 
         error_clear_last();
         $this->tokens = @token_get_all($code);
-        $this->postprocessTokens($errorHandler);
+        $this->handleErrors($errorHandler);
 
         if (false !== $scream) {
             ini_set('xdebug.scream', $scream);
@@ -108,9 +81,13 @@ class Lexer
     }
 
     private function handleInvalidCharacterRange($start, $end, $line, ErrorHandler $errorHandler) {
-        $tokens = [];
         for ($i = $start; $i < $end; $i++) {
             $chr = $this->code[$i];
+            if ($chr === 'b' || $chr === 'B') {
+                // HHVM does not treat b" tokens correctly, so ignore these
+                continue;
+            }
+
             if ($chr === "\0") {
                 // PHP cuts error message after null byte, so need special case
                 $errorMsg = 'Unexpected null byte';
@@ -120,7 +97,6 @@ class Lexer
                 );
             }
 
-            $tokens[] = [\T_BAD_CHARACTER, $chr, $line];
             $errorHandler->handleError(new Error($errorMsg, [
                 'startLine' => $line,
                 'endLine' => $line,
@@ -128,7 +104,6 @@ class Lexer
                 'endFilePos' => $i,
             ]));
         }
-        return $tokens;
     }
 
     /**
@@ -142,100 +117,43 @@ class Lexer
             && substr($token[1], -2) !== '*/';
     }
 
-    protected function postprocessTokens(ErrorHandler $errorHandler) {
+    /**
+     * Check whether an error *may* have occurred during tokenization.
+     *
+     * @return bool
+     */
+    private function errorMayHaveOccurred() : bool {
+        if (defined('HHVM_VERSION')) {
+            // In HHVM token_get_all() does not throw warnings, so we need to conservatively
+            // assume that an error occurred
+            return true;
+        }
+
+        return null !== error_get_last();
+    }
+
+    protected function handleErrors(ErrorHandler $errorHandler) {
+        if (!$this->errorMayHaveOccurred()) {
+            return;
+        }
+
         // PHP's error handling for token_get_all() is rather bad, so if we want detailed
         // error information we need to compute it ourselves. Invalid character errors are
         // detected by finding "gaps" in the token array. Unterminated comments are detected
         // by checking if a trailing comment has a "*/" at the end.
-        //
-        // Additionally, we canonicalize to the PHP 8 comment format here, which does not include
-        // the trailing whitespace anymore.
-        //
-        // We also canonicalize to the PHP 8 T_NAME_* tokens.
 
         $filePos = 0;
         $line = 1;
-        $numTokens = \count($this->tokens);
-        for ($i = 0; $i < $numTokens; $i++) {
-            $token = $this->tokens[$i];
-
-            // Since PHP 7.4 invalid characters are represented by a T_BAD_CHARACTER token.
-            // In this case we only need to emit an error.
-            if ($token[0] === \T_BAD_CHARACTER) {
-                $this->handleInvalidCharacterRange($filePos, $filePos + 1, $line, $errorHandler);
-            }
-
-            if ($token[0] === \T_COMMENT && substr($token[1], 0, 2) !== '/*'
-                    && preg_match('/(\r\n|\n|\r)$/D', $token[1], $matches)) {
-                $trailingNewline = $matches[0];
-                $token[1] = substr($token[1], 0, -strlen($trailingNewline));
-                $this->tokens[$i] = $token;
-                if (isset($this->tokens[$i + 1]) && $this->tokens[$i + 1][0] === \T_WHITESPACE) {
-                    // Move trailing newline into following T_WHITESPACE token, if it already exists.
-                    $this->tokens[$i + 1][1] = $trailingNewline . $this->tokens[$i + 1][1];
-                    $this->tokens[$i + 1][2]--;
-                } else {
-                    // Otherwise, we need to create a new T_WHITESPACE token.
-                    array_splice($this->tokens, $i + 1, 0, [
-                        [\T_WHITESPACE, $trailingNewline, $line],
-                    ]);
-                    $numTokens++;
-                }
-            }
-
-            // Emulate PHP 8 T_NAME_* tokens, by combining sequences of T_NS_SEPARATOR and T_STRING
-            // into a single token.
-            // TODO: Also handle reserved keywords in namespaced names.
-            if (\is_array($token)
-                    && ($token[0] === \T_NS_SEPARATOR || $token[0] === \T_STRING || $token[0] === \T_NAMESPACE)) {
-                $lastWasSeparator = $token[0] === \T_NS_SEPARATOR;
-                $text = $token[1];
-                for ($j = $i + 1; isset($this->tokens[$j]); $j++) {
-                    if ($lastWasSeparator) {
-                        if ($this->tokens[$j][0] !== \T_STRING) {
-                            break;
-                        }
-                        $lastWasSeparator = false;
-                    } else {
-                        if ($this->tokens[$j][0] !== \T_NS_SEPARATOR) {
-                            break;
-                        }
-                        $lastWasSeparator = true;
-                    }
-                    $text .= $this->tokens[$j][1];
-                }
-                if ($lastWasSeparator) {
-                    // Trailing separator is not part of the name.
-                    $j--;
-                    $text = substr($text, 0, -1);
-                }
-                if ($j > $i + 1) {
-                    if ($token[0] === \T_NS_SEPARATOR) {
-                        $type = \T_NAME_FULLY_QUALIFIED;
-                    } else if ($token[0] === \T_NAMESPACE) {
-                        $type = \T_NAME_RELATIVE;
-                    } else {
-                        $type = \T_NAME_QUALIFIED;
-                    }
-                    $token = [$type, $text, $line];
-                    array_splice($this->tokens, $i, $j - $i, [$token]);
-                    $numTokens -= $j - $i - 1;
-                }
-            }
-
+        foreach ($this->tokens as $token) {
             $tokenValue = \is_string($token) ? $token : $token[1];
             $tokenLen = \strlen($tokenValue);
 
             if (substr($this->code, $filePos, $tokenLen) !== $tokenValue) {
                 // Something is missing, must be an invalid character
                 $nextFilePos = strpos($this->code, $tokenValue, $filePos);
-                $badCharTokens = $this->handleInvalidCharacterRange(
+                $this->handleInvalidCharacterRange(
                     $filePos, $nextFilePos, $line, $errorHandler);
                 $filePos = (int) $nextFilePos;
-
-                array_splice($this->tokens, $i, 0, $badCharTokens);
-                $numTokens += \count($badCharTokens);
-                $i += \count($badCharTokens);
             }
 
             $filePos += $tokenLen;
@@ -258,9 +176,8 @@ class Lexer
                 $this->tokens[] = [$isDocComment ? \T_DOC_COMMENT : \T_COMMENT, $comment, $line];
             } else {
                 // Invalid characters at the end of the input
-                $badCharTokens = $this->handleInvalidCharacterRange(
+                $this->handleInvalidCharacterRange(
                     $filePos, \strlen($this->code), $line, $errorHandler);
-                $this->tokens = array_merge($this->tokens, $badCharTokens);
             }
             return;
         }
@@ -313,13 +230,13 @@ class Lexer
                 $token = "\0";
             }
 
-            if ($this->attributeStartLineUsed) {
+            if (isset($this->usedAttributes['startLine'])) {
                 $startAttributes['startLine'] = $this->line;
             }
-            if ($this->attributeStartTokenPosUsed) {
+            if (isset($this->usedAttributes['startTokenPos'])) {
                 $startAttributes['startTokenPos'] = $this->pos;
             }
-            if ($this->attributeStartFilePosUsed) {
+            if (isset($this->usedAttributes['startFilePos'])) {
                 $startAttributes['startFilePos'] = $this->filePos;
             }
 
@@ -345,33 +262,27 @@ class Lexer
                 $this->line += substr_count($value, "\n");
                 $this->filePos += \strlen($value);
             } else {
-                $origLine = $this->line;
-                $origFilePos = $this->filePos;
-                $this->line += substr_count($token[1], "\n");
-                $this->filePos += \strlen($token[1]);
-
                 if (\T_COMMENT === $token[0] || \T_DOC_COMMENT === $token[0]) {
-                    if ($this->attributeCommentsUsed) {
+                    if (isset($this->usedAttributes['comments'])) {
                         $comment = \T_DOC_COMMENT === $token[0]
-                            ? new Comment\Doc($token[1],
-                                $origLine, $origFilePos, $this->pos,
-                                $this->line, $this->filePos - 1, $this->pos)
-                            : new Comment($token[1],
-                                $origLine, $origFilePos, $this->pos,
-                                $this->line, $this->filePos - 1, $this->pos);
+                            ? new Comment\Doc($token[1], $this->line, $this->filePos, $this->pos)
+                            : new Comment($token[1], $this->line, $this->filePos, $this->pos);
                         $startAttributes['comments'][] = $comment;
                     }
                 }
+
+                $this->line += substr_count($token[1], "\n");
+                $this->filePos += \strlen($token[1]);
                 continue;
             }
 
-            if ($this->attributeEndLineUsed) {
+            if (isset($this->usedAttributes['endLine'])) {
                 $endAttributes['endLine'] = $this->line;
             }
-            if ($this->attributeEndTokenPosUsed) {
+            if (isset($this->usedAttributes['endTokenPos'])) {
                 $endAttributes['endTokenPos'] = $this->pos;
             }
-            if ($this->attributeEndFilePosUsed) {
+            if (isset($this->usedAttributes['endFilePos'])) {
                 $endAttributes['endFilePos'] = $this->filePos - 1;
             }
 
@@ -461,11 +372,6 @@ class Lexer
         if (defined('T_COMPILER_HALT_OFFSET')) {
             $tokenMap[\T_COMPILER_HALT_OFFSET] = Tokens::T_STRING;
         }
-
-        // Assign tokens for which we define compatibility constants, as token_name() does not know them.
-        $tokenMap[\T_NAME_QUALIFIED] = Tokens::T_NAME_QUALIFIED;
-        $tokenMap[\T_NAME_FULLY_QUALIFIED] = Tokens::T_NAME_FULLY_QUALIFIED;
-        $tokenMap[\T_NAME_RELATIVE] = Tokens::T_NAME_RELATIVE;
 
         return $tokenMap;
     }

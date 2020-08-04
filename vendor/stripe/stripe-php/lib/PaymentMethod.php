@@ -22,6 +22,7 @@ namespace Stripe;
  */
 class PaymentMethod extends ApiResource
 {
+
     const OBJECT_NAME = "payment_method";
 
     use ApiOperations\All;

@@ -265,6 +265,8 @@ final class Transcoder
      *
      * @param string $text        Text to decode
      * @param string $fromCharset Original charset
+     *
+     * @return string
      */
     public static function decode(string $text, string $fromCharset): string
     {
@@ -286,9 +288,7 @@ final class Transcoder
             $fromCharset = self::$charsetAliases[$lowercaseFromCharset];
         }
 
-        \set_error_handler(static function (): bool {
-            return true;
-        });
+        \set_error_handler(static function () {});
 
         $iconvDecodedText = \iconv($fromCharset, 'UTF-8', $text);
         if (false === $iconvDecodedText) {
@@ -303,11 +303,9 @@ final class Transcoder
 
         $errorMessage = null;
         $errorNumber  = 0;
-        \set_error_handler(static function ($nr, $message) use (&$errorMessage, &$errorNumber): bool {
+        \set_error_handler(static function ($nr, $message) use (&$errorMessage, &$errorNumber) {
             $errorMessage = $message;
             $errorNumber = $nr;
-
-            return true;
         });
 
         $decodedText = \mb_convert_encoding($text, 'UTF-8', $fromCharset);

@@ -12,19 +12,18 @@ abstract class BaseCollection extends \ArrayObject
     public $count;
 
     /**
-     * @var \stdClass
+     * @var object[]
      */
     public $_links;
 
     /**
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      */
     public function __construct($count, $_links)
     {
         $this->count = $count;
         $this->_links = $_links;
-        parent::__construct();
     }
 
     /**

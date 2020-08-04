@@ -7,9 +7,6 @@
 		<testsuite name="Transports">
 			<directory suffix=".php">Transport</directory>
 		</testsuite>
-		<testsuite name="Proxies">
-			<directory suffix=".php">Proxy</directory>
-		</testsuite>
 		<testsuite name="General">
 			<file>ChunkedEncoding.php</file>
 			<file>Cookies.php</file>
@@ -17,7 +14,6 @@
 			<file>IRI.php</file>
 			<file>Requests.php</file>
 			<file>Response/Headers.php</file>
-			<file>Session.php</file>
 			<file>SSL.php</file>
 		</testsuite>
 	</testsuites>

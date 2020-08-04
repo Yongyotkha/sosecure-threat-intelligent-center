@@ -13,10 +13,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * stores information about the operating system of the server.
  *
  * @author Stefano Arlandini <sarlandini@alice.it>
- *
- * @final since version 2.3
- *
- * @template-extends Context<string>
  */
 class ServerOsContext extends Context
 {
@@ -104,6 +100,8 @@ class ServerOsContext extends Context
 
     /**
      * Gets the name of the operating system.
+     *
+     * @return string
      */
     public function getName(): string
     {
@@ -122,6 +120,8 @@ class ServerOsContext extends Context
 
     /**
      * Gets the version of the operating system.
+     *
+     * @return string
      */
     public function getVersion(): string
     {
@@ -140,6 +140,8 @@ class ServerOsContext extends Context
 
     /**
      * Gets the build of the operating system.
+     *
+     * @return string
      */
     public function getBuild(): string
     {
@@ -158,6 +160,8 @@ class ServerOsContext extends Context
 
     /**
      * Gets the version of the kernel of the operating system.
+     *
+     * @return string
      */
     public function getKernelVersion(): string
     {

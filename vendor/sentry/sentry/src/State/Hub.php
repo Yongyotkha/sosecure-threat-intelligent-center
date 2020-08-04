@@ -7,7 +7,6 @@ namespace Sentry\State;
 use Sentry\Breadcrumb;
 use Sentry\ClientInterface;
 use Sentry\Integration\IntegrationInterface;
-use Sentry\SentrySdk;
 use Sentry\Severity;
 
 /**
@@ -26,6 +25,11 @@ final class Hub implements HubInterface
     private $lastEventId;
 
     /**
+     * @var HubInterface The hub that is set as the current one
+     */
+    private static $currentHub;
+
+    /**
      * Hub constructor.
      *
      * @param ClientInterface|null $client The client bound to the hub
@@ -33,7 +37,11 @@ final class Hub implements HubInterface
      */
     public function __construct(?ClientInterface $client = null, ?Scope $scope = null)
     {
-        $this->stack[] = new Layer($client, $scope ?? new Scope());
+        if (null === $scope) {
+            $scope = new Scope();
+        }
+
+        $this->stack[] = new Layer($client, $scope);
     }
 
     /**
@@ -182,7 +190,7 @@ final class Hub implements HubInterface
             return false;
         }
 
-        $breadcrumb = $beforeBreadcrumbCallback($breadcrumb);
+        $breadcrumb = \call_user_func($beforeBreadcrumbCallback, $breadcrumb);
 
         if (null !== $breadcrumb) {
             $this->getScope()->addBreadcrumb($breadcrumb, $maxBreadcrumbs);
@@ -196,9 +204,11 @@ final class Hub implements HubInterface
      */
     public static function getCurrent(): HubInterface
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 2.2 and will be removed in 3.0. Use SentrySdk::getCurrentHub() instead.', __METHOD__), E_USER_DEPRECATED);
+        if (null === self::$currentHub) {
+            self::$currentHub = new self();
+        }
 
-        return SentrySdk::getCurrentHub();
+        return self::$currentHub;
     }
 
     /**
@@ -206,9 +216,7 @@ final class Hub implements HubInterface
      */
     public static function setCurrent(HubInterface $hub): HubInterface
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 2.2 and will be removed in 3.0. Use SentrySdk::setCurrentHub() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        SentrySdk::setCurrentHub($hub);
+        self::$currentHub = $hub;
 
         return $hub;
     }
@@ -219,7 +227,6 @@ final class Hub implements HubInterface
     public function getIntegration(string $className): ?IntegrationInterface
     {
         $client = $this->getClient();
-
         if (null !== $client) {
             return $client->getIntegration($className);
         }
@@ -229,6 +236,8 @@ final class Hub implements HubInterface
 
     /**
      * Gets the scope bound to the top of the stack.
+     *
+     * @return Scope
      */
     private function getScope(): Scope
     {
@@ -237,6 +246,8 @@ final class Hub implements HubInterface
 
     /**
      * Gets the topmost client/layer pair in the stack.
+     *
+     * @return Layer
      */
     private function getStackTop(): Layer
     {

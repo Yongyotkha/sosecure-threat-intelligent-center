@@ -13,7 +13,6 @@ namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -21,7 +20,7 @@ use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
  */
 class PsrHttpFactoryTest extends AbstractHttpMessageFactoryTest
 {
-    protected function buildHttpMessageFactory(): HttpMessageFactoryInterface
+    protected function buildHttpMessageFactory()
     {
         $factory = new Psr17Factory();
 

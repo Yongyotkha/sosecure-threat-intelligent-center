@@ -1,14 +1,13 @@
 <?php
 /**
  * @see       https://github.com/zendframework/zend-diactoros for the canonical source repository
- * @copyright Copyright (c) 2015-2018 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2017 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types=1);
-
 namespace Zend\Diactoros;
 
+use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -76,19 +75,19 @@ class ServerRequest implements ServerRequestInterface
      * @param array $queryParams Query params for the message, if any.
      * @param null|array|object $parsedBody The deserialized body parameters, if any.
      * @param string $protocol HTTP protocol version.
-     * @throws Exception\InvalidArgumentException for any invalid value.
+     * @throws InvalidArgumentException for any invalid value.
      */
     public function __construct(
         array $serverParams = [],
         array $uploadedFiles = [],
         $uri = null,
-        string $method = null,
+        $method = null,
         $body = 'php://input',
         array $headers = [],
         array $cookies = [],
         array $queryParams = [],
         $parsedBody = null,
-        string $protocol = '1.1'
+        $protocol = '1.1'
     ) {
         $this->validateUploadedFiles($uploadedFiles);
 
@@ -108,7 +107,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getServerParams() : array
+    public function getServerParams()
     {
         return $this->serverParams;
     }
@@ -116,7 +115,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getUploadedFiles() : array
+    public function getUploadedFiles()
     {
         return $this->uploadedFiles;
     }
@@ -124,7 +123,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function withUploadedFiles(array $uploadedFiles) : ServerRequest
+    public function withUploadedFiles(array $uploadedFiles)
     {
         $this->validateUploadedFiles($uploadedFiles);
         $new = clone $this;
@@ -135,7 +134,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getCookieParams() : array
+    public function getCookieParams()
     {
         return $this->cookieParams;
     }
@@ -143,7 +142,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function withCookieParams(array $cookies) : ServerRequest
+    public function withCookieParams(array $cookies)
     {
         $new = clone $this;
         $new->cookieParams = $cookies;
@@ -153,7 +152,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getQueryParams() : array
+    public function getQueryParams()
     {
         return $this->queryParams;
     }
@@ -161,7 +160,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function withQueryParams(array $query) : ServerRequest
+    public function withQueryParams(array $query)
     {
         $new = clone $this;
         $new->queryParams = $query;
@@ -179,10 +178,10 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function withParsedBody($data) : ServerRequest
+    public function withParsedBody($data)
     {
         if (! is_array($data) && ! is_object($data) && null !== $data) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 '%s expects a null, array, or object argument; received %s',
                 __METHOD__,
                 gettype($data)
@@ -197,7 +196,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttributes() : array
+    public function getAttributes()
     {
         return $this->attributes;
     }
@@ -217,7 +216,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function withAttribute($attribute, $value) : ServerRequest
+    public function withAttribute($attribute, $value)
     {
         $new = clone $this;
         $new->attributes[$attribute] = $value;
@@ -227,7 +226,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function withoutAttribute($attribute) : ServerRequest
+    public function withoutAttribute($attribute)
     {
         $new = clone $this;
         unset($new->attributes[$attribute]);
@@ -235,11 +234,48 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
+     * Proxy to receive the request method.
+     *
+     * This overrides the parent functionality to ensure the method is never
+     * empty; if no method is present, it returns 'GET'.
+     *
+     * @return string
+     */
+    public function getMethod()
+    {
+        if (empty($this->method)) {
+            return 'GET';
+        }
+        return $this->method;
+    }
+
+    /**
+     * Set the request method.
+     *
+     * Unlike the regular Request implementation, the server-side
+     * normalizes the method to uppercase to ensure consistency
+     * and make checking the method simpler.
+     *
+     * This methods returns a new instance.
+     *
+     * @param string $method
+     * @return self
+     */
+    public function withMethod($method)
+    {
+        $this->validateMethod($method);
+        $new = clone $this;
+        $new->method = $method;
+        return $new;
+    }
+
+    /**
      * Recursively validate the structure in an uploaded files array.
      *
-     * @throws Exception\InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
+     * @param array $uploadedFiles
+     * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
      */
-    private function validateUploadedFiles(array $uploadedFiles) : void
+    private function validateUploadedFiles(array $uploadedFiles)
     {
         foreach ($uploadedFiles as $file) {
             if (is_array($file)) {
@@ -248,7 +284,7 @@ class ServerRequest implements ServerRequestInterface
             }
 
             if (! $file instanceof UploadedFileInterface) {
-                throw new Exception\InvalidArgumentException('Invalid leaf in uploaded files structure');
+                throw new InvalidArgumentException('Invalid leaf in uploaded files structure');
             }
         }
     }

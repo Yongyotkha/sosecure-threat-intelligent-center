@@ -20,8 +20,6 @@ use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Stream;
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\UploadedFile;
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Uri;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile as HttpFoundationUploadedFile;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,7 +32,7 @@ class HttpFoundationFactoryTest extends TestCase
     /** @var string */
     private $tmpDir;
 
-    public function setUp(): void
+    public function setup()
     {
         $this->factory = new HttpFoundationFactory();
         $this->tmpDir = sys_get_temp_dir();
@@ -82,28 +80,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals('France', $symfonyRequest->server->get('country'));
         $this->assertEquals('The body', $symfonyRequest->getContent());
         $this->assertEquals('1.0', $symfonyRequest->headers->get('X-Dunglas-API-Platform'));
-        $this->assertEquals(['a', 'b'], $symfonyRequest->headers->all('X-data'));
-    }
-
-    public function testCreateRequestWithStreamedBody()
-    {
-        $serverRequest = new ServerRequest(
-            '1.1',
-            [],
-            new Stream('The body'),
-            '/',
-            'GET',
-            null,
-            [],
-            [],
-            [],
-            [],
-            null,
-            []
-        );
-
-        $symfonyRequest = $this->factory->createRequest($serverRequest, true);
-        $this->assertEquals('The body', $symfonyRequest->getContent());
+        $this->assertEquals(['a', 'b'], $symfonyRequest->headers->get('X-data', null, false));
     }
 
     public function testCreateRequestWithNullParsedBody()
@@ -183,11 +160,12 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals('An uploaded file.', file_get_contents($this->tmpDir.'/'.$uniqid));
     }
 
+    /**
+     * @expectedException        \Symfony\Component\HttpFoundation\File\Exception\FileException
+     * @expectedExceptionMessage The file "e" could not be written on disk.
+     */
     public function testCreateUploadedFileWithError()
     {
-        $this->expectException(FileException::class);
-        $this->expectExceptionMessage('The file "e" could not be written on disk.');
-
         $uploadedFile = $this->createUploadedFile('Error.', UPLOAD_ERR_CANT_WRITE, 'e', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
 
@@ -196,7 +174,7 @@ class HttpFoundationFactoryTest extends TestCase
         $symfonyUploadedFile->move($this->tmpDir, 'shouldFail.txt');
     }
 
-    private function createUploadedFile($content, $error, $clientFileName, $clientMediaType): UploadedFile
+    private function createUploadedFile($content, $error, $clientFileName, $clientMediaType)
     {
         $filePath = tempnam($this->tmpDir, uniqid());
         file_put_contents($filePath, $content);
@@ -204,7 +182,7 @@ class HttpFoundationFactoryTest extends TestCase
         return new UploadedFile($filePath, filesize($filePath), $error, $clientFileName, $clientMediaType);
     }
 
-    private function callCreateUploadedFile(UploadedFileInterface $uploadedFile): HttpFoundationUploadedFile
+    private function callCreateUploadedFile(UploadedFileInterface $uploadedFile)
     {
         $reflection = new \ReflectionClass($this->factory);
         $createUploadedFile = $reflection->getMethod('createUploadedFile');

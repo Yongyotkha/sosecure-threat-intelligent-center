@@ -472,20 +472,15 @@ abstract class AbstractGrant implements GrantTypeInterface
      * @throws OAuthServerException
      * @throws UniqueTokenIdentifierConstraintViolationException
      *
-     * @return RefreshTokenEntityInterface|null
+     * @return RefreshTokenEntityInterface
      */
     protected function issueRefreshToken(AccessTokenEntityInterface $accessToken)
     {
+        $maxGenerationAttempts = self::MAX_RANDOM_TOKEN_GENERATION_ATTEMPTS;
+
         $refreshToken = $this->refreshTokenRepository->getNewRefreshToken();
-
-        if ($refreshToken === null) {
-            return null;
-        }
-
         $refreshToken->setExpiryDateTime((new DateTime())->add($this->refreshTokenTTL));
         $refreshToken->setAccessToken($accessToken);
-
-        $maxGenerationAttempts = self::MAX_RANDOM_TOKEN_GENERATION_ATTEMPTS;
 
         while ($maxGenerationAttempts-- > 0) {
             $refreshToken->setIdentifier($this->generateUniqueIdentifier());

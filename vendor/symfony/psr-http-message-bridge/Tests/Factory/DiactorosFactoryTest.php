@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
-use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -22,7 +21,7 @@ use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
  */
 class DiactorosFactoryTest extends AbstractHttpMessageFactoryTest
 {
-    protected function buildHttpMessageFactory(): HttpMessageFactoryInterface
+    protected function buildHttpMessageFactory()
     {
         if (!class_exists('Zend\Diactoros\ServerRequestFactory')) {
             $this->markTestSkipped('Zend Diactoros is not installed.');

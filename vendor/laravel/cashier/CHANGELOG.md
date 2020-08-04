@@ -1,46 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.6...9.0)
-
-
-## [v9.3.6 (2020-03-24)](https://github.com/laravel/cashier/compare/v9.3.5...v9.3.6)
-
-### Fixed
-- Add X-Vapor-Base64-Encode header ([#897](https://github.com/laravel/cashier/pull/897))
-
-
-## [v9.3.5 (2019-07-30)](https://github.com/laravel/cashier/compare/v9.3.4...v9.3.5)
-
-### Changed
-- Remove old 5.9 version constraints ([c7664fc](https://github.com/laravel/cashier/commit/c7664fc90d0310d6fa3a52bec45e94868bff995d))
-
-### Fixed
-- Don't try and find a user when stripeId is null ([#721](https://github.com/laravel/cashier/pull/721))
-
-
-## [v9.3.4 (2019-07-29)](https://github.com/laravel/cashier/compare/v9.3.3...v9.3.4)
-
-### Changed
-- Updated version constraints for Laravel 6.0 ([4a4c5c2](https://github.com/laravel/cashier/commit/4a4c5c226bb98aa0726f57bb5970115d3eaab377))
-
-
-## [v9.3.3 (2019-06-14)](https://github.com/laravel/cashier/compare/v9.3.2...v9.3.3)
-
-### Fixed
-- Fix hasStartingBalance and subtotal on `Invoice` ([#684](https://github.com/laravel/cashier/pull/684))
-
-
-## [v9.3.2 (2019-06-04)](https://github.com/laravel/cashier/compare/v9.3.1...v9.3.2)
-
-### Changed
-- `VerifyWebhookSignature` is no longer `final` ([260de04](https://github.com/laravel/cashier/commit/260de0458fc76708f90eb955ddddef0ee6d68798))
-- Remove strict type check for `trialUntil()` ([#678](https://github.com/laravel/cashier/pull/678))
-
-
-## [v9.3.1 (2019-05-07)](https://github.com/laravel/cashier/compare/v9.3.0...v9.3.1)
-
-### Fixed
-- Fixing `defaultCard()` exception when user is not a Stripe customer ([#660](https://github.com/laravel/cashier/pull/660))
+## [Unreleased](https://github.com/laravel/cashier/compare/v9.3.0...9.0)
 
 
 ## [v9.3.0 (2019-04-16)](https://github.com/laravel/cashier/compare/v9.2.1...v9.3.0)

@@ -50,8 +50,6 @@ class Builder
             'ambient-light-sensor',
             'autoplay',
             'camera',
-            'display-capture',
-            'document-domain',
             'encrypted-media',
             'fullscreen',
             'geolocation',
@@ -64,7 +62,7 @@ class Builder
             'speaker',
             'sync-xhr',
             'usb',
-            'vr',
+            'var',
         ];
 
         foreach ($directives as $directive) {
@@ -80,16 +78,12 @@ class Builder
                 $value = '*';
             } else {
                 if ($config[$directive]['self']) {
-                    $value .= " 'self'";
-                }
-
-                if ($config[$directive]['src'] ?? false) {
-                    $value .= " 'src'";
+                    $value = "'self'";
                 }
 
                 foreach ($config[$directive]['allow'] as $url) {
                     if (false !== ($url = filter_var($url, FILTER_SANITIZE_URL))) {
-                        $value .= " {$url}";
+                        $value = sprintf('%s %s', $value, $url);
                     }
                 }
             }
@@ -103,7 +97,7 @@ class Builder
             return [];
         }
 
-        return ['Feature-Policy' => trim(implode('; ', $headers))];
+        return ['Feature-Policy' => implode('; ', $headers)];
     }
 
     /**
@@ -159,11 +153,7 @@ class Builder
             ? 'Content-Security-Policy-Report-Only'
             : 'Content-Security-Policy';
 
-        $headers = array_filter($headers, function (string $header) {
-            return strlen(trim($header)) > 0;
-        });
-
-        return [$key => implode('; ', $headers)];
+        return [$key => implode('; ', array_filter($headers, 'strlen'))];
     }
 
     /**

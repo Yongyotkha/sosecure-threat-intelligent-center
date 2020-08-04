@@ -23,9 +23,9 @@ class VirtualAccount extends Entity
     {
         $relativeUrl = $this->getEntityUrl() . $this->id;
 
-        $data = array(
+        $data = [
             'status' => 'closed'
-        );
+        ];
 
         return $this->request('PATCH', $relativeUrl, $data);
     }

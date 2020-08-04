@@ -45,9 +45,12 @@ class NamedRange
      * Create a new NamedRange.
      *
      * @param string $pName
+     * @param Worksheet $pWorksheet
      * @param string $pRange
      * @param bool $pLocalOnly
      * @param null|Worksheet $pScope Scope. Only applies when $pLocalOnly = true. Null for global scope.
+     *
+     * @throws Exception
      */
     public function __construct($pName, Worksheet $pWorksheet, $pRange = 'A1', $pLocalOnly = false, $pScope = null)
     {
@@ -79,7 +82,7 @@ class NamedRange
      *
      * @param string $value
      *
-     * @return $this
+     * @return NamedRange
      */
     public function setName($value)
     {
@@ -120,9 +123,9 @@ class NamedRange
      *
      * @param Worksheet $value
      *
-     * @return $this
+     * @return NamedRange
      */
-    public function setWorksheet(?Worksheet $value = null)
+    public function setWorksheet(Worksheet $value = null)
     {
         if ($value !== null) {
             $this->worksheet = $value;
@@ -146,7 +149,7 @@ class NamedRange
      *
      * @param string $value
      *
-     * @return $this
+     * @return NamedRange
      */
     public function setRange($value)
     {
@@ -172,7 +175,7 @@ class NamedRange
      *
      * @param bool $value
      *
-     * @return $this
+     * @return NamedRange
      */
     public function setLocalOnly($value)
     {
@@ -195,9 +198,11 @@ class NamedRange
     /**
      * Set scope.
      *
-     * @return $this
+     * @param null|Worksheet $value
+     *
+     * @return NamedRange
      */
-    public function setScope(?Worksheet $value = null)
+    public function setScope(Worksheet $value = null)
     {
         $this->scope = $value;
         $this->localOnly = $value != null;

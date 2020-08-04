@@ -3,22 +3,18 @@
 namespace NumberToWords;
 
 use NumberToWords\CurrencyTransformer\CurrencyTransformer;
-use NumberToWords\CurrencyTransformer\GeorgianCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\GermanCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\DanishCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\EnglishCurrencyTransformer;
-use NumberToWords\CurrencyTransformer\LithuanianCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\PolishCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\PortugueseBrazilianCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\RomanianCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\RussianCurrencyTransformer;
-use NumberToWords\CurrencyTransformer\SlovakCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\SpanishCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\TurkmenCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\TurkishCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\UkrainianCurrencyTransformer;
 use NumberToWords\CurrencyTransformer\FrenchCurrencyTransformer;
-use NumberToWords\CurrencyTransformer\YorubaCurrencyTransformer;
 use NumberToWords\NumberTransformer\BulgarianNumberTransformer;
 use NumberToWords\NumberTransformer\CzechNumberTransformer;
 use NumberToWords\NumberTransformer\DanishNumberTransformer;
@@ -27,7 +23,6 @@ use NumberToWords\NumberTransformer\EnglishNumberTransformer;
 use NumberToWords\NumberTransformer\EstonianNumberTransformer;
 use NumberToWords\NumberTransformer\FrenchBelgianNumberTransformer;
 use NumberToWords\NumberTransformer\FrenchNumberTransformer;
-use NumberToWords\NumberTransformer\GeorgianNumberTransformer;
 use NumberToWords\NumberTransformer\GermanNumberTransformer;
 use NumberToWords\NumberTransformer\HungarianNumberTransformer;
 use NumberToWords\NumberTransformer\IndonesianNumberTransformer;
@@ -40,13 +35,11 @@ use NumberToWords\NumberTransformer\NumberTransformer;
 use NumberToWords\NumberTransformer\PortugueseBrazilianNumberTransformer;
 use NumberToWords\NumberTransformer\RomanianNumberTransformer;
 use NumberToWords\NumberTransformer\RussianNumberTransformer;
-use NumberToWords\NumberTransformer\SlovakNumberTransformer;
 use NumberToWords\NumberTransformer\SpanishNumberTransformer;
 use NumberToWords\NumberTransformer\SwedishNumberTransformer;
 use NumberToWords\NumberTransformer\TurkishNumberTransformer;
 use NumberToWords\NumberTransformer\TurkmenNumberTransformer;
 use NumberToWords\NumberTransformer\UkrainianNumberTransformer;
-use NumberToWords\NumberTransformer\YorubaNumberTransformer;
 
 class NumberToWords
 {
@@ -71,13 +64,10 @@ class NumberToWords
         'pt_BR' => PortugueseBrazilianNumberTransformer::class,
         'ro' => RomanianNumberTransformer::class,
         'ru' => RussianNumberTransformer::class,
-        'sk' => SlovakNumberTransformer::class,
         'sv' => SwedishNumberTransformer::class,
         'tk' => TurkmenNumberTransformer::class,
         'tr' => TurkishNumberTransformer::class,
-        'ua' => UkrainianNumberTransformer::class,
-        'ka' => GeorgianNumberTransformer::class,
-        'yo' => YorubaNumberTransformer::class,
+        'ua' => UkrainianNumberTransformer::class
     ];
 
     private $currencyTransformers = [
@@ -87,17 +77,13 @@ class NumberToWords
         'es' => SpanishCurrencyTransformer::class,
         'fr' => FrenchCurrencyTransformer::class,
         'hu' => HungarianNumberTransformer::class,
-        'ka' => GeorgianCurrencyTransformer::class,
-        'lt' => LithuanianCurrencyTransformer::class,
         'pl' => PolishCurrencyTransformer::class,
         'pt_BR' => PortugueseBrazilianCurrencyTransformer::class,
         'ro' => RomanianCurrencyTransformer::class,
         'ru' => RussianCurrencyTransformer::class,
-        'sk' => SlovakCurrencyTransformer::class,
         'tk' => TurkmenCurrencyTransformer::class,
         'tr' => TurkishCurrencyTransformer::class,
-        'ua' => UkrainianCurrencyTransformer::class,
-        'yo' => YorubaCurrencyTransformer::class
+        'ua' => UkrainianCurrencyTransformer::class
     ];
 
     /**

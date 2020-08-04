@@ -6,7 +6,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Invoice;
 use Mollie\Api\Resources\InvoiceCollection;
 
-class InvoiceEndpoint extends CollectionEndpointAbstract
+class InvoiceEndpoint extends EndpointAbstract
 {
     protected $resourcePath = "invoices";
 
@@ -24,7 +24,7 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
      * Get the collection object that is used by this API. Every API uses one type of collection object.
      *
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      *
      * @return \Mollie\Api\Resources\BaseCollection
      */
