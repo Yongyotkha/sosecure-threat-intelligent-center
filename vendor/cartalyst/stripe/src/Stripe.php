@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.2.0
+ * @version    2.4.2
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2019, Cartalyst LLC
- * @link       http://cartalyst.com
+ * @copyright  (c) 2011-2020, Cartalyst LLC
+ * @link       https://cartalyst.com
  */
 
 namespace Cartalyst\Stripe;
@@ -29,7 +29,7 @@ class Stripe
      *
      * @var string
      */
-    const VERSION = '2.1.4';
+    const VERSION = '2.4.2';
 
     /**
      * The Config repository instance.
@@ -172,6 +172,30 @@ class Stripe
         $this->config->setAccountId($accountId);
 
         return $this;
+    }
+
+    /**
+     * Returns the application's information.
+     *
+     * @return array|null
+     */
+    public function getAppInfo()
+    {
+        return $this->config->getAppInfo();
+    }
+
+    /**
+     * Sets the application's information.
+     *
+     * @param string $appName
+     * @param string $appVersion
+     * @param string $appUrl
+     * @param string $appPartnerId
+     * @return $this
+     */
+    public function setAppInfo($appName, $appVersion = null, $appUrl = null, $appPartnerId = null)
+    {
+        return $this->config->setAppInfo($appName, $appVersion, $appUrl, $appPartnerId);
     }
 
     /**

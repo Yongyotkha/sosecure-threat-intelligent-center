@@ -22,7 +22,7 @@ class Method extends BaseResource
      * An object containing value and currency. It represents the minimum payment amount required to use this
      * payment method.
      *
-     * @var object
+     * @var \stdClass
      */
     public $minimumAmount;
 
@@ -30,14 +30,14 @@ class Method extends BaseResource
      * An object containing value and currency. It represents the maximum payment amount allowed when using this
      * payment method.
      *
-     * @var object
+     * @var \stdClass
      */
     public $maximumAmount;
 
     /**
      * The $image->size1x and $image->size2x to display the payment method logo.
      *
-     * @var object
+     * @var \stdClass
      */
     public $image;
 
@@ -58,7 +58,14 @@ class Method extends BaseResource
     public $pricing;
 
     /**
-     * @var object[]
+     * The activation status the method is in.
+     *
+     * @var string
+     */
+    public $status;
+
+    /**
+     * @var \stdClass
      */
     public $_links;
 
@@ -71,8 +78,8 @@ class Method extends BaseResource
     {
         return ResourceFactory::createBaseResourceCollection(
             $this->client,
-            $this->issuers,
-            Issuer::class
+            Issuer::class,
+            $this->issuers
         );
     }
 
@@ -85,8 +92,8 @@ class Method extends BaseResource
     {
         return ResourceFactory::createBaseResourceCollection(
             $this->client,
-            $this->pricing,
-            MethodPrice::class
+            MethodPrice::class,
+            $this->pricing
         );
     }
 }

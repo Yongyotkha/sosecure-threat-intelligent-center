@@ -68,13 +68,13 @@ https://developer.paypal.com/docs/classic/api/apiCredentials/#create-an-api-sign
 composer require srmklive/paypal:~1.0
 ```
 
-* Add the service provider to your `$providers` array in `config/app.php` file like: 
+* Add the service provider to your `providers[]` array in `config/app.php` file like: 
 
 ```php
 Srmklive\PayPal\Providers\PayPalServiceProvider::class
 ```
 
-* Add the alias to your `$aliases` array in `config/app.php` file like: 
+* Add the alias to your `aliases[]` array in `config/app.php` file like: 
 
 ```php
 'PayPal' => Srmklive\PayPal\Facades\PayPal::class
@@ -196,11 +196,13 @@ $data['items'] = [
     [
         'name' => 'Product 1',
         'price' => 9.99,
+        'desc'  => 'Description for product 1'
         'qty' => 1
     ],
     [
         'name' => 'Product 2',
         'price' => 4.99,
+        'desc'  => 'Description for product 2',
         'qty' => 2
     ]
 ];

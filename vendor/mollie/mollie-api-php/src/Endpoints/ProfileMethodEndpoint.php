@@ -7,7 +7,7 @@ use Mollie\Api\Resources\MethodCollection;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\ResourceFactory;
 
-class ProfileMethodEndpoint extends EndpointAbstract
+class ProfileMethodEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "profiles_methods";
 
@@ -25,7 +25,7 @@ class ProfileMethodEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return MethodCollection()
      */

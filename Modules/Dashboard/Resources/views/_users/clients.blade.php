@@ -1,6 +1,4 @@
 <aside class="b-l bg" id="">
-    
-    
     <section class="scrollable">
         <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
             <section class="padder">
@@ -47,12 +45,7 @@
                                 <span class="h4 block m-t-xs text-dark">{{ Auth::user()->profile->company > 0 ? formatCurrency(get_option('default_currency'), Auth::user()->profile->business->creditBalance()) : 'N/A' }}</span>
                             </a>
                         </div>
-                        
                     </div>
-
-
-
-
 
 
             <section class="panel panel-default">

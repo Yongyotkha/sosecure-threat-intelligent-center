@@ -6,7 +6,7 @@ use Mollie\Api\Resources\Chargeback;
 use Mollie\Api\Resources\ChargebackCollection;
 use Mollie\Api\Resources\Payment;
 
-class PaymentChargebackEndpoint extends EndpointAbstract
+class PaymentChargebackEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "payments_chargebacks";
 
@@ -24,7 +24,7 @@ class PaymentChargebackEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return ChargebackCollection
      */
