@@ -32,7 +32,7 @@
                 
             </aside>
 
-            {{-- <aside class="aside-lg b-l">
+            <aside class="aside-lg b-l">
                 <section class="vbox">
                     
                     <section class="scrollable" id="feeds">
@@ -46,4 +46,4 @@
                 </section>
                     
                 </section>
-            </aside> --}}
+            </aside>

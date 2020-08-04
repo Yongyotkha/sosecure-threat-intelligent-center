@@ -20,10 +20,11 @@ use SebastianBerc\Repositories\Traits\Filterable;
 use SebastianBerc\Repositories\Traits\Sortable;
 
 /**
- * Class Repositories.
+ * Class Repositories
  *
  * @author    Sebastian Berć <sebastian.berc@gmail.com>
  * @copyright Copyright (c) Sebastian Berć
+ * @package   SebastianBerc\Repositories
  */
 abstract class Repository implements RepositoryInterface
 {
@@ -101,7 +102,7 @@ abstract class Repository implements RepositoryInterface
      */
     public function mediator(array $parameters)
     {
-        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]["function"];
 
         if ($this->shouldCache()) {
             return $this->mediator->cache($caller, $parameters);
@@ -115,9 +116,8 @@ abstract class Repository implements RepositoryInterface
      *
      * @param CriteriaInterface|null $criteria
      *
-     * @throws InvalidCriteria
-     *
      * @return CriteriaService|$this
+     * @throws InvalidCriteria
      */
     public function criteria($criteria = null)
     {
@@ -126,7 +126,7 @@ abstract class Repository implements RepositoryInterface
         }
 
         if (!is_null($criteria) && !is_a($criteria, CriteriaInterface::class)) {
-            throw new InvalidCriteria();
+            throw new InvalidCriteria;
         }
 
         $this->mediator->criteria()->addCriteria($criteria);
@@ -144,9 +144,8 @@ abstract class Repository implements RepositoryInterface
     /**
      * Return instance of Eloquent model.
      *
-     * @throws InvalidRepositoryModel
-     *
      * @return Eloquent
+     * @throws InvalidRepositoryModel
      */
     public function makeModel()
     {
@@ -196,9 +195,8 @@ abstract class Repository implements RepositoryInterface
      *
      * @param string $transformer
      *
-     * @throws InvalidTransformer
-     *
      * @return static
+     * @throws InvalidTransformer
      */
     public function setTransformer($transformer)
     {
@@ -282,7 +280,7 @@ abstract class Repository implements RepositoryInterface
      *
      * @param int $identifier
      *
-     * @return bool|null
+     * @return boolean|null
      */
     public function delete($identifier)
     {
@@ -389,9 +387,8 @@ abstract class Repository implements RepositoryInterface
      * @param string $method
      * @param array  $parameters
      *
-     * @throws InvalidRepositoryModel
-     *
      * @return mixed
+     * @throws InvalidRepositoryModel
      */
     public function __call($method, $parameters)
     {

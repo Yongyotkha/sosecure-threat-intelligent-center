@@ -3,10 +3,10 @@
 namespace Laravel\Cashier;
 
 use Carbon\Carbon;
-use DateTimeInterface;
-use Illuminate\Database\Eloquent\Model;
 use LogicException;
+use DateTimeInterface;
 use Stripe\Error\Card as StripeCard;
+use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
 {

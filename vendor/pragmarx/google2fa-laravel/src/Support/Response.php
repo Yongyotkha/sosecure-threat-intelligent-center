@@ -32,15 +32,10 @@ trait Response
      */
     protected function makeStatusCode()
     {
-        if ($this->getRequest()->isMethod('get') || ($this->checkOTP() === Constants::OTP_VALID)) {
-            return SymfonyResponse::HTTP_OK;
-        }
-
-        if ($this->checkOTP() === Constants::OTP_EMPTY) {
-            return SymfonyResponse::HTTP_BAD_REQUEST;
-        }
-
-        return SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY;
+        return
+            $this->inputHasOneTimePassword() && !$this->checkOTP()
+                ? SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY
+                : SymfonyResponse::HTTP_OK;
     }
 
     /**

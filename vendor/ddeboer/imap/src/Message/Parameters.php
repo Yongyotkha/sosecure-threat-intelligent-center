@@ -14,6 +14,9 @@ class Parameters extends \ArrayIterator
         'filename*' => 'filename',
     ];
 
+    /**
+     * @param array $parameters
+     */
     public function __construct(array $parameters = [])
     {
         parent::__construct();
@@ -21,6 +24,9 @@ class Parameters extends \ArrayIterator
         $this->add($parameters);
     }
 
+    /**
+     * @param array $parameters
+     */
     public function add(array $parameters = []): void
     {
         foreach ($parameters as $parameter) {
@@ -34,6 +40,8 @@ class Parameters extends \ArrayIterator
     }
 
     /**
+     * @param string $key
+     *
      * @return mixed
      */
     public function get(string $key)
@@ -43,6 +51,10 @@ class Parameters extends \ArrayIterator
 
     /**
      * Decode value.
+     *
+     * @param string $value
+     *
+     * @return string
      */
     final protected function decode(string $value): string
     {

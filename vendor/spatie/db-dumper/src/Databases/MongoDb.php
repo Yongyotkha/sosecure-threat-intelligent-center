@@ -3,8 +3,8 @@
 namespace Spatie\DbDumper\Databases;
 
 use Spatie\DbDumper\DbDumper;
-use Spatie\DbDumper\Exceptions\CannotStartDump;
 use Symfony\Component\Process\Process;
+use Spatie\DbDumper\Exceptions\CannotStartDump;
 
 class MongoDb extends DbDumper
 {
@@ -83,12 +83,10 @@ class MongoDb extends DbDumper
      *
      * @return string
      */
-    public function getDumpCommand(string $filename): string
+    public function getDumpCommand(string $filename) : string
     {
-        $quote = $this->determineQuote();
-
         $command = [
-            "{$quote}{$this->dumpBinaryPath}mongodump{$quote}",
+            "'{$this->dumpBinaryPath}mongodump'",
             "--db {$this->dbName}",
             '--archive',
         ];

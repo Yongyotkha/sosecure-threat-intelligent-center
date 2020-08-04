@@ -3,16 +3,15 @@
 namespace Spatie\Dropbox;
 
 use Exception;
-use GrahamCampbell\GuzzleFactory\GuzzleFactory;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\PumpStream;
 use GuzzleHttp\Psr7\StreamWrapper;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use GuzzleHttp\Client as GuzzleClient;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\ClientException;
 use Spatie\Dropbox\Exceptions\BadRequest;
+use GuzzleHttp\Exception\RequestException;
 
 class Client
 {
@@ -33,12 +32,6 @@ class Client
     /** @var string */
     protected $accessToken;
 
-    /** @var string */
-    protected $appKey;
-
-    /** @var string */
-    protected $appSecret;
-
     /** @var \GuzzleHttp\Client */
     protected $client;
 
@@ -49,21 +42,16 @@ class Client
     protected $maxUploadChunkRetries;
 
     /**
-     * @param string|array|null $accessTokenOrAppCredentials
+     * @param string $accessToken
      * @param GuzzleClient|null $client
      * @param int $maxChunkSize Set max chunk size per request (determines when to switch from "one shot upload" to upload session and defines chunk size for uploads via session).
      * @param int $maxUploadChunkRetries How many times to retry an upload session start or append after RequestException.
      */
-    public function __construct($accessTokenOrAppCredentials = null, GuzzleClient $client = null, int $maxChunkSize = self::MAX_CHUNK_SIZE, int $maxUploadChunkRetries = 0)
+    public function __construct(string $accessToken, GuzzleClient $client = null, int $maxChunkSize = self::MAX_CHUNK_SIZE, int $maxUploadChunkRetries = 0)
     {
-        if (is_array($accessTokenOrAppCredentials)) {
-            [$this->appKey, $this->appSecret] = $accessTokenOrAppCredentials;
-        }
-        if (is_string($accessTokenOrAppCredentials)) {
-            $this->accessToken = $accessTokenOrAppCredentials;
-        }
+        $this->accessToken = $accessToken;
 
-        $this->client = $client ?? new GuzzleClient(['handler' => GuzzleFactory::handler()]);
+        $this->client = $client ?? new GuzzleClient();
 
         $this->maxChunkSize = ($maxChunkSize < self::MAX_CHUNK_SIZE ? ($maxChunkSize > 1 ? $maxChunkSize : 1) : self::MAX_CHUNK_SIZE);
         $this->maxUploadChunkRetries = $maxUploadChunkRetries;
@@ -113,7 +101,7 @@ class Client
      *
      * @link https://www.dropbox.com/developers/documentation/http/documentation#sharing-create_shared_link_with_settings
      */
-    public function createSharedLinkWithSettings(string $path, array $settings = []): array
+    public function createSharedLinkWithSettings(string $path, array $settings = [])
     {
         $parameters = [
             'path' => $this->normalizePath($path),
@@ -124,21 +112,6 @@ class Client
         }
 
         return $this->rpcEndpointRequest('sharing/create_shared_link_with_settings', $parameters);
-    }
-
-    /**
-     * Search a file or folder in the user's Dropbox.
-     *
-     * @link https://www.dropbox.com/developers/documentation/http/documentation#files-search
-     */
-    public function search(string $query, bool $includeHighlights = false): array
-    {
-        $parameters = [
-            'query' => $query,
-            'include_highlights' => $includeHighlights,
-        ];
-
-        return $this->rpcEndpointRequest('files/search_v2', $parameters);
     }
 
     /**
@@ -198,28 +171,6 @@ class Client
         ];
 
         $response = $this->contentEndpointRequest('files/download', $arguments);
-
-        return StreamWrapper::getResource($response->getBody());
-    }
-
-    /**
-     * Download a folder from the user's Dropbox, as a zip file.
-     * The folder must be less than 20 GB in size and have fewer than 10,000 total files.
-     * The input cannot be a single file. Any single file must be less than 4GB in size.
-     *
-     * @param string $path
-     *
-     * @return resource
-     *
-     * @link https://www.dropbox.com/developers/documentation/http/documentation#files-download_zip
-     */
-    public function downloadZip(string $path)
-    {
-        $arguments = [
-            'path' => $this->normalizePath($path),
-        ];
-
-        $response = $this->contentEndpointRequest('files/download_zip', $arguments);
 
         return StreamWrapper::getResource($response->getBody());
     }
@@ -410,7 +361,7 @@ class Client
      * @param string $path
      * @param string|resource $contents
      * @param string $mode
-     * @param int|null $chunkSize
+     * @param int $chunkSize
      *
      * @return array
      */
@@ -570,7 +521,7 @@ class Client
      *
      * @link https://www.dropbox.com/developers/documentation/http/documentation#auth-token-revoke
      */
-    public function revokeToken(): void
+    public function revokeToken()
     {
         $this->rpcEndpointRequest('auth/token/revoke');
     }
@@ -697,31 +648,8 @@ class Client
      */
     protected function getHeaders(array $headers = []): array
     {
-        $auth = [];
-        if ($this->accessToken || ($this->appKey && $this->appSecret)) {
-            $auth = $this->accessToken ? $this->getHeadersForBearerToken() : $this->getHeadersForCredentials();
-        }
-
-        return array_merge($auth, $headers);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getHeadersForBearerToken()
-    {
-        return [
+        return array_merge([
             'Authorization' => "Bearer {$this->accessToken}",
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getHeadersForCredentials()
-    {
-        return [
-            'Authorization' => 'Basic '.base64_encode("{$this->appKey}:{$this->appSecret}"),
-        ];
+        ], $headers);
     }
 }

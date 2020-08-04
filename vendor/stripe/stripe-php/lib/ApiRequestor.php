@@ -205,7 +205,7 @@ class ApiRequestor
                     return new Error\Idempotency($msg, $rcode, $rbody, $resp, $rheaders);
                 }
 
-                // no break
+                // intentional fall-through
             case 404:
                 return new Error\InvalidRequest($msg, $param, $rcode, $rbody, $resp, $rheaders);
             case 401:

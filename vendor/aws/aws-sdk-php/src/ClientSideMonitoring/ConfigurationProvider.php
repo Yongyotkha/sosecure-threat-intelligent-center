@@ -1,10 +1,8 @@
 <?php
 namespace Aws\ClientSideMonitoring;
 
-use Aws\AbstractConfigurationProvider;
 use Aws\CacheInterface;
 use Aws\ClientSideMonitoring\Exception\ConfigurationException;
-use Aws\ConfigurationProviderInterface;
 use GuzzleHttp\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 
@@ -42,56 +40,110 @@ use GuzzleHttp\Promise\PromiseInterface;
  * $config = $promise->wait();
  * </code>
  */
-class ConfigurationProvider extends AbstractConfigurationProvider
-    implements ConfigurationProviderInterface
+class ConfigurationProvider
 {
+
+    const CACHE_KEY = 'aws_cached_csm_config';
     const DEFAULT_CLIENT_ID = '';
     const DEFAULT_ENABLED = false;
-    const DEFAULT_HOST = '127.0.0.1';
     const DEFAULT_PORT = 31000;
     const ENV_CLIENT_ID = 'AWS_CSM_CLIENT_ID';
     const ENV_ENABLED = 'AWS_CSM_ENABLED';
-    const ENV_HOST = 'AWS_CSM_HOST';
     const ENV_PORT = 'AWS_CSM_PORT';
     const ENV_PROFILE = 'AWS_PROFILE';
 
-    public static $cacheKey = 'aws_cached_csm_config';
+    /**
+     * Wraps a credential provider and saves provided credentials in an
+     * instance of Aws\CacheInterface. Forwards calls when no credentials found
+     * in cache and updates cache with the results.
+     *
+     * @param callable $provider Credentials provider function to wrap
+     * @param CacheInterface $cache Cache to store credentials
+     * @param string|null $cacheKey (optional) Cache key to use
+     *
+     * @return callable
+     */
+    public static function cache(
+        callable $provider,
+        CacheInterface $cache,
+        $cacheKey = null
+    ) {
+        $cacheKey = $cacheKey ?: self::CACHE_KEY;
 
-    protected static $interfaceClass = ConfigurationInterface::class;
-    protected static $exceptionClass = ConfigurationException::class;
+        return function () use ($provider, $cache, $cacheKey) {
+            $found = $cache->get($cacheKey);
+            if ($found instanceof ConfigurationInterface) {
+                return Promise\promise_for($found);
+            }
+
+            return $provider()
+                ->then(function (ConfigurationInterface $config) use (
+                    $cache,
+                    $cacheKey
+                ) {
+                    $cache->set(
+                        $cacheKey,
+                        $config
+                    );
+
+                    return $config;
+                });
+        };
+    }
 
     /**
-     * Create a default config provider that first checks for environment
-     * variables, then checks for a specified profile in the environment-defined
-     * config file location (env variable is 'AWS_CONFIG_FILE', file location
-     * defaults to ~/.aws/config), then checks for the "default" profile in the
-     * environment-defined config file location, and failing those uses a default
-     * fallback set of configuration options.
+     * Creates an aggregate credentials provider that invokes the provided
+     * variadic providers one after the other until a provider returns
+     * credentials.
+     *
+     * @return callable
+     */
+    public static function chain()
+    {
+        $links = func_get_args();
+        if (empty($links)) {
+            throw new \InvalidArgumentException('No providers in chain');
+        }
+
+        return function () use ($links) {
+            /** @var callable $parent */
+            $parent = array_shift($links);
+            $promise = $parent();
+            while ($next = array_shift($links)) {
+                $promise = $promise->otherwise($next);
+            }
+            return $promise;
+        };
+    }
+
+    /**
+     * Create a default CSM config provider that first checks for environment
+     * variables, then checks for a specified profile in ~/.aws/config, then
+     * checks for the "aws_csm" profile in ~/.aws/config, and failing those uses
+     * a default fallback set of configuration options.
      *
      * This provider is automatically wrapped in a memoize function that caches
      * previously provided config options.
      *
-     * @param array $config
+     * @param array $config Optional array of ecs/instance profile credentials
+     *                      provider options.
      *
      * @return callable
      */
     public static function defaultProvider(array $config = [])
     {
-        $configProviders = [self::env()];
-        if (
-            !isset($config['use_aws_shared_config_files'])
-            || $config['use_aws_shared_config_files'] != false
-        ) {
-            $configProviders[] = self::ini();
-        }
-        $configProviders[] = self::fallback();
+        $configProviders = [
+            self::env(),
+            self::ini(),
+            self::fallback()
+        ];
 
         $memo = self::memoize(
             call_user_func_array('self::chain', $configProviders)
         );
 
         if (isset($config['csm']) && $config['csm'] instanceof CacheInterface) {
-            return self::cache($memo, $config['csm'], self::$cacheKey);
+            return self::cache($memo, $config['csm'], self::CACHE_KEY);
         }
 
         return $memo;
@@ -111,7 +163,6 @@ class ConfigurationProvider extends AbstractConfigurationProvider
                 return Promise\promise_for(
                     new Configuration(
                         $enabled,
-                        getenv(self::ENV_HOST) ?: self::DEFAULT_HOST,
                         getenv(self::ENV_PORT) ?: self::DEFAULT_PORT,
                         getenv(self:: ENV_CLIENT_ID) ?: self::DEFAULT_CLIENT_ID
                      )
@@ -119,8 +170,8 @@ class ConfigurationProvider extends AbstractConfigurationProvider
             }
 
             return self::reject('Could not find environment variable CSM config'
-                . ' in ' . self::ENV_ENABLED. '/' . self::ENV_HOST . '/'
-                . self::ENV_PORT . '/' . self::ENV_CLIENT_ID);
+                . ' in ' . self::ENV_ENABLED. '/' . self::ENV_PORT . '/'
+                . self::ENV_CLIENT_ID);
         };
     }
 
@@ -135,7 +186,6 @@ class ConfigurationProvider extends AbstractConfigurationProvider
             return Promise\promise_for(
                 new Configuration(
                     self::DEFAULT_ENABLED,
-                    self::DEFAULT_HOST,
                     self::DEFAULT_PORT,
                     self::DEFAULT_CLIENT_ID
                 )
@@ -144,20 +194,38 @@ class ConfigurationProvider extends AbstractConfigurationProvider
     }
 
     /**
-     * Config provider that creates config using a config file whose location
-     * is specified by an environment variable 'AWS_CONFIG_FILE', defaulting to
-     * ~/.aws/config if not specified
+     * Gets the environment's HOME directory if available.
+     *
+     * @return null|string
+     */
+    private static function getHomeDir()
+    {
+        // On Linux/Unix-like systems, use the HOME environment variable
+        if ($homeDir = getenv('HOME')) {
+            return $homeDir;
+        }
+
+        // Get the HOMEDRIVE and HOMEPATH values for Windows hosts
+        $homeDrive = getenv('HOMEDRIVE');
+        $homePath = getenv('HOMEPATH');
+
+        return ($homeDrive && $homePath) ? $homeDrive . $homePath : null;
+    }
+
+    /**
+     * CSM config provider that creates CSM config using an ini file stored
+     * in the current user's home directory.
      *
      * @param string|null $profile  Profile to use. If not specified will use
-     *                              the "default" profile.
+     *                              the "aws_csm" profile in "~/.aws/config".
      * @param string|null $filename If provided, uses a custom filename rather
-     *                              than looking in the default directory.
+     *                              than looking in the home directory.
      *
      * @return callable
      */
     public static function ini($profile = null, $filename = null)
     {
-        $filename = $filename ?: (self::getDefaultConfigFilename());
+        $filename = $filename ?: (self::getHomeDir() . '/.aws/config');
         $profile = $profile ?: (getenv(self::ENV_PROFILE) ?: 'aws_csm');
 
         return function () use ($profile, $filename) {
@@ -176,11 +244,6 @@ class ConfigurationProvider extends AbstractConfigurationProvider
                     INI profile '{$profile}' ({$filename})");
             }
 
-            // host is optional
-            if (empty($data[$profile]['csm_host'])) {
-                $data[$profile]['csm_host'] = self::DEFAULT_HOST;
-            }
-
             // port is optional
             if (empty($data[$profile]['csm_port'])) {
                 $data[$profile]['csm_port'] = self::DEFAULT_PORT;
@@ -194,12 +257,57 @@ class ConfigurationProvider extends AbstractConfigurationProvider
             return Promise\promise_for(
                 new Configuration(
                     $data[$profile]['csm_enabled'],
-                    $data[$profile]['csm_host'],
                     $data[$profile]['csm_port'],
                     $data[$profile]['csm_client_id']
                 )
             );
         };
+    }
+
+    /**
+     * Wraps a CSM config provider and caches previously provided configuration.
+     *
+     * Ensures that cached configuration is refreshed when it expires.
+     *
+     * @param callable $provider CSM config provider function to wrap.
+     *
+     * @return callable
+     */
+    public static function memoize(callable $provider)
+    {
+        return function () use ($provider) {
+            static $result;
+            static $isConstant;
+
+            // Constant config will be returned constantly.
+            if ($isConstant) {
+                return $result;
+            }
+
+            // Create the initial promise that will be used as the cached value
+            // until it expires.
+            if (null === $result) {
+                $result = $provider();
+            }
+
+            // Return config and set flag that provider is already set
+            return $result
+                ->then(function (ConfigurationInterface $config) use (&$isConstant) {
+                    $isConstant = true;
+                    return $config;
+                });
+        };
+    }
+
+    /**
+     * Reject promise with standardized exception.
+     * 
+     * @param $msg
+     * @return Promise\RejectedPromise
+     */
+    private static function reject($msg)
+    {
+        return new Promise\RejectedPromise(new ConfigurationException($msg));
     }
 
     /**
@@ -223,11 +331,9 @@ class ConfigurationProvider extends AbstractConfigurationProvider
         } elseif (is_array($config) && isset($config['enabled'])) {
             $client_id = isset($config['client_id']) ? $config['client_id']
                 : self::DEFAULT_CLIENT_ID;
-            $host = isset($config['host']) ? $config['host']
-                : self::DEFAULT_HOST;
             $port = isset($config['port']) ? $config['port']
                 : self::DEFAULT_PORT;
-            return new Configuration($config['enabled'], $host, $port, $client_id);
+            return new Configuration($config['enabled'], $port, $client_id);
         }
 
         throw new \InvalidArgumentException('Not a valid CSM configuration '

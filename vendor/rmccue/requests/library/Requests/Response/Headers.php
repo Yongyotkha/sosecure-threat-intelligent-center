@@ -25,9 +25,8 @@ class Requests_Response_Headers extends Requests_Utility_CaseInsensitiveDictiona
 	 */
 	public function offsetGet($key) {
 		$key = strtolower($key);
-		if (!isset($this->data[$key])) {
+		if (!isset($this->data[$key]))
 			return null;
-		}
 
 		return $this->flatten($this->data[$key]);
 	}
@@ -62,9 +61,8 @@ class Requests_Response_Headers extends Requests_Utility_CaseInsensitiveDictiona
 	 */
 	public function getValues($key) {
 		$key = strtolower($key);
-		if (!isset($this->data[$key])) {
+		if (!isset($this->data[$key]))
 			return null;
-		}
 
 		return $this->data[$key];
 	}
@@ -79,9 +77,8 @@ class Requests_Response_Headers extends Requests_Utility_CaseInsensitiveDictiona
 	 * @return string Flattened value
 	 */
 	public function flatten($value) {
-		if (is_array($value)) {
+		if (is_array($value))
 			$value = implode(',', $value);
-		}
 
 		return $value;
 	}

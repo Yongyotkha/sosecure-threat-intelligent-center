@@ -19,28 +19,21 @@ class Entity extends Resource implements ArrayableInterface
     {
         $entityUrl = $this->getEntityUrl();
 
-        $this->validateIdPresence($id);
+        if ($id === null)
+        {
+            $path = explode('\\', get_class($this));
+            $class = strtolower(array_pop($path));
+
+            $message = 'The ' . $class . ' id provided is null';
+
+            $code = Errors\ErrorCode::BAD_REQUEST_ERROR;
+
+            throw new Errors\BadRequestError($message, $code, 500);
+        }
 
         $relativeUrl = $entityUrl . $id;
 
         return $this->request('GET', $relativeUrl);
-    }
-
-    protected function validateIdPresence($id)
-    {
-        if ($id !== null)
-        {
-            return;
-        }
-
-        $path = explode('\\', get_class($this));
-        $class = strtolower(array_pop($path));
-
-        $message = 'The ' . $class . ' id provided is null';
-
-        $code = Errors\ErrorCode::BAD_REQUEST_ERROR;
-
-        throw new Errors\BadRequestError($message, $code, 500);
     }
 
     protected function all($options = array())

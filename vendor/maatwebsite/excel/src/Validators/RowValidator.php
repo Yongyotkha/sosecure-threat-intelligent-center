@@ -2,12 +2,12 @@
 
 namespace Maatwebsite\Excel\Validators;
 
-use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException as IlluminateValidationException;
+use Illuminate\Contracts\Validation\Factory;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Exceptions\RowSkippedException;
+use Illuminate\Validation\ValidationException as IlluminateValidationException;
 
 class RowValidator
 {

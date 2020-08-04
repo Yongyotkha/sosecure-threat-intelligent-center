@@ -11,9 +11,7 @@ Develop:
 
 This package supercedes and replaces [phly/http](https://github.com/phly/http).
 
-`zend-diactoros` is a PHP package containing implementations of the
-[PSR-7 HTTP message interfaces](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-7-http-message.md)
-and [PSR-17 HTTP message factory interfaces](https://www.php-fig.org/psr/psr-17).
+`zend-diactoros` is a PHP package containing implementations of the [accepted PSR-7 HTTP message interfaces](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-7-http-message.md), as well as a "server" implementation similar to [node's http.Server](http://nodejs.org/api/http.html).
 
 * File issues at https://github.com/zendframework/zend-diactoros/issues
 * Issue patches to https://github.com/zendframework/zend-diactoros/pulls
@@ -22,9 +20,9 @@ and [PSR-17 HTTP message factory interfaces](https://www.php-fig.org/psr/psr-17)
 
 Documentation is available at:
 
-- https://docs.zendframework.com/zend-diactoros/
+- https://zendframework.github.io/zend-diactoros/
 
-Source files for documentation are [in the docs/ tree](docs/).
+Source files for documentation are [in the doc/ tree](doc/).
 
   [Master]: https://travis-ci.org/zendframework/zend-diactoros
   [Master image]: https://secure.travis-ci.org/zendframework/zend-diactoros.svg?branch=master

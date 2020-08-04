@@ -5,11 +5,6 @@ namespace Mollie\Api\Types;
 class PaymentMethod
 {
     /**
-     * @link https://www.mollie.com/en/payments/applepay
-     */
-    const APPLEPAY = "applepay";
-
-    /**
      * @link https://www.mollie.com/en/payments/bancontact
      */
     const BANCONTACT = "bancontact";
@@ -25,7 +20,7 @@ class PaymentMethod
     const BELFIUS = "belfius";
 
     /**
-     * @deprecated 2019-05-01
+     * @link https://www.mollie.com/en/payments/bitcoin
      */
     const BITCOIN = "bitcoin";
 
@@ -78,11 +73,6 @@ class PaymentMethod
      * @link https://www.mollie.com/en/payments/klarna-slice-it
      */
     const KLARNA_SLICE_IT = "klarnasliceit";
-
-    /**
-     * @link https://www.mollie.com/en/payments/mybank
-     */
-    const MYBANK = "mybank";
 
     /**
      * @link https://www.mollie.com/en/payments/paypal

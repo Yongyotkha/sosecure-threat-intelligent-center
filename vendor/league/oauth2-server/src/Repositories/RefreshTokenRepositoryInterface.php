@@ -20,7 +20,7 @@ interface RefreshTokenRepositoryInterface extends RepositoryInterface
     /**
      * Creates a new refresh token
      *
-     * @return RefreshTokenEntityInterface|null
+     * @return RefreshTokenEntityInterface
      */
     public function getNewRefreshToken();
 

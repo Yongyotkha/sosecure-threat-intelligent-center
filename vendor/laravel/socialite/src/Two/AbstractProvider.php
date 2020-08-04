@@ -3,10 +3,11 @@
 namespace Laravel\Socialite\Two;
 
 use GuzzleHttp\Client;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use GuzzleHttp\ClientInterface;
+use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Contracts\Provider as ProviderContract;
 
 abstract class AbstractProvider implements ProviderContract
@@ -155,7 +156,7 @@ abstract class AbstractProvider implements ProviderContract
     }
 
     /**
-     * Build the authentication URL for the provider from the given base URL.
+     * Get the authentication URL for the provider.
      *
      * @param  string  $url
      * @param  string  $state
@@ -257,9 +258,11 @@ abstract class AbstractProvider implements ProviderContract
      */
     public function getAccessTokenResponse($code)
     {
+        $postKey = (version_compare(ClientInterface::VERSION, '6') === 1) ? 'form_params' : 'body';
+
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],
-            'form_params' => $this->getTokenFields($code),
+            $postKey => $this->getTokenFields($code),
         ]);
 
         return json_decode($response->getBody(), true);

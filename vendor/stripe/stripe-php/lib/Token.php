@@ -19,6 +19,7 @@ namespace Stripe;
  */
 class Token extends ApiResource
 {
+
     const OBJECT_NAME = "token";
 
     use ApiOperations\Create;

@@ -2,11 +2,10 @@
 
 namespace Maatwebsite\Excel;
 
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 
 class Cell
 {
@@ -59,11 +58,7 @@ class Cell
             if ($this->cell->getValue() instanceof RichText) {
                 $value = $this->cell->getValue()->getPlainText();
             } elseif ($calculateFormulas) {
-                try {
-                    $value = $this->cell->getCalculatedValue();
-                } catch (Exception $e) {
-                    $value = $this->cell->getOldCalculatedValue();
-                }
+                $value = $this->cell->getCalculatedValue();
             } else {
                 $value = $this->cell->getValue();
             }

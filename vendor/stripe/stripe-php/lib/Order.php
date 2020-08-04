@@ -23,7 +23,7 @@ namespace Stripe;
  * @property Collection $returns
  * @property string $selected_shipping_method
  * @property mixed $shipping
- * @property array $shipping_methods
+ * @property mixed $shipping_methods
  * @property string $status
  * @property mixed $status_transitions
  * @property int $updated
@@ -33,6 +33,7 @@ namespace Stripe;
  */
 class Order extends ApiResource
 {
+
     const OBJECT_NAME = "order";
 
     use ApiOperations\All;

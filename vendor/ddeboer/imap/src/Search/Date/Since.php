@@ -14,6 +14,8 @@ final class Since extends AbstractDate
 {
     /**
      * Returns the keyword that the condition represents.
+     *
+     * @return string
      */
     protected function getKeyword(): string
     {

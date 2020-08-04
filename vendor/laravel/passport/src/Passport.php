@@ -2,12 +2,11 @@
 
 namespace Laravel\Passport;
 
-use Carbon\Carbon;
+use Mockery;
 use DateInterval;
+use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Route;
-use League\OAuth2\Server\ResourceServer;
-use Mockery;
 
 class Passport
 {
@@ -140,13 +139,6 @@ class Passport
     public static $unserializesCookies = false;
 
     /**
-     * Indicates the scope should inherit its parent scope.
-     *
-     * @var bool
-     */
-    public static $withInheritedScopes = false;
-
-    /**
      * Enable the implicit grant type.
      *
      * @return static
@@ -276,6 +268,8 @@ class Passport
             if (isset(static::$scopes[$id])) {
                 return new Scope($id, static::$scopes[$id]);
             }
+
+            return;
         })->filter()->values()->all();
     }
 
@@ -387,7 +381,7 @@ class Passport
      */
     public static function actingAs($user, $scopes = [], $guard = 'api')
     {
-        $token = Mockery::mock(self::tokenModel())->shouldIgnoreMissing(false);
+        $token = Mockery::mock(Passport::tokenModel())->shouldIgnoreMissing(false);
 
         foreach ($scopes as $scope) {
             $token->shouldReceive('can')->with($scope)->andReturn(true);
@@ -404,29 +398,6 @@ class Passport
         app('auth')->shouldUse($guard);
 
         return $user;
-    }
-
-    /**
-     * Set the current client for the application with the given scopes.
-     *
-     * @param  \Laravel\Passport\Client  $client
-     * @param  array  $scopes
-     * @return \Laravel\Passport\Client
-     */
-    public static function actingAsClient($client, $scopes = [])
-    {
-        $mock = Mockery::mock(ResourceServer::class);
-
-        $mock->shouldReceive('validateAuthenticatedRequest')
-            ->andReturnUsing(function ($request) use ($client, $scopes) {
-                return $request
-                    ->withAttribute('oauth_client_id', $client->id)
-                    ->withAttribute('oauth_scopes', $scopes);
-            });
-
-        app()->instance(ResourceServer::class, $mock);
-
-        return $client;
     }
 
     /**

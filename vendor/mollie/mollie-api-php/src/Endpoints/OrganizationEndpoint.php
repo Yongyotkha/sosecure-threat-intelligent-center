@@ -7,7 +7,7 @@ use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\Organization;
 use Mollie\Api\Resources\OrganizationCollection;
 
-class OrganizationEndpoint extends CollectionEndpointAbstract
+class OrganizationEndpoint extends EndpointAbstract
 {
     protected $resourcePath = "organizations";
 
@@ -23,7 +23,7 @@ class OrganizationEndpoint extends CollectionEndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param \stdClass $_links
+     * @param object[] $_links
      *
      * @return OrganizationCollection
      */

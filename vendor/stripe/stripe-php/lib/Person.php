@@ -35,6 +35,7 @@ namespace Stripe;
  */
 class Person extends ApiResource
 {
+
     const OBJECT_NAME = "person";
 
     use ApiOperations\Delete;
@@ -44,7 +45,7 @@ class Person extends ApiResource
      * Possible string representations of a person's gender.
      * @link https://stripe.com/docs/api/persons/object#person_object-gender
      */
-    const GENDER_MALE   = 'male';
+    const GENDER_MALE = 'male';
     const GENDER_FEMALE = 'female';
 
     /**

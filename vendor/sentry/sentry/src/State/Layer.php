@@ -38,6 +38,8 @@ final class Layer
 
     /**
      * Gets the client held by this layer.
+     *
+     * @return ClientInterface|null
      */
     public function getClient(): ?ClientInterface
     {
@@ -60,6 +62,8 @@ final class Layer
 
     /**
      * Gets the scope held by this layer.
+     *
+     * @return Scope
      */
     public function getScope(): Scope
     {

@@ -36,7 +36,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="{{ getAsset('css/theme.css') }}" type="text/css"/>
-    <link rel="stylesheet" href="{{ getAsset('css/custom.css') }}" type="text/css"/>
     
     <link rel="stylesheet" href="{{ getAsset('plugins/apps/pace.css') }}" type="text/css"/>
 

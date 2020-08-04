@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.4.2
+ * @version    2.2.0
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2020, Cartalyst LLC
- * @link       https://cartalyst.com
+ * @copyright  (c) 2011-2019, Cartalyst LLC
+ * @link       http://cartalyst.com
  */
 
 namespace Cartalyst\Stripe\Api;
@@ -31,9 +31,7 @@ class Subscriptions extends Api
      */
     public function create($customerId, array $parameters = [])
     {
-        $parameters['customer'] = $customerId;
-
-        return $this->_post('subscriptions', $parameters);
+        return $this->_post("customers/{$customerId}/subscriptions", $parameters);
     }
 
     /**
@@ -45,7 +43,7 @@ class Subscriptions extends Api
      */
     public function find($customerId, $subscriptionId)
     {
-        return $this->_get("subscriptions/{$subscriptionId}");
+        return $this->_get("customers/{$customerId}/subscriptions/{$subscriptionId}");
     }
 
     /**
@@ -58,7 +56,7 @@ class Subscriptions extends Api
      */
     public function update($customerId, $subscriptionId, array $parameters = [])
     {
-        return $this->_post("subscriptions/{$subscriptionId}", $parameters);
+        return $this->_post("customers/{$customerId}/subscriptions/{$subscriptionId}", $parameters);
     }
 
     /**
@@ -71,7 +69,7 @@ class Subscriptions extends Api
      */
     public function cancel($customerId, $subscriptionId, $atPeriodEnd = false)
     {
-        return $this->_delete("subscriptions/{$subscriptionId}", [
+        return $this->_delete("customers/{$customerId}/subscriptions/{$subscriptionId}", [
             'at_period_end' => (bool) $atPeriodEnd,
         ]);
     }
@@ -119,25 +117,20 @@ class Subscriptions extends Api
      */
     public function deleteDiscount($customerId, $subscriptionId)
     {
-        return $this->_delete("subscriptions/{$subscriptionId}/discount");
+        return $this->_delete("customers/{$customerId}/subscriptions/{$subscriptionId}/discount");
     }
 
     /**
-     * Lists all subscriptions for the given customer or
-     * all the subscriptions for the Stripe account.
+     * Lists all subscriptions from the given customer.
      *
-     * @param  string|null  $customerId
+     * @param  string  $customerId
      * @param  array  $parameters
      * @return array
      */
-    public function all($customerId = null, array $parameters = [])
+    public function all($customerId, array $parameters = [])
     {
-        if ($customerId !== null) {
-            $parameters = array_merge($parameters, [
-                'customer' => $customerId,
-            ]);
-        }
-
-        return $this->_get('subscriptions', $parameters);
+        return $this->_get('subscriptions', array_merge($parameters, [
+            'customer' => $customerId
+        ]));
     }
 }

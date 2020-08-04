@@ -5,8 +5,6 @@
  * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
  */
 
-declare(strict_types=1);
-
 namespace Zend\Diactoros;
 
 use function array_change_key_case;
@@ -27,17 +25,19 @@ use function substr;
  *
  * @param array $server SAPI parameters
  * @param array $headers HTTP request headers
+ * @return Uri
  */
-function marshalUriFromSapi(array $server, array $headers) : Uri
+function marshalUriFromSapi(array $server, array $headers)
 {
     /**
      * Retrieve a header value from an array of headers using a case-insensitive lookup.
      *
+     * @param string $name
      * @param array $headers Key/value header pairs
      * @param mixed $default Default value to return if header not found
      * @return mixed
      */
-    $getHeaderFromArray = function (string $name, array $headers, $default = null) {
+    $getHeaderFromArray = function ($name, array $headers, $default = null) {
         $header  = strtolower($name);
         $headers = array_change_key_case($headers, CASE_LOWER);
         if (array_key_exists($header, $headers)) {
@@ -51,10 +51,12 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
     /**
      * Marshal the host and port from HTTP headers and/or the PHP environment.
      *
+     * @param array $headers
+     * @param array $server
      * @return array Array of two items, host and port, in that order (can be
      *     passed to a list() operation).
      */
-    $marshalHostAndPort = function (array $headers, array $server) use ($getHeaderFromArray) : array {
+    $marshalHostAndPort = function (array $headers, array $server) use ($getHeaderFromArray) {
         /**
         * @param string|array $host
         * @return array Array of two items, host and port, in that order (can be
@@ -77,10 +79,13 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
         };
 
         /**
+        * @param array $server
+        * @param string $host
+        * @param null|int $port
         * @return array Array of two items, host and port, in that order (can be
         *     passed to a list() operation).
         */
-        $marshalIpv6HostAndPort = function (array $server, ?int $port) : array {
+        $marshalIpv6HostAndPort = function (array $server, $host, $port) {
             $host = '[' . $server['SERVER_ADDR'] . ']';
             $port = $port ?: 80;
             if ($port . ']' === substr($host, strrpos($host, ':') + 1)) {
@@ -93,14 +98,8 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
 
         static $defaults = ['', null];
 
-        $forwardedHost = $getHeaderFromArray('x-forwarded-host', $headers, false);
-        if ($forwardedHost !== false) {
-            return $marshalHostAndPortFromHeader($forwardedHost);
-        }
-
-        $host = $getHeaderFromArray('host', $headers, false);
-        if ($host !== false) {
-            return $marshalHostAndPortFromHeader($host);
+        if ($getHeaderFromArray('host', $headers, false)) {
+            return $marshalHostAndPortFromHeader($getHeaderFromArray('host', $headers));
         }
 
         if (! isset($server['SERVER_NAME'])) {
@@ -118,7 +117,7 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
 
         // Misinterpreted IPv6-Address
         // Reported for Safari on Windows
-        return $marshalIpv6HostAndPort($server, $port);
+        return $marshalIpv6HostAndPort($server, $host, $port);
     };
 
     /**
@@ -134,23 +133,26 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
      * From ZF2's Zend\Http\PhpEnvironment\Request class
      * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
      * @license   http://framework.zend.com/license/new-bsd New BSD License
+     *
+     * @param array $server SAPI environment array (typically `$_SERVER`)
+     * @return string Discovered path
      */
-    $marshalRequestPath = function (array $server) : string {
+    $marshalRequestPath = function (array $server) {
         // IIS7 with URL Rewrite: make sure we get the unencoded url
         // (double slash problem).
-        $iisUrlRewritten = $server['IIS_WasUrlRewritten'] ?? null;
-        $unencodedUrl    = $server['UNENCODED_URL'] ?? '';
+        $iisUrlRewritten = array_key_exists('IIS_WasUrlRewritten', $server) ? $server['IIS_WasUrlRewritten'] : null;
+        $unencodedUrl    = array_key_exists('UNENCODED_URL', $server) ? $server['UNENCODED_URL'] : '';
         if ('1' === $iisUrlRewritten && ! empty($unencodedUrl)) {
             return $unencodedUrl;
         }
 
-        $requestUri = $server['REQUEST_URI'] ?? null;
+        $requestUri = array_key_exists('REQUEST_URI', $server) ? $server['REQUEST_URI'] : null;
 
         if ($requestUri !== null) {
             return preg_replace('#^[^/:]+://[^/]+#', '', $requestUri);
         }
 
-        $origPathInfo = $server['ORIG_PATH_INFO'] ?? null;
+        $origPathInfo = array_key_exists('ORIG_PATH_INFO', $server) ? $server['ORIG_PATH_INFO'] : null;
         if (empty($origPathInfo)) {
             return '/';
         }
@@ -162,37 +164,22 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
 
     // URI scheme
     $scheme = 'http';
-    $marshalHttpsValue = function ($https) : bool {
-        if (is_bool($https)) {
-            return $https;
-        }
-
-        if (! is_string($https)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'SAPI HTTPS value MUST be a string or boolean; received %s',
-                gettype($https)
-            ));
-        }
-
-        return 'on' === strtolower($https);
-    };
     if (array_key_exists('HTTPS', $server)) {
-        $https = $marshalHttpsValue($server['HTTPS']);
+        $https = $server['HTTPS'];
     } elseif (array_key_exists('https', $server)) {
-        $https = $marshalHttpsValue($server['https']);
+        $https = $server['https'];
     } else {
         $https = false;
     }
-
-    if ($https
-        || strtolower($getHeaderFromArray('x-forwarded-proto', $headers, '')) === 'https'
+    if (($https && 'off' !== strtolower($https))
+        || strtolower($getHeaderFromArray('x-forwarded-proto', $headers, false)) === 'https'
     ) {
         $scheme = 'https';
     }
     $uri = $uri->withScheme($scheme);
 
     // Set the host
-    [$host, $port] = $marshalHostAndPort($headers, $server);
+    list($host, $port) = $marshalHostAndPort($headers, $server);
     if (! empty($host)) {
         $uri = $uri->withHost($host);
         if (! empty($port)) {
@@ -215,7 +202,7 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
     // URI fragment
     $fragment = '';
     if (strpos($path, '#') !== false) {
-        [$path, $fragment] = explode('#', $path, 2);
+        list($path, $fragment) = explode('#', $path, 2);
     }
 
     return $uri

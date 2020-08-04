@@ -2,24 +2,10 @@
 
 namespace League\HTMLToMarkdown\Converter;
 
-use League\HTMLToMarkdown\Configuration;
-use League\HTMLToMarkdown\ConfigurationAwareInterface;
 use League\HTMLToMarkdown\ElementInterface;
 
-class LinkConverter implements ConverterInterface, ConfigurationAwareInterface
+class LinkConverter implements ConverterInterface
 {
-    /**
-     * @var Configuration
-     */
-    protected $config;
-
-    /**
-     * @param Configuration $config
-     */
-    public function setConfig(Configuration $config) {
-        $this->config = $config;
-    }
-
     /**
      * @param ElementInterface $element
      *
@@ -38,9 +24,6 @@ class LinkConverter implements ConverterInterface, ConfigurationAwareInterface
         } elseif ($href === 'mailto:' . $text && $this->isValidEmail($text)) {
             $markdown = '<' . $text . '>';
         } else {
-            if (stristr($href, ' ')) {
-                $href = '<'.$href.'>';
-            }
             $markdown = '[' . $text . '](' . $href . ')';
         }
 
@@ -66,8 +49,7 @@ class LinkConverter implements ConverterInterface, ConfigurationAwareInterface
      */
     private function isValidAutolink($href)
     {
-        $useAutolinks = $this->config->getOption('use_autolinks');
-        return $useAutolinks && (preg_match('/^[A-Za-z][A-Za-z0-9.+-]{1,31}:[^<>\x00-\x20]*/i', $href) === 1);
+        return preg_match('/^[A-Za-z][A-Za-z0-9.+-]{1,31}:[^<>\x00-\x20]*/i', $href) === 1;
     }
 
     /**

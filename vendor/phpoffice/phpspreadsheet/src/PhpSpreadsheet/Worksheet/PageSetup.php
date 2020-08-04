@@ -76,6 +76,10 @@ use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
  * 67 = A3 transverse paper (297 mm by 420 mm)
  * 68 = A3 extra transverse paper (322 mm by 445 mm)
  * </code>
+ *
+ * @category   PhpSpreadsheet
+ *
+ * @copyright  Copyright (c) 2006 - 2016 PhpSpreadsheet (https://github.com/PHPOffice/PhpSpreadsheet)
  */
 class PageSetup
 {
@@ -176,7 +180,7 @@ class PageSetup
      * Print scaling. Valid values range from 10 to 400
      * This setting is overridden when fitToWidth and/or fitToHeight are in use
      *
-     * @var null|int
+     * @var int?
      */
     private $scale = 100;
 
@@ -192,7 +196,7 @@ class PageSetup
      * Fit To Height
      * Number of vertical pages to fit on.
      *
-     * @var null|int
+     * @var int?
      */
     private $fitToHeight = 1;
 
@@ -200,7 +204,7 @@ class PageSetup
      * Fit To Width
      * Number of horizontal pages to fit on.
      *
-     * @var null|int
+     * @var int?
      */
     private $fitToWidth = 1;
 
@@ -268,7 +272,7 @@ class PageSetup
      *
      * @param int $pValue see self::PAPERSIZE_*
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setPaperSize($pValue)
     {
@@ -292,7 +296,7 @@ class PageSetup
      *
      * @param string $pValue see self::ORIENTATION_*
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setOrientation($pValue)
     {
@@ -304,7 +308,7 @@ class PageSetup
     /**
      * Get Scale.
      *
-     * @return null|int
+     * @return int?
      */
     public function getScale()
     {
@@ -319,7 +323,9 @@ class PageSetup
      * @param null|int $pValue
      * @param bool $pUpdate Update fitToPage so scaling applies rather than fitToHeight / fitToWidth
      *
-     * @return $this
+     * @throws PhpSpreadsheetException
+     *
+     * @return PageSetup
      */
     public function setScale($pValue, $pUpdate = true)
     {
@@ -352,7 +358,7 @@ class PageSetup
      *
      * @param bool $pValue
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setFitToPage($pValue)
     {
@@ -364,7 +370,7 @@ class PageSetup
     /**
      * Get Fit To Height.
      *
-     * @return null|int
+     * @return int?
      */
     public function getFitToHeight()
     {
@@ -377,7 +383,7 @@ class PageSetup
      * @param null|int $pValue
      * @param bool $pUpdate Update fitToPage so it applies rather than scaling
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setFitToHeight($pValue, $pUpdate = true)
     {
@@ -392,7 +398,7 @@ class PageSetup
     /**
      * Get Fit To Width.
      *
-     * @return null|int
+     * @return int?
      */
     public function getFitToWidth()
     {
@@ -405,7 +411,7 @@ class PageSetup
      * @param null|int $pValue
      * @param bool $pUpdate Update fitToPage so it applies rather than scaling
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setFitToWidth($pValue, $pUpdate = true)
     {
@@ -448,7 +454,7 @@ class PageSetup
      *
      * @param array $pValue Containing start column and end column, empty array if option unset
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setColumnsToRepeatAtLeft(array $pValue)
     {
@@ -463,7 +469,7 @@ class PageSetup
      * @param string $pStart eg: 'A'
      * @param string $pEnd eg: 'B'
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setColumnsToRepeatAtLeftByStartAndEnd($pStart, $pEnd)
     {
@@ -503,7 +509,7 @@ class PageSetup
      *
      * @param array $pValue Containing start column and end column, empty array if option unset
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setRowsToRepeatAtTop(array $pValue)
     {
@@ -518,7 +524,7 @@ class PageSetup
      * @param int $pStart eg: 1
      * @param int $pEnd eg: 1
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setRowsToRepeatAtTopByStartAndEnd($pStart, $pEnd)
     {
@@ -542,7 +548,7 @@ class PageSetup
      *
      * @param bool $value
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setHorizontalCentered($value)
     {
@@ -566,7 +572,7 @@ class PageSetup
      *
      * @param bool $value
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setVerticalCentered($value)
     {
@@ -582,6 +588,8 @@ class PageSetup
      *                            Default behaviour, or a index value of 0, will return all ranges as a comma-separated string
      *                            Otherwise, the specific range identified by the value of $index will be returned
      *                            Print areas are numbered from 1
+     *
+     * @throws PhpSpreadsheetException
      *
      * @return string
      */
@@ -626,7 +634,7 @@ class PageSetup
      *                            Otherwise, the range identified by the value of $index will be removed from the series
      *                            Print areas are numbered from 1
      *
-     * @return $this
+     * @return PageSetup
      */
     public function clearPrintArea($index = 0)
     {
@@ -661,7 +669,9 @@ class PageSetup
      *                            Default behaviour, or the "O" method, overwrites existing print area
      *                            The "I" method, inserts the new print area before any specified index, or at the end of the list
      *
-     * @return $this
+     * @throws PhpSpreadsheetException
+     *
+     * @return PageSetup
      */
     public function setPrintArea($value, $index = 0, $method = self::SETPRINTRANGE_OVERWRITE)
     {
@@ -720,7 +730,9 @@ class PageSetup
      *                                list.
      *                            Print areas are numbered from 1
      *
-     * @return $this
+     * @throws PhpSpreadsheetException
+     *
+     * @return PageSetup
      */
     public function addPrintArea($value, $index = -1)
     {
@@ -748,7 +760,9 @@ class PageSetup
      *                                Default behaviour, or the "O" method, overwrites existing print area
      *                                The "I" method, inserts the new print area before any specified index, or at the end of the list
      *
-     * @return $this
+     * @throws PhpSpreadsheetException
+     *
+     * @return PageSetup
      */
     public function setPrintAreaByColumnAndRow($column1, $row1, $column2, $row2, $index = 0, $method = self::SETPRINTRANGE_OVERWRITE)
     {
@@ -773,7 +787,9 @@ class PageSetup
      *                                    list.
      *                                Print areas are numbered from 1
      *
-     * @return $this
+     * @throws PhpSpreadsheetException
+     *
+     * @return PageSetup
      */
     public function addPrintAreaByColumnAndRow($column1, $row1, $column2, $row2, $index = -1)
     {
@@ -799,7 +815,7 @@ class PageSetup
      *
      * @param int $value
      *
-     * @return $this
+     * @return PageSetup
      */
     public function setFirstPageNumber($value)
     {
@@ -811,7 +827,7 @@ class PageSetup
     /**
      * Reset first page number.
      *
-     * @return $this
+     * @return PageSetup
      */
     public function resetFirstPageNumber()
     {
