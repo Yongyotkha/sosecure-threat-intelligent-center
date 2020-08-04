@@ -11,11 +11,11 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.2.0
+ * @version    2.4.2
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2019, Cartalyst LLC
- * @link       http://cartalyst.com
+ * @copyright  (c) 2011-2020, Cartalyst LLC
+ * @link       https://cartalyst.com
  */
 
 namespace Cartalyst\Stripe\Api;
@@ -64,11 +64,12 @@ class SubscriptionItems extends Api
      * Deletes an existing subscription item.
      *
      * @param  string  $itemId
+     * @param  array  $parameters
      * @return array
      */
-    public function delete($itemId)
+    public function delete($itemId, array $parameters = [])
     {
-        return $this->_delete("subscription_items/{$itemId}");
+        return $this->_delete("subscription_items/{$itemId}", $parameters);
     }
 
     /**

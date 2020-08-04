@@ -8,7 +8,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Resources\ResourceFactory;
 
-class OrderLineEndpoint extends EndpointAbstract
+class OrderLineEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "orders_lines";
 
@@ -33,7 +33,7 @@ class OrderLineEndpoint extends EndpointAbstract
      * endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return OrderLineCollection
      */
@@ -73,7 +73,7 @@ class OrderLineEndpoint extends EndpointAbstract
      */
     public function cancelForId($orderId, array $data)
     {
-        if(! isset($data, $data['lines']) || ! is_array($data['lines'])) {
+        if(! isset($data['lines']) || ! is_array($data['lines'])) {
             throw new ApiException("A lines array is required.");
         }
         $this->parentId = $orderId;

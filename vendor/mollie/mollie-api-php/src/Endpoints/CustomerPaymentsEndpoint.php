@@ -6,7 +6,7 @@ use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 
-class CustomerPaymentsEndpoint extends EndpointAbstract
+class CustomerPaymentsEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "customers_payments";
 
@@ -24,7 +24,7 @@ class CustomerPaymentsEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return PaymentCollection
      */

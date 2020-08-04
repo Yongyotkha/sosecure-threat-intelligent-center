@@ -7,7 +7,7 @@ use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Mandate;
 use Mollie\Api\Resources\MandateCollection;
 
-class MandateEndpoint extends EndpointAbstract
+class MandateEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "customers_mandates";
 
@@ -25,7 +25,7 @@ class MandateEndpoint extends EndpointAbstract
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return MandateCollection
      */
@@ -110,7 +110,7 @@ class MandateEndpoint extends EndpointAbstract
      * @param null $limit
      * @param array $parameters
      *
-     * @return \Mollie\Api\Resources\BaseCollection
+     * @return \Mollie\Api\Resources\BaseCollection|\Mollie\Api\Resources\MandateCollection
      * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function listForId($customerId, $from = null, $limit = null, array $parameters = [])

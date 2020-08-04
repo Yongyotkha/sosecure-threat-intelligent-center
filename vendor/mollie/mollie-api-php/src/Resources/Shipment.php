@@ -44,13 +44,13 @@ class Shipment extends BaseResource
 
     /**
      * An object containing tracking details for the shipment, if available.
-     * @var object|null
+     * @var \stdClass|null
      */
     public $tracking;
 
     /**
      * An object with several URL objects relevant to the customer. Every URL object will contain an href and a type field.
-     * @var object[]
+     * @var \stdClass
      */
     public $_links;
 
@@ -94,7 +94,11 @@ class Shipment extends BaseResource
      */
     public function lines()
     {
-        return ResourceFactory::createBaseResourceCollection($this->client, $this->lines, OrderLine::class);
+        return ResourceFactory::createBaseResourceCollection(
+            $this->client,
+            OrderLine::class,
+            $this->lines
+        );
     }
 
     /**

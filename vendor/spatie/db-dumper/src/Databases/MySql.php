@@ -3,8 +3,8 @@
 namespace Spatie\DbDumper\Databases;
 
 use Spatie\DbDumper\DbDumper;
-use Symfony\Component\Process\Process;
 use Spatie\DbDumper\Exceptions\CannotStartDump;
+use Symfony\Component\Process\Process;
 
 class MySql extends DbDumper
 {
@@ -283,6 +283,10 @@ class MySql extends DbDumper
             $command[] = "--tables {$includeTables}";
         }
 
+        foreach ($this->extraOptionsAfterDbName as $extraOptionAfterDbName) {
+            $command[] = $extraOptionAfterDbName;
+        }
+
         return $this->echoToFile(implode(' ', $command), $dumpFile);
     }
 
@@ -307,13 +311,8 @@ class MySql extends DbDumper
             }
         }
 
-        if (strlen('dbName') === 0 && ! $this->allDatabasesWasSetAsExtraOption) {
-            throw CannotStartDump::emptyParameter($requiredProperty);
+        if (strlen($this->dbName) === 0 && ! $this->allDatabasesWasSetAsExtraOption) {
+            throw CannotStartDump::emptyParameter('dbName');
         }
-    }
-
-    protected function determineQuote(): string
-    {
-        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? '"' : "'";
     }
 }

@@ -21,7 +21,7 @@
         </span>
         <section class="panel panel-default bg-white m-t-sm b-r-xs">
             <header class="panel-heading text-center login-heading">{{ get_option('login_title') }}</header>
-            @if (settingEnabled('enable_languages'))
+            {{-- @if (settingEnabled('enable_languages'))
             <div class="panel-body text-right clearfix">
                 <div class="btn-group dropdown">
                     <button type="button" class="btn btn-sm dropdown-toggle btn-{{ get_option('theme_color') }}" data-toggle="dropdown" btn-icon="" title="@langapp('languages')  ">
@@ -44,7 +44,7 @@
                     </ul>
                 </div>
             </div>
-            @endif
+            @endif --}}
             
             {!! Form::open(['route' => 'login', 'class' => 'panel-body wrapper-lg']) !!}
             <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
@@ -108,13 +108,13 @@
             
             <div class="line line-dashed"></div>
 
-            @if (settingEnabled('allow_client_registration'))
+            {{-- @if (settingEnabled('allow_client_registration'))
             <p class="text-muted text-center">
                 <small>@langapp('do_not_have_an_account') </small>
             </p>
             <a href="{{ url('/register') }}"
             class="btn btn-{{ get_option('theme_color') }} btn-block">@langapp('get_your_account') </a>
-            @endif
+            @endif --}}
             
             
             {!! Form::close() !!}
