@@ -2,7 +2,8 @@
 /public/storage
 /storage/*.key
 /storage/*
-/vendor
+/storage/framework/cache/data/*
+/vendor/*
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
