@@ -91,75 +91,75 @@
                     </ul> --}}
 
                     <ul class="nav">
-                        <li class="active">
+                        <li class="{{ $page === langapp('home') ? 'active' : '' }}">
                             <a href="{{ site_url('/dashboard') }}">
                                 <i class="fas fa-home icon"><b class="bg-info"></b></i>
-                                <span> Dashboard </span>
+                                <span> @langapp('dashboard') </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="">
+                        <li class="{{ $page === langapp('alert') ? 'active' : '' }}">
+                            <a href="{{ site_url('/alert') }}">
                                 <i class="fas fa-exclamation-triangle icon"><b class="bg-info"></b></i>
-                                <span> Alert </span>
+                                <span> @langapp('alert') </span>
                                 <span class="count-alert"> 1 </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="">
+                        <li class="{{ $page === langapp('news') ? 'active' : '' }}">
+                            <a href="{{ site_url('/news') }}">
                                 <i class="fas fa-newspaper icon"><b class="bg-info"></b></i>
-                                <span> News </span>
+                                <span> @langapp('news') </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="">
+                        <li class="{{ $page === langapp('indicators') ? 'active' : '' }}">
+                            <a href="{{ site_url('/indicators') }}">
                                 <i class="fab fa-searchengin icon"><b class="bg-info"></b></i>
-                                <span> Indicators </span>
+                                <span> @langapp('indicators') </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="">
+                        <li class="{{ $page === langapp('volnerability') ? 'active' : '' }}">
+                            <a href="{{ site_url('/volnerability') }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
-                                <span> Volnerability </span>
+                                <span> @langapp('volnerability') </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="">
+                        <li class="{{ $page === langapp('compromised') ? 'active' : '' }}">
+                            <a href="{{ site_url('/compromised') }}">
                                 <i class="fas fa-bug icon"><b class="bg-info"></b></i>
-                                <span> Compromised </span>
+                                <span> @langapp('compromised') </span>
                             </a>
                         </li>
-                        <li class="nav-w-children" id="menu_sales">
+                        <li class="nav-w-children {{ $page === langapp('data_leak') ? 'active' : '' }}" id="menu_sales">
                             <a href="#" class="">
                                 <i class="fas fa-database icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
-                                <span> Data Leak </span>
+                                <span> @langapp('data_leak') </span>
                             </a>
                             <ul class="nav lt" style="display: none;">
-                                <li class="">
-                                    <a href="">
+                                <li {{ $page === langapp('dark_web') ? 'active' : '' }}>
+                                    <a href="{{ site_url('/darkweb') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> Darkweb </span>
+                                        <span> @langapp('dark_web') </span>
                                     </a>
                                 </li>
-                                <li class="">
-                                    <a href="">
+                                <li {{ $page === langapp('social') ? 'active' : '' }}>
+                                    <a href="{{ site_url('/social') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> Social </span>
+                                        <span> @langapp('social') </span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
-                        <li>
+                        <li class="{{ $page === langapp('users') ? 'active' : '' }}">
                             <a href="{{ site_url('/users') }}">
                                 <i class="fas fa-users icon"><b class="bg-info"></b></i>
-                                <span> Users </span>
+                                <span> @langapp('users') </span>
                             </a>
                         </li>
-                        <li>
+                        <li class="{{ $page === langapp('settings') ? 'active' : '' }}">
                             <a href="{{ site_url('/settings') }}">
                                 <i class="fas fa-cog icon"><b class="bg-info"></b></i>
-                                <span> Setting </span>
+                                <span> @langapp('settings') </span>
                             </a>
                         </li>
                     </ul>

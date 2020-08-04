@@ -9,10 +9,6 @@ use Illuminate\Routing\Controller;
 class AlertController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     * @return Response
-     */
-    /**
      * Item Model
      *
      * @var \Modules\Items\Entities\Item
@@ -36,8 +32,8 @@ class AlertController extends Controller
      */
     public function index()
     {
-        $data['page'] = langapp('Alerts');
-        return view('alert::index');
+        $data['page'] = langapp('alert');
+       return view('alert::index')->with($data);
     }
 
     /**

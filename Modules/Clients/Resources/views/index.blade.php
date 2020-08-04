@@ -54,11 +54,6 @@
     
     @endcan
 
-
-
-    
-
-
 </header>
 <section class="scrollable wrapper">
             <section class="panel panel-default">

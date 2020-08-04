@@ -8,10 +8,7 @@ use Illuminate\Routing\Controller;
 
 class BlogController extends Controller
 {
-
-
-
-        /**
+    /**
      * Item Model
      *
      * @var \Modules\Items\Entities\Item
@@ -35,7 +32,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $data['page'] = langapp('items');
+        $data['page'] = langapp('Blog');
         return view('blog::index')->with($data);
     }
 

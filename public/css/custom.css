@@ -58,3 +58,53 @@
 .nav-primary ul.nav>li>a{
     text-transform: unset !important;
 }
+
+.bg-dark{
+    background-color: #04284d !important;
+}
+.bg-dark a {
+    color: #ffffff;
+}
+.bg-dark .nav>li>a {
+    color: #ffffff;
+}
+
+.bg-dark, .bg-dark .lt{
+    background-color: #04284d !important;
+}
+
+.header-badge{
+    background: #eee;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+ul.list-indicators{
+    list-style: none;
+    padding: 0;
+    height: auto;
+    max-height: 450px;
+    overflow-y: auto;
+    user-select: none;
+}
+ul.list-indicators li{
+    padding-left: 1rem;
+}
+
+ul.list-indicators li:hover{
+    background: #eee;
+}
+ul.list-indicators li:not(:last-child){
+    border-bottom: 3px solid #eee;
+    padding-bottom: 1rem ;
+}
+.font-weight-bold{
+    font-weight: bold;
+}
+.primary-text{
+    color: #04284d;
+}
+.secondary-text{
+    color: #e0206f !important;
+}
