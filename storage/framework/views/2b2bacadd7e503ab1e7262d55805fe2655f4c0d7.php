@@ -1,1 +1,0 @@
-<script src="<?php echo e(getAsset('js/chart.js')); ?>"></script>
