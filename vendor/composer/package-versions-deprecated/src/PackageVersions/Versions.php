@@ -35,7 +35,7 @@ final class Versions
     const VERSIONS          = array (
   '2checkout/2checkout-php' => '0.3.1@cbac8da68155b6f557db0da0ac16a48a0faa5400',
   'arrilot/laravel-widgets' => '3.13.0@24297e9a7b1988808b782567892170cd421e6715',
-  'aws/aws-sdk-php' => '3.147.10@b259aad35203d262c02be9b6353597fd62484374',
+  'aws/aws-sdk-php' => '3.147.11@3ec07169c15bb05f587be47bf6f393df5ebf8f75',
   'bacon/bacon-qr-code' => '1.0.3@5a91b62b9d37cee635bbf8d553f4546057250bee',
   'barryvdh/laravel-dompdf' => 'v0.8.6@d7108f78cf5254a2d8c224542967f133e5a6d4e8',
   'bepsvpt/secure-headers' => '5.6.0@96d0fc68d82827c9a04fce5f001c64307dae91a8',
@@ -240,7 +240,7 @@ final class Versions
   'symfony/yaml' => 'v5.1.3@ea342353a3ef4f453809acc4ebc55382231d4d23',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'webmozart/assert' => '1.8.0@ab2cb0b3b559010b75981b1bdce728da3ee90ad6',
-  'laravel/laravel' => 'dev-NewJame@85c34287985096ecc8abfc578528039ac0935f3d',
+  'laravel/laravel' => 'dev-master@cf8f615771daa1d0faeca35dc9da3279e3f2d1d5',
 );
 
     private function __construct()
