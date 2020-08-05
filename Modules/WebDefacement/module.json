@@ -1,0 +1,14 @@
+{
+    "name": "WebDefacement",
+    "alias": "webdefacement",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\WebDefacement\\Providers\\WebDefacementServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

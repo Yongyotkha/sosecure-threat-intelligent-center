@@ -5,7 +5,7 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         
-        @include('partial.settings_menu')
+        {{-- @include('partial.settings_menu') --}}
 
         <aside>
             <section class="vbox">

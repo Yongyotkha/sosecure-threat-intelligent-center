@@ -3,6 +3,9 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
+            <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+            </a>
             <div class="bc-head">@langapp('compromised')</div>
             <div class="btn-group pull-right">
                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">
@@ -15,8 +18,7 @@
                             @langapp('Last Hour')
                         </a>
                   </li>
-                    <li><
-                        a href="#">@langapp('all') </>
+                    <li><a href="#">@langapp('all') </a>
                     </li>
                     <a href="{{  route('clients.create') }}"
                     class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"

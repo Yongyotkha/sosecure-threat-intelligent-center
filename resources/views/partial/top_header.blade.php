@@ -23,15 +23,7 @@
                 @icon('solid/cog')
             </a>
         </div>
-        <div class="text-center">
-            <div class="input-group-custom">
-                <input type="text" class="form-control" name="keyword" placeholder="Type tag keyword">
-                <span class="input-group-btn">
-                    <i class="fas fa-search"></i>
-                </span>
-            </div>
-        </div>
- 
+
         {{-- <ul class="nav navbar-nav hidden-xs" id="todolist">
             <li class="">
                 
@@ -68,30 +60,22 @@
             @include('partial.notifications')
             @admin
             <li class="dropdown hidden-xs">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    @icon('solid/search', 'fa-fw')
-                </a>
-                <section class="dropdown-menu aside-xl animated fadeInUp">
-                    <section class="panel bg-white">
-                        <form action="{{ route('search.app') }}" method="POST" role="search">
-                            {!! csrf_field() !!}
-                            <div class="form-group wrapper m-b-none">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="keyword" placeholder="Type tag keyword">
-                                    <span class="input-group-btn">
-                                        <button type="submit" class="btn btn-info btn-icon"><i class="fas fa-search"></i></button>
-                                    </span>
-                                </div>
-                            </div>
-                        </form>
-                    </section>
-                </section>
+                <form action="{{ route('search.app') }}" method="POST" role="search">
+                    {!! csrf_field() !!}
+                    <div class="form-group" style="margin-top: 9px;margin-bottom:0;">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="keyword" placeholder="Type tag keyword">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-info btn-icon"><i class="fas fa-search"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
             </li>
             @endadmin
 
 
-            
-            
+
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <span class="thumb-sm avatar pull-left">

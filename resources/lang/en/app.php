@@ -932,4 +932,9 @@ return [
     'sort'                                       => 'Sort',
     'log_formatting'                             => 'Log Formatting',
     'email_setting'                              => 'E-mail Setting',
+    'webdefacement'                              => 'Web Defacement',
+    'monitoring'                                 => 'Monitoring',
+    'assets'                                     => 'Assets',
+    'update_code'                                => 'Update Code',
+    'api_integration'                            => 'API Integration',
 ];
