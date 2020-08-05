@@ -3,75 +3,102 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            <div class="btn-group">
+            <div class="bc-head">@langapp('indicators')</div>
+            {{-- <div class="btn-group pull-right">
+
                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">
                     @langapp('filter')
                     <span class="caret"></span>
                 </button>
+
                 <ul class="dropdown-menu">
                     <li>
                         <a href="#">
                             @langapp('Last Hour')
                         </a>
-                  </li>
+                    </li>
                     <li><a href="#">@langapp('all') </a></li>
                 </ul>
-            </div>
-            <a href="{{  route('clients.create') }}"
+
+                <a href="{{  route('clients.create') }}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
                 title="@langapp('create') " data-placement="bottom">
                 @icon('solid/plus') @langapp('create')
-            </a>
-            
-            <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
-                @icon('solid/cloud-upload-alt') @langapp('import')
-            </a>
-            <a href="{{  route('clients.export')  }}"
-                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
-                @icon('solid/cloud-download-alt') CSV
-            </a>
+                </a>
+                
+                <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
+                    @icon('solid/cloud-upload-alt') @langapp('import')
+                </a>
+                <a href="{{  route('clients.export')  }}"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
+                    @icon('solid/cloud-download-alt') CSV
+                </a>
+            </div> --}}
+
         </header>
         <section class="scrollable wrapper bg-white">
             <div class="row">
-                <div class="col-md-12">
-                    <h1>Indicators Search</h1> 
-                </div>
-                <div class="col-md-4">
-                    <select name="" id="indicator_type" class="select2-option form-control" multiple="multiple">
-                        <option value="1">test</option>
-                        <option value="2">test</option>
-                        <option value="3">test</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <select name="" id="role" class="select2-option form-control" multiple="multiple">
-                        <option value="1">test</option>
-                        <option value="2">test</option>
-                        <option value="3">test</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group m-b-md">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="keyword" placeholder="Search">
+                        <label for="" class="">Keyword</label>
+                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+                        {{-- <div class="input-group">
                             <span class="input-group-btn">
                                 <button type="submit" class="btn btn-info btn-icon">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </span>
-                        </div>
+                        </div> --}}
                     </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="" class="">Indicator Type</label>
+                        <select name="" id="indicator_type" class="select2-option form-control" multiple="multiple">
+                            <option value="1">Email</option>
+                            <option value="2">CVE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="" class="">Indicator Type</label>
+                        <select name="" id="role" class="select2-option form-control" multiple="multiple">
+                            <option value="1">FilePath</option>
+                            <option value="2">IPv4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="" class="">Date</label>
+                      <select name="" id="date" class="select2-option form-control">
+                          <option value="Last 24 hours">Last 24 hours</option>
+                      </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <button class="btn btn-info">
+                        <i class="fas fa-search"></i>
+                        <span> Search </span>
+                    </button>
+                    <button class="btn btn-defualt">
+                        <i class="fas fa-broom"></i>
+                        <span> Clear </span>
+                    </button>
                 </div>
             </div>
             <section class="">
                 <div class="row header-badge">
-                    <div class="col-md-6">
+                    <div class="col-md-6 p-l-r-0">
                         <span class="font-weight-bold">We've found 29 indicators</span>
                     </div>
-                    <div class="col-md-6 text-right">
+                    <div class="col-md-6 p-l-r-0 text-right">
                         <div class="btn-group">
-                            <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">
-                                @langapp('sort')
+                            <button class="btn btn-dark btn-sm dropdown-toggle" data-toggle="dropdown">
+                                @langapp('sort_by')
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
@@ -148,6 +175,9 @@
             placeholder:'Indicator Type',
         });
         $('#role').select2({
+            placeholder:'Role',
+        });
+        $('#date').select2({
             placeholder:'Role',
         });
     });

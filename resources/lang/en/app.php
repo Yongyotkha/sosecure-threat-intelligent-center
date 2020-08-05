@@ -928,6 +928,7 @@ return [
     'hostname'                                   => 'Hostname',
     'site'                                       => 'Site',
     'Last Hour'                                  => 'Last Hour',
+    'sort_by'                                    => 'Sort By',
     'sort'                                       => 'Sort',
     'log_formatting'                             => 'Log Formatting',
     'email_setting'                              => 'E-mail Setting',

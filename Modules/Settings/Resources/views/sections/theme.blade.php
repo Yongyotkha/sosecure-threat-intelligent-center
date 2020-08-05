@@ -134,9 +134,11 @@
                             <option value="muli"{{  $font == 'muli' ? ' selected="selected"' : '' }}>
                                 Muli
                             </option>
-
                             <option value="miriam"{{  $font == 'miriam' ? ' selected="selected"' : '' }}>
                                 Miriam Libre
+                            </option>
+                            <option value="poppins"{{  $font == 'poppins' ? ' selected="selected"' : '' }}>
+                                Poppins
                             </option>
                         </select>
                     </div>

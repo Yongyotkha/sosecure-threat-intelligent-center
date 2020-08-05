@@ -122,6 +122,10 @@
             $family = 'Miriam Libre';
             echo "<link href='//fonts.googleapis.com/css?family=Miriam+Libre' rel='stylesheet'>";
             break;
+        case 'poppins':
+            $family = 'Poppins';
+            echo "<link href='//fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>";
+            break;
     }
     ?>
 

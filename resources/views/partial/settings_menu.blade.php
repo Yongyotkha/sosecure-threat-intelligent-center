@@ -15,7 +15,6 @@
                                     <a href="{{  route('settings.edit', ['section' => $menu->route])  }}">
                                         @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                         @langapp($menu->name)  
-                                        
                                     </a>
 
                                 </li>

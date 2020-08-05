@@ -1,3 +1,4 @@
+{{-- <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav"> --}}
 <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav">
     <section class="vbox">
         
@@ -149,6 +150,12 @@
                                     </a>
                                 </li>
                             </ul>
+                        </li>
+                        <li class="{{ $page === langapp('customers') ? 'active' : '' }}">
+                            <a href="{{ site_url('/clients') }}">
+                                <i class="fas fa-user icon"><b class="bg-info"></b></i>
+                                <span> @langapp('customers') </span>
+                            </a>
                         </li>
                         <li class="{{ $page === langapp('users') ? 'active' : '' }}">
                             <a href="{{ site_url('/users') }}">
