@@ -23,6 +23,12 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
     border-radius: 100%;
 }
 
+.nav-primary ul.nav>li li a {
+    font-weight: 700 !important;
+    text-transform: none;
+    font-size: 10px;
+}
+
 .panel .table td, .panel .table th {
     padding: 15px 15px !important;
     border-top: 1px solid #f1f1f1;

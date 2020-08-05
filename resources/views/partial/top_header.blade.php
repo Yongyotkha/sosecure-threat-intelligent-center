@@ -23,6 +23,15 @@
                 @icon('solid/cog')
             </a>
         </div>
+        <div class="text-center">
+            <div class="input-group-custom">
+                <input type="text" class="form-control" name="keyword" placeholder="Type tag keyword">
+                <span class="input-group-btn">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
+        </div>
+ 
         {{-- <ul class="nav navbar-nav hidden-xs" id="todolist">
             <li class="">
                 

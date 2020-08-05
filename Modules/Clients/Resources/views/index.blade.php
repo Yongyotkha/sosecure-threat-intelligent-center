@@ -6,8 +6,8 @@
         <header class="header bg-white b-b b-light">
 
             
-
-            <div class="btn-group">
+            <div class="bc-head">@langapp('customers')</div>
+            <div class="btn-group pull-right">
                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle"
                 data-toggle="dropdown"> @langapp('filter')
                 <span class="caret"></span>
@@ -34,25 +34,28 @@
                 </li>
             <li><a href="{{ route('clients.index') }}">@langapp('all') </a></li>
         </ul>
+        @can('clients_create')
+        <a href="{{  route('clients.create')  }}"
+            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
+            title="@langapp('create') " data-placement="bottom">
+            @icon('solid/plus') @langapp('create')
+        </a>
+        
+        <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
+            @icon('solid/cloud-upload-alt') @langapp('import')
+        </a>
+        <a href="{{  route('clients.export')  }}"
+            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
+            @icon('solid/cloud-download-alt') CSV
+        </a>
+        @endcan
     </div>
 
-    @can('clients_create')
+    
 
-    <a href="{{  route('clients.create')  }}"
-        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
-        title="@langapp('create') " data-placement="bottom">
-        @icon('solid/plus') @langapp('create')
-    </a>
+
     
-    <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
-        @icon('solid/cloud-upload-alt') @langapp('import')
-    </a>
-    <a href="{{  route('clients.export')  }}"
-        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
-        @icon('solid/cloud-download-alt') CSV
-    </a>
     
-    @endcan
 
 </header>
 <section class="scrollable wrapper">

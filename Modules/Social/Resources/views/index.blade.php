@@ -3,6 +3,7 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
+            <div class="bc-head">@langapp('social')</div>
             <a href="{{ route('tasks.template') }}" data-toggle="ajaxModal"
                 class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right">
                 @icon('solid/tasks') @langapp('tasks')
