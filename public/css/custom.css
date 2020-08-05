@@ -390,3 +390,38 @@ ul.show-comments li{
     position: absolute;
     height: 100%;
 }
+
+.navbar-center{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.w-400px{
+    width: 400px;  
+}
+
+.form-custom{
+    background: #ffffff26 !important;
+}
+.form-transparent{
+    border: none !important;
+    border-radius: unset !important;
+    background: transparent !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+.icon-search{
+    padding: 1rem;
+}
+.icon-search>i{
+    font-size: 1.6rem;
+    color: #fff;
+}
+
+@media (max-width:1020px){
+    .w-400px{
+       display: none;
+    } 
+}

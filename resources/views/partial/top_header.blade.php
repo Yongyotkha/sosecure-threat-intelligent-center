@@ -44,7 +44,24 @@
                 
             </li>
         </ul> --}}
-
+        <ul class="nav navbar-nav hidden-xs navbar-center">
+            @admin
+            <li class="dropdown hidden-xs">
+                <form action="{{ route('search.app') }}" method="POST" role="search">
+                    {!! csrf_field() !!}
+                    <div class="form-group form-custom" style="margin-top: 9px;margin-bottom:0;">
+                        <div class="input-group w-400px" style="width: 400px;">
+                            <span class="input-group-btn icon-search">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword">
+                            
+                        </div>
+                    </div>
+                </form>
+            </li>
+            @endadmin
+        </ul>
 
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
 
@@ -58,21 +75,7 @@
             @endif
 
             @include('partial.notifications')
-            @admin
-            <li class="dropdown hidden-xs">
-                <form action="{{ route('search.app') }}" method="POST" role="search">
-                    {!! csrf_field() !!}
-                    <div class="form-group" style="margin-top: 9px;margin-bottom:0;">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="keyword" placeholder="Type tag keyword">
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info btn-icon"><i class="fas fa-search"></i></button>
-                            </span>
-                        </div>
-                    </div>
-                </form>
-            </li>
-            @endadmin
+            
 
 
 

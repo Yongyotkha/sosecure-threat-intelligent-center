@@ -1,4 +1,4 @@
-@if(count(Auth::user()->unreadNotifications))
+{{-- @if(count(Auth::user()->unreadNotifications)) --}}
 <li class="hidden-xs notif">
         <a href="#topAlerts" class="dropdown-toggle" data-toggle="class:show animated fadeInRight">
           @icon('solid/bell')
@@ -7,5 +7,5 @@
           </span>
         </a>
   </li>
-@endif
+{{-- @endif --}}
       

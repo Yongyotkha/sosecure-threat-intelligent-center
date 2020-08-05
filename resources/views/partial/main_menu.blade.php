@@ -221,6 +221,12 @@
                                         <span> @langapp('api_integration') </span>
                                     </a>
                                 </li>
+                                <li class="{{ $page === langapp('vm_client_settings') ? 'active' : '' }}">
+                                    <a href="{{ site_url('') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('vm_client_settings') </span>
+                                    </a>
+                                </li>
                                 <li class="{{ $page === langapp('system_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/settings/system') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>

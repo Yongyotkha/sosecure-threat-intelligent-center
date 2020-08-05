@@ -937,4 +937,5 @@ return [
     'assets'                                     => 'Assets',
     'update_code'                                => 'Update Code',
     'api_integration'                            => 'API Integration',
+    'vm_client_settings'                         => 'VM Client Settings',
 ];

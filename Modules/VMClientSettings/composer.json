@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/vmclientsettings",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\VMClientSettings\\Providers\\VMClientSettingsServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\VMClientSettings\\": ""
+        }
+    }
+}
