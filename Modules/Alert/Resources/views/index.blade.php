@@ -3,13 +3,9 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
-            <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a>
             <div class="bc-head">@langapp('alert')</div>
         </header>
         <section class="scrollable wrapper">
-            
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li class="active"><a href="#alert_tab" data-toggle="tab">Asset</a></li>

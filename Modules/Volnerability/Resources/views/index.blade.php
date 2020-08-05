@@ -12,7 +12,7 @@
                 class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right">
                 @icon('solid/list') @langapp('items')
             </a>
-            
+
         </header>
         <section class="scrollable wrapper">
             
