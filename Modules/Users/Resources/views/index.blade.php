@@ -7,8 +7,6 @@
 
             <section class="vbox">
 
-
-
                 <header class="header panel-heading bg-white b-b b-light">
 
                     @admin

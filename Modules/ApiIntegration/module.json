@@ -1,0 +1,14 @@
+{
+    "name": "ApiIntegration",
+    "alias": "apiintegration",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\ApiIntegration\\Providers\\ApiIntegrationServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

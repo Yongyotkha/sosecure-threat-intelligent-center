@@ -21,7 +21,6 @@
                 </div>
             </header>
             <section class="scrollable wrapper scrollpane">
-
                 <div class="row">
                     <div class="col-sm-12 m-b-xs">
                         <div class="sub-tab text-uc small m-b-10">

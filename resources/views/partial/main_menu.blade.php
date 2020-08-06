@@ -116,6 +116,12 @@
                             </a>
                         </li>
 
+                        <li class="{{ $page === langapp('manage_assets') ? 'active' : '' }}">
+                            <a href="{{ site_url('/manageassets') }}">
+                                <i class="fas fa-tasks icon"><b class="bg-info"></b></i>
+                                <span> @langapp('manage_assets') </span>
+                            </a>
+                        </li>
                         <li class="{{ $page === langapp('indicators') ? 'active' : '' }}">
                             <a href="{{ site_url('/indicators') }}">
                                 <i class="fab fa-searchengin icon"><b class="bg-info"></b></i>
@@ -123,12 +129,12 @@
                             </a>
                         </li>
 
-                        <li class="nav-w-children {{ $page === langapp('volnerability') ? 'active' : '' }}">
-                            <a href="#" class="{{ $page === langapp('volnerability') ? 'active' : '' }}">
+                        <li class="nav-w-children {{ $page === langapp('vulnerability') ? 'active' : '' }}">
+                            <a href="#" class="{{ $page === langapp('vulnerability') ? 'active' : '' }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
-                                <span> @langapp('volnerability') </span>
+                                <span> @langapp('vulnerability') </span>
                             </a>
                             <ul class="nav lt">
                                 <li class="{{ $page === langapp('monitoring') ? 'active' : '' }}">
@@ -182,16 +188,16 @@
                                 <span> @langapp('webdefacement') </span>
                             </a>
                         </li>
-                        <li class="{{ $page === langapp('customers') ? 'active' : '' }}">
+                        <li class="{{ $page === langapp('manage_customers') ? 'active' : '' }}">
                             <a href="{{ site_url('/clients') }}">
-                                <i class="fas fa-user icon"><b class="bg-info"></b></i>
-                                <span> @langapp('customers') </span>
+                                <i class="fas fa-user-cog icon"><b class="bg-info"></b></i>
+                                <span> @langapp('manage_customers') </span>
                             </a>
                         </li>
-                        <li class="{{ $page === langapp('users') ? 'active' : '' }}">
+                        <li class="{{ $page === langapp('manage_users') ? 'active' : '' }}">
                             <a href="{{ site_url('/users') }}">
                                 <i class="fas fa-users icon"><b class="bg-info"></b></i>
-                                <span> @langapp('users') </span>
+                                <span> @langapp('manage_users') </span>
                             </a>
                         </li>
                         {{-- <li class="{{ $page === langapp('settings') ? 'active' : '' }}">
@@ -209,22 +215,40 @@
                                 <span> @langapp('settings') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page === langapp('general_settings') ? 'active' : '' }}">
-                                    <a href="{{ site_url('/settings/general') }}">
+                                <li class="{{ $page == langapp('category_settings') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/categorysettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('general_settings') </span>
+                                        <span> @langapp('category_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('api_integration') ? 'active' : '' }}">
-                                    <a href="{{ site_url('') }}">
+                                <li class="{{ $page == langapp('rss_feed_settings') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/rssfeedsettings') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('rss_feed_settings') </span>
+                                    </a>
+                                </li>
+                                <li class="{{ $page == langapp('api_integration') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/apiintegration') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('api_integration') </span>
                                     </a>
                                 </li>
                                 <li class="{{ $page === langapp('vm_client_settings') ? 'active' : '' }}">
-                                    <a href="{{ site_url('') }}">
+                                    <a href="{{ site_url('/vmclientsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('vm_client_settings') </span>
+                                    </a>
+                                </li>
+                                <li class="{{ $page === langapp('update_code') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/updatecode') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('update_code') </span>
+                                    </a>
+                                </li>
+                                <li class="{{ $page === 'settings/general' ? 'active' : '' }}">
+                                    <a href="{{ site_url('/settings/general') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('general_settings') </span>
                                     </a>
                                 </li>
                                 <li class="{{ $page === langapp('system_settings') ? 'active' : '' }}">
@@ -237,12 +261,6 @@
                                     <a href="{{ site_url('/settings/theme') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('theme_settings') </span>
-                                    </a>
-                                </li>
-                                <li class="{{ $page === langapp('update_code') ? 'active' : '' }}">
-                                    <a href="{{ site_url('/updatecode') }}">
-                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('update_code') </span>
                                     </a>
                                 </li>
                                 <li class="{{ $page === langapp('system_info') ? 'active' : '' }}">

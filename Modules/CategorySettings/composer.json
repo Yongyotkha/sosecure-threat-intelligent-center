@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/categorysettings",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\CategorySettings\\Providers\\CategorySettingsServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CategorySettings\\": ""
+        }
+    }
+}

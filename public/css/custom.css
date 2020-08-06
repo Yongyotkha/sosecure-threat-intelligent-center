@@ -425,3 +425,37 @@ ul.show-comments li{
        display: none;
     } 
 }
+
+.method-post,
+.method-get{
+    padding: 0.5rem 0rem;
+    text-align: center;
+    display: inline-block;
+    user-select: none;
+    width: 70px;
+}
+.method-get{
+    background: #337ab7;
+    color: #fff;
+}
+.method-post{
+    background: #65bd77;
+    color: #fff;
+}
+
+.bd-ol-ct{
+    border:1px solid #eee;
+    padding: 1rem;
+    background: #fff;
+}
+
+.d-flex-center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-action{
+    background: #eaeaea;
+    padding: 1rem;
+}

@@ -6,40 +6,45 @@
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a> --}}
-            <div class="bc-head">@langapp('alert')</div>
-        </header>
-        <section class="scrollable wrapper">
+            <div class="bc-head">@langapp('settings') @langapp('vm_client_settings')</div>
+            <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+                @icon('solid/download') CSV
+            </a>
+            <a href="{{ route('users.create') }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
+                @icon('solid/plus') @langapp('create')
+            </a>
             
-                <div class="tabbable">
-                    <ul class="nav nav-tabs nav-tabs-highlight">
-                        <li class="active"><a href="#alert_tab" data-toggle="tab">Asset</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        
-                        <div class="tab-pane active" id="alert_tab">
-                            
-                            <section class="panel panel-default">
-                            <div class="table-responsive">
-                                <table  class="table table-striped" id="table-alert-template">
-                                    <thead>
-                                        <tr>
-                                            <th class="hide"></th>
-                                            <th>@langapp('type')  </th>
-                                            <th>@langapp('ip_address')</th>
-                                            <th>@langapp('hostname')   </th>
-                                            <th>@langapp('site')   </th>
-                                            <th class="no-sort"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        
-                                    </tbody>
-                                </table>
-                            </div>
-                        </section>
-                        </div>
-                    </div>
+        </header>
+        <section class="scrollable wrapper">              
+            <section class="panel panel-default">
+                <div class="table-responsive">
+                    <table  class="table table-striped" id="table-vm-template">
+                        <thead>
+                            <tr>
+                                <th class="hide"></th>
+                                <th class="no-sort">
+                                    <label>
+                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </th>
+                                <th>@langapp('key')  </th>
+                                <th>@langapp('key_vm')</th>
+                                <th>@langapp('update')   </th>
+                                <th>@langapp('last_online')   </th>
+                                <th>@langapp('version')   </th>
+                                <th>@langapp('status')   </th>
+                                <th class="no-sort"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
+                        </tbody>
+                    </table>
+                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs" value="bulk-delete">
+                    <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+                </div>
             </section>
         </section>
     </section>
@@ -55,7 +60,7 @@
 
 <script>
 $(function() {
-    $('#table-alert-template').DataTable({
+    $('#table-vm-template').DataTable({
         processing: true,
         order: [[ 0, "desc" ]],
     });

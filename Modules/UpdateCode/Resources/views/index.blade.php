@@ -3,9 +3,9 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
-            <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
-            </a>
+            </a> --}}
             <div class="bc-head">@langapp('update_code')</div>
         </header>
     </section>

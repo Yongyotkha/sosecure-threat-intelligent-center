@@ -1,0 +1,14 @@
+{
+    "name": "RSSFeedSettings",
+    "alias": "rssfeedsettings",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\RSSFeedSettings\\Providers\\RSSFeedSettingsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
