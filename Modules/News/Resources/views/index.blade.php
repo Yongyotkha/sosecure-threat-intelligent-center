@@ -43,7 +43,9 @@
                     <li class="active"><a href="#tab_related_news" data-toggle="tab">Related news (20)</a></li>
                     <li><a href="#tab_lastest_news" data-toggle="tab">Lastest news (42)</a></li>   
                     <li class="pull-right">
-                        <button class="btn btn-default disabled">TH</button>
+                        <button class="btn btn-default actove">TH</button>
+                    </li>   
+                    <li class="pull-right">
                         <button class="btn btn-default">EN</button>
                     </li>   
                 </ul>

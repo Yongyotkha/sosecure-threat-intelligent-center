@@ -50,7 +50,7 @@
                 <form action="{{ route('search.app') }}" method="POST" role="search">
                     {!! csrf_field() !!}
                     <div class="form-group form-custom" style="margin-bottom:0;">
-                        <div class="input-group w-400px" style="width:400px;padding: 1rem;">
+                        <div class="input-group w-400px" style="width:400px;padding: .8rem;">
                             <span class="input-group-btn icon-search">
                                 <i class="fas fa-search"></i>
                             </span>
