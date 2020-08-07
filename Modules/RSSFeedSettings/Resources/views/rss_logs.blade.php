@@ -6,7 +6,7 @@
             <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            <div class="bc-head">@langapp('settings') - @langapp('rss_feed_settings') - www.xxx.xxx/xxx.xxx.rss</div>
+            <div class="bc-head">@langapp('settings') > @langapp('rss_feed_settings') / www.xxx.xxx/xxx.xxx.rss</div>
             <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                 @icon('solid/download') CSV
             </a>

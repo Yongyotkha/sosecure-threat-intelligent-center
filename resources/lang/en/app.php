@@ -951,4 +951,5 @@ return [
     'link'                                       => 'Link',
     'logs'                                       => 'Logs',
     'delete_all'                                 => 'Delete All',
+    'remark'                                     => 'Remark',
 ];
