@@ -61,7 +61,7 @@
                 <form action="">
                 <div class="modal-body">
                     <div class="form-group row">
-                        <label class="col-lg-3 control-label">Key <span class="text-danger">*</span> </label>
+                        <label class="col-lg-3 control-label">Link <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
                             <input type="text" class="form-control">
                         </div>
