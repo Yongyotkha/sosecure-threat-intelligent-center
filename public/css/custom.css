@@ -473,20 +473,27 @@ article.def-rlt{
 }
 
 article.def-rlt figure.overlay {
-    display: block;
+    display: inline-block;
     margin-bottom: 15px;
-    padding-top: 56.25%;
+    overflow: hidden;
+    float: left;
+    position: relative;
+    width: 150px;
+    height: 115px;
     overflow: hidden;
 }
 
 article.def-rlt .img-responsive {
     display: block;
     width: 100%;
+    max-width: 150px;
 }
 
 article div.entry{
     display: block;
-    padding: 0 15px;
+    padding: 1rem 15px;
+    position: relative;
+    overflow: hidden;
 }
 article.def-rlt span.entry-category{
     text-transform: uppercase;
@@ -526,11 +533,6 @@ article.def-rlt div.description-text {
     margin-top: 15px;
     line-height: 20px;
 }
-a.thumb-overlay-small{
-    position: absolute;
-    top: 0;
-    left: 0;
-}
 article.def-rlt figure.overlay a.thumb-overlay-small:before {
     bottom: 0;
     content: "";
@@ -551,8 +553,14 @@ article.def-rlt figure.overlay a.thumb-overlay-small:before {
     display: block;
     max-width: 100%;
     height: auto; 
+    max-width: 150px;
+    height: 100%;
+    object-fit: cover;
+    
 }
 
 .shadow-box-news{
     margin-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+    padding: 1rem;
 }

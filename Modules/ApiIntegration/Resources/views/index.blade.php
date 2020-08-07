@@ -17,7 +17,7 @@
         </header>
         <section class="scrollable wrapper">              
             <form method="POST" action="" accept-charset="UTF-8" class="bs-example form-horizontal ajaxifyForm">
-                <div class="container-fluid">
+                <div class="container-fluid" style="padding:0;">
                     <div class="bd-ol-ct m-t-xs">
                         <div class="row">
                             <div class="col-md-6 m-b-md">
