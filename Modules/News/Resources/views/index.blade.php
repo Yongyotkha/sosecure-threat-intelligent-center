@@ -36,8 +36,6 @@
                     </div>
                 </div>
             </section>
-            
-
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
                     <li class="active"><a href="#tab_related_news" data-toggle="tab">Related news (20)</a></li>
