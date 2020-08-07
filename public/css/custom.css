@@ -1,3 +1,6 @@
+a,button{
+    outline: none !important;
+}
 article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
     display: block;
     scroll-behavior: smooth;
@@ -462,4 +465,98 @@ input.form-transparent::placeholder{
 .footer-action{
     background: #eaeaea;
     padding: 1rem;
+}
+
+
+/* CSS NEWS */
+article.def-rlt{
+    position: relative;
+}
+.relative{
+    position: relative;
+}
+
+article.def-rlt figure.overlay {
+    display: block;
+    margin-bottom: 15px;
+    padding-top: 56.25%;
+    overflow: hidden;
+}
+
+article.def-rlt .img-responsive {
+    display: block;
+    width: 100%;
+}
+
+article div.entry{
+    display: block;
+    padding: 0 15px;
+}
+article.def-rlt span.entry-category{
+    text-transform: uppercase;
+    line-height: 12px;
+    font-size: 12px;
+    opacity: 1;
+    font-weight: 700;
+    color: #5c5c5c;
+    display: block;
+    margin-bottom: 5px;
+}
+article.def-rlt span.entry-category a{
+    color: #337ab7 !important
+}
+article.def-rlt h3{
+    line-height: 26px;
+    font-weight: normal;
+    font-style: normal;
+    opacity: 1px;
+    margin-top: 10px;
+}
+article.def-rlt div.entry-meta,
+article.def-rlt div.entry-meta a
+{
+    line-height: 12px;
+    color: #999;
+    font-size: 12px;
+}
+div.entry-meta {
+    display: block;
+    font-size: 11px;
+    color: #999;
+    margin-top: -3px;
+}
+article.def-rlt div.description-text {
+    color: #777;
+    margin-top: 15px;
+    line-height: 20px;
+}
+a.thumb-overlay-small{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+article.def-rlt figure.overlay a.thumb-overlay-small:before {
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 70%;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.5)));
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#b3000000', GradientType=0);
+}
+.img-responsive{
+    display: block;
+    max-width: 100%;
+    height: auto; 
+}
+
+.shadow-box-news{
+    margin-bottom: 1rem;
 }

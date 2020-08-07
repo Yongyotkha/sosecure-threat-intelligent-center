@@ -2,136 +2,380 @@
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
+
+        {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a> --}}
             <div class="bc-head">@langapp('news')</div>    
         </header>
+
+        {{-- Search --}}
+        
+
+        {{-- Tab Content --}}
         <section class="scrollable wrapper">
-            
-                <div class="tabbable">
-                    <ul class="nav nav-tabs nav-tabs-highlight">
-                        <li class="active"><a href="#itemstab" data-toggle="tab">Product Items</a></li>
-                        <li><a href="#taskstab" data-toggle="tab">Task Templates</a></li>
-                        
-                    </ul>
-                    <div class="tab-content">
-                        
-                        <div class="tab-pane active" id="itemstab">
-                            
-                            <section class="panel panel-default">
-                            <div class="table-responsive">
-                                <table  class="table table-striped" id="table-item-template">
-                                    <thead>
-                                        <tr>
-                                            <th class="hide"></th>
-                                            <th>@langapp('product')  </th>
-                                            <th class="col-currency">@langapp('unit_price')</th>
-                                            <th>@langapp('tax_rate')   </th>
-                                            <th>@langapp('qty')   </th>
-                                            <th class="no-sort"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (Modules\Items\Entities\Item::templates()->get() as $key => $item)
-                                        <tr>
-                                            <td class="display-none">{{ $item->id }}</td>
-                                            <td>
-                                                <a class="text-muted" href="#" data-original-title="{{  $item->description  }}"
-                                                    data-toggle="tooltip" data-placement="right" title="">
-                                                    {{  str_limit($item->name, 50)  }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                            {{ formatCurrency(get_option('default_currency'), $item->unit_cost) }}</td>
-                                            <td>{{ $item->tax_rate }}%</td>
-                                            <td>{{ $item->quantity }}</td>
-                                            <td>
-                                                <a href="{{ route('items.edit', ['id' => $item->id]) }}" data-toggle="ajaxModal" class="m-l-xs">
-                                                    @icon('solid/pencil-alt')
-                                                </a>
-                                                <a href="{{ route('items.delete', ['id' => $item->id]) }}" data-toggle="ajaxModal" class="m-l-xs">
-                                                    @icon('solid/trash-alt')
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </section>
+            <section class="panel panel-default">
+                <div class="container-fluid" style="padding: 2rem;">
+                    <div class="row">
+                        <div class="col-xl-8 col-lg-6">
+                            <label for="">Keywords</label>
+                            <input type="text" class="form-control">
                         </div>
-                        <div class="tab-pane" id="taskstab">
-                            <section class="panel panel-default">
-
-                            <div class="table-responsive">
-                                <table id="table-tasks-template" class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>@langapp('task_name')</th>
-                                            <th>@langapp('hourly_rate')</th>
-                                            <th>@langapp('visible')</th>
-                                            <th>@langapp('estimated_hours')</th>
-                                            <th class="no-sort"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (Modules\Tasks\Entities\Task::templates()->get() as $key => $task)
-                                        <tr>
-                                            <td>
-                                                <a class="text-muted" href="#"
-                                                    data-original-title="{{  $task->description  }}" data-toggle="tooltip"
-                                                    data-placement="right">
-                                                {{ str_limit($task->name, 50) }}</a></td>
-                                                <td class="">{{ $task->hourly_rate  }}/ hr</td>
-                                                <td>{{ $task->visible === 1 ? langapp('yes') : langapp('no') }}</td>
-                                                <td><strong>{{ $task->estimated_hours }} @langapp('hours') </strong></td>
-                                                <td>
-                                                    <a href="{{ route('tasks.editTemplate', ['id' => $task->id]) }}" data-toggle="ajaxModal" class="m-l-xs">
-                                                        @icon('solid/pencil-alt')
-                                                    </a>
-                                                    <a href="{{ route('tasks.deleteTemplate', ['id' => $task->id]) }}" data-toggle="ajaxModal" class="m-l-xs">
-                                                        @icon('solid/trash-alt')
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-
+                        <div class="col-xl-2 col-lg-3">
+                            <label for="">Select News</label>
+                            <section id="select_news" class="select2-option form-control">
+                                <option value="1" selected>All</option>
                             </section>
-                                
-                            </div>
-                            
+                        </div>
+                        <div class="col-xl-2 col-lg-3">
+                            <div style="margin-bottom: 4px;">&nbsp;</div>
+                            <button class="btn btn-info btn-responsive btn-block" style="max-width: 100px;">
+                                <i class="fas fa-search"></i>
+                                Search
+                            </button>
                         </div>
                     </div>
-
+                </div>
             </section>
-        </section>
+            
+
+            <div class="tabbable">
+                <ul class="nav nav-tabs nav-tabs-highlight">
+                    <li class="active"><a href="#tab_related_news" data-toggle="tab">Related news (20)</a></li>
+                    <li><a href="#tab_lastest_news" data-toggle="tab">Lastest news (42)</a></li>   
+                    <li class="pull-right">
+                        <button class="btn btn-default disabled">TH</button>
+                        <button class="btn btn-default">EN</button>
+                    </li>   
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_related_news">
+                        <section class="panel panel-default">
+                            <div class="row m-b-md">
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">Technology News</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        WhatsApp’s new fact-check feature lets users identify fake information
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    WhatsApp's "Search the Web" feature lets users perform web searches on viral messages to confirm their authenticity.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1544890225-2f3faec4cd60?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">CYBER CRIME</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        How hackers behind Twitter Bitcoin scam were caught
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    The Twitter Bitcoin scam allowed hackers to rake in over £80,000/$100,000.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1066&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">PHISHING SCAM</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        Fake Zoom meeting invitation phishing scam harvests Microsoft credentials
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    Initially targeting Zoom users; the phishing scam aims for Outlook and Office365 credentials.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1568027763595-ef293f388029?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">HACKING NEWS</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        Transmission of Pakistani news channel interrupted to display Indian flag
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    Prominent Pakistani news channel Dawn had its transmission...
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-b-md">
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">Technology News</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        WhatsApp’s new fact-check feature lets users identify fake information
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    WhatsApp's "Search the Web" feature lets users perform web searches on viral messages to confirm their authenticity.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1544890225-2f3faec4cd60?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">CYBER CRIME</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        How hackers behind Twitter Bitcoin scam were caught
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    The Twitter Bitcoin scam allowed hackers to rake in over £80,000/$100,000.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1066&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">PHISHING SCAM</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        Fake Zoom meeting invitation phishing scam harvests Microsoft credentials
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    Initially targeting Zoom users; the phishing scam aims for Outlook and Office365 credentials.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1568027763595-ef293f388029?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">HACKING NEWS</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        Transmission of Pakistani news channel interrupted to display Indian flag
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    Prominent Pakistani news channel Dawn had its transmission...
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-md">
+                                <div class="col-xs-12 text-center">
+                                    <div class="paginate-footer">
+                                        <button class="btn btn-default btn-icon previos">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        &nbsp;
+                                        <button class="btn btn-default btn-icon next">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="tab-pane" id="tab_lastest_news">
+                        <section class="panel panel-default">
+                            <div class="row m-b-md">
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1066&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">PHISHING SCAM</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        Fake Zoom meeting invitation phishing scam harvests Microsoft credentials
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    Initially targeting Zoom users; the phishing scam aims for Outlook and Office365 credentials.
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="shadow-box-news">
+                                        <article class="def-rlt">
+                                            <figure class="overlay relative">
+                                                <a href="" class="thumb-overlay-small">
+                                                    <img class="img-responsive" src="https://images.unsplash.com/photo-1568027763595-ef293f388029?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80" alt="">
+                                                </a>
+                                            </figure>
+                                            <div class="entry">
+                                                <span class="entry-category">
+                                                    <a href="">HACKING NEWS</a>
+                                                </span>
+                                                <h3>
+                                                    <a href="">
+                                                        Transmission of Pakistani news channel interrupted to display Indian flag
+                                                    </a>
+                                                </h3>
+                                                <div class="entry-meta">
+                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
+                                                </div>
+                                                <div class="description-text hidden-xs">
+                                                    Prominent Pakistani news channel Dawn had its transmission...
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-md">
+                                <div class="col-xs-12 text-center">
+                                    <div class="paginate-footer">
+                                        <button class="btn btn-default btn-icon previos">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        &nbsp;
+                                        <button class="btn btn-default btn-icon next">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>  
+                    </div>
+                </div>
+            </div>
+          </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
 @push('pagestyle')
     @include('stacks.css.datatables')
+    @include('stacks.css.form')
 @endpush
 
 @push('pagescript')
 @include('stacks.js.datatables')
+@include('stacks.js.form')
 
 <script>
-$(function() {
-$('#table-item-template').DataTable({
-    processing: true,
-    order: [[ 0, "desc" ]],
-});
-$('#table-tasks-template').DataTable({
-    processing: true,
-    order: [[ 0, "desc" ]],
-});
-});
+    $('#select_news').select2();
 </script>
 @endpush
 @endsection
