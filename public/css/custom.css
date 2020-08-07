@@ -404,6 +404,10 @@ ul.show-comments li{
 .form-custom{
     background: #ffffff26 !important;
 }
+
+input.form-transparent::placeholder{
+    color: #d8d8d8 !important;
+}
 .form-transparent{
     border: none !important;
     border-radius: unset !important;

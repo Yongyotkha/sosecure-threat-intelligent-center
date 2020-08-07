@@ -9,49 +9,57 @@
                 @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">@langapp('manage_customers')</div>
-            <div class="btn-group pull-right">
+            <div class="btn-group pull-right" style="margin-left: 0">
                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle"
                 data-toggle="dropdown"> @langapp('filter')
                 <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ route('clients.index', ['filter' => 'balance']) }}">
+                    <li>
+                        <a href="{{ route('clients.index', ['filter' => 'balance']) }}">
                         @langapp('outstanding')
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('clients.index', ['filter' => 'expenses']) }}">
-                    @langapp('expenses')
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('clients.index', ['filter' => 'prospects']) }}">
-                    @langapp('prospects')
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('clients.index', ['filter' => 'customers']) }}">
-                    @langapp('customers')
-                    </a>
-                </li>
-            <li><a href="{{ route('clients.index') }}">@langapp('all') </a></li>
-        </ul>
-        @can('clients_create')
-        <a href="{{  route('clients.create')  }}"
-            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
-            title="@langapp('create') " data-placement="bottom">
-            @icon('solid/plus') @langapp('create')
-        </a>
-        
-        <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
-            @icon('solid/cloud-upload-alt') @langapp('import')
-        </a>
-        <a href="{{  route('clients.export')  }}"
-            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
-            @icon('solid/cloud-download-alt') CSV
-        </a>
-        @endcan
-    </div>
+                        </a>
+                    </li>
+                     <li>
+                        <a href="{{ route('clients.index', ['filter' => 'expenses']) }}">
+                        @langapp('expenses')
+                        </a>
+                    </li>
+                      <li>
+                        <a href="{{ route('clients.index', ['filter' => 'prospects']) }}">
+                        @langapp('prospects')
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('clients.index', ['filter' => 'customers']) }}">
+                        @langapp('customers')
+                        </a>
+                    </li>
+                   <li><a href="{{ route('clients.index') }}">@langapp('all') </a></li>
+                </ul>
+            </div>
+            <div class="btn-group pull-right">
+                @can('clients_create')
+                <a href="{{  route('clients.create')  }}"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
+                    title="@langapp('create') " data-placement="bottom">
+                    @icon('solid/plus') @langapp('create')
+                </a>
+                @can('clients_delete')
+                <button type="submit" id="button" class="btn btn-sm btn-danger" value="bulk-delete">
+                <span class="">@icon('solid/trash-alt') @langapp('delete')</span>
+                </button>
+                @endcan
+                <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
+                    @icon('solid/cloud-upload-alt') @langapp('import')
+                </a>
+                <a href="{{  route('clients.export')  }}"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
+                    @icon('solid/cloud-download-alt') CSV
+                </a>
+
+                @endcan
+            </div>
 </header>
 <section class="scrollable wrapper">
             <section class="panel panel-default">
@@ -75,12 +83,6 @@
                             </tr>
                         </thead>
                     </table>
-                    @can('clients_delete')
-                    <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color') }} m-xs" value="bulk-delete">
-                    <span class="">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-                    @endcan
-
                     </div>
                 </form>
             </section>

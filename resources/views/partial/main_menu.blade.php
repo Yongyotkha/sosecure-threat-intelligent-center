@@ -207,27 +207,27 @@
                             </a>
                         </li> --}}
 
-                        <li class="nav-w-children {{ $page === langapp('settings') ? 'active' : '' }}" id="menu_sales">
-                            <a href="#" class="">
+                        <li class="nav-w-children {{ $page === langapp('settings') ? 'active' : '' }}">
+                            <a href="#" class="{{ $page === langapp('settings') ? 'active' : '' }}">
                                 <i class="fas fa-cog icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
                                 <span> @langapp('settings') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page == langapp('category_settings') ? 'active' : '' }}">
+                                <li class="{{ $page === langapp('category_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/categorysettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('category_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page == langapp('rss_feed_settings') ? 'active' : '' }}">
+                                <li class="{{ $page === langapp('rss_feed_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('rss_feed_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page == langapp('api_integration') ? 'active' : '' }}">
+                                <li class="{{ $page === langapp('api_integration') ? 'active' : '' }}">
                                     <a href="{{ site_url('/apiintegration') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('api_integration') </span>

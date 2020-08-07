@@ -10,10 +10,13 @@
             <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                 @icon('solid/download') CSV
             </a>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
+            <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
+                <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+            </button>
+            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create_key_modal">
                 @icon('solid/plus') @langapp('create')
             </a>
-            
+           
         </header>
         <section class="scrollable wrapper">              
             <section class="panel panel-default">
@@ -38,9 +41,6 @@
 
                         </tbody>
                     </table>
-                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs" value="bulk-delete">
-                    <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
                 </div>
             </section>
         </section>
@@ -48,7 +48,7 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
     <!-- Modal Gen Category -->
-    <div class="modal fade" id="create_key" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="create_key_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">

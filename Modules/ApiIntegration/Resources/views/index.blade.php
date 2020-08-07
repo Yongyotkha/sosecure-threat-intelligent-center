@@ -7,12 +7,12 @@
                 @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">@langapp('settings') - @langapp('api_integration')</div>
-            <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+            {{-- <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                 @icon('solid/download') CSV
             </a>
             <a href="{{  route('apiintegration.create')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
                 @icon('solid/plus') @langapp('create')
-            </a>
+            </a> --}}
             
         </header>
         <section class="scrollable wrapper">              
@@ -86,56 +86,6 @@
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-
-    <!-- Modal Gen Key -->
-    <div class="modal fade" id="create_key" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Create Key</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="">
-                <div class="modal-body">
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">Key <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="generate_key" value="" readonly>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info">Gen</button>  
-                            </span>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">Status </label>
-                        <div class="col-lg-6">
-                            <label class="switch">
-                                <input type="hidden" value="FALSE" name="">
-                                <input type="checkbox" name="" value="TRUE">
-                                <span></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
     
 </section>
 
