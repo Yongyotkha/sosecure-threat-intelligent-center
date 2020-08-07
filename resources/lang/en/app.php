@@ -952,4 +952,5 @@ return [
     'logs'                                       => 'Logs',
     'delete_all'                                 => 'Delete All',
     'remark'                                     => 'Remark',
+    'api_indicators'                             => 'API Indicators',
 ];

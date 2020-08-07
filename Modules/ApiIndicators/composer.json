@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/apiindicators",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\ApiIndicators\\Providers\\ApiIndicatorsServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ApiIndicators\\": ""
+        }
+    }
+}

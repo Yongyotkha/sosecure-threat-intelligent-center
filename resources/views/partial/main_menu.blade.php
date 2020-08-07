@@ -227,10 +227,10 @@
                                         <span> @langapp('rss_feed_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('api_integration') ? 'active' : '' }}">
-                                    <a href="{{ site_url('/apiintegration') }}">
+                                <li class="{{ $page === langapp('api_indicators') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/apiindicators') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('api_integration') </span>
+                                        <span> @langapp('api_indicators') </span>
                                     </a>
                                 </li>
                                 <li class="{{ $page === langapp('vm_client_settings') ? 'active' : '' }}">

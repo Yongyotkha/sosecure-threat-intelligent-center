@@ -1,0 +1,14 @@
+{
+    "name": "ApiIndicators",
+    "alias": "apiindicators",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\ApiIndicators\\Providers\\ApiIndicatorsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

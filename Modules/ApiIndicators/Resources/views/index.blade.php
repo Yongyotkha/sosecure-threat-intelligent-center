@@ -91,8 +91,6 @@
 
 
 
-
-
 @push('pagestyle')
     @include('stacks.css.datatables')
 @endpush
@@ -101,12 +99,7 @@
 @include('stacks.js.datatables')
 
 <script>
-$(function() {
-    $('#table-vm-template').DataTable({
-        processing: true,
-        order: [[ 0, "desc" ]],
-    });
-});
+
 </script>
 @endpush
 @endsection
