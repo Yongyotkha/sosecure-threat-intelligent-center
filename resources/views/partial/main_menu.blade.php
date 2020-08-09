@@ -92,14 +92,12 @@
                     </ul> --}}
 
                     <ul class="nav">
-
-                        <li class="{{ $page === langapp('home') ? 'active' : '' }}">
-                            <a href="{{ site_url('/dashboard') }}">
+                        <li class="{{ $page === langapp('dashboard') ? 'active' : '' }}">
+                            <a href="{{ site_url('/dashboardnew') }}">
                                 <i class="fas fa-home icon"><b class="bg-info"></b></i>
                                 <span> @langapp('dashboard') </span>
                             </a>
                         </li>
-
                         <li class="{{ $page === langapp('alert') ? 'active' : '' }}">
                             <a href="{{ site_url('/alert') }}">
                                 <i class="fas fa-exclamation-triangle icon"><b class="bg-info"></b></i>

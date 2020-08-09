@@ -564,3 +564,109 @@ article.def-rlt figure.overlay a.thumb-overlay-small:before {
     border-bottom: 2px solid #eee;
     padding: 1rem;
 }
+
+.header-text-badge{
+    font-weight: 700;
+    display: block;
+    padding: 1rem;
+    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    background: #eee;
+}
+
+.dash-card{
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    transition: all .3s ease-in-out;
+    user-select: none;
+    cursor: pointer;
+}
+.dash-card:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 1px 10px rgba(0,0,0,.2);
+}
+
+.dash-name{
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+.dash-count{
+    font-size: 56px;
+    display: inline-block;
+    font-size: 700;
+}
+.dash-count.color-purple{
+    color: rgb(143, 8, 143);
+}
+.dash-count.color-red{
+    color: rgb(223, 31, 31);
+}
+.dash-count.color-yellow{
+    color: rgb(252, 207, 9);
+}
+.dash-count.color-blue{
+    color: rgb(44, 92, 248);
+}
+.dash-count.color-green{
+    color: rgb(52, 165, 29);
+}
+.dash-count.color-light-purple{
+    color: rgb(77, 29, 165);
+}
+
+.main-dash{
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: auto;
+    height: auto;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-end;
+}
+ul.item-list-dash{
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+ul.item-list-dash li:not(:last-child){
+    margin-right: 1rem;
+}
+.item-dash{
+    padding: 1rem;
+}
+.item-dash.bg-blue{
+    background: #4375ff73;
+}
+.item-dash.bg-green{
+    background: #69ff4373;
+}
+.item-dash.bg-gray{
+    background: #6b6b6b73;
+}
+.item-dash.bg-yellow{
+    background: #ffbf3473;
+}
+.item-dash.bg-red{
+    background: #ff3d2f73;
+}
+.item-dash.bg-purple{
+    background: #e72fff73;
+}
+.item-dash:not(:last-child){
+    margin-bottom: 1rem;
+}
+
+.main-dash-box{
+    border: 1px solid #e4e4e4;
+    padding: 2rem;
+}
+
+.main-dash-box:not(:last-child){
+    margin-right: 1rem;
+}
