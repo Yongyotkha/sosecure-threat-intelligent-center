@@ -36,26 +36,29 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="show-content-news">
-                       Lorem ipsum dolor, sit amet consectetur adipisicing elit. Earum eos suscipit nostrum ipsa pariatur vero unde amet, repellendus inventore ex, voluptatibus laboriosam sapiente asperiores similique! Earum nam sint maiores atque!
-                       Doloremque doloribus veniam delectus nemo vitae quo atque neque corrupti culpa, nulla quaerat, dicta nobis consequuntur suscipit quam. Nisi provident dignissimos earum nesciunt! Nesciunt corporis ad laborum, dolorum necessitatibus fuga?
-                       Expedita culpa inventore blanditiis ipsam vitae facere labore beatae id fuga minima modi, architecto nesciunt. Ratione suscipit laborum magnam, odio cum voluptatem nisi, aspernatur, distinctio quia doloremque cumque tenetur. Delectus.
-                       Sunt ut, quas similique labore, odit repellat a, corporis optio nisi quia voluptas eum in dicta et! Corporis, velit pariatur necessitatibus maxime tempore rem, laudantium animi temporibus officia optio quisquam.
-                       Provident placeat mollitia ea amet expedita iste, facere facilis officia commodi perferendis, unde est voluptatum reiciendis! Odio modi, asperiores quas sint voluptates dicta omnis sed inventore. Voluptatum aliquam quis consectetur.
-                       Facere, inventore accusamus! Reprehenderit sequi cumque ducimus consequuntur consequatur? Porro ut, repellat corporis minima modi atque, incidunt, quae temporibus debitis voluptatum rerum quas. Doloremque laudantium sunt non sint deleniti consectetur.
-                       Itaque iusto laudantium eum odio facilis reiciendis cumque, aliquid repellat eligendi, a perferendis quae consequatur voluptate aspernatur nihil mollitia sequi maiores ad. Molestias praesentium culpa amet saepe inventore debitis aspernatur!
-                       Pariatur exercitationem quia explicabo? Perferendis, velit natus, obcaecati exercitationem pariatur sint optio fuga quisquam modi molestias quo ex dolorum fugit repudiandae magnam laudantium quae? Beatae dicta autem magnam unde at.
-                       Porro at mollitia totam nesciunt itaque quos aut iusto quasi sed sequi beatae, nulla fugiat esse rem aliquid recusandae similique autem magni? Suscipit blanditiis sapiente quod ipsum reiciendis, id recusandae?
-                       Adipisci reprehenderit praesentium ullam laudantium modi soluta, quia ipsum autem, corporis velit dolorem? Provident consequuntur voluptatem quidem quod consectetur, eius voluptates. Vero quas, perferendis aspernatur dolorum soluta sequi tenetur in?
-                       Nam modi tempora, culpa dignissimos consectetur repellat ipsum pariatur, delectus earum ab necessitatibus praesentium labore ducimus nemo corporis optio aperiam sint non. Quidem ex beatae error nisi impedit praesentium consequatur?
-                       Asperiores perspiciatis facilis repudiandae alias tempora hic amet fuga, esse, odio dignissimos rem, commodi et iusto delectus molestias enim tempore quaerat perferendis nam ab animi. Cupiditate iusto vel eos perferendis!
-                       Provident quibusdam, explicabo optio debitis repellendus, laudantium alias sunt illo quis aliquam consectetur autem quos mollitia veritatis assumenda iure accusantium! Nemo odio optio temporibus voluptatibus sit sunt voluptate laudantium dolorum?
-                       Quam soluta explicabo pariatur earum optio deserunt ipsam fugit et. Officia harum recusandae sapiente sequi corporis amet voluptatibus excepturi quia totam cumque, alias iusto error, cum est dolores, neque facere?
-                       Dolores nobis sunt neque esse maxime natus quam nostrum ad, harum nesciunt vel nam, velit omnis delectus perferendis praesentium. Magnam suscipit facilis fugiat ex nam id eius temporibus ad labore?
-                       Debitis ipsa reiciendis laborum dignissimos recusandae dicta dolorem numquam tempora deserunt, accusamus ab in soluta, officiis molestiae explicabo, amet ipsam quod reprehenderit velit repellat quibusdam. Ea tempora placeat commodi reprehenderit.
-                       Eaque eius sunt reiciendis, maiores consequuntur voluptas temporibus facilis aperiam porro molestiae earum. Esse facere quidem a blanditiis est tempore, eos, temporibus sapiente dicta, odio ullam minus explicabo natus necessitatibus!
-                       Eveniet laboriosam veniam dignissimos quam officia? Corrupti nihil quae velit ad minus iusto officia exercitationem, totam recusandae cum ut, maiores ratione enim itaque sed repellat sunt! Maxime adipisci officia iure.
-                       Pariatur vitae porro autem doloremque ipsam totam deserunt magni at explicabo libero aut, alias eum, quasi possimus veritatis eos nihil veniam. Reiciendis quidem iusto quos ullam, et fugiat excepturi ut.
-                       Nisi, amet? Commodi repudiandae magni rem nobis enim facilis quam quia eius veniam quod veritatis esse ducimus doloremque doloribus id tempore excepturi aperiam, eaque corporis, dicta consequuntur, sit voluptatem. Distinctio.
+                        <p>Intel is currently looking into how 20GB of sensitive internal data came to find its way online.</p>
+
+                        <p>The range of documents — some marked “confidential,” “under NDA” or “restricted secret”— were uploaded to file hosting service MEGA by Swiss Android developer Till Kottmann.</p>
+                        
+                        <p>Before his account was suspended <a href="https://twitter.com/deletescape/status/1291405688204402689" target="_blank" data-feathr-click-track="true">by Twitter</a>, Kottmann explained on the site that “most of the things here have not been published anywhere before.”</p>
+                        
+                        <p>They include details on chip roadmaps, development and debugging tools, schematics, training videos, process simulator ADKs, sample code, Bringup guides and much more.</p>
+                        
+                        <p>Affected platforms include Kaby Lake, Snow Ridge, Elkhart Lake and the unreleased 10nm Tiger Lake architecture.</p>
+                        
+                        <p>Kottmann claimed to have received this data from a third party who found it on an unsecured server via a simple nmap scan. Many of the zip files were reportedly protected with easy-to-guess or crack passwords.</p>
+                        
+                        <p>However, Intel doesn’t believe the data came from a network breach, and said in a brief statement that it is urgently investigating what may have happened.</p>
+                        
+                        <p>“The information appears to come from the Intel Resource and Design Center, which hosts information for use by our customers, partners and other external parties who have registered for access,” it continued. “We believe an individual with access downloaded and shared this data."</p>
+                        
+                        <p>Although there appears to have been no personally identifiable information (PII) exposed in the breach, the compromise of so many sensitive internal documents will be ringing alarm bells at the chipmaker’s HQ — especially as more leaks have been promised.</p>
+                        
+                        <p>Erich Kron, security awareness advocate at KnowBe4, said the incident highlights supply chain cyber-risk.</p>
+                        
+                        <p>“There is always a risk when sharing potentially sensitive information to these business partners, however, this is often an unavoidable part of doing business,” he added.</p>
+                        
+                        <p>“Whenever providing intellectual property access to another organization or individual, it is important to log not only who has access, but when and what data they are accessing. Even better, as in this case with Intel, ensuring that you know where the documents have been shared by potentially marking the document itself, can be very valuable when hunting potential misuse as appears to have occurred here."</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -66,6 +69,8 @@
                         <li><a href="">Lorem ipsum dolor, sit amet consectetur Lorem ipsum dolor, sit amet consectetur </a></li>
                         <li><a href="">adipisicing elit. Autem quis cum veniam Autem quis cum veniam</a> </li>
                         <li><a href="">laudantium expedita hic illum optio expedita hic illum</a></li>
+                        <li><a href="">laudantium expedita hic illum optio expedita hic illum</a></li>
+                        <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li>
                         <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li>
                     </ul>
                 </div>

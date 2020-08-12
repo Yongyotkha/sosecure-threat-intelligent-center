@@ -737,16 +737,23 @@ ul.news_related{
     list-style: none;
     padding: 0;
 }
-ul.news_related li:not(:last-child){ 
+/* ul.news_related li:not(:last-child){ 
     margin-bottom: 10px;
-}
+} */
 ul.news_related li{
-    padding: 1rem;
-    border-bottom: 2px solid #dcdcdc;
+    padding: 1.5rem;
+    border-bottom: solid 4px #eaeaea;
+}
+ul.news_related li a{
+    color: #333;
+}
+ul.news_related li a:hover{
+    color: #333;
+    text-decoration: underline;
 }
 
 .show-content-news{
-    padding: 1rem;
+    padding: 3rem 2rem;
     line-height: 150%;
 }
 .entry-view{
