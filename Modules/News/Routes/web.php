@@ -15,5 +15,6 @@ Route::group(
 	['middleware' => 'web', 'prefix' => 'news'],
 	function () {
 		Route::get('/', 'NewsController@index')->name('news.index')->middleware('can:menu_items');
+		Route::get('/news_details', 'NewsController@news_details')->name('news.news_details')->middleware('can:menu_items');
 	}
 );

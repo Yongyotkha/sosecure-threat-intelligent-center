@@ -41,7 +41,13 @@ class NewsController extends Controller
     {
         $data['page'] = langapp('news');
        return view('news::index')->with($data);
-   }
+    }
+
+    public function news_details()
+    {
+        $data['page'] = langapp('news_details');
+       return view('news::news_details')->with($data);
+    }
 
     /**
      * Show the form for creating a new resource.
