@@ -991,3 +991,14 @@ ul.total-count li{
     font-size: 40px;
     color: #ff5858;
   }
+
+  .border-alpha{
+      border: 1px solid #eee;
+  }
+
+  @media screen and (min-width:1300px){
+      .d-f-j-ct{
+          display: flex;
+          justify-content: center;
+      }
+  }
