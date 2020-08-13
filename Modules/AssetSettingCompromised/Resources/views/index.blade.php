@@ -4,19 +4,19 @@
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('compromised') > Assets Setting</div>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                @icon('solid/download') CSV
+            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span data-rel="tooltip" title="@langapp('export') CSV">@icon('solid/download') CSV</span>
             </a>
             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right" value="bulk-delete">
-                <span data-rel="tooltip" title="Are you sure?" data-placement="top">@icon('solid/trash-alt') @langapp('delete')</span>
+                <span data-rel="tooltip" title="Are You Sure !">@icon('solid/trash-alt') @langapp('delete')</span>
             </button>
 
-            <button type="submit" id="button" class="btn btn-sm btn-default pull-right" value="" data-rel="tooltip" title="" data-original-title="Stop">
-                @icon('solid/stop')
+            <button type="submit" id="button" class="btn btn-sm btn-default pull-right" value="">
+                <span data-rel="tooltip" title="Stop" data-placement="top">@icon('solid/stop')</span>
             </button>
 
-            <button type="submit" id="button" class="btn btn-sm btn-default pull-right" value="" data-rel="tooltip" title="" data-original-title="Re-run">
-                @icon('solid/redo')
+            <button type="submit" id="button" class="btn btn-sm btn-default pull-right" value="">
+                <span data-rel="tooltip" title="" data-original-title="Re-run">@icon('solid/redo')</span>
             </button>
             
 
