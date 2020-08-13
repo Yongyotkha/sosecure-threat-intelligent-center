@@ -32,7 +32,7 @@ class AssetSettingCompromisedController extends Controller
      */
     public function index()
     {
-        $data['page'] = langapp('asset_setting_compromised');
+        $data['page'] = langapp('assets_setting_compromised');
         return view('assetsettingcompromised::index')->with($data);
     }
 

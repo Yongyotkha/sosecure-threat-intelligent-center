@@ -939,6 +939,7 @@ return [
     'monitoring_vulnerability'                   => 'Monitoring',
     'assets_setting_compromised'                 => 'Assets Setting',
     'assets_setting_vulnerability'               => 'Assets Setting',
+    'assets_setting_vulnerabilitys'              => 'Assets Setting',
     'assets'                                     => 'Assets',
     'update_code'                                => 'Update Code',
     'api_integration'                            => 'API Integration',
