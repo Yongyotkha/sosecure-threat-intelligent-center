@@ -18,7 +18,6 @@
             
         </header>
         <section class="scrollable wrapper">
-            
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li class="active"><a href="#itemstab" data-toggle="tab">Product Items</a></li>

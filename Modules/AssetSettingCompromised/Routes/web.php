@@ -14,5 +14,6 @@ Route::group(
 	['middleware' => 'web', 'prefix' => 'assetsettingcompromised'],
 	function () {
 		Route::get('/', 'AssetSettingCompromisedController@index')->name('assetsettingcompromised.index')->middleware('can:menu_items');
+		Route::get('/show', 'AssetSettingCompromisedController@show_detail')->name('assetsettingcompromised.show')->middleware('can:menu_items');
 	}
 );

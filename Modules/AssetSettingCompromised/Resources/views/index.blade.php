@@ -20,7 +20,7 @@
             </button>
             
 
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
+            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create_assets_compromised">
                 @icon('solid/plus') @langapp('create')
             </a>
 
@@ -39,14 +39,14 @@
                                         <span class="label-text"></span>
                                     </label>
                                 </th>
-                                <th>@langapp('name')  </th>
+                                <th>@langapp('name')</th>
                                 <th>@langapp('target')</th>
-                                <th>@langapp('started')   </th>
-                                <th>@langapp('finished')   </th>
-                                <th>@langapp('status')   </th>
-                                <th>@langapp('element')   </th>
-                                <th>@langapp('corelations')   </th>
-                                <th>@langapp('update')   </th>
+                                <th>@langapp('started')</th>
+                                <th>@langapp('finished')</th>
+                                <th>@langapp('status')</th>
+                                <th>@langapp('element')</th>
+                                <th>@langapp('corelations')</th>
+                                <th>@langapp('update')</th>
                                 <th class="no-sort"></th>
                             </tr>
                         </thead>
@@ -60,6 +60,72 @@
 
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+
+    <!-- Modal create_assets_compromised -->
+    <div class="modal fade" id="create_assets_compromised" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="exampleModalLabel">Asset</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" placeholder="name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Target Scan</label>
+                        <div class="col-md-9">
+                            <textarea name="" id="" cols="30" rows="8" class="form-control">
+                                Scan target(s), which may be one or more domains, hostnames, IPv4 and v6 addresses, subnets (e.g. 1.2.3.0/24), ASNs,
+                                phone numbers (must be prefixed with + and have no spaces dashes or brackets, e.g. +1555123123), e-mail addresses, usernames or human names.
+                            </textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Start Scan</label>
+                        <div class="col-md-9">
+                            <label class="switch">
+                                <input type="hidden" value="FALSE" name="">
+                                <input type="checkbox" name="" value="TRUE">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Status</label>
+                        <div class="col-md-9">
+                            <label class="switch">
+                                <input type="hidden" value="FALSE" name="">
+                                <input type="checkbox" name="" value="TRUE">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-info btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
 </section>
 
 @push('pagestyle')

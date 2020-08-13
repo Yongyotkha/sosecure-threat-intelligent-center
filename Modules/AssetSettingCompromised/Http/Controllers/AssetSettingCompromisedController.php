@@ -36,6 +36,12 @@ class AssetSettingCompromisedController extends Controller
         return view('assetsettingcompromised::index')->with($data);
     }
 
+    public function show_detail()
+    {
+        $data['page'] = langapp('show');
+        return view('assetsettingcompromised::show')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
