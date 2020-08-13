@@ -8,10 +8,7 @@ use Illuminate\Routing\Controller;
 
 class NewsController extends Controller
 {
-
-
-
-        /**
+    /**
      * Item Model
      *
      * @var \Modules\Items\Entities\Item
@@ -39,20 +36,20 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $data['page'] = langapp('news');
+       $data['page'] = langapp('news');
        return view('news::index')->with($data);
     }
 
-    public function news_details()
+    public function news_detail()
     {
-        $data['page'] = langapp('news_details');
-       return view('news::news_details')->with($data);
+        $data['page'] = langapp('news_detail');
+       return view('news::news_detail')->with($data);
     }
     
-    public function public_details()
+    public function public_detail()
     {
-        $data['page'] = langapp('news_details');
-       return view('news::public_details')->with($data);
+       $data['page'] = langapp('news_detail');
+       return view('news::public_detail')->with($data);
     }
 
     /**

@@ -59,16 +59,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">Technology News</a>
+                                                    <a href="{{route('news.news_detail')}}">Technology News</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         WhatsApp’s new fact-check feature lets users identify fake information
                                                     </a>
                                                 </h3>
@@ -87,16 +87,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1544890225-2f3faec4cd60?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">CYBER CRIME</a>
+                                                    <a href="{{route('news.news_detail')}}">CYBER CRIME</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         How hackers behind Twitter Bitcoin scam were caught
                                                     </a>
                                                 </h3>
@@ -115,16 +115,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1066&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">PHISHING SCAM</a>
+                                                    <a href="{{route('news.news_detail')}}">PHISHING SCAM</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         Fake Zoom meeting invitation phishing scam harvests Microsoft credentials
                                                     </a>
                                                 </h3>
@@ -143,16 +143,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1568027763595-ef293f388029?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">HACKING NEWS</a>
+                                                    <a href="{{route('news.news_detail')}}">HACKING NEWS</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         Transmission of Pakistani news channel interrupted to display Indian flag
                                                     </a>
                                                 </h3>
@@ -190,16 +190,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1066&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">PHISHING SCAM</a>
+                                                    <a href="{{route('news.news_detail')}}">PHISHING SCAM</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         Fake Zoom meeting invitation phishing scam harvests Microsoft credentials
                                                     </a>
                                                 </h3>
@@ -218,16 +218,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1568027763595-ef293f388029?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">HACKING NEWS</a>
+                                                    <a href="{{route('news.news_detail')}}">HACKING NEWS</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         Transmission of Pakistani news channel interrupted to display Indian flag
                                                     </a>
                                                 </h3>
@@ -246,16 +246,16 @@
                                     <div class="shadow-box-news">
                                         <article class="def-rlt">
                                             <figure class="overlay relative">
-                                                <a href="{{route('news.news_details')}}" class="thumb-overlay-small">
+                                                <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
                                                     <img class="img-responsive" src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
                                                 </a>
                                             </figure>
                                             <div class="entry">
                                                 <span class="entry-category">
-                                                    <a href="{{route('news.news_details')}}">Technology News</a>
+                                                    <a href="{{route('news.news_detail')}}">Technology News</a>
                                                 </span>
                                                 <h3>
-                                                    <a href="{{route('news.news_details')}}">
+                                                    <a href="{{route('news.news_detail')}}">
                                                         WhatsApp’s new fact-check feature lets users identify fake information
                                                     </a>
                                                 </h3>

@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/monitoringcompromised",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\MonitoringCompromised\\Providers\\MonitoringCompromisedServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\MonitoringCompromised\\": ""
+        }
+    }
+}

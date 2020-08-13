@@ -1,0 +1,14 @@
+{
+    "name": "AssetSettingCompromised",
+    "alias": "assetsettingcompromised",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\AssetSettingCompromised\\Providers\\AssetSettingCompromisedServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

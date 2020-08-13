@@ -98,13 +98,13 @@
                                 <span> @langapp('dashboard') </span>
                             </a>
                         </li>
-                        <li class="{{ $page === langapp('alert') ? 'active' : '' }}">
+                        {{-- <li class="{{ $page === langapp('alert') ? 'active' : '' }}">
                             <a href="{{ site_url('/alert') }}">
                                 <i class="fas fa-exclamation-triangle icon"><b class="bg-info"></b></i>
                                 <span> @langapp('alert') </span>
                                 <span class="count-alert"> 1 </span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         <li class="{{ $page === langapp('news') ? 'active' : '' }}">
                             <a href="{{ site_url('/news') }}">
@@ -114,12 +114,13 @@
                             </a>
                         </li>
 
-                        <li class="{{ $page === langapp('manage_assets') ? 'active' : '' }}">
+                        {{-- <li class="{{ $page === langapp('manage_assets') ? 'active' : '' }}">
                             <a href="{{ site_url('/manageassets') }}">
                                 <i class="fas fa-tasks icon"><b class="bg-info"></b></i>
                                 <span> @langapp('manage_assets') </span>
                             </a>
-                        </li>
+                        </li> --}}
+                        
                         <li class="{{ $page === langapp('indicators') ? 'active' : '' }}">
                             <a href="{{ site_url('/indicators') }}">
                                 <i class="fab fa-searchengin icon"><b class="bg-info"></b></i>
@@ -127,34 +128,50 @@
                             </a>
                         </li>
 
-                        <li class="nav-w-children {{ $page === langapp('vulnerability') ? 'active' : '' }}">
-                            <a href="#" class="{{ $page === langapp('vulnerability') ? 'active' : '' }}">
+                        <li class="nav-w-children {{ $page === langapp('vulnerabilitys') ? 'active' : '' }}">
+                            <a href="{{ site_url('/vulnerability') }}" class="{{ $page === langapp('vulnerability') ? 'active' : '' }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
-                                <span> @langapp('vulnerability') </span>
+                                <span> @langapp('vulnerabilitys') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page === langapp('monitoring') ? 'active' : '' }}">
-                                    <a href="{{ site_url('/monitoring') }}">
+                                <li class="{{ $page === langapp('monitoring_vulnerability') ? 'active' : '' }}">
+                                    <a href="{{ route('monitoringvulnerabilitys.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('monitoring') </span>
+                                        <span> @langapp('monitoring_vulnerability') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('assets') ? 'active' : '' }}">
-                                    <a href="{{ site_url('/assets') }}">
+                                <li class="{{ $page === langapp('assets_setting_vulnerability') ? 'active' : '' }}">
+                                    <a href="{{ route('assetsettingvulnerabilitys.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('assets') </span>
+                                        <span> @langapp('assets_setting_vulnerability') </span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
-                        <li class="{{ $page === langapp('compromised') ? 'active' : '' }}">
-                            <a href="{{ site_url('/compromised') }}">
+                        <li class="nav-w-children {{ $page === langapp('compromised') ? 'active' : '' }}">
+                            <a href="{{ site_url('/compromised') }}" class="{{ $page === langapp('compromised') ? 'active' : '' }}">
                                 <i class="fas fa-bug icon"><b class="bg-info"></b></i>
+                                <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                <i class="fas fa-angle-up text-active"></i></span>
                                 <span> @langapp('compromised') </span>
                             </a>
+                            <ul class="nav lt">
+                                <li class="{{ $page === langapp('monitoring') ? 'active' : '' }}">
+                                    <a href="{{ route('monitoringcompromised.index') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('monitoring_compromised') </span>
+                                    </a>
+                                </li>
+                                <li class="{{ $page === langapp('assets_setting_compromised') ? 'active' : '' }}">
+                                    <a href="{{ route('assetsettingcompromised.index')  }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('assets_setting_compromised') </span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                         <li class="nav-w-children {{ $page === langapp('data_leak') ? 'active' : '' }}">
