@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.public')
 @section('image','https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')
 @section('content')
 <section id="content" class="bg">
@@ -27,7 +27,7 @@
                     </div>
                     <div class="shared-news">
                         <div class="pos-rlt">
-                            <button class="btn-shared" onclick="shared_news('178.128.208.129:8082/news/news_details')" data-toggle="tooltip" data-placement="top" data-original-title="Shared">
+                            <button class="btn-shared" onclick="shared_news('178.128.208.129:8082/public_details')" data-toggle="tooltip" data-placement="top" data-original-title="Shared">
                                 <i class="fas fa-share-square"></i>
                             </button>
                             <div class="menu-shared-main d-none">

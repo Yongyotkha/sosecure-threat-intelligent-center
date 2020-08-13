@@ -42,20 +42,6 @@
         <section class="scrollable wrapper bg-white">
             <div class="row">
                 <div class="col-md-3">
-                    <div class="form-group m-b-md">
-                        <label for="" class="">Keyword</label>
-                        <input type="text" class="form-control" name="keyword" placeholder="Search">
-                        {{-- <div class="input-group">
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info btn-icon">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </span>
-                        </div> --}}
-                    </div>
-                </div>
-
-                <div class="col-md-3">
                     <div class="form-group">
                         <label for="" class="">Indicator Type</label>
                         <select name="" id="role" class="select2-option form-control" multiple="multiple">
@@ -125,6 +111,20 @@
                           <option value="Last 24 hours">Last 30 days</option>
                           <option value="Last 24 hours" selected>All Time</option>
                       </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group m-b-md">
+                        <label for="" class="">Keyword</label>
+                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+                        {{-- <div class="input-group">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-info btn-icon">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </span>
+                        </div> --}}
                     </div>
                 </div>
             </div>

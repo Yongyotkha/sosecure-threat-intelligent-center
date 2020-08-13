@@ -953,4 +953,5 @@ return [
     'delete_all'                                 => 'Delete All',
     'remark'                                     => 'Remark',
     'api_indicators'                             => 'API Indicators',
+    'news_details'                               => 'News Details',
 ];

@@ -12,25 +12,29 @@
         
 
         {{-- Tab Content --}}
-        <section class="scrollable wrapper">
+        <section class="scrollable wrapper bg-white">
             <section class="panel panel-default">
                 <div class="container-fluid" style="padding: 2rem;">
                     <div class="row">
-                        <div class="col-xl-8 col-lg-6">
-                            <label for="">Keywords</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="col-xl-2 col-lg-3">
+                        <div class="col-xl-2 col-lg-4">
                             <label for="">Select News</label>
                             <section id="select_news" class="select2-option form-control">
                                 <option value="1" selected>All</option>
                             </section>
                         </div>
-                        <div class="col-xl-2 col-lg-3">
+                        <div class="col-xl-8 col-lg-4">
+                            <label for="">Keywords</label>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="col-xl-2 col-lg-4">
                             <div style="margin-bottom: 4px;">&nbsp;</div>
-                            <button class="btn btn-info btn-responsive btn-block" style="max-width: 100px;">
+                            <button class="btn btn-info btn-responsive">
                                 <i class="fas fa-search"></i>
                                 Search
+                            </button>
+                            <button class="btn btn-defualt btn-responsive">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
                             </button>
                         </div>
                     </div>
@@ -49,7 +53,7 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_related_news">
-                        <section class="panel panel-default">
+                        <section class="panel panel-default border-n">
                             <div class="row m-b-md">
                                 <div class="col-sm-12">
                                     <div class="shadow-box-news">

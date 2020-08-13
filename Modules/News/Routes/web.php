@@ -18,3 +18,5 @@ Route::group(
 		Route::get('/news_details', 'NewsController@news_details')->name('news.news_details')->middleware('can:menu_items');
 	}
 );
+
+Route::get('/public_details', 'NewsController@public_details')->name('news.public_details');

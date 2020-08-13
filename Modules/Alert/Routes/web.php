@@ -14,5 +14,6 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'alert'],
     function () {
         Route::get('/', 'AlertController@index')->name('alert.index')->middleware('can:menu_items');
+        Route::get('/alert_details', 'AlertController@alert_details')->name('alert.alert_details')->middleware('can:menu_items');
     }
 );

@@ -6,11 +6,15 @@
     <meta name="keywords" content="{{ get_option('site_keywords') }}">
     <meta name="description" content="{{ get_option('site_desc') }}">
     
+    <meta property="og:url" content="@yield('url_share')">
+    <meta property="og:image" content="@yield('image')">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ get_option('company_name') }}</title>
     <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,300i" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Mr+Dafoe" rel="stylesheet">
     <link rel="stylesheet" href="{{ getAsset('css/theme.css') }}" type="text/css"/>
+    <link rel="stylesheet" href="{{ getAsset('css/custom.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/app.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('storage/css/style.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/sofia.css') }}" type="text/css"/>

@@ -35,6 +35,12 @@ class AlertController extends Controller
         $data['page'] = langapp('alert');
        return view('alert::index')->with($data);
     }
+    
+    public function alert_details()
+    {
+        $data['page'] = langapp('alert');
+       return view('alert::alert_details')->with($data);
+    }
 
     /**
      * Show the form for creating a new resource.

@@ -6,6 +6,8 @@
     <meta name="author" content="{{ get_option('site_author') }}">
     <meta name="keywords" content="{{ get_option('site_keywords') }}">
     <meta name="description" content="{{ get_option('site_desc') }}">
+    <meta property="og:url" content="@yield('url_share')">
+    <meta property="og:image" content="@yield('image')">
     
     <?php $favicon = get_option('site_favicon');
     $ext = substr($favicon, -4); ?>

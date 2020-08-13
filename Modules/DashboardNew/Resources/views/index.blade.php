@@ -9,8 +9,8 @@
             <div class="bc-head">@langapp('dashboard')</div>
         </header>
 
-        <section class="scrollable wrapper">
-            <div class="container-fluid">
+        <section class="scrollable wrapper pd-0">
+            <div class="container-fluid pd-0">
                 <div class="row">
                     <div class="col-md-12">
                         <header class="header-text-badge"><i class="fas fa-network-wired"></i>&nbsp; Asset</header>
@@ -193,7 +193,8 @@
                         </div>
                     </div>
                 </div>
-                
+            </div>
+            <div class="container-fluid">                 
                 <div class="row">
                     <div class="col-md-3">
                         <section class="panel panel-default">
