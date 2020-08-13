@@ -965,5 +965,10 @@ return [
     'edition'                                    => 'Edition',
     'site_ip'                                    => 'Site IP',
     'hosting'                                    => 'Hosting',
+    'vulnerability_settings'                     => 'Vulnerability Settings',
     'ip'                                         => 'IP',
+    'vuln_id'                                         => 'Vuln ID',
+    'summary'                                         => 'Summary',
+    'cvss_severity'                                         => 'CVSS Severity',
+    'transaction'                                         => 'Transaction',
 ];

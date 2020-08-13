@@ -148,6 +148,12 @@
                                         <span> @langapp('assets_setting_vulnerability') </span>
                                     </a>
                                 </li>
+                                <li class="{{ $page === langapp('vulnerability_settings') ? 'active' : '' }}">
+                                    <a href="{{ route('vulnerability_settings.index') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('settings') </span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 
