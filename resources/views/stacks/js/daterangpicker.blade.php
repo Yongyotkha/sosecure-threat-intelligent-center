@@ -1,0 +1,1 @@
+<script src="{{ getAsset('plugins/daterangepicker/daterangepicker.js') }}"></script>

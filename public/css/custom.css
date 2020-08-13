@@ -973,7 +973,7 @@ ul.total-count li{
       /* transform: translateY(-50%) rotate(45deg); */
   }
   
-  .active, .accordion:hover {
+  .active.accordion, .accordion:hover {
     background-color: #ccc; 
   }
   
@@ -981,4 +981,13 @@ ul.total-count li{
     /* padding: 0 18px; */
     display: block;
     background-color: white;
+  }
+
+  .total-count li span.color-purple{
+    font-size: 40px;
+    color: #743ee2;
+  }
+  .total-count li span.color-red{
+    font-size: 40px;
+    color: #ff5858;
   }
