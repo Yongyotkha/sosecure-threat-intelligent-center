@@ -134,7 +134,7 @@
                         <i class="fas fa-search"></i>
                         <span> Search </span>
                     </button>
-                    <button class="btn btn-defualt">
+                    <button class="btn btn-default">
                         <i class="fas fa-broom"></i>
                         <span> Clear </span>
                     </button>

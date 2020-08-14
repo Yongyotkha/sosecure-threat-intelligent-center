@@ -11,157 +11,326 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a> --}}
             <div class="bc-head">@langapp('compromised') > Assets Setting > baac.or.th</div>
-        </header>
-        <section class="scrollable wrapper">
-            <div class="tabbable">
-                <ul class="nav nav-tabs nav-tabs-highlight">
-                    <li class="active"><a href="#overview_tab" data-toggle="tab">Overview</a></li>
-                    <li><a href="#correlations_tab" data-toggle="tab">Correlations</a></li>
+
+            <div class="btn-group pull-right">
+                <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle btn-responsive"
+                data-toggle="dropdown">@icon('solid/ellipsis-h')
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ route('deals.index', ['view' => 'forecast']) }}">@icon('solid/clock', 'text-muted') @langapp('forecasted')</a></li>
+                    <li><a href="{{ route('deals.import') }}" data-toggle="ajaxModal">@icon('solid/cloud-upload-alt', 'text-muted') @langapp('import')</a></li>
+                    <li><a href="{{ route('deals.export')  }}">@icon('solid/cloud-download-alt', 'text-muted') @langapp('export')</a></li>
+                    <li><a href="{{ route('deals.index', ['filter' => 'won'])  }}">@icon('solid/check', 'text-muted') @langapp('won')</a></li>
+                    <li><a href="{{ route('deals.index', ['filter' => 'lost'])  }}">@icon('solid/times', 'text-muted') @langapp('lost')</a></li>
+                    <li><a href="{{ route('deals.index', ['filter' => 'archived'])  }}">@icon('solid/archive', 'text-muted') @langapp('archived')</a></li>
                 </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="overview_tab">
-                        <section class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row d-f-j-ct">
-                                    <div class="col-lg-3 col-md-3 border-alpha">
-                                        <ul class="total-count-com">
-                                            <li class="total-p1">
-                                                <h3 class="text-dark">Total Data Elements</h3>
-                                                <span class="color-purple">10</span>
-                                            </li>
-                                            <li class="total-p1">
-                                                <h3 class="text-dark">Unique Data Elements</h3>
-                                                <span class="color-green">2597</span>
-                                            </li>
-                                            <li class="total-p1">
-                                                <h3 class="text-dark">Errors</h3>
-                                                <span class="color-red">2597</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-lg-3 col-md-3 text-center border-alpha" style="padding: 0">
-                                        <h1>Correlations</h1>
-                                        <div id="chart-show-pie-1"></div>
-                                    </div>
-                                    <div class="col-lg-3 col-md-3 text-center border-alpha" style="padding: 0">
-                                        <h1>Module Categories</h1>
-                                        <div id="chart-show-pie-2"></div>
-                                    </div>
-                                    <div class="col-lg-3 col-md-3 text-center border-alpha" style="padding: 0">
-                                        <h1>Data Sources</h1>
-                                        <div id="chart-show-pie-3"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
+            </div>
 
+            <div class="btn-group pull-right">
+                <a href="{{ route('deals.index', ['view' => 'table']) }}" data-rel="tooltip" title="Table" data-placement="bottom" class="btn btn-sm btn-default">
+                    @icon('solid/th')
+                </a>
+                <a href="{{ route('deals.index', ['view' => 'kanban']) }}" data-rel="tooltip" title="Kanban" data-placement="bottom" class="btn btn-sm btn-default">
+                    @icon('solid/align-justify')
+                </a>
+            </div>
 
-                        <section class="panel panel-default">
-                            <header class="panel-heading font-bold">
-                                Data Elements: Unique VS. Non-unique
-                            </header>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div id="chart-show-bar"></div>
-                                    </div>
-                                </div>
+            <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right" data-rel="tooltip" title="@langapp('create')" data-placement="left">
+                @icon('solid/plus') @langapp('create') Asset
+            </a>
+
+            <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right" data-rel="tooltip" title="@langapp('create')" data-placement="left">
+                 @icon('solid/plus') @langapp('create') Group
+            </a>
+        </header>
+
+        <section class="scrollable wrapper overflow-x-auto" style="padding-top:0">
+            <div class="row" style="margin:0">
+                <div class="bd-ol-ct m-t-xs">
+                    <div class="row" style="margin:0">
+                        <div class="col-md-3 padder-v b-r bg-dark b-light pallete">
+                            <a class="clear" href="#">
+                                <span class="fa-stack fa-2x pull-left m-r-sm">
+                                    <i class="fab fa-expeditedssl"></i>
+                                </span>
+                                <small class="text-uc">Total Item </small>
+                                <span class="h4 block m-t-xs">200</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 padder-v b-r bg-dark b-light pallete">
+                            <a class="clear" href="#">
+                                <span class="fa-stack fa-2x pull-left m-r-sm">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                                <small class="text-uc">Total Group </small>
+                                <span class="h4 block m-t-xs">10</span>
+                            </a>
+                            
+                        </div>
+                        <div class="col-md-3 padder-v b-r bg-dark b-light pallete">
+                            <a class="clear" href="#">
+                                <span class="fa-stack fa-2x pull-left m-r-sm">
+                                    <i class="fas fa-bug"></i>
+                                </span>
+                                <small class="text-uc">Total Item Scan 195</small>
+                                <span class="h4 block m-t-xs">last : 2020-08-18 16:11</span>
+                            </a>
+                            <div class="btn-absolute">
+                                <button type="submit" id="button" class="btn btn-sm btn-default" value="">
+                                    <span data-rel="tooltip" title="" data-original-title="Re-run">@icon('solid/redo')</span>
+                                </button>
                             </div>
-                        </section>
-                        
+                        </div>
+                        <div class="col-md-3 padder-v b-r bg-dark b-light pallete">
+                            <a class="clear" href="#">
+                                <span class="fa-stack fa-2x pull-left m-r-sm">
+                                    <i class="fas fa-plus-circle"></i>
+                                </span>
+                                <small class="text-uc">Total Item Add</small>
+                                <span class="h4 block m-t-xs">5</span>
+                            </a>
+                        </div>
                     </div>
-                    <div class="tab-pane" id="correlations_tab">
-                        <section class="panel panel-default">
+                </div>
+            </div>
 
-                        </section>      
+            <div class="row" style="margin:0;">
+                <div class="bd-ol-ct m-t-md">
+                    <div class="row">
+                        <div class="col-md-6 m-b-md">
+                            <select name="" id="" class="form-control">
+                                <option value="">Group All</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 m-b-md">
+                            <input type="text" class="form-control" placeholder="keyword">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <div class="btn-group">
+                                <button class="btn btn-info">
+                                    <i class="fas fa-search"></i>
+                                    <span> Search </span>
+                                </button>
+                                <button class="btn btn-default">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row m-t-md">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body collapse in">
+                            <div class="card-block">
+                                <div class="overflow-hidden">
+                                    <div id="todo-lists-basic-demo"class="lobilists-wrapper lobilists single-line sortable ps-container ps-theme-dark ps-active-x">
+                                        <div class="lobilist-wrapper ps-container ps-theme-dark ps-active-y kanban-col">
+                                            <div id="lobilist-list-0"
+                                                class="lobilist lobilist-default">
+                                                <div class="lobilist-header ui-sortable-handle">
+                                                    <div class="lobilist-title text-ellipsis text-uc text-muted">
+                                                        <span class="arrow right"></span> INTERNEL
+                                                    </div>
+                                                </div>
+                                                <div class="lobilist-body scrumboard slim-scroll" data-disable-fade-out="true"
+                                                    data-distance="0" data-size="3px" data-height="550"
+                                                    data-color="#333333">
+                                                    <ul class="lobilist-items ui-sortable list" id="">
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">baac.or.th</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">ns1.baac.or.th</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">202.94.73.42</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                {{-- <div class="lobilist-footer">
+                                                    <strong>123</strong>
+                                                    <strong class="pull-right">Deal(s)</strong>
+                                                </div> --}}
+                                            </div>
+                                        </div>
+
+                                        <div class="lobilist-wrapper ps-container ps-theme-dark ps-active-y kanban-col">
+                                            <div id="lobilist-list-0"
+                                                class="lobilist lobilist-default">
+                                                <div class="lobilist-header ui-sortable-handle">
+                                                    <div class="lobilist-title text-ellipsis text-uc text-muted">
+                                                        <span class="arrow right"></span> EMAIL ADDRESS
+                                                    </div>
+                                                </div>
+                                                <div class="lobilist-body scrumboard slim-scroll" data-disable-fade-out="true"
+                                                    data-distance="0" data-size="3px" data-height="550"
+                                                    data-color="#333333">
+                                                    <ul class="lobilist-items ui-sortable list" id="">
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">anita@baac.or.th</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">boonthai@baac.or.th</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                {{-- <div class="lobilist-footer">
+                                                    <strong>123</strong>
+                                                    <strong class="pull-right">Deal(s)</strong>
+                                                </div> --}}
+                                            </div>
+                                        </div>
+
+                                        <div class="lobilist-wrapper ps-container ps-theme-dark ps-active-y kanban-col">
+                                            <div id="lobilist-list-0"
+                                                class="lobilist lobilist-default">
+                                                <div class="lobilist-header ui-sortable-handle">
+                                                    <div class="lobilist-title text-ellipsis text-uc text-muted">
+                                                        <span class="arrow right"></span> DNS TXT RECORD
+                                                    </div>
+                                                </div>
+                                                <div class="lobilist-body scrumboard slim-scroll" data-disable-fade-out="true"
+                                                    data-distance="0" data-size="3px" data-height="550"
+                                                    data-color="#333333">
+                                                    <ul class="lobilist-items ui-sortable list" id="">
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">Bank for Agriuclture and agricutural Coop</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                        <li id="" draggable="true" class="lobilist-item kanban-entry grab custom-lobilist-item">
+                                                            <div class="lobilist-item-title text-ellipsis m-l-xs font14">
+                                                                <a href="" class="text-danger">MS=ms24090778</a>
+                                                            </div>
+                                                            <span class="thumb-xs avatar lobilist-check lobilist-check-top">
+                                                                <i class="fas fa-user-circle fa-2x text-info"></i>
+                                                            </span>
+                                                            <div class="drag-handler"></div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                {{-- <div class="lobilist-footer">
+                                                    <strong>123</strong>
+                                                    <strong class="pull-right">Deal(s)</strong>
+                                                </div> --}}
+                                            </div>
+                                        </div>
+
+                                        <div class="modal modal-static fade" id="processing-modal"
+                                            role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog processing-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-body">
+                                                        <div class="text-center">
+                                                            @icon('solid/sync-alt', 'fa-4x fa-spin')
+                                                            <h4>Processing...</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
+        
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.datepicker')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+
 @endpush
 
 @push('pagescript')
-@include('stacks.js.datatables')
-@include('stacks.js.datepicker')
-@include('stacks.js.daterangpicker')
-@include('stacks.js.chart')
-
-<script>
-
-    var chart_pie_1 = new frappe.Chart("#chart-show-pie-1", { 
-        title: "",
-        data:{
-            labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-                { values: [18, 40, 30, 35, 8, 52, 17, -4] }
-            ]
-        },
-        type: 'pie',
-        height: 300,
-        colors: ['#743ee2']
-    });
-
-    var chart_pie_2 = new frappe.Chart("#chart-show-pie-2", { 
-        title: "",
-        data:{
-            labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-                { values: [18, 40, 30, 35, 8, 52, 17, -4] }
-            ]
-        },
-        type: 'pie',
-        height: 300,
-        colors: ['#743ee2']
-    });
-
-    var chart_pie_3 = new frappe.Chart("#chart-show-pie-3", { 
-        title: "",
-        data:{
-            labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-                { values: [18, 40, 30, 35, 8, 52, 17, -4] }
-            ]
-        },
-        type: 'pie',
-        height: 300,
-        colors: ['#743ee2']
-    });
-
-
-    var chart_bar = new frappe.Chart("#chart-show-bar", { 
-        title: "",
-        data:{
-            labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-                {
-                    name: "Unique",
-                    values: [18, 40, 30, 35, 8, 52, 17, 6],
-                    chartType: 'bar'
-                },
-                {
-                    name: "Non-unique",
-                    values: [30, 50, 5, 15, 18, 32, 27, 14],
-                    chartType: 'bar'
-                }
-            ]
-        },
-        type: 'bar',
-        height: 300,
-        colors: ['#7cd6fd','#a9a9a9']
-    });
-
+<script type="text/javascript">
+$(document).ready(function () {
+var kanbanCol = $('.scrumboard');
+draggableInit();
+});
+function draggableInit() {
+var sourceId;
+$('[draggable=true]').bind('dragstart', function (event) {
+sourceId = $(this).parent().attr('id');
+event.originalEvent.dataTransfer.setData("text/plain", event.target.getAttribute('id'));
+});
+$('.scrumboard').bind('dragover', function (event) {
+event.preventDefault();
+});
+$('.scrumboard').bind('drop', function (event) {
+var children = $(this).children();
+var targetId = children.attr('id');
+if (sourceId != targetId) {
+var elementId = event.originalEvent.dataTransfer.getData("text/plain");
+$('#processing-modal').modal('toggle');
+setTimeout(function () {
+var element = document.getElementById(elementId);
+deal_id = element.getAttribute('id');
+$.ajax({
+type: "POST",
+url: "{{ route('deals.movestage') }}",
+data: {
+'id': deal_id,
+'_token': '{{ csrf_token() }}',
+'target': targetId
+},
+success: function (msg) {
+toastr.success(msg, '@langapp('success') ');
+}
+});
+children.prepend(element);
+$('#processing-modal').modal('toggle');
+}, 1000);
+}
+event.preventDefault();
+});
+}
 </script>
+
 @endpush
 @endsection

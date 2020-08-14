@@ -1040,3 +1040,26 @@ ul.total-count li{
           justify-content: center;
       }
   }
+
+  .lobilist-check.lobilist-check-top{
+    top: 6px !important;
+  }
+
+  .lobilist-item.custom-lobilist-item {
+    border: 1px solid transparent;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    -webkit-transition: background-color .2s;
+    transition: background-color .2s;
+    position: relative;
+    padding: 1rem 1rem 1rem 40px !important;
+}
+.b-d-all{
+    border: 2px solid #eee !important;
+}
+.btn-absolute{
+    position:absolute;
+    top:50%;
+    right:25px;
+    transform:translateY(-50%)
+}

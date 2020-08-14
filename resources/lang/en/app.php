@@ -977,4 +977,7 @@ return [
     'element'                                    => 'Element',
     'target'                                     => 'Target',
     'corelations'                                => 'Corelations',
+    'group'                                      => 'Group',
+    'group_name'                                 => 'Group Name',
+    'item_name'                                  => 'Item Name',
 ];

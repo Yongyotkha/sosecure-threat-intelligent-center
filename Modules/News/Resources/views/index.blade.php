@@ -32,7 +32,7 @@
                                 <i class="fas fa-search"></i>
                                 Search
                             </button>
-                            <button class="btn btn-defualt btn-responsive">
+                            <button class="btn btn-default btn-responsive">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
