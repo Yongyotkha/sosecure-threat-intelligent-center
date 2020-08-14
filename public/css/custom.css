@@ -457,6 +457,24 @@ input.form-transparent::placeholder{
     align-items: center;
     justify-content: center;
 }
+.d-flex{
+    display: flex;
+}
+
+.haed-d-flex{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.head-d-flex-nowrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
 
 .footer-action{
     background: #eaeaea;
@@ -1067,3 +1085,54 @@ ul.total-count li{
 .select2-container{
     width: 100% !important;
 }
+
+.m-none{
+    margin:0 !important;
+}
+
+
+@media screen and (max-width:405px){
+    ul.detail-show {
+        display: flex;
+        padding: 0;
+        flex-direction: column;
+    }
+    ul.detail-show li{
+        margin: .5rem 0 !important;
+    }
+    .pulse-indicator-counts{
+        margin-top: .5rem;
+    }
+}
+@media screen and (max-width:1184px){
+    .related-pulses{
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+    }
+    .related-img{
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: start;
+        align-items: start;
+        padding: 1rem;
+    }
+    .related-title{
+        display: flex;
+        flex-direction: column;
+        align-items: self-end;
+    }
+    .related-content {
+        width: 100%;
+    }
+    .active-indicator {
+        align-items: center;
+        padding: 1rem 0rem;
+        flex-direction: row;
+    }
+    .related-subscribers{
+        display: none;
+    }
+}
+
