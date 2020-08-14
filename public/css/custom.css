@@ -1063,3 +1063,7 @@ ul.total-count li{
     right:25px;
     transform:translateY(-50%)
 }
+
+.select2-container{
+    width: 100% !important;
+}

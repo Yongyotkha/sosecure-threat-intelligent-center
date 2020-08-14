@@ -15,24 +15,25 @@
         <section class="scrollable wrapper bg-white">
             <section class="panel panel-default">
                 <div class="container-fluid" style="padding: 2rem;">
-                    <div class="row">
-                        <div class="col-xl-2 col-lg-4">
+                    <div class="row m-b-md">
+                        <div class="col-lg-4">
                             <label for="">Select Source</label>
                             <section id="select_source" class="select2-option form-control">
                                 <option value="1" selected>All</option>
                             </section>
                         </div>
-                        <div class="col-xl-8 col-lg-4">
+                        <div class="col-lg-8">
                             <label for="">Keywords</label>
                             <input type="text" class="form-control">
                         </div>
-                        <div class="col-xl-2 col-lg-4">
-                            <div style="margin-bottom: 4px;">&nbsp;</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
                             <button class="btn btn-info btn-responsive">
                                 <i class="fas fa-search"></i>
                                 Search
                             </button>
-                            <button class="btn btn-default btn-responsive">
+                            <button class="btn btn-default btn-responsive" style="white-space: nowrap">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
