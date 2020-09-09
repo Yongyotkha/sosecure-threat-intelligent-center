@@ -4,7 +4,7 @@
 /storage/*
 /storage/framework/cache/data/
 /storage/framework/cache/
-/vendor/*
+/vendor/
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
