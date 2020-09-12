@@ -2,23 +2,25 @@
     <div class="modal-content">
         <div class="modal-header bg-danger">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">@langapp('delete_company') </h4>
+            <h4 class="modal-title">@langapp('delete')   {{  $categorySettings->name  }}</h4>
         </div>
-        {!! Form::open(['route' => ['categorysettings.api.delete', $categorySettings->id], 'method' => 'DELETE']) !!}
+
+        {!! Form::open(['route' => ['categorysettings.api.delete', $categorySettings->id], 'class' => 'ajaxifyForm', 'method' => 'DELETE']) !!}
+
         <div class="modal-body">
-            <p class="text-danger">@langapp('delete_company_warning') </p>
+            <p class="text-danger">@langapp('delete_warning')  </p>
 
-
-            <input type="hidden" name="id" value="{{  $categorySettings->id }}">
+            <input type="hidden" name="checked[]" value="{{  $categorySettings->id  }}">
 
         </div>
         <div class="modal-footer">
 
             {!! closeModalButton() !!}
-            {!! okModalButton() !!}
-            
-        </div>
+            {!! renderAjaxButton('ok') !!}
 
+        </div>
+        
         {!! Form::close() !!}
     </div>
 </div>
+@include('partial.ajaxify')

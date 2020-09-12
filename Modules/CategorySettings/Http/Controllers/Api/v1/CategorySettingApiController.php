@@ -137,6 +137,26 @@ class CategorySettingApiController extends Controller
         );
     }
 
+       /**
+     * Remove the specified resource from storage.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete($id = null)
+    {
+        $model = $this->CategorySettings->find($id);
+        // dd($model);
+        $model->delete();
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('categorysettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
     private function uploadLogo($request, $client)
     {
         $currentLogo = $client->getOriginal('logo');
@@ -273,23 +293,5 @@ class CategorySettingApiController extends Controller
         return response($deals, Response::HTTP_OK);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function delete($id = null)
-    {
-        $model = $this->CategorySettings->find($id);
-        // dd($model);
-        $model->delete();
-        return ajaxResponse(
-            [
-                'message'  => langapp('deleted_successfully'),
-                'redirect' => route('categorysettings.index'),
-            ],
-            true,
-            Response::HTTP_OK
-        );
-    }
+ 
 }

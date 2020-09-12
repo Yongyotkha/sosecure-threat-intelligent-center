@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 // });
 
 Route::group(
-    ['middleware' => 'auth:api', 'prefix' => 'api/v1', 'namespace' => 'Api\v1'], function () {
+    ['middleware' => 'auth:api', 'prefix' => 'v1', 'namespace' => 'Api\v1'], function () {
         Route::get('categorysettings/{id}', 'CategorySettingApiController@show')->name('categorysettings.api.show')->middleware('can:settings');
         Route::get('categorysettings', 'CategorySettingApiController@index')->name('categorysettings.api.index')->middleware('can:settings');
         Route::post('categorysettings', 'CategorySettingApiController@save')->name('categorysettings.api.save')->middleware('can:categorysettings_create');//->middleware('can:categorysettings_create')

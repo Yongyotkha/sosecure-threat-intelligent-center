@@ -17,7 +17,9 @@ use App\Traits\Vaultable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 use Modules\Clients\Observers\ClientObserver;
 use Modules\Clients\Scopes\ClientScope;
 use Modules\Contracts\Entities\Contract;
@@ -30,16 +32,21 @@ use Modules\Payments\Entities\Payment;
 use Modules\Projects\Entities\Project;
 use Modules\Users\Entities\Profile;
 use Modules\Users\Entities\User;
+use Spatie\Permission\Traits\HasRoles;
 
-class CategorySettings extends Model implements HasLocalePreference
+class CategorySettings extends Authenticatable implements HasLocalePreference//extends Model
 {
     // use Notifiable, Observable, SoftDeletes, Actionable, Commentable, Todoable, Vaultable,
     // Taggable, Customizable, Noteable, Uploadable, Emailable, CustomBillable;
+    use Notifiable, HasRoles,HasApiTokens,Observable, SoftDeletes, Actionable, Vaultable,Customizable, Uploadable, Emailable;
+
+    protected static $observer = UserObserver::class;
+    protected static $scope    = null;
 
     protected $table = "categories";
     public $timestamps = false;
     protected $fillable = [
-        'name', 'module', 'color', 'active', 'order', 'description', 'pipeline',
+        'id','name', 'module', 'color', 'active', 'order', 'description', 'pipeline',
     ];
     // protected $appends = ['contact_person', 'expense_cost', 'outstanding', 'map', 'maplink'];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
