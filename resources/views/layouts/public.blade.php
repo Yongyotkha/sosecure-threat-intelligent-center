@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="{{ getAsset('css/app.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('storage/css/style.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/sofia.css') }}" type="text/css"/>
+    <link rel="stylesheet" href="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.css') }}" type="text/css"/>
     
     <link rel="icon" type="image/png" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}">
     <link rel="apple-touch-icon" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_appleicon')) }}"/>
@@ -103,6 +104,7 @@
 </section>
 
 <script src="{{ getAsset('js/app.js') }}"></script>
+<script src="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.js') }}"></script>
 
 <script src="{{ getAsset('js/theme.js') }}"></script>
     @push('pagescript')

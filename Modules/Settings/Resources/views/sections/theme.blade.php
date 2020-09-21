@@ -1,3 +1,19 @@
+<style>
+    .progress {
+      display: none;
+      margin-bottom: 1rem;
+    }
+    .alert {
+      display: none;
+    }
+    .preview_logo{
+        height: 30px;
+        width: 60px;
+        border: 1px solid #eee;
+        overflow: hidden;
+        margin: auto;
+    }
+</style>
 <div class="row">
     <!-- Start Form -->
     <div class="col-lg-12">
@@ -44,8 +60,9 @@
                                data-placement="bottomRight">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">@langapp('company_logo')  </label>
+
+                {{-- <div class="form-group">
+                    <label class="col-lg-3 control-label">@langapp('company_logo')</label>
                     <div class="col-lg-6">
                         <input type="file" name="company_logo">
                     </div>
@@ -56,8 +73,24 @@
                             </div>
                         @endif
                     </div>
+                </div> --}}
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">@langapp('company_logo')</label>
+                        <div class="col-lg-6">
+                            <input type="file" id="input_company_logo" name="company_logo" accept="image/*">
+                        </div>
+                        <div class="col-lg-2">
+                            <img class="settings-image" id="company_logo_img" src="https://avatars0.githubusercontent.com/u/3456749?s=160" alt="avatar">
+                        </div>
+                    </label>
                 </div>
 
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <div class="alert" role="alert"></div>
+               
                 <div class="form-group">
                     <label class="col-lg-3 control-label">@langapp('login_background')  </label>
                     <div class="col-lg-6">
@@ -252,9 +285,120 @@
     </div>
 </div>
 
+<!-- Modal Crop Image-->
+<div class="modal fade" id="modal_crop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Cropper</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="text-center">Crop Image</h1>
+                                <div class="img-container">
+                                    <img id="crop_img" src="" alt="Picture">
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <h1>Preview Company Logo</h1>
+                                <div class="preview_logo"></div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="crop">Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('pagestyle')
 <link rel="stylesheet" href="{{ getAsset('plugins/iconpicker/fontawesome-iconpicker.min.css') }}" type="text/css"/>
 @endpush
 @push('pagescript')
     @include('stacks.js.iconpicker')
+
+    {{-- Crop Images --}}
+    <script>
+     $(document).ready(function(){
+        var image = document.getElementById('crop_img');
+          var input_logo = $('#input_company_logo');
+          var cropBoxData;
+          var canvasData;
+          var cropper;
+          var $modal = $('#modal_crop');
+
+          input_logo.change(function(event) {
+              var files = event.target.files;
+              var done = function(url){
+                  image.src = url;
+                  $modal.modal('show');
+              };
+
+              if (files && files.length > 0)
+              {
+                  reader = new FileReader();
+                  reader.onload = function(event)
+                  {
+                      done(reader.result);
+                  };
+                  reader.readAsDataURL(files[0]);
+              }
+          });
+         
+        $modal.on('shown.bs.modal', function () {
+            cropper = new Cropper(image, {
+                dragMode: 'move',
+                aspectRatio: 16 / 9,
+                restore: false,
+                guides: false,
+                center: false,
+                highlight: false,
+                cropBoxMovable: false,
+                cropBoxResizable: false,
+                toggleDragModeOnDblclick: false,
+                preview:'.preview_logo'
+            });
+        }).on('hidden.bs.modal', function () {
+            cropper.destroy();
+            cropper = null;
+        });
+
+        $('#crop').click(function(){
+            canvas = cropper.getCroppedCanvas({
+                width: 60,
+                height: 30,
+            });
+            canvas.toBlob(function (blob) {
+                url = URL.createObjectURL(blob);
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = function(){
+                    var base64data = reader.result;
+                    $.ajax({
+                        url:'',
+                        method:'POST',
+                        data:{image:base64data},
+                        success:function(data)
+                        {
+                            $modal.modal('hide');
+                            $('#company_logo_img').attr('src',data)
+                        }
+                    })
+                    
+                };
+            });
+        });
+
+     });
+    </script>
 @endpush
