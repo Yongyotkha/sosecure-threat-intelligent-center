@@ -38,7 +38,7 @@ class SiteSettingApiController extends Controller
      *
      * @var string
      */
-    protected $logos_dir;
+    protected $site_dir;
 
     /**
      * Create a new controller instance.
@@ -48,7 +48,7 @@ class SiteSettingApiController extends Controller
         $this->middleware('localize');
         $this->request   = $request;
         $this->SiteSettings    = new SiteSettings;
-        // $this->logos_dir = config('system.logos_dir') . '/';
+        $this->site_dir = config('system.site_dir') . '/';
     }
 
     public function index()
@@ -79,8 +79,15 @@ class SiteSettingApiController extends Controller
         // $SiteSettings = $this->SiteSettings->create($request->all());
         $SiteSettings = $this->SiteSettings;
         $SiteSettings->name = $request->name;
+        $SiteSettings->descript = $request->descript;
+        $SiteSettings->address = $request->address;
+        $SiteSettings->remark = $request->remark;
         $SiteSettings->active = $request->active ? 1 : 0;
         $SiteSettings->save();
+
+        if ($request->hasFile('logo')) {
+            $this->uploadLogo($request, $SiteSettings);
+        }
 
         // if (!empty($request->contact_email)) {
         //     $user = User::create(
@@ -120,12 +127,15 @@ class SiteSettingApiController extends Controller
         $SiteSettings = $this->SiteSettings->findOrFail($id);
         // $SiteSettings->update($request->all());
         $SiteSettings->name = $request->name;
+        $SiteSettings->descript = $request->descript;
+        $SiteSettings->address = $request->address;
+        $SiteSettings->remark = $request->remark;
         $SiteSettings->active = $request->active ? 1 : 0;
         $SiteSettings->save();
 
-        // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $client);
-        // }
+        if ($request->hasFile('logo')) {
+            $this->uploadLogo($request, $SiteSettings);
+        }
         return ajaxResponse(
             [
                 'id'       => $SiteSettings->id,
@@ -148,9 +158,6 @@ class SiteSettingApiController extends Controller
         $SiteSettings->active = $SiteSettings->active == 1 ? 0 : 1;
         $SiteSettings->save();
 
-        // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $client);
-        // }
         return ajaxResponse(
             [
                 'id'       => $SiteSettings->id,
@@ -182,14 +189,14 @@ class SiteSettingApiController extends Controller
         );
     }
 
-    private function uploadLogo($request, $client)
+    private function uploadLogo($request, $SiteSettings)
     {
-        $currentLogo = $client->getOriginal('logo');
-        if (\Storage::exists($this->logos_dir . $currentLogo)) {
-            \Storage::delete($this->logos_dir . $currentLogo);
+        $currentLogo = $SiteSettings->getOriginal('logo');
+        if (\Storage::exists($this->site_dir . $currentLogo)) {
+            \Storage::delete($this->site_dir . $currentLogo);
         }
-        \Storage::putFile($this->logos_dir, $request->file('logo'), 'public');
-        $client->update(['logo' => $request->logo->hashName()]);
+        \Storage::putFile($this->site_dir, $request->file('logo'), 'public');
+        $SiteSettings->update(['logo' => $request->logo->hashName()]);
     }
     /**
      * Show the specified client contacts.

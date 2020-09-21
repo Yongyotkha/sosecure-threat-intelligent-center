@@ -5,6 +5,7 @@ return [
     'avatar_dir'               => env('AVATAR_DIR', 'public/avatars'),
     'signature_dir'            => env('SIGNATURE_DIR', 'public/signatures'),
     'logos_dir'                => env('LOGOS_DIR', 'public/logos'),
+    'site_dir'                => env('LOGOS_DIR', 'public/site'),
     'media_dir'                => env('MEDIA_DIR', 'public/media'),
     'pdf_font'                 => env('PDF_FONT', 'lato'),
     'pdf'                      => [
