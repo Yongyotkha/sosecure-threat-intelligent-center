@@ -1,0 +1,14 @@
+{
+    "name": "SiteSettings",
+    "alias": "sitesettings",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\SiteSettings\\Providers\\SiteSettingsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

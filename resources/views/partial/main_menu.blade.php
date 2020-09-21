@@ -242,6 +242,12 @@
                                         <span> @langapp('category_settings') </span>
                                     </a>
                                 </li>
+                                <li class="{{ $page === langapp('site_settings') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/sitesettings') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('site_settings') </span>
+                                    </a>
+                                </li>
                                 <li class="{{ $page === langapp('rss_feed_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>

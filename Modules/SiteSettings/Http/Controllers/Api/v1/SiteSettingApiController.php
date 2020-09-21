@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\CategorySettings\Http\Controllers\Api\v1;
+namespace Modules\SiteSettings\Http\Controllers\Api\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\CategorySettings\Entities\CategorySettings;
-use Modules\CategorySettings\Http\Requests\CategorySettingsRequest;
+use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
 // use Modules\Clients\Transformers\ClientResource;
 // use Modules\Clients\Transformers\ClientsResource;
 // use Modules\Contacts\Transformers\ContactsResource;
@@ -19,14 +19,14 @@ use Modules\CategorySettings\Http\Requests\CategorySettingsRequest;
 // use Modules\Subscriptions\Transformers\SubscriptionsResource;
 // use Modules\Users\Entities\User;
 
-class CategorySettingApiController extends Controller
+class SiteSettingApiController extends Controller
 {
     /**
      * Client model
      *
-     * @var \Modules\Clients\Entities\CategorySettings
+     * @var \Modules\Clients\Entities\SiteSettings
      */
-    protected $CategorySettings;
+    protected $SiteSettings;
     /**
      * Request instance
      *
@@ -47,18 +47,18 @@ class CategorySettingApiController extends Controller
     {
         $this->middleware('localize');
         $this->request   = $request;
-        $this->CategorySettings    = new CategorySettings;
+        $this->SiteSettings    = new SiteSettings;
         // $this->logos_dir = config('system.logos_dir') . '/';
     }
 
     public function index()
     {
-        $CategorySettings = new CategorySettings(
-            $this->CategorySettings->with(['name,module,color,active,order,description,pipeline'])
+        $SiteSettings = new SiteSettings(
+            $this->SiteSettings->with(['name,descript,logo,address,remark,active'])
                 ->orderByDesc('id')
                 ->paginate(40)
         );
-        return response($CategorySettings, Response::HTTP_OK);
+        return response($SiteSettings, Response::HTTP_OK);
     }
 
     /**
@@ -68,19 +68,19 @@ class CategorySettingApiController extends Controller
      */
     public function show($id = null)
     {
-        $CategorySettings = $this->CategorySettings->findOrFail($id);
-        return response(new CategorySettings($CategorySettings), Response::HTTP_OK);
+        $SiteSettings = $this->SiteSettings->findOrFail($id);
+        return response(new SiteSettings($SiteSettings), Response::HTTP_OK);
     }
 
-    public function save(CategorySettingsRequest $request)
+    public function save(SiteSettingsRequest $request)
     {
         // dd($request);
-        // $this->authorize('create', CategorySettings::class);
-        // $CategorySettings = $this->CategorySettings->create($request->all());
-        $CategorySettings = $this->CategorySettings;
-        $CategorySettings->name = $request->name;
-        $CategorySettings->active = $request->active ? 1 : 0;
-        $CategorySettings->save();
+        // $this->authorize('create', SiteSettings::class);
+        // $SiteSettings = $this->SiteSettings->create($request->all());
+        $SiteSettings = $this->SiteSettings;
+        $SiteSettings->name = $request->name;
+        $SiteSettings->active = $request->active ? 1 : 0;
+        $SiteSettings->save();
 
         // if (!empty($request->contact_email)) {
         //     $user = User::create(
@@ -97,65 +97,65 @@ class CategorySettingApiController extends Controller
         //             'country' => $client->country,
         //         ]
         //     );
-        //     // $CategorySettings->update(['primary_contact' => $user->id]);
+        //     // $SiteSettings->update(['primary_contact' => $user->id]);
         // }
         // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $CategorySettings);
+        //     $this->uploadLogo($request, $SiteSettings);
         // }
         return ajaxResponse(
             [
-                'id'       => $CategorySettings->id,
+                'id'       => $SiteSettings->id,
                 'message'  => langapp('saved_successfully'),
-                'redirect' => route('categorysettings.index'),
+                'redirect' => route('sitesettings.index'),
             ],
             true,
             Response::HTTP_CREATED
         );
     }
 
-    public function update(CategorySettingsRequest $request, $id = null)
+    public function update(SiteSettingsRequest $request, $id = null)
     {
         // dd($request);
         // exit();
-        $CategorySettings = $this->CategorySettings->findOrFail($id);
-        // $CategorySettings->update($request->all());
-        $CategorySettings->name = $request->name;
-        $CategorySettings->active = $request->active ? 1 : 0;
-        $CategorySettings->save();
+        $SiteSettings = $this->SiteSettings->findOrFail($id);
+        // $SiteSettings->update($request->all());
+        $SiteSettings->name = $request->name;
+        $SiteSettings->active = $request->active ? 1 : 0;
+        $SiteSettings->save();
 
         // if ($request->hasFile('logo')) {
         //     $this->uploadLogo($request, $client);
         // }
         return ajaxResponse(
             [
-                'id'       => $CategorySettings->id,
+                'id'       => $SiteSettings->id,
                 'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('categorysettings.index'),
+                'redirect' => route('sitesettings.index'),
             ],
             true,
             Response::HTTP_OK
         );
     }
 
-    public function change_status(CategorySettingsRequest $request)
+    public function change_status(SiteSettingsRequest $request)
     {
         // dd($request);
         // exit();
-        $data['category_id'] = $this->request->category_id;
-        $CategorySettings = $this->CategorySettings->findOrFail($data['category_id']);
-        // $CategorySettings->update($request->all());
-        // $CategorySettings->name = $request->name;
-        $CategorySettings->active = $CategorySettings->active == 1 ? 0 : 1;
-        $CategorySettings->save();
+        $data['site_id'] = $this->request->site_id;
+        $SiteSettings = $this->SiteSettings->findOrFail($data['site_id']);
+        // $SiteSettings->update($request->all());
+        // $SiteSettings->name = $request->name;
+        $SiteSettings->active = $SiteSettings->active == 1 ? 0 : 1;
+        $SiteSettings->save();
 
         // if ($request->hasFile('logo')) {
         //     $this->uploadLogo($request, $client);
         // }
         return ajaxResponse(
             [
-                'id'       => $CategorySettings->id,
+                'id'       => $SiteSettings->id,
                 'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('categorysettings.index'),
+                'redirect' => route('sitesettings.index'),
             ],
             true,
             Response::HTTP_OK
@@ -169,13 +169,13 @@ class CategorySettingApiController extends Controller
      */
     public function delete($id = null)
     {
-        $model = $this->CategorySettings->find($id);
+        $model = $this->SiteSettings->find($id);
         // dd($model);
         $model->delete();
         return ajaxResponse(
             [
                 'message'  => langapp('deleted_successfully'),
-                'redirect' => route('categorysettings.index'),
+                'redirect' => route('sitesettings.index'),
             ],
             true,
             Response::HTTP_OK

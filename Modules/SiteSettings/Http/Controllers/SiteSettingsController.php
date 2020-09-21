@@ -1,18 +1,18 @@
 <?php
 
-namespace Modules\CategorySettings\Http\Controllers;
+namespace Modules\SiteSettings\Http\Controllers;
 
 use Auth;
 use DataTables;
-use Modules\CategorySettings\Entities\CategorySettings;
-use Modules\CategorySettings\Jobs\BulkDeleteCategorySettings;
+use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
 
-class CategorySettingsController extends Controller
+class SiteSettingsController extends Controller
 {
     /**
      * Item Model
@@ -20,7 +20,7 @@ class CategorySettingsController extends Controller
      * @var \Modules\Items\Entities\Item
      */
     protected $item;
-    protected $categorySettings;
+    protected $siteSettings;
     /**
      * Request instance
      *
@@ -28,11 +28,11 @@ class CategorySettingsController extends Controller
      */
     protected $request;
 
-    public function __construct(Request $request , CategorySettings $categorySettings)
+    public function __construct(Request $request , SiteSettings $siteSettings)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
-        $this->categorySettings    = $categorySettings;
+        $this->siteSettings    = $siteSettings;
     }
     /**
      * Display a listing of the resource.
@@ -40,16 +40,16 @@ class CategorySettingsController extends Controller
      */
     public function index()
     {
-    //    $data['page'] = langapp('category_settings');
+    //    $data['page'] = langapp('site_settings');
 
        $data['filter'] = $this->request->filter;
        $data['page']   = $this->getPage();
-       return view('categorysettings::index')->with($data);
+       return view('sitesettings::index')->with($data);
     }
 
     public function test()
     {
-       $data['page'] = langapp('category_settings');
+       $data['page'] = langapp('site_settings');
        return $data['page'];
     }
 
@@ -59,7 +59,7 @@ class CategorySettingsController extends Controller
      */
     public function create()
     {
-        return view('categorysettings::modal.create');
+        return view('sitesettings::modal.create');
     }
 
     /**
@@ -79,7 +79,7 @@ class CategorySettingsController extends Controller
      */
     public function show($id)
     {
-        return view('categorysettings::show');
+        return view('sitesettings::show');
     }
 
     /**
@@ -87,11 +87,11 @@ class CategorySettingsController extends Controller
      * @param int $id
      * @return Response
      */
-    public function edit(CategorySettings $id)
+    public function edit(SiteSettings $id)
     {
-        $data['categorySettings'] = $id;
+        $data['siteSettings'] = $id;
         // dd($id);
-        return view('categorysettings::modal.update')->with($data);
+        return view('sitesettings::modal.update')->with($data);
     }
 
     /**
@@ -106,10 +106,10 @@ class CategorySettingsController extends Controller
     }
 
 
-    public function delete(CategorySettings $id)
+    public function delete(SiteSettings $id)
     {
-        $data['categorySettings'] = $id;
-        return view('categorysettings::modal.delete')->with($data);
+        $data['siteSettings'] = $id;
+        return view('sitesettings::modal.delete')->with($data);
     }
 
     public function holiday($status = null)
@@ -127,7 +127,7 @@ class CategorySettingsController extends Controller
     public function bulkDelete()
     {
         if ($this->request->has('checked')) {
-            BulkDeleteCategorySettings::dispatch($this->request->checked, Auth::id());
+            BulkDeleteSiteSettings::dispatch($this->request->checked, Auth::id());
             $data['message']  = langapp('deleted_successfully');
             $data['redirect'] = url()->previous();
             return ajaxResponse($data);
@@ -137,9 +137,9 @@ class CategorySettingsController extends Controller
 
     public function change_status()
     {
-            $data['category_id'] = $this->request->category_id;
+            $data['site_id'] = $this->request->site_id;
 
-            // echo ($data['category_id']);
+            // echo ($data['site_id']);
             // exit();
 
             // $get_active = $this->Site_model->get_by_id_site($site_id);
@@ -159,7 +159,7 @@ class CategorySettingsController extends Controller
 
 
 
-        if ($this->request->has('category_id')) {
+        if ($this->request->has('site_id')) {
            
             $data['message']  = langapp('change_status_successfully');
             $data['redirect'] = url()->previous();
@@ -176,40 +176,40 @@ class CategorySettingsController extends Controller
     public function tableData()
     {
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
-        $model = $this->categorySettings->query();
+        $model = $this->siteSettings->query();
         return DataTables::eloquent($model)
             ->editColumn(
                 'no',
-                function ($categorySettings) {
-                    return $categorySettings->id;
+                function ($siteSettings) {
+                    return $siteSettings->id;
                 }
             )
             ->editColumn(
                 'chk',
-                function ($categorySettings) {
-                    return '<label><input type="checkbox" name="checked[]" value="' . $categorySettings->id . '"><span class="label-text"></span></label>';
+                function ($siteSettings) {
+                    return '<label><input type="checkbox" name="checked[]" value="' . $siteSettings->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(
                 'name',
-                function ($categorySettings) {
-                    return $categorySettings->name;
+                function ($siteSettings) {
+                    return $siteSettings->name;
                 }
             )
             ->editColumn(
                 'status',
-                function ($categorySettings) {
-                    if($categorySettings->active == '1') {
+                function ($siteSettings) {
+                    if($siteSettings->active == '1') {
                         $checked_val = 'checked';
                     } else {
                         $checked_val = '';
                     }
                     $html = '';
                     $html .= '<script>
-                    function change_category_active (category_id) {
-                        axios.post("'. route('categorysettings.api.change_status') .'", {
+                    function change_site_active (site_id) {
+                        axios.post("'. route('sitesettings.api.change_status') .'", {
                             // params: {
-                                category_id: category_id
+                                site_id: site_id
                             // }
                           })
                         .then(function (response) {
@@ -231,7 +231,7 @@ class CategorySettingsController extends Controller
                     // $html = '';
                     $html .= '<label class="switch">
                                 <input type="hidden" value="FALSE" name="">
-                                <input type="checkbox" onclick="change_category_active(' . $categorySettings->id . ')" '.$checked_val.' name="active" value="1">
+                                <input type="checkbox" onclick="change_site_active(' . $siteSettings->id . ')" '.$checked_val.' name="active" value="1">
                                 <span></span>
                               </label>';
                     return $html;
@@ -239,16 +239,16 @@ class CategorySettingsController extends Controller
             )
             ->editColumn(
                 'action',
-                function ($categorySettings) {
+                function ($siteSettings) {
                     $html = '';
                     $html .= "<!--<a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                     @icon('solid/shield-alt')
                                 </a>-->
                                 
-                                <a href='". route('categorysettings.edit', ['id' => $categorySettings->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                                <a href='". route('sitesettings.edit', ['id' => $siteSettings->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
                                 </a>
-                                <a href='". route('categorysettings.delete', ['id' => $categorySettings->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                                <a href='". route('sitesettings.delete', ['id' => $siteSettings->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
                                 </a>";
                     return $html;
@@ -268,7 +268,7 @@ class CategorySettingsController extends Controller
 
     private function getPage()
     {
-        return langapp('category_settings');
+        return langapp('site_settings');
     }
 
 

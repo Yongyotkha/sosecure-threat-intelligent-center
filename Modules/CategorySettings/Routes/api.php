@@ -24,6 +24,7 @@ Route::group(
         Route::get('categorysettings', 'CategorySettingApiController@index')->name('categorysettings.api.index')->middleware('can:settings');
         Route::post('categorysettings', 'CategorySettingApiController@save')->name('categorysettings.api.save')->middleware('can:categorysettings_create');//->middleware('can:categorysettings_create')
         Route::put('categorysettings/{id}', 'CategorySettingApiController@update')->name('categorysettings.api.update')->middleware('can:categorysettings_update');
+        Route::post('categorysettings/change_status', 'CategorySettingApiController@change_status')->name('categorysettings.api.change_status')->middleware('can:categorysettings_update');
         Route::delete('categorysettings/{id}', 'CategorySettingApiController@delete')->name('categorysettings.api.delete')->middleware('can:categorysettings_delete');
     }
 );

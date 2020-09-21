@@ -7,7 +7,7 @@
             btn-sm btn-responsive pull-left m-r-5">
             @icon('solid/arrow-left')
                 </a> --}}
-                <div class="bc-head">@langapp('settings') > Categorys</div>
+                <div class="bc-head">@langapp('settings') > Site</div>
                 <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
                     data-rel="tooltip" title="@langapp('export') CSV">
                     @icon('solid/download') CSV
@@ -19,7 +19,7 @@
                     </a> --}}
 
                     @if(isAdmin() || can('settings'))
-                        <a href="{{ route('categorysettings.create') }}"
+                        <a href="{{ route('sitesettings.create') }}"
                             class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
                             data-toggle="ajaxModal">
                             @icon('solid/plus') @langapp('create')
@@ -30,12 +30,12 @@
         <section class="scrollable wrapper">
             <section class="panel panel-default">
 
-                <form id="frm-category" method="POST">
+                <form id="frm-site" method="POST">
                     <div class="table-responsive">
                         @php
                             // dd(lastMonth());
                         @endphp
-                        <table class="table table-striped" id="table-category-template">
+                        <table class="table table-striped" id="table-site-template">
                             <thead>
                                 <tr>
                                     <th class="">No.</th>
@@ -70,55 +70,7 @@
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
-    <!-- Modal Gen Category -->
-    {{-- <div class="modal fade" id="create_key_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Category</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="">
-                <div class="modal-body">
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">Key <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="generate_key" value="" readonly>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info">Gen</button>  
-                            </span>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">Status </label>
-                        <div class="col-lg-6">
-                            <label class="switch">
-                                <input type="hidden" value="FALSE" name="">
-                                <input type="checkbox" name="" value="TRUE">
-                                <span></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div> --}}
+
 
 </section>
 
@@ -137,11 +89,11 @@
    
 
 
-            var table = $('#table-category-template').DataTable({
+            var table = $('#table-site-template').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{!! route('categorysettings.data') !!}',
+                    url: '{!! route('sitesettings.data') !!}',
                     data: ""
                 },
                 order: [
@@ -174,11 +126,11 @@
                 ]
             });
 
-            $("#frm-category button").click(function (ev) {
+            $("#frm-site button").click(function (ev) {
                 ev.preventDefault();
                 if ($(this).attr("value") == "bulk-delete") {
-                    var form = $("#frm-category").serialize();
-                    axios.post('{{ route('categorysettings.bulk.delete') }}', form)
+                    var form = $("#frm-site").serialize();
+                    axios.post('{{ route('sitesettings.bulk.delete') }}', form)
                         .then(function (response) {
                             toastr.warning(response.data.message, '@langapp('response_status')');
                             window.location.href = response.data.redirect;
@@ -198,9 +150,9 @@
         });
 
 
-        // function change_category_active(category_id,category_active) {
-        //             // var form = $("#frm-category").serialize();
-        //             axios.post('{{ route('categorysettings.bulk.delete') }}', category_id)
+        // function change_site_active(site_id,site_active) {
+        //             // var form = $("#frm-site").serialize();
+        //             axios.post('{{ route('sitesettings.bulk.delete') }}', site_id)
         //                 .then(function (response) {
         //                     toastr.warning(response.data.message, '@langapp('response_status')');
         //                     window.location.href = response.data.redirect;
@@ -216,12 +168,12 @@
         // }
 
 
-        function change_category_active (category_id) {
+        function change_site_active (site_id) {
          
 			$.ajax({
 				type:"POST",
-                url:"{{ route('categorysettings.change_status') }}",
-                data:{category_id:category_id},
+                url:"{{ route('sitesettings.change_status') }}",
+                data:{site_id:site_id},
                 beforeSend: function(){
                     // appLoader.show();
                 },
