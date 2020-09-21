@@ -75,7 +75,7 @@
 
     <link rel="stylesheet" href="{{ getAsset('storage/css/style.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/sofia.css') }}" type="text/css"/>
-
+    <link rel="stylesheet" href="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.css') }}" type="text/css"/>
     <?php
     $family = 'Sofia';
     $font = get_option('system_font');
@@ -204,6 +204,7 @@
     <script src="{{ getAsset('plugins/intro/demo.js') }}"></script>
 @endisset
 
+<script src="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.js') }}"></script>
 {!! Toastr::message() !!}
 
 @stack('pagescript')
