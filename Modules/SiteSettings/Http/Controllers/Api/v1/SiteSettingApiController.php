@@ -7,6 +7,9 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
+
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 // use Modules\Clients\Transformers\ClientResource;
 // use Modules\Clients\Transformers\ClientsResource;
 // use Modules\Contacts\Transformers\ContactsResource;
@@ -189,14 +192,45 @@ class SiteSettingApiController extends Controller
         );
     }
 
+    function is_base64($s)
+    {
+          return (bool) preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $s);
+    }
+
     private function uploadLogo($request, $SiteSettings)
     {
-        $currentLogo = $SiteSettings->getOriginal('logo');
-        if (\Storage::exists($this->site_dir . $currentLogo)) {
-            \Storage::delete($this->site_dir . $currentLogo);
+        if($this->is_base64($request->data)) {
+
         }
-        \Storage::putFile($this->site_dir, $request->file('logo'), 'public');
-        $SiteSettings->update(['logo' => $request->logo->hashName()]);
+
+        // $request->logo_image_base64;
+        $img_type = $request->image_type;
+
+        // $data = 'data:image/png;base64,AAAFBfj42Pj4';
+
+        // list($type, $data) = explode(';', $data);
+        // list(, $data)      = explode(',', $data);
+
+
+        $data = base64_decode($request->logo_image_base64);
+        // dd($data);
+        // exit();
+
+        // $currentLogo = $SiteSettings->getOriginal('logo');
+        $currentLogo = $SiteSettings->logo;
+        // if (\Storage::exists($this->site_dir . $currentLogo)) {
+
+        //     \Storage::delete($this->site_dir . $currentLogo);
+        // }
+        // \Storage::putFile($this->site_dir, $data, 'public');//$request->file('logo')
+        // file_put_contents($this->site_dir.'/logo_'.time().'.'.$img_type, $data);
+        // file_put_contents(Storage::disk('public')->url('site/logo_'.time().'.'.$img_type), $data);
+        // file_put_contents($this->site_dir.'logo_'.time().'.'.$img_type, $data);
+        move_uploaded_file($data, $this->site_dir.'logo_'.time().'.'.$img_type);
+        // Storage::disk('public')->url('images/' . $fileName)
+        // dd(1234);
+        // exit();
+        $SiteSettings->update(['logo' => 'logo_'.time().'.'.$img_type]);//$request->logo->hashName()
     }
     /**
      * Show the specified client contacts.

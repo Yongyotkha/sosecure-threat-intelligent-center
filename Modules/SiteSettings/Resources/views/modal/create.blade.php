@@ -27,10 +27,19 @@
             </div>
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Logo </label>
-                <div class="col-lg-9">
+                {{-- <div class="col-lg-9">
                     <div class="">
                         <input id="input_logo" type="file" class="form-control" name="logo" accept="image/*">
                     </div>
+                </div> --}}
+                <div class="pull-left mr15">
+                    <img id="logo_preview" name="logo_preview" src="{{ getStorageUrl(config('system.site_dir').'/default_site.png') }}" width="50" height="50" alt="..." />
+                </div>
+                <input type="hidden" id="logo_image_base64" name="logo_image_base64">
+                <input type="hidden" id="image_type" name="image_type">
+                <div class="pull-left file-upload btn btn-default btn-xs">
+                    <span>...</span>
+                    <input id="input_logo" class="cropbox-upload upload" name="logo" accept="image/*" type="file"  />
                 </div>
             </div>
             
@@ -173,14 +182,29 @@
                    reader.readAsDataURL(blob);
                    reader.onloadend = function(){
                        var base64data = reader.result;
+                       console.log(base64data);
+                       let image_parts = base64data.split(";base64,");
+                       console.log('image_parts : '+image_parts);
+                       let image_type_aux = image_parts[0].split("image/");
+                       console.log('image_type_aux : '+image_type_aux);
+                       let image_type = image_type_aux[1];
+                       console.log('image_type : '+image_type);
+                       console.log('bb : '+image_parts[1]);
+                    //    let image_base64 = base64_decode(image_parts[1]);
+                       let image_base64_de = atob(image_parts[1]);
+                    //    console.log('image_base64 : '+image_base64_de);
+                       $('#logo_preview').attr('src',base64data);
+                       $('#logo_image_base64').val(image_parts[1]);
+                       $('#image_type').val(image_type);
+                    //    $('#input_logo').val(base64data);
                     //    $.ajax({
                     //        url:'',
-                    //        method:'POST',
+                    //        method:'GET',
                     //        data:{image:base64data},
                     //        success:function(data)
                     //        {
                     //            $modal.modal('hide');
-                    //             $('#show_img').attr('src',data)
+                    //             $('#logo_preview').attr('src',data)
                     //        }
                     //    })
                    };
