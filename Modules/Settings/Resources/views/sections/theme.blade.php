@@ -61,7 +61,7 @@
                     </div>
                 </div>
 
-                {{-- <div class="form-group">
+                <div class="form-group">
                     <label class="col-lg-3 control-label">@langapp('company_logo')</label>
                     <div class="col-lg-6">
                         <input type="file" name="company_logo">
@@ -73,9 +73,9 @@
                             </div>
                         @endif
                     </div>
-                </div> --}}
+                </div>
 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label class="col-lg-3 control-label">@langapp('company_logo')</label>
                         <div class="col-lg-6">
                             <input type="file" id="input_company_logo" name="company_logo" accept="image/*">
@@ -84,7 +84,7 @@
                             <img class="settings-image" id="company_logo_img" src="https://avatars0.githubusercontent.com/u/3456749?s=160" alt="avatar">
                         </div>
                     </label>
-                </div>
+                </div> --}}
 
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -286,7 +286,7 @@
 </div>
 
 <!-- Modal Crop Image-->
-<div class="modal fade" id="modal_crop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="modal_crop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -319,7 +319,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 @push('pagestyle')
 <link rel="stylesheet" href="{{ getAsset('plugins/iconpicker/fontawesome-iconpicker.min.css') }}" type="text/css"/>
@@ -328,7 +328,7 @@
     @include('stacks.js.iconpicker')
 
     {{-- Crop Images --}}
-    <script>
+    {{-- <script>
      $(document).ready(function(){
         var image = document.getElementById('crop_img');
           var input_logo = $('#input_company_logo');
@@ -400,5 +400,5 @@
         });
 
      });
-    </script>
+    </script> --}}
 @endpush
