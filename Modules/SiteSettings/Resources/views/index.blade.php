@@ -45,7 +45,9 @@
                                             <span class="label-text"></span>
                                         </label>
                                     </th>
+                                    <th>@langapp('logo')</th>
                                     <th>@langapp('name')</th>
+                                    <th>Categorys</th>
                                     <th>@langapp('status')</th>
                                     <th class="no-sort">Action</th>
                                     
@@ -110,8 +112,16 @@
                         sortable: false
                     },
                     {
+                        data: 'logo',
+                        name: 'logo'
+                    },
+                    {
                         data: 'name',
                         name: 'name'
+                    },
+                    {
+                        data: 'categorys',
+                        name: 'categorys'
                     },
                     {
                         data: 'status',

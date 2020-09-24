@@ -25,7 +25,14 @@ Route::group(
         Route::get('edit-sitesettings/{id}', 'SiteSettingsController@edit')->name('sitesettings.edit')->middleware('can:sitesettings_update');
         Route::get('delete-sitesettings/{id}', 'SiteSettingsController@delete')->name('sitesettings.delete')->middleware('can:sitesettings_delete');
         // Route::get('/test', 'SiteSettingsController@test')->name('sitesettings.test')->middleware('can:menu_items');
+
+        Route::get('/systemsetting', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
+   
+        Route::get('/data-setting', 'DataSettingsController@datasetting')->name('datasettings.index')->middleware('can:menu_items');
+        
+        Route::get('/users-setting', 'UsersSettingsController@users_settings')->name('userssettings.index')->middleware('can:menu_items');
     }
+    
 );
 
 

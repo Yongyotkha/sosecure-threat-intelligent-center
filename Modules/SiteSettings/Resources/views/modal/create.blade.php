@@ -47,20 +47,30 @@
                 <label class="col-lg-3 control-label">Address </label>
                 <div class="col-lg-9">
                     <div class="">
-                        {{-- <input type="text" class="form-control" name="address" value=""> --}}
                         <textarea id="address" name="address" rows="4" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-lg-3 control-label">Remark </label>
                 <div class="col-lg-9">
                     <div class="">
-                        {{-- <input type="textarea" class="form-control" name="remark" value=""> --}}
                         <textarea id="remark" name="remark" rows="4" class="form-control"></textarea>
                     </div>
                 </div>
+            </div> --}}
+
+            <div class="form-group row">
+                <label for="" class="col-lg-3 control-label">Category</label>
+                <div class="col-lg-9">
+                    <select name="" id="categorys" class="select2-option form-control" multiple="multiple">
+                        <option value="1">TEST1</option>
+                        <option value="2">TEST2</option>
+                        <option value="3">CVE</option>
+                    </select>
+                </div>
             </div>
+
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Status </label>
                 <div class="col-lg-6">
@@ -89,7 +99,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalLabel">Cropper</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" onclick="close_crop();" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -110,7 +120,7 @@
                 </div>
             </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal"> <i class="fas fa-times text-muted"></i> Close</button>
+                    <button type="button" class="btn btn-default btn-rounded" onclick="close_crop();"> <i class="fas fa-times text-muted"></i> Close</button>
                     <button type="button" class="btn btn-info btn-rounded" id="crop"><i class="fas fa-check"></i> Save</button>
                 </div>
             </div>
@@ -127,6 +137,12 @@
 
     {{-- Crop Images --}}
     <script>
+        $(document).ready(function () {
+            $('#categorys').select2({
+                placeholder:'Categorys',
+            });
+        });
+
         $(document).ready(function(){
            var image = document.getElementById('crop_img');
              var input_logo = $('#input_logo');
@@ -134,7 +150,7 @@
              var canvasData;
              var cropper;
              var $modal = $('#modal_crop_logo');
-   
+
              input_logo.change(function(event) {
                  var files = event.target.files;
                  var done = function(url){
@@ -211,8 +227,13 @@
                    $modal.modal('hide'); //ตัวนี้สามารถเอาไปใส่ใน Ajax ด้านบนได้เลยนะครับ
                });
            });
-   
         });
+
+        function close_crop(){
+            var $modal = $('#modal_crop_logo');
+            $modal.modal('hide');
+        }
+
     </script>
 @endpush
 

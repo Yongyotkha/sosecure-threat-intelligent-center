@@ -3,9 +3,6 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a> --}}
             <div class="bc-head">@langapp('settings') > @langapp('vm_client_settings')</div>
             <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                 @icon('solid/download') CSV
@@ -16,7 +13,6 @@
             <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create_key_modal">
                 @icon('solid/plus') @langapp('create')
             </a>
-            
         </header>
         <section class="scrollable wrapper">              
             <section class="panel panel-default">
