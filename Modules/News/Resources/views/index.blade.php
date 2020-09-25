@@ -13,7 +13,7 @@
             
 
             {{-- Tab Content --}}
-            <section class="scrollable wrapper bg-white">
+            <section class="scrollable wrapper bg-grey">
                 <section class="panel panel-default">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">

@@ -1143,3 +1143,12 @@ ul.total-count li{
     overflow: hidden;
     margin: auto;
 }
+
+.bg-grey {
+    background-color: #eee;
+}
+
+.panel {
+    -webkit-box-shadow: 0 2px 3px rgba(0,0,0,.2) !important;
+    box-shadow: 0 2px 3px rgba(0,0,0,.2) !important;
+}

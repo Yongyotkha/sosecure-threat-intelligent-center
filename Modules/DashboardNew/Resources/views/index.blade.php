@@ -9,7 +9,7 @@
             <div class="bc-head">@langapp('dashboard')</div>
         </header>
 
-        <section class="scrollable wrapper pd-0">
+        <section class="scrollable wrapper bg-grey pd-0">
             <div class="container-fluid pd-0">
                 <div class="row">
                     <div class="col-md-12">
