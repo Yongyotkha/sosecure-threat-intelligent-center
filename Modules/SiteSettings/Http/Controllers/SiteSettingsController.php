@@ -5,6 +5,7 @@ namespace Modules\SiteSettings\Http\Controllers;
 use Auth;
 use DataTables;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 
 use Illuminate\Http\Request;
@@ -59,6 +60,8 @@ class SiteSettingsController extends Controller
      */
     public function create()
     {
+        // $data['category'] = CategorySettings::get();
+        // dd($data['category']);
         return view('sitesettings::modal.create');
     }
 
@@ -188,7 +191,7 @@ class SiteSettingsController extends Controller
             ->editColumn(
                 'chk',
                 function ($siteSettings) {
-                    return '<label><input type="checkbox" name="checked[]" value="' . $siteSettings->id . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" name="checked" value="' . $siteSettings->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(

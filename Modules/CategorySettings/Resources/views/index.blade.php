@@ -26,6 +26,13 @@
                         </a>
                     @endcan
 
+                    @can('users_delete')
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">
+                            <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
+                                @langapp('delete')</span>
+                        </button>
+                    @endcan
+
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
@@ -38,13 +45,13 @@
                         <table class="table table-striped" id="table-category-template">
                             <thead>
                                 <tr>
-                                    <th class="">No.</th>
                                     <th class="no-sort">
                                         <label>
                                             <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
                                             <span class="label-text"></span>
                                         </label>
                                     </th>
+                                    <th class="">No.</th>
                                     <th>@langapp('name')</th>
                                     <th>@langapp('status')</th>
                                     <th class="no-sort">Action</th>
@@ -56,12 +63,7 @@
                             </tbody>
                         </table>
 
-                        @can('users_delete')
-                            <button type="submit" id="button" class="btn btn-sm btn-danger m-xs" value="bulk-delete">
-                                <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
-                                    @langapp('delete')</span>
-                            </button>
-                        @endcan
+                       
 
                     </div>
                 </form>
@@ -147,15 +149,18 @@
                 order: [
                     [0, "desc"]
                 ],
-                columns: [{
-                        data: 'no',
-                        name: 'id'
-                    },
+                columns: [
                     {
                         data: 'chk',
                         orderable: false,
                         searchable: false,
                         sortable: false
+                    },
+                    {
+                        data: 'id',
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        },
                     },
                     {
                         data: 'name',
@@ -174,28 +179,45 @@
                 ]
             });
 
-            $("#frm-category button").click(function (ev) {
-                ev.preventDefault();
-                if ($(this).attr("value") == "bulk-delete") {
-                    var form = $("#frm-category").serialize();
-                    axios.post('{{ route('categorysettings.bulk.delete') }}', form)
-                        .then(function (response) {
-                            toastr.warning(response.data.message, '@langapp('response_status')');
-                            window.location.href = response.data.redirect;
-                        })
-                        .catch(function (error) {
-                            var errors = error.response.data.errors;
-                            var errorsHtml = '';
-                            $.each(errors, function (key, value) {
-                                errorsHtml += '<li>' + value[0] + '</li>';
-                            });
-                            toastr.error(errorsHtml, '@langapp('response_status') ');
-                        });
+            let del_val = [];
+            $("#btn_del_select").click(function(){
+                del_val = [];
+                $("input[type='checkbox'][name='checked']").each(function(){
+                    
+                    if($(this).is(":checked")) {
+                        del_val.push($(this).val());
+                        /* alert(3);*/
+                    }
+                });
+                console.log(del_val);
+
+                if(del_val.length > 0) {
+                    del_cate_select(del_val);
+                } else {
+                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
                 }
 
             });
+            
+         
 
         });
+
+        function del_cate_select(cate_id) {
+            axios.post('{{ route('categorysettings.bulk.delete') }}', {checked: cate_id})
+                .then(function (response) {
+                    toastr.warning(response.data.message, '@langapp('response_status')');
+                    window.location.href = response.data.redirect;
+                })
+                .catch(function (error) {
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                });
+        }
 
 
         // function change_category_active(category_id,category_active) {
@@ -223,21 +245,15 @@
                 url:"{{ route('categorysettings.change_status') }}",
                 data:{category_id:category_id},
                 beforeSend: function(){
-                    // appLoader.show();
                 },
 				success:function(response) {
-                    // var obj = JSON.parse(response);
                     console.log(response);
-                    // appLoader.hide();
-                    // appAlert.success(obj.message, {duration: 10000});
 
                     toastr.warning(response.data.message, '@langapp('response_status')');
                     window.location.href = response.data.redirect;
 				
                 },
                 error: function (error){
-                    // appLoader.hide();
-                    // console.log(e);
                     var errors = error.response.data.errors;
                     var errorsHtml = '';
                     $.each(errors, function (key, value) {
