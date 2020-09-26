@@ -2,6 +2,8 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+require 'vendor/autoload.php';
+
 use Auth;
 use DataTables;
 use Modules\SiteSettings\Entities\SiteSettings;
@@ -45,6 +47,20 @@ class SiteSettingsController extends Controller
 
        $data['filter'] = $this->request->filter;
        $data['page']   = $this->getPage();
+       return view('sitesettings::index')->with($data);
+    }
+
+    public function test_mongo()
+    {
+        $client = new \MongoDB\Client("mongodb://localhost:27017");//Client
+        $collection = $client->demo->threat_intelligent_center;
+        $insertOneResult = $collection->insertOne([
+            'username' => 'admin',
+            'email' => 'admin@example.com',
+            'name' => 'Admin User',
+        ]);
+        $data['filter'] = $this->request->filter;
+        $data['page']   = $this->getPage();
        return view('sitesettings::index')->with($data);
     }
 
@@ -197,7 +213,12 @@ class SiteSettingsController extends Controller
             ->editColumn(
                 'logo',
                 function ($siteSettings) {
-                    $logo = '';
+                    if($siteSettings->logo) {
+                        $site_logo = asset('storage/logos/'.$siteSettings->logo);
+                    } else {
+                        $site_logo = asset('storage/logos/default_logo.png');
+                    }
+                    $logo = '<div style="width: 100px; height: 50px;"><img src="'.$site_logo.'" style="object-fit: cover; width: 100%; height: 100%;"></div>';
                     return $logo;
                 }
             )
@@ -276,7 +297,7 @@ class SiteSettingsController extends Controller
                     return $html;
                 }
             )
-            ->rawColumns(['no', 'chk', 'name', 'status', 'action'])
+            ->rawColumns(['no', 'chk', 'logo', 'name', 'status', 'action'])
             ->make(true);
     }
 

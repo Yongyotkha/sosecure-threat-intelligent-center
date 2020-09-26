@@ -39,6 +39,7 @@
         "league/html-to-markdown": "^4.4",
         "maatwebsite/excel": "^3.0",
         "mollie/laravel-mollie": "^2.0",
+        "mongodb/mongodb": "^1.7",
         "nwidart/laravel-modules": "^4.0",
         "oriceon/oauth-5-laravel": "dev-master",
         "pragmarx/google2fa-laravel": "^1.0",
