@@ -28,3 +28,9 @@ Route::group(
         Route::delete('sitesettings/{id}', 'SiteSettingApiController@delete')->name('sitesettings.api.delete')->middleware('can:sitesettings_delete');
     }
 );
+
+$router->group(['middleware' => 'auth:api','prefix' => 'v1', 'namespace' => 'Api\v1'], function ($router) {
+    // Users
+    $router->get('user/register', 'SiteSettingApiController@register');
+    $router->post('user/login', ['uses' => 'UserController@login']);
+});

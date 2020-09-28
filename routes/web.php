@@ -13,6 +13,8 @@
 
 Route::get('/', 'Welcome@index')->middleware(['auth']);
 
+Route::get('/test', 'Welcome@test');
+
 Auth::routes(['verify' => true, 'register' => settingEnabled('allow_client_registration')]);
 
 Route::get('/redirect/{provider}', 'SocialAuthController@redirectToProvider');

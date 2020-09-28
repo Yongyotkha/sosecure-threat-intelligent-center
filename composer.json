@@ -25,6 +25,7 @@
         "ddeboer/imap": "^1.0",
         "eluceo/ical": "^0.11",
         "fideloper/proxy": "^4.0",
+        "firebase/php-jwt": "^5.2",
         "guzzlehttp/guzzle": "^6.3",
         "hautelook/phpass": "^1.1",
         "kwn/number-to-words": "^1.3",

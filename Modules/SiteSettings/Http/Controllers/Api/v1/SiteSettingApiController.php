@@ -2,6 +2,7 @@
 
 namespace Modules\SiteSettings\Http\Controllers\Api\v1;
 
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -54,6 +55,32 @@ class SiteSettingApiController extends Controller
         $this->request   = $request;
         $this->SiteSettings    = new SiteSettings;
         $this->site_dir = config('system.site_dir') . '/';
+    }
+
+    public function register(Request $request)
+    {
+                $user = @Auth::user()->id;
+                return $user;
+                // return $this->responseRequestSuccess($user);   
+    }
+
+    protected function jwt($user)
+    {
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued.
+            'exp' => time() + env('JWT_EXPIRE_HOUR') * 60 * 60, // Expiration time
+        ];
+
+        return JWT::encode($payload, env('JWT_SECRET'));
+    }
+
+    protected function responseRequestSuccess($ret)
+    {
+        return response()->json(['status' => 'success', 'data' => $ret], 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     }
 
     public function index()
