@@ -2,6 +2,7 @@
 
 namespace Modules\Users\Entities;
 
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Entities\Feedback;
 use App\Entities\Phone;
 use App\Entities\Reminder;
@@ -44,7 +45,7 @@ use Modules\Users\Entities\QuickAccess;
 use Modules\Users\Observers\UserObserver;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
+class User extends Authenticatable implements JWTSubject, HasLocalePreference, MustVerifyEmail
 {
     use Notifiable, HasRoles, SoftDeletes, Searchable, Emailable,
     HasApiTokens, Vaultable, Observable, Actionable, Uploadable, Noteable;
@@ -508,5 +509,20 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         if (!empty($value)) {
             return decrypt($value);
         }
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }
