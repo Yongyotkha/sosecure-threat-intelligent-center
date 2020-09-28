@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Auth;
 use Hautelook\Phpass\PasswordHash;
+use Illuminate\Support\Facades\Hash;
+use Firebase\JWT\JWT;
+use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Modules\Users\Entities\User;
@@ -66,7 +69,7 @@ class LoginController extends Controller
         if ($this->attemptLogin($request) || $this->oldLogin($request)) {
             // $user = $this->guard('api')->user();
             // $user->generateToken();
-
+            
             return $this->sendLoginResponse($request);
         }
 
@@ -117,5 +120,87 @@ class LoginController extends Controller
     {
         auth()->logout();
         return redirect('/');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Api เข้าสู่ระบบ
+    |--------------------------------------------------------------------------
+     */
+
+    public function test_api(Request $request)
+    {
+        return 123;
+    }
+    public function login_api(Request $request)
+    {
+        // $user = User::select('id')->where('username', $request->username)->first();
+
+        $user = User::select('id','username','email','password')->where('email', $request->email)->first();
+        if ($user != null) {
+            $passwordHasher = new PasswordHash(8, true);
+            $passwordMatch  = $passwordHasher->CheckPassword($request->password, $user->password);
+            if ($passwordMatch) {
+                $token = $this->jwt($user);
+                $user["api_token"] = $token;
+    
+                return $this->responseRequestSuccess($user);
+            } else{
+                return $this->responseRequestError("Username or password is incorrect");
+            }
+        } else {
+            return $this->responseRequestError("Username or password is incorrect");
+        }
+
+
+        // if (!empty($user) && Hash::check($request->password, $user->password)) {
+        //     $token = $this->jwt($user);
+        //     $user["api_token"] = $token;
+
+        //     return $this->responseRequestSuccess($user);
+        // } else {
+        //     return $this->responseRequestError("Username or password is incorrect");
+        // }
+    }
+
+        /*
+    |--------------------------------------------------------------------------
+    | ตัวเข้ารหัส JWT
+    |--------------------------------------------------------------------------
+     */
+    protected function jwt($user)
+    {
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued.
+            'exp' => time() + env('JWT_EXPIRE_HOUR') * 60 * 60, // Expiration time
+        ];
+
+        return JWT::encode($payload, env('JWT_SECRET'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | response เมื่อข้อมูลส่งถูกต้อง
+    |--------------------------------------------------------------------------
+     */
+    protected function responseRequestSuccess($ret)
+    {
+        return response()->json(['status' => 'success', 'data' => $ret], 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | response เมื่อข้อมูลมีการผิดพลาด
+    |--------------------------------------------------------------------------
+     */
+    protected function responseRequestError($message = 'Bad request', $statusCode = 200)
+    {
+        return response()->json(['status' => 'error', 'error' => $message], $statusCode)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     }
 }

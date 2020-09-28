@@ -88,6 +88,7 @@ class Kernel extends HttpKernel
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         '2fa'                => \App\Http\Middleware\Google2FAMiddleware::class,
         'localize'           => \App\Http\Middleware\Localization::class,
+        'jwt.auth'           => \App\Http\Middleware\JwtMiddleware::class,
     ];
 
     /**
