@@ -2,7 +2,8 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
-require 'vendor/autoload.php';
+// require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 
 use Auth;
 use DataTables;
@@ -53,6 +54,7 @@ class SiteSettingsController extends Controller
     public function test_mongo()
     {
         $client = new \MongoDB\Client("mongodb://localhost:27017");//Client
+        // $client = new \MongoDB\Driver\Manager("mongodb://localhost:27017");//Client
         $collection = $client->demo->threat_intelligent_center;
         $insertOneResult = $collection->insertOne([
             'username' => 'admin',
@@ -62,6 +64,26 @@ class SiteSettingsController extends Controller
         $data['filter'] = $this->request->filter;
         $data['page']   = $this->getPage();
        return view('sitesettings::index')->with($data);
+    }
+
+    public function test_mongo2()
+    {
+        $mongo_client = new MongoDBDriverManager();
+
+        // echo ""
+
+        // Connection to Manager():
+
+        // "";
+
+        var_dump($mongo_client);
+    //    return view('sitesettings::index')->with($data);
+    }
+
+    public function phpinfo()
+    {
+        phpinfo();
+    //    return phpinfo();
     }
 
     public function test()
