@@ -56,16 +56,13 @@
                                     <th>@langapp('name')</th>
                                     <th>Categorys</th>
                                     <th>@langapp('status')</th>
-                                    <th class="no-sort">Action</th>
-                                    
+                                    <th class="no-sort">Action</th> 
                                 </tr>
                             </thead>
                             <tbody>
 
                             </tbody>
                         </table>
-
-
                     </div>
                 </form>
             </section>

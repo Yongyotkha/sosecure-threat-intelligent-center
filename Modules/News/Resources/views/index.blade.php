@@ -10,8 +10,6 @@
             </header>
 
             {{-- Search --}}
-            
-
             {{-- Tab Content --}}
             <section class="scrollable wrapper bg-grey">
                 <section class="panel panel-default">

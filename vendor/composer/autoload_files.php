@@ -108,7 +108,6 @@ return array(
     '135133ad0ca20ef21cc262b30da9a000' => $vendorDir . '/deployer/deployer/src/functions.php',
     'f18cc91337d49233e5754e93f3ed9ec3' => $vendorDir . '/laravelcollective/html/src/helpers.php',
     '1b8b16d5e16612118084bfbc3cca2fc5' => $vendorDir . '/mollie/laravel-mollie/src/helpers.php',
-    '3a37ebac017bc098e9a86b35401e7a68' => $vendorDir . '/mongodb/mongodb/src/functions.php',
     '9f394da3192a168c4633675768d80428' => $vendorDir . '/nwidart/laravel-modules/src/helpers.php',
     '0c3c22e27afa83be19b4c938f4c6e9ea' => $vendorDir . '/spatie/laravel-backup/src/Helpers/functions.php',
     '377b22b161c09ed6e5152de788ca020a' => $vendorDir . '/spatie/laravel-permission/src/helpers.php',

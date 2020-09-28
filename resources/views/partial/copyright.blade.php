@@ -3,7 +3,7 @@
 </small> --}}
 
 <p>
-    <small>Powered by <a href="{{ config('system.saleurl') }}" target="_blank">Sosecure</a> v{{ getCurrentVersion()['version']  }}
+    <small>Powered by <a href="{{ config('system.saleurl') }}" target="_blank">Sosecure</a> v1.0.1
     <br>&copy; {{ date('Y') }} <a href="{{ get_option('company_domain') }}"
     target="_blank">{{ get_option('company_name') }}</a>
     </small>
