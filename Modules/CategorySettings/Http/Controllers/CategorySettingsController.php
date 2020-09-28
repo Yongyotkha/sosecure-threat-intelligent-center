@@ -187,7 +187,7 @@ class CategorySettingsController extends Controller
             ->editColumn(
                 'chk',
                 function ($categorySettings) {
-                    return '<label><input type="checkbox" name="checked[]" value="' . $categorySettings->id . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" name="checked" value="' . $categorySettings->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(

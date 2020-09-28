@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
+use Auth;
 
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -85,8 +87,16 @@ class SiteSettingApiController extends Controller
         $SiteSettings->descript = $request->descript;
         $SiteSettings->address = $request->address;
         $SiteSettings->remark = $request->remark;
+        $SiteSettings->created_by = @Auth::user()->id;
         $SiteSettings->active = $request->active ? 1 : 0;
         $SiteSettings->save();
+
+        foreach($request->category AS $cate) {
+            $SiteCategory = new SiteCategory;
+            $SiteCategory->site_id = $SiteSettings->id;
+            $SiteCategory->category_id = $cate;
+            $SiteCategory->save();
+        }
 
         if ($request->hasFile('logo')) {
             $this->uploadLogo($request, $SiteSettings);
@@ -218,15 +228,20 @@ class SiteSettingApiController extends Controller
 
         // $currentLogo = $SiteSettings->getOriginal('logo');
         $currentLogo = $SiteSettings->logo;
-        // if (\Storage::exists($this->site_dir . $currentLogo)) {
+        if (\Storage::exists($this->site_dir . $currentLogo)) {
 
-        //     \Storage::delete($this->site_dir . $currentLogo);
-        // }
+            \Storage::delete($this->site_dir . $currentLogo);
+        }
         // \Storage::putFile($this->site_dir, $data, 'public');//$request->file('logo')
         // file_put_contents($this->site_dir.'/logo_'.time().'.'.$img_type, $data);
         // file_put_contents(Storage::disk('public')->url('site/logo_'.time().'.'.$img_type), $data);
         // file_put_contents($this->site_dir.'logo_'.time().'.'.$img_type, $data);
-        move_uploaded_file($data, $this->site_dir.'logo_'.time().'.'.$img_type);
+        //อัพโหลดภาพไปยัง public
+        // $path = public_path('storage') .'/site';
+        \Storage::disk('local')->put($this->site_dir.'logo_'.time().'.'.$img_type, $data);
+        //ทำการอัพโหลดภาพ
+        // file_put_contents($path, $data);
+        // move_uploaded_file($data, $this->site_dir.'logo_'.time().'.'.$img_type);
         // Storage::disk('public')->url('images/' . $fileName)
         // dd(1234);
         // exit();

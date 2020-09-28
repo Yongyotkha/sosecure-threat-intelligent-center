@@ -18,6 +18,7 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'sitesettings'],
     function () {
         Route::get('/', 'SiteSettingsController@index')->name('sitesettings.index')->middleware('can:menu_items');
+        Route::get('/test_mongo', 'SiteSettingsController@test_mongo')->name('sitesettings.test_mongo')->middleware('can:menu_items');
         Route::get('data', 'SiteSettingsController@tableData')->name('sitesettings.data')->middleware('can:menu_items');
         Route::get('create', 'SiteSettingsController@create')->name('sitesettings.create')->middleware('can:settings');
         Route::post('bulk-delete', 'SiteSettingsController@bulkDelete')->name('sitesettings.bulk.delete')->middleware(['can:sitesettings_delete']);//->middleware(['can:sitesettings_delete', 'demo']);

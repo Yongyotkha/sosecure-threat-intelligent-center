@@ -63,10 +63,13 @@
             <div class="form-group row">
                 <label for="" class="col-lg-3 control-label">Category</label>
                 <div class="col-lg-9">
-                    <select name="" id="categorys" class="select2-option form-control" multiple="multiple">
-                        <option value="1">TEST1</option>
-                        <option value="2">TEST2</option>
-                        <option value="3">CVE</option>
+                    {{-- {{dd($category)}} --}}
+                    <select name="category[]" id="categorys" class="select2-option form-control" multiple="multiple">
+                        @foreach (Modules\CategorySettings\Entities\CategorySettings::where([['active',1],['deleted_at','=',null]])->get() as $CategorySetting)
+                            <option value="{{ $CategorySetting->id  }}" >
+                                {{ $CategorySetting->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
