@@ -89,6 +89,7 @@ class Kernel extends HttpKernel
         '2fa'                => \App\Http\Middleware\Google2FAMiddleware::class,
         'localize'           => \App\Http\Middleware\Localization::class,
         'jwt.auth'           => \App\Http\Middleware\JwtMiddleware::class,
+        'jwt'                => \App\Http\Middleware\JWTT::class,
     ];
 
     /**

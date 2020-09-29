@@ -25,7 +25,7 @@ class Fn_api extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('jwt', ['except' => ['login']]);
         $this->guard = "api";
     }
 
@@ -39,7 +39,7 @@ class Fn_api extends Controller
         $credentials = request(['email', 'password']);
 
         if (!$token = auth($this->guard)->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Unauthorized', 'code_status' => '02'], 401);
         }
 
         return $this->respondWithToken_api($token);
@@ -53,14 +53,14 @@ class Fn_api extends Controller
     {
         $token = $request->header('Authorization');
 
-        if (!$token) {
-            // Unauthorized response if token not there
-            return response()->json([
-                'error' => 'Token not provided.',
-                'message' => 'Token not provided.',
-                'status_code' => '02',//error
-            ], 401);
-        }
+        // if (!$token) {
+        //     // Unauthorized response if token not there
+        //     return response()->json([
+        //         'error' => 'Token not provided.',
+        //         'message' => 'Token not provided.',
+        //         'status_code' => '02',//error
+        //     ], 401);
+        // }
         return response()->json(auth($this->guard)->user());
     }
 
@@ -98,7 +98,7 @@ class Fn_api extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth($this->guard)->factory()->getTTL() * 60
+            'expires_in' => auth($this->guard)->factory()->getTTL() * 60//expires_in
         ]);
     }
 }

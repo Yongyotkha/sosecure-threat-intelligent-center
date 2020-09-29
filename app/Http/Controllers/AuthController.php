@@ -10,11 +10,11 @@ use App\Classes\Fn_api;
 
 class AuthController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api', ['except' => ['login']]);
-    //     $this->guard = "api";
-    // }
+    public function __construct()
+    {
+        $this->middleware('jwt', ['except' => ['login']]);
+        $this->guard = "api";
+    }
 
     public function login()
     {
@@ -45,6 +45,10 @@ class AuthController extends Controller
         $refresh_api = $Fn_api->refresh_api();
         return $refresh_api;
     //   return view('pages.home', compact('prices'));
+    }
+    public function payload()
+    {
+        return auth()->payload();
     }
 }
 

@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Handler extends ExceptionHandler
 {
@@ -51,6 +52,16 @@ class Handler extends ExceptionHandler
     {
         // This will replace our 404 response with
         // a JSON response // && $request->wantsJson()
+        if($exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+            return response()->json(['error' => 'Token is Invalid', 'code_status' => '02'], 400);
+        } else if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+            return response()->json(["error" => $exception->getMessage(), 'code_status' => '02'], 401);
+        } else if($exception instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
+            return response()->json(['error' => 'There is problem with your token', 'code_status' => '02'], 400);
+        }
+        // else {
+        //     return response()->json(['error' => 'There is problem with your token', 'code_status' => '02'], 400);
+        // }
         if ($exception instanceof ModelNotFoundException && $request->wantsJson()) {
             return response()->json(
                 [
@@ -93,7 +104,7 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+            return response()->json(['error' => 'Unauthenticated.', 'code_status' => '02'], 401);
         }
 
         return redirect()->guest(route('login'));
