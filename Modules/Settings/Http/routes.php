@@ -77,6 +77,6 @@ Route::group(
         Route::get('artisan/regenerate', 'CommandsController@regenerateKey')->name('commands.key')->middleware(['can:settings_update', 'demo']);
 
         Route::get('/{section?}', 'SettingController@index')->name('settings.index')->middleware('can:menu_settings');
-        Route::post('{section}', 'SettingController@configure')->name('settings.edit')->middleware(['demo', 'can:settings_update']);
+        Route::post('{section}', 'SettingController@configure')->name('settings.edit')->middleware(['can:settings_update']);//->middleware(['demo', 'can:settings_update']);
     }
 );

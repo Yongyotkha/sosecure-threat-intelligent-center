@@ -2,82 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 
+use App\Classes\Fn_api;
+
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login']]);
-        $this->guard = "api";
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api', ['except' => ['login']]);
+    //     $this->guard = "api";
+    // }
 
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login()
     {
-        $credentials = request(['email', 'password']);
-
-        if (!$token = auth($this->guard)->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $this->respondWithToken($token);
+        $Fn_api = new Fn_api();
+        $login_api = $Fn_api->login_api();
+        return $login_api;
+    //   return view('pages.home', compact('prices'));
     }
-     /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function me()
+
+    public function show_data(Request $request)
     {
-        return response()->json(auth($this->guard)->user());
+            $Fn_api = new Fn_api();
+            $show_data_api = $Fn_api->show_data_api($request);
+            return $show_data_api;
     }
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout()
     {
-        auth($this->guard)->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        $Fn_api = new Fn_api();
+        $logout_api = $Fn_api->logout_api();
+        return $logout_api;
+    //   return view('pages.home', compact('prices'));
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function refresh()
     {
-        return $this->respondWithToken(auth($this->guard)->refresh());
-    }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth($this->guard)->factory()->getTTL() * 60
-        ]);
+        $Fn_api = new Fn_api();
+        $refresh_api = $Fn_api->refresh_api();
+        return $refresh_api;
+    //   return view('pages.home', compact('prices'));
     }
 }
+
