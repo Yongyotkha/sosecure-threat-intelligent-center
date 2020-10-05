@@ -4,9 +4,10 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">New Site </h4>
         </div>
-        {!! Form::open(['route' => 'sitesettings.api.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
+       
 
         <div class="modal-body">
+            {!! Form::open(['route' => 'sitesettings.api.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
@@ -16,22 +17,17 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-lg-3 control-label">Description</label>
                 <div class="col-lg-9">
                     <div class="">
-                        {{-- <input type="text" class="form-control" name="descript" value=""> --}}
                         <textarea id="descript" name="descript" rows="4" class="form-control"></textarea>
                     </div>
                 </div>
-            </div>
-            <div class="form-group row">
+            </div> --}}
+            {{-- <div class="form-group row">
                 <label class="col-lg-3 control-label">Logo </label>
-                {{-- <div class="col-lg-9">
-                    <div class="">
-                        <input id="input_logo" type="file" class="form-control" name="logo" accept="image/*">
-                    </div>
-                </div> --}}
+
                 <div class="pull-left mr15">
                     <img id="logo_preview" name="logo_preview" src="{{ getStorageUrl(config('system.site_dir').'/default_site.png') }}" width="50" height="50" alt="..." />
                 </div>
@@ -50,7 +46,7 @@
                         <textarea id="address" name="address" rows="4" class="form-control"></textarea>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             {{-- <div class="form-group row">
                 <label class="col-lg-3 control-label">Remark </label>
                 <div class="col-lg-9">

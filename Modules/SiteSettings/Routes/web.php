@@ -34,6 +34,10 @@ Route::group(
         Route::get('/data-setting', 'DataSettingsController@datasetting')->name('datasettings.index')->middleware('can:menu_items');
         
         Route::get('/users-setting', 'UsersSettingsController@users_settings')->name('userssettings.index')->middleware('can:menu_items');
+        
+        Route::get('/domain-setting', 'DomainSettingsController@domain_setting')->name('domain.index')->middleware('can:menu_items');
+
+        Route::get('/domain-setting/detail/{tab?}', 'DomainSettingsController@domain_detail')->name('domain_detail.index');
     }
     
 );

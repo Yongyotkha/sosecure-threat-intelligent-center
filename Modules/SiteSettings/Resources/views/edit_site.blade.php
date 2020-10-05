@@ -31,13 +31,19 @@
                             <li class="">
                                 <a href="{{route('datasettings.index')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    Data Settings
+                                    Permission & Config Settings
                                 </a>
                             </li>
                             <li class="">
                                 <a href="{{route('userssettings.index')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Users
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{route('domain.index')}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Domain
                                 </a>
                             </li>
                         </ul>
@@ -97,12 +103,12 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="" class="col-lg-3 control-label">Site Categorys</label>
+                                    <label for="" class="col-lg-3 control-label">Categorys</label>
                                     <div class="col-lg-6">
                                         <select name="" id="categorys" class="select2-option form-control" multiple="multiple">
-                                            <option value="1">TEST1</option>
-                                            <option value="2">TEST2</option>
-                                            <option value="3">CVE</option>
+                                            <option value="1" selected>TEST1</option>
+                                            <option value="2" selected>TEST2</option>
+                                            <option value="3" selected>CVE</option>
                                         </select>
                                     </div>
                                 </div>

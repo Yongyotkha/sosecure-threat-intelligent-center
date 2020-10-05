@@ -85,10 +85,6 @@
 
     <script>
         $(function () {
-
-   
-
-
             var table = $('#table-site-template').DataTable({
                 processing: true,
                 serverSide: true,

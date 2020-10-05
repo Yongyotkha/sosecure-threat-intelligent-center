@@ -32,13 +32,19 @@
                             <li class="">
                                 <a href="{{route('datasettings.index')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    Data Settings
+                                    Permission & Config Settings
                                 </a>
                             </li>
                             <li class="">
                                 <a href="{{route('userssettings.index')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Users
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{route('domain.index')}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Domain
                                 </a>
                             </li>
                         </ul>
@@ -52,7 +58,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <div class="bc-head">System Setting</div>
+                    <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
                 </header>
                 <section class="scrollable wrapper">
                     <div class="row">
@@ -156,7 +162,7 @@
                                         </div>
                                     </div>
                                  </div>
-                                 <div class="form-group row">
+                                 {{-- <div class="form-group row">
                                      <div class="col-lg-3 control-label">API Key</div>
                                      <div class="col-lg-6">
                                         <div class="input-group">
@@ -166,7 +172,59 @@
                                             </span>
                                         </div>
                                      </div>
+                                 </div> --}}
+
+                                 <div class="row">
+                                     <div class="col-lg- text-center">
+                                        <div class="line"></div>
+                                        <h4 class="py-3">Client System Status : <span class="text-success">Online (Last Update : 2020-08-29 11:11:23)</span>
+                                            &nbsp;<button type="submit" class="btn btn-xs btn-info"><i class="fa fa-sync-alt"></i></button>
+                                        </h4> 
+                                       
+                                     </div>
                                  </div>
+                                 <div class="row pa-sm">
+                                    <div class="col-lg-12" style="background: #f3f6f9;">
+                                        <div class="m-xs">
+                                            <span class="text-dark">Laravel Version</span>: <span class="text-muted">5.7.29</span>
+                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
+                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
+                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">Code Version</span>: <span class="text-muted">2.0.5</span>
+                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" id="updatesBtn" data-rel="tooltip" title="Check for updates now">@icon('solid/code-branch') @langapp('check_for_updates')</a>
+                                            <span class="text-danger ml-2">Last Version 3.0.5</span>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">OS Version</span>: <span class="text-muted">Linux</span>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">Sever Time</span>: <span class="text-muted">Sep 29,2020 11:26 AM</span>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">PHP Version</span>: <span class="text-muted">7.3.20</span>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">Your App Name</span>: <span class="text-muted">Threat-inSight</span>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">Timezone</span>: <span class="text-muted">Asia/Bangkok</span>
+                                        </div>
+                                        <div class="line"></div>
+                                        <div class="m-xs">
+                                            <span class="text-dark">Key System</span>: <span class="text-muted">xxxxxxxxxxxxxxxxxxxxxx</span>
+                                        </div>
+                                        <div class="line"></div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div class="panel-footer">
                                 {!! closeModalButton() !!}
