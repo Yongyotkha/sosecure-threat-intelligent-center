@@ -8,8 +8,10 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
+use Modules\SiteSettings\Entities\SiteConnectSystem;
 use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
 use Auth;
+use App\Classes\Fn_api;
 
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
