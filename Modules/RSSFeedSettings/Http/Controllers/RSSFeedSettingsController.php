@@ -45,10 +45,28 @@ class RSSFeedSettingsController extends Controller
         return view('rssfeedsettings::create');
     }
 
+    public function rss_setting()
+    {
+        $data['page'] = langapp('rss_logs');
+        return view('rssfeedsettings::rss_setting')->with($data);
+    }
+
     public function rss_logs()
     {
         $data['page'] = langapp('rss_logs');
         return view('rssfeedsettings::rss_logs')->with($data);
+    }
+
+    public function rss_news()
+    {
+        $data['page'] = langapp('rss_logs');
+        return view('rssfeedsettings::rss_news')->with($data);
+    }
+
+    public function rss_feed_all()
+    {
+        $data['page'] = langapp('rss_logs');
+        return view('rssfeedsettings::rss_feed_all')->with($data);
     }
 
     /**

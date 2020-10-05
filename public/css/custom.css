@@ -1237,6 +1237,9 @@ ul.total-count li{
 }
 
 @media (min-width: 576px){
+    .modal-slide.size-50 .modal-dialog {
+        width: 50% !important;
+    }
     .modal-slide .modal-dialog {
         width: 60rem;
     }

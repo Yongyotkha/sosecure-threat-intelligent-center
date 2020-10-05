@@ -8,8 +8,7 @@
         <aside class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
-                        data-target="#setting-nav">@icon('solid/bars')</a>
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="modal" data-target="#setting-nav">@icon('solid/bars')</a>
                     <p class="h3">@langapp('settings')  </p>
                 </header>
                 <section class="scrollable">
