@@ -165,9 +165,9 @@
              <form action="">
                  <div class="modal-body">
                      <div class="container-fluid">
-                         <div class="row">
+                         <div class="form-group row">
                              <div class="col-md-4">
-                                <h5>Date :</h5>
+                                <h5>Data Source : cshub</h5>
                                 <h5>Update : 2020-31-04 18:00:05</h5>
                              </div>
                              <div class="col-md-8">
@@ -188,6 +188,7 @@
                             </div>
                          </div>
 
+                         <div class="line"></div>
                          <div class="row m-b-sm">
                              <div class="col-md-4"></div>
                              <div class="col-md-8 offset-md-4">
@@ -195,9 +196,10 @@
                                 <button class="btn btn-default">EN</button>
                              </div>
                          </div>
-                         <div class="row">
-                             <div class="col-md-4">
-                                <h5>Category</h5>
+
+                         <div class="form-group row">
+                             <div class="col-md-4 text-right">
+                                <h5>Categorys</h5>
                              </div>
                              <div class="col-md-8">
                                 <select name="" id="category" class="select2-option form-control" multiple="multiple">
@@ -206,8 +208,9 @@
                                 </select>
                              </div>
                          </div>
+                         <div class="line"></div>
 
-                         <div class="row">
+                         <div class="form-group row">
                              <div class="col-md-12">
                                 <div class="tabbable">
                                     <ul class="nav nav-tabs nav-tabs-highlight">
@@ -243,6 +246,132 @@
                                 </div>
                              </div>
                          </div>
+                         <div class="line"></div>
+                         <div class="form-group row">
+                            <div class="col-md-4 text-right">
+                               <h5>Reference</h5>
+                            </div>
+                            <div class="col-md-8">
+                               <select name="" class="select2 select2-option form-control" multiple="multiple">
+                                   <option value="1">a</option>
+                                   <option value="2">b</option>
+                               </select>
+                            </div>
+                        </div>
+                         <div class="form-group row">
+                            <div class="col-md-4 text-right">
+                               <h5>Tags</h5>
+                            </div>
+                            <div class="col-md-8">
+                               <select name="" class="select2 select2-option form-control" multiple="multiple">
+                                   <option value="1">a</option>
+                                   <option value="2">b</option>
+                               </select>
+                            </div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Send Email</h5>
+                            </div>
+                         </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-4 text-right">Sites</div>
+                            <div class="col-md-8">
+                                <div class="checkbox" style="margin:0;">
+                                    <label style="padding-left: 0;margin:0;">
+                                        <input id="site" type="checkbox" name="" value="TRUE">
+                                        <span class="label-text" data-rel="tooltip" title=""></span>
+                                    </label>
+                                    <span class="view_site" style="cursor: pointer">View Site</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="show_site form-group row">
+                            <div class="col-md-4 text-right">Show Site</div>
+                            <div class="col-md-8">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Site 01</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-4 text-right">Other</div>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Public</h5>
+                            </div>
+                         </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-4 control-label text-right">Start</label>
+                            <div class="col-lg-8">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="input-group date">
+                                            <input id="send_date" type="text" class="form-control datetimepicker-input"
+                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
+                                            data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                            <div class="input-group-addon">
+                                                @icon('solid/calendar-alt', 'text-muted')
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="checkbox">
+                                            <label style="padding-left: 0;">
+                                                <input id="set_exp" type="checkbox" name="" value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Set an expire date</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="show_end_exp_date" class="form-group row">
+                            <label class="col-lg-4 control-label text-right">End</label>
+                            <div class="col-lg-8">
+                                <div class="input-group date">
+                                    <input id="send_date" type="text" class="form-control datetimepicker-input"
+                                    value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
+                                    data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                    <div class="input-group-addon">
+                                        @icon('solid/calendar-alt', 'text-muted')
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label text-right">Status </label>
+                            <div class="col-md-8">
+                                <label class="switch">
+                                    <input type="hidden" value="FALSE" name="">
+                                    <input type="checkbox" name="" value="TRUE">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
                      </div>
                  </div>
 
@@ -279,6 +408,16 @@
 $(function() {
 
     $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+
+    $('#show_end_exp_date').hide();
+
+    $('#set_exp').on('change',function(){
+        if($(this).prop('checked')){
+            $('#show_end_exp_date').show();
+        }else{
+            $('#show_end_exp_date').hide();
+        }
+    });
     $(document).ready(function () {
         $('#keywords').select2({
             tags: true,
@@ -288,6 +427,13 @@ $(function() {
         $('#category').select2({
             tags: true,
             tokenSeparators: [' ']
+        });
+        
+        $('.select2').select2();
+
+        $('.show_site').hide();
+        $('.view_site').on('click',function(){
+            $('.show_site').show();
         });
     });
 
