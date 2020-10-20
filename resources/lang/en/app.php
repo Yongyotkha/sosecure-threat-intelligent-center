@@ -982,4 +982,5 @@ return [
     'group'                                      => 'Group',
     'group_name'                                 => 'Group Name',
     'item_name'                                  => 'Item Name',
+    'scans'                                      => 'Scans',
 ];
