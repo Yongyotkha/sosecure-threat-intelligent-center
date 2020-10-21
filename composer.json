@@ -83,7 +83,8 @@
         },
         "files": [
             "app/Helpers/App.php",
-            "app/Helpers/DateHelper.php"
+            "app/Helpers/DateHelper.php",
+            "app/Helpers/fn_custom.php"
         ]
     },
     "autoload-dev": {
