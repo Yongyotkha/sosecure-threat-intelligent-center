@@ -110,7 +110,34 @@ class SiteSettingsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $SiteSettings = $this->siteSettings;
+        $SiteSettings->name = $request->name;
+        $SiteSettings->descript = $request->descript;
+        $SiteSettings->address = $request->address;
+        $SiteSettings->remark = $request->remark;
+        $SiteSettings->created_by = @Auth::user()->id;
+        $SiteSettings->active = $request->active ? 1 : 0;
+        $SiteSettings->save();
+
+        foreach($request->category AS $cate) {
+            $SiteCategory = new SiteCategory;
+            $SiteCategory->site_id = $SiteSettings->id;
+            $SiteCategory->category_id = $cate;
+            $SiteCategory->save();
+        }
+
+        if ($request->hasFile('logo')) {
+            $this->uploadLogo($request, $SiteSettings);
+        }
+        return ajaxResponse(
+            [
+                'id'       => $SiteSettings->id,
+                'message'  => langapp('saved_successfully'),
+                'redirect' => route('sitesettings.index'),
+            ],
+            true,
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -219,6 +246,7 @@ class SiteSettingsController extends Controller
     {
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
         $model = $this->siteSettings->query();
+        
         return DataTables::eloquent($model)
             ->editColumn(
                 'no',

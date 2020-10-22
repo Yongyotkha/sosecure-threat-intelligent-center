@@ -5,9 +5,8 @@
             <h4 class="modal-title">New Site </h4>
         </div>
        
-
+        {!! Form::open(['route' => 'sitesettings.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
         <div class="modal-body">
-            {!! Form::open(['route' => 'sitesettings.api.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">

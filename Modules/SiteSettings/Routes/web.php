@@ -27,19 +27,14 @@ Route::group(
         Route::post('change_status', 'SiteSettingsController@change_status')->name('sitesettings.change_status')->middleware(['can:sitesettings_update']);
         Route::get('edit-sitesettings/{id}', 'SiteSettingsController@edit')->name('sitesettings.edit')->middleware('can:sitesettings_update');
         Route::get('delete-sitesettings/{id}', 'SiteSettingsController@delete')->name('sitesettings.delete')->middleware('can:sitesettings_delete');
+        Route::post('sitesettings', 'SiteSettingsController@store')->name('sitesettings.save')->middleware('can:sitesettings_create');
         // Route::get('/test', 'SiteSettingsController@test')->name('sitesettings.test')->middleware('can:menu_items');
 
         Route::get('/systemsetting', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
-   
         Route::get('/data-setting', 'DataSettingsController@datasetting')->name('datasettings.index')->middleware('can:menu_items');
-        
         Route::get('/users-setting', 'UsersSettingsController@users_settings')->name('userssettings.index')->middleware('can:menu_items');
-        
         Route::get('/domain-setting', 'DomainSettingsController@domain_setting')->name('domain.index')->middleware('can:menu_items');
-
         Route::get('/domain-setting/detail/{tab?}', 'DomainSettingsController@domain_detail')->name('domain_detail.index');
     }
     
 );
-
-
