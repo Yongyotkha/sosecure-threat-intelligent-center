@@ -38,6 +38,10 @@ function gen_uuid() {
     );
 }
 
+function generator_uuid(){
+    return Str::uuid()->toString();
+}
+
 function generate_site_key_login() {
     $exists = true;
     while ($exists)

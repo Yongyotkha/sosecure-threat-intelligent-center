@@ -88,13 +88,11 @@
             var table = $('#table-site-template').DataTable({
                 processing: true,
                 serverSide: true,
+                destroy: true,
                 ajax: {
                     url: '{!! route('sitesettings.data') !!}',
                     data: ""
                 },
-                order: [
-                    [0, "desc"]
-                ],
                 columns: [
                     {
                         data: 'chk',
