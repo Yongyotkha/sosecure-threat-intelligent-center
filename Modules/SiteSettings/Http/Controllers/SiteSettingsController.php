@@ -36,7 +36,7 @@ class SiteSettingsController extends Controller
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
-        $this->siteSettings    = $siteSettings;
+        $this->siteSettings = $siteSettings;
     }
     /**
      * Display a listing of the resource.
@@ -44,7 +44,7 @@ class SiteSettingsController extends Controller
      */
     public function index()
     {
-    //    $data['page'] = langapp('site_settings');
+       $data['page'] = langapp('site_settings');
 
        $data['filter'] = $this->request->filter;
        $data['page']   = $this->getPage();
