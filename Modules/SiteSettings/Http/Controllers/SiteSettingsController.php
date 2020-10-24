@@ -32,7 +32,7 @@ class SiteSettingsController extends Controller
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
-        $this->siteSettings    = $siteSettings;
+        $this->siteSettings = $siteSettings;
     }
     /**
      * Display a listing of the resource.
