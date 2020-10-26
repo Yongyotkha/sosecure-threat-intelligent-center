@@ -114,7 +114,9 @@
                                             ?>
                                             @foreach($categories as $key => $category)
                                                 <option value="{{ $category->id  }}"
-                                                     {{ $category_site_id[$key] ? $category_site_id[$key] === $category -> id ? 'selected' : '' : ''}}
+                                                    @foreach($siteSettings->get_categorys as $siteCategory)
+                                                        {{ $siteCategory->category_id === $category -> id ? 'selected' : ''}}
+                                                    @endforeach
                                                 >
                                                     {{ $category->name }}
                                                 </option>
