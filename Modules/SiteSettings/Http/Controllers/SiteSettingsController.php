@@ -3,14 +3,17 @@
 namespace Modules\SiteSettings\Http\Controllers;
 
 use Auth;
+use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\File;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
+use Image;
 
 class SiteSettingsController extends Controller
 {
@@ -27,12 +30,14 @@ class SiteSettingsController extends Controller
      * @var \Illuminate\Http\Request
      */
     protected $request;
+    protected $logos_dir;
 
     public function __construct(Request $request , SiteSettings $siteSettings)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
         $this->siteSettings = $siteSettings;
+        $this->logos_dir = config('system.logos_dir') . '/';
     }
     /**
      * Display a listing of the resource.
@@ -94,6 +99,7 @@ class SiteSettingsController extends Controller
      */
     public function store(Request $request)
     {
+        $dt = Carbon::now();
         $SiteSettings = $this->siteSettings;
         $SiteSettings->code = generator_uuid();
         $SiteSettings->name = $request->name;
@@ -102,11 +108,17 @@ class SiteSettingsController extends Controller
         $SiteSettings->remark = $request->remark;
         $SiteSettings->created_by = @Auth::user()->id;
         $SiteSettings->active = $request->active ? 1 : 0;
+
+        $SiteSettings->system_web_online = 1;
+        $SiteSettings->system_site_online = 1;
+        $SiteSettings->no_expiration_active = 0;
+        $SiteSettings->start_active = $dt;
+        $SiteSettings->end_active = $dt->addYear();
+        $SiteSettings->system_key = generator_uuid();
         $SiteSettings->save();
 
         foreach($request->category AS $category) {
             $SiteCategory = new SiteCategory;
-            $SiteCategory->code = $SiteSettings->code;
             $SiteCategory->site_id = $SiteSettings->id;
             $SiteCategory->category_id = $category;
             $SiteCategory->save();
@@ -160,38 +172,72 @@ class SiteSettingsController extends Controller
      * @param int $id
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update($id, Request $request)
     {
-        $SiteSettings = $this->SiteSettings->get_data($id);
-        $SiteSettings->name = $request->name;
-        $SiteSettings->descript = $request->descript;
-        $SiteSettings->address = $request->address;
-        $SiteSettings->remark = $request->remark;
-        $SiteSettings->active = $request->active ? 1 : 0;
+        $SiteSettings = SiteSettings::where('code',$id)->first();
+        if($request->page_setting == 'site_settings'){
+            $SiteSettings->name = $request->name;
+            $SiteSettings->descript = $request->descript;
+            $SiteSettings->address = $request->address;
+            $SiteSettings->remark = $request->remark;
+            $SiteSettings->active = $request->active ? 1 : 0;
+        }else if($request->page_setting == 'system_settings'){
+            $SiteSettings->system_web_online = $request->system_web_online ? 1 : 0;
+            $SiteSettings->system_site_online = $request->system_site_online ? 1 : 0;
+            $SiteSettings->no_expiration_active = $request->no_expiration_active ? 1 : 0;
+            if($request->no_expiration_active){
+                $SiteSettings->start_active_key = Carbon::parse($request->start_active_key);
+                $SiteSettings->end_active_key = Carbon::parse($request->end_active_key);
+            }
+            $SiteSettings->start_active = Carbon::parse($request->start_active);
+            $SiteSettings->end_active = Carbon::parse($request->end_active);
+            $SiteSettings->system_key = $request->system_key;
+        }
         $SiteSettings->save();
-        SiteCategory::where('site_id', $SiteSettings -> id)->delete();
-        foreach($request->category AS $category) {
-            $SiteCategory = new SiteCategory;
-            $SiteCategory->code = $SiteSettings->code;
-            $SiteCategory->site_id = $SiteSettings->id;
-            $SiteCategory->category_id = $category;
-            $SiteCategory->save();
+        if($request->page_setting == 'site_settings'){
+            SiteCategory::where('site_id', $SiteSettings -> id)->delete();
+            foreach($request->category AS $category) {
+                $SiteCategory = new SiteCategory;
+                $SiteCategory->site_id = $SiteSettings->id;
+                $SiteCategory->category_id = $category;
+                $SiteCategory->save();
+            }
+    
+            if ($request->hasFile('logo')) {
+                $image_path = $SiteSettings->logo;
+                if(File::exists($image_path)) {
+                    File::delete($image_path);
+                }
+                $image = $request->file('logo');
+                $imagename = time().'.'.$image->getClientOriginalExtension();
+                $destinationPath = public_path('images/logo_site');
+                $image->move($destinationPath, $imagename);
+                $SiteSettings -> logo = 'images/logo_site/'.$imagename;
+                $SiteSettings -> save();
+            }
         }
-
-        if ($request->hasFile('logo')) {
-            $this->uploadLogo($request, $SiteSettings);
+        if($request->page_setting == 'site_settings'){
+            return ajaxResponse(
+                [
+                    'id'       => $SiteSettings->id,
+                    'message'  => langapp('changes_saved_successful'),
+                    'redirect' => route('sitesettings.edit', ['id' => $SiteSettings->code]),
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else if($request->page_setting == 'system_settings'){
+            return ajaxResponse(
+                [
+                    'id'       => $SiteSettings->id,
+                    'message'  => langapp('changes_saved_successful'),
+                    'redirect' => route('systemsetting.index', ['id' => $SiteSettings->code]),
+                ],
+                true,
+                Response::HTTP_OK
+            );
         }
-        return ajaxResponse(
-            [
-                'id'       => $SiteSettings->id,
-                'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('sitesettings.index'),
-            ],
-            true,
-            Response::HTTP_OK
-        );
     }
-
 
     public function delete(SiteSettings $id)
     {
@@ -222,16 +268,21 @@ class SiteSettingsController extends Controller
         return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
     }
 
-    public function change_status()
+    public function change_status(Request $request)
     {
-        $data['site_id'] = $this->request->site_id;
-        if ($this->request->has('site_id')) {
-           
-            $data['message']  = langapp('change_status_successfully');
-            $data['redirect'] = url()->previous();
-            return ajaxResponse($data);
-        }
-        return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+        $SiteSettings = SiteSettings::where('code', $request->code)->first();
+        $SiteSettings->active = $request->active;
+        $SiteSettings->save();
+
+        return ajaxResponse(
+            [
+                'id'       => $SiteSettings->id,
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('sitesettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
         /**
@@ -251,7 +302,7 @@ class SiteSettingsController extends Controller
             })
             ->editColumn('logo', function ($siteSettings) {
                 if($siteSettings->logo) {
-                    $site_logo = asset('storage/logos/'.$siteSettings->logo);
+                    $site_logo = asset($siteSettings->logo);
                 } else {
                     $site_logo = asset('storage/logos/default_logo.png');
                 }
@@ -275,35 +326,10 @@ class SiteSettingsController extends Controller
                     $checked_val = '';
                 }
                 $html = '';
-                $html .= '<script>
-                function change_site_active (site_id) {
-                    axios.post("'. route('sitesettings.api.change_status') .'", {
-                        // params: {
-                            site_id: site_id
-                        // }
-                        })
-                    .then(function (response) {
-                        toastr.warning(response.message, '.@langapp("response_status").');
-                        window.location.href = response.redirect;
-                    })
-                    .catch(function (error) {
-                        var errors = error.errors;
-                        var errorsHtml = "";
-                        $.each(errors, function (key, value) {
-                            errorsHtml += "<li>" + value[0] + "</li>";
-                        });
-                        toastr.error(errorsHtml, '.@langapp("response_status"). ');
-                    });
-                    
-                }
-                </script>';
-
-                // $html = '';
                 $html .= '<label class="switch">
-                            <input type="hidden" value="FALSE" name="">
-                            <input type="checkbox" onclick="change_site_active(' . $siteSettings->id . ')" '.$checked_val.' name="active" value="1">
+                            <input type="checkbox" id="site-active-'.$siteSettings->code.'" onchange="change_site_active(\''.$siteSettings->code.'\')" '.$checked_val.' value="1">
                             <span></span>
-                            </label>';
+                        </label>';
                 return $html;
             })
             ->editColumn('action', function ($siteSettings) {

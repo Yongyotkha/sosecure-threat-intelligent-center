@@ -62,12 +62,11 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['sitesettings.api.update', 'id' => $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             <section class="panel panel-default">
                             <header class="panel-heading">@icon('solid/cogs') Site Details  </header>
+                            <input type="hidden" name="page_setting" value="site_settings">
                             <div class="panel-body">
-                                <input type="hidden" name="id" value="{{  $siteSettings->id  }}">
-
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Logo </label>
                                     <div class="col-lg-6">
@@ -105,13 +104,7 @@
                                 <div class="form-group row">
                                     <label for="" class="col-lg-3 control-label">Categorys</label>
                                     <div class="col-lg-6">
-                                        <select name="category" id="categorys" class="select2-option form-control" multiple="multiple">
-                                            <?php 
-                                                $category_site_id = [];
-                                                foreach($siteSettings->get_categorys as $siteCategory){
-                                                    $category_site_id[] = $siteCategory->category_id;
-                                                }
-                                            ?>
+                                        <select name="category[]" id="categorys" class="select2-option form-control" multiple="multiple">
                                             @foreach($categories as $key => $category)
                                                 <option value="{{ $category->id  }}"
                                                     @foreach($siteSettings->get_categorys as $siteCategory)

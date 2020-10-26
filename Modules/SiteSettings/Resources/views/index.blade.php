@@ -169,54 +169,21 @@
                 });
         }
 
-
-        // function change_site_active(site_id,site_active) {
-        //             // var form = $("#frm-site").serialize();
-        //             axios.post('{{ route('sitesettings.bulk.delete') }}', site_id)
-        //                 .then(function (response) {
-        //                     toastr.warning(response.data.message, '@langapp('response_status')');
-        //                     window.location.href = response.data.redirect;
-        //                 })
-        //                 .catch(function (error) {
-        //                     var errors = error.response.data.errors;
-        //                     var errorsHtml = '';
-        //                     $.each(errors, function (key, value) {
-        //                         errorsHtml += '<li>' + value[0] + '</li>';
-        //                     });
-        //                     toastr.error(errorsHtml, '@langapp('response_status') ');
-        //                 });
-        // }
-
-
-        function change_site_active (site_id) {
-         
-			$.ajax({
-				type:"POST",
-                url:"{{ route('sitesettings.change_status') }}",
-                data:{site_id:site_id},
-                beforeSend: function(){
-                    // appLoader.show();
-                },
-				success:function(response) {
-                    // var obj = JSON.parse(response);
-                    console.log(response);
-                    // appLoader.hide();
-                    // appAlert.success(obj.message, {duration: 10000});
-
-                    toastr.warning(response.data.message, '@langapp('response_status')');
-                    window.location.href = response.data.redirect;
-				
-                },
-                error: function (error){
-                    // appLoader.hide();
-                    // console.log(e);
-                    var errors = error.response.data.errors;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += '<li>' + value[0] + '</li>';
-                    });
-                    toastr.error(errorsHtml, '@langapp('response_status') ');
-                }
+        function change_site_active(code) {
+            let checkState = $("#site-active-" + code).is(":checked") ? 1 : 0;
+            axios.post('{{route('sitesettings.change_status.settings')}}', {
+                active: checkState,
+                code: code,
+            }).then(function (response) {
+                toastr.success(response.data.message, '@langapp('response_status')');
+                window.location.href = response.data.redirect;
+            }).catch(function (error) {
+                var errors = error.errors;
+                var errorsHtml = "";
+                $.each(errors, function (key, value) {
+                    errorsHtml += "<li>" + value[0] + "</li>";
+                });
+                toastr.error(errorsHtml, '@langapp('response_status')');
             });
         }
     </script>

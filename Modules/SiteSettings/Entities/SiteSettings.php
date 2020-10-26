@@ -2,18 +2,16 @@
 
 namespace Modules\SiteSettings\Entities;
 
-use App\Traits\Observable;
 use Illuminate\Database\Eloquent\Model;
 use Modules\SiteSettings\Entities\SiteCategory;
 
 class SiteSettings extends Model{
-    protected $guarded = [];
     protected $table = "site";
     public $timestamps = true;
     protected $fillable = [
-        'id','code','name', 'descript', 'logo', 'address', 'remark', 'active',
+        'id','code','name', 'descript', 'logo', 'address', 'remark', 'active', 'system_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 
     ];
-    protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
+    protected $dates   = ['deleted_at', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key'];
 
     public function preferredLocale()
     {
@@ -25,7 +23,7 @@ class SiteSettings extends Model{
     }
 
     public function get_data($uuid, $active = null){
-        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'created_at', 'updated_at')
+        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'system_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key')
         ->where('code', $uuid)
         ->where('deleted_at', '=', null);
         if($active !== null){

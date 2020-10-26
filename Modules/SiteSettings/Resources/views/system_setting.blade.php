@@ -58,21 +58,22 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
+                <div class="bc-head">Site Setting > {{$siteSettings->name}}</div>
                 </header>
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['class' => 'bs-example form-horizontal ajaxifyForm validator']) !!}
+                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT']) !!}
                             <section class="panel panel-default">
                             <header class="panel-heading">@icon('solid/cogs') System Details  </header>
+                            <input type="hidden" name="page_setting" value="system_settings">
                             <div class="panel-body">
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">System Online </label>
                                     <div class="col-lg-3">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <input type="checkbox" name="system_web_online" {{ $siteSettings -> system_web_online === 1 ? 'checked' : '' }} value="1">
                                                 <span class="label-text" data-rel="tooltip" title="">Web Online</span>
                                             </label>
                                         </div>
@@ -80,7 +81,7 @@
                                     <div class="col-lg-3">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <input type="checkbox" name="system_site_online" {{ $siteSettings -> system_site_online === 1 ? 'checked' : '' }} value="1">
                                                 <span class="label-text" data-rel="tooltip" title="">Site System</span>
                                             </label>
                                         </div>
@@ -91,8 +92,8 @@
                                     <div class="col-lg-6">
                                         <div class="input-group date">
                                             <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
-                                            data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                            value="{{  timePickerFormat($siteSettings -> start_active) }}" name="start_active"
+                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
                                             <div class="input-group-addon">
                                                 @icon('solid/calendar-alt', 'text-muted')
                                             </div>
@@ -104,8 +105,8 @@
                                     <div class="col-lg-6">
                                         <div class="input-group date">
                                             <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
-                                            data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                            value="{{  timePickerFormat($siteSettings -> end_active) }}" name="end_active"
+                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
                                             <div class="input-group-addon">
                                                 @icon('solid/calendar-alt', 'text-muted')
                                             </div>
@@ -118,17 +119,17 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" name="generate_key" value="" readonly>
+                                                    <input type="text" class="form-control" id="generate_key" name="system_key" value="{{ $siteSettings -> system_key }}" readonly>
                                                     <span class="input-group-btn">
-                                                        <button type="submit" class="btn btn-info">Copy</button>  
-                                                        <button type="submit" class="btn btn-info">Gen</button>  
+                                                        <button type="button" class="btn btn-info" onclick="copy_system_key()">Copy</button>  
+                                                        <button type="button" class="btn btn-info" onclick="genarate_system_key()">Gen</button>  
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="checkbox">
                                                     <label>
-                                                        <input id="set_exp" type="checkbox" name="" value="TRUE">
+                                                        <input id="set_exp" type="checkbox" name="no_expiration_active" value="1" {{ $siteSettings -> no_expiration_active === 1 ? 'checked' : '' }}>
                                                         <span class="label-text" data-rel="tooltip" title="">Set an expiration date</span>
                                                     </label>
                                                 </div>
@@ -141,8 +142,8 @@
                                     <div class="col-lg-6">
                                         <div class="input-group date">
                                             <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
-                                            data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                            value="{{  timePickerFormat($siteSettings -> start_active_key) }}" name="start_active_key"
+                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
                                             <div class="input-group-addon">
                                                 @icon('solid/calendar-alt', 'text-muted')
                                             </div>
@@ -154,8 +155,8 @@
                                     <div class="col-lg-6">
                                         <div class="input-group date">
                                             <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
-                                            data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                            value="{{  timePickerFormat($siteSettings -> end_active_key) }}" name="end_active_key"
+                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
                                             <div class="input-group-addon">
                                                 @icon('solid/calendar-alt', 'text-muted')
                                             </div>
@@ -252,7 +253,6 @@
 @include('stacks.js.datepicker')
 
 <script>
-
 $(document).ready(function(){
     $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
 
@@ -270,7 +270,35 @@ $(document).ready(function(){
     });
 });
 
+function genarate_system_key(){
+    let system_key = uuidv4();
+    $('#generate_key').val(system_key);
+}
+
+function copy_system_key(){
+    var copyText = document.getElementById("generate_key");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 </script>
+@if($siteSettings -> no_expiration_active === 1)
+    <script>
+        $(document).ready(function(){
+            $('#show_start_exp_date').show();
+            $('#show_end_exp_date').show();
+        });
+    </script>
+@endif
 @endpush
 
 @endsection

@@ -68,6 +68,7 @@
     64 => 'App\\Providers\\DropboxServiceProvider',
     65 => 'App\\Providers\\ExtrasServiceProvider',
     66 => 'App\\Providers\\CaptchaServiceProvider',
+    67 => 'Intervention\\Image\\ImageServiceProvider',
   ),
   'eager' => 
   array (
@@ -120,6 +121,7 @@
     46 => 'App\\Providers\\DropboxServiceProvider',
     47 => 'App\\Providers\\ExtrasServiceProvider',
     48 => 'App\\Providers\\CaptchaServiceProvider',
+    49 => 'Intervention\\Image\\ImageServiceProvider',
   ),
   'deferred' => 
   array (
