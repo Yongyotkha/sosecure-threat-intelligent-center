@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\CategorySettings\Entities\CategorySettings;
 
 class SiteCategory extends Model {
-    protected $table = "site";
+    protected $table = "site_category";
     public $timestamps = true;
     protected $fillable = [
         'id', 'code', 'site_id', 'category_id',

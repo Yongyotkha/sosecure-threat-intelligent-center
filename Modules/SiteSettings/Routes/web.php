@@ -30,7 +30,7 @@ Route::group(
         Route::post('sitesettings', 'SiteSettingsController@store')->name('sitesettings.save')->middleware('can:sitesettings_create');
         // Route::get('/test', 'SiteSettingsController@test')->name('sitesettings.test')->middleware('can:menu_items');
 
-        Route::get('/systemsetting', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
+        Route::get('/systemsetting/{id}', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
         Route::get('/data-setting', 'DataSettingsController@datasetting')->name('datasettings.index')->middleware('can:menu_items');
         Route::get('/users-setting', 'UsersSettingsController@users_settings')->name('userssettings.index')->middleware('can:menu_items');
         Route::get('/domain-setting', 'DomainSettingsController@domain_setting')->name('domain.index')->middleware('can:menu_items');

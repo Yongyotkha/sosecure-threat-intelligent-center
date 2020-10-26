@@ -25,7 +25,7 @@ class SiteSettings extends Model{
     }
 
     public function get_data($uuid, $active = null){
-        $data = $this->select('code','name', 'descript', 'logo', 'address', 'remark', 'active', 'created_at', 'updated_at')
+        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'created_at', 'updated_at')
         ->where('code', $uuid)
         ->where('deleted_at', '=', null);
         if($active !== null){
@@ -35,6 +35,6 @@ class SiteSettings extends Model{
     }
 
     public function get_categorys(){
-        return $this->hasMany(SiteCategory::class, 'id', 'site_id');
+        return $this->hasMany(SiteCategory::class, 'site_id', 'id');
     }
 }

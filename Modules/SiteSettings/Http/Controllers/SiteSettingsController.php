@@ -7,7 +7,7 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
@@ -104,11 +104,11 @@ class SiteSettingsController extends Controller
         $SiteSettings->active = $request->active ? 1 : 0;
         $SiteSettings->save();
 
-        foreach($request->category AS $cate) {
+        foreach($request->category AS $category) {
             $SiteCategory = new SiteCategory;
             $SiteCategory->code = $SiteSettings->code;
             $SiteCategory->site_id = $SiteSettings->id;
-            $SiteCategory->category_id = $cate;
+            $SiteCategory->category_id = $category;
             $SiteCategory->save();
         }
 
@@ -119,7 +119,7 @@ class SiteSettingsController extends Controller
             [
                 'id'       => $SiteSettings->id,
                 'message'  => langapp('saved_successfully'),
-                'redirect' => route('sitesettings.index'),
+                'redirect' =>route('sitesettings.edit', ['id' => $SiteSettings->code]),
             ],
             true,
             Response::HTTP_CREATED
@@ -144,6 +144,11 @@ class SiteSettingsController extends Controller
     public function edit($id)
     {
         $get_data = $this->siteSettings->get_data($id);
+        $categories = CategorySettings::where([
+            ['active',1],
+            ['deleted_at','=',null]
+        ])->get();
+        $data['categories'] = $categories;
         $data['siteSettings'] = $get_data;
         $data['page'] = $this->getPage();
         return view('sitesettings::edit_site')->with($data);
@@ -157,7 +162,34 @@ class SiteSettingsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $SiteSettings = $this->SiteSettings->get_data($id);
+        $SiteSettings->name = $request->name;
+        $SiteSettings->descript = $request->descript;
+        $SiteSettings->address = $request->address;
+        $SiteSettings->remark = $request->remark;
+        $SiteSettings->active = $request->active ? 1 : 0;
+        $SiteSettings->save();
+        SiteCategory::where('site_id', $SiteSettings -> id)->delete();
+        foreach($request->category AS $category) {
+            $SiteCategory = new SiteCategory;
+            $SiteCategory->code = $SiteSettings->code;
+            $SiteCategory->site_id = $SiteSettings->id;
+            $SiteCategory->category_id = $category;
+            $SiteCategory->save();
+        }
+
+        if ($request->hasFile('logo')) {
+            $this->uploadLogo($request, $SiteSettings);
+        }
+        return ajaxResponse(
+            [
+                'id'       => $SiteSettings->id,
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('sitesettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
 
@@ -230,11 +262,11 @@ class SiteSettingsController extends Controller
                 return $siteSettings->name;
             })
             ->editColumn('categorys', function ($siteSettings) {
-                // $return = '';
-                // foreach($siteSettings -> categorys as $data){
-                //     $return .= $data -> category;
-                // }
-                return $siteSettings -> get_categorys;
+                $return = '';
+                foreach($siteSettings -> get_categorys as $data){
+                    $return .= $data -> category -> name. ', ';
+                }
+                return rtrim($return, ", ");
             })
             ->editColumn('status', function ($siteSettings) {
                 if($siteSettings->active == '1') {

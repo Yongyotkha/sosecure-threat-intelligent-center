@@ -5,6 +5,7 @@ namespace Modules\sitesettings\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\SiteSettings\Entities\SiteSettings;
 
 class SystemSettingsController extends Controller
 {
@@ -14,6 +15,7 @@ class SystemSettingsController extends Controller
      * @var \Modules\Items\Entities\Item
      */
     protected $item;
+    protected $siteSettings;
     /**
      * Request instance
      *
@@ -21,17 +23,20 @@ class SystemSettingsController extends Controller
      */
     protected $request;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, SiteSettings $siteSettings)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
+        $this->siteSettings = $siteSettings;
     }
     /**
      * Display a listing of the resource.
      * @return Response
      */
-    public function systemsetting()
+    public function systemsetting($id)
     {
+        $get_data = $this->siteSettings->get_data($id);
+        $data['siteSettings'] = $get_data;
         $data['page'] = 'SystemSettings';
         return view('sitesettings::system_setting')->with($data);
     }

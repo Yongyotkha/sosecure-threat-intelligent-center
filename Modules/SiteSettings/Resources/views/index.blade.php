@@ -56,7 +56,7 @@
                                     <th>@langapp('name')</th>
                                     <th>Categorys</th>
                                     <th>@langapp('status')</th>
-                                    <th class="no-sort">Action</th> 
+                                    <th class="no-sort" width="10%">Action</th> 
                                 </tr>
                             </thead>
                             <tbody>

@@ -17,13 +17,13 @@
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li>
-                                <a href="{{route('sitesettings.edit', ['id' => 2])}}">
+                                <a href="{{route('sitesettings.edit', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Site Settings
                                 </a>
                             </li>
                             <li class="active">
-                                <a href="{{route('systemsetting.index')}}">
+                                <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
 
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     System Settings

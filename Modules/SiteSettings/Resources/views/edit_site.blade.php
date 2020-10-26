@@ -17,13 +17,13 @@
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li class="active">
-                                <a href="{{route('sitesettings.edit', ['id' => 2])}}">
+                                <a href="{{route('sitesettings.edit', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Site Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('systemsetting.index')}}">
+                                <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     System Settings
                                 </a>
@@ -62,7 +62,7 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['sitesettings.api.update', 'id' => $siteSettings->id], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['sitesettings.api.update', 'id' => $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             <section class="panel panel-default">
                             <header class="panel-heading">@icon('solid/cogs') Site Details  </header>
                             <div class="panel-body">
@@ -105,14 +105,23 @@
                                 <div class="form-group row">
                                     <label for="" class="col-lg-3 control-label">Categorys</label>
                                     <div class="col-lg-6">
-                                        <select name="" id="categorys" class="select2-option form-control" multiple="multiple">
-                                            <option value="1" selected>TEST1</option>
-                                            <option value="2" selected>TEST2</option>
-                                            <option value="3" selected>CVE</option>
+                                        <select name="category" id="categorys" class="select2-option form-control" multiple="multiple">
+                                            <?php 
+                                                $category_site_id = [];
+                                                foreach($siteSettings->get_categorys as $siteCategory){
+                                                    $category_site_id[] = $siteCategory->category_id;
+                                                }
+                                            ?>
+                                            @foreach($categories as $key => $category)
+                                                <option value="{{ $category->id  }}"
+                                                     {{ $category_site_id[$key] ? $category_site_id[$key] === $category -> id ? 'selected' : '' : ''}}
+                                                >
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
-
                                 {{-- <div class="form-group row">
                                     <label class="col-lg-3 control-label">Remark </label>
                                     <div class="col-lg-9">
