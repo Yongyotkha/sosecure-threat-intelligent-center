@@ -5,6 +5,7 @@ namespace Modules\sitesettings\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\SiteSettings\Entities\SiteSettings;
 
 class DomainSettingsController extends Controller
 {
@@ -14,6 +15,7 @@ class DomainSettingsController extends Controller
      * @var \Modules\Items\Entities\Item
      */
     protected $item;
+    protected $siteSettings;
     /**
      * Request instance
      *
@@ -21,17 +23,20 @@ class DomainSettingsController extends Controller
      */
     protected $request;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, SiteSettings $siteSettings)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
+        $this->siteSettings = $siteSettings;
     }
     /**
      * Display a listing of the resource.
      * @return Response
      */
-    public function domain_setting()
+    public function domain_setting($id)
     {
+        $get_data = $this->siteSettings->get_data($id);
+        $data['siteSettings'] = $get_data;
         $data['page'] = 'Domain Settings';
         return view('sitesettings::domain')->with($data);
     }

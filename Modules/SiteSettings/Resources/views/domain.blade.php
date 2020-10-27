@@ -23,25 +23,25 @@
                                 </a>
                             </li>
                             <li >
-                                <a href="{{route('systemsetting.index')}}">
+                                <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     System Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('datasettings.index')}}">
+                                <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Permission & Config Settings
                                 </a>
                             </li>
                             <li>
-                                <a href="{{route('userssettings.index')}}">
+                                <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Users
                                 </a>
                             </li>
                             <li class="active">
-                                <a href="{{route('domain.index')}}">
+                                <a href="{{route('domain.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Domain
                                 </a>

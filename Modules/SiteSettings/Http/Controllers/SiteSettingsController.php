@@ -114,7 +114,7 @@ class SiteSettingsController extends Controller
         $SiteSettings->no_expiration_active = 0;
         $SiteSettings->start_active = $dt;
         $SiteSettings->end_active = $dt->addYear();
-        $SiteSettings->system_key = generator_uuid();
+        // $SiteSettings->system_key = generator_uuid();
         $SiteSettings->save();
 
         foreach($request->category AS $category) {
@@ -191,7 +191,9 @@ class SiteSettingsController extends Controller
             }
             $SiteSettings->start_active = Carbon::parse($request->start_active);
             $SiteSettings->end_active = Carbon::parse($request->end_active);
-            $SiteSettings->system_key = $request->system_key;
+            $SiteSettings->ip_key = $request->ip_key;
+            $SiteSettings->mac_address_key = $request->mac_address_key;
+            $SiteSettings->system_key = $this->encrypt_decrypt('encrypt', $id.'&'.$request->ip_key.'&'.$request->mac_address_key ,$request->ip_key, $request->mac_address_key);
         }
         $SiteSettings->save();
         if($request->page_setting == 'site_settings'){
@@ -357,6 +359,25 @@ class SiteSettingsController extends Controller
     private function getPage()
     {
         return langapp('site_settings');
+    }
+
+    private function encrypt_decrypt($action, $string, $ip, $mac) {
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        $secret_key = 'secret-key-!@#$#@!@#$%^' . $ip . '?><!@#$' . $mac;
+        $secret_iv = 'secret-iv-!@#$#@!@#$%^' . $ip . '?><!@#$' . $mac;
+        // hash
+        $key = hash('sha256', $secret_key);
+    
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+        $iv = substr(hash('sha256', $secret_iv), 0, 16);
+        if ( $action == 'encrypt' ) {
+            $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+            $output = base64_encode($output);
+        } else if( $action == 'decrypt' ) {
+            $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+        }
+        return $output;
     }
 
 

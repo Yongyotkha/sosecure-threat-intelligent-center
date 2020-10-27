@@ -30,19 +30,19 @@
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('datasettings.index')}}">
+                                <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Permission & Config Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('userssettings.index')}}">
+                                <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Users
                                 </a>
                             </li>
                             <li>
-                                <a href="{{route('domain.index')}}">
+                                <a href="{{route('domain.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Domain
                                 </a>
@@ -113,6 +113,30 @@
                                         </div>
                                     </div>
                                  </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">IP  <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-input">
+                                                    <input type="text" class="form-control" id="ip_key" name="ip_key" value="{{ $siteSettings -> ip_key }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Mac Address <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-input">
+                                                    <input type="text" class="form-control" id="mac_address_key" name="mac_address_key" value="{{ $siteSettings -> mac_address_key }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                  <div class="form-group row">
                                     <label class="col-lg-3 control-label">System Key <span  data-rel="tooltip" title="Copy Key ไปใส่ในระบบ Site System"><i class="far fa-question-circle"></i></span> <span class="text-danger">*</span> </label>
                                     <div class="col-lg-6">
@@ -122,7 +146,7 @@
                                                     <input type="text" class="form-control" id="generate_key" name="system_key" value="{{ $siteSettings -> system_key }}" readonly>
                                                     <span class="input-group-btn">
                                                         <button type="button" class="btn btn-info" onclick="copy_system_key()">Copy</button>  
-                                                        <button type="button" class="btn btn-info" onclick="genarate_system_key()">Gen</button>  
+                                                        {{-- <button type="button" class="btn btn-info" onclick="genarate_system_key()">Gen</button>   --}}
                                                     </span>
                                                 </div>
                                             </div>
