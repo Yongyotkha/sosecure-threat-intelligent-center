@@ -164,7 +164,7 @@ function dueInDays($due_date)
 
 function timePickerFormat($attr)
 {
-    return Carbon::parse($attr)->format('d-m-Y h:i A');
+    return Carbon::parse($attr)->format('d-m-Y H:i:s');
 }
 
 function datePickerFormat($date)

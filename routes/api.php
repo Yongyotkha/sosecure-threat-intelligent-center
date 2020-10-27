@@ -16,11 +16,10 @@ Route::group(['prefix' => 'v1'], function () {//, 'middleware' => 'auth:api'
     // Route::post('register', 'Auth\RegisterController@register');
     // Route::post('login', 'Auth\LoginController@login');
     Route::post('login', 'Auth\LoginController@login_api');
+    Route::post('register_site', 'Api\RegisterSiteController@register_site');
 });
-Route::group(['middleware' => 'jwt.auth','prefix' => 'v1'], function () {//, 'middleware' => 'auth:api'
-    // Route::post('register', 'Auth\RegisterController@register');
-    // Route::post('login', 'Auth\LoginController@login');
-    Route::get('test_api', 'Auth\LoginController@test_api');
+Route::group(['middleware' => 'api','prefix' => 'v1'], function ($router) {//, 'middleware' => 'auth:api'
+    $router->get('test_api', 'Auth\LoginController@test_api');
 });
 
 Route::group([
