@@ -15,18 +15,22 @@ class RegisterSiteController extends Controller
         $value = $request -> key;
         $data = $this->encrypt_decrypt('decrypt', $value, $ip, $mac);
         if($data === false){
-            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400'], 400);
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
             $site_explode = explode('&', $data);
             $site = SiteSettings::where('code', $site_explode[0])->first();
             if($site->no_expiration_active === 0){
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site], 200);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
             }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site], 200);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
             }else{
-                return response()->json(['error' => 'The key is invalid', 'status_code' => '401'], 401);
+                return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
             }
         }
+    }
+
+    public function test_get(Request $request){
+        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $request -> page]);
     }
 
     private function encrypt_decrypt($action, $string, $ip, $mac) {
