@@ -17,6 +17,7 @@ Route::group(['prefix' => 'v1'], function () {//, 'middleware' => 'auth:api'
     // Route::post('login', 'Auth\LoginController@login');
     Route::post('login', 'Auth\LoginController@login_api');
     Route::post('register_site', 'Api\RegisterSiteController@register_site');
+    Route::get('test_get', 'Api\RegisterSiteController@test_get');
 });
 Route::group(['middleware' => 'api','prefix' => 'v1'], function ($router) {//, 'middleware' => 'auth:api'
     $router->get('test_api', 'Auth\LoginController@test_api');
