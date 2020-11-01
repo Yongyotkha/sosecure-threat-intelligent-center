@@ -9,7 +9,7 @@ class SiteSettings extends Model{
     protected $table = "site";
     public $timestamps = true;
     protected $fillable = [
-        'id','code','name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 
+        'id','code','name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 
     ];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key'];
 
@@ -23,7 +23,7 @@ class SiteSettings extends Model{
     }
 
     public function get_data($uuid, $active = null){
-        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key')
+        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key')
         ->where('code', $uuid)
         ->where('deleted_at', '=', null);
         if($active !== null){

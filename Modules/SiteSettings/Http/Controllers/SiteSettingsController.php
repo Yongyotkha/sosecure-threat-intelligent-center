@@ -115,6 +115,7 @@ class SiteSettingsController extends Controller
         $SiteSettings->start_active = $dt;
         $SiteSettings->end_active = $dt->addYear();
         // $SiteSettings->system_key = generator_uuid();
+        $SiteSettings->public_key = str_random(135);
         $SiteSettings->save();
 
         foreach($request->category AS $category) {
