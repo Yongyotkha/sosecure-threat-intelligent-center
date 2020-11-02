@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DeployCode;
+use App\DeployHistory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
@@ -15,31 +17,36 @@ class RegisterSiteController extends Controller
         if(empty($site)){
             return ['error' => 'Unauthorized', 'status_code' => '401'];
         }else{
-            return ['error' => '', 'status_code' => '200'];
+            return ['error' => '', 'status_code' => '200', 'data' => $site];
         }
     }
 
     public function register_site(Request $request){
         $header = $request->bearerToken();
-        if($this->AuthorizationRegister($header)['status_code'] !== '200'){
+        $site = $this->AuthorizationRegister($header);
+        if($site['status_code'] !== '200'){
             return $this->AuthorizationRegister($header);
         }
         
-        $ip = '192.168.2.1';
-        $mac = 'fe80::8c98:dba3:69f3:2ecb%6';
-        $value = $request -> key;
-        $data = $this->encrypt_decrypt('decrypt', $value, $ip, $mac);
+        $value = $request -> data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']->ip_key,  $site['data']->mac_address_key);
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
-            $site_explode = explode('&', $data);
-            $site = SiteSettings::where('code', $site_explode[0])->first();
-            if($site->no_expiration_active === 0){
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
-            }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
+            $data_key = json_decode($data, true);
+            $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']->ip_key,  $site['data']->mac_address_key);
+            if($data_key_decrypt === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{
-                return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
+                $site_explode = explode('&', $data_key_decrypt);
+                $site = SiteSettings::where('code', $site_explode[0])->first();
+                if($site->no_expiration_active === 0){
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
+                }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
+                }else{
+                    return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
+                }
             }
         }
     }
@@ -63,20 +70,56 @@ class RegisterSiteController extends Controller
 
     public function site_request_version(Request $request){
         $header = $request->bearerToken();
-        if($this->AuthorizationRegister($header)['status_code'] !== '200'){
+        $site = $this->AuthorizationRegister($header);
+        if($site['status_code'] !== '200'){
             return $this->AuthorizationRegister($header);
         }
         
-        $ip = '192.168.2.1';
-        $mac = 'fe80::8c98:dba3:69f3:2ecb%6';
-        $value = $request -> key;
-        $data = $this->encrypt_decrypt('decrypt', $value, $ip, $mac);
+        $value = $request -> data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']->ip_key,  $site['data']->mac_address_key);
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
-            $data_version = json_decode($data, true);
-            $file_version = file_version::where('main', 1)->orderBy('created_at', 'desc')->first();
-            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => ['new_version' => $file_version , 'current_version' => $data_version]]);
+            $data_key = json_decode($data, true);
+            $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']->ip_key,  $site['data']->mac_address_key);
+            if($data_key_decrypt === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{
+                $new_version = DeployCode::select('version', 'created_at')->where('status', 1)->where('access_type', 1)->orderBy('version', 'desc')->first();
+                $current_version = DeployCode::select('version', 'created_at')->where('version', $data_key_decrypt)->first();
+                $update_version = DeployCode::select('code','path')->where('status', 1)->where('access_type', 1)->where('version','>', $data_key_decrypt)->get();
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => ['new_version' => $new_version, 'current_version' => $current_version, 'update_version' => $update_version]]);
+            }
+        }
+    }
+
+    public function save_deploy_history(Request $request){
+        $header = $request->bearerToken();
+        $site = $this->AuthorizationRegister($header);
+        if($site['status_code'] !== '200'){
+            return $this->AuthorizationRegister($header);
+        }
+        
+        $value = $request -> data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']->ip_key,  $site['data']->mac_address_key);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $data_key = json_decode($data, true);
+            foreach($data_key['code'] as $code){
+                $DeployCode = DeployCode::where('code', $code)->first();
+                $DeployHistory = new DeployHistory;
+                $DeployHistory->code = $DeployCode -> code;
+                $DeployHistory->path = $DeployCode -> path;
+                $DeployHistory->status = 1;
+                $DeployHistory->site_id = $site['data']->id;
+                $DeployHistory->save(); 
+            }
+            $site = SiteSettings::where('id', $site['data']->id)->first(); 
+            $site->installed = 1;
+            $site->save();
+            
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);
         }
     }
 
