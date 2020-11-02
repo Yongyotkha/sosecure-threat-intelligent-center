@@ -187,6 +187,21 @@
                                         </div>
                                     </div>
                                  </div>
+                                 <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Public Key <span  data-rel="tooltip" title="Copy Key ไปใส่ในระบบ Site System"><i class="far fa-question-circle"></i></span> <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="public_key" value="{{ $siteSettings -> public_key }}" readonly>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info" onclick="copy_public_key()">Copy</button>  
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                  {{-- <div class="form-group row">
                                      <div class="col-lg-3 control-label">API Key</div>
                                      <div class="col-lg-6">
@@ -301,6 +316,14 @@ function genarate_system_key(){
 
 function copy_system_key(){
     var copyText = document.getElementById("generate_key");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function copy_public_key(){
+    var copyText = document.getElementById("public_key");
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     document.execCommand("copy");

@@ -10,7 +10,21 @@ use App\file_version;
 
 class RegisterSiteController extends Controller
 {
+    private function AuthorizationRegister($header){
+        $site = SiteSettings::where('public_key', '!=', null)->where('public_key', $header)->first();
+        if(empty($site)){
+            return ['error' => 'Unauthorized', 'status_code' => '401'];
+        }else{
+            return ['error' => '', 'status_code' => '200'];
+        }
+    }
+
     public function register_site(Request $request){
+        $header = $request->bearerToken();
+        if($this->AuthorizationRegister($header)['status_code'] !== '200'){
+            return $this->AuthorizationRegister($header);
+        }
+        
         $ip = '192.168.2.1';
         $mac = 'fe80::8c98:dba3:69f3:2ecb%6';
         $value = $request -> key;
@@ -31,6 +45,11 @@ class RegisterSiteController extends Controller
     }
 
     public function test_get(Request $request){
+        $header = $request->bearerToken();
+        if($this->AuthorizationRegister($header)['status_code'] !== '200'){
+            return $this->AuthorizationRegister($header);
+        }
+
         $ip = '192.168.2.1';
         $mac = 'fe80::8c98:dba3:69f3:2ecb%6';
         $value = '{
@@ -43,6 +62,11 @@ class RegisterSiteController extends Controller
     }
 
     public function site_request_version(Request $request){
+        $header = $request->bearerToken();
+        if($this->AuthorizationRegister($header)['status_code'] !== '200'){
+            return $this->AuthorizationRegister($header);
+        }
+        
         $ip = '192.168.2.1';
         $mac = 'fe80::8c98:dba3:69f3:2ecb%6';
         $value = $request -> key;
