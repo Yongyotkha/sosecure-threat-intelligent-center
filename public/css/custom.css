@@ -1170,7 +1170,7 @@ ul.total-count li{
 .modal.modal-slide.in{
     -webkit-transform: translateX(0) !important;
     transform: translateX(0) !important;
-    transition: 2.5s ease-in-out;
+    transition: .8s ease-in-out;
 }
 
 .modal-slide .modal-dialog {
@@ -1184,6 +1184,7 @@ ul.total-count li{
     width: 100%;
 }
 
+.modal-slide .modal-dialog.full-screen
 .modal-content {
     position: relative;
     display: -ms-flexbox;
