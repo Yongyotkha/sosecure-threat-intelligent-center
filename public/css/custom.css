@@ -1161,17 +1161,16 @@ ul.total-count li{
    
 }
 
-.modal-dialog{
+.modal{
     transition: 1s ease-in-out;
-}
-.modal-slide.show .modal-dialog, .modal-slide .modal.show .modal-dialog {
     -webkit-transform: translateX(100%);
     transform: translateX(100%);
 }
-.modal-slide.in .modal-dialog, .modal-slide .modal.in .modal-dialog {
+
+.modal.modal-slide.in{
     -webkit-transform: translateX(0) !important;
     transform: translateX(0) !important;
-    transition: .5s ease-in-out;
+    transition: 2.5s ease-in-out;
 }
 
 .modal-slide .modal-dialog {
