@@ -240,8 +240,10 @@ $(document).ready(function(){
           .catch(function (error) {
             toastr.error('Error clearing notifications', '@langapp('response_status') ');
         });
-    });
+    }); 
 });
+
+
 </script>
 
 </body>

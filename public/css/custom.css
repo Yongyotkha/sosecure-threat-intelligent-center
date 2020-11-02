@@ -1155,10 +1155,16 @@ ul.total-count li{
 
 
 /* Custom New Modal Right Side */
+.fullscreen-btn{
+    cursor: pointer;
+}
+.fullscreen-btn:hover{
+    cursor: pointer;
+    color: #606060;
+}
 .modal-slide, .modal-slide .modal {
     overflow: hidden !important;
     padding: 0 !important;
-   
 }
 
 .modal{
@@ -1183,7 +1189,9 @@ ul.total-count li{
     max-width: none;
     width: 100%;
 }
-
+.modal-slide .modal-dialog.fullscreen {
+    width: 100% !important;
+}
 .modal-slide .modal-dialog.full-screen
 .modal-content {
     position: relative;

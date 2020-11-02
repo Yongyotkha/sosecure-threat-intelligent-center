@@ -102,7 +102,7 @@ Date.now = Date.now || function() { return +new Date; };
         $modal.load($remote);
       }
     );
-    
+
     // dropdown menu
     $.fn.dropdown.Constructor.prototype.change = function(e){
       e.preventDefault();

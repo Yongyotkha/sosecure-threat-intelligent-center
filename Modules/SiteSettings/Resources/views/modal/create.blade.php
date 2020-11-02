@@ -2,7 +2,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">New Site </h4>
+            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> New Site </h4>
         </div>
        
         {!! Form::open(['route' => 'sitesettings.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
@@ -131,6 +131,7 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
+@include('stacks.js.fullscreen')
 @include('partial.ajaxify')
 
     {{-- Crop Images --}}
