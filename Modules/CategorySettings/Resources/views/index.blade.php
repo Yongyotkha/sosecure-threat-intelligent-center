@@ -154,27 +154,32 @@
                         data: 'chk',
                         orderable: false,
                         searchable: false,
-                        sortable: false
+                        sortable: false,
+                        className: "w-10",
                     },
                     {
                         data: 'id',
+                        className: "w-15",
                         render: function (data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         },
                     },
                     {
                         data: 'name',
-                        name: 'name'
+                        name: 'name',
+                        className:'w-100',
                     },
                     {
                         data: 'status',
-                        name: 'active'
+                        name: 'active',
+                        className:'w-25',
                     },
                     {
                         data: 'action',
                         orderable: false,
                         searchable: false,
-                        sortable: false
+                        sortable: false,
+                        className:'w-80',
                     }
                 ]
             });

@@ -1153,6 +1153,21 @@ ul.total-count li{
     box-shadow: 0 2px 3px rgba(0,0,0,.2) !important;
 }
 
+.w-10{
+    width: 10px;
+}
+.w-15{
+    width: 15px;
+}
+.w-25{
+    width: 25px;
+}
+.w-80{
+    width: 80px;
+}
+.w-100{
+    width: auto;
+}
 
 /* Custom New Modal Right Side */
 .fullscreen-btn{
