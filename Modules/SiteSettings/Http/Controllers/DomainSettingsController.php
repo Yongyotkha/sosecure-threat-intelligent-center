@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Entities\Domain;
+use Modules\SiteSettings\Http\Requests\DomainRequest;
 
 class DomainSettingsController extends Controller
 {
@@ -23,11 +25,12 @@ class DomainSettingsController extends Controller
      */
     protected $request;
 
-    public function __construct(Request $request, SiteSettings $siteSettings)
+    public function __construct(Request $request, SiteSettings $siteSettings, Domain $domain)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
         $this->siteSettings = $siteSettings;
+        $this->domain = $domain;
     }
     /**
      * Display a listing of the resource.
@@ -35,6 +38,7 @@ class DomainSettingsController extends Controller
      */
     public function domain_setting($id)
     {
+        // dd(1);
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
         $data['page'] = 'Domain Settings';
@@ -56,9 +60,10 @@ class DomainSettingsController extends Controller
      * Show the form for creating a new resource.
      * @return Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('sitesettings::create');
+        $code = $request->code;
+        return view('sitesettings::modal.create_domain',compact('code'));
     }
 
     /**
@@ -70,6 +75,53 @@ class DomainSettingsController extends Controller
     {
         //
     }
+
+
+    public function save(DomainRequest $request)//DomainRequest
+    {
+        // dd($request);
+        // $this->authorize('create', Domain::class);
+        // $Domain = $this->Domain->create($request->all());
+        $segments = request()->segments();
+        $last_segments  = end($segments);
+        // $segment3 =  request()->segment(3);
+        // dd($segment3);
+        $code = $request->code;
+
+        $SiteSettings = SiteSettings::where('code',$code)->first();
+
+        $Domain = $this->domain;
+        $Domain->code = generator_uuid();
+        $Domain->name = $request->name;
+        $Domain->domain = $request->domain;
+        // $Domain->created_by = @Auth::user()->id;
+        $Domain->status = $request->status ? 1 : 0;
+        $Domain->site_id = $SiteSettings->id;
+        $Domain->save();
+
+        // foreach($request->category AS $cate) {
+        //     $SiteCategory = new SiteCategory;
+        //     $SiteCategory->site_id = $Domain->id;
+        //     $SiteCategory->category_id = $cate;
+        //     $SiteCategory->save();
+        // }
+
+        // if ($request->hasFile('logo')) {
+        //     $this->uploadLogo($request, $Domain);
+        // }
+
+   
+        return ajaxResponse(
+            [
+                'id'       => $Domain->id,
+                'message'  => langapp('saved_successfully'),
+                'redirect' =>route('domain.index', ['id' => $SiteSettings->code]),
+            ],
+            true,
+            Response::HTTP_CREATED
+        );
+    }
+
 
     /**
      * Show the specified resource.

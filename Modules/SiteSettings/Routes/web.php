@@ -37,6 +37,8 @@ Route::group(
         Route::get('/users-setting/{id}', 'UsersSettingsController@users_settings')->name('userssettings.index')->middleware('can:menu_items');
         Route::get('/domain-setting/{id}', 'DomainSettingsController@domain_setting')->name('domain.index')->middleware('can:menu_items');
         Route::get('/domain-setting/detail/{tab?}', 'DomainSettingsController@domain_detail')->name('domain_detail.index');
+        Route::get('/domain-setting/domain/create/{code}', 'DomainSettingsController@create')->name('domain.create')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
+        Route::post('/domain-setting/domain/save/{code}', 'DomainSettingsController@save')->name('domain.save')->middleware('can:categorysettings_create');//->middleware('can:categorysettings_create')
     }
     
 );
