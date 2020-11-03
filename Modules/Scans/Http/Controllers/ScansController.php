@@ -5,6 +5,9 @@ namespace Modules\Scans\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use phpseclib\Net\SSH2;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class ScansController extends Controller
 {
@@ -104,5 +107,21 @@ class ScansController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function scan_command(){
+        // $process = new SSH2('10.104.0.7');
+        // $process->login('root', '$0$ecure-!@#$%^&*()');
+        // echo $process->exec('');
+        $ip = new Process("hostname --all-ip-addresses | awk '{print $1}'");
+        $ip->setTimeout(3600);
+        $ip->run();
+
+        $mac = new Process("cat /sys/class/net/$(ip route show default | awk '/default/ {print $5}')/address");
+        $mac->setTimeout(3600);
+        $mac->run();
+
+        echo $ip->getOutput() . '<br>';
+        echo $mac->getOutput();
     }
 }

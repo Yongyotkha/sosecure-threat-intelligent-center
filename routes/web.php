@@ -53,3 +53,8 @@ Route::post('search', 'SearchController@search')->name('search.app');
 
 Route::get('support', 'SupportController@ticket')->name('support.ticket')->middleware('cors');
 Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
+
+
+Route::get('phpinfo', function() {
+    phpinfo();
+});
