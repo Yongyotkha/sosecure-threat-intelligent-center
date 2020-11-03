@@ -1152,3 +1152,420 @@ ul.total-count li{
     -webkit-box-shadow: 0 2px 3px rgba(0,0,0,.2) !important;
     box-shadow: 0 2px 3px rgba(0,0,0,.2) !important;
 }
+
+.w-10{
+    width: 10px;
+}
+.w-15{
+    width: 15px;
+}
+.w-25{
+    width: 25px;
+}
+.w-80{
+    width: 80px;
+}
+.w-100{
+    width: auto;
+}
+
+/* Custom New Modal Right Side */
+.fullscreen-btn{
+    cursor: pointer;
+}
+.fullscreen-btn:hover{
+    cursor: pointer;
+    color: #606060;
+}
+.modal-slide, .modal-slide .modal {
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
+.modal{
+    transition: 1s ease-in-out;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+}
+
+.modal.modal-slide.in{
+    -webkit-transform: translateX(0) !important;
+    transform: translateX(0) !important;
+    transition: .8s ease-in-out;
+}
+
+.modal-slide .modal-dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    margin: 0;
+    max-width: none;
+    width: 100%;
+}
+.modal-slide .modal-dialog.fullscreen {
+    width: 100% !important;
+}
+.modal-slide .modal-dialog.full-screen
+.modal-content {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0px solid rgba(24,28,33,0.2);
+    border-radius: .25rem;
+    outline: 0;
+}
+
+.modal-slide .modal-content {
+    overflow: auto;
+    padding-top: 3.22127rem;
+    padding-bottom: 3.22127rem;
+    height: 100%;
+    border-radius: 0;
+}
+
+.modal-slide .modal-body {
+    flex-grow: 0;
+    padding-top: 2rem;
+    padding-bottom: 0;
+}
+.modal-body {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.5625rem;
+}
+
+.modal-footer {
+    padding: 1.25rem 1.5625rem;
+}
+.modal-footer {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    padding: 1.5625rem;
+    border-top: 1px solid rgba(24,28,33,0.075);
+    border-bottom-right-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+}
+
+@media (min-width: 576px){
+    .modal-slide.size-50 .modal-dialog {
+        width: 50% !important;
+    }
+    .modal-slide .modal-dialog {
+        width: 60rem;
+    }
+}
+
+.py-3{
+    padding: 2.5rem 0;
+}
+
+.ml-2{
+    margin-left: 1.5rem;
+}
+
+.pa-sm{
+    padding: 1rem;
+}
+
+@media (min-width: 768px){
+    .aside-md {
+        width: 240px;
+    }
+}
+
+.role-main{
+    margin-bottom: 5px;
+}
+ul.role-group,
+ul.role-group li ul.role-group-sub{
+    list-style: none;
+    padding: 0;
+}
+ul.role-group li ul.role-group-sub{
+    padding-left: 2rem;
+}
+
+ul.role-group li ul.role-group-sub li{
+    margin-bottom: 5px;
+}
+
+.role-click{
+    cursor: pointer;
+}
+
+.checkbox.chk-inline  label{
+    padding-left: 1rem !important;
+}
+.chk-inline {
+    display: inline !important;
+}
+
+
+
+
+
+
+/* Progress Bars */
+.progress--bar {
+    height: 1.5rem;
+    margin: 1rem;
+    background-color: #ddd;
+  }
+  .progress--bar:after {
+    content: '';
+    display: block;
+    height: 100%;
+    background-color: #63B8FF;
+  }
+  
+  .progress--circle {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ddd;
+  }
+  .progress--circle:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #fbfbfb;
+    }
+  .progress--circle:after {
+    content: '';
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #63B8FF;
+  }
+  
+  .progress__number {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    line-height: 1;
+    margin-top: -0.75rem;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #777;
+  }
+  
+  .progress--pie:before {
+    display: none;
+    /* Get rid of white circle for "pie chart style" meter */
+  }
+  .progress--pie .progress__number {
+    color: white;
+    text-shadow: rgba(0, 0, 0, 0.35) 1px 1px 1px;
+  }
+  
+  /**
+  * $step is set to 5 by default, meaning you can only use percentage classes in increments of five (e.g. 25, 30, 45, 50, and so on). This helps to reduce the size of the final CSS file. If you need a number that doesn't end in 0 or 5, you can change the text percentage while rounding the class up/down to the nearest 5.
+  */
+  .progress--bar.progress--0:after {
+    width: 0%;
+  }
+  
+  .progress--circle.progress--0:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(90deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--5:after {
+    width: 5%;
+  }
+  
+  .progress--circle.progress--5:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(108deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--10:after {
+    width: 10%;
+  }
+  
+  .progress--circle.progress--10:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(126deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--15:after {
+    width: 15%;
+  }
+  
+  .progress--circle.progress--15:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(144deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--20:after {
+    width: 20%;
+  }
+  
+  .progress--circle.progress--20:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(162deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--25:after {
+    width: 25%;
+  }
+  
+  .progress--circle.progress--25:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(180deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--30:after {
+    width: 30%;
+  }
+  
+  .progress--circle.progress--30:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(198deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--35:after {
+    width: 35%;
+  }
+  
+  .progress--circle.progress--35:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(216deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--40:after {
+    width: 40%;
+  }
+  
+  .progress--circle.progress--40:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(234deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--45:after {
+    width: 45%;
+  }
+  
+  .progress--circle.progress--45:after {
+    background-image: linear-gradient(90deg, #ddd 50%, transparent 50%, transparent), linear-gradient(252deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--50:after {
+    width: 50%;
+  }
+  
+  .progress--circle.progress--50:after {
+    background-image: linear-gradient(-90deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--55:after {
+    width: 55%;
+  }
+  
+  .progress--circle.progress--55:after {
+    background-image: linear-gradient(-72deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--60:after {
+    width: 60%;
+  }
+  
+  .progress--circle.progress--60:after {
+    background-image: linear-gradient(-54deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--65:after {
+    width: 65%;
+  }
+  
+  .progress--circle.progress--65:after {
+    background-image: linear-gradient(-36deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--70:after {
+    width: 70%;
+  }
+  
+  .progress--circle.progress--70:after {
+    background-image: linear-gradient(-18deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--75:after {
+    width: 75%;
+  }
+  
+  .progress--circle.progress--75:after {
+    background-image: linear-gradient(0deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--80:after {
+    width: 80%;
+  }
+  
+  .progress--circle.progress--80:after {
+    background-image: linear-gradient(18deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--85:after {
+    width: 85%;
+  }
+  
+  .progress--circle.progress--85:after {
+    background-image: linear-gradient(36deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--90:after {
+    width: 90%;
+  }
+  
+  .progress--circle.progress--90:after {
+    background-image: linear-gradient(54deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--95:after {
+    width: 95%;
+  }
+  
+  .progress--circle.progress--95:after {
+    background-image: linear-gradient(72deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+  .progress--bar.progress--100:after {
+    width: 100%;
+  }
+  
+  .progress--circle.progress--100:after {
+    background-image: linear-gradient(90deg, #63B8FF 50%, transparent 50%, transparent), linear-gradient(270deg, #63B8FF 50%, #ddd 50%, #ddd);
+  }
+  
+
+  .card-overview{
+      width: 100%;
+      height: 230px;
+      
+  }
+
+  .card-text-ov{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+  }
+
+  .mt20px{
+      margin-top: 20px;
+  }

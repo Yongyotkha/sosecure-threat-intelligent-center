@@ -38,6 +38,10 @@ function gen_uuid() {
     );
 }
 
+function generator_uuid(){
+    return Str::uuid()->toString();
+}
+
 function generate_site_key_login() {
     $exists = true;
     while ($exists)
@@ -64,4 +68,23 @@ function generate_site_key_code() {
         }
     }
     return $code;
+}
+
+function encrypt_decrypt($action, $string, $public_key, $ip, $mac) {
+    $output = false;
+    $encrypt_method = "AES-256-CBC";
+    $secret_key = 'secret-key-' . $public_key . $ip . $mac;
+    $secret_iv = 'secret-iv-' . $public_key . $ip . $mac;
+    // hash
+    $key = hash('sha256', $secret_key);
+
+    // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+    $iv = substr(hash('sha256', $secret_iv), 0, 16);
+    if ( $action == 'encrypt' ) {
+        $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+        $output = base64_encode($output);
+    } else if( $action == 'decrypt' ) {
+        $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+    }
+    return $output;
 }

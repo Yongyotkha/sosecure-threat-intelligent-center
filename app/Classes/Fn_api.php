@@ -39,7 +39,7 @@ class Fn_api extends Controller
         $credentials = request(['email', 'password']);
 
         if (!$token = auth($this->guard)->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized', 'code_status' => '02'], 401);
+            return response()->json(['error' => 'Unauthorized', 'code_status' => '401']);
         }
 
         return $this->respondWithToken_api($token);

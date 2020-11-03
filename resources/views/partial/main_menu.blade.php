@@ -209,6 +209,14 @@
                                 <span> @langapp('webdefacement') </span>
                             </a>
                         </li>
+
+                        <li class="{{ $page === langapp('scans') ? 'active' : '' }}">
+                            <a href="{{ site_url('/scans') }}">
+                                <i class="fas fa-search icon"><b class="bg-info"></b></i>
+                                <span> @langapp('scans') </span>
+                            </a>
+                        </li>
+
                         <li class="{{ $page === langapp('manage_customers') ? 'active' : '' }}">
                             <a href="{{ site_url('/clients') }}">
                                 <i class="fas fa-user-cog icon"><b class="bg-info"></b></i>

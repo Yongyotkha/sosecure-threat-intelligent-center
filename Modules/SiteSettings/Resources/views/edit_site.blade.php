@@ -17,27 +17,33 @@
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li class="active">
-                                <a href="{{route('sitesettings.edit', ['id' => 2])}}">
+                                <a href="{{route('sitesettings.edit', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Site Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('systemsetting.index')}}">
+                                <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     System Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('datasettings.index')}}">
+                                <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    Data Settings
+                                    Permission & Config Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('userssettings.index')}}">
+                                <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Users
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{route('domain.index', ['id' => $siteSettings->code])}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Domain
                                 </a>
                             </li>
                         </ul>
@@ -56,12 +62,11 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['sitesettings.api.update', 'id' => $siteSettings->id], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             <section class="panel panel-default">
                             <header class="panel-heading">@icon('solid/cogs') Site Details  </header>
+                            <input type="hidden" name="page_setting" value="site_settings">
                             <div class="panel-body">
-                                <input type="hidden" name="id" value="{{  $siteSettings->id  }}">
-
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Logo </label>
                                     <div class="col-lg-6">
@@ -97,16 +102,21 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="" class="col-lg-3 control-label">Site Categorys</label>
+                                    <label for="" class="col-lg-3 control-label">Categorys</label>
                                     <div class="col-lg-6">
-                                        <select name="" id="categorys" class="select2-option form-control" multiple="multiple">
-                                            <option value="1">TEST1</option>
-                                            <option value="2">TEST2</option>
-                                            <option value="3">CVE</option>
+                                        <select name="category[]" id="categorys" class="select2-option form-control" multiple="multiple">
+                                            @foreach($categories as $key => $category)
+                                                <option value="{{ $category->id  }}"
+                                                    @foreach($siteSettings->get_categorys as $siteCategory)
+                                                        {{ $siteCategory->category_id === $category -> id ? 'selected' : ''}}
+                                                    @endforeach
+                                                >
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
-
                                 {{-- <div class="form-group row">
                                     <label class="col-lg-3 control-label">Remark </label>
                                     <div class="col-lg-9">

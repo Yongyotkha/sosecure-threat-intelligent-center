@@ -12,15 +12,19 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::group(['prefix' => 'v1'], function () {//, 'middleware' => 'auth:api'
+Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
+    //, 'middleware' => 'auth:api'
     // Route::post('register', 'Auth\RegisterController@register');
     // Route::post('login', 'Auth\LoginController@login');
     Route::post('login', 'Auth\LoginController@login_api');
+    Route::post('register_site', 'Api\RegisterSiteController@register_site');
+    Route::post('site_request_version', 'Api\RegisterSiteController@site_request_version');
+    Route::post('save_deploy_history', 'Api\RegisterSiteController@save_deploy_history');
+    Route::post('test_get', 'Api\ExampleApiController@test_get');
 });
-Route::group(['middleware' => 'jwt.auth','prefix' => 'v1'], function () {//, 'middleware' => 'auth:api'
-    // Route::post('register', 'Auth\RegisterController@register');
-    // Route::post('login', 'Auth\LoginController@login');
-    Route::get('test_api', 'Auth\LoginController@test_api');
+
+Route::group(['middleware' => 'api','prefix' => 'v1'], function ($router) {//, 'middleware' => 'auth:api'
+    $router->get('test_api', 'Auth\LoginController@test_api');
 });
 
 Route::group([

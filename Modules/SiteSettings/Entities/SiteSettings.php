@@ -2,81 +2,37 @@
 
 namespace Modules\SiteSettings\Entities;
 
-use App\Entities\Tag;
-use App\Traits\Actionable;
-use App\Traits\Commentable;
-use App\Traits\CustomBillable;
-use App\Traits\Customizable;
-use App\Traits\Emailable;
-use App\Traits\Noteable;
-use App\Traits\Observable;
-use App\Traits\Taggable;
-use App\Traits\Todoable;
-use App\Traits\Uploadable;
-use App\Traits\Vaultable;
-use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
-use Modules\Clients\Observers\ClientObserver;
-use Modules\Clients\Scopes\ClientScope;
-// use Modules\Contracts\Entities\Contract;
-// use Modules\Creditnotes\Entities\CreditNote;
-// use Modules\Deals\Entities\Deal;
-// use Modules\Estimates\Entities\Estimate;
-// use Modules\Expenses\Entities\Expense;
-// use Modules\Invoices\Entities\Invoice;
-// use Modules\Payments\Entities\Payment;
-// use Modules\Projects\Entities\Project;
-use Modules\Users\Entities\Profile;
-use Modules\Users\Entities\User;
-use Spatie\Permission\Traits\HasRoles;
+use Modules\SiteSettings\Entities\SiteCategory;
 
-class SiteSettings extends Authenticatable implements HasLocalePreference//extends Model
-{
-    // use Notifiable, Observable, SoftDeletes, Actionable, Commentable, Todoable, Vaultable,
-    // Taggable, Customizable, Noteable, Uploadable, Emailable, CustomBillable;
-    use Notifiable, HasRoles,HasApiTokens,Observable, SoftDeletes, Actionable, Vaultable,Customizable, Uploadable, Emailable;
-
-    protected static $observer = UserObserver::class;
-    protected static $scope    = null;
-
+class SiteSettings extends Model{
     protected $table = "site";
     public $timestamps = true;
     protected $fillable = [
-        'id','name', 'descript', 'logo', 'address', 'remark', 'active',
+        'id','code','name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'installed'
     ];
-    // protected $appends = ['contact_person', 'expense_cost', 'outstanding', 'map', 'maplink'];
-    protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
+    protected $dates   = ['deleted_at', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key'];
 
-    // protected static $observer = ClientObserver::class;
-    // protected static $scope    = ClientScope::class;
-
-   
- 
-    /**
-     * Get client contacts.
-     */
-    // public function contacts()
-    // {
-    //     return $this->hasMany(Profile::class, 'company')->with('user:id,username,email,name');
-    // }
-
-
-    /**
-     * Get contact person profile.
-     */
-    // public function contact()
-    // {
-    //     return $this->belongsTo(User::class, 'primary_contact');
-    // }
-
-   
-   
     public function preferredLocale()
     {
         return $this->locale;
+    }
+
+    public function find_id($uuid){
+        return $this->select('id')->where('code', $uuid)->first();
+    }
+
+    public function get_data($uuid, $active = null){
+        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key', 'installed')
+        ->where('code', $uuid)
+        ->where('deleted_at', '=', null);
+        if($active !== null){
+            $data->where('active', $active);
+        }
+        return $data->first();
+    }
+
+    public function get_categorys(){
+        return $this->hasMany(SiteCategory::class, 'site_id', 'id');
     }
 }

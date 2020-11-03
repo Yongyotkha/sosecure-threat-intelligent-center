@@ -17,27 +17,33 @@
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li>
-                                <a href="{{route('sitesettings.edit', ['id' => 2])}}">
+                                <a href="{{route('sitesettings.edit', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Site Settings
                                 </a>
                             </li>
                             <li >
-                                <a href="{{route('systemsetting.index')}}">
+                                <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     System Settings
                                 </a>
                             </li>
                             <li class="">
-                                <a href="{{route('datasettings.index')}}">
+                                <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    Data Settings
+                                    Permission & Config Settings
                                 </a>
                             </li>
                             <li class="active">
-                                <a href="{{route('userssettings.index')}}">
+                                <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Users
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{route('domain.index', ['id' => $siteSettings->code])}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Domain
                                 </a>
                             </li>
                         </ul>
@@ -50,14 +56,14 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <div class="bc-head">Users</div>
+                    <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
                     <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a>
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create-new-user">
                         @icon('solid/plus') @langapp('create')
                     </a>
                     <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color')  }}  pull-right m-xs">
@@ -87,10 +93,11 @@
                                                 <th>@langapp('role')   </th>
                                                 <th>@langapp('status')   </th>
                                                 <th>@langapp('update')   </th>
+                                                <th>@langapp('action')   </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                
+                                            
                                         </tbody>
                                     </table>
                                 </div>
@@ -104,9 +111,81 @@
             </section>
         </aside>
     </section>
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html">
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 
-    </a>
+    <!-- Modal New User -->
+    <div class="modal modal-slide" id="create-new-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="exampleModalLabel">New User</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Set Password <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Re-enter Password <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Role <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <select name="" id="role" class="select2-option form-control">
+                                <option value="1">Admin</option>
+                                <option value="1">User</option>
+                                <option value="1">Customer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Status </label>
+                        <div class="col-lg-8">
+                            <label class="switch">
+                                <input type="hidden" value="FALSE" name="">
+                                <input type="checkbox" name="" value="TRUE">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-info btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 
@@ -119,6 +198,10 @@
 @include('stacks.js.datatables')
 
 <script>
+    $(document).ready(function () {
+        $('#role').select2();
+    });
+
     $(function() {
         $('#table-users-template').DataTable({
             processing: true,
@@ -126,6 +209,7 @@
         });
     });
 </script>
+
 
 @endpush
 

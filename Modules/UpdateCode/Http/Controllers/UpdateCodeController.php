@@ -36,6 +36,18 @@ class UpdateCodeController extends Controller
         return view('updatecode::index')->with($data);
     }
 
+    public function upcode_version()
+    {
+        $data['page'] = langapp('update_code');
+        return view('updatecode::updatecode_version')->with($data);
+    }
+
+    public function upcode_site_version()
+    {
+        $data['page'] = langapp('update_code');
+        return view('updatecode::updatecode_site_version')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
