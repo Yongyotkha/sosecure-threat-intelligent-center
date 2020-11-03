@@ -14,5 +14,7 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'updatecode'],
     function () {
         Route::get('/', 'UpdateCodeController@index')->name('updatecode.index')->middleware('can:menu_items');
+        Route::get('/updatecode_version', 'UpdateCodeController@upcode_version')->name('updatecode.upcode_version')->middleware('can:menu_items');
+        Route::get('/updatecode_site_version', 'UpdateCodeController@upcode_site_version')->name('updatecode.upcode_site_version')->middleware('can:menu_items');
     }
 );
