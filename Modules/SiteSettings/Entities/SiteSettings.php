@@ -22,6 +22,10 @@ class SiteSettings extends Model{
         return $this->select('id')->where('code', $uuid)->first();
     }
 
+    public function find_code($id){
+        return $this->select('code')->where('id', $id)->first();
+    }
+
     public function get_data($uuid, $active = null){
         $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key', 'installed')
         ->where('code', $uuid)

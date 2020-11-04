@@ -82,21 +82,18 @@
                                             <table  class="table table-striped" id="table-domain-template">
                                                 <thead>
                                                     <tr>
-                                                        <th class="hide"></th>
+                                                        {{-- <th class="hide"></th> --}}
                                                         <th class="no-sort">
                                                             <label>
                                                                 <input name="select_all" value="1" id="select-all" type="checkbox" />
                                                                 <span class="label-text"></span>
                                                             </label>
                                                         </th>
-                                                        <th>@langapp('name')  </th>
+                                                        <th class="">No.</th>
+                                                        <th>@langapp('name')</th>
                                                         <th>Domain</th>
-                                                        <th>Started</th>
-                                                        <th>Finished</th>
-                                                        <th>Elements</th>
-                                                        <th>Progress</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>@langapp('status')</th>
+                                                        <th class="no-sort">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -134,6 +131,15 @@
 @include('stacks.js.fullscreen')
 @include('partial.ajaxify')
 
+<?php 
+    // $(function() {
+    //     $('#table-domain-template').DataTable({
+    //         processing: true,
+    //         order: [[ 0, "desc" ]],
+    //     });
+    // });
+?>
+
 <script>
     $(document).ready(function () {
         $('#scan_interval').select2();
@@ -144,17 +150,129 @@
         $('#'+id).slideToggle(150);
     }
 
-    $(function() {
-        $('#table-domain-template').DataTable({
+
+    $(function () {
+
+        var table = $('#table-domain-template').DataTable({
             processing: true,
-            order: [[ 0, "desc" ]],
+            serverSide: true,
+            ajax: {
+                url: '{!! route('domainsettings.data') !!}',
+                data: ""
+            },
+            order: [
+                [0, "desc"]
+            ],
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: "w-10",
+                },
+                {
+                    data: 'no',
+                    className: "w-15",
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                    className:'w-100',
+                },
+                {
+                    data: 'domain',
+                    name: 'domain',
+                    className:'w-100',
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className:'w-25',
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className:'w-80',
+                }
+            ]
         });
+
+        let del_val = [];
+        $("#btn_del_select").click(function(){
+            del_val = [];
+            $("input[type='checkbox'][name='checked']").each(function(){
+                
+                if($(this).is(":checked")) {
+                    del_val.push($(this).val());
+                    /* alert(3);*/
+                }
+            });
+            console.log(del_val);
+
+            if(del_val.length > 0) {
+                del_cate_select(del_val);
+            } else {
+                toastr.warning('Please select atleast 1', '@langapp('response_status')');
+            }
+
+        });
+
+
+
     });
+
+    function del_cate_select(id) {
+        axios.post('{{ route('domainsettings.bulk.delete') }}', {checked: id})
+        .then(function (response) {
+            toastr.warning(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        })
+        .catch(function (error) {
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        });
+    }
+
+
+    function change_category_active (id) {
+        $.ajax({
+            type:"POST",
+            url:"{{ route('domainsettings.change_status') }}",
+            data:{id:id},
+            beforeSend: function(){
+            },
+            success:function(response) {
+                console.log(response);
+
+                toastr.warning(response.data.message, '@langapp('response_status')');
+                window.location.href = response.data.redirect;
+            
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
 
 
 </script>
 
 
 @endpush
-
 @endsection

@@ -2,14 +2,16 @@
 
 namespace Modules\SiteSettings\Entities;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 // use Modules\SiteSettings\Entities\SiteCategory;
 
-class Domain extends Model{
+class Domain extends Model {
+    use SoftDeletes;
     protected $table = "domain";
     public $timestamps = true;
     protected $fillable = [
-        'id','code','name', 'domain', 'open_scan', 'scan_interval', 'status', 'created_at', 'updated_at', 'deleted_at', 'site_id'
+        'id','code','name', 'domain', 'open_scan', 'scan_interval', 'status', 'site_id'
     ];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
 

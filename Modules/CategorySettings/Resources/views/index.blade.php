@@ -55,7 +55,7 @@
                                     <th>@langapp('name')</th>
                                     <th>@langapp('status')</th>
                                     <th class="no-sort">Action</th>
-                                    
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -63,7 +63,7 @@
                             </tbody>
                         </table>
 
-                       
+
 
                     </div>
                 </form>
@@ -90,7 +90,7 @@
                         <div class="input-group">
                             <input type="text" class="form-control" name="generate_key" value="" readonly>
                             <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info">Gen</button>  
+                                <button type="submit" class="btn btn-info">Gen</button>
                             </span>
                         </div>
                         </div>
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
@@ -136,7 +136,7 @@
     <script>
         $(function () {
 
-   
+
 
 
             var table = $('#table-category-template').DataTable({
@@ -188,7 +188,7 @@
             $("#btn_del_select").click(function(){
                 del_val = [];
                 $("input[type='checkbox'][name='checked']").each(function(){
-                    
+
                     if($(this).is(":checked")) {
                         del_val.push($(this).val());
                         /* alert(3);*/
@@ -203,8 +203,8 @@
                 }
 
             });
-            
-         
+
+
 
         });
 
@@ -244,20 +244,20 @@
 
 
         function change_category_active (category_id) {
-         
-			$.ajax({
-				type:"POST",
+
+      			$.ajax({
+      				type:"POST",
                 url:"{{ route('categorysettings.change_status') }}",
                 data:{category_id:category_id},
                 beforeSend: function(){
                 },
-				success:function(response) {
-                    console.log(response);
+        				success:function(response) {
+                            console.log(response);
 
-                    toastr.warning(response.data.message, '@langapp('response_status')');
-                    window.location.href = response.data.redirect;
-				
-                },
+                            toastr.warning(response.data.message, '@langapp('response_status')');
+                            window.location.href = response.data.redirect;
+
+                        },
                 error: function (error){
                     var errors = error.response.data.errors;
                     var errorsHtml = '';
