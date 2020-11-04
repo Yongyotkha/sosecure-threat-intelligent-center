@@ -19,9 +19,9 @@ class CreateTransactionTimeStampScansTable extends Migration
             $table->integer('created_by')->nullable();
             $table->integer('site_id')->nullable();
             $table->integer('domain_id')->nullable();
-            $table->tinyInteger('status')->default(0);
-            $table->integer('elements')->default(0);
-            $table->integer('progress')->default(0);
+            $table->tinyInteger('status')->default(0)->nullable();
+            $table->integer('elements')->default(0)->nullable();
+            $table->integer('progress')->default(0)->nullable();
             $table->timestamps();
         });
     }
