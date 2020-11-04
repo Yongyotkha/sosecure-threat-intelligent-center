@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Uncomment for shared hosting
+        $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
         // $schedule->command('queue:work --workicedaemon --queue=default,high,normal,low --tries=3')->everyMinute()->withoutOverlapping(5);
         // $schedule->command('backup:clean')->dailyAt('02:00')->name('backup.cleaner')->withoutOverlapping(5);
         // $schedule->command('backup:run')->dailyAt('03:00')->name('backup.runner')->withoutOverlapping(5);

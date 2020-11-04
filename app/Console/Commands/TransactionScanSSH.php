@@ -41,7 +41,7 @@ class TransactionScanSSH extends Command
         $TransactionTimeStampScans = TransactionTimeStampScans::where('progress', 0)->where('status', 1)->first();
         $TransactionTimeStampScans->progress = 1;
         $TransactionTimeStampScans->save();
-        $domain = "vulnweb.com";
+        $domain = $TransactionTimeStampScans->get_domain->domain;
         $current = '';
         $cmd_1 = 'ssh -t root@10.104.0.12  /usr/spiderfoot/sf.py -m sfp_dnsbrute,sfp_dnsresolve,sfp_whois,sfp_crobat_api -s '.$domain.' -q -FAFFILIATE_DOMAIN_NAME,AFFILIATE_INTERNET_NAME,INTERNET_NAME';
         $cmd_2 = 'ssh -t root@10.104.0.12  "/usr/spiderfoot/sf.py -m sfp_dnsbrute,sfp_dnsresolve,sfp_whois,sfp_crobat_api,sfp_crt -s '.$domain.' -q -r -F IP_ADDRESS"';
@@ -69,5 +69,8 @@ class TransactionScanSSH extends Command
 
         $file = './file.txt';
         file_put_contents($file, $current);
+
+        $TransactionTimeStampScans->progress = 2;
+        $TransactionTimeStampScans->save();
     }
 }
