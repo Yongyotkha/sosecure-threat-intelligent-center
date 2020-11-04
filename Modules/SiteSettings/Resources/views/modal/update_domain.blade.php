@@ -2,9 +2,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">@langapp('make_changes')  - {{ $domain->name }}</h4>
+            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $domain->name }}</h4>
         </div>
-        {!! Form::open(['route' => ['sitesettings.api.update', 'id' => $domain->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+        {!! Form::open(['route' => ['domainsettings.update', 'id' => $domain->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
 
         <input type="hidden" name="id" value="{{  $domain->id  }}">
 
@@ -12,13 +12,13 @@
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" name="name" class="form-control">
+                    <input type="text" name="name" class="form-control" value="<?=@$domain->name?>">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Domain <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" name="domain" class="form-control">
+                    <input type="text" name="domain" class="form-control" value="<?=@$domain->domain?>">
                 </div>
             </div>
             <div class="form-group row" style="display: none;">
@@ -212,46 +212,30 @@
                     </select>
                 </div>
             </div>
+ 
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Status </label>
                 <div class="col-lg-8">
                     <label class="switch">
-                        <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="status" checked value="TRUE">
+                        <input type="checkbox" name="status" checked value="1" {{$domain->status == 1 ? 'checked' : ''}}>
                         <span></span>
                     </label>
                 </div>
             </div>
-        </div>
-
-        <div class="modal-footer">
+            <div class="modal-footer">
+                {!! closeModalButton() !!}
+                {!! renderAjaxButton() !!}
+            </div>
             {!! Form::close() !!}
-            {{-- <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
-                <i class="fas fa-times"></i>
-                Close
-            </button> --}}
-            {!! closeModalButton() !!}
-            
-            {{-- <button type="button" class="btn btn-success btn-rounded">
-                <i class="fas fa-play"></i>
-                Run Scan And Save Now
-            </button> --}}
-
-            {{-- <button type="submit" class="btn btn-info btn-rounded">
-                <i class="fas fa-paper-plane"></i>
-                Save
-            </button> --}}
-            {!! renderAjaxButton() !!}
         </div>
-        {!! Form::close() !!}
-
-</div>
+    </div>
 
 @push('pagestyle')
 @include('stacks.css.form')
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
+@include('stacks.js.fullscreen')
 @include('partial.ajaxify')
 @endpush
 

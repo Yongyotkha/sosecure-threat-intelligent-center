@@ -2,6 +2,7 @@
 
 namespace Modules\sitesettings\Http\Controllers;
 
+use Modules\CategorySettings\Entities\CategorySettings;
 use Auth;
 use DataTables;
 use Illuminate\Http\Request;
@@ -352,7 +353,7 @@ class DomainSettingsController extends Controller
     }
 
 
-    public function edit(Domain $id)//edit_domain
+    public function edit(Domain $id)
     {
         $data['domain'] = $id;
         // dd($id);
