@@ -270,6 +270,25 @@
     }
 
 
+    function change_domain_active(code) {
+        let checkState = $("#domain_active_" + code).is(":checked") ? 1 : 0;
+        axios.post('{{route('domainsettings.change_status')}}', {
+            active: checkState,
+            code: code,
+        }).then(function (response) {
+            toastr.success(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        }).catch(function (error) {
+            var errors = error.errors;
+            var errorsHtml = "";
+            $.each(errors, function (key, value) {
+                errorsHtml += "<li>" + value[0] + "</li>";
+            });
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
+
+
 
 </script>
 

@@ -212,25 +212,44 @@ class DomainSettingsController extends Controller
         //
     }
 
+    // public function change_status(Request $request)
+    // {
+    //     // dd($request);
+    //     // exit();
+    //     $data['id'] = $this->request->id;
+    //     $domain = $this->domain->findOrFail($data['id']);
+    //     // $domain->update($request->all());
+    //     // $domain->name = $request->name;
+    //     $domain->status = $domain->status == 1 ? 0 : 1;
+    //     $domain->save();
+
+    //     $site_code = $this->siteSettings->find_code($dmain->site_id);
+
+    //     // if ($request->hasFile('logo')) {
+    //     //     $this->uploadLogo($request, $client);
+    //     // }
+    //     return ajaxResponse(
+    //         [
+    //             'id'       => $domain->id,
+    //             'message'  => langapp('changes_saved_successful'),
+    //             'redirect' => route('domain.index',['id' => $site_code->code]),
+    //         ],
+    //         true,
+    //         Response::HTTP_OK
+    //     );
+    // }
+
     public function change_status(Request $request)
     {
-        // dd($request);
-        // exit();
-        $data['id'] = $this->request->id;
-        $domain = $this->domain->findOrFail($data['id']);
-        // $domain->update($request->all());
-        // $domain->name = $request->name;
-        $domain->status = $domain->status == 1 ? 0 : 1;
-        $domain->save();
+        $Domain = Domain::where('code', $request->code)->first();
+        $Domain->status = $request->active;
+        $Domain->save();
 
-        $site_code = $this->siteSettings->find_code($dmain->site_id);
+        $site_code = $this->siteSettings->find_code($Domain->site_id);
 
-        // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $client);
-        // }
         return ajaxResponse(
             [
-                'id'       => $domain->id,
+                'id'       => $Domain->id,
                 'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('domain.index',['id' => $site_code->code]),
             ],
@@ -299,35 +318,13 @@ class DomainSettingsController extends Controller
                         $checked_val = '';
                     }
                     $html = '';
-                    $html .= '<script>
-                    function change_domain_status (id) {
-                        axios.post("'. route('domainsettings.change_status') .'", {
-                            // params: {
-                                id: id
-                            // }
-                          })
-                        .then(function (response) {
-                            toastr.warning(response.message, '.@langapp("response_status").');
-                            window.location.href = response.redirect;
-                        })
-                        .catch(function (error) {
-                            var errors = error.errors;
-                            var errorsHtml = "";
-                            $.each(errors, function (key, value) {
-                                errorsHtml += "<li>" + value[0] + "</li>";
-                            });
-                            toastr.error(errorsHtml, '.@langapp("response_status"). ');
-                        });
-                       
-                    }
-                    </script>';
-
+                    
                     // $html = '';
                     $html .= '<label class="switch">
-                                <input type="hidden" value="FALSE" name="">
-                                <input type="checkbox" onclick="change_domain_status(' . $domain->id . ')" '.$checked_val.' name="active" value="1">
+                                <input type="checkbox" id="domain_active_'.$domain->code.'" onchange="change_domain_active(\''. $domain->code .'\')" '.$checked_val.' name="active" value="1">
                                 <span></span>
                               </label>';
+
                     return $html;
                 }
             )
