@@ -2,6 +2,7 @@
 
 namespace Modules\Scans\Http\Controllers;
 
+use App\TransactionScans;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -10,7 +11,9 @@ use phpseclib\Net\SSH2;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use App\TransactionTimeStampScans;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class ScansController extends Controller
 {
@@ -113,29 +116,55 @@ class ScansController extends Controller
     }
 
     public function scan_command(Request $request){
-        $array = explode("\n", file_get_contents(public_path().'/files/scans/DNS_recon_filter_for_ip_v6.txt'));
-        $arrays = [];
-        $arrays_final = [];
-        $arrays_last_final = [];
-        foreach ($array as $item) {
-            $arrays[] = explode("\t", $item);
-        }
-        foreach($arrays as $data){
-            $arrays_final[] = $data;
-        }
-        foreach($arrays_final as $item){
+        $TransactionTimeStampScans = TransactionTimeStampScans::where('progress', 2)->where('status', 1)->get();
+        foreach($TransactionTimeStampScans as $TransactionTimeStampScan){
+            $path = public_path().'/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
+            $array = explode("\n", file_get_contents($path.'/looking_for_subdomain.txt'));
             $arrays = [];
-            foreach($item as $data){
-                if(!empty($data)){
-                    $arrays[] = trim($data);
+            $arrays_final = [];
+            $arrays_last_final = [];
+            foreach ($array as $item) {
+                $arrays[] = explode("\t", $item);
+            }
+            foreach($arrays as $data){
+                $arrays_final[] = $data;
+            }
+            foreach($arrays_final as $item){
+                $arrays = [];
+                foreach($item as $data){
+                    if(!empty($data)){
+                        $arrays[] = trim($data);
+                    }
+                }
+                $arrays_last_final[] = $arrays;
+            }
+            $arrays_last_final = array_filter($arrays_last_final);
+            array_pop($arrays_last_final);
+            foreach($arrays_last_final as $item){
+                $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
+                ->where('domain_id', $TransactionTimeStampScan->domain_id)
+                ->where('module', $item[0])
+                ->where('data_type', $item[1])
+                ->where('raw_data', $item[2])
+                ->first();
+                if(!empty($TransactionScans)){
+                    $TransactionScans -> updated_at = Carbon::now();
+                }else{
+                    $CreateTransactionScans = new TransactionScans();
+                    $CreateTransactionScans -> code = Str::uuid()->toString();
+                    $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
+                    $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
+                    $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
+                    $CreateTransactionScans -> module = $item[0];
+                    $CreateTransactionScans -> data_type = $item[1];
+                    $CreateTransactionScans -> raw_data = $item[2];
+                    $CreateTransactionScans -> status = 1;
+                    $CreateTransactionScans -> save();
                 }
             }
-            $arrays_last_final[] = $arrays;
-        }
-        $arrays_last_final = array_filter($arrays_last_final);
-        array_pop($arrays_last_final);
-        foreach($arrays_last_final as $data){
-            dd($data[1]);
+
+            $TransactionTimeStampScan->progress = 3;
+            $TransactionTimeStampScan->save();
         }
     }
 
