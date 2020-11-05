@@ -1,0 +1,7 @@
+sfp_dnsresolve                	IPv6 Address                                 	mtsc.co.th	2606:4700:3031::ac43:a08c
+sfp_dnsresolve                	IPv6 Address                                 	mtsc.co.th	2606:4700:3036::681f:49f5
+sfp_dnsresolve                	IPv6 Address                                 	mtsc.co.th	2606:4700:3034::681f:48f5
+sfp_dnsresolve                	IPv6 Address                                 	www.mtsc.co.th	2606:4700:3031::ac43:a08c
+sfp_dnsresolve                	IPv6 Address                                 	www.mtsc.co.th	2606:4700:3036::681f:49f5
+sfp_dnsresolve                	IPv6 Address                                 	www.mtsc.co.th	2606:4700:3034::681f:48f5
+Source                        	Type                                         	Source Data	Data

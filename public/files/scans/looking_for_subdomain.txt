@@ -1,0 +1,4 @@
+SpiderFoot UI                 	Internet Name                                	mtsc.co.th
+sfp_dnsbrute                  	Internet Name                                	mail.mtsc.co.th
+sfp_dnsbrute                  	Internet Name                                	www.mtsc.co.th
+Source                        	Type                                         	Data
