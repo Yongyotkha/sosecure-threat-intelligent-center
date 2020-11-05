@@ -5,7 +5,11 @@ namespace Modules\CategorySettings\Http\Controllers;
 use Auth;
 use DataTables;
 use Modules\CategorySettings\Entities\CategorySettings;
+use Modules\CategorySettings\Http\Requests\CategorySettingsRequest;
 use Modules\CategorySettings\Jobs\BulkDeleteCategorySettings;
+
+// use Modules\Users\Transformers\UserResource;
+use Modules\CategorySettings\Transformers\CategorysResource;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -100,16 +104,50 @@ class CategorySettingsController extends Controller
      * @param int $id
      * @return Response
      */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+     public function update(CategorySettingsRequest $request, $id = null)
+     {
+        //  dd($request);
+        //  exit();
+         $CategorySettings = $this->categorySettings->findOrFail($id);
+         // $CategorySettings->update($request->all());
+         $CategorySettings->name = $request->name;
+         $CategorySettings->active = $request->active ? 1 : 0;
+         $CategorySettings->save();
+
+         // if ($request->hasFile('logo')) {
+         //     $this->uploadLogo($request, $client);
+         // }
+         return ajaxResponse(
+             [
+                 'id'       => $CategorySettings->id,
+                 'message'  => langapp('changes_saved_successful'),
+                 'redirect' => route('categorysettings.index'),
+             ],
+             true,
+             Response::HTTP_OK
+         );
+     }
 
 
     public function delete(CategorySettings $id)
     {
         $data['categorySettings'] = $id;
         return view('categorysettings::modal.delete')->with($data);
+    }
+
+    public function delete_process($id = null)
+    {
+        $model = $this->categorySettings->find($id);
+        // dd($model);
+        $model->delete();
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('categorysettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
     public function holiday($status = null)
@@ -135,37 +173,62 @@ class CategorySettingsController extends Controller
         return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
     }
 
-    public function change_status()
+    // public function change_status()
+    // {
+    //         $data['category_id'] = $this->request->category_id;
+
+    //         // echo ($data['category_id']);
+    //         // exit();
+
+    //         // $get_active = $this->Site_model->get_by_id_site($site_id);
+    //         // if($get_active) {
+    //         //     $get_active = $get_active->site_active == 'Y' ? 'N' : 'Y';
+    //         // } else {
+    //         //     $get_active = 'N';
+    //         // }
+
+    //         // $site_set_data = array(
+    //         //     "site_id" => $site_id,
+    //         //     "site_active" => $get_active
+    //         // );
+
+
+    //         // $save_id = $this->Site_model->update_active__by_id_site($site_set_data);
+
+
+
+    //     if ($this->request->has('category_id')) {
+
+    //         $data['message']  = langapp('change_status_successfully');
+    //         $data['redirect'] = url()->previous();
+    //         return ajaxResponse($data);
+    //     }
+    //     return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+    // }
+
+    public function change_status(CategorySettingsRequest $request)
     {
-            $data['category_id'] = $this->request->category_id;
+        // dd($request);
+        // exit();
+        $data['category_id'] = $this->request->category_id;
+        $CategorySettings = $this->categorySettings->findOrFail($data['category_id']);
+        // $CategorySettings->update($request->all());
+        // $CategorySettings->name = $request->name;
+        $CategorySettings->active = $CategorySettings->active == 1 ? 0 : 1;
+        $CategorySettings->save();
 
-            // echo ($data['category_id']);
-            // exit();
-
-            // $get_active = $this->Site_model->get_by_id_site($site_id);
-            // if($get_active) {
-            //     $get_active = $get_active->site_active == 'Y' ? 'N' : 'Y';
-            // } else {
-            //     $get_active = 'N';
-            // }
-
-            // $site_set_data = array(
-            //     "site_id" => $site_id,
-            //     "site_active" => $get_active
-            // );
-
-
-            // $save_id = $this->Site_model->update_active__by_id_site($site_set_data);
-
-
-
-        if ($this->request->has('category_id')) {
-           
-            $data['message']  = langapp('change_status_successfully');
-            $data['redirect'] = url()->previous();
-            return ajaxResponse($data);
-        }
-        return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+        // if ($request->hasFile('logo')) {
+        //     $this->uploadLogo($request, $client);
+        // }
+        return ajaxResponse(
+            [
+                'id'       => $CategorySettings->id,
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('categorysettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
         /**
@@ -177,6 +240,18 @@ class CategorySettingsController extends Controller
     {
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
         $model = $this->categorySettings->query();
+        // ->with(['profile.business:id,name'])
+        // ->orderByDesc('id')
+        // ->paginate(50)
+        // ->query();
+
+        // $model = new CategorysResource(
+        //     $this->categorySettings
+        //         // ->with(['profile.business:id,name'])
+        //         ->orderByDesc('id')
+        //         ->paginate(50)
+        // );
+
         return DataTables::eloquent($model)
             ->editColumn(
                 'no',
@@ -207,7 +282,7 @@ class CategorySettingsController extends Controller
                     $html = '';
                     $html .= '<script>
                     function change_category_active (category_id) {
-                        axios.post("'. route('categorysettings.api.change_status') .'", {
+                        axios.post("'. route('categorysettings.change_status') .'", {
                             // params: {
                                 category_id: category_id
                             // }
@@ -224,7 +299,7 @@ class CategorySettingsController extends Controller
                             });
                             toastr.error(errorsHtml, '.@langapp("response_status"). ');
                         });
-                       
+
                     }
                     </script>';
 
@@ -244,7 +319,7 @@ class CategorySettingsController extends Controller
                     $html .= "<!--<a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                     @icon('solid/shield-alt')
                                 </a>-->
-                                
+
                                 <a href='". route('categorysettings.edit', ['id' => $categorySettings->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
                                 </a>

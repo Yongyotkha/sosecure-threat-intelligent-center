@@ -5,7 +5,7 @@
             <h4 class="modal-title">@langapp('delete')   {{  $categorySettings->name  }}</h4>
         </div>
 
-        {!! Form::open(['route' => ['categorysettings.api.delete', $categorySettings->id], 'class' => 'ajaxifyForm', 'method' => 'DELETE']) !!}
+        {!! Form::open(['route' => ['categorysettings.delete_process', $categorySettings->id], 'class' => 'ajaxifyForm', 'method' => 'DELETE']) !!}
 
         <div class="modal-body">
             <p class="text-danger">@langapp('delete_warning')  </p>

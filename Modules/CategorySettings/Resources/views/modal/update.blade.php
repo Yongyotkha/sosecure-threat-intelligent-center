@@ -4,7 +4,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $categorySettings->name }}</h4>
         </div>
-        {!! Form::open(['route' => ['categorysettings.api.update', 'id' => $categorySettings->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+        {!! Form::open(['route' => ['categorysettings.update', 'id' => $categorySettings->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
 
         <input type="hidden" name="id" value="{{  $categorySettings->id  }}">
 
@@ -14,7 +14,7 @@
                 <div class="col-lg-9">
                     <div class="">
                         <input type="text" class="form-control" name="name" value="{{$categorySettings->name}}">
-                        
+
                     </div>
                 </div>
             </div>
