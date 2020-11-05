@@ -1,0 +1,47 @@
+SpiderFoot UI                 	Internet Name                                	mtsc.co.th
+sfp_dnsbrute                  	Internet Name                                	mail.mtsc.co.th
+sfp_dnsresolve                	Domain Name                                  	mtsc.co.th
+sfp_whois                     	Domain Whois                                 	
+Whois Server Version 2.1.5
+
+Domain Name:                MTSC.CO.TH
+Registrar:                  T.H.NIC Co., Ltd.
+Name Server:                GEORGIA.NS.CLOUDFLARE.COM
+Name Server:                BEAU.NS.CLOUDFLARE.COM
+DNSSEC:                     unsigned
+Status:                     ACTIVE
+Updated date:               02 Oct 2020
+Created date:               13 Sep 2017
+Exp date:                   12 Sep 2021
+Domain Holder Organization: Magic Tech Solution Co.,Ltd. (บริษัท เมจิกเทคโซลูชั่น จำกัด)
+Domain Holder Street:       Personal Information*
+Domain Holder Country:      TH
+
+Tech Contact:               Personal Information*
+Tech Organization:          Personal Information*
+Tech Street:                Personal Information*
+Tech Country:               TH
+
+>>> Last updated on Thu, 05 Nov 2020 15:28:01 UTC+7 <<< 
+
+If you have a legitimate interest in viewing the non-public WHOIS details, send your request and the reasons for your request to staff@thnic.co.th and specify the domain name in the subject line. We will review that request and may ask for supporting documentation and explanation.
+
+For more information please visit: https://www.thnic.co.th/whois
+
+
+sfp_whois                     	Domain Registrar                             	T.H.NIC Co., Ltd.
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	www.mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	www.mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	www.mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	www.mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	www.mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsresolve                	Internet Name                                	mtsc.co.th
+sfp_dnsbrute                  	Internet Name                                	www.mtsc.co.th
+SpiderFoot UI                 	Domain Name                                  	mtsc.co.th
+Source                        	Type                                         	Data

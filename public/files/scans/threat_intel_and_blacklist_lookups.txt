@@ -1,0 +1,4 @@
+SpiderFoot UI                 	Internet Name                                	mtsc.co.th
+sfp_cloudflaredns             	Malicious Internet Name                      	Blocked by CloudFlare DNS [mtsc.co.th]
+SpiderFoot UI                 	Domain Name                                  	mtsc.co.th
+Source                        	Type                                         	Data
