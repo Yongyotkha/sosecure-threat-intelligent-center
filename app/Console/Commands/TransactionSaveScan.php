@@ -79,6 +79,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -128,6 +129,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -178,6 +180,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -229,6 +232,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -279,6 +283,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -328,6 +333,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -377,6 +383,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -426,6 +433,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -475,6 +483,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
@@ -524,6 +533,7 @@ class TransactionSaveScan extends Command
                         ->first();
                         if(!empty($TransactionScans)){
                             $TransactionScans -> updated_at = Carbon::now();
+                            $TransactionScans -> save();
                         }else{
                             $CreateTransactionScans = new TransactionScans;
                             $CreateTransactionScans -> code = Str::uuid()->toString();
