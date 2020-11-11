@@ -10,7 +10,7 @@
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" class="form-control" name="username">
+                    <input type="email" class="form-control" name="username">
                 </div>
             </div>
             <div class="form-group row">
@@ -22,13 +22,13 @@
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Set Password <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" class="form-control" name="password">
+                    <input type="password" class="form-control" name="password">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Re-enter Password <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" class="form-control" name="password_re">
+                    <input type="password" class="form-control" name="password_re">
                 </div>
             </div>
             <div class="form-group row">
@@ -36,8 +36,8 @@
                 <div class="col-lg-8">
                     <select name="role_id" id="role" class="select2-option form-control">
                         <option value="1">Admin</option>
-                        <option value="1">User</option>
-                        <option value="1">Customer</option>
+                        <option value="2">User</option>
+                        <option value="3">Customer</option>
                     </select>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                 <div class="col-lg-8">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="active" value="TRUE">
+                        <input type="checkbox" name="active" value="TRUE" checked>
                         <span></span>
                     </label>
                 </div>
