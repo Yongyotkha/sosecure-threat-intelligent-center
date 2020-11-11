@@ -4,7 +4,7 @@
 
 <section id="content" class="bg">
     <section class="hbox stretch">
-        
+
         <aside class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
@@ -13,7 +13,7 @@
                     <p class="h3">@langapp('settings')  </p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
+                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li>
@@ -63,9 +63,10 @@
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create-new-user">
+                    <!-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create-new-user">
                         @icon('solid/plus') @langapp('create')
-                    </a>
+                    </a> -->
+                    <a href="{{route('user.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-toggle="ajaxModal">@icon('solid/plus') @langapp('create')</a>
                     <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color')  }}  pull-right m-xs">
                         <span>@icon('solid/user') @langapp('role')</span>
                     </button>
@@ -73,7 +74,7 @@
 
                 <section class="scrollable wrapper">
                     <div class="row">
-                        <div class="col-lg-12">  
+                        <div class="col-lg-12">
                             <section class="panel panel-default">
                             <header class="panel-heading">@icon('solid/user') Users</header>
                             <div class="panel-body">
@@ -97,13 +98,13 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                             {{-- <div class="panel-footer">
-                               
+
                             </div> --}}
                         </div>
                     </div>
@@ -170,7 +171,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
@@ -196,6 +197,8 @@
 @push('pagescript')
 @include('stacks.js.form')
 @include('stacks.js.datatables')
+@include('stacks.js.fullscreen')
+@include('partial.ajaxify')
 
 <script>
     $(document).ready(function () {
@@ -208,6 +211,42 @@
             order: [[ 0, "desc" ]],
         });
     });
+
+
+    function del_cate_select(id) {
+        axios.post('{{ route('domainsettings.bulk.delete') }}', {checked: id})
+        .then(function (response) {
+            toastr.warning(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        })
+        .catch(function (error) {
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        });
+    }
+
+
+    function change_domain_active(code) {
+        let checkState = $("#domain_active_" + code).is(":checked") ? 1 : 0;
+        axios.post('{{route('domainsettings.change_status')}}', {
+            active: checkState,
+            code: code,
+        }).then(function (response) {
+            toastr.success(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        }).catch(function (error) {
+            var errors = error.errors;
+            var errorsHtml = "";
+            $.each(errors, function (key, value) {
+                errorsHtml += "<li>" + value[0] + "</li>";
+            });
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
 </script>
 
 

@@ -47,6 +47,17 @@ Route::group(
         Route::get('/domain-setting/domain/delete/{id}', 'DomainSettingsController@delete')->name('domainsettings.delete')->middleware('can:categorysettings_delete');
         Route::put('/domain-setting/domain/update/{id}', 'DomainSettingsController@update')->name('domainsettings.update')->middleware('can:sitesettings_update');
         Route::delete('/domain-setting/domain/delete_process/{id}', 'DomainSettingsController@delete_process')->name('domainsettings.delete_process')->middleware('can:categorysettings_delete');
+
+        Route::get('/user-setting/user/create/{code}', 'UsersSettingsController@create')->name('user.create')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
+        Route::post('/user-setting/user/save/{code}', 'UsersSettingsController@save')->name('user.save')->middleware('can:categorysettings_create');//->middleware('can:categorysettings_create')
+        Route::post('/user-setting/user/change_status', 'UsersSettingsController@change_status')->name('user.change_status')->middleware(['can:categorysettings_update']);
+        Route::post('/user-setting/user/bulk-delete', 'UsersSettingsController@bulkDelete')->name('user.bulk.delete')->middleware(['can:categorysettings_delete']);//->middleware(['can:categorysettings_delete', 'demo']);
+        Route::get('/user-setting/user/data', 'UsersSettingsController@tableData')->name('user.data')->middleware('can:menu_items');
+        Route::get('/user-setting/user/test', 'UsersSettingsController@test')->name('user.test')->middleware('can:menu_items');
+        Route::get('/user-setting/user/edit/{id}', 'UsersSettingsController@edit')->name('user.edit')->middleware('can:categorysettings_update');
+        Route::get('/user-setting/user/delete/{id}', 'UsersSettingsController@delete')->name('user.delete')->middleware('can:categorysettings_delete');
+        Route::put('/user-setting/user/update/{id}', 'UsersSettingsController@update')->name('user.update')->middleware('can:sitesettings_update');
+        Route::delete('/user-setting/user/delete_process/{id}', 'UsersSettingsController@delete_process')->name('user.delete_process')->middleware('can:categorysettings_delete');
     }
     
 );
