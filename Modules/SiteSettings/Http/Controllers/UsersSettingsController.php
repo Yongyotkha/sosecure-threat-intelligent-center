@@ -103,10 +103,11 @@ class UsersSettingsController extends Controller
         $User = new User;
         $User->code = generator_uuid();
         $User->username = $request->username;
+        $User->email = $request->username;
         $User->name = $request->name;
         $User->password = $request->password;
         // $User->created_by = @Auth::user()->id;
-        $User->status = $request->status ? 1 : 0;
+        $User->active = $request->active ? 1 : 0;
         $User->site_id = $SiteSettings->id;
         $User->save();
 
