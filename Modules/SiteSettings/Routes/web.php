@@ -55,7 +55,7 @@ Route::group(
         Route::get('/user-setting/user/data', 'UsersSettingsController@tableData')->name('user.data')->middleware('can:menu_items');
         Route::get('/user-setting/user/test', 'UsersSettingsController@test')->name('user.test')->middleware('can:menu_items');
         Route::get('/user-setting/user/edit/{id}', 'UsersSettingsController@edit')->name('user.edit')->middleware('can:categorysettings_update');
-        Route::get('/user-setting/user/delete/{id}', 'UsersSettingsController@delete')->name('user.delete')->middleware('can:categorysettings_delete');
+        Route::get('/user-setting/user/delete/{id}', 'UsersSettingsController@delete')->name('user.delete2')->middleware('can:categorysettings_delete');
         Route::put('/user-setting/user/update/{id}', 'UsersSettingsController@update')->name('user.update')->middleware('can:sitesettings_update');
         Route::delete('/user-setting/user/delete_process/{id}', 'UsersSettingsController@delete_process')->name('user.delete_process')->middleware('can:categorysettings_delete');
     }

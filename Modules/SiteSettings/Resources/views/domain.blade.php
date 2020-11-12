@@ -56,7 +56,7 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
+                    <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
                     <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a>
@@ -93,7 +93,7 @@
                                                         <th>@langapp('name')</th>
                                                         <th>Domain</th>
                                                         <th>@langapp('status')</th>
-                                                        <th class="no-sort">Action</th>
+                                                        <th class="no-sort">@langapp('action')</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>

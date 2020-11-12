@@ -56,7 +56,7 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
+                    <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
                     <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a>
@@ -82,18 +82,19 @@
                                     <table  class="table table-striped" id="table-users-template">
                                         <thead>
                                             <tr>
-                                                <th class="hide"></th>
+                                                {{-- <th class="hide"></th> --}}
                                                 <th class="no-sort">
                                                     <label>
                                                         <input name="select_all" value="1" id="select-all" type="checkbox" />
                                                         <span class="label-text"></span>
                                                     </label>
                                                 </th>
+                                                <th class="">No.</th>
                                                 <th>@langapp('name')  </th>
                                                 <th>@langapp('email')</th>
                                                 <th>@langapp('role')   </th>
                                                 <th>@langapp('status')   </th>
-                                                <th>@langapp('update')   </th>
+                                                {{-- <th>@langapp('update')   </th> --}}
                                                 <th>@langapp('action')   </th>
                                             </tr>
                                         </thead>
@@ -205,10 +206,82 @@
         $('#role').select2();
     });
 
-    $(function() {
-        $('#table-users-template').DataTable({
+
+
+    $(function () {
+
+        var table = $('#table-users-template').DataTable({
             processing: true,
-            order: [[ 0, "desc" ]],
+            serverSide: true,
+            ajax: {
+                url: '{!! route('user.data') !!}',
+                data: ""
+            },
+            order: [
+                [0, "desc"]
+            ],
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: "w-10",
+                },
+                {
+                    data: 'no',
+                    className: "w-15",
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                    className:'w-100',
+                },
+                {
+                    data: 'email',
+                    name: 'email',
+                    className:'w-100',
+                },
+                {
+                    data: 'role',
+                    name: 'role',
+                    className:'w-25',
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className:'w-25',
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className:'w-80',
+                }
+            ]
+        });
+
+        let del_val = [];
+        $("#btn_del_select").click(function(){
+            del_val = [];
+            $("input[type='checkbox'][name='checked']").each(function(){
+                
+                if($(this).is(":checked")) {
+                    del_val.push($(this).val());
+                    /* alert(3);*/
+                }
+            });
+            console.log(del_val);
+
+            if(del_val.length > 0) {
+                del_cate_select(del_val);
+            } else {
+                toastr.warning('Please select atleast 1', '@langapp('response_status')');
+            }
         });
     });
 
@@ -230,9 +303,9 @@
     }
 
 
-    function change_domain_active(code) {
-        let checkState = $("#domain_active_" + code).is(":checked") ? 1 : 0;
-        axios.post('{{route('domainsettings.change_status')}}', {
+    function change_user_active(code) {
+        let checkState = $("#user_active_" + code).is(":checked") ? 1 : 0;
+        axios.post('{{route('user.change_status')}}', {
             active: checkState,
             code: code,
         }).then(function (response) {
