@@ -58,6 +58,8 @@ class UsersApiController extends Controller
         $this->checkPassword($request);
         $userColumns = ['username', 'email', 'password', 'name', 'locale'];
         $user        = $this->user->create($request->only($userColumns));
+        $user->code = generator_uuid();
+        $user->save();
         $user->profile->update($request->except(['username', 'password', 'email', 'roles', 'department', 'name', 'locale']));
 
         $user->syncRoles($request->roles);

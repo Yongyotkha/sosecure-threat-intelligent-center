@@ -2,226 +2,71 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $domain->name }}</h4>
+            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $user->name }}</h4>
         </div>
-        {!! Form::open(['route' => ['domainsettings.update', 'id' => $domain->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+        {!! Form::open(['route' => ['user.update', 'id' => $user->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
 
-        <input type="hidden" name="id" value="{{  $domain->id  }}">
+        <input type="hidden" name="id" value="{{  $user->id  }}">
 
         <div class="modal-body">
+
+
+            <div class="form-group row">
+                <label class="col-lg-4 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
+                <div class="col-lg-8">
+                    <input type="email" class="form-control" name="username" value="<?=@$user->email;?>">
+                </div>
+            </div>
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" name="name" class="form-control" value="<?=@$domain->name?>">
+                    <input type="text" class="form-control" name="name" value="<?=@$user->name;?>">
                 </div>
             </div>
+
+            <button class="btn btn-primary" type="button" id="ch_pass" data-val="0" data-toggle="collapse" data-target="#collapse_ch_pass" aria-expanded="false" aria-controls="collapse_ch_pass">
+                Edit Password
+            </button>
+
+            <div class="collapse" id="collapse_ch_pass">
+                <div class="form-group row">
+                    <label class="col-lg-4 control-label">Set Password <span class="text-danger">*</span> </label>
+                    <div class="col-lg-8">
+                        <input type="password" class="form-control" name="password" id="password" minlength="6" maxlength="20" disabled>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-4 control-label">Re-enter Password <span class="text-danger">*</span> </label>
+                    <div class="col-lg-8">
+                        <input type="password" class="form-control" name="password_re" id="password_re" minlength="6" maxlength="20" disabled>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Domain <span class="text-danger">*</span> </label>
+                <label class="col-lg-4 control-label">Role <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" name="domain" class="form-control" value="<?=@$domain->domain?>">
-                </div>
-            </div>
-            <div class="form-group row" style="display: none;">
-                <label class="col-lg-4 control-label">Open Scan </label>
-                <div class="col-lg-8">
-                    <label class="switch">
-                        <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="open_scan" value="TRUE">
-                        <span></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group row" style="display: none;">
-                <label class="col-lg-4 control-label"></label>
-                <div class="col-lg-8">
-                    <ul class="role-group">
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-1')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">Content Analysis</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-1" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-2')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">Crawling and Scanning</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-2" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-3')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">DNS</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-3" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-4')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">Leaks, Dumps and Breaches</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-4" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-5')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">Passive DNS</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-5" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-6')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">Real World</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-6" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <div class="role-main">
-                                <span class="role-click" onclick="openrole(this,'role-7')">@icon('solid/plus')</span>
-                                <span class="checkbox chk-inline">
-                                    <label>
-                                        <input type="checkbox" name="" checked="" value="TRUE">
-                                        <span class="label-text" data-rel="tooltip" title="">Social Media</span>
-                                    </label>
-                                </span>
-                            </div>
-                            <ul id="role-7" class="role-group-sub">
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
-                                                <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-
-            <div class="form-group row" style="display: none;">
-                <label class="col-lg-4 control-label">Scan Interval <span class="text-danger">*</span> </label>
-                <div class="col-lg-8">
-                    <select name="" id="scan_interval" class="select2-option form-control" multiple>
-                        <option value="1">15</option>
-                        <option value="2">30</option>
-                        <option value="3">60</option>
+                    <select name="role_id" id="role" class="select2-option form-control">
+                        <option value="1">Admin</option>
+                        <option value="2">User</option>
+                        <option value="3">Customer</option>
                     </select>
                 </div>
             </div>
- 
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Status </label>
                 <div class="col-lg-8">
                     <label class="switch">
-                        <input type="checkbox" name="status" checked value="1" {{$domain->status == 1 ? 'checked' : ''}}>
+                        <input type="hidden" value="FALSE" name="">
+                        <input type="checkbox" name="active" value="TRUE" checked>
                         <span></span>
                     </label>
                 </div>
             </div>
+
+
+  
+ 
             <div class="modal-footer">
                 {!! closeModalButton() !!}
                 {!! renderAjaxButton() !!}
@@ -237,6 +82,37 @@
 @include('stacks.js.form')
 @include('stacks.js.fullscreen')
 @include('partial.ajaxify')
+
+    <script>
+        $("#ch_pass").click(function() {
+            if($(this).data("val")== '0') {
+                click_enabled()
+                $(this).text("Cancel Edit Password");
+                $(this).data("val",1);
+            } else {
+                click_disabled()
+                $(this).text("Edit Password");
+                $(this).data("val",0);
+            }
+        });
+
+
+        function click_enabled() {
+            // alert(1);
+            $("#password").prop("disabled",false);
+            $("#password_re").prop("disabled",false);
+            $("#password").prop("required",true);
+            $("#password_re").prop("required",true);
+
+        }
+        function click_disabled() {
+            // alert(0);
+            $("#password").prop("disabled",true);
+            $("#password_re").prop("disabled",true);
+            $("#password").prop("required",false);
+            $("#password_re").prop("required",false);
+        }
+    </script>
 @endpush
 
 @stack('pagestyle')

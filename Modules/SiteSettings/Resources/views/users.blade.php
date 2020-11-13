@@ -215,7 +215,9 @@
             serverSide: true,
             ajax: {
                 url: '{!! route('user.data') !!}',
-                data: ""
+                data: {
+                    "site_code":'{{ Request::segment(3) }}'
+                }
             },
             order: [
                 [0, "desc"]
