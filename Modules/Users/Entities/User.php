@@ -45,7 +45,8 @@ use Modules\Users\Entities\QuickAccess;
 use Modules\Users\Observers\UserObserver;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements JWTSubject, HasLocalePreference, MustVerifyEmail
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
+// class User extends Authenticatable implements JWTSubject, HasLocalePreference, MustVerifyEmail
 {
     use Notifiable, HasRoles, SoftDeletes, Searchable, Emailable,
     HasApiTokens, Vaultable, Observable, Actionable, Uploadable, Noteable;
@@ -511,18 +512,18 @@ class User extends Authenticatable implements JWTSubject, HasLocalePreference, M
         }
     }
 
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
+    // public function getJWTIdentifier()
+    // {
+    //     return $this->getKey();
+    // }
 
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
+    // /**
+    //  * Return a key value array, containing any custom claims to be added to the JWT.
+    //  *
+    //  * @return array
+    //  */
+    // public function getJWTCustomClaims()
+    // {
+    //     return [];
+    // }
 }

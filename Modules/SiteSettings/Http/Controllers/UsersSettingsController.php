@@ -141,13 +141,17 @@ class UsersSettingsController extends Controller
     {
         // dd($request);
         // exit();
-        $user = $this->user->findOrFail($id);
+        // $user = $this->user->findOrFail($id);
+        // $user = $this->user->where('code',$id)->first();
+        $user = User::where('code',$id)->first();
+        // dd($user);
+        // exit();
         // $user->update($request->all());
-        $user->name = $request->name;
-        $user->user = $request->user;
+        $user->name = trim($request->name);
+        $user->username = trim($request->username);
         // $user->open_scan = $request->open_scan;
         // $user->scan_interval = $request->scan_interval;
-        $user->status = $request->status ? 1 : 0;
+        $user->active = $request->active ? 1 : 0;
         $user->save();
 
         $site_code = $this->siteSettings->find_code($user->site_id);
@@ -220,16 +224,36 @@ class UsersSettingsController extends Controller
     }
 
     public function test() {
-        $model = $this->user->query();
+        $current_uri = request()->segments();
+        dd($current_uri[2]);
+        // $model = $this->user->query();
         // dd($model);
         // return $modal;
-       dd(DataTables::eloquent($model)->make(true));
+    //    dd(DataTables::eloquent($model)->make(true));
     }
 
     public function tableData()
     {
+        $current_uri = request()->segments();
+        // $site_code = $current_uri[2];
+        $site_code = $this->request->site_code;
+        // $site_code = 'a7b6ff37-30ec-4494-9527-93b0ccc51d56';
+        $site_id_find = $this->siteSettings->find_id($site_code);
+        $site_id = $site_id_find->id;
+
+        // $site_code = $this->request->site_code;
+        // $site_id = $this->request->site_id;
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
         $model = $this->user->query();
+        $test = 1;
+        $model->when(
+            $test == 1,
+            function ($q) use ($site_id) {
+                return $q->where('site_id','=', $site_id);
+            }
+        );
+        // $model = $this->user->where('site_id','43')->query();
+        // $model = User::all()->toArray();
         // var_dump($model);
         // exit();
         return DataTables::eloquent($model)
@@ -304,9 +328,9 @@ class UsersSettingsController extends Controller
     }
 
 
-    public function edit(User $id)
+    public function edit(Request $request, $id)
     {
-        $data['user'] = $id;
+        $data['user'] = User::where('code', $id)->first();
         // dd($id);
         return view('sitesettings::modal.update_user')->with($data);
     }

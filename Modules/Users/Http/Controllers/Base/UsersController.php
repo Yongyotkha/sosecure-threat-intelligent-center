@@ -212,7 +212,7 @@ abstract class UsersController extends Controller
             ->editColumn(
                 'name',
                 function ($user) {
-                    return '<a href="' . route('users.view', $user->id) . '"><span class="thumb-xs avatar lobilist-check"><img src="' . $user->profile->photo . '" class="img-circle"></span> ' . str_limit($user->name, 15) . '</a>';
+                    return '<a href="' . route('users.view', $user->id) . '"><span class="thumb-xs avatar lobilist-check"><img src="' . @$user->profile->photo . '" class="img-circle"></span> ' . str_limit($user->name, 15) . '</a>';
                 }
             )
             ->editColumn(
@@ -225,19 +225,19 @@ abstract class UsersController extends Controller
                 'job_title',
                 function ($user) {
                     $str = $user->on_holiday ? '<i class="fas fa-plane-departure text-danger"></i> ' : '';
-                    return $str .= str_limit($user->profile->job_title, 15);
+                    return $str .= str_limit(@$user->profile->job_title, 15);
                 }
             )
             ->editColumn(
                 'mobile',
                 function ($user) {
-                    return $user->profile->mobile;
+                    return @$user->profile->mobile;
                 }
             )
             ->editColumn(
                 'city',
                 function ($user) {
-                    return $user->profile->city;
+                    return @$user->profile->city;
                 }
             )
             ->editColumn(
