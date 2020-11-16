@@ -269,7 +269,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="limit" value="">
+                                        <input type="text" class="form-control" name="limit" value="0">
                                     </div>
                                 </div>
 
@@ -314,7 +314,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="limit" value="">
+                                        <input type="text" class="form-control" name="limit" value="0">
                                     </div>
                                 </div>
 
@@ -331,7 +331,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="limit" value="">
+                                        <input type="text" class="form-control" name="limit" value="0">
                                     </div>
                                 </div>
 
@@ -371,6 +371,7 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
+@include('stacks.js.touchspin')
 
 <script>
     $(document).ready(function () {
@@ -378,12 +379,20 @@
             tags: true,
             tokenSeparators: [' ']
         });
+        
+        $("input[name='limit']").TouchSpin({
+            min: 0,
+            step: 1,
+            boostat: 5,
+            maxboostedstep: 10,
+        });
     });
 
     $('ul.role-group-sub').hide();
     function openrole(onck,id){
         $('#'+id).slideToggle(150);
     }
+
 </script>
 
 @endpush

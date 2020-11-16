@@ -7,7 +7,7 @@
             <a href="{{  url('/')  }}" class="navbar-brand">
                 @php $display = get_option('logo_or_icon'); @endphp
                 @if ($display == 'logo' || $display == 'logo_title')
-                <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="m-r-sm">
+                <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="m-r-sm" onerror="setDefaultPic(this)">
                 @elseif ($display == 'icon' || $display == 'icon_title')
                 <i class="fa {{  get_option('site_icon')  }}"></i>
                 @endif

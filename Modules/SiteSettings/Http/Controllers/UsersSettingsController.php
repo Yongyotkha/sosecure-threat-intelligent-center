@@ -282,6 +282,13 @@ class UsersSettingsController extends Controller
                 }
             )
             ->editColumn(
+                'confirm',
+                function ($user) {
+                    $html = '';
+                    return $html;
+                }
+            )
+            ->editColumn(
                 'role',
                 function ($user) {
                     return $user->user;
@@ -303,6 +310,13 @@ class UsersSettingsController extends Controller
                                 <span></span>
                               </label>';
 
+                    return $html;
+                }
+            )
+            ->editColumn(
+                'lastupdate',
+                function ($user) {
+                    $html = '';
                     return $html;
                 }
             )

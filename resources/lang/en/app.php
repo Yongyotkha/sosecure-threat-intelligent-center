@@ -983,4 +983,6 @@ return [
     'group_name'                                 => 'Group Name',
     'item_name'                                  => 'Item Name',
     'scans'                                      => 'Scans',
+    'confirm'                                    => 'Confirmed',
+    'lastupdate'                                 => 'Last update',
 ];

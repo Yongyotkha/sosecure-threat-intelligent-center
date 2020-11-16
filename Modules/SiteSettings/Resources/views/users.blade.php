@@ -92,9 +92,10 @@
                                                 <th class="">No.</th>
                                                 <th>@langapp('name')  </th>
                                                 <th>@langapp('email')</th>
+                                                <th>@langapp('confirm')</th>
                                                 <th>@langapp('role')   </th>
                                                 <th>@langapp('status')   </th>
-                                                {{-- <th>@langapp('update')   </th> --}}
+                                                <th>@langapp('lastupdate')   </th>
                                                 <th>@langapp('action')   </th>
                                             </tr>
                                         </thead>
@@ -188,6 +189,65 @@
         </div>
     </div>
 
+
+    <div class="modal modal-slide" id="support-password" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="exampleModalLabel">Support Password</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <button type="submit" class="btn btn-info"> Support Password </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-center">Password</th>
+                                    <th class="text-center">Date Expried</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span>Upvel Admin</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="submit" class="btn btn-success btn-rounded"> Copy Password </button>
+                                    </td>
+                                    <td class="text-center">
+                                        <span>16-11-2020 11:18:39</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-info btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 
@@ -248,6 +308,11 @@
                     className:'w-100',
                 },
                 {
+                    data: 'confirm',
+                    name: 'confirm',
+                    className:'w-25',
+                },
+                {
                     data: 'role',
                     name: 'role',
                     className:'w-25',
@@ -255,6 +320,11 @@
                 {
                     data: 'status',
                     name: 'status',
+                    className:'w-25',
+                },
+                {
+                    data: 'lastupdate',
+                    name: 'lastupdate',
                     className:'w-25',
                 },
                 {

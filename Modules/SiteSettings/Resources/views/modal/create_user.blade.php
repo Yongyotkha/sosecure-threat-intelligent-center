@@ -7,12 +7,12 @@
        
         {!! Form::open(['route' => ['user.save',$code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
         <div class="modal-body">
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-lg-4 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
                     <input type="email" class="form-control" name="username">
                 </div>
-            </div>
+            </div> --}}
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">

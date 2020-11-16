@@ -76,6 +76,7 @@
     <link rel="stylesheet" href="{{ getAsset('storage/css/style.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/sofia.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.css') }}" type="text/css"/>
+    {{-- <link rel="stylesheet" href="{{ getAsset('plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css') }}" type="text/css"/> --}}
     <?php
     $family = 'Sofia';
     $font = get_option('system_font');
@@ -181,6 +182,12 @@
 <script src="{{ getAsset('js/theme.js') }}"></script>
 
 <script>
+    function setDefaultPic(source) {
+    source.src = '{{asset("images/image-not-found.jpg")}}';
+    source.onerror = "";
+    }
+</script>
+<script>
     var locale = '@langapp('lang_code') ';
     var base_url = '{{ url('/') }}';
 
@@ -203,15 +210,13 @@
     <script src="{{ getAsset('plugins/intro/intro.min.js') }}"></script>
     <script src="{{ getAsset('plugins/intro/demo.js') }}"></script>
 @endisset
-
-<script src="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.js') }}"></script>
 {!! Toastr::message() !!}
 
 @stack('pagescript')
-
 @include('partial.ajaxify')
 
 <script>
+
 $(document).ready(function(){
     $( ".comment-item table" ).addClass( "table table-striped" );
 
@@ -242,7 +247,6 @@ $(document).ready(function(){
         });
     }); 
 });
-
 
 </script>
 

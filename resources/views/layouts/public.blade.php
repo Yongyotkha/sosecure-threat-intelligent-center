@@ -114,6 +114,10 @@
     $(document).ready(function(){
         toastr.options.positionClass = '{{ config('toastr.options.positionClass') }}';
     });
+    function setDefaultPic(source) {
+        source.src = '{{asset("images/image-not-found.jpg")}}';
+        source.onerror = "";
+    }
     </script>
     {!! Toastr::message() !!}
     @endpush

@@ -1,0 +1,1 @@
+<script src="{{ getAsset('plugins/cropperjs-master/dist/cropper.js') }}"></script>

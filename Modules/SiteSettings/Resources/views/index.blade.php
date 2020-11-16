@@ -82,6 +82,7 @@
 @push('pagescript')
 
     @include('stacks.js.datatables')
+    @include('stacks.js.defaultpic')
 
     <script>
         $(function () {

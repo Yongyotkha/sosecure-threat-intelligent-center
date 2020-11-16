@@ -71,7 +71,7 @@
                                     <label class="col-lg-3 control-label">Logo </label>
                                     <div class="col-lg-6">
                                         <div class="">
-                                            <input type="file" class="form-control" name="logo" value="">
+                                            <input id="file-input" type="file" class="form-control" name="logo" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -149,6 +149,38 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html">
 
     </a>
+
+
+{{-- Modal Crop Logo --}}
+<div class="modal modal-slide" id="upload_image_logo_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">ปรับขนาดโลโก้</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <img id="crop-img-logo" src="https://images.unsplash.com/photo-1593642634627-6fdaf35209f4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80" alt="Picture" style="width: 100%">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mx-auto" style="padding:5%;">
+                        <h1 class="text-center">ตัวอย่างโลโก้</h1>
+                        <div class="preview_logo" style="width:200px;height:150px;overflow:hidden;margin:0 auto;border:1px solid #eee"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success upload-image-logo" data-dismiss="modal">Upload</button>
+            </div>
+         </div>
+    </div>
+</div>
+
 </section>
 
 
@@ -157,6 +189,72 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
+
+<script>
+    // Crop Logo
+    // var cropper_logo;
+    // var imgs_logo = null;
+    // window.addEventListener('DOMContentLoaded', function () {
+    //     var image = document.getElementById('crop-img-logo');
+    //     var input_logo = $('#file-input');
+    //     var cropBoxData;
+    //     var canvasData;
+    //     var $modal = $('#upload_image_logo_modal');
+    //     var result = document.getElementById('result');
+
+    //         input_logo.change(function(event) {
+    //             var files = event.target.files;
+    //             var done = function(url){
+    //                 image.src = url;
+    //                 $modal.modal('show');
+    //             };
+
+    //             if (files && files.length > 0)
+    //             {
+    //                 reader = new FileReader();
+    //                 reader.onload = function(event)
+    //                 {
+    //                     done(reader.result);
+    //                 };
+    //                 reader.readAsDataURL(files[0]);
+    //             }
+    //         });
+
+    //         $modal.on('shown.bs.modal', function () {
+    //             cropper_logo = new Cropper(image, {
+    //                 dragMode: 'move',
+    //                 aspectRatio: 16 / 9,
+    //                 restore: false,
+    //                 guides: false,
+    //                 center: false,
+    //                 highlight: false,
+    //                 cropBoxMovable: true,
+    //                 cropBoxResizable: true,
+    //                 toggleDragModeOnDblclick: false,
+    //                 preview:'.preview_logo',
+    //                 ready: function () {
+    //                     //Should set crop box data first here
+    //                     cropper_logo.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+    //                 },
+    //             });
+    //         }).on('hidden.bs.modal', function () {
+    //             cropBoxData = cropper_logo.getCropBoxData();
+    //             canvasData = cropper_logo.getCanvasData();
+    //             cropper_logo.destroy();
+    //         });
+    //     });
+
+    //     // $('.upload-image-logo').on('click', function (ev) {
+    //     //     canvas = cropper_logo.getCroppedCanvas({
+    //     //         width: 200,
+    //     //         height: 150,
+    //     //     }).toDataURL();
+    //     //     imgs_logo = canvas;
+    //     //     html = '<img src="' + imgs_logo + '" />';
+    //     //     $("#preview_cer_img").html(html);
+    //     //     $("#preview-image_logo").html("");
+    //     // });
+    // </script>
 @endpush
 
 @endsection
