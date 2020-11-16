@@ -154,16 +154,18 @@
 @include('partial.ajaxify')
 
 <script type="text/javascript">
+
     $(document).ready(function () {
         $('[data-rel="tooltip"]').tooltip();
         $(".dropdown-toggle").click(function () {
             $(".dropdown-menu").toggle();
         });
     });
+
     function setDefaultPic(source) {
-    source.src = '{{asset("images/image-not-found.jpg")}}';
-    source.onerror = "";
-}
+        source.src = '{{asset("images/image-not-found.jpg")}}';
+        source.onerror = "";
+    }
 </script>
 </div>
 </body>
