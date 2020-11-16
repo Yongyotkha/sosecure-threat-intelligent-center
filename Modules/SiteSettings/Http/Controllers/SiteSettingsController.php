@@ -193,6 +193,7 @@ class SiteSettingsController extends Controller
             $SiteSettings->start_active = Carbon::parse($request->start_active);
             $SiteSettings->end_active = Carbon::parse($request->end_active);
             $SiteSettings->ip_key = $request->ip_key;
+            $SiteSettings->ip_public = $request->ip_public;
             $SiteSettings->mac_address_key = $request->mac_address_key;
             $SiteSettings->system_key = $this->encrypt_decrypt('encrypt', $id.'&'.$request->ip_key.'&'.$request->mac_address_key ,$request->ip_key, $request->mac_address_key);
         }

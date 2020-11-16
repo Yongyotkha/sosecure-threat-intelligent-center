@@ -2,10 +2,13 @@
 
 namespace Modules\sitesettings\Http\Controllers;
 
+use App\DeployCode;
+use App\DeployHistory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Carbon\Carbon;
 
 class SystemSettingsController extends Controller
 {
@@ -38,6 +41,8 @@ class SystemSettingsController extends Controller
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
         $data['page'] = 'SystemSettings';
+        $data['last_version'] = DeployCode::where('status', 1)->orderBy('version', 'desc')->where('deleted_at', null)->first()->version;
+        $data['code_version'] = @DeployHistory::where('site_id', $get_data -> id)->where('status', 1)->orderBy('version', 'desc')->where('deleted_at', null)->first()->version;
         return view('sitesettings::system_setting')->with($data);
     }
 
