@@ -14,6 +14,7 @@ use App\TransactionTimeStampScans;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use DataTables;
 
 class ScansController extends Controller
 {
@@ -191,5 +192,19 @@ class ScansController extends Controller
         $arrays_last_final = array_filter($arrays_last_final);
         array_pop($arrays_last_final);
         dd($arrays_last_final);
+    }
+
+    public function tableData()
+    {
+        $model = TransactionTimeStampScans::where('status', 1)->get();
+        return DataTables::of($model)
+            ->addColumn('chk', function (TransactionTimeStampScans $model) {
+                    return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
+            })
+            ->addColumn('name', function (TransactionTimeStampScans $model) {
+                return '<label>'.$model -> get_site -> name.'</label>';
+        })
+            ->rawColumns(['chk','name'])
+            ->make(true);
     }
 }

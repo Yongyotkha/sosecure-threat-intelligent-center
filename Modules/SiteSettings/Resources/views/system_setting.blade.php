@@ -114,12 +114,24 @@
                                     </div>
                                  </div>
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">IP  <span class="text-danger">*</span> </label>
+                                    <label class="col-lg-3 control-label">IP Private<span class="text-danger">*</span> </label>
                                     <div class="col-lg-6">
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="form-input">
                                                     <input type="text" class="form-control" id="ip_key" name="ip_key" value="{{ $siteSettings -> ip_key }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">IP Public<span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-input">
+                                                    <input type="text" class="form-control" id="ip_public" name="ip_public" value="{{ $siteSettings -> ip_public }}" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -226,40 +238,40 @@
                                  <div class="row pa-sm">
                                     <div class="col-lg-12" style="background: #f3f6f9;">
                                         <div class="m-xs">
-                                            <span class="text-dark">Laravel Version</span>: <span class="text-muted">5.7.29</span>
+                                            <span class="text-dark">Laravel Version</span>: <span class="text-muted">{{ $siteSettings -> laravel_version == null ? 'ไม่มีข้อมูล' : $siteSettings -> laravel_version }}</span>
                                             <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
                                             <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
                                             <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">Code Version</span>: <span class="text-muted">2.0.5</span>
+                                            <span class="text-dark">Code Version</span>: <span class="text-muted">{{ empty($code_version) ? 'ไม่มีข้อมูล' : $code_version }}</span>
                                             <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" id="updatesBtn" data-rel="tooltip" title="Check for updates now">@icon('solid/code-branch') @langapp('check_for_updates')</a>
-                                            <span class="text-danger ml-2">Last Version 3.0.5</span>
+                                            <span class="text-danger ml-2">Last Version {{ $last_version }}</span>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">OS Version</span>: <span class="text-muted">Linux</span>
+                                            <span class="text-dark">OS Version</span>: <span class="text-muted">{{ $siteSettings -> os == null ? 'ไม่มีข้อมูล' : $siteSettings -> os }}</span>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">Sever Time</span>: <span class="text-muted">Sep 29,2020 11:26 AM</span>
+                                            <span class="text-dark">Sever Time</span>: <span class="text-muted">{{ $siteSettings -> server_time == null ? 'ไม่มีข้อมูล' : $siteSettings -> server_time }}</span>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">PHP Version</span>: <span class="text-muted">7.3.20</span>
+                                            <span class="text-dark">PHP Version</span>: <span class="text-muted">{{ $siteSettings -> php_version == null ? 'ไม่มีข้อมูล' : $siteSettings -> php_version }}</span>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">Your App Name</span>: <span class="text-muted">Threat-inSight</span>
+                                            <span class="text-dark">Your App Name</span>: <span class="text-muted">{{ $siteSettings -> your_app_name == null ? 'ไม่มีข้อมูล' : $siteSettings -> your_app_name }}</span>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">Timezone</span>: <span class="text-muted">Asia/Bangkok</span>
+                                            <span class="text-dark">Timezone</span>: <span class="text-muted">{{ $siteSettings -> time_zone == null ? 'ไม่มีข้อมูล' : $siteSettings -> time_zone }}</span>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
-                                            <span class="text-dark">Key System</span>: <span class="text-muted">xxxxxxxxxxxxxxxxxxxxxx</span>
+                                            <span class="text-dark">Key System</span>: <span class="text-muted">{{ $siteSettings -> key_system == null ? 'ไม่มีข้อมูล' : $siteSettings -> key_system }}</span>
                                         </div>
                                         <div class="line"></div>
                                     </div>

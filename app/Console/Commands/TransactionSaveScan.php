@@ -147,6 +147,56 @@ class TransactionSaveScan extends Command
                     //throw $th;
                 }
 
+                // try {
+                //     //full_DNS_recon_all_detail
+                //     $array = explode("\n", file_get_contents($path.'/full_DNS_recon_all_detail.txt'));
+                //     $arrays = [];
+                //     $arrays_final = [];
+                //     $arrays_last_final = [];
+                //     foreach ($array as $item) {
+                //         $arrays[] = explode("\t", $item);
+                //     }
+                //     foreach($arrays as $data){
+                //         $arrays_final[] = $data;
+                //     }
+                //     foreach($arrays_final as $item){
+                //         $arrays = [];
+                //         foreach($item as $data){
+                //             if(!empty($data)){
+                //                 $arrays[] = trim($data);
+                //             }
+                //         }
+                //         $arrays_last_final[] = $arrays;
+                //     }
+                //     $arrays_last_final = array_filter($arrays_last_final);
+                //     array_pop($arrays_last_final);
+                //     foreach($arrays_last_final as $item){
+                //         $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
+                //         ->where('domain_id', $TransactionTimeStampScan->domain_id)
+                //         ->where('module', $item[0])
+                //         ->where('data_type', $item[1])
+                //         ->where('raw_data', $item[2])
+                //         ->first();
+                //         if(!empty($TransactionScans)){
+                //             $TransactionScans -> updated_at = Carbon::now();
+                //             $TransactionScans -> save();
+                //         }else{
+                //             $CreateTransactionScans = new TransactionScans;
+                //             $CreateTransactionScans -> code = Str::uuid()->toString();
+                //             $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
+                //             $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
+                //             $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
+                //             $CreateTransactionScans -> module = $item[0];
+                //             $CreateTransactionScans -> data_type = $item[1];
+                //             $CreateTransactionScans -> raw_data = $item[2];
+                //             $CreateTransactionScans -> status = 1;
+                //             $CreateTransactionScans -> save();
+                //         }
+                //     }
+                // } catch (\Throwable $th) {
+                //     //throw $th;
+                // }
+
                 try {
                     //DNS_recon_filter_for_ip_v4
                     $array = explode("\n", file_get_contents($path.'/DNS_recon_filter_for_ip_v4.txt'));

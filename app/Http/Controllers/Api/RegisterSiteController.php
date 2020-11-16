@@ -85,6 +85,7 @@ class RegisterSiteController extends ApiController
                 $DeployHistory = new DeployHistory;
                 $DeployHistory->code = $DeployCode -> code;
                 $DeployHistory->path = $DeployCode -> path;
+                $DeployHistory->version = $DeployCode -> version;
                 $DeployHistory->status = 1;
                 $DeployHistory->site_id = $site['data']['id'];
                 $DeployHistory->save(); 
