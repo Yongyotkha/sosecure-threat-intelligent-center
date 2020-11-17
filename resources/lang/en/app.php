@@ -948,6 +948,7 @@ return [
     'category_settings'                          => 'Category Settings',
     'site_settings'                              => 'Site Settings',
     'rss_feed_settings'                          => 'RSS Feed Settings',
+    'rss_feed'                                   => 'RSS Feed',
     'manage_assets'                              => 'Manage Assets',
     'manage_customers'                           => 'Manage Customers',
     'manage_users'                               => 'Manage Users',

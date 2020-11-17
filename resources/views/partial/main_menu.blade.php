@@ -256,10 +256,10 @@
                                         <span> @langapp('site_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('rss_feed_settings') ? 'active' : '' }}">
+                                <li class="{{ $page === langapp('rss_feed') ? 'active' : '' }}">
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('rss_feed_settings') </span>
+                                        <span> @langapp('rss_feed') </span>
                                     </a>
                                 </li>
                                 <li class="{{ $page === langapp('api_indicators') ? 'active' : '' }}">
