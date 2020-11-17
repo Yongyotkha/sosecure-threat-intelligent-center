@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\TransactionTimeStampScans;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 
 class TransactionScanSSH extends Command
@@ -42,6 +43,7 @@ class TransactionScanSSH extends Command
         try {
             $TransactionTimeStampScans = TransactionTimeStampScans::where('progress', 0)->where('status', 1)->get();
             foreach($TransactionTimeStampScans as $TransactionTimeStampScan){
+                $TransactionTimeStampScan->created_at = Carbon::now();
                 $TransactionTimeStampScan->progress = 1;
                 $TransactionTimeStampScan->save();
 
