@@ -41,7 +41,7 @@
                                 <th>Finished</th>
                                 <th>Elements</th>
                                 <th>Progress</th>
-                                <th>Status</th>
+                                {{-- <th>Status</th> --}}
                                 <th class="no-sort" width="10%">Action</th>
                             </tr>
                         </thead>
@@ -257,6 +257,14 @@
                 {
                     data: 'elements',
                     name: 'elements'
+                },
+                {
+                    data: 'progress',
+                    name: 'progress'
+                },
+                {
+                    data: 'action',
+                    name: 'action'
                 },
                 
             ]
