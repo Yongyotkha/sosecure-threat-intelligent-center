@@ -13,6 +13,9 @@
                 @if($tab == 'datatype')
                     <div class="button-control pull-right">
                         <div class="btn-group">
+                            <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled> Asset To Use</button>
+                        </div>
+                        <div class="btn-group">
                             <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
                         </div>
                         <div class="btn-group">
