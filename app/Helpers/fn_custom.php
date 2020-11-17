@@ -38,6 +38,44 @@ function gen_uuid() {
     );
 }
 
+// function get_name_scan_status($status_id) {
+//     if($status_id == 0) {
+//         $html = '<span class="badge badge-secondary">waiting</span>';
+//     } else if($status_id == 1) {
+//         $html = '<span class="badge badge-Warning" style="background-color: #ffc107;">scanning</span>';
+//     } else if($status_id == 2) {
+//         $html = '<span class="badge badge-Warning" style="background-color: #ffc107;">scanning</span>';
+//     } else if($status_id == 3) {
+//         $html = '<span class="badge badge-Success" style="background-color: #179f83;">complete</span>';
+//     }
+// }
+function get_name_scan_status($status_id,$badg='') {
+    $html = '';
+    if($badg == 'badg') {
+        if($status_id == 0) {
+            $html = '<span class="badge badge-secondary">waiting</span>';
+        } else if($status_id == 1) {
+            $html = '<span class="badge badge-Warning" style="background-color: #ffc107;">scanning</span>';
+        } else if($status_id == 2) {
+            $html = '<span class="badge badge-Warning" style="background-color: #ffc107;">scanning</span>';
+        } else if($status_id == 3) {
+            $html = '<span class="badge badge-Success" style="background-color: #179f83;">complete</span>';
+        }
+    } else {
+        if($status_id == 0) {
+            $html = 'waiting';
+        } else if($status_id == 1) {
+            $html = 'scanning';
+        } else if($status_id == 2) {
+            $html = 'scanning';
+        } else if($status_id == 3) {
+            $html = 'complete';
+        }
+    }
+    return $html;
+}
+
+
 function generator_uuid(){
     return Str::uuid()->toString();
 }

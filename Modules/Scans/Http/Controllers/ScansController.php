@@ -218,21 +218,13 @@ class ScansController extends Controller
             })
             ->addColumn('progress', function (TransactionTimeStampScans $model) {
                 $html = '';
-                if($model -> progress == 0) {
-                    $html = '<span class="badge badge-secondary">waiting</span>';
-                } else if($model -> progress == 1) {
-                    $html = '<span class="badge badge-Warning" style="background-color: #ffc107;">scanning</span>';
-                } else if($model -> progress == 2) {
-                    $html = '<span class="badge badge-Warning" style="background-color: #ffc107;">scanning</span>';
-                } else if($model -> progress == 3) {
-                    $html = '<span class="badge badge-Success" style="background-color: #179f83;">complete</span>';
-                }
+                $html = get_name_scan_status($model -> progress , 'badg');
                 return $html;
             })
             ->addColumn('action', function (TransactionTimeStampScans $model) {
                 $html = '';
                 $html .= "
-                            <a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                            <a href='". route('scans.index', ['tab' => 'overview', 'site_code' => $model -> code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs'>
                                 <i class='far fa-eye'></i>
                             </a>
                             <a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
