@@ -9,6 +9,7 @@ use App\TranSactionScanTemps;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use App\DataScans;
 
 class TransactionSaveScan extends Command
 {
@@ -544,11 +545,46 @@ class TransactionSaveScan extends Command
                     $data -> delete();
                 }
 
-                $TransactionScans_elemtnts = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)->count();
+                $TransactionScans_elemtnts = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
+                ->where('domain_id', $TransactionTimeStampScan->domain_id)->count();
+
                 $TransactionTimeStampScan->elements = $TransactionScans_elemtnts;
                 $TransactionTimeStampScan->progress = 3;
                 $TransactionTimeStampScan->path = '/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
                 $TransactionTimeStampScan->save();
+
+                
+
+                $DataScans = DataScans::where('site_id', $TransactionTimeStampScan->site_id)
+                ->where('domain_id', $TransactionTimeStampScan->domain_id)->get();
+                if($DataScans){
+                    DataScans::where('site_id', $TransactionTimeStampScan->site_id)
+                    ->where('domain_id', $TransactionTimeStampScan->domain_id)->delete();
+
+                    $TransactionScans_data_scan = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
+                    ->where('domain_id', $TransactionTimeStampScan->domain_id)
+                    ->get();
+                    if($TransactionScans_data_scan){
+                        foreach($TransactionScans_data_scan as $data){
+                            $DataScans_data_type = DataScans::where('site_id', $TransactionTimeStampScan->site_id)
+                            ->where('domain_id', $TransactionTimeStampScan->domain_id)
+                            ->where('data_type', $data->data_type)
+                            ->first();
+                            if(!$DataScans_data_type){
+                                $DataScans_save = new DataScans;
+                                $DataScans_save -> code = Str::uuid()->toString();
+                                $DataScans_save -> site_id = $TransactionTimeStampScan->site_id;
+                                $DataScans_save -> domain_id = $TransactionTimeStampScan->domain_id;
+                                $DataScans_save -> data_type = $data->data_type;
+                                $DataScans_save -> total = 1;
+                                $DataScans_save -> save();
+                            }else{
+                                $DataScans_data_type -> total = ($DataScans_data_type -> total + 1);
+                                $DataScans_data_type -> save();
+                            }
+                        }
+                    }
+                }
 
             }
         } catch (\Throwable $th) {

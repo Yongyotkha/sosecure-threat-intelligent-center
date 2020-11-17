@@ -8,7 +8,7 @@
                     <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                     Site Setting > ธนาคารออมสิน | Scan Domain : baac.or.th
+                     Site Setting > {{ $site -> get_site -> name }} | Scan Domain : {{ $site -> get_domain -> domain }}
                 </div>
                 @if($tab == 'datatype')
                     <div class="button-control pull-right">
@@ -52,23 +52,23 @@
 
                     <ul class="nav pro-nav-tabs nav-tabs-dashed">
                         <li class="{{ ($tab == 'overview') ? 'active' : '' }}">
-                            <a href="{{ route('scans.index', ['tab' => 'overview']) }}">
+                            <a href="{{ route('scans.index', ['tab' => 'overview', 'site_code' => $site -> code]) }}">
                                 @icon('solid/database') @langapp('overview')
                             </a>
                         </li>
 
                         <li class="{{ ($tab == 'datatype') ? 'active' : '' }}">
-                            <a href="{{ route('scans.index', ['tab' => 'datatype']) }}">
+                            <a href="{{ route('scans.index', ['tab' => 'datatype', 'site_code' => $site -> code]) }}">
                                 @icon('solid/folder-open') Data
                             </a>
                         </li>
                         <li class="{{ ($tab == 'settings') ? 'active' : '' }}">
-                            <a href="{{ route('scans.index', ['tab' => 'settings']) }}">
+                            <a href="{{ route('scans.index', ['tab' => 'settings', 'site_code' => $site -> code]) }}">
                                 @icon('solid/life-ring') @langapp('settings')
                             </a>
                         </li>
                         <li class="{{ ($tab == 'logs') ? 'active' : '' }}">
-                            <a href="{{ route('scans.index', ['tab' => 'logs']) }}">
+                            <a href="{{ route('scans.index', ['tab' => 'logs', 'site_code' => $site -> code]) }}">
                             @icon('solid/clock') @langapp('logs')
                             </a>
                         </li>

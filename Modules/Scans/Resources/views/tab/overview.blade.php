@@ -5,7 +5,7 @@
                 <div class="card-overview">
                     <div class="card-text-ov">
                         <h3>Total Data Elements</h3>
-                        <h1>3,216</h1>
+                        <h1>{{ $site -> elements }}</h1>
                     </div>
                 </div>
             </div>
