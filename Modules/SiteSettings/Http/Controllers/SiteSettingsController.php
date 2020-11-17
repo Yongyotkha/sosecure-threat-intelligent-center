@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\File;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
+use Modules\SiteSettings\Entities\Tags;
+use Modules\SiteSettings\Entities\Tags_site;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 use Image;
 
@@ -157,12 +159,14 @@ class SiteSettingsController extends Controller
     public function edit($id)
     {
         $get_data = $this->siteSettings->get_data($id);
+        $Tags = Tags::all();
         $categories = CategorySettings::where([
             ['active',1],
             ['deleted_at','=',null]
         ])->get();
         $data['categories'] = $categories;
         $data['siteSettings'] = $get_data;
+        $data['tags'] = $Tags;
         $data['page'] = $this->getPage();
         return view('sitesettings::edit_site')->with($data);
     }
@@ -205,6 +209,29 @@ class SiteSettingsController extends Controller
                 $SiteCategory->category_id = $category;
                 $SiteCategory->save();
             }
+            Tags_site::where('site_id', $SiteSettings -> id)->delete();
+            foreach($request->tag AS $tag) {
+                $Tags = Tags::where('id', $tag)->first();
+                if($Tags) {
+
+                } else {
+                    $Tags = new Tags;
+                    $Tags->name = $tag;
+                    $Tags->save();
+                }
+                $Tags_site = new Tags_site;
+                $Tags_site->site_id = $SiteSettings->id;
+                $Tags_site->tag_id = $Tags->id;
+                $Tags_site->save();
+            }
+
+            // Tags_site::where('site_id', $SiteSettings -> id)->delete();
+            // foreach($request->tag AS $tag) {
+            //     $Tags_site = new Tags_site;
+            //     $Tags_site->site_id = $SiteSettings->id;
+            //     $Tags_site->tag_id = $tag;
+            //     $Tags_site->save();
+            // }
     
             if ($request->hasFile('logo')) {
                 $image_path = $SiteSettings->logo;

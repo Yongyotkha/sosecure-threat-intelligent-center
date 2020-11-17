@@ -4,6 +4,7 @@ namespace Modules\SiteSettings\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\SiteSettings\Entities\SiteCategory;
+use Modules\SiteSettings\Entities\Tags_site;
 
 class SiteSettings extends Model{
     protected $table = "site";
@@ -38,5 +39,9 @@ class SiteSettings extends Model{
 
     public function get_categorys(){
         return $this->hasMany(SiteCategory::class, 'site_id', 'id');
+    }
+
+    public function get_tags(){
+        return $this->hasMany(Tags_site::class, 'site_id', 'id');
     }
 }
