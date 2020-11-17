@@ -248,19 +248,23 @@
                 },
                 {
                     data: 'created_at',
-                    name: 'created_at'
+                    name: 'created_at',
+                    className: 'w-15 text-center'
                 },
                 {
                     data: 'updated_at',
-                    name: 'updated_at'
+                    name: 'updated_at',
+                    className: 'w-15 text-center'
                 },
                 {
                     data: 'elements',
-                    name: 'elements'
+                    name: 'elements',
+                    className: 'w-10 text-center'
                 },
                 {
                     data: 'progress',
-                    name: 'progress'
+                    name: 'progress',
+                    className: 'w-10'
                 },
                 {
                     data: 'action',
