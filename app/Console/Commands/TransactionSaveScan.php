@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\TransactionTimeStampScans;
 use App\TransactionScans;
+use App\TranSactionScanTemps;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -71,27 +72,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/looking_for_subdomain.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -121,27 +112,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/looking_for_domain_name.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -171,26 +152,27 @@ class TransactionSaveScan extends Command
                 //     $arrays_last_final = array_filter($arrays_last_final);
                 //     array_pop($arrays_last_final);
                 //     foreach($arrays_last_final as $item){
-                //         $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
+                //         $TransactionScanTemps = TransactionScanTemps::where('site_id', $TransactionTimeStampScan->site_id)
                 //         ->where('domain_id', $TransactionTimeStampScan->domain_id)
                 //         ->where('module', $item[0])
                 //         ->where('data_type', $item[1])
                 //         ->where('raw_data', $item[2])
                 //         ->first();
-                //         if(!empty($TransactionScans)){
-                //             $TransactionScans -> updated_at = Carbon::now();
-                //             $TransactionScans -> save();
+                //         if(!empty($TransactionScanTemps)){
+                //             $TransactionScanTemps -> status = 2;
+                //             $TransactionScanTemps -> updated_at = Carbon::now();
+                //             $TransactionScanTemps -> save();
                 //         }else{
-                //             $CreateTransactionScans = new TransactionScans;
-                //             $CreateTransactionScans -> code = Str::uuid()->toString();
-                //             $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                //             $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                //             $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                //             $CreateTransactionScans -> module = $item[0];
-                //             $CreateTransactionScans -> data_type = $item[1];
-                //             $CreateTransactionScans -> raw_data = $item[2];
-                //             $CreateTransactionScans -> status = 1;
-                //             $CreateTransactionScans -> save();
+                //             $CreateTransactionScanTemps = new TransactionScanTemps;
+                //             $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                //             $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                //             $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                //             $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                //             $CreateTransactionScanTemps -> module = $item[0];
+                //             $CreateTransactionScanTemps -> data_type = $item[1];
+                //             $CreateTransactionScanTemps -> raw_data = $item[2];
+                //             $CreateTransactionScanTemps -> status = 1;
+                //             $CreateTransactionScanTemps -> save();
                 //         }
                 //     }
                 // } catch (\Throwable $th) {
@@ -221,29 +203,18 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('referent', $item[2])
-                        ->where('raw_data', $item[3])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> referent = $item[2];
-                            $CreateTransactionScans -> raw_data = $item[3];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> referent = $item[2];
+                        $CreateTransactionScanTemps -> raw_data = $item[3];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/DNS_recon_filter_for_ip_v4.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -273,29 +244,18 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('referent', $item[2])
-                        ->where('raw_data', $item[3])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> referent = $item[2];
-                            $CreateTransactionScans -> raw_data = $item[3];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> referent = $item[2];
+                        $CreateTransactionScanTemps -> raw_data = $item[3];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/DNS_recon_filter_for_ip_v6.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -325,27 +285,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/looking_for_hijack_subdomain.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -375,27 +325,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/looking_for_compromised_email.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -425,27 +365,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/looking_for_all_compromised.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -475,27 +405,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/threat_intel_and_blacklist_lookups.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -525,27 +445,17 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/scraping_names_emails_and_phone_number.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
@@ -575,34 +485,71 @@ class TransactionSaveScan extends Command
                     $arrays_last_final = array_filter($arrays_last_final);
                     array_pop($arrays_last_final);
                     foreach($arrays_last_final as $item){
-                        $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                        ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                        ->where('module', $item[0])
-                        ->where('data_type', $item[1])
-                        ->where('raw_data', $item[2])
-                        ->first();
-                        if(!empty($TransactionScans)){
-                            $TransactionScans -> updated_at = Carbon::now();
-                            $TransactionScans -> save();
-                        }else{
-                            $CreateTransactionScans = new TransactionScans;
-                            $CreateTransactionScans -> code = Str::uuid()->toString();
-                            $CreateTransactionScans -> created_by = $TransactionTimeStampScan -> created_by;
-                            $CreateTransactionScans -> site_id = $TransactionTimeStampScan->site_id;
-                            $CreateTransactionScans -> domain_id = $TransactionTimeStampScan->domain_id;
-                            $CreateTransactionScans -> module = $item[0];
-                            $CreateTransactionScans -> data_type = $item[1];
-                            $CreateTransactionScans -> raw_data = $item[2];
-                            $CreateTransactionScans -> status = 1;
-                            $CreateTransactionScans -> save();
-                        }
+                        $CreateTransactionScanTemps = new TranSactionScanTemps;
+                        $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+                        $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+                        $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+                        $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+                        $CreateTransactionScanTemps -> module = $item[0];
+                        $CreateTransactionScanTemps -> data_type = $item[1];
+                        $CreateTransactionScanTemps -> raw_data = $item[2];
+                        $CreateTransactionScanTemps -> status = 1;
+                        $CreateTransactionScanTemps -> path = '/port_scanner.txt';
+                        $CreateTransactionScanTemps -> save();
                     }
                 } catch (\Throwable $th) {
                     //throw $th;
                 }
+
+                $TransactionScans = TransactionScans::select('status_progrress')
+                ->where('site_id', $TransactionTimeStampScan->site_id)
+                ->where('domain_id', $TransactionTimeStampScan->domain_id)->get();
+                if($TransactionScans){
+                    foreach($TransactionScans as $data){
+                        $data -> status = 0;
+                        $data -> status_progrress = 0;
+                        $data -> save();
+                    }    
+                }
                 
+                $TransactionScanTemps = TranSactionScanTemps::where('site_id', $TransactionTimeStampScan->site_id)
+                ->where('domain_id', $TransactionTimeStampScan->domain_id)->get();
+                foreach($TransactionScanTemps as $data){
+                    $TransactionScans_save = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
+                    ->where('domain_id', $TransactionTimeStampScan->domain_id)
+                    ->where('module', $data->module)
+                    ->where('data_type', $data->data_type)
+                    ->where('referent', $data->referent)
+                    ->where('raw_data', $data->raw_data)
+                    ->first();
+                    if($TransactionScans_save){
+                        $TransactionScans_save -> status = 1;
+                        $TransactionScans_save -> status_progrress = 1;
+                        $TransactionScans_save -> save();
+                    }else{
+                        $CreateTransactionScan = new TransactionScans;
+                        $CreateTransactionScan -> code = $data->code;
+                        $CreateTransactionScan -> created_by = $data->created_by;
+                        $CreateTransactionScan -> site_id = $data->site_id;
+                        $CreateTransactionScan -> domain_id = $data->domain_id;
+                        $CreateTransactionScan -> module = $data->module;
+                        $CreateTransactionScan -> data_type = $data->data_type;
+                        $CreateTransactionScan -> referent = $data->referent;
+                        $CreateTransactionScan -> raw_data = $data->raw_data;
+                        $CreateTransactionScan -> status = 2;
+                        $CreateTransactionScan -> path = $data->path;
+                        $CreateTransactionScan -> status_progrress = 1;
+                        $CreateTransactionScan -> save();
+                    }
+                    $data -> delete();
+                }
+
+                $TransactionScans_elemtnts = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)->count();
+                $TransactionTimeStampScan->elements = $TransactionScans_elemtnts;
                 $TransactionTimeStampScan->progress = 3;
+                $TransactionTimeStampScan->path = '/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
                 $TransactionTimeStampScan->save();
+
             }
         } catch (\Throwable $th) {
             //throw $th;

@@ -29,7 +29,6 @@
                     <table class="table table-striped" id="table-scans-template">
                         <thead>
                             <tr>
-                                <th class="hide"></th>
                                 <th class="no-sort">
                                     <label>
                                         <input name="select_all" value="1" id="select-all" type="checkbox" />
@@ -43,7 +42,7 @@
                                 <th>Elements</th>
                                 <th>Progress</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th class="no-sort" width="10%">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -242,6 +241,22 @@
                 {
                     data: 'name',
                     name: 'name'
+                },
+                {
+                    data: 'domain',
+                    name: 'domain'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at'
+                },
+                {
+                    data: 'elements',
+                    name: 'elements'
                 },
                 
             ]

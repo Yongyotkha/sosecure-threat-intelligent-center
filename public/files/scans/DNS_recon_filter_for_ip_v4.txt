@@ -1,4 +1,7 @@
-sfp_dnsresolve                	IP Address                                   	mtsc.co.th	172.67.160.140
+sfp_dnsresolve                	IP Address                                   	mail.mtsc.co.th	172.67.160.140
+sfp_dnsresolve                	IP Address                                   	mail.mtsc.co.th	104.31.73.245
+sfp_dnsresolve                	IP Address                                   	mail.mtsc.co.th	104.31.72.245
 sfp_dnsresolve                	IP Address                                   	mtsc.co.th	104.31.73.245
+sfp_dnsresolve                	IP Address                                   	mtsc.co.th	172.67.160.140
 sfp_dnsresolve                	IP Address                                   	mtsc.co.th	104.31.72.245
 Source                        	Type                                         	Source Data	Data

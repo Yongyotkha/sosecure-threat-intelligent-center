@@ -196,15 +196,18 @@ class ScansController extends Controller
 
     public function tableData()
     {
-        $model = TransactionTimeStampScans::where('status', 1)->get();
-        return DataTables::of($model)
-            ->addColumn('chk', function (TransactionTimeStampScans $model) {
+        $model = TransactionTimeStampScans::query();
+        return DataTables::eloquent($model)
+            ->editColumn('chk', function (TransactionTimeStampScans $model) {
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
             ->addColumn('name', function (TransactionTimeStampScans $model) {
                 return '<label>'.$model -> get_site -> name.'</label>';
-        })
-            ->rawColumns(['chk','name'])
-            ->make(true);
+            })
+            ->addColumn('domain', function (TransactionTimeStampScans $model) {
+                return '<label>'.$model -> get_domain -> name.'</label>';
+            })
+            ->rawColumns(['chk','name','domain'])
+            ->toJson();
     }
 }
