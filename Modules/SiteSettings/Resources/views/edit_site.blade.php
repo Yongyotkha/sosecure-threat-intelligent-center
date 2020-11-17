@@ -117,6 +117,22 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-lg-3 control-label">Tags</label>
+                                    <div class="col-lg-6">
+                                        <select name="tag[]" id="tags" class="select2-option form-control" multiple="multiple">
+                                            @foreach($tags as $key => $tag)
+                                                <option value="{{ $tag->id  }}"
+                                                    @foreach($siteSettings->get_tags as $site_tag)
+                                                        {{ $site_tag->tag_id === $tag->id ? 'selected' : ''}}
+                                                    @endforeach
+                                                >
+                                                    {{ $tag->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 {{-- <div class="form-group row">
                                     <label class="col-lg-3 control-label">Remark </label>
                                     <div class="col-lg-9">
@@ -191,6 +207,12 @@
 @include('stacks.js.form')
 
 <script>
+    $(document).ready(function(){
+        $("#tags").select2({
+        tags: true
+        });
+    });
+
     // Crop Logo
     // var cropper_logo;
     // var imgs_logo = null;
@@ -254,7 +276,7 @@
     //     //     $("#preview_cer_img").html(html);
     //     //     $("#preview-image_logo").html("");
     //     // });
-    // </script>
+     </script>
 @endpush
 
 @endsection

@@ -5,47 +5,21 @@
                 <div class="card-overview">
                     <div class="card-text-ov">
                         <h3>Total Data Elements</h3>
-                        <h1>3,216</h1>
+                        <h1>{{ $site -> elements }}</h1>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <table class="table">
+                    @foreach($DataScans as $data)
                     <tr>
                         <td>
-                            <div class="progress--circle progress--25"></div>
+                            <div class="progress--circle progress--{{ round($data -> total) }}"></div>
                         </td>
-                        <td><a href="">Target Website</a></td>
-                        <td>1,793</td>
+                        <td><a href="">{{ $data -> data_type }}</a></td>
+                        <td>{{ $data -> total }}</td>
                     </tr>
-                    <tr>
-                        <td>
-                            <div class="progress--circle progress--100"></div>
-                        </td>
-                        <td><a href="">CommonCrawl</a></td>
-                        <td>381</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="progress--circle progress--80"></div>
-                        </td>
-                        <td><a href="">Certificate Transparency</a></td>
-                        <td>193</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="progress--circle progress--80"></div>
-                        </td>
-                        <td><a href="">DNS</a></td>
-                        <td>116</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="progress--circle progress--50"></div>
-                        </td>
-                        <td><a href="">File Metadata Extactor</a></td>
-                        <td>102</td>
-                    </tr>
+                    @endforeach
                 </table>
                 <div class="text-center">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
@@ -57,23 +31,25 @@
                 <table class="table table-striped">
                     <tr>
                         <td>Name :</td>
-                        <td>baac.or.th</td>
+                        <td>{{ $site -> get_domain -> domain }}</td>
                     </tr>
                     <tr>
                         <td>Target(s) :</td>
-                        <td>baac.or.th</td>
+                        <td>{{ $site -> get_domain -> domain }}</td>
                     </tr>
                     <tr>
                         <td>Started :</td>
-                        <td>2020-07-21 04:47:10</td>
+                        <td>{{ $site -> created_at }}</td>
                     </tr>
                     <tr>
                         <td>Completed :</td>
-                        <td>2020-07-21 05:02:45</td>
+                        <td>{{ $site -> updated_at }}</td>
                     </tr>
                     <tr>
                         <td>Status :</td>
-                        <td>ABORTED</td>
+                        <td>
+                            {{ get_name_scan_status($site -> progress) }}
+                        </td>
                     </tr>
                 </table>
                 <div class="text-center">

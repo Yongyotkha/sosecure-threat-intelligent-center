@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Entities\Menu;
+use Modules\SiteSettings\Entities\Menu_sub;
 
 class DataSettingsController extends Controller
 {
@@ -36,7 +38,10 @@ class DataSettingsController extends Controller
     public function datasetting($id)
     {
         $get_data = $this->siteSettings->get_data($id);
+        $Menu = Menu::all();
+
         $data['siteSettings'] = $get_data;
+        $data['menus'] = $Menu;
         $data['page'] = 'DataSetting';
         return view('sitesettings::data_setting')->with($data);
     }

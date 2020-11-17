@@ -29,7 +29,6 @@
                     <table class="table table-striped" id="table-scans-template">
                         <thead>
                             <tr>
-                                <th class="hide"></th>
                                 <th class="no-sort">
                                     <label>
                                         <input name="select_all" value="1" id="select-all" type="checkbox" />
@@ -41,9 +40,9 @@
                                 <th>Started</th>
                                 <th>Finished</th>
                                 <th>Elements</th>
-                                <th>Prograss</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <th>Progress</th>
+                                {{-- <th>Status</th> --}}
+                                <th class="no-sort" width="10%">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -225,7 +224,54 @@
     $(function () {
         $('#table-scans-template').DataTable({
             processing: true,
-            order: [[0, "desc"]],
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                url: '{!! route('scans.data') !!}',
+                data: ""
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'domain',
+                    name: 'domain'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    className: 'w-15 text-center'
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at',
+                    className: 'w-15 text-center'
+                },
+                {
+                    data: 'elements',
+                    name: 'elements',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'progress',
+                    name: 'progress',
+                    className: 'w-10'
+                },
+                {
+                    data: 'action',
+                    name: 'action'
+                },
+                
+            ]
         });
     });
 
@@ -233,3 +279,34 @@
 </script>
 @endpush
 @endsection
+{{-- {
+    data: 'domain',
+    name: 'domain'
+},
+{
+    data: 'started',
+    name: 'started'
+},
+{
+    data: 'finished',
+    name: 'finished',
+},
+{
+    data: 'progress',
+    name: 'progress',
+},
+{
+    data: 'elements',
+    name: 'elements',
+},
+{
+    data: 'status',
+    name: 'status',
+},
+{
+    data: 'action',
+    orderable: false,
+    searchable: false,
+    sortable: false,
+    className: 'w-50'
+} --}}

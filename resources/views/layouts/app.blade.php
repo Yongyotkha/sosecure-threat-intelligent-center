@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" dir="{{ get_option('rtl') == 'TRUE' ? 'rtl' : 'ltr' }}" class="app">
 <head>
+    <script>
+        function setDefaultPic(source) {
+        source.src = '{{asset("images/image-not-found.jpg")}}';
+        source.onerror = "";
+        }
+    </script>
 
     <meta charset="utf-8"/>
     <meta name="author" content="{{ get_option('site_author') }}">
@@ -181,12 +187,7 @@
 
 <script src="{{ getAsset('js/theme.js') }}"></script>
 
-<script>
-    function setDefaultPic(source) {
-    source.src = '{{asset("images/image-not-found.jpg")}}';
-    source.onerror = "";
-    }
-</script>
+
 <script>
     var locale = '@langapp('lang_code') ';
     var base_url = '{{ url('/') }}';

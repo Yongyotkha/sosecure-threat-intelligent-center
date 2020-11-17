@@ -14,7 +14,8 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'scans'],
     function () {
         Route::get('/', 'ScansController@index')->name('scans.index')->middleware('can:menu_items');
-        Route::get('/scans-domain/{tab}', 'ScansController@scan_domain')->name('scans.index');
+        Route::get('data', 'ScansController@tableData')->name('scans.data')->middleware('can:menu_items');
+        Route::get('/scans-domain/{tab}/{site_code}', 'ScansController@scan_domain')->name('scans.index');
         Route::get('/scan_command', 'ScansController@scan_command');
     }
 );
