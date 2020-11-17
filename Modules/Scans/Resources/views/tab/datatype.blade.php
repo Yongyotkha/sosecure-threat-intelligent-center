@@ -27,14 +27,14 @@
                 </div>
     
     
-                <div class="col-md-4">
+                {{-- <div class="col-md-4">
                     <div class="form-group">
                         <label for="" class="">module</label>
                         <select name="" id="module" class="select2-option form-control" multiple="multiple">
                             <option value="1">All</option>
                         </select>
                     </div>
-                </div>
+                </div> --}}
                
                 <div class="col-md-4">
                     <div class="form-group">
@@ -67,28 +67,17 @@
                             <th>Data Type</th>
                             <th>Raw Data</th>
                             <th>Referent</th>
-                            <th>Module</th>
+                            {{-- <th>Module</th> --}}
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach($TransactionScans as $data)
                         <tr>
-                            <td class="text-left">Internet Name</td>
-                            <td class="text-left">Surver.baac.or.th</td>
-                            <td class="text-left"></td>
-                            <td class="text-left">sfp_dnsbrute</td>
+                            <td class="text-left">{{ $data -> data_type }}</td>
+                            <td class="text-left">{{ $data -> raw_data }}</td>
+                            <td class="text-left">{{ $data -> referent }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-left">Internet Name</td>
-                            <td class="text-left">216.58.192.74</td>
-                            <td class="text-left">lifetax.it.baac.or.th</td>
-                            <td class="text-left">sfp_dnsbrute</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">Internet Name</td>
-                            <td class="text-left">Surver.baac.or.th</td>
-                            <td class="text-left">202.94.73.147</td>
-                            <td class="text-left">sfp_dnsbrute</td>
-                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -108,7 +97,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#module').select2();
+        // $('#module').select2();
         $('#datatype').select2();
         $('#source').select2();
     });
