@@ -123,7 +123,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="user_limit" value="0">
+                                        <input type="text" class="form-control touch_spin" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else {{get_option('site_user_limit_default')}} @endif">
                                     </div>
                                 </div>
 
