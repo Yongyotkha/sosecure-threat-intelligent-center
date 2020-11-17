@@ -15,6 +15,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use DataTables;
+use Modules\SiteSettings\Entities\SiteSettings;
+use App\DataScans;
 
 class ScansController extends Controller
 {
@@ -47,12 +49,19 @@ class ScansController extends Controller
     }
 
 
-    public function scan_domain($tab = 'overview')
+    public function scan_domain($tab = 'overview', $site_code)
     {
         $allowed      = ['overview', 'datatype', 'settings', 'logs'];
         $tab          = in_array($tab, $allowed) ? $tab : 'overview';
         $data['page'] = 'Domain Settings';
         $data['tab']  = $tab;
+        $SiteSettings = TransactionTimeStampScans::where('code', $site_code)->first();
+        $data['site']  = $SiteSettings;
+        if($tab == 'overview'){
+            $DataScans = DataScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->orderBy('total', 'desc')->get();
+            $data['DataScans'] = $DataScans;
+        }
+
         return view('scans::scans_domain')->with($data);
     }
     
