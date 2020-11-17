@@ -58,8 +58,11 @@ class ScansController extends Controller
         $SiteSettings = TransactionTimeStampScans::where('code', $site_code)->first();
         $data['site']  = $SiteSettings;
         if($tab == 'overview'){
-            $DataScans = DataScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->orderBy('total', 'desc')->get();
+            $DataScans = DataScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->orderBy('total', 'desc')->take(5)->get();
             $data['DataScans'] = $DataScans;
+        }else if($tab == 'datatype'){
+            $TransactionScans = TransactionScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->get();
+            $data['TransactionScans'] = $TransactionScans;
         }
 
         return view('scans::scans_domain')->with($data);
