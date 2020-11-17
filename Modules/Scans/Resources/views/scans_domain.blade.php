@@ -150,37 +150,7 @@
                             <hr>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h3>Mtsc.co.th</h3>
-                        </div>
-                        <div class="col-md-9">
-                           <table class="table table-bordered asset-table">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <input type="text" class="form-control">
-                                        </td>
-                                        <td>
-                                            <select name="" class="select2 form-control">
-                                                <option value="all">IPv6 Address</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <button type="submit" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete">
-                                                <span>@icon('solid/trash-alt')
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                           </table>
-
-                           <div class="text-center">
-                               <button type="submit" class="btn btn-sm btn-info m-xs add-row" value="Add Row">
-                                   <span>@icon('solid/plus')  Add
-                               </button>
-                           </div>
-                        </div>
+                    <div id="show_asets" class="row">
                     </div>
                 </div>
 

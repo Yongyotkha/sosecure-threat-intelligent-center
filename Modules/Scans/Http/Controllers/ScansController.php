@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use DataTables;
 use Modules\SiteSettings\Entities\SiteSettings;
 use App\DataScans;
+use App\DataTypes;
 
 class ScansController extends Controller
 {
@@ -66,6 +67,20 @@ class ScansController extends Controller
         }
 
         return view('scans::scans_domain')->with($data);
+    }
+
+    public function get_referent(Request $request){
+        $TransactionScans = [];
+        foreach($request->values as $key => $data){
+            $TransactionScans[$key]['raw_data'] = $data['raw_data'];
+            $TransactionScans[$key]['data'] = TransactionScans::where('site_id', $data['site_id'])
+            ->where('domain_id', $data['domain_id'])
+            ->where('referent', $data['raw_data'])
+            ->orwhere('raw_data', $data['raw_data'])
+            ->get();
+        }
+        $DataTypes = DataTypes::all();
+        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $TransactionScans, 'data_type' => $DataTypes]);   
     }
     
     /**

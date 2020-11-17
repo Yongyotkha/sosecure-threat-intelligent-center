@@ -17,5 +17,6 @@ Route::group(
         Route::get('data', 'ScansController@tableData')->name('scans.data')->middleware('can:menu_items');
         Route::get('/scans-domain/{tab}/{site_code}', 'ScansController@scan_domain')->name('scans.index');
         Route::get('/scan_command', 'ScansController@scan_command');
+        Route::post('/get_referent', 'ScansController@get_referent');
     }
 );

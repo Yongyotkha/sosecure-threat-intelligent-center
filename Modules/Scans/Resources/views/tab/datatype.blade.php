@@ -81,7 +81,7 @@
                         <tr>
                             <td class="text-left">
                                 <label>
-                                    <input name="select" value="1" class="select-chk" type="checkbox" />
+                                    <input name="select[]" value="{{ $data -> raw_data }}" data-domain="{{ $data -> domain_id }}" data-site="{{ $data -> site_id }}" class="select-chk" type="checkbox" />
                                     <span class="label-text"></span>
                                 </label>
                             </td>
@@ -110,6 +110,63 @@
 <script>
        
     $(document).ready(function(){
+        $("#asset-to-use").click(function(){
+            var values = $("input[name='select[]']:checked").map(function(){
+                return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain') , 'site_id' : $(this).data('site')};
+            }).get();
+            axios.post('/scans/get_referent', {
+                values: values,
+            }).then(function (response) {
+                let result = response.data;
+                var html = ``;
+                for(let i in result.data){
+                    const data_referent = result.data[i];
+                    const raw_data = data_referent.raw_data;
+                    const data_transaction = data_referent.data;
+                    html += `<div class="col-md-3">
+                        <h3>${raw_data}</h3>
+                    </div>
+                    <div class="col-md-9">
+                        <table class="table table-bordered asset-table">
+                            <tbody>`;
+                                for(let c in data_transaction){
+                                    const data_transaction_val = data_transaction[c];
+                                    html += `<tr>
+                                        <td>
+                                            <input type="text" class="form-control" value="${data_transaction_val.raw_data}">
+                                        </td>
+                                        <td>
+                                            <select name="" class="select2 form-control">`;
+                                            for(let b in result.data_type){
+                                                const data_type = result.data_type[b];
+                                                html += `<option value="${data_type.value}" ${data_type.value == data_transaction_val.data_type ? 'selected' : ''}>${data_type.value}</option>`;
+                                            }
+                                            html += `</select>
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete">
+                                                <span>@icon('solid/trash-alt')
+                                            </button>
+                                        </td>
+                                    </tr>`;
+                                }
+                            html += `</tbody>
+                        </table>
+                        <div class="text-center">
+                                <button type="submit" class="btn btn-sm btn-info m-xs add-row" value="Add Row">
+                                    <span>@icon('solid/plus')  Add
+                                </button>
+                            </div>
+                        </div>`;      
+                }
+                $('#show_asets').html(html);
+            }).catch(function (error) {
+                var errors = error;
+                var errorsHtml = "";
+                errorsHtml += "<li>" + errors + "</li>";
+                toastr.error(errorsHtml, '@langapp('response_status')');
+            });
+        });
         $(".add-row").click(function(){
             var markup = `
             <tr>
@@ -160,3 +217,4 @@
 
 
 @endpush
+
