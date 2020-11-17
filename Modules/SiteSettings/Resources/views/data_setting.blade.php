@@ -56,7 +56,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
+                    <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
                 </header>
                 <section class="scrollable wrapper">
                     <div class="row">
@@ -66,194 +66,48 @@
                             <header class="panel-heading">@icon('solid/cogs') Permission & Config Settings  </header>
                             <div class="panel-body">
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">Permission </label>
+                                    <label class="col-lg-3 control-label">Permission Menu </label>
                                     <div class="col-lg-9">
+
                                         <ul class="role-group">
+                                            @php  $i=1;  @endphp
+                                            @foreach($menus AS $menu)
                                             <li>
                                                 <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-1')">@icon('solid/plus')</span>
+                                                    <span class="role-click" onclick="openrole(this,'role-{{$i}}')">@if(count($menu->get_menu_sub) > 0)@icon('solid/plus')@else <i class="fas fa-minus icon"></i>  @endif</span>
                                                     <span class="checkbox chk-inline">
                                                         <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Dashboard</span>
+                                                            <input type="checkbox" name="menu[]" checked="" value="{{$menu->code}}">
+                                                            <span class="label-text" data-rel="tooltip" title="">{{$menu->name}}</span>
                                                         </label>
                                                     </span>
                                                 </div>
-                                                <ul id="role-1" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
+                                                
+                                                @if(count($menu->get_menu_sub) > 0)
+                                                    <ul id="role-{{$i}}" class="role-group-sub">
+                                                    @foreach($menu->get_menu_sub as $menu_sub) 
+                                                    
+                                                        <li>
+                                                            <div class="role-sub">
+                                                                <span class="checkbox chk-inline">
+                                                                    <label>
+                                                                        <input type="checkbox" name="menu_sub[]" checked="" value="{{$menu_sub->code}}">
+                                                                        <span class="label-text" data-rel="tooltip" title="">{{$menu_sub->name}}</span>
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    @endforeach
+                                                    </ul>
+                                                @endif
+                                                
+
                                             </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-2')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">News</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-2" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-3')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Indicators</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-3" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-4')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Vulnerabilitys</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-4" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-5')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Compromised</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-5" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-6')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Data Leak</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-6" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-7')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Web Defacement</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-7" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <div class="role-main">
-                                                    <span class="role-click" onclick="openrole(this,'role-8')">@icon('solid/plus')</span>
-                                                    <span class="checkbox chk-inline">
-                                                        <label>
-                                                            <input type="checkbox" name="" checked="" value="TRUE">
-                                                            <span class="label-text" data-rel="tooltip" title="">Settings</span>
-                                                        </label>
-                                                    </span>
-                                                </div>
-                                                <ul id="role-8" class="role-group-sub">
-                                                    <li>
-                                                        <div class="role-sub">
-                                                            <span class="checkbox chk-inline">
-                                                                <label>
-                                                                    <input type="checkbox" name="" checked="" value="TRUE">
-                                                                    <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
-                                                                </label>
-                                                            </span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </li>
+                                            @php $i++; @endphp
+                                            @endforeach
+                                            
                                         </ul>
+
                                     </div>
                                 </div>
 
@@ -262,14 +116,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_user_allow" checked="" value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="limit" value="0">
+                                        <input type="text" class="form-control touch_spin" name="user_limit" value="0">
                                     </div>
                                 </div>
 
@@ -278,26 +132,26 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_role_allow" checked="" value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Admin</span>
                                             </label>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
-                                        <div class="checkbox">
+                                        {{-- <div class="checkbox">
                                             <label>
                                                 <input type="checkbox" name="" checked="" value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Read Only</span>
                                             </label>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="col-lg-2">
-                                        <div class="checkbox">
+                                        {{-- <div class="checkbox">
                                             <label>
                                                 <input type="checkbox" name="" checked="" value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Customer <a href="#" data-rel="tooltip" title="ติดต่อผู้ดูแลระบบ คลิก"><i class="far fa-question-circle"></i></a></span>
                                             </label>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
 
@@ -307,14 +161,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_domain_allow" checked="" value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="limit" value="0">
+                                        <input type="text" class="form-control touch_spin" name="domain_limit" value="0">
                                     </div>
                                 </div>
 
@@ -324,14 +178,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_asset_allow" checked="" value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="limit" value="0">
+                                        <input type="text" class="form-control touch_spin" name="asset_limit" value="0">
                                     </div>
                                 </div>
 
@@ -380,12 +234,13 @@
             tokenSeparators: [' ']
         });
         
-        $("input[name='limit']").TouchSpin({
+        $(".touch_spin").TouchSpin({
             min: 0,
             step: 1,
             boostat: 5,
             maxboostedstep: 10,
         });
+
     });
 
     $('ul.role-group-sub').hide();
