@@ -14,10 +14,6 @@
                 
 
             <form class="panel-body wrapper-lg" method="POST" action="">
-                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                    <label>@langapp('email')</label>
-                    <input id="email" type="email" class="form-control" name="email" required>
-                </div>
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                     <label>@langapp('password')</label>
                     <input id="password" type="password" class="form-control" name="password" required>

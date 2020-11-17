@@ -249,12 +249,12 @@
                 {
                     data: 'created_at',
                     name: 'created_at',
-                    className: 'w-15 text-center'
+                    className: 'text-center'
                 },
                 {
                     data: 'updated_at',
                     name: 'updated_at',
-                    className: 'w-15 text-center'
+                    className: 'text-center'
                 },
                 {
                     data: 'elements',
@@ -268,7 +268,8 @@
                 },
                 {
                     data: 'action',
-                    name: 'action'
+                    name: 'action',
+                    className: 'no-wrap'
                 },
                 
             ]

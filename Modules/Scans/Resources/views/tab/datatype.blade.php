@@ -64,6 +64,12 @@
                 <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
+                            <th class="no-sort">
+                                <label>
+                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                    <span class="label-text"></span>
+                                </label>
+                            </th>
                             <th>Data Type</th>
                             <th>Raw Data</th>
                             <th>Referent</th>
@@ -73,6 +79,12 @@
                     <tbody>
                         @foreach($TransactionScans as $data)
                         <tr>
+                            <td class="text-left">
+                                <label>
+                                    <input name="select" value="1" class="select-chk" type="checkbox" />
+                                    <span class="label-text"></span>
+                                </label>
+                            </td>
                             <td class="text-left">{{ $data -> data_type }}</td>
                             <td class="text-left">{{ $data -> raw_data }}</td>
                             <td class="text-left">{{ $data -> referent }}</td>
@@ -96,15 +108,55 @@
 @include('stacks.js.form')
 
 <script>
+       
+    $(document).ready(function(){
+        $(".add-row").click(function(){
+            var markup = `
+            <tr>
+                <td>
+                    <input type="text" class="form-control">
+                </td>
+                <td>
+                    <select name="" class="select2 form-control">
+                        <option value="all">IPv6 Address</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-sm btn-danger m-xs delete-row">
+                        <span>@icon('solid/trash-alt')
+                    </button>
+                </td>
+            </tr>
+            `;
+            $("table.asset-table tbody").append(markup);
+        });
+    });  
+
     $(document).ready(function () {
-        // $('#module').select2();
         $('#datatype').select2();
         $('#source').select2();
+
+        $('.select2').select2();
+
+        $('.hide-fillter').hide();
+        $('#fillter-advance').click(function(){
+            $('.hide-fillter').toggle();
+        });
     });
 
-    $('.hide-fillter').hide();
-    $('#fillter-advance').click(function(){
-        $('.hide-fillter').toggle();
+    $('.select-chk').click(function() {
+        if($(this).is(':checked')){
+            if($('#asset-to-use').is(':disabled')) {
+            $('#asset-to-use').removeAttr('disabled');
+            } else {
+                $('#asset-to-use').attr('disabled', 'disabled');
+            }
+        }else{
+            $('#asset-to-use').attr('disabled', 'disabled');
+        }
     });
+
 </script>
+
+
 @endpush
