@@ -11,7 +11,7 @@ class SiteSettings extends Model{
     public $timestamps = true;
     protected $fillable = [
         'id','code','name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'ip_public', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'installed',
-        'laravel_version', 'code_version', 'os', 'server_time', 'php_version', 'your_app_name', 'time_zone', 'key_system', 'register_step'
+        'laravel_version', 'code_version', 'os', 'server_time', 'php_version', 'your_app_name', 'time_zone', 'key_system', 'register_step', 'user_allow', 'user_limit_amount', 'role_allow_admin', 'domain_allow', 'domain_limit', 'asset_allow', 'asset_limit'
     ];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key'];
 
