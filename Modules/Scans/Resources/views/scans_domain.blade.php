@@ -22,27 +22,67 @@
                             <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
                                 <span class="caret"></span>
                             </button>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-left">
                                 <li>
                                     <a href="#">
-                                        Default
+                                        Internet Name
                                     </a>
                                 </li>   
                                 <li>
                                     <a href="#">
-                                        Datatype
+                                        Affiliate - Internet Name
                                     </a>
                                 </li>   
                                 <li>
                                     <a href="#">
-                                        Source
+                                        Affiliate - Domain Name
                                     </a>
                                 </li>   
                                 <li>
                                     <a href="#">
-                                        Module
+                                        Domain Name
                                     </a>
-                                </li>   
+                                </li>  
+                                <li>
+                                    <a href="#">
+                                        IP Address
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        IPv6 Address
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Malicious Internet Name
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Human Name
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Internet Name
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Email Address
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Domain Name (Parent)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Phone Number
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -65,7 +105,7 @@
                                 @icon('solid/folder-open') Data
                             </a>
                         </li>
-                        <li class="{{ ($tab == 'settings') ? 'active' : '' }}">
+                        {{-- <li class="{{ ($tab == 'settings') ? 'active' : '' }}">
                             <a href="{{ route('scans.index', ['tab' => 'settings', 'site_code' => $site -> code]) }}">
                                 @icon('solid/life-ring') @langapp('settings')
                             </a>
@@ -74,7 +114,7 @@
                             <a href="{{ route('scans.index', ['tab' => 'logs', 'site_code' => $site -> code]) }}">
                             @icon('solid/clock') @langapp('logs')
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
 
                 </div>
