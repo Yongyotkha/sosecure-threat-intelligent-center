@@ -75,6 +75,7 @@
             var $temp = $("<input>");
             $("body").append($temp);
             $temp.val($(element).val()).select();
+            setTimeout(function(){ document.execCommand("copy"); }, 1000);
             document.execCommand("copy");
             $temp.remove();
         }
@@ -89,6 +90,7 @@
                 console.log(response);
                 $("#time_pass_expire").text(response.data.time_pass_expire);
                 $("#p1").val(response.data.pass);
+                setTimeout(function(){ copyToClipboard('#p1'); }, 3000);
                 copyToClipboard('#p1');
             }).catch(function (error) {
                 var errors = error.errors;
