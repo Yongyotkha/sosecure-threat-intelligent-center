@@ -217,12 +217,12 @@
                             </a>
                         </li>
 
-                        <li class="{{ $page === langapp('manage_customers') ? 'active' : '' }}">
+                        {{-- <li class="{{ $page === langapp('manage_customers') ? 'active' : '' }}">
                             <a href="{{ site_url('/clients') }}">
                                 <i class="fas fa-user-cog icon"><b class="bg-info"></b></i>
                                 <span> @langapp('manage_customers') </span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="{{ $page === langapp('manage_users') ? 'active' : '' }}">
                             <a href="{{ site_url('/users') }}">
                                 <i class="fas fa-users icon"><b class="bg-info"></b></i>
@@ -260,6 +260,12 @@
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('rss_feed') </span>
+                                    </a>
+                                </li>
+                                <li class="{{ $page === langapp('keywords') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/keywords') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('keywords') </span>
                                     </a>
                                 </li>
                                 <li class="{{ $page === langapp('api_indicators') ? 'active' : '' }}">

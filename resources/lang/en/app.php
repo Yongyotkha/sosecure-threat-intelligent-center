@@ -986,4 +986,5 @@ return [
     'scans'                                      => 'Scans',
     'confirm'                                    => 'Confirmed',
     'lastupdate'                                 => 'Last update',
+    'keywords'                                   => 'Keywords',
 ];
