@@ -19,5 +19,7 @@ Route::group(
         Route::get('/scan_command', 'ScansController@scan_command');
         Route::post('/get_referent', 'ScansController@get_referent');
         Route::post('/save_assets', 'ScansController@save_assets');
+        Route::post('/save_assets_new', 'ScansController@save_assets_new');
+        Route::get('/get_data_type', 'ScansController@get_data_type');
     }
 );

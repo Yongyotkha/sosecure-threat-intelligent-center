@@ -13,6 +13,9 @@
                 @if($tab == 'datatype' )
                     <div class="button-control pull-right">
                         <div class="btn-group">
+                            <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Asset To Use</button>
+                        </div>
+                        <div class="btn-group">
                             <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset To Use</button>
                         </div>
                         <div class="btn-group">
@@ -239,6 +242,50 @@
                         Close
                     </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="save_assets()">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Modal Scans -->
+        <div class="modal modal-slide" id="asset_to_use_manual" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered size-half-50" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="exampleModalLabel">Asset To Use</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-3 text-center">
+                            <h3 class="text-dark">Assets</h3>
+                        </div>
+                        <div class="col-xs-9 text-center">
+                            <h3 class="text-dark">Referent</h3>
+                        </div>
+                        <div class="col-md-12">
+                            <hr>
+                        </div>
+                    </div>
+                    <div id="show_asets_manual" class="row">
+                    </div>
+                    <button type="button" class="btn btn-sm btn-info m-xs" onclick="add_new_assets_manual()">
+                        <span>@icon('solid/plus')  Add Assets
+                    </button>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-info btn-rounded" onclick="save_assets_manual()">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>

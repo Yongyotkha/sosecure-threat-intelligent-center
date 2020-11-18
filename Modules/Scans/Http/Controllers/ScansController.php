@@ -86,6 +86,11 @@ class ScansController extends Controller
         return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $TransactionScans, 'data_type' => $DataTypes]);   
     }
 
+    public function get_data_type(){
+        $DataTypes = DataTypes::all();
+        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data_type' => $DataTypes]); 
+    }
+
     public function save_assets(Request $request){
         foreach($request -> assets as $data){
             $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
@@ -107,6 +112,44 @@ class ScansController extends Controller
                 ->first();
                 if(!$AssetsData){
                     if($item['raw_data_base'] == $Assets -> raw_data){
+                        $AssetsData = new AssetsData;
+                        $AssetsData -> code = generator_uuid();
+                        $AssetsData -> created_by = Auth::user()->id;
+                        $AssetsData -> site_id = $data['site_id'];
+                        $AssetsData -> domain_id = $data['domain_id'];
+                        $AssetsData -> status = 1;
+                        $AssetsData -> value = $item['raw_data'];
+                        $AssetsData -> data_type_id = $item['data_type'];
+                        $AssetsData -> asset_id = $Assets -> id;
+                        $AssetsData -> save();
+                    }
+                }
+            }
+        }
+        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => '']); 
+    }
+
+    public function save_assets_new(Request $request){
+        foreach($request -> assets as $data){
+            $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
+            if(!$Assets){
+                $Assets = new Assets;
+                $Assets -> code = generator_uuid();
+                $Assets -> created_by = Auth::user()->id;
+                $Assets -> site_id = $data['site_id'];
+                $Assets -> domain_id = $data['domain_id'];
+                $Assets -> status = 1;
+                $Assets -> raw_data = $data['raw_data'];
+                $Assets -> save();
+            }
+            foreach($request -> assets_data as $item){
+                $AssetsData = AssetsData::where('site_id', $data['site_id'])
+                ->where('domain_id', $data['domain_id'])
+                ->where('value', $item['raw_data'])
+                ->where('data_type_id', $item['data_type'])
+                ->first();
+                if(!$AssetsData){
+                    if($item['raw_data_base'] == $data['raw_data_base']){
                         $AssetsData = new AssetsData;
                         $AssetsData -> code = generator_uuid();
                         $AssetsData -> created_by = Auth::user()->id;
