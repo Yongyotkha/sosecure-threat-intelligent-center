@@ -15,7 +15,9 @@
             if(error.response.data.exception){
                 toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                 $(".formSaving").html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                alert();
             }else{
+                alert();
                 var errors = error.response.data.errors;
                 var errorsHtml= '';
                 $.each( errors, function( key, value ) {

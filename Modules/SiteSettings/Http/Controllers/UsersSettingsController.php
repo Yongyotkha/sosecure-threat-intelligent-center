@@ -2,6 +2,9 @@
 
 namespace Modules\sitesettings\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 use Auth;
 use DataTables;
 use Modules\Users\Entities\User;
@@ -170,6 +173,40 @@ class UsersSettingsController extends Controller
         );
     }
 
+    public function process_gen_pass(Request $request)
+    {
+        // dd($request);
+        // exit();
+        // $user = $this->user->findOrFail($id);
+        $user_code = $request->user_code;
+        $user = User::where('code',$user_code)->first();
+        // dd($user);
+        // exit();
+        $user->password = Hash::make(Str::uuid());
+        $user->password_time_expire = Carbon::now()->addMinutes(10);
+        $user->active = 1;
+        $user->save();
+
+        $user_find = User::where('code',$user->code)->first();
+
+        $site_code = $this->siteSettings->find_code($user->site_id);
+
+        // if ($request->hasFile('logo')) {
+        //     $this->uploadLogo($request, $user);
+        // }
+        return ajaxResponse(
+            [
+                'id'       => $user->id,
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('userssettings.index',['id' => $site_code->code]),
+                'pass' => Str::uuid(),
+                'time_pass_expire' => $user_find->password_time_expire,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
     public function delete_process($id = null)
     {
         // $data['user'] = User::where('code', $id)->first();
@@ -266,7 +303,12 @@ class UsersSettingsController extends Controller
             ->editColumn(
                 'chk',
                 function ($user) {
-                    return '<label><input type="checkbox" name="checked" value="' . $user->id . '"><span class="label-text"></span></label>';
+                    if($user->site_role_id == 99) {
+                        $disabled = 'disabled';
+                    } else {
+                        $disabled = '';
+                    } 
+                    return '<label><input type="checkbox" '.$disabled.' name="checked" value="' . $user->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(
@@ -302,12 +344,20 @@ class UsersSettingsController extends Controller
                     } else {
                         $checked_val = '';
                     }
+
+                    if($user->site_role_id == 99) {
+                        $disabled = 'disabled';
+                        $bg = 'background-color: #54a56291 !important;';
+                    } else {
+                        $disabled = '';
+                        $bg = '';
+                    } 
                     $html = '';
                     
                     // $html = '';
                     $html .= '<label class="switch">
-                                <input type="checkbox" id="user_active_'.$user->code.'" onchange="change_user_active(\''. $user->code .'\')" '.$checked_val.' name="active" value="1">
-                                <span></span>
+                                <input type="checkbox" id="user_active_'.$user->code.'" onchange="change_user_active(\''. $user->code .'\')" '.$checked_val.' name="active" value="1" '.$disabled.'>
+                                <span style="'.$bg.'"></span>
                               </label>';
 
                     return $html;
@@ -324,8 +374,14 @@ class UsersSettingsController extends Controller
                 'action',
                 function ($user) {
                     $html = '';
-                    $html .= "<!--<a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                                    @icon('solid/shield-alt')
+                    if($user->site_role_id == 99) {
+                        $html .= "<a href='". route('user.edit_gen_pass', ['id' => $user->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                        <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                        <span>Password</span>
+                        </a>";
+                    } else {
+                        $html .= "<!--<a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                                @icon('solid/shield-alt')
                                 </a>-->
                                 
                                 <a href='". route('user.edit', ['id' => $user->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
@@ -334,6 +390,8 @@ class UsersSettingsController extends Controller
                                 <a href='". route('user.delete2', ['id' => $user->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
                                 </a>";
+                    }
+
                     return $html;
                 }
             )
@@ -347,6 +405,13 @@ class UsersSettingsController extends Controller
         $data['user'] = User::where('code', $id)->first();
         // dd($id);
         return view('sitesettings::modal.update_user')->with($data);
+    }
+
+    public function edit_gen_pass(Request $request, $id)
+    {
+        $data['user'] = User::where('code', $id)->first();
+        // dd($id);
+        return view('sitesettings::modal.edit_gen_pass')->with($data);
     }
 
     public function delete(Request $request, $id)//del_domain
