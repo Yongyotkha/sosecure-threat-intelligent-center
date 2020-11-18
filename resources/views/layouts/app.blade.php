@@ -148,6 +148,94 @@
         }
         .inv-bg { background-color: {{ get_option('invoice_color') }}; }
         .est-bg { background-color: {{ get_option('estimate_color') }}; color: #fff; }
+        #nest6 {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        height: 50px;
+        width: 50px;
+        margin: -25px 0 0 -25px;
+        border: 2px solid transparent;
+        border-top-color: #0b96c5;
+        border-radius: 50%;
+        -webkit-animation: spin12 2s linear infinite;
+                animation: spin12 2s linear infinite;
+        z-index: 1000;
+    }
+
+    #nest6:before {
+        content: "";
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        bottom: 7px;
+        left: 7px;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        border-top-color: #2b629c;
+        -webkit-animation: spin12 3s linear infinite;
+                animation: spin12 3s linear infinite;
+    }
+
+    #nest6:after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        bottom: 15px;
+        left: 15px;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        background: #33b4d7;
+        border-top-color: #b6d7e0;
+        -webkit-animation: spin12 1.5s linear infinite;
+                animation: spin12 1.5s linear infinite;
+    }
+
+    @-webkit-keyframes spin12 {
+        from {
+            -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+        }
+        to {
+            -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+        }
+    }
+    @keyframes spin12 {
+        from {
+            -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+        }
+        to {
+            -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+            -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+        }
+    }
+    .overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0,0,0,0.4);
+        backdrop-filter: blur(1.5px);
+        z-index: 10000;
+    }
+    .center_text{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: 30px 0 0 -40px;
+        font-weight: 900;
+        color: white;
+    }
     </style>
 
 
@@ -157,6 +245,10 @@
     <![endif]-->
 </head>
 <body>
+<div class="overlay">
+        <div id="nest6"></div>
+        <h3 class="center_text">WAITING</h3>
+    </div>
     @include('cookie_consent')
     
 <section class="vbox" id="app">
@@ -193,6 +285,15 @@
     var base_url = '{{ url('/') }}';
 
       axios.defaults.headers.common['Content-Language'] = '{{ app()->getLocale() }}';
+    function loading(mode){
+        if(mode == 'load'){
+            $('.overlay').css('display', 'block');
+            $('#nest6').css('display', 'block');
+        }else if(mode == 'stop_load'){
+            $('.overlay').css('display', 'none');
+            $('#nest6').css('display', 'none');
+        }
+    }
 </script>
 
 @if (config('system.pusher_enabled'))

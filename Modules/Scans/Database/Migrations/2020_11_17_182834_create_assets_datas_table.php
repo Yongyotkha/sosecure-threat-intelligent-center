@@ -13,7 +13,7 @@ class CreateAssetsDataTable extends Migration
      */
     public function up()
     {
-        Schema::create('assets_data', function (Blueprint $table) {
+        Schema::create('assets_datas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('code')->nullable();
             $table->integer('created_by')->nullable();
@@ -34,6 +34,6 @@ class CreateAssetsDataTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('assets_data');
+        Schema::dropIfExists('assets_datas');
     }
 }
