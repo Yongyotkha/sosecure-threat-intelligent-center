@@ -1582,6 +1582,10 @@ ul.role-group li ul.role-group-sub li{
     background-color: #179f83 !important;
   }
 
+  .badge-danger{
+    background-color: #fa5542 !important;
+  }
+
   .asset-list-tb{
       list-style: none;
       padding: 0;

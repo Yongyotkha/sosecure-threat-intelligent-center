@@ -67,8 +67,31 @@
                                     <li>admin.sosecure.co.th</li>
                                 </ul>
                             </td>
+                            <td class="text-center">
+                                <span class="badge badge-success">Active</span>
+                            </td>
+                            <td class="no-wrap">
+                                <button type="submit" class="btn btn-sm btn-info m-xs">
+                                    <span>@icon('solid/edit')
+                                </button>
+
+                                <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                    <span>@icon('solid/trash-alt')
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
                             <td>
-                                <span class="badge badge-success">Status</span>
+                                secureserver.net
+                            </td>
+                            <td>
+                                <ul class="asset-list-tb">
+                                    <li>Ip-166-62-28-135.ip.secureserver.net</li>
+                                    <li>admin.sosecure.co.th</li>
+                                </ul>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-danger">Inactive</span>
                             </td>
                             <td class="no-wrap">
                                 <button type="submit" class="btn btn-sm btn-info m-xs">
