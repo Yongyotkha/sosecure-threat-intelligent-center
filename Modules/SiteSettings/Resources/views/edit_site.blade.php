@@ -211,8 +211,10 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
-
+@include('stacks.js.select2checkbox')
+@include('partial.ajaxify')
 <script>
+
     $(document).ready(function(){
         $("#tags").select2({
         tags: true
