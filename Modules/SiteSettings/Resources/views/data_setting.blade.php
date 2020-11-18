@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+{{-- {{dd($site_menu_permission)}} --}}
 
 <section id="content" class="bg">
     <section class="hbox stretch">
@@ -61,7 +62,9 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['class' => 'bs-example form-horizontal ajaxifyForm validator']) !!}
+                            {{-- {!! Form::open(['class' => 'bs-example form-horizontal ajaxifyForm validator']) !!} --}}
+                            {!! Form::open(['route' => ['datasettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            <input type="hidden" name="page_setting" value="site_permission_settings">
                             <section class="panel panel-default">
                             <header class="panel-heading">@icon('solid/cogs') Permission & Config Settings  </header>
                             <div class="panel-body">
@@ -77,7 +80,12 @@
                                                     <span class="role-click" onclick="openrole(this,'role-{{$i}}')">@if(count($menu->get_menu_sub) > 0)@icon('solid/plus')@else <i class="fas fa-minus icon"></i>  @endif</span>
                                                     <span class="checkbox chk-inline">
                                                         <label>
-                                                            <input type="checkbox" name="menu[]" checked="" value="{{$menu->code}}">
+                                                            @if(in_array($menu->code,$site_menu_permission))
+                                                            @php $checked = 'checked'; @endphp
+                                                            @else
+                                                            @php $checked = ''; @endphp
+                                                            @endif
+                                                            <input type="checkbox" name="menu[]" {{$checked}} {{--checked=""--}} value="{{$menu->code}}">
                                                             <span class="label-text" data-rel="tooltip" title="">{{$menu->name}}</span>
                                                         </label>
                                                     </span>
@@ -91,7 +99,12 @@
                                                             <div class="role-sub">
                                                                 <span class="checkbox chk-inline">
                                                                     <label>
-                                                                        <input type="checkbox" name="menu_sub[]" checked="" value="{{$menu_sub->code}}">
+                                                                        @if(in_array($menu_sub->code,$site_menu_sub_permission))
+                                                                        @php $checked = 'checked'; @endphp
+                                                                        @else
+                                                                        @php $checked = ''; @endphp
+                                                                        @endif
+                                                                        <input type="checkbox" name="menu_sub[]" {{$checked}} {{--checked=""--}} value="{{$menu_sub->code}}">
                                                                         <span class="label-text" data-rel="tooltip" title="">{{$menu_sub->name}}</span>
                                                                     </label>
                                                                 </span>
@@ -116,14 +129,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="site_user_allow" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_user_allow" {{$siteSettings->user_allow == 'Y' ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else {{get_option('site_user_limit_default')}} @endif">
+                                        <input type="text" class="form-control touch_spin" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else{{$site_user_limit_default->value}}@endif">
                                     </div>
                                 </div>
 
@@ -132,7 +145,7 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="site_role_allow" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_role_allow" {{$siteSettings->role_allow_admin == 'Y' ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Admin</span>
                                             </label>
                                         </div>
@@ -161,14 +174,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="site_domain_allow" checked="" value="TRUE">
+                                                <input type="checkbox" name="site_domain_allow" {{$siteSettings->domain_allow == 'Y' ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="domain_limit" value="0">
+                                        <input type="text" class="form-control touch_spin" name="domain_limit" value="@if($siteSettings->domain_limit){{$siteSettings->domain_limit}}@else{{$site_domain_limit_default->value}}@endif">
                                     </div>
                                 </div>
 
@@ -178,23 +191,28 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="site_asset_allow" checked="" value="TRUE">
+                                                {{-- @php var_dump($siteSettings->name) @endphp --}}
+                                                <input type="checkbox" name="site_asset_allow" {{$siteSettings->asset_allow == 'Y' ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="asset_limit" value="0">
+                                        <input type="text" class="form-control touch_spin" name="asset_limit" value="@if($siteSettings->asset_limit){{$siteSettings->asset_limit}}@else{{$site_asset_limit_default->value}}@endif">
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">E-mail Alert : </label>
                                     <div class="col-lg-9">
-                                        <select name="" id="email-alert" class="select2-option form-control" multiple="multiple">
-                                            <option value="1">a</option>
-                                            <option value="2">b</option>
+                                        <select name="email_alert[]" id="email_alert" class="select2-option form-control" multiple="multiple">
+                                            {{-- <option value="1">a</option>
+                                            <option value="2">b</option> --}}
+                                            
+                                                @foreach($siteSettings->get_site_config_email_alert as $site_config_email_alert)
+                                                    <option value="{{ $site_config_email_alert->email  }}" selected >{{ $site_config_email_alert->email }}</option>
+                                                @endforeach
                                         </select>
 
                                         <div class="text-muted">Alert (News,Other)</div>
@@ -229,7 +247,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#email-alert').select2({
+        $('#email_alert').select2({
             tags: true,
             tokenSeparators: [' ']
         });
@@ -247,6 +265,48 @@
     function openrole(onck,id){
         $('#'+id).slideToggle(150);
     }
+
+   
+        if($("input[name='site_user_allow']").is(':checked')) {
+            $("input[name='user_limit']").prop("disabled",false);
+        } else {
+            $("input[name='user_limit']").prop("disabled",true);
+        }
+    
+        if($("input[name='site_domain_allow']").is(':checked')) {
+            $("input[name='domain_limit']").prop("disabled",false);
+        } else {
+            $("input[name='domain_limit']").prop("disabled",true);
+        }
+    
+        if($("input[name='site_asset_allow']").is(':checked')) {
+            $("input[name='asset_limit']").prop("disabled",false);
+        } else {
+            $("input[name='asset_limit']").prop("disabled",true);
+        }
+
+
+    $("input[name='site_user_allow']").click(function() {
+        if($(this).is(':checked')) {
+            $("input[name='user_limit']").prop("disabled",false);
+        } else {
+            $("input[name='user_limit']").prop("disabled",true);
+        }
+    });
+    $("input[name='site_domain_allow']").click(function() {
+        if($(this).is(':checked')) {
+            $("input[name='domain_limit']").prop("disabled",false);
+        } else {
+            $("input[name='domain_limit']").prop("disabled",true);
+        }
+    });
+    $("input[name='site_asset_allow']").click(function() {
+        if($(this).is(':checked')) {
+            $("input[name='asset_limit']").prop("disabled",false);
+        } else {
+            $("input[name='asset_limit']").prop("disabled",true);
+        }
+    });
 
 </script>
 
