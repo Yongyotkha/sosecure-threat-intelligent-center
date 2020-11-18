@@ -130,7 +130,7 @@
         <!-- Modal Scans -->
         <div class="modal modal-slide" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered size-half-50" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">Asset To Use</span>
@@ -141,10 +141,10 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-xs-3 text-center">
-                            <h3>Assets</h3>
+                            <h3 class="text-dark">Assets</h3>
                         </div>
                         <div class="col-xs-9 text-center">
-                            <h3>Referent</h3>
+                            <h3 class="text-dark">Referent</h3>
                         </div>
                         <div class="col-md-12">
                             <hr>

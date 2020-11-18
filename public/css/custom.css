@@ -1577,3 +1577,9 @@ ul.role-group li ul.role-group-sub li{
   .no-wrap{
       white-space: nowrap !important;
   }
+
+  @media screen and (min-width:576px){
+    .modal-slide .modal-dialog.size-half-50 {
+        width: 50% !important;
+    }
+  }

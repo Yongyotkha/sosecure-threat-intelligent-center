@@ -124,7 +124,7 @@
                     const raw_data = data_referent.raw_data;
                     const data_transaction = data_referent.data;
                     html += `<div class="col-md-3">
-                        <h3>${raw_data}</h3>
+                        <h4 class="text-dark">${raw_data}</h4>
                     </div>
                     <div class="col-md-9">
                         <table class="table table-bordered asset-table">
@@ -160,32 +160,38 @@
                         </div>`;      
                 }
                 $('#show_asets').html(html);
+
+                $(".add-row").click(function(){
+                    var markup = `
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control">
+                        </td>
+                        <td>
+                            <select name="" class="select2 form-control">
+                                <option value="all">IPv6 Address</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-sm btn-danger m-xs delete-row">
+                                <span>@icon('solid/trash-alt')
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                    $("table.asset-table tbody").append(markup);
+                });
+
+                $(".asset-table").on('click','.delete-row',function(){
+                    $(this).closest('tr').remove();
+                });
+
             }).catch(function (error) {
                 var errors = error;
                 var errorsHtml = "";
                 errorsHtml += "<li>" + errors + "</li>";
                 toastr.error(errorsHtml, '@langapp('response_status')');
             });
-        });
-        $(".add-row").click(function(){
-            var markup = `
-            <tr>
-                <td>
-                    <input type="text" class="form-control">
-                </td>
-                <td>
-                    <select name="" class="select2 form-control">
-                        <option value="all">IPv6 Address</option>
-                    </select>
-                </td>
-                <td>
-                    <button type="submit" class="btn btn-sm btn-danger m-xs delete-row">
-                        <span>@icon('solid/trash-alt')
-                    </button>
-                </td>
-            </tr>
-            `;
-            $("table.asset-table tbody").append(markup);
         });
     });  
 
