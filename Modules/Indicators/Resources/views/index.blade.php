@@ -221,7 +221,6 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
-
 <script>
     $(document).ready(function () {
         $('#indicator_type').select2({

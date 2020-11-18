@@ -22,9 +22,9 @@
                     @endforeach
                 </table>
                 <div class="text-center">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <a href="{{ route('scans.index', ['tab' => 'datatype', 'site_code' => $site -> code]) }}" class="btn btn-default btn-rounded">
                         More
-                    </button>
+                    </a>
                 </div>
             </div>
             <div class="col-md-4">
@@ -56,7 +56,7 @@
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         Logs
                     </button>
-                    <button type="submit" class="btn btn-success btn-rounded">
+                    <button type="submit" class="btn btn-success btn-rounded  {{ round($data -> total > 0) ? '' : 'disabled' }}">
                         <i class="fas fa-play"></i>
                         Run Scan Now
                     </button>

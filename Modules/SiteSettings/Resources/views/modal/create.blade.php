@@ -141,6 +141,7 @@
                 placeholder:'Categorys',
             });
         });
+        
 
         $(document).ready(function(){
            var image = document.getElementById('crop_img');

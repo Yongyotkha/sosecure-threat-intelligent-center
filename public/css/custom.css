@@ -1598,3 +1598,29 @@ ul.role-group li ul.role-group-sub li{
         width: 50% !important;
     }
   }
+
+
+
+/* Select Checkbox */
+ .select2-results__option .wrap:before{
+    font-family: Font Awesome\ 5 Free;
+    content: "\F0C8";
+    color:#63b8ff;
+    width:25px;
+    height:25px;
+    padding-right: 10px;
+    
+}
+ .select2-results__option[aria-selected=true] .wrap:before{
+    font-family: Font Awesome\ 5 Free;
+    content: "\F14A";
+}
+
+ .select2-container .select2-selection--single {
+    height: 32px !important;
+}
+ .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #444;
+    line-height: 31px !important;
+    font-size: 13px;
+}

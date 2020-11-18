@@ -73,6 +73,8 @@
                             <th>Data Type</th>
                             <th>Raw Data</th>
                             <th>Referent</th>
+                            <th class="text-center">Last Update</th>
+                            <th class="text-center">Status</th>
                             {{-- <th>Module</th> --}}
                         </tr>
                     </thead>
@@ -88,6 +90,13 @@
                             <td class="text-left">{{ $data -> data_type }}</td>
                             <td class="text-left">{{ $data -> raw_data }}</td>
                             <td class="text-left">{{ $data -> referent }}</td>
+                            <td class="text-center">
+                                2020-10-01 11:12    
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-success">นำไปใช่้งานแล้ว</span>
+                                {{-- <span class="badge badge-danger">เพิ่มมาใหม่</span>  --}}
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
