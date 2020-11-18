@@ -5,6 +5,7 @@ namespace Modules\SiteSettings\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\Tags_site;
+use Modules\SiteSettings\Entities\site_config_email_alert;
 
 class SiteSettings extends Model{
     protected $table = "site";
@@ -29,7 +30,7 @@ class SiteSettings extends Model{
     }
 
     public function get_data($uuid, $active = null){
-        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'ip_public', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key', 'installed', 'laravel_version', 'code_version', 'os', 'server_time', 'php_version', 'your_app_name', 'time_zone', 'key_system', 'register_step')
+        $data = $this->select('id', 'code', 'name', 'descript', 'logo', 'address', 'remark', 'active', 'ip_key', 'ip_public', 'mac_address_key', 'system_key', 'public_key', 'system_web_online', 'system_site_online', 'no_expiration_active', 'created_at', 'updated_at', 'start_active', 'end_active', 'start_active_key', 'end_active_key', 'installed', 'laravel_version', 'code_version', 'os', 'server_time', 'php_version', 'your_app_name', 'time_zone', 'key_system', 'register_step', 'user_allow', 'user_limit_amount', 'role_allow_admin', 'domain_allow', 'domain_limit', 'asset_allow', 'asset_limit')
         ->where('code', $uuid)
         ->where('deleted_at', '=', null);
         if($active !== null){
@@ -44,5 +45,9 @@ class SiteSettings extends Model{
 
     public function get_tags(){
         return $this->hasMany(Tags_site::class, 'site_id', 'id');
+    }
+
+    public function get_site_config_email_alert(){
+        return $this->hasMany(site_config_email_alert::class, 'site_id', 'id');
     }
 }
