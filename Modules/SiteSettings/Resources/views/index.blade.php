@@ -55,6 +55,9 @@
                                     <th>@langapp('logo')</th>
                                     <th>@langapp('name')</th>
                                     <th>Categorys</th>
+                                    <th>Assets Use</th>
+                                    <th>Start Date</th>
+                                    <th>Exprie Date</th>
                                     <th>@langapp('status')</th>
                                     <th class="no-sort" width="10%">Action</th> 
                                 </tr>
@@ -120,6 +123,18 @@
                     {
                         data: 'categorys',
                         name: 'categorys'
+                    },
+                    {
+                        data: 'assets_use',
+                        name: 'assets_use'
+                    },
+                    {
+                        data: 'start_date',
+                        name: 'start_date'
+                    },
+                    {
+                        data: 'exp_date',
+                        name: 'exp_date'
                     },
                     {
                         data: 'status',

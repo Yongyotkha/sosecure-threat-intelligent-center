@@ -1624,3 +1624,14 @@ ul.role-group li ul.role-group-sub li{
     line-height: 31px !important;
     font-size: 13px;
 }
+
+.justify-content-between{
+    justify-content: space-between;
+}
+
+.align-items-center{
+    align-items: center;
+}
+.m-0{
+    margin: 0 !important;
+}

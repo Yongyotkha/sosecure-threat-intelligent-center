@@ -1,27 +1,66 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <section class="vbox">
-        <header class="header panel-heading bg-white b-b b-light">
-            <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a>
-            <div class="bc-head">@langapp('rss_feed_settings') | www.xxx.xxx/xxx.xxx.rss</div>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                @icon('solid/download') CSV
-            </a>
-            <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
-            </button>
-            <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                <span>@icon('solid/trash-alt') @langapp('delete')</span>
-            </button>
+    <section class="hbox stretch">      
+        <aside class="aside aside-md b-r">
+            <section class="vbox">
+                <header class="dk header b-b">
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
+                    <p class="h3">@langapp('settings')  </p>
+                </header>
+                <section class="scrollable">
+                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
+                    <section id="setting-nav" class="hidden-xs">
+                        <ul class="nav nav-pills nav-stacked no-radius">
+                            <li>
+                                <a href="{{route('rssfeedsettings.index')}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    RSS Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{route('rssfeedsettings.rss_data')}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    RSS Data
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="{{route('rssfeedsettings.rss_data')}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    News
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+                </section>
+            </section>
+        </aside>
+    
+        <aside>
+            <section class="vbox">
+    
+                <header class="header panel-heading bg-white b-b b-light">
+                    <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                        @icon('solid/arrow-left')
+                    </a>
+                    <div class="bc-head">@langapp('rss_feed_settings') | www.xxx.xxx/xxx.xxx.rss</div>
+                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+                        @icon('solid/download') CSV
+                    </a>
+                    <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                        <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
+                    </button>
+                    <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                        <span>@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+        
+                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create-news">
+                        @icon('solid/plus') @langapp('create') News
+                    </a>
+              
+                </header>
 
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create-news">
-                @icon('solid/plus') @langapp('create') News
-            </a>
-      
-        </header>
             {{-- Search --}}
             {{-- Tab Content --}}
             <section class="scrollable wrapper bg-grey">
@@ -60,7 +99,7 @@
                             </div>
                             <div class="col-lg-3">
                                 <label for="">Status</label>
-                                <section id="select_news" class="select2-option form-control">
+                                <section id="select_news" class="select2-option form-control" multiple="multiple">
                                     <option value="1" selected>All</option>
                                 </section>
                             </div>
@@ -73,7 +112,9 @@
                                     <option value="2">b</option>
                                 </select>
                             </div>
-                            <div class="col-lg-9 text-right">
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
                                 <button class="btn btn-info btn-responsive">
                                     <i class="fas fa-search"></i>
                                     Search
@@ -122,11 +163,13 @@
 
                 
             </section>
+            </section>
+        </aside>
     </section>
+
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-    
      <!-- Modal RSS -->
-    <div class="modal modal-slide size-50" id="create-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     <div class="modal modal-slide size-50" id="create-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
      <div class="modal-dialog modal-dialog-centered" role="document">
          <div class="modal-content">

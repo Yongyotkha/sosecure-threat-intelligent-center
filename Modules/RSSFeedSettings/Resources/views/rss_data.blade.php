@@ -24,6 +24,12 @@
                                     RSS Data
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{route('rssfeedsettings.news')}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    News
+                                </a>
+                            </li>
                         </ul>
                     </section>
                 </div>
