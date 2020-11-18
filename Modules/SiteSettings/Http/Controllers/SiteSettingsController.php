@@ -2,6 +2,8 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
+use Modules\Users\Entities\User;
 use Auth;
 use Carbon\Carbon;
 use DataTables;
@@ -130,6 +132,29 @@ class SiteSettingsController extends Controller
         if ($request->hasFile('logo')) {
             $this->uploadLogo($request, $SiteSettings);
         }
+
+        //---start---gen user_support-------//
+        $user = new User;
+        $user->code = generator_uuid();
+        $user->username = 'support@'.$SiteCategory->id.'.com';
+        $user->email = 'support@'.$SiteCategory->id.'.com';
+        $user->email_verified_at = Carbon::now();
+        $user->name = 'Admin Support';
+        $user->password = 'support';
+        $user->calendar_token = generator_uuid();
+        $user->access_token = generator_uuid();
+        $user->site_id = $SiteSettings->id;
+        $user->site_role_id = 99;
+        $user->password_time_expire = Carbon::now();
+        // dd($user);
+        // exit();
+        // $user->password = Hash::make(Str::uuid());
+        // $user->password_time_expire = Carbon::now()->addMinutes(10);
+        $user->active = 1;
+        $user->save();
+        //----end------gen user_support----------------//
+
+
         return ajaxResponse(
             [
                 'id'       => $SiteSettings->id,

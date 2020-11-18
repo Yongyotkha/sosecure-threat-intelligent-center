@@ -88,6 +88,17 @@ class DomainSettingsController extends Controller
         // dd($request);
         // $this->authorize('create', Domain::class);
         // $Domain = $this->Domain->create($request->all());
+        $SiteSettings = SiteSettings::where('code',$request->code)->where("active",1)->where("deleted_at",null)->first();
+        if($SiteSettings->domain_allow != 'Y') {
+            return response()->json(['status' => 'warning', 'message' => 'Add domain not allow.', 'errors' => 'test'], 400);
+            // return response()->json(['error' => 'Unauthorized', 'code_status' => '401']);
+            // return response()->json([
+            //             'error' => 'Token not provided.',
+            //             'message' => 'Token not provided.',
+            //             'status_code' => '02',//error
+            //         ], 401);
+            exit();
+        }
         $segments = request()->segments();
         $last_segments  = end($segments);
         // $segment3 =  request()->segment(3);
