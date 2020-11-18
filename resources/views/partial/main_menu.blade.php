@@ -148,12 +148,12 @@
                                         <span> @langapp('assets_setting_vulnerability') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('vulnerability_settings') ? 'active' : '' }}">
+                                {{-- <li class="{{ $page === langapp('vulnerability_settings') ? 'active' : '' }}">
                                     <a href="{{ route('vulnerability_settings.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('settings') </span>
                                     </a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </li>
 
@@ -209,14 +209,6 @@
                                 <span> @langapp('webdefacement') </span>
                             </a>
                         </li>
-
-                        <li class="{{ $page === langapp('scans') ? 'active' : '' }}">
-                            <a href="{{ site_url('/scans') }}">
-                                <i class="fas fa-search icon"><b class="bg-info"></b></i>
-                                <span> @langapp('scans') </span>
-                            </a>
-                        </li>
-
                         {{-- <li class="{{ $page === langapp('manage_customers') ? 'active' : '' }}">
                             <a href="{{ site_url('/clients') }}">
                                 <i class="fas fa-user-cog icon"><b class="bg-info"></b></i>
@@ -256,6 +248,13 @@
                                         <span> @langapp('site_settings') </span>
                                     </a>
                                 </li>
+                                <li class="{{ $page === langapp('scans') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/scans') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span>@langapp('scans')</span>
+                                    </a>
+                                </li>
+                               
                                 <li class="{{ $page === langapp('rss_feed') ? 'active' : '' }}">
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>

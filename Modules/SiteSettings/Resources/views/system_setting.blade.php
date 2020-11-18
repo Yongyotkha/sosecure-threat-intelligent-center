@@ -47,6 +47,12 @@
                                     Domain
                                 </a>
                             </li>
+                            <li></li>
+                                <a href="{{route('vulsetting.vul_settings', ['id' => $siteSettings->code])}}">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Vulnerability Setting
+                                </a>
+                            </li>
                         </ul>
                     </section>
                 </div>

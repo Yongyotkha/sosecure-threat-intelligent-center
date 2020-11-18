@@ -24,6 +24,12 @@
                 @icon('solid/plus') @langapp('create')
             </a>
 
+            <div class="pull-right" style="margin-top: 9px;">
+                <select name="" id="" class="select2-option form-control select-site" style="min-width: 100px">
+                    <option value="1">All Site</option>
+                </select>
+            </div>
+
         </header>
 
         <section class="scrollable wrapper">
