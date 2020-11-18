@@ -207,15 +207,15 @@
         });
     });
 
-    $('.select-chk').click(function() {
-        if($(this).is(':checked')){
-            if($('#asset-to-use').is(':disabled')) {
-            $('#asset-to-use').removeAttr('disabled');
-            } else {
-                $('#asset-to-use').attr('disabled', 'disabled');
+
+    $('#asset-to-use').prop("disabled", true);
+        $('.select-chk').click(function() {
+        if ($(this).is(':checked')) {
+            $('#asset-to-use').prop("disabled", false);
+        } else {
+            if ($('.select-chk').filter(':checked').length < 1){
+                $('#asset-to-use').attr('disabled',true);
             }
-        }else{
-            $('#asset-to-use').attr('disabled', 'disabled');
         }
     });
 
