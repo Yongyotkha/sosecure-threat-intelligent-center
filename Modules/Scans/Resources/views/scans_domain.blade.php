@@ -238,7 +238,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
+                    <button type="button" class="btn btn-info btn-rounded" onclick="save_assets()">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>

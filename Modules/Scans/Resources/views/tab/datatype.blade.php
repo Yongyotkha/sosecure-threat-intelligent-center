@@ -108,15 +108,19 @@
 @include('stacks.js.form')
 
 <script>
-       
+    var number_rows = 0; 
+    var base_datatype = []; 
     $(document).ready(function(){
         $("#asset-to-use").click(function(){
+            $('#show_asets').html("");
+            loading('load');
             var values = $("input[name='select[]']:checked").map(function(){
                 return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain') , 'site_id' : $(this).data('site')};
             }).get();
             axios.post('/scans/get_referent', {
                 values: values,
             }).then(function (response) {
+                loading('stop_load');
                 let result = response.data;
                 var html = ``;
                 for(let i in result.data){
@@ -127,24 +131,31 @@
                         <h4 class="text-dark">${raw_data}</h4>
                     </div>
                     <div class="col-md-9">
-                        <table class="table table-bordered asset-table">
+                        <table class="table table-bordered asset-table-${i}">
                             <tbody>`;
+                                let count = 0;
                                 for(let c in data_transaction){
                                     const data_transaction_val = data_transaction[c];
-                                    html += `<tr>
+                                    number_rows++;
+                                    count++;
+                                    if(count == 1){
+                                        html += `<input type="hidden" name="assets[]" class="form-control" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id}" data-site_id="${data_transaction_val.site_id}">`;
+                                    }
+                                    html += `<tr id="rows_${number_rows}">
                                         <td>
-                                            <input type="text" class="form-control" value="${data_transaction_val.raw_data}">
+                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
                                         </td>
                                         <td>
-                                            <select name="" class="select2 form-control">`;
+                                            <select name="data_type[]" class="select2 form-control">`;
                                             for(let b in result.data_type){
+                                                base_datatype = result.data_type;
                                                 const data_type = result.data_type[b];
-                                                html += `<option value="${data_type.value}" ${data_type.value == data_transaction_val.data_type ? 'selected' : ''}>${data_type.value}</option>`;
+                                                html += `<option value="${data_type.id}" ${data_type.value == data_transaction_val.data_type ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
                                             }
                                             html += `</select>
                                         </td>
                                         <td>
-                                            <button type="submit" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete">
+                                            <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
                                                 <span>@icon('solid/trash-alt')
                                             </button>
                                         </td>
@@ -153,40 +164,15 @@
                             html += `</tbody>
                         </table>
                         <div class="text-center">
-                                <button type="submit" class="btn btn-sm btn-info m-xs add-row" value="Add Row">
+                                <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets(${i},'${raw_data}')">
                                     <span>@icon('solid/plus')  Add
                                 </button>
                             </div>
-                        </div>`;      
+                        </div>`;   
                 }
                 $('#show_asets').html(html);
-
-                $(".add-row").click(function(){
-                    var markup = `
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control">
-                        </td>
-                        <td>
-                            <select name="" class="select2 form-control">
-                                <option value="all">IPv6 Address</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button type="submit" class="btn btn-sm btn-danger m-xs delete-row">
-                                <span>@icon('solid/trash-alt')
-                            </button>
-                        </td>
-                    </tr>
-                    `;
-                    $("table.asset-table tbody").append(markup);
-                });
-
-                $(".asset-table").on('click','.delete-row',function(){
-                    $(this).closest('tr').remove();
-                });
-
             }).catch(function (error) {
+                loading('stop_load');
                 var errors = error;
                 var errorsHtml = "";
                 errorsHtml += "<li>" + errors + "</li>";
@@ -194,6 +180,36 @@
             });
         });
     });  
+
+    function add_assets(i, raw_data){
+        number_rows++;
+        var markup = ``;
+        markup = `
+        <tr id="rows_${number_rows}">
+            <td>
+                <input type="text" name="raw_data[]" class="form-control" data-raw_data="${raw_data}">
+            </td>
+            <td>
+                <select name="data_type[]" class="select2 form-control">`;
+                for(let b in base_datatype){
+                    const data_type = base_datatype[b];
+                    markup += `<option value="${data_type.id}" data-raw_data="${raw_data}">${data_type.value}</option>`;
+                }
+            markup += `</select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_tr(${number_rows})">
+                    <span>@icon('solid/trash-alt')
+                </button>
+            </td>
+        </tr>
+        `;
+        $("table.asset-table-"+i+" tbody").append(markup);
+    }
+
+    function delete_tr(c){
+        $('#rows_' + c).remove();
+    }
 
     $(document).ready(function () {
         $('#datatype').select2();
@@ -218,6 +234,39 @@
             }
         }
     });
+
+    function save_assets(){
+        var values = $("input[name='assets[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain_id') , 'site_id' : $(this).data('site_id')};
+        }).get();
+        var raw_data = $("input[name='raw_data[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data')};
+        }).get();
+        var data_type = $("select[name='data_type[]'] option:selected").map(function(){
+            return {'data_type' : $(this).val(), 'raw_data_base' : $(this).data('raw_data')};
+        }).get();    
+        var res = raw_data.map(function(v, i) {
+            if(data_type[i].raw_data_base == v.raw_data_base){
+                return {
+                    data_type: data_type[i].data_type,
+                    raw_data: v.raw_data,
+                    raw_data_base: v.raw_data_base
+                };
+            }
+        });
+        axios.post('/scans/save_assets', {
+            assets: values,
+            assets_data: res,
+        }).then(function (response) {
+            $('#show_asets').html("");
+            console.log(response);
+        }).catch(function (error) {
+            var errors = error;
+            var errorsHtml = "";
+            errorsHtml += "<li>" + errors + "</li>";
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
 
 </script>
 
