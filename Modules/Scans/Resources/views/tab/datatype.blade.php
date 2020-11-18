@@ -118,8 +118,63 @@
 
 <script>
     var number_rows = 0; 
+    var number_add_rows = 0;
+    var number_tbody_rows = 0;
+    var number_table_rows = 1;
+    var number_new_rows_assets = 0;
     var base_datatype = []; 
     $(document).ready(function(){
+        $("#asset-to-use-manual").click(function(){
+            loading('load');
+            $('#show_asets_manual').html("");
+            axios.get('/scans/get_data_type')
+            .then(function (response) {
+                loading('stop_load');
+                 var html = ``;
+                 let result = response.data;
+                    html += `
+                    <input type="hidden" id="domain_id_manual" class="form-control" value="{{ $site->domain_id }}">
+                    <input type="hidden" id="site_id_manual" class="form-control" value="{{ $site->site_id }}">
+                    <div class="col-md-12">
+                        <table class="table table-bordered asset-table-manual-0">
+                            <tbody id="assets_show_${number_tbody_rows}">
+                                <tr id="rows_manual_${number_add_rows}">
+                                    <td>
+                                        <input type="text" name="assets_manual[]" data-raw_data_manual="${0}" class="form-control">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${0}">
+                                    </td>
+                                    <td>
+                                        <select name="data_type_manual[]" class="select2 form-control">`;
+                                        base_datatype = result.data_type;
+                                        for(let b in result.data_type){
+                                            const data_type = result.data_type[b];
+                                            html += `<option value="${data_type.id}" data-raw_data_manual="${0}">${data_type.value}</option>`;
+                                        }
+                                        html += `</select>
+                                    </td>
+                                    <td></td>
+                                </tr>`;
+                        html += `</tbody>
+                        </table>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets_manual(0,${number_tbody_rows},0)">
+                                <span>@icon('solid/plus')  Add
+                            </button>
+                        </div>
+                    </div>
+                    <div id="new_assets_show_${number_new_rows_assets}"></div>`;   
+                $('#show_asets_manual').html(html);
+            }).catch(function (error) {
+                loading('stop_load');
+                var errors = error;
+                var errorsHtml = "";
+                errorsHtml += "<li>" + errors + "</li>";
+                toastr.error(errorsHtml, '@langapp('response_status')');
+            });
+        });
+
         $("#asset-to-use").click(function(){
             $('#show_asets').html("");
             loading('load');
@@ -173,7 +228,7 @@
                             html += `</tbody>
                         </table>
                         <div class="text-center">
-                                <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets(${i},'${raw_data}')">
+                                <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets('${raw_data}')">
                                     <span>@icon('solid/plus')  Add
                                 </button>
                             </div>
@@ -190,7 +245,78 @@
         });
     });  
 
-    function add_assets(i, raw_data){
+    var number_rows_data_manual = 0;
+    function add_new_assets_manual(){
+        number_rows_data_manual++;
+        number_add_rows++;
+        number_table_rows++;
+        number_tbody_rows++;
+        var html = ``;
+        html += `<div class="col-md-12" id="new_add_assets_${number_new_rows_assets}">
+            <table class="table table-bordered asset-table-manual-${number_table_rows}">
+                <tbody id="assets_show_${number_tbody_rows}">
+                    <tr id="rows_manual_${number_add_rows}">
+                        <td>
+                            <input type="text" name="assets_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
+                        </td>
+                        <td>
+                            <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
+                        </td>
+                        <td>
+                            <select name="data_type_manual[]" class="select2 form-control">`;
+                            for(let b in base_datatype){
+                                const data_type = base_datatype[b];
+                                html += `<option value="${data_type.id}" data-raw_data_manual="${number_rows_data_manual}">${data_type.value}</option>`;
+                            }
+                            html += `</select>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_assets_manual_main(${number_new_rows_assets})">
+                                <span>@icon('solid/trash-alt')
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center">
+                <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets_manual(${number_table_rows},${number_tbody_rows},${number_rows_data_manual})">
+                    <span>@icon('solid/plus')  Add
+                </button>
+            </div>
+        </div>
+        <div id="new_assets_show_${number_new_rows_assets+1}"></div>`;
+        $("#new_assets_show_" + number_new_rows_assets).append(html);
+        number_new_rows_assets++;
+    }
+
+    function add_assets_manual(table_row, tbody_rows, rows_data_manual){
+        number_add_rows++;
+        var markup = ``;
+        markup = `
+        <tr id="rows_manual_${number_add_rows}">
+            <td></td>
+            <td>
+                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
+            </td>
+            <td>
+                <select name="data_type_manual[]" class="select2 form-control">`;
+                for(let b in base_datatype){
+                    const data_type = base_datatype[b];
+                    markup += `<option value="${data_type.id}" data-raw_data_manual="${rows_data_manual}">${data_type.value}</option>`;
+                }
+            markup += `</select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_assets_manual(${number_add_rows})">
+                    <span>@icon('solid/trash-alt')
+                </button>
+            </td>
+        </tr>
+        `;
+        $("table.asset-table-manual-"+table_row+" tbody#assets_show_" + tbody_rows).append(markup);
+    }
+
+    function add_assets(raw_data){
         number_rows++;
         var markup = ``;
         markup = `
@@ -220,6 +346,16 @@
         $('#rows_' + c).remove();
     }
 
+    function delete_assets_manual_main(c){
+        $('#new_add_assets_' + c).remove();
+        number_new_rows_assets--;
+        number_rows_data_manual--;
+    }
+
+    function delete_assets_manual(c){
+         $('#rows_manual_' + c).remove();
+    }
+
     $(document).ready(function () {
         $('#datatype').select2();
         $('#source').select2();
@@ -245,6 +381,7 @@
     });
 
     function save_assets(){
+        loading('load');
         var values = $("input[name='assets[]']").map(function(){
             return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain_id') , 'site_id' : $(this).data('site_id')};
         }).get();
@@ -267,9 +404,47 @@
             assets: values,
             assets_data: res,
         }).then(function (response) {
+            loading('stop_load');
             $('#show_asets').html("");
-            console.log(response);
+            $('#asset_to_use').modal('hide');
         }).catch(function (error) {
+            loading('stop_load');
+            var errors = error;
+            var errorsHtml = "";
+            errorsHtml += "<li>" + errors + "</li>";
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
+
+    function save_assets_manual(){
+        loading('load');
+        var values = $("input[name='assets_manual[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual'), 'domain_id' : $("#domain_id_manual").val() , 'site_id' : $("#site_id_manual").val()};
+        }).get();
+        var raw_data = $("input[name='raw_data_manual[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual')};
+        }).get();
+        var data_type = $("select[name='data_type_manual[]'] option:selected").map(function(){
+            return {'data_type' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual')};
+        }).get();   
+        var res = raw_data.map(function(v, i) {
+            if(data_type[i].raw_data_base == v.raw_data_base){
+                return {
+                    data_type: data_type[i].data_type,
+                    raw_data: v.raw_data,
+                    raw_data_base: v.raw_data_base
+                };
+            }
+        }); 
+        axios.post('/scans/save_assets_new', {
+            assets: values,
+            assets_data: res,
+        }).then(function (response) {
+            loading('stop_load');
+            $('#show_asets_manual').html("");
+            $('#asset_to_use_manual').modal('hide');
+        }).catch(function (error) {
+            loading('stop_load');
             var errors = error;
             var errorsHtml = "";
             errorsHtml += "<li>" + errors + "</li>";
@@ -281,4 +456,3 @@
 
 
 @endpush
-
