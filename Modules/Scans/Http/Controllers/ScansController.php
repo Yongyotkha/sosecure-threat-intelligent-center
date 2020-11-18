@@ -52,7 +52,7 @@ class ScansController extends Controller
 
     public function scan_domain($tab = 'overview', $site_code)
     {
-        $allowed      = ['overview', 'datatype', 'settings', 'logs'];
+        $allowed      = ['overview', 'datatype', 'asset', 'settings', 'logs'];
         $tab          = in_array($tab, $allowed) ? $tab : 'overview';
         $data['page'] = 'Domain Settings';
         $data['tab']  = $tab;

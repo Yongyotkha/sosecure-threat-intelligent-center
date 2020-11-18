@@ -1578,6 +1578,17 @@ ul.role-group li ul.role-group-sub li{
       white-space: nowrap !important;
   }
 
+  .badge-success{
+    background-color: #179f83 !important;
+  }
+
+  .asset-list-tb{
+      list-style: none;
+      padding: 0;
+  }
+  .asset-list-tb li{
+      margin-bottom: 5px;
+  }
   @media screen and (min-width:576px){
     .modal-slide .modal-dialog.size-half-50 {
         width: 50% !important;

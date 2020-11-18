@@ -10,7 +10,7 @@
                     </a>
                      Site Setting > {{ $site -> get_site -> name }} | Scan Domain : {{ $site -> get_domain -> domain }}
                 </div>
-                @if($tab == 'datatype')
+                @if($tab == 'datatype' )
                     <div class="button-control pull-right">
                         <div class="btn-group">
                             <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset To Use</button>
@@ -86,7 +86,81 @@
                             </ul>
                         </div>
                     </div>
-                    @endif
+                @endif
+                @if($tab == 'asset' )
+                <div class="button-control pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-left">
+                            <li>
+                                <a href="#">
+                                    Internet Name
+                                </a>
+                            </li>   
+                            <li>
+                                <a href="#">
+                                    Affiliate - Internet Name
+                                </a>
+                            </li>   
+                            <li>
+                                <a href="#">
+                                    Affiliate - Domain Name
+                                </a>
+                            </li>   
+                            <li>
+                                <a href="#">
+                                    Domain Name
+                                </a>
+                            </li>  
+                            <li>
+                                <a href="#">
+                                    IP Address
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    IPv6 Address
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Malicious Internet Name
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Human Name
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Internet Name
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Email Address
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Domain Name (Parent)
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Phone Number
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                @endif
                 &nbsp;
 
             </header>
@@ -103,6 +177,11 @@
                         <li class="{{ ($tab == 'datatype') ? 'active' : '' }}">
                             <a href="{{ route('scans.index', ['tab' => 'datatype', 'site_code' => $site -> code]) }}">
                                 @icon('solid/folder-open') Data
+                            </a>
+                        </li>
+                        <li class="{{ ($tab == 'asset') ? 'active' : '' }}">
+                            <a href="{{ route('scans.index', ['tab' => 'asset', 'site_code' => $site -> code]) }}">
+                                @icon('solid/folder-open') Asset
                             </a>
                         </li>
                         {{-- <li class="{{ ($tab == 'settings') ? 'active' : '' }}">
