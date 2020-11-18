@@ -47,7 +47,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered" id="table-scans-data-assets">
                     <thead>
                         <tr>
                             <th>Asset</th>
@@ -56,7 +56,7 @@
                             <th style="width: 20px" class="text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    {{-- <tbody>
                         <tr>
                             <td>
                                 secureserver.net
@@ -103,7 +103,7 @@
                                 </button>
                             </td>
                         </tr>
-                    </tbody>
+                    </tbody> --}}
                 </table>
             </div>
         </div>
@@ -121,6 +121,43 @@
 @include('stacks.js.form')
 
 <script>
+    $(function () {
+        $('#table-scans-data-assets').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('scans.data_scans_assets') !!}',
+                data: function ( d ) {
+                    d.code = '{{ $site->code }}';
+                    return JSON.stringify( d );
+                }
+            },
+            columns: [
+                {
+                    data: 'assets',
+                    name: 'assets',
+                },
+                {
+                    data: 'referent',
+                    name: 'referent',
+                }, 
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },  
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },    
+            ],
+        });
+    });
     $(document).ready(function () {
         $('#datatype').select2();
         $('#source').select2();

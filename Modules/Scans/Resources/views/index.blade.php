@@ -227,8 +227,13 @@
             serverSide: true,
             destroy: true,
             ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
                 url: '{!! route('scans.data') !!}',
-                data: ""
+                data: function ( d ) {
+                    return JSON.stringify( d );
+                },
             },
             columns: [
                 {

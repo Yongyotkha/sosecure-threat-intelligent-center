@@ -64,9 +64,6 @@ class ScansController extends Controller
         if($tab == 'overview'){
             $DataScans = DataScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->orderBy('total', 'desc')->take(5)->get();
             $data['DataScans'] = $DataScans;
-        }else if($tab == 'datatype'){
-            $TransactionScans = TransactionScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->get();
-            $data['TransactionScans'] = $TransactionScans;
         }
 
         return view('scans::scans_domain')->with($data);
@@ -122,6 +119,16 @@ class ScansController extends Controller
                         $AssetsData -> data_type_id = $item['data_type'];
                         $AssetsData -> asset_id = $Assets -> id;
                         $AssetsData -> save();
+
+                        $TransactionScans = TransactionScans::where('site_id', $data['site_id'])
+                        ->where('domain_id', $data['domain_id'])
+                        ->where('raw_data', $item['raw_data'])
+                        ->where('data_type', $AssetsData->get_data_type->value)
+                        ->first();
+                        if($TransactionScans){
+                            $TransactionScans -> status_asset_use = 1;
+                            $TransactionScans -> save();
+                        }
                     }
                 }
             }
@@ -341,5 +348,78 @@ class ScansController extends Controller
             })
             ->rawColumns(['chk','name','domain','progress','action'])
             ->toJson();
+    }
+
+    public function tableDataScans(Request $request){
+        $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
+        $TransactionScans = TransactionScans::where('site_id', $SiteSettings -> site_id)->where('domain_id', $SiteSettings -> domain_id)->get();
+        return DataTables::of($TransactionScans)
+            ->editColumn('chk', function (TransactionScans $data) {
+                $res = '';
+                if($data -> status_asset_use == 1){
+                    $res .= '<label>
+                    <input type="checkbox" checked onclick="return false;"/>
+                        <span class="label-text"></span>
+                    </label>';
+                }else{
+                    $res .= '<label>
+                        <input name="select[]" value="'.$data -> raw_data.'" data-domain="'.$data -> domain_id.'" data-site="'.$data -> site_id.'" class="select-chk" type="checkbox" />
+                        <span class="label-text"></span>
+                    </label>';
+                }
+                return $res;
+            })
+            ->addColumn('use', function (TransactionScans $data) {
+                $res = '';
+                if($data -> status_asset_use == 1){
+                    $res .= '<span class="badge badge-success">นำไปใช่้งานแล้ว</span>';
+                }else if($data -> status == 0){
+                    $res .= '<span class="badge badge-danger">หาไม่เจอ</span>';
+                }else if($data -> status == 1){
+                    $res .= '<span class="badge badge-warning" style="background-color: #ffc107;">เจอค่า</span>';
+                }else if($data -> status == 2){
+                    $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">เพิ่มมาใหม่</span>';
+                }
+                return $res;
+            })
+            ->rawColumns(['chk','use'])
+            ->toJson();
+    }
+
+    public function tableDataScanAssets(Request $request){
+        $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
+        $Assets = Assets::where('site_id', $SiteSettings->site_id)->where('domain_id', $SiteSettings->domain_id)->get();
+        return DataTables::of($Assets)
+        ->addColumn('assets', function (Assets $data) {
+            return $data -> raw_data;
+        })
+        ->addColumn('referent', function (Assets $data) {
+            $res = '';
+            $res .= '<ul class="asset-list-tb">';
+                foreach($data->get_assets_data as $item){
+                    $res .= '<li>' . $item -> value . '</li>';
+                }
+            $res .= '</ul>';
+            return $res;
+        })
+        ->addColumn('status', function (Assets $data) {
+            $res = '';
+            if($data -> status == 1){
+                $res .= '<span class="badge badge-success">Active</span>';
+            }else{
+                $res .= '<span class="badge badge-danger">Inactive</span>';
+            }
+            return $res;
+        })
+        ->addColumn('action', function (Assets $data) {
+            return '<button type="submit" class="btn btn-sm btn-info m-xs">
+                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                </button>
+                <button type="submit" class="btn btn-sm btn-danger m-xs">
+                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
+                </button>';
+        })
+        ->rawColumns(['assets','referent','status','action'])
+        ->toJson();
     }
 }

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\Scans\Entities\AssetsData;
 
 class TransactionScans extends Model
 {

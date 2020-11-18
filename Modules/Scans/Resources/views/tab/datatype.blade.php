@@ -61,7 +61,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered" id="table-scans-data">
                     <thead>
                         <tr>
                             <th class="no-sort">
@@ -78,28 +78,6 @@
                             {{-- <th>Module</th> --}}
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($TransactionScans as $data)
-                        <tr>
-                            <td class="text-left">
-                                <label>
-                                    <input name="select[]" value="{{ $data -> raw_data }}" data-domain="{{ $data -> domain_id }}" data-site="{{ $data -> site_id }}" class="select-chk" type="checkbox" />
-                                    <span class="label-text"></span>
-                                </label>
-                            </td>
-                            <td class="text-left">{{ $data -> data_type }}</td>
-                            <td class="text-left">{{ $data -> raw_data }}</td>
-                            <td class="text-left">{{ $data -> referent }}</td>
-                            <td class="text-center">
-                                2020-10-01 11:12    
-                            </td>
-                            <td class="text-center">
-                                <span class="badge badge-success">นำไปใช่้งานแล้ว</span>
-                                {{-- <span class="badge badge-danger">เพิ่มมาใหม่</span>  --}}
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -117,6 +95,63 @@
 @include('stacks.js.form')
 
 <script>
+     $(function () {
+        $('#asset-to-use').prop("disabled", true);
+        $('#table-scans-data').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('scans.data_scans') !!}',
+                data: function ( d ) {
+                    d.code = '{{ $site->code }}';
+                    return JSON.stringify( d );
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },
+                {
+                    data: 'data_type',
+                    name: 'data_type'
+                },
+                {
+                    data: 'raw_data',
+                    name: 'raw_data'
+                },
+                {
+                    data: 'referent',
+                    name: 'referent',
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at',
+                    className: 'text-center'
+                },
+                {
+                    data: 'use',
+                    name: 'use',
+                },        
+            ],
+        });
+        $('#table-scans-data').on('click', '.select-chk', function () {
+            if ($(this).is(':checked')) {
+                $('#asset-to-use').prop("disabled", false);
+            } else {
+                if ($('.select-chk').filter(':checked').length < 1){
+                    $('#asset-to-use').attr('disabled',true);
+                }
+            }
+        });
+    });
     var number_rows = 0; 
     var number_add_rows = 0;
     var number_tbody_rows = 0;
@@ -368,18 +403,6 @@
         });
     });
 
-
-    $('#asset-to-use').prop("disabled", true);
-        $('.select-chk').click(function() {
-        if ($(this).is(':checked')) {
-            $('#asset-to-use').prop("disabled", false);
-        } else {
-            if ($('.select-chk').filter(':checked').length < 1){
-                $('#asset-to-use').attr('disabled',true);
-            }
-        }
-    });
-
     function save_assets(){
         loading('load');
         var values = $("input[name='assets[]']").map(function(){
@@ -405,6 +428,8 @@
             assets_data: res,
         }).then(function (response) {
             loading('stop_load');
+            $('#table-scans-data').DataTable().ajax.reload();
+            $('#asset-to-use').prop("disabled", true);
             $('#show_asets').html("");
             $('#asset_to_use').modal('hide');
         }).catch(function (error) {
@@ -441,6 +466,8 @@
             assets_data: res,
         }).then(function (response) {
             loading('stop_load');
+            $('#table-scans-data').DataTable().ajax.reload();
+            $('#asset-to-use').prop("disabled", true);
             $('#show_asets_manual').html("");
             $('#asset_to_use_manual').modal('hide');
         }).catch(function (error) {

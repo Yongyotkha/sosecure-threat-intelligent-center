@@ -318,7 +318,11 @@
 @include('partial.ajaxify')
 
 <script>
-
+$.ajaxSetup({
+  headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  }
+});
 $(document).ready(function(){
     $( ".comment-item table" ).addClass( "table table-striped" );
 

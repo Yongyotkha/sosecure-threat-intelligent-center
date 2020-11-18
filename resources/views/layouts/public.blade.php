@@ -202,6 +202,11 @@
     @include('stacks.js.markdown')
     @include('partial.ajaxify')
     <script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $(document).ready(function(){
         toastr.options.positionClass = '{{ config('toastr.options.positionClass') }}';
     });
