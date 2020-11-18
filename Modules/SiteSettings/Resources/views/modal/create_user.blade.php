@@ -20,6 +20,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label class="col-lg-4 control-label">Email <span class="text-danger">*</span> </label>
+                <div class="col-lg-8">
+                    <input type="email" class="form-control" name="email">
+                </div>
+            </div>
+            {{-- <div class="form-group row">
                 <label class="col-lg-4 control-label">Set Password <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
                     <input type="password" class="form-control" name="password">
@@ -30,14 +36,14 @@
                 <div class="col-lg-8">
                     <input type="password" class="form-control" name="password_re">
                 </div>
-            </div>
+            </div> --}}
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Role <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
                     <select name="role_id" id="role" class="select2-option form-control">
                         <option value="1">Admin</option>
                         <option value="2">User</option>
-                        <option value="3">Customer</option>
+                        {{-- <option value="3">Customer</option> --}}
                     </select>
                 </div>
             </div>
@@ -71,7 +77,7 @@
                 <i class="fas fa-paper-plane"></i>
                 Save
             </button> --}}
-            {!! renderAjaxButton() !!}
+            {!! renderAjaxButton("Create_User") !!}
         </div>
         {!! Form::close() !!}
     </div>

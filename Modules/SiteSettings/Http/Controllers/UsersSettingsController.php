@@ -10,10 +10,12 @@ use DataTables;
 use Modules\Users\Entities\User;
 use Modules\SiteSettings\Http\Requests\UserRequest;
 
+use Mail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Emails\SiteCreateUserMail;
 
 class UsersSettingsController extends Controller
 {
@@ -31,6 +33,7 @@ class UsersSettingsController extends Controller
      * @var \Illuminate\Http\Request
      */
     protected $request;
+    protected $summary;
 
     public function __construct(Request $request, SiteSettings $siteSettings, User $user)
     {
@@ -38,6 +41,7 @@ class UsersSettingsController extends Controller
         $this->request = $request;
         $this->siteSettings = $siteSettings;
         $this->user = $user;
+        $this->summary = [];
     }
     /**
      * Display a listing of the resource.
@@ -107,14 +111,31 @@ class UsersSettingsController extends Controller
         // $User = $this->domain;
         $User = new User;
         $User->code = generator_uuid();
-        $User->username = $request->username;
-        $User->email = $request->username;
+        $User->username = $request->email;
+        $User->email = $request->email;
         $User->name = $request->name;
-        $User->password = $request->password;
+        $User->site_role_id = $request->role_id;
         // $User->created_by = @Auth::user()->id;
         $User->active = $request->active ? 1 : 0;
         $User->site_id = $SiteSettings->id;
         $User->save();
+
+
+            $this->summary = [
+                // 'payment_received'   => formatCurrency(get_option('default_currency'), $this->paidToday()),
+                // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
+                // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
+                // 'hours_worked'       => $this->workedToday(),
+                // 'deals_won'          => Deal::whereDate('won_time', today()->toDateTimeString())->count(),
+                // 'leads_converted'    => Lead::whereDate('converted_at', today()->toDateTimeString())->count(),
+                // 'expenses_total'     => formatCurrency(get_option('default_currency'), $this->expensesToday()),
+                // 'closed_tickets'     => Ticket::whereDate('closed_at', today()->toDateTimeString())->count(),
+                // 'completed_tasks'    => Task::completed()->whereDate('updated_at', today()->toDateTimeString())->count(),
+            ];
+            // \Mail::to(User::role('admin')->get())->send(new DailyDigestMail($this->summary));
+            \Mail::to('master_msn@msn.com')->send(new SiteCreateUserMail($this->summary));
+        
+        // Xrun::dispatch()->onQueue('low')->delay(now()->addMinutes(10));
 
         // foreach($request->category AS $cate) {
         //     $SiteCategory = new SiteCategory;
