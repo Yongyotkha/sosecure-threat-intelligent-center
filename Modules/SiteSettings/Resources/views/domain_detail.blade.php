@@ -40,9 +40,15 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('vulsetting.vul_settings', ['id' => $siteSettings->code])}}">
+                            <a href="{{route('vulsetting.vul_assets', ['id' => $siteSettings->code])}}">
                                 @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                Vulnerability Setting
+                                Vulnerabillty Assets
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{route('vulsetting.vul_logs', ['id' => $siteSettings->code])}}">
+                                @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                Vulnerability Logs
                             </a>
                         </li>
                     </ul>

@@ -128,7 +128,14 @@
                             </a>
                         </li>
 
-                        <li class="nav-w-children {{ $page === langapp('vulnerabilitys') ? 'active' : '' }}">
+                        <li class="{{ $page === langapp('monitoring_vulnerabilitys') ? 'active' : '' }}">
+                            <a href="{{ route('monitoringvulnerabilitys.index') }}">
+                                <i class="fas fa-lock icon"><b class="bg-info"></b></i>
+                                <span> @langapp('vulnerabilitys') </span>
+                            </a>
+                        </li>
+
+                        {{-- <li class="nav-w-children {{ $page === langapp('vulnerabilitys') ? 'active' : '' }}">
                             <a href="{{ site_url('/vulnerability') }}" class="{{ $page === langapp('vulnerability') ? 'active' : '' }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
@@ -148,14 +155,14 @@
                                         <span> @langapp('assets_setting_vulnerability') </span>
                                     </a>
                                 </li>
-                                {{-- <li class="{{ $page === langapp('vulnerability_settings') ? 'active' : '' }}">
+                                <li class="{{ $page === langapp('vulnerability_settings') ? 'active' : '' }}">
                                     <a href="{{ route('vulnerability_settings.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('settings') </span>
                                     </a>
-                                </li> --}}
+                                </li>
                             </ul>
-                        </li>
+                        </li> --}}
 
                         <li class="nav-w-children {{ $page === langapp('compromised') ? 'active' : '' }}">
                             <a href="{{ site_url('/compromised') }}" class="{{ $page === langapp('compromised') ? 'active' : '' }}">
@@ -254,7 +261,12 @@
                                         <span>@langapp('scans')</span>
                                     </a>
                                 </li>
-                               
+                                <li class="{{ $page === langapp('assets') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/assets') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span>@langapp('assets')</span>
+                                    </a>
+                                </li>
                                 <li class="{{ $page === langapp('rss_feed') ? 'active' : '' }}">
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
