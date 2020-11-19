@@ -94,7 +94,7 @@ class RegisterSiteController extends ApiController
             $site->installed = 1;
             $site->save();
             
-            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'code' => $site->code, 'key' => $site->public_key]);
         }
     } 
 }

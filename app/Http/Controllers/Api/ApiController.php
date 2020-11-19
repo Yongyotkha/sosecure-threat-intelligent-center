@@ -33,6 +33,26 @@ class ApiController extends Controller
         }
     }
 
+    protected function AuthorizationLogin($header, $mode, $code){
+        if($mode == 'site_offline'){
+            $site = SiteSettings::where('code', $code)->first();
+            if(empty($site)){
+                return ['error' => 'The request parameters are invalid', 'status_code' => '400'];
+            }else{
+                return ['error' => '', 'status_code' => '200', 'data' => $site];
+            }
+        }else{
+            $site = SiteSettings::where('code', $code)->first();
+            if(empty($site)){
+                return ['error' => 'The request parameters are invalid', 'status_code' => '400'];
+            }else{
+                $site['ip_key'] = '192.168.0.1';
+                $site['mac_address_key'] = '000:000:000:000';
+                return ['error' => '', 'status_code' => '200', 'data' => $site];
+            }
+        }
+    }
+
     protected function Authorization($header, $mode, $code){
         if($mode == 'site_offline'){
             $user = User::where('access_token', $header)->first();
