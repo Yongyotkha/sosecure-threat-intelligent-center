@@ -38,7 +38,7 @@ class SiteCreateUserMail extends Mailable
             $mail = $this->subject('Notification Register | Threat Intelligent Center')
             // ->from('sales@dsure.net', 'Dsure')//glorysociety@gmail.com
             // ->view('backEnd.template_email.send_massage_data_mailto_org_ins');
-            ->markdown('emails.create_site_user');
+            ->markdown('emails.template_email_create_site_user');
 
             // if (File::exists(public_path($part_file).'/Application_Form_Insurance.xlsx')) {
             //     $mail->attach(public_path($part_file).'/Application_Form_Insurance.xlsx');

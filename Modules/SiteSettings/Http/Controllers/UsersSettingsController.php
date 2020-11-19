@@ -124,6 +124,7 @@ class UsersSettingsController extends Controller
 
             $this->summary = [
                 'site_add_user_token'   => $User->site_add_user_token,
+                'User'   => $User,
                 // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
                 // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
                 // 'hours_worked'       => $this->workedToday(),
