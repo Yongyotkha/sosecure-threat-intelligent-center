@@ -71,6 +71,7 @@ Route::group(
         Route::get('/vulnerability_logs/{id}', 'VulnerabilityController@index')->name('vulsetting.vul_logs')->middleware('can:menu_items');
 
         Route::get('/vulnerability_assets/{id}', 'VulnerabilityController@vulassets')->name('vulsetting.vul_assets')->middleware('can:menu_items');
+        Route::get('/vulnerability_assets/cve_assets/data', 'VulnerabilityController@tableData')->name('cve_assets.data')->middleware('can:menu_items');
     }
 );
 
