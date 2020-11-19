@@ -356,7 +356,7 @@
                 {
                     data: 'confirm',
                     name: 'confirm',
-                    className:'w-25',
+                    className:'w-25 text-center',
                 },
                 {
                     data: 'role',

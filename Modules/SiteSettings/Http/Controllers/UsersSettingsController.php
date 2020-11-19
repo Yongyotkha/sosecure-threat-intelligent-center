@@ -350,7 +350,13 @@ class UsersSettingsController extends Controller
             ->editColumn(
                 'confirm',
                 function ($user) {
-                    $html = '';
+                    $html = "";
+                    if($user->verify == 1) {
+                        // $html = '<i class="fas fa-check"></i>';
+                        $html = '<i class="fas fa-check"></i>';
+                    } else {
+                        $html = '<i class="fas fa-times"></i>';
+                    }
                     return $html;
                 }
             )
@@ -391,6 +397,7 @@ class UsersSettingsController extends Controller
                 'lastupdate',
                 function ($user) {
                     $html = '';
+                    $html .= $user->updated_at;
                     return $html;
                 }
             )
@@ -419,7 +426,7 @@ class UsersSettingsController extends Controller
                     return $html;
                 }
             )
-            ->rawColumns(['no', 'chk', 'name', 'email', 'role', 'status', 'action'])
+            ->rawColumns(['no', 'chk', 'name', 'email', 'confirm', 'role', 'status', 'lastupdate', 'action'])
             ->make(true);
     }
 
