@@ -118,11 +118,12 @@ class UsersSettingsController extends Controller
         // $User->created_by = @Auth::user()->id;
         $User->active = $request->active ? 1 : 0;
         $User->site_id = $SiteSettings->id;
+        $User->site_add_user_token = generator_uuid();
         $User->save();
 
 
             $this->summary = [
-                // 'payment_received'   => formatCurrency(get_option('default_currency'), $this->paidToday()),
+                'site_add_user_token'   => $User->site_add_user_token,
                 // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
                 // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
                 // 'hours_worked'       => $this->workedToday(),
@@ -133,7 +134,8 @@ class UsersSettingsController extends Controller
                 // 'completed_tasks'    => Task::completed()->whereDate('updated_at', today()->toDateTimeString())->count(),
             ];
             // \Mail::to(User::role('admin')->get())->send(new DailyDigestMail($this->summary));
-            \Mail::to('master_msn@msn.com')->send(new SiteCreateUserMail($this->summary));
+            \Mail::to($User->email)->send(new SiteCreateUserMail($this->summary));
+            // Mail::to($MAIL_TO_sent)->cc($MAIL_RECEIVE_ORDER_TO_ORG_cc_arr)->send(new Send_data_mailto_org_ins($OrderProductCar,$NO_ID,$LISNO,$vw_sys_product_cars,$OrderProductCarInsure,$sys_file,'sent_mailto_org_controller'));
         
         // Xrun::dispatch()->onQueue('low')->delay(now()->addMinutes(10));
 

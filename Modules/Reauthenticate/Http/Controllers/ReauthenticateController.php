@@ -2,6 +2,11 @@
 
 namespace Modules\Reauthenticate\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Auth;
+use Modules\Users\Entities\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -15,6 +20,12 @@ class ReauthenticateController extends Controller
     public function index()
     {
         return view('reauthenticate::index');
+    }
+
+    public function verify_site_user($token)
+    {
+        $User = User::where('site_add_user_token',$token)->first();
+        return view('reauthenticate::index',compact('User'));
     }
 
     /**

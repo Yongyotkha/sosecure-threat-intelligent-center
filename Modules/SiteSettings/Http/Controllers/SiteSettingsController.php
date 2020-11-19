@@ -141,8 +141,8 @@ class SiteSettingsController extends Controller
         $user->email_verified_at = Carbon::now();
         $user->name = 'Admin Support';
         $user->password = 'support';
-        $user->calendar_token = generator_uuid();
-        $user->access_token = generator_uuid();
+        // $user->calendar_token = generator_uuid();
+        // $user->access_token = generator_uuid();
         $user->site_id = $SiteSettings->id;
         $user->site_role_id = 99;
         $user->password_time_expire = Carbon::now();

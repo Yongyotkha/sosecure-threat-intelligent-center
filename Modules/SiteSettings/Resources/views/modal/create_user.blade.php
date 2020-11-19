@@ -14,7 +14,7 @@
                 </div>
             </div> --}}
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
+                <label class="col-lg-4 control-label">Name <!--<span class="text-danger">*</span>--> </label>
                 <div class="col-lg-8">
                     <input type="text" class="form-control" name="name">
                 </div>
