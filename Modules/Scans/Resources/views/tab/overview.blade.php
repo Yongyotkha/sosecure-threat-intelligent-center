@@ -13,8 +13,13 @@
                 <table class="table">
                     @foreach($DataScans as $data)
                     <tr>
-                        <td>
-                            <div class="progress--circle progress--{{ round($data -> total) }}"></div>
+                        <td class="d-flex align-items-center justify-content-center">
+                            <div class="progress-circle {{ round($data -> total > 50) ? 'over50' : '' }}  p{{ round($data -> total) }}">
+                                <div class="left-half-clipper">
+                                   <div class="first50-bar"></div>
+                                   <div class="value-bar"></div>
+                                </div>
+                             </div>
                         </td>
                         <td><a href="">{{ $data -> data_type }}</a></td>
                         <td>{{ $data -> total }}</td>
