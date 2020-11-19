@@ -24,11 +24,11 @@
                 </div>
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                     <label><b>@langapp('password')</b><span class="text-danger">*</span></label>
-                    <input id="password" type="password" class="form-control" min="6" name="password" required>
+                    <input id="password" type="password" class="form-control" minlength="6" name="password" required>
                 </div>
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                     <label><b>Password confirm</b><span class="text-danger">*</span></label>
-                    <input id="password_confirm" type="password" class="form-control" min="6" name="password_confirm" required>
+                    <input id="password_confirm" type="password" class="form-control" minlength="6" name="password_confirm" required>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success btn-block"> @icon('solid/unlock-alt') @langapp('confirm')</button>
