@@ -26,8 +26,8 @@ class VerifyUserRequest extends FormRequest
         //     'logo' => 'sometimes|mimes:jpeg,jpg,png|max:1000',
         // ];
         return [
-            'password'         => 'required',
-            'password_confirm' => 'required|same:password'  
+            'password'         => 'required|min:6',
+            'password_confirm' => 'required|same:password|min:6'  
         ];
     }
 
