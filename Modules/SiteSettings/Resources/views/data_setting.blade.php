@@ -46,17 +46,23 @@
                                     Domain
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{route('vulsetting.vul_assets', ['id' => $siteSettings->code])}}">
+                            <li class="main-link">
+                                <a href="#">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    Vulnerabillty Assets
+                                    Vulnerability
                                 </a>
-                            </li>
-                            <li>
-                                <a href="{{route('vulsetting.vul_logs', ['id' => $siteSettings->code])}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    Vulnerability Logs
-                                </a>
+                                <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+                                    <li style="padding-left:2rem">
+                                        <a href="{{route('vulsetting.vul_assets', ['id' => $siteSettings->code])}}">
+                                            Assets
+                                        </a>
+                                    </li>
+                                    <li style="padding-left:2rem">
+                                        <a href="{{route('vulsetting.vul_logs', ['id' => $siteSettings->code])}}">
+                                            Logs
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </section>
@@ -256,6 +262,7 @@
 @push('pagescript')
 @include('stacks.js.form')
 @include('stacks.js.touchspin')
+@include('stacks.js.menusub')
 
 <script>
     $(document).ready(function () {
