@@ -988,4 +988,6 @@ return [
     'confirm'                                    => 'Confirmed',
     'lastupdate'                                 => 'Last update',
     'keywords'                                   => 'Keywords',
+    'function_command'                           => 'Function Command',
+    'cpe_setting'                                => 'CPE Setting',
 ];

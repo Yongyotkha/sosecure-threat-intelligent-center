@@ -276,15 +276,34 @@
                                 <li class="{{ $page === langapp('keywords') ? 'active' : '' }}">
                                     <a href="{{ site_url('/keywords') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span> @langapp('keywords') </span>
+                                        <span> @langapp('keywords') Setting</span>
                                     </a>
                                 </li>
+
+                                <li class="{{ $page === langapp('cpe_setting') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/cpe_setting') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('cpe_setting') </span>
+                                    </a>
+                                </li>
+
+                                <li class="{{ $page === langapp('function_command') ? 'active' : '' }}">
+                                    <a href="{{ site_url('/functioncommandsetting') }}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span> @langapp('function_command') </span>
+                                    </a>
+                                </li>
+                                
                                 <li class="{{ $page === langapp('api_indicators') ? 'active' : '' }}">
                                     <a href="{{ site_url('/apiindicators') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('api_indicators') </span>
                                     </a>
                                 </li>
+
+
+
+
                                 <li class="{{ $page === langapp('vm_client_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/vmclientsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>

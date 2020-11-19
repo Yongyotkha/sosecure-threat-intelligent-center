@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/cpesetting",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\CpeSetting\\Providers\\CpeSettingServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CpeSetting\\": ""
+        }
+    }
+}

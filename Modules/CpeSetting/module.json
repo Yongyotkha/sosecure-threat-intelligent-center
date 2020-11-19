@@ -1,0 +1,14 @@
+{
+    "name": "CpeSetting",
+    "alias": "cpesetting",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\CpeSetting\\Providers\\CpeSettingServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

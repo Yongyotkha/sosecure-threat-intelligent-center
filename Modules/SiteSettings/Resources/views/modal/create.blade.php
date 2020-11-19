@@ -11,8 +11,7 @@
                 <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <div class="">
-                        <input type="text" class="form-control" name="name" value="">
-                        
+                        <input type="text" class="form-control" name="name" value="">       
                     </div>
                 </div>
             </div>
