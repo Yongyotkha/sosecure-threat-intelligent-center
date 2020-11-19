@@ -183,7 +183,8 @@
                 url: '{!! route('scans.data') !!}',
                 data: {
                     "site_code":'{{ Request::segment(3) }}'
-                }
+                },
+                type: "POST",
             },
             order: [
                 [0, "desc"]
@@ -305,7 +306,7 @@
             toastr.success(response.data.message, '@langapp('response_status')');
             window.location.href = response.data.redirect;
         }).catch(function (error) {
-            var errors = error.errors;
+            var errors = error.response.data.errors;
             var errorsHtml = "";
             $.each(errors, function (key, value) {
                 errorsHtml += "<li>" + value[0] + "</li>";
