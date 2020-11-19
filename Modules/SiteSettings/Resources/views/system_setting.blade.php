@@ -47,6 +47,33 @@
                                     Domain
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="#">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Assets
+                                </a>
+                            </li>
+                            <li class="main-link">
+                                <a href="#">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    Data Leak
+                                </a>
+                                <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+                                    <li style="padding-left:2rem">
+                                        <a href="#">
+                                            Keyboard Setting
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                                    News
+                                </a>
+                            </li>
+
                             <li class="main-link">
                                 <a href="#">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
