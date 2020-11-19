@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\SiteSettings\Http\Requests\DomainRequest;
+use App\TransactionTimeStampScans;
 
 use Modules\SiteSettings\Jobs\BulkDeleteDomainSettings;
 

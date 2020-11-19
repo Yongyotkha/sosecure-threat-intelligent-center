@@ -101,11 +101,15 @@
                                                                 <span class="label-text"></span>
                                                             </label>
                                                         </th>
-                                                        <th class="">No.</th>
-                                                        <th>@langapp('name')</th>
+                                                        {{-- <th class="">No.</th> --}}
+                                                        {{-- <th>Site Name</th> --}}
                                                         <th>Domain</th>
-                                                        <th>@langapp('status')</th>
-                                                        <th class="no-sort">@langapp('action')</th>
+                                                        <th>Started</th>
+                                                        <th>Finished</th>
+                                                        <th>Elements</th>
+                                                        <th>Progress</th>
+                                                        {{-- <th>@langapp('status')</th> --}}
+                                                        <th class="no-sort" width="10%">@langapp('action')</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -169,8 +173,10 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{!! route('domainsettings.data') !!}',
-                data: ""
+                url: '{!! route('scans.data') !!}',
+                data: {
+                    "site_code":'{{ Request::segment(3) }}'
+                }
             },
             order: [
                 [0, "desc"]
@@ -181,37 +187,38 @@
                     orderable: false,
                     searchable: false,
                     sortable: false,
-                    className: "w-10",
-                },
-                {
-                    data: 'no',
-                    className: "w-15",
-                    render: function (data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    },
-                },
-                {
-                    data: 'name',
-                    name: 'name',
-                    className:'w-100',
+                    className: 'w-10'
                 },
                 {
                     data: 'domain',
-                    name: 'domain',
-                    className:'w-100',
+                    name: 'domain'
                 },
                 {
-                    data: 'status',
-                    name: 'status',
-                    className:'w-25',
+                    data: 'created_at',
+                    name: 'created_at',
+                    className: 'text-center'
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at',
+                    className: 'text-center'
+                },
+                {
+                    data: 'elements',
+                    name: 'elements',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'progress',
+                    name: 'progress',
+                    className: 'w-10'
                 },
                 {
                     data: 'action',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                    className:'w-80',
-                }
+                    name: 'action',
+                    className: 'no-wrap'
+                },
+                
             ]
         });
 
