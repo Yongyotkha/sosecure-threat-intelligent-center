@@ -13,18 +13,22 @@
             <header class="panel-heading text-center"><strong>Setting Password</strong> </header>
                 
 
-            <form class="panel-body wrapper-lg" method="POST" action="">
+            {{-- <form class="panel-body wrapper-lg" method="POST" action=""> --}}
+            {!! Form::open(['route' => ['reauth.verify_update_pass', 'id' => $User->code], 'class' => 'panel-body wrapper-lg ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => false]) !!}
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label>Username</label><br>
+                    <label><b>Welcome Site: </b>{{$User->get_SiteSettings->name}}</label>
+                </div>
+                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                    <label><b>Username</b></label><br>
                     <label>{{$User->email}}</label>
                 </div>
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label>@langapp('password')<span class="text-danger">*</span></label>
-                    <input id="password" type="password" class="form-control" name="password" required>
+                    <label><b>@langapp('password')</b><span class="text-danger">*</span></label>
+                    <input id="password" type="password" class="form-control" min="6" name="password" required>
                 </div>
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label>Password again<span class="text-danger">*</span></label>
-                    <input id="re_password" type="re_password" class="form-control" name="re_password" required>
+                    <label><b>Password confirm</b><span class="text-danger">*</span></label>
+                    <input id="password_confirm" type="password" class="form-control" min="6" name="password_confirm" required>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success btn-block"> @icon('solid/unlock-alt') @langapp('confirm')</button>
@@ -33,7 +37,8 @@
                         <strong>Tip:</strong> You are entering sudo mode. You will not be asked for your Email for a few hours.</p>
                 </div>
                 <div class="line line-dashed"> </div>
-            </form>
+            {!! Form::close() !!}
+            {{-- </form> --}}
                 @if (!settingEnabled('hide_branding')) 
                     <footer id="footer" class="copyright-footer">
                         <div class="text-center text-muted padder">

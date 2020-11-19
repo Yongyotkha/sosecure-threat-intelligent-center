@@ -42,6 +42,7 @@ use Modules\Todos\Entities\Todo;
 use Modules\Users\Entities\CannedResponse;
 use Modules\Users\Entities\Profile;
 use Modules\Users\Entities\QuickAccess;
+use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Users\Observers\UserObserver;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -62,7 +63,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected $fillable = [
         'username', 'email', 'email_verified_at', 'name', 'banned', 'ban_reason', 'last_ip', 'last_login', 'slack_webhook_url',
         'calendar_token', 'access_token', 'email_preferences', 'locale', 'unsubscribed_at', 'remember_token', 'google2fa_secret',
-        'google2fa_enable', 'password', 'on_holiday', 'active', 'site_id', 'site_role_id'
+        'google2fa_enable', 'password', 'on_holiday', 'active', 'site_id', 'site_role_id', 'password_time_expire', 'verify', 'first_login', 'last_change_pass', 'site_add_user_token'
     ];
 
     /**
@@ -510,6 +511,10 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         if (!empty($value)) {
             return decrypt($value);
         }
+    }
+
+    public function get_SiteSettings(){
+        return $this->belongsTo(SiteSettings::class, 'site_id', 'id');
     }
 
     // public function getJWTIdentifier()

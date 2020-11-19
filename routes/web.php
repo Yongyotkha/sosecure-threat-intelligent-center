@@ -11,7 +11,7 @@
 |
  */
 
-Route::get('/', 'Welcome@index')->middleware(['auth']);
+Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
 
 Route::get('/test', 'Welcome@test');
 
