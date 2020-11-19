@@ -16,7 +16,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     //, 'middleware' => 'auth:api'
     // Route::post('register', 'Auth\RegisterController@register');
     // Route::post('login', 'Auth\LoginController@login');
-    Route::post('login', 'Auth\LoginController@login_api');
+    Route::post('login', 'Api\AuthController@login');
     Route::post('register_site', 'Api\RegisterSiteController@register_site');
     Route::post('site_request_version', 'Api\RegisterSiteController@site_request_version');
     Route::post('save_deploy_history', 'Api\RegisterSiteController@save_deploy_history');
