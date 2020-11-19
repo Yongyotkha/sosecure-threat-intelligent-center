@@ -141,6 +141,7 @@ class SiteSettingsController extends Controller
         $user->email_verified_at = Carbon::now();
         $user->name = 'Admin Support';
         $user->password = 'support';
+        $user->verify = 1;
         // $user->calendar_token = generator_uuid();
         // $user->access_token = generator_uuid();
         $user->site_id = $SiteSettings->id;
@@ -375,6 +376,18 @@ class SiteSettingsController extends Controller
                 }
                 return rtrim($return, ", ");
             })
+            ->editColumn('assets_use', function ($siteSettings) {
+                $return = '';
+                return $return;
+            })
+            ->editColumn('start_date', function ($siteSettings) {
+                $return = '';
+                return $return;
+            })
+            ->editColumn('exp_date', function ($siteSettings) {
+                $return = '';
+                return $return;
+            })
             ->editColumn('status', function ($siteSettings) {
                 if($siteSettings->active == '1') {
                     $checked_val = 'checked';
@@ -398,7 +411,7 @@ class SiteSettingsController extends Controller
                         </a>";
                 return $html;
             })
-            ->rawColumns(['no', 'chk', 'logo', 'name', 'categorys', 'status', 'action'])
+            ->rawColumns(['no', 'chk', 'logo', 'name', 'categorys', 'assets_use', 'start_date', 'exp_date', 'status', 'action'])
             ->make(true);
     }
 
