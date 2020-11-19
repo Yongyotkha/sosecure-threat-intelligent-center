@@ -8,6 +8,12 @@
                      Setting > Assets
                 </div>
 
+                <div class="pull-right">
+                    <select name="" id="select-site" class="select2-option form-control" style="min-width: 100px">
+                        <option value="allsite">All Site</option>
+                    </select>
+                </div>
+
                 <div class="button-control pull-right">
                     <div class="btn-group">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
@@ -251,7 +257,6 @@
     </div>
 
 </section>
-@endsection
 
 @push('pagestyle')
 @include('stacks.css.datatables')
@@ -266,8 +271,7 @@
     $(document).ready(function () {
         $('#datatype').select2();
         $('#source').select2();
-
-        $('.select2').select2();
+        $('#select-site').select2();
 
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
@@ -282,6 +286,6 @@
         });
     });
 </script>
-
-
 @endpush
+
+@endsection
