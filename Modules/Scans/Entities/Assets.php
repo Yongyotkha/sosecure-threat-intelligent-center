@@ -12,4 +12,8 @@ class Assets extends Model
     public function get_assets_data(){
         return $this->hasMany(AssetsData::class, 'asset_id', 'id');
     }
+
+    public function find_id($uuid){
+        return $this->select('id')->where('code', $uuid)->first();
+    }
 }
