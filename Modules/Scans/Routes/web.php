@@ -23,5 +23,7 @@ Route::group(
         Route::get('/get_data_type', 'ScansController@get_data_type');
         Route::post('data_scans', 'ScansController@tableDataScans')->name('scans.data_scans')->middleware('can:menu_items');
         Route::post('data_scans_assets', 'ScansController@tableDataScanAssets')->name('scans.data_scans_assets')->middleware('can:menu_items');
+        Route::get('scans_assets_delete/{id}/{code}', 'ScansController@scans_assets_delete')->name('scans_assets.delete');
+        Route::delete('f_scans_assets_delete/{id}/{code}', 'ScansController@f_scans_assets_delete')->name('f_scans_assets.delete');
     }
 );
