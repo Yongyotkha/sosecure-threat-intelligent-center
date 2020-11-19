@@ -10,13 +10,21 @@
         </span>
 
         <section class="panel panel-default bg-white m-t-lg b-r-cust">
-            <header class="panel-heading text-center"><strong>Setting Email or Password</strong> </header>
+            <header class="panel-heading text-center"><strong>Setting Password</strong> </header>
                 
 
             <form class="panel-body wrapper-lg" method="POST" action="">
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label>@langapp('password')</label>
+                    <label>Username</label><br>
+                    <label>{{$User->email}}</label>
+                </div>
+                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                    <label>@langapp('password')<span class="text-danger">*</span></label>
                     <input id="password" type="password" class="form-control" name="password" required>
+                </div>
+                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                    <label>Password again<span class="text-danger">*</span></label>
+                    <input id="re_password" type="re_password" class="form-control" name="re_password" required>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success btn-block"> @icon('solid/unlock-alt') @langapp('confirm')</button>
