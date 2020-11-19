@@ -314,12 +314,14 @@ class ScansController extends Controller
 
     public function tableData()
     {
+        $site_id = '';
         $site_code = $this->request->site_code;
         // $site_code = 'a7b6ff37-30ec-4494-9527-93b0ccc51d56';
         $site_id_find = SiteSettings::where("code",$site_code)->first();
         if($site_code) {
             $site_id = $site_id_find->id;
         }
+        
 
         // $site_code = $this->request->site_code;
         // $site_id = $this->request->site_id;
