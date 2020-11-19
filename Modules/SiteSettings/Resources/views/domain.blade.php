@@ -207,7 +207,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{!! route('scans.data') !!}',
+                url: '{!! route('domainsettings.data') !!}',
                 data: {
                     "site_code":'{{ Request::segment(3) }}'
                 },
