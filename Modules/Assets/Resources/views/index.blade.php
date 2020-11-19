@@ -106,24 +106,16 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="" class="">Datatype Type</label>
-                                <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                                    <option value="1">All</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Referent</label>
                                 <input type="text" class="form-control" name="keyword" placeholder="">
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group m-b-md">
-                                <label for="" class="d-block">&nbsp;</label>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group m-b-md pull-right">
                                 <button class="btn btn-info">
                                     <i class="fas fa-search"></i>
                                     <span> Search </span>
@@ -145,6 +137,12 @@
                     <table class="table table-striped table-bordered" id="table-assets-template">
                         <thead>
                             <tr>
+                                <th class="no-sort">
+                                    <label>
+                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </th>
                                 <th>Site Name</th>
                                 <th>Asset</th>
                                 <th>Referent</th>
@@ -269,7 +267,6 @@
 
 <script>
     $(document).ready(function () {
-        $('#datatype').select2();
         $('#source').select2();
         $('#select-site').select2();
 
