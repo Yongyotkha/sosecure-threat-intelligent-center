@@ -237,20 +237,25 @@ class SiteSettingsController extends Controller
                 $SiteCategory->save();
             }
             Tags_site::where('site_id', $SiteSettings -> id)->delete();
-            foreach($request->tag AS $tag) {
-                $Tags = Tags::where('id', $tag)->first();
-                if($Tags) {
-
-                } else {
-                    $Tags = new Tags;
-                    $Tags->name = $tag;
-                    $Tags->save();
+            if($request->tag) {
+                if(count($request->tag) > 0) {
+                    foreach($request->tag AS $tag) {
+                        $Tags = Tags::where('id', $tag)->first();
+                        if($Tags) {
+        
+                        } else {
+                            $Tags = new Tags;
+                            $Tags->name = $tag;
+                            $Tags->save();
+                        }
+                        $Tags_site = new Tags_site;
+                        $Tags_site->site_id = $SiteSettings->id;
+                        $Tags_site->tag_id = $Tags->id;
+                        $Tags_site->save();
+                    }
                 }
-                $Tags_site = new Tags_site;
-                $Tags_site->site_id = $SiteSettings->id;
-                $Tags_site->tag_id = $Tags->id;
-                $Tags_site->save();
             }
+
 
             // Tags_site::where('site_id', $SiteSettings -> id)->delete();
             // foreach($request->tag AS $tag) {
