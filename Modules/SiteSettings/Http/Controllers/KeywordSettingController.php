@@ -1,19 +1,21 @@
 <?php
 
-namespace Modules\CpeSetting\Http\Controllers;
+namespace Modules\SiteSettings\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\SiteSettings\Entities\SiteSettings;
 
-class CpeSettingController extends Controller
+class KeywordSettingController extends Controller
 {
-   /**
+    /**
      * Item Model
      *
      * @var \Modules\Items\Entities\Item
      */
     protected $item;
+    protected $siteSettings;
     /**
      * Request instance
      *
@@ -21,19 +23,22 @@ class CpeSettingController extends Controller
      */
     protected $request;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, SiteSettings $siteSettings)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
+        $this->siteSettings = $siteSettings;
     }
     /**
      * Display a listing of the resource.
      * @return Response
      */
-    public function index()
+    public function index($id)
     {
-        $data['page'] = langapp('cpesetting');
-        return view('cpesetting::index')->with($data);
+       $get_data = $this->siteSettings->get_data($id);
+       $data['siteSettings'] = $get_data;
+       $data['page'] = 'Vulnerability Logs';
+       return view('sitesettings::keyword_setting')->with($data);
     }
 
     /**
@@ -42,7 +47,7 @@ class CpeSettingController extends Controller
      */
     public function create()
     {
-        return view('cpesetting::create');
+        return view('sitesettings::create');
     }
 
     /**
@@ -62,7 +67,7 @@ class CpeSettingController extends Controller
      */
     public function show($id)
     {
-        return view('cpesetting::show');
+        return view('sitesettings::show');
     }
 
     /**
@@ -72,7 +77,7 @@ class CpeSettingController extends Controller
      */
     public function edit($id)
     {
-        return view('cpesetting::edit');
+        return view('sitesettings::edit');
     }
 
     /**

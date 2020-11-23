@@ -50,7 +50,7 @@
                                     Assets
                                 </a>
                             </li>
-                            <li class="main-link">
+                            <li class="main-link active">
                                 <a href="#">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Data Leak
@@ -70,7 +70,7 @@
                                 </a>
                             </li>
 
-                            <li class="active main-link">
+                            <li class="main-link">
                                 <a href="#">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Vulnerability
@@ -98,7 +98,7 @@
             <section class="vbox">
     
                 <header class="header panel-heading bg-white b-b b-light">
-                    <div class="bc-head">Settings > @langapp('vulnerability') Assets </div>
+                    <div class="bc-head">Settings > Keyword </div>
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a>
@@ -108,11 +108,6 @@
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create_assets_vulnerability">
                         @icon('solid/plus') @langapp('create')
                     </a>
-                    <div class="pull-right" style="margin-top: 9px;">
-                        <select name="" id="" class="select2-option form-control select-site" style="min-width: 100px">
-                            <option value="1">All Site</option>
-                        </select>
-                    </div>
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default">
@@ -120,23 +115,16 @@
                             <table  class="table table-striped" id="table_cve_assets">
                                 <thead>
                                     <tr>
-                                        <th class="hide"></th>
-                                        <th class="no-sort">
+                                        <th class="no-sort w-10">
                                             <label>
                                                 <input name="select_all" value="1" id="select-all" type="checkbox" />
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th>@langapp('vendor')</th>
-                                        <th>@langapp('title')</th>
-                                        <th>@langapp('version')</th>
-                                        <th>@langapp('edition')</th>
-                                        <th>@langapp('site')</th>
-                                        <th>@langapp('ip')</th>
-                                        <th>@langapp('hosting')</th>
+                                        <th>@langapp('keyword')</th>
+                                        <th>Last @langapp('update')</th>
                                         <th>@langapp('status')</th>
-                                        <th>@langapp('update')</th>
-                                        <th class="no-sort" width="10%">@langapp('action')</th>
+                                        <th class="no-sort">@langapp('action')</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -164,55 +152,23 @@
                 <form action="">
                 <div class="modal-body">
                     <div class="form-group row">
-                        <label for="" class="col-md-3">Vendor <span class="text-danger">*</span></label>
-                        <div class="col-md-9">
-                            <select id="vendor_select2" type="text" class="select2-option form-control">
-                                <option value="1">- Select Vendor -</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="" class="col-md-3">Title <span class="text-danger">*</span></label>
-                        <div class="col-md-9">
-                            <select id="title_select2" type="text" class="select2-option form-control">
-                                <option value="1">- Select Title -</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="" class="col-md-3">Version</label>
-                        <div class="col-md-9">
-                            <select id="version_select2" type="text" class="select2-option form-control">
-                                <option value="1">- Select Version -</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="" class="col-md-3">Edtion</label>
-                        <div class="col-md-9">
-                            <select id="edition_select2" type="text" class="select2-option form-control">
-                                <option value="1">- Select Edtion -</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
                         <label for="" class="col-md-3">Site</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" placeholder="Site">
                         </div>
                     </div>
+
                     <div class="form-group row">
-                        <label for="" class="col-md-3">IP</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" placeholder="IP">
+                        <label class="col-lg-3 control-label">Status</label>
+                        <div class="col-lg-9">
+                            <label class="switch">
+                                <input type="hidden" value="FALSE" name="">
+                                <input type="checkbox" name="" value="TRUE">
+                                <span></span>
+                            </label>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label for="" class="col-md-3">Hostname</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" placeholder="Hostname">
-                        </div>
-                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
@@ -244,95 +200,9 @@
 <script>
 $(function() {
         var table = $('#table_cve_assets').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{!! route('cve_assets.data') !!}',
-                data: {
-                    "site_code":'{{ Request::segment(3) }}'
-                }
-            },
-            order: [
-                [0, "desc"]
-            ],
-            columns: [
-                {
-                    name: 'id',
-                    data: 'no'
-                },
-                {
-                    data: 'chk',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                    className: 'w-10'
-                },
-                {
-                    data: 'vendor',
-                    name: 'vendor'
-                },
-                {
-                    data: 'title',
-                    name: 'title',
-                    className: 'text-center'
-                },
-                {
-                    data: 'version',
-                    name: 'version',
-                    className: 'text-center'
-                },
-                {
-                    data: 'edition',
-                    name: 'edition',
-                    className: 'w-10 text-center'
-                },
-                {
-                    data: 'Site',
-                    name: 'Site',
-                    className: 'w-10'
-                },
-                {
-                    data: 'IP',
-                    name: 'IP',
-                    className: 'w-10'
-                },
-                {
-                    data: 'Hostname',
-                    name: 'Hostname',
-                    className: 'w-10'
-                },
-                {
-                    data: 'active',
-                    name: 'active',
-                    className: 'w-10'
-                },
-                {
-                    data: 'updated_at',
-                    name: 'updated_at',
-                    className: 'w-10'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    className: 'no-wrap'
-                },
-                
-            ]
         });
 });
 
-$('#vendor_select2').select2({
-    placeholder:'--Select Vendor--',
-});
-$('#title_select2').select2({
-    placeholder:'--Select Title--',
-});
-$('#version_select2').select2({
-    placeholder:'--Select Version--',
-});
-$('#edition_select2').select2({
-    placeholder:'--Select Edition--',
-});
 </script>
 @endpush
 @endsection

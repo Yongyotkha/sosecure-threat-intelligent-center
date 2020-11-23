@@ -34,6 +34,7 @@
                                 <th>Name</th>
                                 <th>Command</th>
                                 <th>OS</th>
+                                <th>Last Update</th>
                                 <th style="width: 20px" class="text-center">Status</th>
                                 <th style="width: 20px" class="text-center no-wrap">Action</th>
                             </tr>
@@ -55,8 +56,15 @@
                                 <td>
                                     Linux
                                 </td>
+                                <td>
+                                    2020-11-12 12:15
+                                </td>
                                 <td class="text-center">
-                                    <span class="badge badge-success">Active</span>
+                                    <label class="switch">
+                                        <input type="hidden" value="FALSE" name="">
+                                        <input type="checkbox" name="" value="TRUE">
+                                        <span></span>
+                                    </label>
                                 </td>
                                 <td class="no-wrap">
                                     <button type="submit" class="btn btn-sm btn-secondary m-xs">
@@ -87,10 +95,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Function Command</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Function Command </h4>
                 </div>
                 <form action="">
                 <div class="modal-body">
@@ -191,6 +196,7 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
+@include('stacks.js.fullscreen')
 
 <script>
         $(document).ready(function () {

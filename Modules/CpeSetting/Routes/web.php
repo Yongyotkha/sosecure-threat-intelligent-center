@@ -11,6 +11,9 @@
 |
 */
 
-Route::prefix('cpesetting')->group(function() {
-    Route::get('/', 'CpeSettingController@index');
-});
+Route::group(
+    ['middleware' => 'web', 'prefix' => 'cpesetting'],
+    function () {
+        Route::get('/', 'CpeSettingController@index')->name('cpesetting.index')->middleware('can:menu_items');
+    }
+);

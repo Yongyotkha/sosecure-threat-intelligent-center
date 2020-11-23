@@ -281,7 +281,7 @@
                                 </li>
 
                                 <li class="{{ $page === langapp('cpe_setting') ? 'active' : '' }}">
-                                    <a href="{{ site_url('/cpe_setting') }}">
+                                    <a href="{{ site_url('/cpesetting') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('cpe_setting') </span>
                                     </a>
