@@ -339,7 +339,7 @@ class ScansController extends Controller
         }
 
 
-        $model = TransactionTimeStampScans::query();
+        // $model = TransactionTimeStampScans::query();
         return DataTables::eloquent($model)
             ->editColumn('chk', function (TransactionTimeStampScans $model) {
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';

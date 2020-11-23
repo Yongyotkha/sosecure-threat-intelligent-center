@@ -2,6 +2,7 @@
 
 namespace Modules\SiteSettings\Entities;
 
+use App\TransactionTimeStampScans;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 // use Modules\SiteSettings\Entities\SiteCategory;
@@ -34,7 +35,7 @@ class Domain extends Model {
         return $data->first();
     }
 
-    // public function get_categorys(){
-    //     return $this->hasMany(SiteCategory::class, 'site_id', 'id');
-    // }
+    public function get_transaction_time_stamp_scans(){
+        return $this->hasOne(TransactionTimeStampScans::class, 'domain_id', 'id');
+    }
 }
