@@ -141,7 +141,6 @@
                                     <input type="text" class="form-control" name="" value="" placeholder="Password">    
                                 </div>
                             </div>
-                         
                         </div>
                     </div>
 
