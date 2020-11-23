@@ -25,6 +25,7 @@ class DomainSettingsController extends Controller
     protected $item;
     protected $siteSettings;
     protected $domain;
+    protected $TransactionTimeStampScans;
     /**
      * Request instance
      *
@@ -32,12 +33,13 @@ class DomainSettingsController extends Controller
      */
     protected $request;
 
-    public function __construct(Request $request, SiteSettings $siteSettings, Domain $domain)
+    public function __construct(Request $request, SiteSettings $siteSettings, Domain $domain, TransactionTimeStampScans $TransactionTimeStampScans)
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
         $this->siteSettings = $siteSettings;
         $this->domain = $domain;
+        $this->TransactionTimeStampScans = $TransactionTimeStampScans;
     }
     /**
      * Display a listing of the resource.
@@ -128,7 +130,17 @@ class DomainSettingsController extends Controller
         //     $this->uploadLogo($request, $Domain);
         // }
 
-   
+        if($request->formsubmit == 'formSavingAndRun'){
+            $TransactionTimeStampScans = $this->TransactionTimeStampScans;
+            $TransactionTimeStampScans->code = generator_uuid(); 
+            $TransactionTimeStampScans->created_by = @Auth::user()->id;
+            $TransactionTimeStampScans->site_id = $SiteSettings->id;
+            $TransactionTimeStampScans->domain_id = $Domain->id;
+            $TransactionTimeStampScans->status = 1;
+            $TransactionTimeStampScans->progress = 0;
+            $TransactionTimeStampScans->save();
+        }
+
         return ajaxResponse(
             [
                 'id'       => $Domain->id,
@@ -350,9 +362,7 @@ class DomainSettingsController extends Controller
                 return $html;
             })
             ->addColumn('progress', function ($domain) {
-                $html = '';
-                $html .= @$domain->get_transaction_time_stamp_scans->progress;
-                // $html = get_name_scan_status($domain -> progress , 'badg');
+                $html = get_name_scan_status(@$domain->get_transaction_time_stamp_scans->progress , 'badg');
                 return $html;
             })
             // ->editColumn(
@@ -379,11 +389,18 @@ class DomainSettingsController extends Controller
                 $html = '';
                 $html .= "<div style='display: flex;'><a href='". route('scans.index', ['tab' => 'overview', 'site_code' => @$domain->get_transaction_time_stamp_scans->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs'>
                                 <i class='far fa-eye'></i>
-                            </a>
-                            <a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                                <i class='fas fa-redo'></i>
-                            </a>
-                            <a href='". route('domainsettings.edit', ['id' => $domain->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                            </a>";
+                            if(@$domain -> get_transaction_time_stamp_scans -> progress !== 3){
+                                $html .= "<a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
+                                    <i class='fas fa-redo'></i>
+                                </a>";
+                            }else{
+                                $html .= "<a href='". route('domainsettings.redo', ['id' => $domain->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                                    <i class='fas fa-redo'></i>
+                                </a>";
+                            }
+                           
+                            $html .= "<a href='". route('domainsettings.edit', ['id' => $domain->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                             <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
                             </a>
                             <a href='". route('domainsettings.delete', ['id' => $domain->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
@@ -403,10 +420,33 @@ class DomainSettingsController extends Controller
         return view('sitesettings::modal.update_domain')->with($data);
     }
 
+    public function redo($id)
+    {
+        $data['domain'] = $this->domain->get_data($id);
+        return view('sitesettings::modal.redo_domain_transaction')->with($data);
+    }
+
     public function delete(Domain $id)//del_domain
     {
         $data['domain'] = $id;
         return view('sitesettings::modal.delete_domain')->with($data);
+    }
+
+    public function redo_process($id){
+        $get_data = $this->domain->get_data($id);
+        $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $get_data->site_id)->where('domain_id', $get_data->id)->first();
+        $TransactionTimeStampScans -> progress = 0;
+        $TransactionTimeStampScans -> save();
+
+        $site_code = $this->siteSettings->find_code($get_data->site_id);
+        return ajaxResponse(
+            [
+                'message'  => "Successfully",
+                'redirect' => route('domain.index',['id' => $site_code->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
     
 }

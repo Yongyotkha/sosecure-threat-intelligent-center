@@ -225,13 +225,13 @@
         {{-- @include('partial.privacy_consent') --}}
         
         <div class="modal-footer">
-            {!! Form::close() !!}
+            {{-- {!! Form::close() !!} --}}
             {{-- <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                 <i class="fas fa-times"></i>
                 Close
             </button> --}}
             {!! closeModalButton() !!}
-            <button type="button" class="btn btn-success btn-rounded">
+            <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
                 <i class="fas fa-play"></i>
                 Run Scan And Save Now
             </button>

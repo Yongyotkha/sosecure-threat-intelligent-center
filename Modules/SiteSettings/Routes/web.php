@@ -46,6 +46,7 @@ Route::group(
         Route::get('/domain-setting/detail/{tab?}', 'DomainSettingsController@domain_detail')->name('domain_detail.index');
         Route::get('/domain-setting/domain/create/{code}', 'DomainSettingsController@create')->name('domain.create')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
         Route::post('/domain-setting/domain/save/{code}', 'DomainSettingsController@save')->name('domain.save')->middleware('can:categorysettings_create');//->middleware('can:categorysettings_create')
+        Route::get('/domain-setting/domain/redo/{id}', 'DomainSettingsController@redo')->name('domainsettings.redo')->middleware('can:categorysettings_update');
         Route::post('/domain-setting/domain/change_status', 'DomainSettingsController@change_status')->name('domainsettings.change_status')->middleware(['can:categorysettings_update']);
         Route::post('/domain-setting/domain/bulk-delete', 'DomainSettingsController@bulkDelete')->name('domainsettings.bulk.delete')->middleware(['can:categorysettings_delete']);//->middleware(['can:categorysettings_delete', 'demo']);
         Route::post('/domain-setting/domain/data', 'DomainSettingsController@tableData')->name('domainsettings.data')->middleware('can:menu_items');
@@ -54,6 +55,7 @@ Route::group(
         Route::get('/domain-setting/domain/delete/{id}', 'DomainSettingsController@delete')->name('domainsettings.delete')->middleware('can:categorysettings_delete');
         Route::put('/domain-setting/domain/update/{id}', 'DomainSettingsController@update')->name('domainsettings.update')->middleware('can:sitesettings_update');
         Route::delete('/domain-setting/domain/delete_process/{id}', 'DomainSettingsController@delete_process')->name('domainsettings.delete_process')->middleware('can:categorysettings_delete');
+        Route::put('/domain-setting/domain/redo_process/{id}', 'DomainSettingsController@redo_process')->name('domainsettings.redo_process')->middleware('can:sitesettings_update');
 
         Route::get('/user-setting/user/create/{code}', 'UsersSettingsController@create')->name('user.create')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
         Route::post('/user-setting/user/save/{code}', 'UsersSettingsController@save')->name('user.save')->middleware('can:categorysettings_create');//->middleware('can:categorysettings_create')
@@ -77,5 +79,3 @@ Route::group(
 );
 
 Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_details')->name('vulsetting.detail')->middleware('can:menu_items');
-
-

@@ -1,20 +1,26 @@
 <script>
+    var form_save = '.formSaving';
+    $('.formSavingAndRun').click(function() {
+        form_save = '.formSavingAndRun';
+    });
     $('.ajaxifyForm').submit(function (event) {
-        $(".formSaving").html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+        $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
         event.preventDefault();
 
         var data = new FormData(this);
-
+        if(form_save == '.formSavingAndRun'){
+            data.append('formsubmit', 'formSavingAndRun');
+        }
         axios.post($(this).attr("action"), data)
             .then(function (response) {
                     toastr.success(response.data.message, '@langapp('response_status') ');
-                    $(".formSaving").html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                    $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
                     window.location.href = response.data.redirect;
           })
           .catch(function (error) {
             if(error.response.data.exception){
                 toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
-                $(".formSaving").html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
             }else{
                 var errors = error.response.data.errors;
                 var errorsHtml= '';
@@ -22,7 +28,7 @@
                     errorsHtml += '<li>' + value[0] + '</li>'; 
                 });
                 toastr.error( errorsHtml , '@langapp('response_status') ');
-                $(".formSaving").html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
             }
             
             

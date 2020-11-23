@@ -359,11 +359,17 @@ class ScansController extends Controller
                 $html = '';
                 $html .= "<div style='display: flex;'><a href='". route('scans.index', ['tab' => 'overview', 'site_code' => $model -> code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs'>
                                 <i class='far fa-eye'></i>
-                            </a>
-                            <a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                                <i class='fas fa-redo'></i>
-                            </a>
-                            <a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                            </a>";
+                            if(@$model -> progress !== 3){
+                                $html .= "<a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
+                                    <i class='fas fa-redo'></i>
+                                </a>";
+                            }else{
+                                $html .= "<a href='". route('get.scans.redo_process', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                                    <i class='fas fa-redo'></i>
+                                </a>";
+                            }
+                            $html .= "<a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                             <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
                             </a>
                             <a href='' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
@@ -397,13 +403,13 @@ class ScansController extends Controller
             ->addColumn('use', function (TransactionScans $data) {
                 $res = '';
                 if($data -> status_asset_use == 1){
-                    $res .= '<span class="badge badge-success">นำไปใช่้งานแล้ว</span>';
+                    $res .= '<span class="badge badge-success">Uesd</span>';
                 }else if($data -> status == 0){
-                    $res .= '<span class="badge badge-danger">หาไม่เจอ</span>';
+                    $res .= '<span class="badge badge-danger">Not Found</span>';
                 }else if($data -> status == 1){
-                    $res .= '<span class="badge badge-warning" style="background-color: #ffc107;">เจอค่า</span>';
+                    $res .= '<span class="badge badge-warning" style="background-color: #ffc107;">Found</span>';
                 }else if($data -> status == 2){
-                    $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">เพิ่มมาใหม่</span>';
+                    $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">New</span>';
                 }
                 return $res;
             })
@@ -475,6 +481,28 @@ class ScansController extends Controller
             [
                 'message'  => langapp('deleted_successfully'),
                 'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function scans_redo($code){
+        $TransactionTimeStampScans = TransactionTimeStampScans::where('code', $code)->first();
+        $data['domain'] = $TransactionTimeStampScans;
+        return view('scans::modal.redo_domain_transaction')->with($data);
+    }
+
+    
+    public function redo_process($code){
+        $TransactionTimeStampScans = TransactionTimeStampScans::where('code', $code)->first();
+        $TransactionTimeStampScans -> progress = 0;
+        $TransactionTimeStampScans -> save();
+
+        return ajaxResponse(
+            [
+                'message'  => "Successfully",
+                'redirect' => '/scans',
             ],
             true,
             Response::HTTP_OK

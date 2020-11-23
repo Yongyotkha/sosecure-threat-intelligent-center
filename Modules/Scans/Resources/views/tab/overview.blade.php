@@ -61,10 +61,18 @@
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         Logs
                     </button>
-                    <button type="submit" class="btn btn-success btn-rounded  {{ round($data -> total > 0) ? '' : 'disabled' }}">
-                        <i class="fas fa-play"></i>
-                        Run Scan Now
-                    </button>
+                    @if(@$site -> progress !== 3)
+                        <button type="button" class="btn btn-success btn-rounded" disabled>
+                            <i class="fas fa-play"></i>
+                            Run Scan Now
+                        </button>
+                    @else
+                        <a href='{{ route("get.scans.redo_process", ["id" => $site->code]) }}' class='btn btn-success btn-rounded' data-toggle='ajaxModal'>
+                            <i class="fas fa-play"></i>
+                            Run Scan Now
+                        </a>
+                    @endif
+                   
                 </div>
             </div>
         </div>
