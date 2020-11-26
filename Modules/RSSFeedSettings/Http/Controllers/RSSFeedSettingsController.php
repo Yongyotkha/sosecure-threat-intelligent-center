@@ -71,17 +71,6 @@ class RSSFeedSettingsController extends Controller
             ->editColumn('chk', function (TransactionRssData $model) {
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
-            ->addColumn('status', function (RSSData $model) {
-                if($model->status == '1') {
-                    $checked_val = 'checked';
-                } else {
-                    $checked_val = '';
-                }
-                $html = '';
-                $html .= '<label class="switch">
-                            <input type="checkbox" id="rss-active-'.$model->code.'" onchange="change_rss_active(\''.$model->code.'\')" '.$checked_val.' value="1">
-                            <span></span>
-                        </label>';
             ->addColumn('link', function (TransactionRssData $model) {
                 $html = '';
                 $html .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' data-toggle='ajaxModal'>
@@ -118,7 +107,7 @@ class RSSFeedSettingsController extends Controller
         $search = $request->searchTerm;
         $get_tags_query = "SELECT * FROM fx_tags ";
         if(!empty($search)){
-            $get_tags_query = $get_tags_query . "AND name LIKE %"."'".$search."'"."%";
+            $get_tags_query = $get_tags_query . "WHERE name LIKE '%$search%'";
         }
         $get_tags = DB::select($get_tags_query);
         $get_tags = collect($get_tags);

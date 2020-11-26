@@ -140,8 +140,8 @@
                     name: 'link'
                 },
                 {
-                    data: 'transcation_date',
-                    name: 'transcation_date',
+                    data: 'pubDate',
+                    name: 'pubDate',
                     className: 'text-center'
                 },
                 {
