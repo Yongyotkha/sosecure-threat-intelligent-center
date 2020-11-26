@@ -65,7 +65,6 @@
                             <table class="table table-striped" id="table-rss-data">
                                 <thead>
                                     <tr>
-                                        <th class="hide"></th>
                                         <th class="no-sort">
                                             <label>
                                                 <input name="select_all" value="1" id="select-all" type="checkbox" />
@@ -113,7 +112,50 @@
     $(function () {
         $('#table-rss-data').DataTable({
             processing: true,
-            order: [[0, "desc"]],
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('rssfeedsettings.rss_data_table') !!}',
+                data: function ( d ) {
+                    return JSON.stringify( d );
+                },
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },
+                {
+                    data: 'title',
+                    name: 'title'
+                },
+                {
+                    data: 'url',
+                    name: 'url'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },
+                
+            ]
         });
     });
 </script>
