@@ -3,6 +3,9 @@
     $('.formSavingAndRun').click(function() {
         form_save = '.formSavingAndRun';
     });
+    $('.formPreview').click(function() {
+        form_save = '.formPreview';
+    });
     $('.ajaxifyForm').submit(function (event) {
         $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
         event.preventDefault();
@@ -10,6 +13,8 @@
         var data = new FormData(this);
         if(form_save == '.formSavingAndRun'){
             data.append('formsubmit', 'formSavingAndRun');
+        }else if(form_save == '.formPreview'){
+            data.append('formsubmit', 'formPreview');
         }
         axios.post($(this).attr("action"), data)
             .then(function (response) {
