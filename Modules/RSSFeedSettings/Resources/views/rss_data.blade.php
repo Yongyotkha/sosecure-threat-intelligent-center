@@ -136,12 +136,12 @@
                     name: 'title'
                 },
                 {
-                    data: 'url',
-                    name: 'url'
+                    data: 'link',
+                    name: 'link'
                 },
                 {
-                    data: 'created_at',
-                    name: 'created_at',
+                    data: 'transcation_date',
+                    name: 'transcation_date',
                     className: 'text-center'
                 },
                 {
