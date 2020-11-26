@@ -87,12 +87,12 @@
                                         </th>
                                         <th>@langapp('name')</th>
                                         <th>URL</th>
-                                        <th>@langapp('keyword')</th>
+                                        {{-- <th>@langapp('keyword')</th>
                                         <th>Interval (Day)</th>
                                         <th>Start Date Feed</th>
                                         <th>Last Date Feed</th>
                                         <th>Data Feed</th>
-                                        <th>Data Error</th>
+                                        <th>Data Error</th> --}}
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -121,12 +121,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="">
+                {!! Form::open(['route' => ['rssfeedsettings.save'], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => false]) !!}
+                {{-- <form action=""> --}}
                     <div class="modal-body">
                         <div class="form-group row">
                             <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
                             <div class="col-lg-9">
-                                <input type="text" class="form-control">
+                                <input type="text" id="name_rss" name="name_rss" class="form-control">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -135,21 +136,19 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="col-lg-9">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="input-group"><input type="text" class="form-control"  name="generate_key" value="" readonly="">
-                                            <span  class="input-group-btn">
+                                
+                                        <input type="url" class="form-control" id="url_rss" name="url_rss" value="" >
+                                            {{-- <span  class="input-group-btn">
                                                 <button type="submit" class="btn btn-info">Copy</button>
-                                            </span>
-                                            <span><i class="far fa-check-circle fa-2x text-success"></i></span>
-                                        </div>
-                                    </div>
-                                </div>
+                                            </span> --}}
+                                            {{-- <span><i class="far fa-check-circle fa-2x text-success"></i></span> --}}
+                                        
+                                    
                             </div>
                         </div>
 
 
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label class="col-lg-3 control-label">Keywords </label>
                             <div class="col-lg-9">
                                 <select name="" id="keywords" class="select2-option form-control" multiple="multiple">
@@ -167,9 +166,9 @@
                                     <option value="2">b</option>
                                 </select>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label class="col-lg-3 control-label">Start</label>
                             <div class="col-lg-9">
                                 <div class="row">
@@ -207,14 +206,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="form-group row">
                             <label class="col-lg-3 control-label">Status </label>
                             <div class="col-lg-6">
                                 <label class="switch">
-                                    <input type="hidden" value="FALSE" name="">
-                                    <input type="checkbox" name="" value="TRUE">
+                                    {{-- <input type="hidden" value="FALSE" name=""> --}}
+                                    <input type="checkbox" name="status_rss" value="TRUE">
                                     <span></span>
                                 </label>
                             </div>
@@ -231,7 +230,8 @@
                             Save
                         </button>
                     </div>
-                </form>
+                    {!! Form::close() !!}
+                {{-- </form> --}}
             </div>
         </div>
     </div>
@@ -279,11 +279,62 @@
 
 
     $(function () {
-        $('#table-rss-setting-template').DataTable({
+        
+
+
+        var table = $('#table-rss-setting-template').DataTable({
             processing: true,
-            order: [[0, "desc"]],
+            serverSide: true,
+            ajax: {
+                url: '{!! route('rssfeedsettings.rss_data_table') !!}',
+                "type": "POST",
+                data: ''
+            },
+            order: [[ 0, "desc" ]],
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false, className: 'w-10' },
+                { data: 'name', name: 'name' },
+                { data: 'url', name: 'url' },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-25'
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-50'
+                }
+            ]
         });
+
+
+
     });
+
+
+    function change_rss_active(code) {
+        let checkState = $("#rss-active-" + code).is(":checked") ? 1 : 0;
+        axios.post('{{route('rssfeedsettings.change_status')}}', {
+            active: checkState,
+            code: code,
+        }).then(function (response) {
+            toastr.success(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        }).catch(function (error) {
+            var errors = error.errors;
+            var errorsHtml = "";
+            $.each(errors, function (key, value) {
+                errorsHtml += "<li>" + value[0] + "</li>";
+            });
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
+
+
 </script>
 @endpush
 @endsection
