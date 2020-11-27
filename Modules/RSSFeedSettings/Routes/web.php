@@ -18,6 +18,7 @@ Route::group(
 
         Route::get('/rss_data', 'RSSFeedSettingsController@rss_data')->name('rssfeedsettings.rss_data')->middleware('can:menu_items');
         Route::post('rss_data_table', 'RSSFeedSettingsController@tableRssData')->name('rssfeedsettings.rss_data_table')->middleware('can:menu_items');
+        Route::post('rss_setting_table', 'RSSFeedSettingsController@tableRssSetting')->name('rssfeedsettings.rss_setting_table')->middleware('can:menu_items');
         
         Route::post('rssfeedsettings/change_status', 'RSSFeedSettingsController@change_status')->name('rssfeedsettings.change_status')->middleware('can:menu_items');
         Route::get('delete-rssfeedsettings/{id}', 'RSSFeedSettingsController@delete')->name('rssfeedsettings.delete')->middleware('can:menu_items');

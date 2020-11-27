@@ -286,7 +286,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{!! route('rssfeedsettings.rss_data_table') !!}',
+                url: '{!! route('rssfeedsettings.rss_setting_table') !!}',
                 "type": "POST",
                 data: ''
             },
