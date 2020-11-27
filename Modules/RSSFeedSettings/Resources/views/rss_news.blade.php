@@ -133,21 +133,21 @@
                             <table  class="table table-striped" id="table-rss-news-template">
                                 <thead>
                                     <tr>
-                                        <th class="hide"></th>
                                         <th class="no-sort">
                                             <label>
                                                 <input name="select_all" value="1" id="select-all" type="checkbox" />
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
+                                        <th>Site Name</th>
+                                        <th>Source name</th>
                                         <th>Title</th>
-                                        <th>Categorys</th>
-                                        <th>Site</th>
-                                        <th>Update</th>
-                                        <th>Status</th>
+                                        <th>Topic</th>
+                                        <th>Data Satatus</th>
+                                        <th>Public Date</th>
                                         <th>View Count</th>
-                                        <th>Hightlight</th>
                                         <th>Link</th>
+                                        <th>Status</th>
                                         <th>Action</th>
                                         <th class="no-sort"></th>
                                     </tr>
@@ -322,12 +322,8 @@ $(function() {
                 contentType: "application/json",
                 dataType: 'JSON',
                 type: "POST",
-                url: '{!! route('rssfeedsettings.rss_data_table') !!}',
+                url: '{!! route('rssfeedsettings.rss_news_table') !!}',
                 data: function ( d ) {
-                    d.keywords = keywords;
-                    d.public_date = public_date;
-                    d.status = status;
-                    d.source = source;
                     return JSON.stringify( d );
                 },
             },
@@ -340,17 +336,36 @@ $(function() {
                     className: 'w-10'
                 },
                 {
+                    data: 'site_name',
+                    name: 'site_name'
+                },
+                {
+                    data: 'source',
+                    name: 'source'
+                },
+                {
                     data: 'title',
-                    name: 'title'
+                    name: 'title',
+                },
+                {
+                    data: 'topic',
+                    name: 'topic',
+                },
+                {
+                    data: 'data_status',
+                    name: 'data_status',
+                },
+                {
+                    data: 'public_date',
+                    name: 'public_date',
+                },
+                {
+                    data: 'view',
+                    name: 'view',
                 },
                 {
                     data: 'link',
-                    name: 'link'
-                },
-                {
-                    data: 'pubDate',
-                    name: 'pubDate',
-                    className: 'text-center'
+                    name: 'link',
                 },
                 {
                     data: 'status',
@@ -362,7 +377,6 @@ $(function() {
                     name: 'action',
                     className: 'no-wrap'
                 },
-                
             ]
         });
     }
