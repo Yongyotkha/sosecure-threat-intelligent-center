@@ -24,26 +24,25 @@
             </a>
         </div>
 
-        {{-- <ul class="nav navbar-nav hidden-xs" id="todolist">
+        <ul class="nav navbar-nav hidden-xs" id="todolist">
             <li class="">
-                
-                <div class="m-t m-l-lg">
-                    <a href="{{ route('calendar.todos') }}" class="" data-rel="tooltip" title="@langapp('tasks') " data-placement="bottom">
+                <div style="margin-top:8px;margin-left:0px;">
+                    {{-- <a href="{{ route('calendar.todos') }}" class="" data-rel="tooltip" title="@langapp('tasks') " data-placement="bottom">
                         @icon('solid/tasks')
                         <span class="badge badge-sm up bg-danger m-l-n-sm display-inline">{{ \Auth::user()->todoToday() }}</span>
                     </a>
                     <a href="{{ route('calendar.index') }}" class="m-l" data-rel="tooltip" title="@langapp('calendar')" data-placement="bottom">
                         @icon('solid/calendar-alt')
                     </a>
-
                     <a href="{{ route('calendar.appointments') }}" class="m-l" data-rel="tooltip" title="@langapp('appointments') " data-placement="bottom">
                         @icon('solid/calendar-check')
-                    </a> 
-                    
+                    </a>  --}}
+                    <a class="btn btn-link" id="collapse-menu">
+                        @icon('solid/bars')
+                    </a>
                 </div>
-                
             </li>
-        </ul> --}}
+        </ul>
         <ul class="nav navbar-nav hidden-xs navbar-center">
             @admin
             <li class="dropdown hidden-xs">

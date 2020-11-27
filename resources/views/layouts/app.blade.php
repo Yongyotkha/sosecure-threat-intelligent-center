@@ -352,6 +352,10 @@ $(document).ready(function(){
             toastr.error('Error clearing notifications', '@langapp('response_status') ');
         });
     }); 
+
+    $('#collapse-menu').click(function(){
+        $('#nav').toggle();
+    });
 });
 
 </script>

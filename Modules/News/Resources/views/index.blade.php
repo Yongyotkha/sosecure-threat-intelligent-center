@@ -44,27 +44,27 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 text-center">
-                                <div style="margin-top: 8px;">
-                                    <label class="mr-3">
-                                        <input type="checkbox" name="" value="TRUE">
-                                        <span class="label-text" style="font-weight: bold">Related News</span>
-                                    </label>
-    
-                                    <label class="mr-3">
-                                        <input type="checkbox" name="" value="TRUE">
-                                        <span class="label-text" style="font-weight: bold">Thai</span>
-                                    </label>
-    
-                                    <label class="mr-3">
-                                        <input type="checkbox" name="" value="TRUE">
-                                        <span class="label-text" style="font-weight: bold">English</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 text-center">
                                 <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;
                                     <span></span> <i class="fa fa-caret-down"></i>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <div style="margin-top: 8px;">
+                                    <label class="mr-3">
+                                        <input type="checkbox" name="" value="TRUE">
+                                        <span class="label-text" style="font-size: 16px;">Related News</span>
+                                    </label>
+    
+                                    <label class="mr-3">
+                                        <input type="checkbox" name="" value="TRUE">
+                                        <span class="label-text" style="font-size: 16px;">Thai</span>
+                                    </label>
+    
+                                    <label class="mr-3">
+                                        <input type="checkbox" name="" value="TRUE">
+                                        <span class="label-text" style="font-size: 16px;">English</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -197,10 +197,13 @@
                                                 </label>
                                             </div>
                                             <div class="content-news-text">
-                                                <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                <a href="{{route('news.news_detail')}}">
+                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                </a>
                                                 <div class="entry-meta">
                                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
                                                     <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
+                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
                                                 </div>
                                             </div>
                                             <div class="content-news-image">
@@ -220,7 +223,11 @@
                                                 </label>
                                             </div>
                                             <div class="content-news-text">
-                                                <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                <a href="{{route('news.news_detail')}}">
+                                                    <a href="{{route('news.news_detail')}}">
+                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                </a>
+                                                </a>
                                                 <div class="entry-meta">
                                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
                                                     <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
@@ -229,7 +236,7 @@
                                             </div>
                                             <div class="content-news-image">
                                                 <a href="{{route('news.news_detail')}}">
-                                                    <img src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
+                                                    <img src="https://images.unsplash.com/photo-1602524207251-8ad5d2b2c303?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80" alt="">
                                                 </a>
                                             </div>
                                             <div class="action-bookmark">
@@ -244,10 +251,13 @@
                                                 </label>
                                             </div>
                                             <div class="content-news-text">
-                                                <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                <a href="{{route('news.news_detail')}}">
+                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                </a>
                                                 <div class="entry-meta">
                                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
                                                     <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
+                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
                                                 </div>
                                             </div>
                                             <div class="content-news-image">
@@ -267,10 +277,13 @@
                                                 </label>
                                             </div>
                                             <div class="content-news-text">
-                                                <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                <a href="{{route('news.news_detail')}}">
+                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                </a>
                                                 <div class="entry-meta">
                                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
                                                     <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
+                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
                                                 </div>
                                             </div>
                                             <div class="content-news-image">
@@ -424,10 +437,13 @@
                                                 </label>
                                             </div>
                                             <div class="content-news-text">
-                                                <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                <a href="{{route('news.news_detail')}}">
+                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
+                                                </a>
                                                 <div class="entry-meta">
                                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
                                                     <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
+                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
                                                 </div>
                                             </div>
                                             <div class="content-news-image">

@@ -1857,44 +1857,56 @@ ul.topics-news-list li a:hover{
     display: flex;
     position: relative;
     justify-content: space-between;
-    padding: 1rem;
+    padding: 1rem 1rem 0;
     border-bottom: 1px solid #d6d6d6;
 }
-/* .list-news:not(:last-child){
+/*.list-news:not(:last-child){
     border-bottom: 1px solid #d6d6d6;
 } */
 .checkbox-news-input{
-    font-size: 25px;
-    font-weight: bold
+    font-size: 20px;
 }
 .checkbox-news-select{
     width: 30px;
 }
 .content-news-text{
     flex: 1;
+    overflow: hidden;
 }
 .content-news-text span.head-news-text{
-    font-size: 24px !important;
+    font-size: 15.5px !important;
     font-weight: 500;
     color: #333;
-    line-height: 1.4;
-    margin-bottom: 15px !important;
+    line-height: 1.5;
+    margin-bottom: 10px !important;
     display: block;
 }
 .content-news-text .entry-meta{
     font-size: 14px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    overflow: hidden;
 }
 .content-news-image {
     flex: 0;
-    padding: 2rem 10rem;
+    padding: 0rem 3rem;
 }
 .content-news-image a{
     width: 60px;
     height: 60px;
     position: relative;
     display: inline-block;
-
 }
+
+.text-elipse-overflow{
+    white-space: nowrap; 
+    max-width: 100%; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    width: 100%;
+}
+
 .content-news-image a img{
     position: absolute;
     top: 0;
