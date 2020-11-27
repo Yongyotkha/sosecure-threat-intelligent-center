@@ -18,17 +18,23 @@ Route::group(
 
         Route::get('/rss_data', 'RSSFeedSettingsController@rss_data')->name('rssfeedsettings.rss_data')->middleware('can:menu_items');
         Route::post('rss_data_table', 'RSSFeedSettingsController@tableRssData')->name('rssfeedsettings.rss_data_table')->middleware('can:menu_items');
+
         Route::post('rss_setting_table', 'RSSFeedSettingsController@tableRssSetting')->name('rssfeedsettings.rss_setting_table')->middleware('can:menu_items');
         
+        Route::get('delete-rss_data/{id}', 'RSSFeedSettingsController@rss_data_delete')->name('rssfeedsettings.rss_data_delete')->middleware('can:menu_items');
+        Route::get('/rss_data/news/create/{code}', 'RSSFeedSettingsController@rss_data_create_news')->name('rssfeedsettings.rss_data_create_news');
+        Route::post('rss_data/news/store', 'RSSFeedSettingsController@rss_data_store_news')->name('rssfeedsettings.rss_data_store_news');
+        Route::post('/rss_data/tags', 'RSSFeedSettingsController@rss_data_tags')->name('rssfeedsettings.rss_data_tags');
+        Route::post('/rss_data/topic', 'RSSFeedSettingsController@rss_data_topics')->name('rssfeedsettings.rss_data_topic');
+        Route::delete('rss_data_delete_process/{id}', 'RSSFeedSettingsController@rss_data_delete_process')->name('rssfeedsettings.rss_data_delete_process')->middleware('can:menu_items');
+        Route::post('/rss_data/news/preview', 'RSSFeedSettingsController@rss_data_preview_news')->name('rssfeedsettings.rss_data_preview_news');
         Route::post('rssfeedsettings/change_status', 'RSSFeedSettingsController@change_status')->name('rssfeedsettings.change_status')->middleware('can:menu_items');
         Route::get('delete-rssfeedsettings/{id}', 'RSSFeedSettingsController@delete')->name('rssfeedsettings.delete')->middleware('can:menu_items');
         Route::get('edit-rssfeedsettings/{id}', 'RSSFeedSettingsController@edit')->name('rssfeedsettings.edit')->middleware('can:menu_items');
         Route::post('rssfeedsettings', 'RSSFeedSettingsController@store')->name('rssfeedsettings.save')->middleware('can:menu_items');
         Route::put('rssfeedsettings/{id}', 'RSSFeedSettingsController@update')->name('rssfeedsettings.update')->middleware('can:menu_items');
         Route::delete('rssfeedsettings/{id}', 'RSSFeedSettingsController@delete_process')->name('rssfeedsettings.delete_process')->middleware('can:menu_items');
-        Route::get('/rss_data/news/create/{code}', 'RSSFeedSettingsController@rss_data_create_news')->name('rssfeedsettings.rss_data_create_news');
-        Route::post('rss_data/news/store', 'RSSFeedSettingsController@rss_data_store_news')->name('rssfeedsettings.rss_data_store_news');
-        Route::post('/rss_data/tags', 'RSSFeedSettingsController@rss_data_tags')->name('rssfeedsettings.rss_data_tags');
+
 
 
         Route::get('/setting', 'RSSFeedSettingsController@rss_setting')->name('rssfeedsettings.rss_setting')->middleware('can:menu_items');

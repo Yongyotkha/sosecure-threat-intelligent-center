@@ -2,7 +2,7 @@
 
 namespace Modules\RSSFeedSettings\Http\Controllers;
 
-
+use App\Topic;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
 use Carbon\Carbon;
@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\RSSFeedSettings\Entities\NewsCategory;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\RSSFeedSettings\Entities\NewsTag;
+use Modules\RSSFeedSettings\Entities\NewsTopics;
 use Modules\RSSFeedSettings\Entities\RSSData;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
@@ -65,32 +66,76 @@ class RSSFeedSettingsController extends Controller
         return view('rssfeedsettings::rss_data')->with($data);
     }
 
-    public function tableRssData(){
-        $model = TransactionRssData::all();
+    public function tableRssData(Request $request){
+        if($request -> keywords || $request -> public_date || $request -> status !== "null" || $request -> source){
+            $model = TransactionRssData::where('status', 1);
+            if($request -> keywords){
+                $model -> where('title', 'LIKE' ,'%'.$request -> keywords.'%');
+            }
+            if($request -> public_date){
+                $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+            }
+            if($request -> status){
+                if($request -> status == '2' || $request -> status == '3'){
+                    if($request -> status == '2'){
+                        $RSSNews = RSSNews::where('transaction_rss_id','!=' ,null)->get();
+                        foreach($RSSNews as $data){
+                            $model -> where('id', $data -> transaction_rss_id);
+                        }
+                    }else if($request -> status == '3'){
+                        $RSSNews = RSSNews::where('transaction_rss_id','!=' ,null)->get();
+                        foreach($RSSNews as $data){
+                            $model -> where('id', '!=' ,$data -> transaction_rss_id);
+                        }
+                    }
+                    
+                }  
+            }
+            if($request -> source){
+                $model -> where('link', 'LIKE' ,'%'.$request -> source.'%');
+            }
+            $model -> get();
+        }else{
+            $model = TransactionRssData::all();
+        }
+
         return DataTables::of($model)
             ->editColumn('chk', function (TransactionRssData $model) {
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
             ->addColumn('link', function (TransactionRssData $model) {
                 $html = '';
-                $html .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' data-toggle='ajaxModal'>
-                    ".$model->link."
-                </a>";
+                $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
+                if(!empty($RSSNews)){
+                    $html .= $model->link;
+                }else{
+                    $html .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' data-toggle='ajaxModal'>
+                        ".$model->link."
+                    </a>";
+                }
+               
                 return $html;
             })
             ->addColumn('status', function (TransactionRssData $model) {
+                $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
                 $html = '';
+                if(!empty($RSSNews)){
+                    $html .= '<span class="badge badge-success">Used</span>';
+                }else{
+                    $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+                }  
                 return $html;
             })
             ->addColumn('action', function (TransactionRssData $model) {
                 $html = '';
-                $html .= "<a href='". route('rssfeedsettings.edit', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
-                </a>
-                <a href='". route('rssfeedsettings.delete', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                $html .= "
+                <a href='". route('rssfeedsettings.rss_data_delete', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
                 </a></div>";
                 return $html;
+                // <a href='". route('rssfeedsettings.edit', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                // <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                // </a>
             })
             ->rawColumns(['chk','link','status','action'])
             ->toJson();
@@ -143,6 +188,11 @@ class RSSFeedSettingsController extends Controller
         return view('rssfeedsettings::modal.create_news')->with($data);
     }
 
+    public function rss_data_preview_news(Request $request){
+        $data['page'] = "Preview News";
+        return view('rssfeedsettings::preview_rss_news')->with($data);
+    }
+
     public function rss_data_tags(Request $request){
         $search = $request->searchTerm;
         $get_tags_query = "SELECT * FROM fx_tags ";
@@ -152,6 +202,38 @@ class RSSFeedSettingsController extends Controller
         $get_tags = DB::select($get_tags_query);
         $get_tags = collect($get_tags);
         return response()->json($get_tags);
+    }
+
+    public function rss_data_topics(Request $request){
+        $search = $request->searchTerm;
+        $get_topic_query = "SELECT * FROM fx_topics ";
+        if(!empty($search)){
+            $get_tags_query = $get_topic_query . "WHERE name LIKE '%$search%'";
+        }
+        $get_topic = DB::select($get_topic_query);
+        $get_topic = collect($get_topic);
+        return response()->json($get_topic);
+    }
+
+
+    public function rss_data_delete(Request $id)
+    {
+        $data['rssfeedsettings'] = $id;
+        return view('rssfeedsettings::modal.rss_data_delete')->with($data);
+    }
+
+    public function rss_data_delete_process($id = null)
+    {
+        $model = TransactionRssData::where("code",$id);
+        $model->delete();
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('rssfeedsettings.rss_data'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
     public function rss_data_store_news(Request $request){
@@ -301,6 +383,33 @@ class RSSFeedSettingsController extends Controller
                     } 
                 }
             }
+
+            if(!empty($request -> topic)){
+                foreach($request -> topic as $item){
+                    $Topic = Topic::where('name', $item)->first();
+                    if($Topic){
+                        $NewsTopics = new NewsTopics();
+                        $NewsTopics -> code = generator_uuid();
+                        $NewsTopics -> topic_id = $Topic -> id;
+                        $NewsTopics -> rss_news_id = $RSSNews -> id;
+                        $NewsTopics -> status = 1;
+                        $NewsTopics -> save();
+                    }else{
+                        $Topic = new Topic();
+                        $Topic -> name = $item;
+                        $Topic -> status = 1;
+                        $Topic -> save();
+
+                        $NewsTopics = new NewsTopics();
+                        $NewsTopics -> code = generator_uuid();
+                        $NewsTopics -> topic_id = $Topic -> id;
+                        $NewsTopics -> rss_news_id = $RSSNews -> id;
+                        $NewsTopics -> status = 1;
+                        $NewsTopics -> save();
+                    } 
+                }
+            }
+
             return ajaxResponse(
                 [
                     'message'  => "Successfully",
@@ -463,6 +572,8 @@ class RSSFeedSettingsController extends Controller
         $data['rssfeedsettings'] = $id;
         return view('rssfeedsettings::modal.delete')->with($data);
     }
+
+
 
     public function delete_process($id = null)
     {
