@@ -2,6 +2,8 @@
 
 namespace Modules\News\Http\Controllers;
 
+use Modules\RSSFeedSettings\Entities\RSSNews;
+use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -36,6 +38,13 @@ class NewsController extends Controller
      */
     public function index()
     {
+        $RSSNews_count = RSSNews::count("id");
+        $RSSNews_all = RSSNews::all();
+        // dd($RSSNews_all[0]->get_cate);
+        // dd($RSSNews_all[0]->get_cate[0]->get_cate_name->name);
+        // dd($RSSNews_count);
+       $data['RSSNews_all'] = $RSSNews_all;
+       $data['RSSNews_count'] = $RSSNews_count;
        $data['page'] = langapp('news');
        return view('news::index')->with($data);
     }

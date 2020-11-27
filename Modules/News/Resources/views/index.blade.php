@@ -42,13 +42,13 @@
                 </section>
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
-                        <li class="active"><a href="#tab_related_news" data-toggle="tab">Related news (20)</a></li>
+                        <li class="active"><a href="#tab_related_news" data-toggle="tab">Related news ({{@$RSSNews_count ? $RSSNews_count : 0}})</a></li>
                         <li><a href="#tab_lastest_news" data-toggle="tab">Lastest news (42)</a></li>   
                         <li class="pull-right">
-                            <button class="btn btn-default actove">TH</button>
+                            <button class="btn btn-default">TH</button>
                         </li>   
                         <li class="pull-right">
-                            <button class="btn btn-default">EN</button>
+                            <button class="btn btn-default active">EN</button>
                         </li>   
                     </ul>
                     <div class="tab-content">
@@ -83,7 +83,7 @@
                                             </article>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12">
+                                    {{-- <div class="col-sm-12">
                                         <div class="shadow-box-news">
                                             <article class="def-rlt">
                                                 <figure class="overlay relative">
@@ -166,8 +166,9 @@
                                                 </div>
                                             </article>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
+                                
                                 <div class="row m-md">
                                     <div class="col-xs-12 text-center">
                                         <div class="paginate-footer">
