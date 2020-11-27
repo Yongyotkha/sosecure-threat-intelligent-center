@@ -2,6 +2,10 @@
 
 namespace Modules\News\Http\Controllers;
 
+use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Entities\SiteCategory;
+use Modules\SiteSettings\Entities\SiteNewsRelated;
+
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Illuminate\Http\Request;
@@ -36,6 +40,80 @@ class NewsController extends Controller
      * Display a listing of the resource.
      * @return Response
      */
+    public function test()
+    {
+        $SiteSettings = SiteSettings::all();
+        $RSSNews_all = RSSNews::all();
+        $SiteNewsRelated = SiteNewsRelated::get();
+
+        $news_array = array();
+        // $new_array_sub = [];
+        if($RSSNews_all) {
+            foreach($RSSNews_all as $key => $val) {
+                $val_news_id = $val->id;
+                // $val->get_cate[0]->get_cate_name->id;
+                $new_array_sub = [];
+                if($val->get_cate) {
+                    foreach($val->get_cate as $key2 => $val2) {
+               
+                        $new_array_sub['news_id'] = $val_news_id;
+                        $new_array_sub['cate_id'] = $val2->news_category_id;
+       
+                    }
+                    array_push($news_array, $new_array_sub);
+                }
+
+            }
+        }
+
+        $site_array = [];
+        if($SiteSettings) {
+            foreach($SiteSettings as $key => $val) {
+                $val_news_id = $val->id;
+                // $val->get_cate[0]->get_cate_name->id;
+                $site_array_sub = [];
+                if($val->get_categorys) {
+                    foreach($val->get_categorys as $key2 => $val2) {
+
+               
+                        $site_array_sub['site_id'] = $val_news_id;
+                        $site_array_sub['cate_id'] = $val2->category_id;
+
+                    }
+                    array_push($site_array, $site_array_sub);
+                }
+
+            }
+        }
+
+        // $site_news_related = [];
+        // if($SiteNewsRelated) {
+        //     foreach($SiteNewsRelated as $key => $val) {
+        //         $val_news_related_id = $val->id;
+        //         // $val->get_cate[0]->get_cate_name->id;
+        //         $news_related_array_sub = [];
+        //         if($val->get_categorys) {
+        //             foreach($val->get_categorys as $key2 => $val2) {
+
+        //                 $site_array_sub['site_id'] = $val_news_id;
+        //                 $site_array_sub['cate_id'] = $val2->category_id;
+
+        //             }
+        //             array_push($site_news_related, $news_related_array_sub);
+        //         }
+
+        //     }
+        // }
+
+        dd($news_array);
+        // dd($site_array);
+        // dd($site_news_related);
+
+
+        
+       return view('news::index')->with($data);
+    }
+
     public function index()
     {
         $RSSNews_count = RSSNews::count("id");
