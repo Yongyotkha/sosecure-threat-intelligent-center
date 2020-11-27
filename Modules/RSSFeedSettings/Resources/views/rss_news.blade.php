@@ -309,10 +309,63 @@ $(function() {
         $('#source').select2();
     });
 
-    $('#table-rss-news-template').DataTable({
-        processing: true,
-        order: [[ 0, "desc" ]],
+
+    $(function () {
+        datatable();
     });
+    function datatable(){
+        $('#table-rss-news-template').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('rssfeedsettings.rss_data_table') !!}',
+                data: function ( d ) {
+                    d.keywords = keywords;
+                    d.public_date = public_date;
+                    d.status = status;
+                    d.source = source;
+                    return JSON.stringify( d );
+                },
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },
+                {
+                    data: 'title',
+                    name: 'title'
+                },
+                {
+                    data: 'link',
+                    name: 'link'
+                },
+                {
+                    data: 'pubDate',
+                    name: 'pubDate',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },
+                
+            ]
+        });
+    }
 });
 </script>
 @endpush

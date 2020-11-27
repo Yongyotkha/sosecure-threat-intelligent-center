@@ -6,15 +6,19 @@
     $('.formPreview').click(function() {
         form_save = '.formPreview';
     });
+    $('.formDraft').click(function() {
+        form_save = '.formDraft';
+    });
     $('.ajaxifyForm').submit(function (event) {
         $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
         event.preventDefault();
-
         var data = new FormData(this);
         if(form_save == '.formSavingAndRun'){
             data.append('formsubmit', 'formSavingAndRun');
         }else if(form_save == '.formPreview'){
             data.append('formsubmit', 'formPreview');
+        }else if(form_save == '.formDraft'){
+            data.append('formsubmit', 'formDraft');
         }
         axios.post($(this).attr("action"), data)
             .then(function (response) {
