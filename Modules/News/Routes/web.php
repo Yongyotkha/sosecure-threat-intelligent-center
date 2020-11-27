@@ -16,6 +16,8 @@ Route::group(
 	function () {
 		Route::get('/', 'NewsController@index')->name('news.index')->middleware('can:menu_items');
 		Route::get('/detail', 'NewsController@news_detail')->name('news.news_detail')->middleware('can:menu_items');
+
+		Route::get('/test', 'NewsController@test')->name('news.test')->middleware('can:menu_items');
 	}
 );
 
