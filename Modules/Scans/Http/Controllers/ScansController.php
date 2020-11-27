@@ -403,7 +403,7 @@ class ScansController extends Controller
             ->addColumn('use', function (TransactionScans $data) {
                 $res = '';
                 if($data -> status_asset_use == 1){
-                    $res .= '<span class="badge badge-success">Uesd</span>';
+                    $res .= '<span class="badge badge-success">Used</span>';
                 }else if($data -> status == 0){
                     $res .= '<span class="badge badge-danger">Not Found</span>';
                 }else if($data -> status == 1){

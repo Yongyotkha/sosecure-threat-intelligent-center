@@ -30,12 +30,6 @@
                             </div>
                          </div>
                          <input type="hidden" name="rss_code" value="{{ $rss -> code }}">
-                         <div class="form-group row">
-                            <label for="" class="col-lg-12 control-label">Source <span class="text-danger">*</span></label>
-                            <div class="col-lg-12">
-                                <input type="text" class="form-control" name="source" value="{{ $rss -> link }}" required>
-                            </div>
-                        </div>
                          <div class="row">
                              <label for="" class="col-md-12 control-label">Category <span class="text-danger">*</span></label>
                              <div class="col-md-12">
@@ -46,12 +40,18 @@
                                 </select>
                              </div>
                          </div>
+                         <br>
+                         <div class="form-group row">
+                            <label for="" class="col-lg-12 control-label">Source <span class="text-danger">*</span></label>
+                            <div class="col-lg-12">
+                                <input type="text" class="form-control" name="source" value="{{ $rss -> get_rss -> name }}" disabled required>
+                            </div>
+                        </div>
+                        <br>
                          <div class="row">
-                            <label for="" class="col-md-12 control-label">Tag <span class="text-danger">*</span></label>
+                            <label for="" class="col-md-12 control-label">Topic <span class="text-danger">*</span></label>
                             <div class="col-md-12">
-                               <select name="tags[]" id="tags" class="select2-option form-control" multiple="multiple" required>
-                                    <option value="0">0</option>
-                               </select>
+                               <select name="topic[]" id="topic" class="select2-option form-control" multiple="multiple" required></select>
                             </div>
                         </div>
                          <br>
@@ -85,14 +85,14 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Text (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <input type="text" class="form-control" name="title_th" required>
+                                                        <input type="text" class="form-control" name="title_th" id="title_th" required>
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Detail (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control markdownEditor" name="detail_th" data-id="1" required></textarea>
+                                                        <textarea class="form-control markdownEditor" name="detail_th" id="detail_th" data-id="1" required></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -119,28 +119,42 @@
                              </div>
                          </div>
 
+                         {{--  --}}
+                                <div class="row">
+                                   <label for="" class="col-md-12 control-label">Tag
+                               </div>
+                               <div class="row">
+                                <div class="col-md-12">
+                                        <select name="tags[]" id="tags" class="select2-option form-control" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                        <br>
                          <div class="form-group row">
                              <div class="col-lg-6">
-                                <label class="col-lg-4 control-label">Public Date </label>
-                                <div class="col-lg-8">
-                                    <div class="input-group date">
-                                        <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                        value="{{  timePickerFormat($rss -> pubDate) }}" name="public_date"
-                                        data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
-                                        <div class="input-group-addon">
-                                            @icon('solid/calendar-alt', 'text-muted')
+                                <div class="row">
+                                    <label class="col-lg-4 control-label">Public Date </label>
+                                    <div class="col-lg-8">
+                                        <div class="input-group date">
+                                            <input id="send_date" type="text" class="form-control datetimepicker-input"
+                                            value="{{  timePickerFormat($rss -> pubDate) }}" name="public_date"
+                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
+                                            <div class="input-group-addon">
+                                                @icon('solid/calendar-alt', 'text-muted')
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                              </div>
                              <div class="col-lg-6">
-                                <label class="col-lg-4 control-label">Status </label>
-                                <div class="col-lg-8">
-                                    <label class="switch">
-                                        <input type="hidden" value="FALSE" name="">
-                                        <input type="checkbox" name="status" checked value="TRUE">
-                                        <span></span>
-                                    </label>
+                                <div class="row">
+                                    <label class="col-lg-4 control-label">Status </label>
+                                    <div class="col-lg-8">
+                                        <label class="switch">
+                                            <input type="hidden" value="FALSE" name="">
+                                            <input type="checkbox" name="status" checked value="TRUE">
+                                            <span></span>
+                                        </label>
+                                    </div>
                                 </div>
                              </div>
                         </div>
@@ -150,10 +164,14 @@
 
                  <div class="modal-footer">
                     {!! closeModalButton() !!}
-                    <button type="submit" class="btn btn-success formPreview submit btn-rounded"><i class="fas fa-eye"></i> Preview</button>
                     {!! renderAjaxButton() !!}
+                    {!! Form::close() !!}
+                    {{-- <form action="{{ route('rssfeedsettings.rss_data_preview_news') }}" method="post" target="_blank">
+                        <input type="text" name="title" id="title_preview">
+                        <textarea name="detail" id="detail_preview"></textarea>
+                        <button type="submit" class="btn btn-success formPreview btn-rounded"><i class="fas fa-eye"></i> Preview</button>
+                    </form> --}}
                  </div>
-                {!! Form::close() !!}
          </div>
      </div>
  </div>
@@ -171,6 +189,43 @@
 @include('stacks.js.markdown')
 <script>
     $(document).ready(function(){
+        $("#title_th").blur(function(){
+            $('#title_preview').val(this.value);
+        });
+        $("#detail_th").blur(function(){
+            $('#detail_preview').val(this.Editor("getText"));
+        });
+        $("#topic").select2({
+            allowClear: true,
+            tags: true,
+            width: '100%',
+            ajax: {
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'post',
+                dataType: "json",
+                url: '/rssfeedsettings/rss_data/topic',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        searchTerm: params.term || '',
+                        pageNum: params.page || 1,
+                    }
+                },
+                processResults: function (data) {
+                    return {
+                    results:  $.map(data, function (item) {
+                            return {
+                                text: item.name,
+                                id: item.id,
+                                value: item.name
+                            }
+                        })
+                    };
+                },
+            }
+        });
         $("#tags").select2({
             allowClear: true,
             tags: true,

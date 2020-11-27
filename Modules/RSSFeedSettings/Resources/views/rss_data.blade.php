@@ -38,6 +38,56 @@
         </aside>
     
         <aside>
+            <section class="wrapper bg-grey">
+                <section class="panel panel-default">
+                    <div class="container-fluid" style="padding: 2rem;">
+                        <div class="row m-b-md">
+                            
+                            <div class="col-lg-4">
+                                <label for="">Keywords</label>
+                               <input type="text" class="form-control" name="keywords" id="keywords">
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="">Public Date</label>
+                                <div class="input-group date">
+                                    <input id="public_date" type="text" class="form-control datetimepicker-input" name="public_date"
+                                    data-date-format="DD-MM-YYYY" data-date-start-date="moment()" required>
+                                    <div class="input-group-addon">
+                                        @icon('solid/calendar-alt', 'text-muted')
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="">Status</label>
+                                <select id="status" class="select2-option form-control">
+                                    <option value="1" selected>All</option>
+                                    <option value="2">Used</option>
+                                    <option value="3">Not Used</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label for="">Source</label>
+                                <input type="text" class="form-control" name="source" id="source">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" class="btn btn-info btn-responsive" onclick="search()">
+                                    <i class="fas fa-search"></i>
+                                    Search
+                                </button>
+                                <button type="button" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
             <section class="vbox">
     
                 <header class="header panel-heading bg-white b-b b-light">
@@ -109,7 +159,22 @@
 @include('stacks.js.datepicker')
 
 <script>
+    var keywords = null;
+    var public_date = null;
+    var status = null;
+    var source = null;
+    function search(){
+        keywords = $('#keywords').val();
+        public_date = $('#public_date').val();
+        status = $('#status option:selected').val();
+        source = $('#source').val();
+        datatable();
+    }
     $(function () {
+        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
+        datatable();
+    });
+    function datatable(){
         $('#table-rss-data').DataTable({
             processing: true,
             serverSide: true,
@@ -120,6 +185,10 @@
                 type: "POST",
                 url: '{!! route('rssfeedsettings.rss_data_table') !!}',
                 data: function ( d ) {
+                    d.keywords = keywords;
+                    d.public_date = public_date;
+                    d.status = status;
+                    d.source = source;
                     return JSON.stringify( d );
                 },
             },
@@ -157,7 +226,7 @@
                 
             ]
         });
-    });
+    }
 </script>
 @endpush
 @endsection
