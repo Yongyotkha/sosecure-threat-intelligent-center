@@ -61,7 +61,7 @@
                         data-target="#rss_modal">
                         @icon('solid/plus') @langapp('create')
                     </a>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         data-target="#rss_modal">
                         >_ Run Feed
                     </a>
@@ -72,7 +72,7 @@
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         data-target="#rss_modal">
                         @icon('solid/laptop') Scheldue Update
-                    </a>
+                    </a> --}}
                 </header>
 
                 <section class="wrapper">
