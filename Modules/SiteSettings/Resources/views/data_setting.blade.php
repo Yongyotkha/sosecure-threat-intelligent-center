@@ -6,10 +6,11 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         
-        <aside class="aside aside-md b-r">
+        <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="modal" data-target="#setting-nav">@icon('solid/bars')</a>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                     <p class="h3">@langapp('settings')  </p>
                 </header>
                 <section class="scrollable">
@@ -102,6 +103,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
                 </header>
                 <section class="scrollable wrapper">
@@ -290,6 +292,7 @@
 @include('stacks.js.form')
 @include('stacks.js.touchspin')
 @include('stacks.js.menusub')
+@include('stacks.js.hidesettings')
 
 <script>
     $(document).ready(function () {

@@ -2,11 +2,13 @@
 @section('content')
 <section id="content" class="bg">
     <section class="hbox stretch">      
-        <aside class="aside aside-md b-r">
+        <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
-                        data-target="#setting-nav">@icon('solid/bars')</a>
+                        data-target="#setting-nav">@icon('solid/bars')
+                    </a>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                     <p class="h3">@langapp('settings')  </p>
                 </header>
                 <section class="scrollable">
@@ -45,6 +47,7 @@
                     {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                     @icon('solid/arrow-left')
                     </a> --}}
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
                     <div class="bc-head">@langapp('settings') > @langapp('rss_feed_settings')</div>
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                         title="@langapp('export') CSV">
@@ -72,7 +75,7 @@
                     </a>
                 </header>
 
-                <section class="scrollable wrapper">
+                <section class="wrapper">
                     <section class="panel panel-default">
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-rss-setting-template">
@@ -251,6 +254,7 @@
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
+@include('stacks.js.hidesettings');
 
 <script>
     $(document).ready(function () {
@@ -306,7 +310,7 @@
                     orderable: false,
                     searchable: false,
                     sortable: false,
-                    className: 'w-50'
+                    className: 'w-50 no-wrap'
                 }
             ]
         });

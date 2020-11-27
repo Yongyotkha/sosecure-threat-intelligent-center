@@ -8,11 +8,21 @@
             <a href="{{route('news.index')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            <div class="bc-head">@langapp('news') > WhatsApp’s new fact-check feature lets users identify fake information</div>    
+            <div class="bc-head">@langapp('news') > WhatsApp’s new fact-check feature lets users identify fake information</div>   
+
+             <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span><i class="fas fa-arrow-right"></i></span>
+             </button>
+             <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span><i class="fas fa-arrow-left"></i></span>
+             </button>
+             <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span><i class="fas fa-print"></i></span>
+             </button>
         </header>
 
         <div class="section-jumborton">
-            <div class="thumnail-img" style="background-image:url('https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')"></div>
+            {{-- <div class="thumnail-img" style="background-image:url('https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')"></div> --}}
             <div class="jumborton-description">
                 <div class="container-description">
                     <div class="headding-secondary-text">
