@@ -119,7 +119,9 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('status', function (TransactionRssData $model) {
                 $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
                 $html = '';
-                if(!empty($RSSNews)){
+                if(!empty($RSSNews) && $RSSNews -> save_draft == 1){
+                    $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+                }else if(!empty($RSSNews) && $RSSNews -> save_draft == 0){
                     $html .= '<span class="badge badge-success">Used</span>';
                 }else{
                     $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
@@ -248,12 +250,17 @@ class RSSFeedSettingsController extends Controller
             );
         }else{
             $TransactionRssData = TransactionRssData::where('code', $request->rss_code)->first();
+            $logo = asset('images/image-not-found.jpg');
+            if($TransactionRssData -> enclosure){
+                $logo = $TransactionRssData -> enclosure;
+            }
             $RSSNews = new RSSNews();
             $RSSNews -> code = generator_uuid();
-            $RSSNews -> logo = $TransactionRssData -> enclosure;
+            $RSSNews -> logo = $logo;
             $RSSNews -> title_th = $request -> title_th;
             $RSSNews -> title_en = $request -> title_en;
             $RSSNews -> source = $request -> source;
+            $RSSNews -> link = $TransactionRssData -> link;
             $RSSNews -> public_date = Carbon::parse($request -> public_date);
             $detail_th = $request -> detail_th; //รับค่าจาก messageInput
             $dom = new \domdocument();
@@ -347,6 +354,9 @@ class RSSFeedSettingsController extends Controller
 
             $RSSNews -> transaction_rss_id = $TransactionRssData -> id;
             $RSSNews -> status = $request -> status ? 1 : 0;
+            if($request->formsubmit == 'formDraft'){
+                $RSSNews -> save_draft = 1;
+            }
             $RSSNews -> save();
             if(!empty($request -> category_news)){
                 foreach($request -> category_news as $item){

@@ -4,7 +4,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> News</h4>
         </div>
-        {!! Form::open(['route' => ['rssfeedsettings.rss_data_store_news'], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'POST', 'files' => true]) !!}
+        {!! Form::open(['route' => ['rssfeedsettings.rss_data_store_news'], 'class' => 'ajaxifyForm', 'method' => 'POST', 'files' => true]) !!}
                  <div class="modal-body">
                      <div class="container-fluid">
                          <div class="row">
@@ -31,9 +31,9 @@
                          </div>
                          <input type="hidden" name="rss_code" value="{{ $rss -> code }}">
                          <div class="row">
-                             <label for="" class="col-md-12 control-label">Category <span class="text-danger">*</span></label>
+                             <label for="" class="col-md-12 control-label" id="label_category">Category <span class="text-danger">*</span></label>
                              <div class="col-md-12">
-                                <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple" required>
+                                <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple">
                                     @foreach ($category as $item)
                                         <option value="{{ $item -> id }}">{{ $item -> name }}</option>
                                     @endforeach
@@ -44,14 +44,14 @@
                          <div class="form-group row">
                             <label for="" class="col-lg-12 control-label">Source <span class="text-danger">*</span></label>
                             <div class="col-lg-12">
-                                <input type="text" class="form-control" name="source" value="{{ $rss -> get_rss -> name }}" disabled required>
+                                <input type="text" class="form-control" name="source" value="{{ $rss -> get_rss -> name }}" readonly>
                             </div>
                         </div>
                         <br>
                          <div class="row">
-                            <label for="" class="col-md-12 control-label">Topic <span class="text-danger">*</span></label>
+                            <label for="" class="col-md-12 control-label" id="label_topic">Topic <span class="text-danger">*</span></label>
                             <div class="col-md-12">
-                               <select name="topic[]" id="topic" class="select2-option form-control" multiple="multiple" required></select>
+                               <select name="topic[]" id="topic" class="select2-option form-control" multiple="multiple"></select>
                             </div>
                         </div>
                          <br>
@@ -83,16 +83,16 @@
                                         <div class="tab-pane active" id="tab_th">
                                             <section class="panel-body border-n">
                                                 <div class="form-group row">
-                                                    <label for="" class="col-lg-12 control-label">Text (TH) <span class="text-danger">*</span></label>
+                                                    <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <input type="text" class="form-control" name="title_th" id="title_th" required>
+                                                        <input type="text" class="form-control" name="title_th" id="title_th">
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
-                                                    <label for="" class="col-lg-12 control-label">Detail (TH) <span class="text-danger">*</span></label>
+                                                    <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control markdownEditor" name="detail_th" id="detail_th" data-id="1" required></textarea>
+                                                        <textarea class="form-control markdownEditor" name="detail_th" id="detail_th" data-id="1"></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -137,7 +137,7 @@
                                         <div class="input-group date">
                                             <input id="send_date" type="text" class="form-control datetimepicker-input"
                                             value="{{  timePickerFormat($rss -> pubDate) }}" name="public_date"
-                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
+                                            data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()">
                                             <div class="input-group-addon">
                                                 @icon('solid/calendar-alt', 'text-muted')
                                             </div>
@@ -164,7 +164,9 @@
 
                  <div class="modal-footer">
                     {!! closeModalButton() !!}
-                    {!! renderAjaxButton() !!}
+                    <button type="submit" class="btn btn-warning formDraft btn-rounded"><i class="fas fa-save"></i> SaveDraft</button>
+                    <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
+                    {{-- {!! renderAjaxButton() !!} --}}
                     {!! Form::close() !!}
                     {{-- <form action="{{ route('rssfeedsettings.rss_data_preview_news') }}" method="post" target="_blank">
                         <input type="text" name="title" id="title_preview">
@@ -183,18 +185,91 @@
  @push('pagescript')
  @include('stacks.js.form')
  @include('stacks.js.fullscreen')
- @include('partial.ajaxify')
  @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.markdown')
+{{-- @include('partial.ajaxify') --}}
 <script>
+     var form_save = '.formSaving';
+    $('.formPreview').click(function() {
+        form_save = '.formPreview';
+    });
+    $('.formDraft').click(function() {
+        form_save = '.formDraft';
+    });
+    $('.ajaxifyForm').submit(function (event) {
+        if(form_save == '.formSaving'){
+            let category = $('#category option:selected').val();
+            let topic = $('#topic option:selected').val();
+            let title_th = $('#title_th').val();
+            let detail_th = $('#detail_th').val();
+            if(category == undefined){
+                $('#label_category').css('color', '#a94442');
+                $('#category').css('border-color', '#a94442');
+            }else{
+                $('#label_category').css('color', '#656d78');
+                $('#category').css('border-color', '#656d78');
+            }
+            if(topic == undefined){
+                $('#label_topic').css('color', '#a94442');
+                $('#topic').css('border-color', '#a94442');
+            }else{
+                $('#label_topic').css('color', '#656d78');
+                $('#topic').css('border-color', '#656d78');
+            }
+            if(title_th == ''){
+                $('#label_title_th').css('color', '#a94442');
+                $('#title_th').css('border-color', '#a94442');
+            }else{
+                $('#label_title_th').css('color', '#656d78');
+                $('#title_th').css('border-color', '#656d78');
+            }
+            if(detail_th == ''){
+                $('#label_detail_th').css('color', '#a94442');
+                $('#detail_th').css('border-color', '#a94442');
+            }else{
+                $('#label_detail_th').css('color', '#656d78');
+                $('#detail_th').css('border-color', '#656d78');
+            }
+
+            if(topic == undefined || category == undefined || title_th == '' || detail_th == ''){
+                return false;
+            }
+        }
+
+        $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+        event.preventDefault();
+        var data = new FormData(this);
+        if(form_save == '.formPreview'){
+            data.append('formsubmit', 'formPreview');
+        }else if(form_save == '.formDraft'){
+            data.append('formsubmit', 'formDraft');
+        }
+        axios.post($(this).attr("action"), data)
+            .then(function (response) {
+                    toastr.success(response.data.message, '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                    window.location.href = response.data.redirect;
+          })
+          .catch(function (error) {
+            if(error.response.data.exception){
+                toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+            }else{
+                var errors = error.response.data.errors;
+                var errorsHtml= '';
+                $.each( errors, function( key, value ) {
+                    errorsHtml += '<li>' + value[0] + '</li>'; 
+                });
+                toastr.error( errorsHtml , '@langapp('response_status') ');
+                $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+            }
+            
+            
+        }); 
+        
+    });
     $(document).ready(function(){
-        $("#title_th").blur(function(){
-            $('#title_preview').val(this.value);
-        });
-        $("#detail_th").blur(function(){
-            $('#detail_preview').val(this.Editor("getText"));
-        });
         $("#topic").select2({
             allowClear: true,
             tags: true,
