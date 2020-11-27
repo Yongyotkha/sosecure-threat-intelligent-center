@@ -187,19 +187,47 @@ class RSSFeedSettingsController extends Controller
                 return $model -> source;
             })
             ->addColumn('title', function (RSSNews $model) {
-                return $model -> title;
+                if($model -> title_th){
+                    return $model -> title_th;
+                }else if($model -> title_en){
+                    return $model -> title_en;
+                }else{
+                    return '-';
+                }
             })
             ->addColumn('topic', function (RSSNews $model) {
-                return @$model->get_topic->topic->name;
+                if(empty($model->get_topic->topic)){
+                    return '-';
+                }else{
+                    return $model->get_topic->topic->name;
+                }
             })
             ->addColumn('data_status', function (RSSNews $model) {
-                return '';
+                $html = '';
+                if($model -> save_draft == 1){
+                    $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+                }else if($model -> save_draft == 0){
+                    $html .= '<span class="badge badge-success">Public</span>';
+                }else{
+                    $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+                }  
+                return $html;
             })
             ->addColumn('link', function (RSSNews $model) {
-                return '';
+                return '<a href="#">TH</a> | <a href="#">EN</a>';
             })
             ->addColumn('status', function (RSSNews $model) {
-                return '';
+                if($model->status == '1') {
+                    $checked_val = 'checked';
+                } else {
+                    $checked_val = '';
+                }
+                $html = '';
+                $html .= '<label class="switch">
+                            <input type="checkbox" id="news-active-'.$model->code.'" onchange="change_news_active(\''.$model->code.'\')" '.$checked_val.' value="1">
+                            <span></span>
+                        </label>';
+                return $html;
             })
             ->addColumn('action', function (RSSNews $model) {
                 $html = '';
@@ -521,6 +549,7 @@ class RSSFeedSettingsController extends Controller
     public function rss_news()
     {
         $data['page'] = langapp('rss_logs');
+        $data['category'] = CategorySettings::where('active',1)->get();
         return view('rssfeedsettings::rss_news')->with($data);
     }
 
@@ -645,6 +674,21 @@ class RSSFeedSettingsController extends Controller
                 'id'       => $rss->id,
                 'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function change_status_news(Request $request){
+        $RSSNews = RSSNews::where('code', $request -> code)->first();
+        $RSSNews->status = $request->active;
+        $RSSNews->save();
+        return ajaxResponse(
+            [
+                'id'       => $RSSNews->id,
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('rssfeedsettings.news'),
             ],
             true,
             Response::HTTP_OK

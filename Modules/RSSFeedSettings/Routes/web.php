@@ -43,5 +43,6 @@ Route::group(
         //News
         Route::get('/news', 'RSSFeedSettingsController@rss_news')->name('rssfeedsettings.news')->middleware('can:menu_items');
         Route::post('rss_news_table', 'RSSFeedSettingsController@tableNews')->name('rssfeedsettings.rss_news_table')->middleware('can:menu_items');
+        Route::post('rssfeedsettings/change_status_news', 'RSSFeedSettingsController@change_status_news')->name('rssfeedsettings.change_status_news')->middleware('can:menu_items');
     }
 );
