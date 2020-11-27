@@ -12,4 +12,8 @@ class RSSNews extends Model
     public function get_cate(){
         return $this->hasMany(RSSNewsCategory::class, 'rss_news_id', 'id')->with("get_cate_name");
     }
+
+    public function get_topic(){
+        return $this->belongsTo(NewsTopics::class, 'id', 'rss_news_id');
+    }
 }
