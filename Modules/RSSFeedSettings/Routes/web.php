@@ -39,6 +39,9 @@ Route::group(
 
         Route::get('/setting', 'RSSFeedSettingsController@rss_setting')->name('rssfeedsettings.rss_setting')->middleware('can:menu_items');
         Route::get('/feed-all', 'RSSFeedSettingsController@rss_feed_all')->name('rssfeedsettings.feed_all')->middleware('can:menu_items');
+        
+        //News
         Route::get('/news', 'RSSFeedSettingsController@rss_news')->name('rssfeedsettings.news')->middleware('can:menu_items');
+        Route::post('rss_news_table', 'RSSFeedSettingsController@tableNews')->name('rssfeedsettings.rss_news_table')->middleware('can:menu_items');
     }
 );
