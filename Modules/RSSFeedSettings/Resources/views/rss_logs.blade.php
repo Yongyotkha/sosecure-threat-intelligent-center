@@ -19,7 +19,7 @@
 
       
         </header>
-        <section class="scrollable wrapper">              
+        <section class="wrapper">              
             <section class="panel panel-default">
                 <div class="table-responsive">
                     <table  class="table table-striped" id="table-logs-template">
