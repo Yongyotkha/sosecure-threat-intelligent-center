@@ -110,7 +110,7 @@
                             <a href="{{ site_url('/news') }}">
                                 <i class="fas fa-newspaper icon"><b class="bg-info"></b></i>
                                 <span> @langapp('news') </span>
-                                <span class="count-alert"> 1 </span>
+                                {{-- <span class="count-alert"> 1 </span> --}}
                             </a>
                         </li>
 
