@@ -2,6 +2,7 @@
 
 namespace Modules\RSSFeedSettings\Http\Controllers;
 
+use App\siteNewsRelated;
 use App\Topic;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
@@ -181,7 +182,12 @@ class RSSFeedSettingsController extends Controller
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
             ->addColumn('site_name', function (RSSNews $model) {
-                return '';
+                $data = siteNewsRelated::where('news_id', $model -> id)->get();
+                $html = '';
+                foreach($data as $item){
+                    $html .= $item -> get_site -> name .' , ';
+                }
+                return rtrim($html, ' , ');
             })
             ->addColumn('source', function (RSSNews $model) {
                 return $model -> source;
@@ -319,6 +325,17 @@ class RSSFeedSettingsController extends Controller
         return response()->json($get_topic);
     }
 
+    public function rss_data_source(Request $request){
+        $search = $request->searchTerm;
+        $get_source_query = "SELECT DISTINCT name FROM fx_rss UNION SELECT DISTINCT source FROM fx_r_s_s_news";
+        $get_source = DB::select($get_source_query);
+        $get_source = collect($get_source);
+        if(!empty($search)){
+            $get_source = $get_source->where('name', 'like', '%'.$search.'%');
+        }
+        return response()->json($get_source);
+    }
+
 
     public function rss_data_delete(Request $id)
     {
@@ -334,6 +351,189 @@ class RSSFeedSettingsController extends Controller
             [
                 'message'  => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.rss_data'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function rss_data_store_news_create(Request $request){
+        $logo = asset('images/image-not-found.jpg');
+        if ($request->hasFile('logo')) {
+            $image = $request->file('logo');
+            $imagename = time().'.'.$image->getClientOriginalExtension();
+            $destinationPath = public_path('images/logo_news');
+            $image->move($destinationPath, $imagename);
+            $logo = asset('images/logo_news/'.$imagename);
+        }
+        $RSSNews = new RSSNews();
+        $RSSNews -> code = generator_uuid();
+        $RSSNews -> logo = $logo;
+        $RSSNews -> title_th = $request -> title_th;
+        $RSSNews -> title_en = $request -> title_en;
+        $RSSNews -> source = $request -> source;
+        $RSSNews -> public_date = Carbon::parse($request -> public_date);
+        $detail_th = $request -> detail_th; //รับค่าจาก messageInput
+        $dom = new \domdocument();
+        if ($dom->getelementsbytagname('img')) {
+            $dom->loadHtml('<?xml encoding="UTF-8">' . $detail_th,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+            //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+            $images = $dom->getelementsbytagname('img');
+            //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+            foreach ($images as $k => $img) {
+                $data = $img->getattribute('src');
+                $blacklistArray = array('data:image');
+                $string = $data;
+                $matches = array();
+                $matchFound = preg_match_all(
+                    "/\b(" . implode($blacklistArray, "|") . ")\b/i",
+                    $string,
+                    $matches
+                );
+                // if it find matches bad words
+                if ($matchFound) {
+                    $words = array_unique($matches[0]);
+                    foreach ($words as $word) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data) = explode(',', $data);
+
+                        $data = base64_decode($data);
+                        //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name = time() . $k . '.png';
+                        //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') . '/' . $image_name;
+                        //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', url('/images/file_editor/' . $image_name));
+                    }
+                }
+            }
+            $detail_th = $dom->savehtml();
+        }
+        $RSSNews -> detail_th = $detail_th;
+
+        $detail_en = $request -> detail_en; //รับค่าจาก messageInput
+        $dom = new \domdocument();
+        if ($dom->getelementsbytagname('img')) {
+            $dom->loadHtml('<?xml encoding="UTF-8">' . $detail_en,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+            //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+            $images = $dom->getelementsbytagname('img');
+            //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+            foreach ($images as $k => $img) {
+                $data = $img->getattribute('src');
+                $blacklistArray = array('data:image');
+                $string = $data;
+                $matches = array();
+                $matchFound = preg_match_all(
+                    "/\b(" . implode($blacklistArray, "|") . ")\b/i",
+                    $string,
+                    $matches
+                );
+                // if it find matches bad words
+                if ($matchFound) {
+                    $words = array_unique($matches[0]);
+                    foreach ($words as $word) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data) = explode(',', $data);
+
+                        $data = base64_decode($data);
+                        //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name = time() . $k . '.png';
+                        //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') . '/' . $image_name;
+                        //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', url('/images/file_editor/' . $image_name));
+                    }
+                }
+            }
+            $detail_en = $dom->savehtml();
+        }
+        $RSSNews -> detail_en = $detail_en;
+
+        $RSSNews -> status = $request -> status ? 1 : 0;
+        if($request->formsubmit == 'formDraft'){
+            $RSSNews -> save_draft = 1;
+        }
+        $RSSNews -> save();
+        if(!empty($request -> category_news)){
+            foreach($request -> category_news as $item){
+                $RSSNewsCategory = new RSSNewsCategory();
+                $RSSNewsCategory -> code = generator_uuid();
+                $RSSNewsCategory -> rss_news_id = $RSSNews -> id;
+                $RSSNewsCategory -> news_category_id = $item;
+                $RSSNewsCategory -> status = 1;
+                $RSSNewsCategory -> save();
+            }
+        }
+        
+        if(!empty($request -> tags)){
+            foreach($request -> tags as $item){
+                $tags = Tags::where('name', $item)->first();
+                if($tags){
+                    $NewsTag = new NewsTag();
+                    $NewsTag -> code = generator_uuid();
+                    $NewsTag -> tag_id = $tags -> id;
+                    $NewsTag -> rss_news_id = $RSSNews -> id;
+                    $NewsTag -> status = 1;
+                    $NewsTag -> save();
+                }else{
+                    $tags = new Tags;
+                    $tags -> name = $item;
+                    $tags -> save();
+
+                    $NewsTag = new NewsTag();
+                    $NewsTag -> code = generator_uuid();
+                    $NewsTag -> tag_id = $tags -> id;
+                    $NewsTag -> rss_news_id = $RSSNews -> id;
+                    $NewsTag -> status = 1;
+                    $NewsTag -> save();
+                } 
+            }
+        }
+
+        if(!empty($request -> topic)){
+            foreach($request -> topic as $item){
+                $Topic = Topic::where('name', $item)->first();
+                if($Topic){
+                    $NewsTopics = new NewsTopics();
+                    $NewsTopics -> code = generator_uuid();
+                    $NewsTopics -> topic_id = $Topic -> id;
+                    $NewsTopics -> rss_news_id = $RSSNews -> id;
+                    $NewsTopics -> status = 1;
+                    $NewsTopics -> save();
+                }else{
+                    $Topic = new Topic();
+                    $Topic -> name = $item;
+                    $Topic -> status = 1;
+                    $Topic -> save();
+
+                    $NewsTopics = new NewsTopics();
+                    $NewsTopics -> code = generator_uuid();
+                    $NewsTopics -> topic_id = $Topic -> id;
+                    $NewsTopics -> rss_news_id = $RSSNews -> id;
+                    $NewsTopics -> status = 1;
+                    $NewsTopics -> save();
+                } 
+            }
+        }
+
+        return ajaxResponse(
+            [
+                'message'  => "Successfully",
+                'redirect' => route('rssfeedsettings.news'),
             ],
             true,
             Response::HTTP_OK
