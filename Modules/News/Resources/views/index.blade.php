@@ -210,6 +210,7 @@
     });
 
     function load_more_book_mark(page){
+        $("#list_news_book_mark").empty();
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
