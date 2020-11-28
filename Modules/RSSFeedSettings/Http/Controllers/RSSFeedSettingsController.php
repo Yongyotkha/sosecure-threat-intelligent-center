@@ -184,8 +184,12 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('site_name', function (RSSNews $model) {
                 $data = siteNewsRelated::where('news_id', $model -> id)->get();
                 $html = '';
-                foreach($data as $item){
-                    $html .= $item -> get_site -> name .' , ';
+                if(empty($data)){
+                    $html .= '-';
+                }else{
+                    foreach($data as $item){
+                        $html .= $item -> get_site -> name .' , ';
+                    }
                 }
                 return rtrim($html, ' , ');
             })
