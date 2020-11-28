@@ -2,6 +2,7 @@
 
 namespace Modules\RSSFeedSettings\Http\Controllers;
 
+use App\Mail\NewsMail;
 use App\siteNewsRelated;
 use App\Topic;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Modules\RSSFeedSettings\Entities\NewsCategory;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\RSSFeedSettings\Entities\NewsTag;
@@ -533,7 +535,15 @@ class RSSFeedSettingsController extends Controller
                 } 
             }
         }
-
+        if($request->formsubmit !== 'formDraft'){
+            $mail = ['todeooooo@gmail.com', 'yongyot.kamma@gmail.com'];
+            foreach($mail as $data){
+                $this->news = [
+                    'news' => $RSSNews,
+                ];
+                Mail::to($data)->send(new NewsMail($this->news));
+            }
+        }
         return ajaxResponse(
             [
                 'message'  => "Successfully",
@@ -725,7 +735,15 @@ class RSSFeedSettingsController extends Controller
                     } 
                 }
             }
-
+            if($request->formsubmit !== 'formDraft'){
+                $mail = ['todeooooo@gmail.com', 'yongyot.kamma@gmail.com'];
+                foreach($mail as $data){
+                    $this->news = [
+                        'news' => $RSSNews,
+                    ];
+                    Mail::to($data)->send(new NewsMail($this->news));
+                }
+            }
             return ajaxResponse(
                 [
                     'message'  => "Successfully",
