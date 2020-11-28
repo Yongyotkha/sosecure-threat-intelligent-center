@@ -441,6 +441,53 @@ class NewsController extends Controller
         }
     }
 
+    public function jqueryLoadMoreNewsBookmark(Request $request){
+        $html = '';
+        $Bookmark = Bookmark::all();
+        foreach($Bookmark as $data){
+            $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
+            if($check_read_news){
+                $html .= '<div class="list-news" style="background-color:#ececec">';
+            }else{
+                $html .= '<div class="list-news">';
+            }
+            $html .= '
+                <div class="checkbox-news-select">
+                    <label class="mr-3">
+                        <input type="checkbox" name="" class="chk-bookmark">
+                        <span class="label-text checkbox-news-input"></span>
+                    </label>
+                </div>
+                <div class="content-news-text">
+                    <a href="#">
+                        <span class="head-news-text">'.$data -> news -> title_th.'</span>
+                    </a>
+                    <div class="entry-meta">
+                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
+                        <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> news -> view.'</span>
+                        <span>&nbsp;'.$data -> news -> detail_th.'</span>
+                    </div>
+                </div>
+                <div class="content-news-image">
+                    <a href="#">
+                        <img src="'.$data -> news -> logo.'" alt="">
+                    </a>
+                </div>
+                <div class="action-bookmark">';
+                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$data -> news -> id.'" onclick="Bookmarks(this, '.$data -> news -> id.')"></i>';
+                    $html .= '</div>
+            </div>
+            ';
+        }
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+                "count" => count($Bookmark)
+            ];
+            return response()->json($data); 
+        }
+    }
+
     public function bookmark(Request $request){
         $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $request -> news_id)->first();
         if($checkBookmark){

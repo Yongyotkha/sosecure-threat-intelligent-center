@@ -117,7 +117,7 @@
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
-                        <li id="tab-bookmark"><a id="link_tab_bookmark" href="#tab_lastest_news" data-toggle="tab">My Bookmarks</a></li>   
+                        <li id="tab-bookmark"><a id="link_tab_bookmark" href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
                         <li class="pull-right">
                             <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                                 <span>Bookmarks</span>
@@ -169,45 +169,7 @@
                             <section class="panel panel-default">
                                 <div class="row m-b-md">
                                     <div class="col-sm-12">
-                                        <div class="list-news">
-                                            <div class="checkbox-news-select">
-                                                <label class="mr-3">
-                                                    <input type="checkbox" name="" id="chk-bookmark">
-                                                    <span class="label-text checkbox-news-input"></span>
-                                                </label>
-                                            </div>
-                                            <div class="content-news-text">
-                                                <a href="#">
-                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
-                                                </a>
-                                                <div class="entry-meta">
-                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                    <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
-                                                </div>
-                                            </div>
-                                            <div class="content-news-image">
-                                                <a href="#">
-                                                    <img src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="action-bookmark">
-                                                <i class="fas fa-bookmark bookmark-active" id="mark1" onclick="Bookmarks(this)"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row m-md">
-                                    <div class="col-xs-12 text-center">
-                                        <div class="paginate-footer">
-                                            <button class="btn btn-default btn-icon previos">
-                                                <i class="fas fa-chevron-left"></i>
-                                            </button>
-                                            &nbsp;
-                                            <button class="btn btn-default btn-icon next">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </button>
-                                        </div>
+                                        <div id="list_news_book_mark"></div>
                                     </div>
                                 </div>
                             </section>  
@@ -237,7 +199,7 @@
     var page = 1; 
     var page_stop = true;
     load_more(page);
-
+    load_more_book_mark(page);
     $('.tab-content').scroll(function(event) {
         if($('.tab-content').scrollTop() + $('.tab-content').height() >= $(document).height()) {
             page++;
@@ -246,6 +208,32 @@
             }
         }
     });
+
+    function load_more_book_mark(page){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/news/jqueryLoadMoreNewsBookmark?page=" + page,
+            type: "get",
+            datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                page_stop = false;
+                $('.ajax-loading').html("");
+                $('#count_news_bookmark').text(0);
+                return;
+            }
+            $('#count_news_bookmark').text(data.count);
+            $('.ajax-loading').hide();
+            $("#list_news_book_mark").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
 
     function load_more(page){
         $.ajax({
@@ -315,7 +303,7 @@
         });
     }
 
-    $('#tab-bookmark').addClass("disabled");
+    // $('#tab-bookmark').addClass("disabled");
     $('#link_tab_bookmark').attr("href","#");
     $('#main-list').on('click', '.chk-bookmark', function () {
         if ($(this).is(':checked')) {

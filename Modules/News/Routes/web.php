@@ -21,6 +21,7 @@ Route::group(
 		Route::get('/test', 'NewsController@test')->name('news.test')->middleware('can:menu_items');
 		Route::get('/jqueryLoadMoreNews', 'NewsController@jqueryLoadMoreNews')->name('jqueryLoadMoreNews');
 		Route::get('/jqueryLoadMoreNewsTopic', 'NewsController@jqueryLoadMoreNewsTopic')->name('jqueryLoadMoreNewsTopic');
+		Route::get('/jqueryLoadMoreNewsBookmark', 'NewsController@jqueryLoadMoreNewsBookmark')->name('jqueryLoadMoreNewsBookmark');
 		Route::get('/bookmark', 'NewsController@bookmark')->name('bookmark');
 		
 	}
