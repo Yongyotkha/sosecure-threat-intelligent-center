@@ -133,16 +133,16 @@ class NewsController extends Controller
        $NewsTopic = [];
        $ReadTopic = [];
   
-       if($topic){
+       if(!empty($topic)){
         foreach($topic as $data){
-            $NewsTopic[] = NewsTopics::where('topic_id', $data->id)->wherehas('news', function($q){
+            $NewsTopic[] = NewsTopics::where('topic_id', @$data->id)->wherehas('news', function($q){
                 $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());
             })->first();
            }
        } 
-       if($NewsTopic){
+       if(!empty($NewsTopic)){
             foreach($NewsTopic as $data){
-                $ReadTopic[] = ReadTopic::where('topic_id', '=',$data['topic_id'])->where('news_id', '=',$data['rss_news_id'])->first();
+                $ReadTopic[] = ReadTopic::where('topic_id', '=',@$data['topic_id'])->where('news_id', '=',@$data['rss_news_id'])->first();
            }
        }
 
