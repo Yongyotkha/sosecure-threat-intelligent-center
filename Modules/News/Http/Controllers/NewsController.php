@@ -235,6 +235,19 @@ class NewsController extends Controller
         $data['RSSNews'] = $RSSNews;
         $data['page'] = langapp('news_detail');
         // $RSSNews;
+        $ReadNews_data = ReadNews::where('user_id',@Auth::user()->id)->where('news_id',$RSSNews->id)->where('status',1)->first();
+        if($ReadNews_data) {
+
+        } else {
+            $ReadNews = new ReadNews;
+            $ReadNews->code = generator_uuid();
+            $ReadNews->site_id = null;
+            $ReadNews->user_id = @Auth::user()->id;
+            $ReadNews->news_id = $RSSNews->id;
+            $ReadNews->save();
+        }
+
+
         $RSSNews->view = $RSSNews->view+1;
         $RSSNews->save();
        return view('news::news_detail')->with($data);
@@ -325,7 +338,7 @@ class NewsController extends Controller
                     </label>
                 </div>
                 <div class="content-news-text">
-                    <a href="#">
+                    <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
                         <span class="head-news-text">'.$data -> title_th.'</span>
                     </a>
                     <div class="entry-meta">
@@ -335,7 +348,7 @@ class NewsController extends Controller
                     </div>
                 </div>
                 <div class="content-news-image">
-                    <a href="#">
+                    <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
                         <img src="'.$data -> logo.'" alt="">
                     </a>
                 </div>
