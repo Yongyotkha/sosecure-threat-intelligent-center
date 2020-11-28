@@ -408,7 +408,7 @@ class NewsController extends Controller
                     </label>
                 </div>
                 <div class="content-news-text">
-                    <a href="#">
+                    <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
                         <span class="head-news-text">'.$data -> news -> title_th.'</span>
                     </a>
                     <div class="entry-meta">
@@ -418,7 +418,7 @@ class NewsController extends Controller
                     </div>
                 </div>
                 <div class="content-news-image">
-                    <a href="#">
+                    <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
                         <img src="'.$data -> news -> logo.'" alt="">
                     </a>
                 </div>
@@ -459,7 +459,7 @@ class NewsController extends Controller
                     </label>
                 </div>
                 <div class="content-news-text">
-                    <a href="#">
+                    <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
                         <span class="head-news-text">'.$data -> news -> title_th.'</span>
                     </a>
                     <div class="entry-meta">
@@ -469,7 +469,7 @@ class NewsController extends Controller
                     </div>
                 </div>
                 <div class="content-news-image">
-                    <a href="#">
+                    <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
                         <img src="'.$data -> news -> logo.'" alt="">
                     </a>
                 </div>
