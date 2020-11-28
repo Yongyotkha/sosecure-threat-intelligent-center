@@ -16,4 +16,8 @@ class RSSNews extends Model
     public function get_topic(){
         return $this->belongsTo(NewsTopics::class, 'id', 'rss_news_id');
     }
+
+    public function get_topic_multi(){
+        return $this->hasMany(NewsTopics::class, 'rss_news_id', 'id');
+    }
 }

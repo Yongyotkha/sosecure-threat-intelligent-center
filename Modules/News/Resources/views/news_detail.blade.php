@@ -1,21 +1,37 @@
 @extends('layouts.app')
-@section('image','https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')
+@section('image','{{@$RSSNews->logo}}')
+{{-- @section('image','https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80') --}}
 @section('content')
 <section id="content" class="bg">
+    {{-- @php(dd(@$RSSNews->get_topic->topic->name)) --}}
+    {{-- @php(dd(@$RSSNews->get_topic_multi)) --}}
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
             <a href="{{route('news.index')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            <div class="bc-head">@langapp('news') > WhatsApp’s new fact-check feature lets users identify fake information</div>   
+            <div class="bc-head">@langapp('news') > {{@$RSSNews->title_th}}</div>   
 
-             <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-arrow-right"></i></span>
-             </button>
-             <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-arrow-left"></i></span>
-             </button>
+            @if($RSSNews_next)
+                <a href="{{route('news.news_detail_code',['code' => @$RSSNews_next->code])}}"><button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
+                    <span><i class="fas fa-arrow-right"></i></span>
+                </button></a>
+            @else 
+                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
+                    <span><i class="fas fa-arrow-right"></i></span>
+                </button>
+             @endif
+
+             @if($RSSNews_prev)
+                <a href="{{route('news.news_detail_code',['code' => @$RSSNews_prev->code])}}"><button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
+                    <span><i class="fas fa-arrow-left"></i></span>
+                </button></a>
+             @else 
+                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
+                    <span><i class="fas fa-arrow-left"></i></span>
+                </button>
+             @endif
              <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-print"></i></span>
              </button>
@@ -26,14 +42,25 @@
             <div class="jumborton-description">
                 <div class="container-description">
                     <div class="headding-secondary-text">
-                        <span class="text-date">August 4th, 2020</span>
+                        <span class="text-date">{{--August 4th, 2020--}}{{@date("F d",strtotime($RSSNews->public_date))}}th{{@date(", Y",strtotime($RSSNews->public_date))}}</span>
                         <div class="mobi-d-block">
-                            <span class="badeg-news"><i class="fas fa-newspaper"></i> NEWS</span>
-                            <span class="badeg-view"><i class="fas fa-eye"></i> Views 300</span>
+                            {{-- @php(dd($RSSNews)) --}}
+                            {{-- @$RSSNews->get_topic->topic->name --}}
+                            @if(@$RSSNews->get_topic_multi)
+                                @foreach(@$RSSNews->get_topic_multi as $topic)
+                                {{-- 1 --}}
+                                {{-- {{@var_dump($topic)}} --}}
+                                    {{-- {{@$topic->topic->name}} --}}
+                                    <span class="badeg-news"><i class="fas fa-newspaper"></i> {{@$topic->topic->name}}</span>&nbsp;
+                                @endforeach
+
+                            @endif
+                            {{-- <span class="badeg-news"><i class="fas fa-newspaper"></i> NEWS</span> --}}
+                            <span class="badeg-view"><i class="fas fa-eye"></i> Views {{@$RSSNews->view ? $RSSNews->view : 0}}</span>
                         </div>
                     </div>
                     <div class="headding-primary-text">
-                        WhatsApp’s new fact-check feature lets users identify fake information
+                        {{@$RSSNews->title_th}}
                     </div>
                     <div class="shared-news">
                         <div class="pos-rlt">
@@ -64,7 +91,8 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="show-content-news">
-                        <p>Intel is currently looking into how 20GB of sensitive internal data came to find its way online.</p>
+                        {!!@$RSSNews->detail_th!!}
+                        {{-- <p>Intel is currently looking into how 20GB of sensitive internal data came to find its way online.</p>
 
                         <p>The range of documents — some marked “confidential,” “under NDA” or “restricted secret”— were uploaded to file hosting service MEGA by Swiss Android developer Till Kottmann.</p>
                         
@@ -86,21 +114,34 @@
                         
                         <p>“There is always a risk when sharing potentially sensitive information to these business partners, however, this is often an unavoidable part of doing business,” he added.</p>
                         
-                        <p>“Whenever providing intellectual property access to another organization or individual, it is important to log not only who has access, but when and what data they are accessing. Even better, as in this case with Intel, ensuring that you know where the documents have been shared by potentially marking the document itself, can be very valuable when hunting potential misuse as appears to have occurred here."</p>
+                        <p>“Whenever providing intellectual property access to another organization or individual, it is important to log not only who has access, but when and what data they are accessing. Even better, as in this case with Intel, ensuring that you know where the documents have been shared by potentially marking the document itself, can be very valuable when hunting potential misuse as appears to have occurred here."</p> --}}
                     </div>
                 </div>
                 <div class="col-md-4">
+                    @if(@$RSSNews_last10)
                     <ul class="news_related">
                         <li>
                             <h2>Related to This Story</h2>
                         </li>
-                        <li><a href="">Lorem ipsum dolor, sit amet consectetur Lorem ipsum dolor, sit amet consectetur </a></li>
+                        @if(@$RSSNews_last10)
+                            @if($lang == 'th')
+                                @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                                    <li><a href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_th}}</a></li>
+                                @endforeach
+                            @else
+                                 @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                                    <li><a href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_en}}</a></li>
+                                @endforeach
+                            @endif
+                        @endif
+                        {{-- <li><a href="">Lorem ipsum dolor, sit amet consectetur Lorem ipsum dolor, sit amet consectetur </a></li>
                         <li><a href="">adipisicing elit. Autem quis cum veniam Autem quis cum veniam</a> </li>
                         <li><a href="">laudantium expedita hic illum optio expedita hic illum</a></li>
                         <li><a href="">laudantium expedita hic illum optio expedita hic illum</a></li>
                         <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li>
-                        <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li>
+                        <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li> --}}
                     </ul>
+                    @endif
                 </div>
             </div>
         </div>
