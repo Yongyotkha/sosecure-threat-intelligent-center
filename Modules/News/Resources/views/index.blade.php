@@ -298,6 +298,7 @@
             datatype: "json",
         }).done(function(data){
             $(ele).addClass("bookmark-active"); 
+            load_more_book_mark(page);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
