@@ -44,7 +44,7 @@ class NewsController extends Controller
     {
         $SiteSettings = SiteSettings::all();
         $RSSNews_all = RSSNews::all();
-        $SiteNewsRelated = SiteNewsRelated::get();
+        $SiteNewsRelated = SiteNewsRelated::all();
 
         $news_array = array();
         // $new_array_sub = [];
@@ -86,28 +86,30 @@ class NewsController extends Controller
             }
         }
 
-        // $site_news_related = [];
-        // if($SiteNewsRelated) {
-        //     foreach($SiteNewsRelated as $key => $val) {
-        //         $val_news_related_id = $val->id;
-        //         // $val->get_cate[0]->get_cate_name->id;
-        //         $news_related_array_sub = [];
-        //         if($val->get_categorys) {
-        //             foreach($val->get_categorys as $key2 => $val2) {
+        $site_news_related = [];
+        if($SiteNewsRelated) {
+            foreach($SiteNewsRelated as $key => $val) {
+                $val_news_related_id = $val->site_id;
+                // $val->get_cate[0]->get_cate_name->id;
+                $news_related_array_sub = [];
+                if($val->get_news) {
+                    foreach($val->get_news[0]->get_cate as $key2 => $val2) {
 
-        //                 $site_array_sub['site_id'] = $val_news_id;
-        //                 $site_array_sub['cate_id'] = $val2->category_id;
+                        $news_related_array_sub['site_id'] = $val_news_related_id;
+                        $news_related_array_sub['cate_id'] = $val2->news_category_id;
 
-        //             }
-        //             array_push($site_news_related, $news_related_array_sub);
-        //         }
+                    }
+                    array_push($site_news_related, $news_related_array_sub);
+                }
 
-        //     }
-        // }
+            }
+        }
 
-        dd($news_array);
+        // dd($news_array);
         // dd($site_array);
-        // dd($site_news_related);
+        dd($site_news_related);
+        // dd($SiteNewsRelated[0]->get_news[0]->get_cate);
+        // dd($SiteNewsRelated[0]->get_news->get_cate);
 
 
         
