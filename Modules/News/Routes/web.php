@@ -18,6 +18,10 @@ Route::group(
 		Route::get('/detail', 'NewsController@news_detail')->name('news.news_detail')->middleware('can:menu_items');
 
 		Route::get('/test', 'NewsController@test')->name('news.test')->middleware('can:menu_items');
+		Route::get('/jqueryLoadMoreNews', 'NewsController@jqueryLoadMoreNews')->name('jqueryLoadMoreNews');
+		Route::get('/jqueryLoadMoreNewsTopic', 'NewsController@jqueryLoadMoreNewsTopic')->name('jqueryLoadMoreNewsTopic');
+		Route::get('/bookmark', 'NewsController@bookmark')->name('bookmark');
+		
 	}
 );
 

@@ -11,4 +11,8 @@ class NewsTopics extends Model
     public function topic(){
         return $this->belongsTo(Topic::class, 'topic_id', 'id');
     }
+
+    public function news(){
+        return $this->belongsTo(RSSNews::class, 'rss_news_id', 'id');
+    }
 }

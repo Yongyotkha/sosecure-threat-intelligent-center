@@ -91,84 +91,24 @@
                             </div>
                             <div class="col-lg-12">
                                 <ul class="topics-news-list">
+                                    @foreach($topic as $key => $data)
                                     <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
+                                        <a href="javascript:void(0);" onclick="load_more_topic({{{ $data -> id }}})">{{ $data -> name }} 
+                                            <?php $number[$data -> id] = 0 ?>
+                                            @if(@$NewsTopic[$key]->topic_id == $data -> id)
+                                                <?php $number[$data -> id]++ ?>
+                                                @if(@$ReadTopic[$key]->topic_id == $data -> id)
+                                                    <?php $number[$data -> id]-- ?>
+                                                @endif
+                                                @if(@$number[$data -> id] !== 0)
+                                                    <span id="count_topic_{{ $data -> id }}">
+                                                        <span class="count-alert">{{ $number[$data -> id] }}</span>
+                                                    </span> 
+                                                @endif
+                                            @endif
+                                        </a>
                                     </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">ม็อบราษฏร <span class="count-alert"> 1 </span></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">คนล่ะครึ่ง</a>
-                                    </li>
+                                    @endforeach
                                 </ul>
                             </div>
                         </div>
@@ -176,8 +116,8 @@
                 </section>
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
-                        <li class="active"><a href="#tab_related_news" data-toggle="tab">News ({{@$RSSNews_count ? $RSSNews_count : 0}})</a></li>
-                        <li id="tab-bookmark" class="disabled"><a id="link_tab_bookmark" href="#tab_lastest_news" data-toggle="tab">My Bookmarks</a></li>   
+                        <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
+                        <li id="tab-bookmark"><a id="link_tab_bookmark" href="#tab_lastest_news" data-toggle="tab">My Bookmarks</a></li>   
                         <li class="pull-right">
                             <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                                 <span>Bookmarks</span>
@@ -189,33 +129,9 @@
                             <section class="panel panel-default border-n">
                                 <div id="main-list" class="row m-b-md">
                                     <div class="col-md-12">
-                                        <div class="list-news">
-                                            <div class="checkbox-news-select">
-                                                <label class="mr-3">
-                                                    <input type="checkbox" name="" class="chk-bookmark">
-                                                    <span class="label-text checkbox-news-input"></span>
-                                                </label>
-                                            </div>
-                                            <div class="content-news-text">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
-                                                </a>
-                                                <div class="entry-meta">
-                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                    <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
-                                                </div>
-                                            </div>
-                                            <div class="content-news-image">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <img src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="action-bookmark">
-                                                <i class="fas fa-bookmark bookmark-active" id="mark1" onclick="Bookmarks(this)"></i>
-                                            </div>
-                                        </div>
-                                        <div class="list-news">
+                                        <div id="list_news"></div>
+                                        
+                                        {{-- <div class="list-news">
                                             <div class="checkbox-news-select">
                                                 <label class="mr-3">
                                                     <input type="checkbox" name="" class="chk-bookmark">
@@ -242,185 +158,9 @@
                                             <div class="action-bookmark">
                                                 <i class="fas fa-bookmark" id="mark1" onclick="Bookmarks(this)"></i>
                                             </div>
-                                        </div>
-                                        <div class="list-news">
-                                            <div class="checkbox-news-select">
-                                                <label class="mr-3">
-                                                    <input type="checkbox" name="" class="chk-bookmark">
-                                                    <span class="label-text checkbox-news-input"></span>
-                                                </label>
-                                            </div>
-                                            <div class="content-news-text">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
-                                                </a>
-                                                <div class="entry-meta">
-                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                    <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
-                                                </div>
-                                            </div>
-                                            <div class="content-news-image">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <img src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="action-bookmark">
-                                                <i class="fas fa-bookmark" id="mark2" onclick="Bookmarks(this)"></i>
-                                            </div>
-                                        </div>
-                                        <div class="list-news">
-                                            <div class="checkbox-news-select">
-                                                <label class="mr-3">
-                                                    <input type="checkbox" name="" class="chk-bookmark">
-                                                    <span class="label-text checkbox-news-input"></span>
-                                                </label>
-                                            </div>
-                                            <div class="content-news-text">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
-                                                </a>
-                                                <div class="entry-meta">
-                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                    <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
-                                                </div>
-                                            </div>
-                                            <div class="content-news-image">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <img src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="action-bookmark">
-                                                <i class="fas fa-bookmark" id="mark3" onclick="Bookmarks(this)"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {{-- <div class="col-sm-12">
-                                        <div class="shadow-box-news">
-                                            <article class="def-rlt">
-                                                <figure class="overlay relative">
-                                                    <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
-                                                        <img class="img-responsive" src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="entry">
-                                                    <span class="entry-category">
-                                                        <a href="{{route('news.news_detail')}}">Technology News</a>
-                                                    </span>
-                                                    <h3>
-                                                        <a href="{{route('news.news_detail')}}">
-                                                            WhatsApp’s new fact-check feature lets users identify fake information
-                                                        </a>
-                                                    </h3>
-                                                    <div class="entry-meta">
-                                                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                        <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    </div>
-                                                    <div class="description-text hidden-xs">
-                                                        WhatsApp's "Search the Web" feature lets users perform web searches on viral messages to confirm their authenticity.
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        </div>
-                                    </div> --}}
-                                    {{-- <div class="col-sm-12">
-                                        <div class="shadow-box-news">
-                                            <article class="def-rlt">
-                                                <figure class="overlay relative">
-                                                    <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
-                                                        <img class="img-responsive" src="https://images.unsplash.com/photo-1544890225-2f3faec4cd60?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="entry">
-                                                    <span class="entry-category">
-                                                        <a href="{{route('news.news_detail')}}">CYBER CRIME</a>
-                                                    </span>
-                                                    <h3>
-                                                        <a href="{{route('news.news_detail')}}">
-                                                            How hackers behind Twitter Bitcoin scam were caught
-                                                        </a>
-                                                    </h3>
-                                                    <div class="entry-meta">
-                                                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                        <span class="entry-view"> <i class="fas fa-eye"></i> 1,000</span>
-                                                    </div>
-                                                    <div class="description-text hidden-xs">
-                                                        The Twitter Bitcoin scam allowed hackers to rake in over £80,000/$100,000.
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="shadow-box-news">
-                                            <article class="def-rlt">
-                                                <figure class="overlay relative">
-                                                    <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
-                                                        <img class="img-responsive" src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1066&q=80" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="entry">
-                                                    <span class="entry-category">
-                                                        <a href="{{route('news.news_detail')}}">PHISHING SCAM</a>
-                                                    </span>
-                                                    <h3>
-                                                        <a href="{{route('news.news_detail')}}">
-                                                            Fake Zoom meeting invitation phishing scam harvests Microsoft credentials
-                                                        </a>
-                                                    </h3>
-                                                    <div class="entry-meta">
-                                                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
-                                                        <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    </div>
-                                                    <div class="description-text hidden-xs">
-                                                        Initially targeting Zoom users; the phishing scam aims for Outlook and Office365 credentials.
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="shadow-box-news">
-                                            <article class="def-rlt">
-                                                <figure class="overlay relative">
-                                                    <a href="{{route('news.news_detail')}}" class="thumb-overlay-small">
-                                                        <img class="img-responsive" src="https://images.unsplash.com/photo-1568027763595-ef293f388029?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="entry">
-                                                    <span class="entry-category">
-                                                        <a href="{{route('news.news_detail')}}">HACKING NEWS</a>
-                                                    </span>
-                                                    <h3>
-                                                        <a href="{{route('news.news_detail')}}">
-                                                            Transmission of Pakistani news channel interrupted to display Indian flag
-                                                        </a>
-                                                    </h3>
-                                                    <div class="entry-meta">
-                                                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 3rd, 2020</span>
-                                                        <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    </div>
-                                                    <div class="description-text hidden-xs">
-                                                        Prominent Pakistani news channel Dawn had its transmission...
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        </div>
-                                    </div> --}}
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-xs-12 text-center mb-2">
-                                        <div class="paginate-footer">
-                                            <button class="btn btn-default btn-icon previos">
-                                                <i class="fas fa-chevron-left"></i>
-                                            </button>
-                                            &nbsp;
-                                            <button class="btn btn-default btn-icon next">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </button>
-                                        </div>
+                                        </div> --}}
+                                        
+                                        
                                     </div>
                                 </div>
                             </section>
@@ -494,9 +234,85 @@
 @include('stacks.js.form')
 
 <script>
+    var page = 1; 
+    var page_stop = true;
+    load_more(page);
 
-    function Bookmarks(ele){
-        $(ele).addClass("bookmark-active");
+    $('.tab-content').scroll(function(event) {
+        if($('.tab-content').scrollTop() + $('.tab-content').height() >= $(document).height()) {
+            page++;
+            if(page_stop){
+                load_more(page);
+            }
+        }
+    });
+
+    function load_more(page){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/news/jqueryLoadMoreNews?page=" + page,
+            type: "get",
+            datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                page_stop = false;
+                $('.ajax-loading').html("");
+                $('#count_news').text(0);
+                return;
+            }
+            $('#count_news').text(data.count);
+            $('.ajax-loading').hide();
+            $("#list_news").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+    function load_more_topic(topic_id){
+        $("#list_news").empty();
+        $("#count_topic_" + topic_id).empty();
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/news/jqueryLoadMoreNewsTopic?topic_id=" + topic_id,
+            type: "get",
+            datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                page_stop = false;
+                $('.ajax-loading').html("");
+                $('#count_news').text(0);
+                return;
+            }
+            $('#count_news').text(data.count);
+            $('.ajax-loading').hide();
+            $("#list_news").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+    function Bookmarks(ele, news_id){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/news/bookmark?news_id=" + news_id,
+            type: "get",
+            datatype: "json",
+        }).done(function(data){
+            $(ele).addClass("bookmark-active"); 
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
     }
 
     $('#tab-bookmark').addClass("disabled");
