@@ -132,21 +132,27 @@ class NewsController extends Controller
        $topic = Topic::where('status', 1)->get();
        $NewsTopic = [];
        $ReadTopic = [];
-       foreach($topic as $data){
-        $NewsTopic[] = NewsTopics::where('topic_id', $data->id)->wherehas('news', function($q){
-            $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());
-        })->first();
+  
+       if($topic){
+        foreach($topic as $data){
+            $NewsTopic[] = NewsTopics::where('topic_id', $data->id)->wherehas('news', function($q){
+                $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());
+            })->first();
+           }
+       } 
+       if($NewsTopic){
+            foreach($NewsTopic as $data){
+                $ReadTopic[] = ReadTopic::where('topic_id', '=',$data['topic_id'])->where('news_id', '=',$data['rss_news_id'])->first();
+           }
        }
-       foreach($NewsTopic as $data){
-        $ReadTopic[] = ReadTopic::where('topic_id', '=',$data['topic_id'])->where('news_id', '=',$data['rss_news_id'])->first();
-       }
-       $data['RSSNews_all'] = $RSSNews_all;
-       $data['RSSNews_count'] = $RSSNews_count;
-       $data['page'] = langapp('news');
-       $data['topic'] = $topic;
-       $data['NewsTopic'] = $NewsTopic;
-       $data['ReadTopic'] = $ReadTopic;
-       return view('news::index')->with($data);
+
+       $RSSNews_all = $RSSNews_all;
+       $RSSNews_count = $RSSNews_count;
+       $page = langapp('news');
+       $topic = $topic;
+       $NewsTopic = $NewsTopic;
+       $ReadTopic = $ReadTopic;
+       return view('news::index',compact('RSSNews_all','RSSNews_count','page','topic','NewsTopic','ReadTopic'));
     }
 
     public function news_detail()

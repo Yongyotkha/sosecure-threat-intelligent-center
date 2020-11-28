@@ -177,7 +177,7 @@
                                                 </label>
                                             </div>
                                             <div class="content-news-text">
-                                                <a href="{{route('news.news_detail')}}">
+                                                <a href="#">
                                                     <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
                                                 </a>
                                                 <div class="entry-meta">
@@ -187,7 +187,7 @@
                                                 </div>
                                             </div>
                                             <div class="content-news-image">
-                                                <a href="{{route('news.news_detail')}}">
+                                                <a href="#">
                                                     <img src="https://images.unsplash.com/photo-1593642703013-5a3b53c965f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=925&q=80" alt="">
                                                 </a>
                                             </div>
