@@ -5,6 +5,7 @@ namespace Modules\News\Http\Controllers;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
+use Modules\RSSFeedSettings\Entities\NewsTopics;
 
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
@@ -132,6 +133,91 @@ class NewsController extends Controller
     public function news_detail()
     {
         $data['page'] = langapp('news_detail');
+       return view('news::news_detail')->with($data);
+    }
+
+    public function news_detail_code($code)
+    {
+        $RSSNews_prev = '';
+        $RSSNews_next = '';
+        $RSSNews_last10 = '';
+        $lang = 'th';
+        $RSSNews = RSSNews::where("code",$code)->first();
+
+        $topic_id_all = [];
+        if($RSSNews->get_topic_multi) {
+            foreach($RSSNews->get_topic_multi as $topic) {
+                $topic->topic->id;
+                $topic_id_all[] = intval($topic->topic->id);
+                // dd($topic->topic->id);
+            }
+        }
+        // dd($topic_id_all);
+
+
+        if($topic_id_all) {
+            $NewsTopics = NewsTopics::whereIn('topic_id', $topic_id_all)->where('status',1)->get();
+            // dd($NewsTopics);
+            
+            
+            $rss_news_id_array = [];
+            if($NewsTopics) {
+                foreach($NewsTopics as $NewsTopics_val) {
+                    if($NewsTopics_val->rss_news_id == $RSSNews->id) {
+
+                    } else {
+                        $rss_news_id_array[] = intval($NewsTopics_val->rss_news_id);
+                    }
+                    // dd($topic->topic->id);
+                }
+            }
+            // dd($rss_news_id_array);
+            if($rss_news_id_array) {
+                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->orderBy('public_date','DESC')->limit(10)->get();
+                // dd($RSSNews_last10);
+            }
+
+
+            $rss_news_id_all_array = [];
+            if($NewsTopics) {
+                foreach($NewsTopics as $NewsTopics_val) {
+                    
+                        $rss_news_id_all_array[] = intval($NewsTopics_val->rss_news_id);
+                    
+                    // dd($topic->topic->id);
+                }
+            }
+            // dd($rss_news_id_all_array);
+            if($rss_news_id_all_array) {
+                $RSSNews_prev = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','<',$RSSNews->id)->orderBy('public_date','DESC')->limit(1)->first();
+                $RSSNews_next = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','>',$RSSNews->id)->orderBy('public_date','DESC')->limit(1)->first();
+                // dd($RSSNews_last10);
+            }
+            
+        }
+
+        // dd($RSSNews_prev);
+        // dd($RSSNews_next);
+        if($lang == 'th') {
+            $RSSNews_name = $RSSNews->title_th;
+            $RSSNews_detail = $RSSNews->detail_th;
+        } else {
+            $RSSNews_name = $RSSNews->title_en;
+            $RSSNews_detail = $RSSNews->detail_en;
+        }
+
+
+        $data['RSSNews_prev'] = $RSSNews_prev;
+        $data['RSSNews_next'] = $RSSNews_next;
+        $data['RSSNews_last10'] = $RSSNews_last10;
+        $data['RSSNews_name'] = $RSSNews_name;
+        $data['RSSNews_detail'] = $RSSNews_detail;
+        $data['lang'] = $lang;
+        $data['RSSNews'] = $RSSNews;
+        $data['page'] = langapp('news_detail');
+        // $RSSNews;
+        $RSSNews->view = $RSSNews->view+1;
+        $RSSNews->save();
        return view('news::news_detail')->with($data);
     }
     
