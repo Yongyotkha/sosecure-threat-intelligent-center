@@ -327,7 +327,7 @@ class NewsController extends Controller
 
     public function jqueryLoadMoreNews(Request $request){
         $html = '';
-        $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('public_date','desc')->get();
+        $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->get();
         foreach($news as $data){
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
@@ -380,7 +380,7 @@ class NewsController extends Controller
     public function jqueryLoadMoreNewsTopic(Request $request){
         $html = '';
         $NewsTopic = NewsTopics::where('topic_id', $request->topic_id)->wherehas('news', function($q){
-            $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('public_date','desc');
+            $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc');
         })->get();
         foreach($NewsTopic as $data){
             $checkReadTopic = ReadTopic::where('user_id', Auth::user()->id)->where('topic_id', $data -> topic_id)->where('news_id', $data -> rss_news_id)->first();
