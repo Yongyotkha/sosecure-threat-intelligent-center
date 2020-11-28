@@ -3,7 +3,7 @@
 namespace Modules\SiteSettings\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\SiteSettings\Entities\SiteCategory;
+use Modules\RSSFeedSettings\Entities\RSSNews;
 
 class SiteNewsRelated extends Model{
     protected $table = "site_news_related";
@@ -18,8 +18,10 @@ class SiteNewsRelated extends Model{
         return $this->locale;
     }
 
-    public function get_categorys(){
-        return $this->hasMany(SiteCategory::class, 'site_id', 'id');
+    public function get_news(){
+        // return $this->hasMany(RSSNews::class, 'news_id', 'id');
+        return $this->hasMany(RSSNews::class, 'id', 'news_id')->with("get_cate");
+        // return $this->belongsTo(RSSNews::class, 'news_id', 'id')->with("get_cate");
     }
 
     
