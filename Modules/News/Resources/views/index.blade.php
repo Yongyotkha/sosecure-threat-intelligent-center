@@ -303,7 +303,6 @@
         });
     }
 
-    // $('#tab-bookmark').addClass("disabled");
     $('#link_tab_bookmark').attr("href","#");
     $('#main-list').on('click', '.chk-bookmark', function () {
         if ($(this).is(':checked')) {
