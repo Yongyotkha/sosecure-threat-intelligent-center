@@ -11,14 +11,12 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
 use Modules\RSSFeedSettings\Entities\NewsTopics;
-
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Modules\RSSFeedSettings\Entities\NewsTopics;
 
 class NewsController extends Controller
 {
