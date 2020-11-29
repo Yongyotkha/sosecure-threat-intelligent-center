@@ -6,13 +6,6 @@
     $(document).ready(function() {
   		$('.htmleditor').summernote({
   			height: 300,
-  			toolbar: [
-					    ['style', ['bold', 'italic', 'underline', 'clear']],
-					    ['fontsize', ['fontsize']],
-					    ['color', ['color']],
-					    ['para', ['ul', 'ol', 'paragraph']],
-					    ['height', ['height']]
-					  ]
   		});
 	});
 

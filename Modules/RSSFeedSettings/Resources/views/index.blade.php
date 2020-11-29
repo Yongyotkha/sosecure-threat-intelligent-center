@@ -42,7 +42,6 @@
     
         <aside>
             <section class="vbox">
-    
                 <header class="header panel-heading bg-white b-b b-light">
                     {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                     @icon('solid/arrow-left')
@@ -75,7 +74,7 @@
                     </a> --}}
                 </header>
 
-                <section class="wrapper">
+                <section class="scrollable wrapper">
                     <section class="panel panel-default">
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-rss-setting-template">

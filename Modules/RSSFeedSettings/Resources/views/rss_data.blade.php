@@ -1,11 +1,14 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
+
     <section class="hbox stretch">      
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
+                        data-target="#setting-nav">@icon('solid/bars')
+                    </a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                     <p class="h3">@langapp('settings')  </p>
                 </header>
@@ -39,58 +42,7 @@
         </aside>
     
         <aside>
-            <section class="wrapper bg-grey">
-                <section class="panel panel-default">
-                    <div class="container-fluid" style="padding: 2rem;">
-                        <div class="row m-b-md">
-                            
-                            <div class="col-lg-4">
-                                <label for="">Keywords</label>
-                               <input type="text" class="form-control" name="keywords" id="keywords">
-                            </div>
-                            <div class="col-lg-4">
-                                <label for="">Public Date</label>
-                                <div class="input-group date">
-                                    <input id="public_date" type="text" class="form-control datetimepicker-input" name="public_date"
-                                    data-date-format="DD-MM-YYYY" data-date-start-date="moment()" required>
-                                    <div class="input-group-addon">
-                                        @icon('solid/calendar-alt', 'text-muted')
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <label for="">Status</label>
-                                <select id="status" class="select2-option form-control">
-                                    <option value="1" selected>All</option>
-                                    <option value="2">Used</option>
-                                    <option value="3">Not Used</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <label for="">Source</label>
-                                <input type="text" class="form-control" name="source" id="source">
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-lg-12 text-right">
-                                <button type="button" class="btn btn-info btn-responsive" onclick="search()">
-                                    <i class="fas fa-search"></i>
-                                    Search
-                                </button>
-                                <button type="button" class="btn btn-default btn-responsive" style="white-space: nowrap">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </section>
             <section class="vbox">
-    
                 <header class="header panel-heading bg-white b-b b-light">
                     {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                     @icon('solid/arrow-left')
@@ -111,7 +63,55 @@
                     </a>
                 </header>
 
-                <section class="wrapper">
+                <section class="scrollable wrapper">
+                    <section class="panel panel-default">
+                        <div class="container-fluid" style="padding: 2rem;">
+                            <div class="row m-b-md">
+                                <div class="col-lg-4">
+                                    <label for="">Keywords</label>
+                                   <input type="text" class="form-control" name="keywords" id="keywords">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="">Public Date</label>
+                                    <div class="input-group date">
+                                        <input id="public_date" type="text" class="form-control datetimepicker-input" name="public_date"
+                                        data-date-format="DD-MM-YYYY" data-date-start-date="moment()" required>
+                                        <div class="input-group-addon">
+                                            @icon('solid/calendar-alt', 'text-muted')
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="">Status</label>
+                                    <select id="status" class="select2-option form-control">
+                                        <option value="1" selected>All</option>
+                                        <option value="2">Used</option>
+                                        <option value="3">Not Used</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <label for="">Source</label>
+                                    <input type="text" class="form-control" name="source" id="source">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" class="btn btn-info btn-responsive" onclick="search()">
+                                        <i class="fas fa-search"></i>
+                                        Search
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+    
                     <section class="panel panel-default">
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-rss-data">
@@ -140,6 +140,7 @@
             </section>
         </aside>
     </section>
+    {{-- ------------------- --}}
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
