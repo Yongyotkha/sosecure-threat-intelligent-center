@@ -1,0 +1,1 @@
+<link rel="stylesheet" href="{{ getAsset('plugins/wysiwyg/summernote.css') }}" type="text/css"/>

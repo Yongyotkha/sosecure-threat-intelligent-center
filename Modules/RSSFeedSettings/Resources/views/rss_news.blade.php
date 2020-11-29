@@ -62,7 +62,7 @@
 
             {{-- Search --}}
             {{-- Tab Content --}}
-            <section class="wrapper bg-grey">
+            <section class="scrollable wrapper bg-grey">
                 <section class="panel panel-default">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
@@ -255,7 +255,7 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control markdownEditor" name="detail_th" id="detail_th" data-id="1"></textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1"></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -272,7 +272,7 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Detail (EN) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control markdownEditor" name="detail_en" id="detail_en" data-id="1"></textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1"></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -347,12 +347,14 @@
 @include('stacks.css.datatables')
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
+@include('stacks.css.summernote')
 @endpush
 
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
+@include('scripts.summernote')
 @include('stacks.js.markdown')
 @include('stacks.js.hidesettings')
 
@@ -445,6 +447,7 @@ $(function() {
                 {
                     data: 'link',
                     name: 'link',
+                    className: 'no-wrap'
                 },
                 {
                     data: 'status',

@@ -1931,3 +1931,7 @@ ul.topics-news-list li a:hover{
 .action-bookmark i.bookmark-active{
     color: rgb(253, 207, 3);
 }
+
+.scrollable {
+    width: 100%;
+}

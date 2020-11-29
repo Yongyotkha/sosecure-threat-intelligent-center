@@ -7,7 +7,6 @@
   		$('.htmleditor').summernote({
   			height: 300,
   			toolbar: [
-					    // [groupName, [list of button]]
 					    ['style', ['bold', 'italic', 'underline', 'clear']],
 					    ['fontsize', ['fontsize']],
 					    ['color', ['color']],
