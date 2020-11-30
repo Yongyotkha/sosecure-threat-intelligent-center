@@ -5,6 +5,7 @@ namespace Modules\News\Http\Controllers;
 use App\Bookmark;
 use App\ReadNews;
 use App\ReadTopic;
+use App\ReadCategories;
 use App\Topic;
 use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
@@ -13,6 +14,7 @@ use Modules\SiteSettings\Entities\SiteNewsRelated;
 use Modules\RSSFeedSettings\Entities\NewsTopics;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
+use Modules\CategorySettings\Entities\CategorySettings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -124,35 +126,37 @@ class NewsController extends Controller
 
     public function index()
     {
-        $RSSNews_count = RSSNews::count("id");
+        $RSSNews_count = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
+        // dd($news_all);
+        // $RSSNews_count = RSSNews::count("id");
         $RSSNews_all = RSSNews::all();
         // dd($RSSNews_all[0]->get_cate);
         // dd($RSSNews_all[0]->get_cate[0]->get_cate_name->name);
         // dd($RSSNews_count);
-       $topic = Topic::where('status', 1)->get();
-       $NewsTopic = [];
-       $ReadTopic = [];
+       $Category = CategorySettings::where('active', 1)->get();
+       $NewsCategory = [];
+       $ReadCategories = [];
   
-       if(!empty($topic)){
-        foreach($topic as $data){
-            $NewsTopic[] = NewsTopics::where('topic_id', @$data->id)->wherehas('news', function($q){
+       if(!empty($Category)){
+        foreach($Category as $data){
+            $NewsCategory[] = RSSNewsCategory::where('news_category_id', @$data->id)->wherehas('news', function($q){
                 $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());
             })->first();
            }
        } 
-       if(!empty($NewsTopic)){
-            foreach($NewsTopic as $data){
-                $ReadTopic[] = ReadTopic::where('topic_id', '=',@$data['topic_id'])->where('news_id', '=',@$data['rss_news_id'])->first();
+       if(!empty($NewsCategory)){
+            foreach($NewsCategory as $data){
+                $ReadCategories[] = ReadCategories::where('categories_id', '=',@$data['news_category_id'])->where('news_id', '=',@$data['rss_news_id'])->first();
            }
        }
 
        $RSSNews_all = $RSSNews_all;
        $RSSNews_count = $RSSNews_count;
        $page = langapp('news');
-       $topic = $topic;
-       $NewsTopic = $NewsTopic;
-       $ReadTopic = $ReadTopic;
-       return view('news::index',compact('RSSNews_all','RSSNews_count','page','topic','NewsTopic','ReadTopic'));
+       $Category = $Category;
+       $NewsCategory = $NewsCategory;
+       $ReadCategories = $ReadCategories;
+       return view('news::index',compact('RSSNews_all','RSSNews_count','page','Category','NewsCategory','ReadCategories'));
     }
 
     public function news_detail()
@@ -169,53 +173,53 @@ class NewsController extends Controller
         $lang = 'th';
         $RSSNews = RSSNews::where("code",$code)->first();
 
-        $topic_id_all = [];
-        if($RSSNews->get_topic_multi) {
-            foreach($RSSNews->get_topic_multi as $topic) {
-                $topic->topic->id;
-                $topic_id_all[] = intval($topic->topic->id);
-                // dd($topic->topic->id);
+        $cate_id_all = [];
+        if($RSSNews->get_cate) {
+            foreach($RSSNews->get_cate as $cate) {
+                $cate->get_cate_name->id;
+                $cate_id_all[] = intval($cate->get_cate_name->id);
+                // dd($cate->get_cate_name->id);
             }
         }
-        // dd($topic_id_all);
+        // dd($cate_id_all);
 
 
-        if($topic_id_all) {
-            $NewsTopics = NewsTopics::whereIn('topic_id', $topic_id_all)->where('status',1)->get();
-            // dd($NewsTopics);
+        if($cate_id_all) {
+            $NewsCategory = RSSNewsCategory::whereIn('news_category_id', $cate_id_all)->where('status',1)->get();
+            // dd($NewsCategory);
             
             
             $rss_news_id_array = [];
-            if($NewsTopics) {
-                foreach($NewsTopics as $NewsTopics_val) {
-                    if($NewsTopics_val->rss_news_id == $RSSNews->id) {
+            if($NewsCategory) {
+                foreach($NewsCategory as $NewsCategory_val) {
+                    if($NewsCategory_val->rss_news_id == $RSSNews->id) {
 
                     } else {
-                        $rss_news_id_array[] = intval($NewsTopics_val->rss_news_id);
+                        $rss_news_id_array[] = intval($NewsCategory_val->rss_news_id);
                     }
                     // dd($topic->topic->id);
                 }
             }
             // dd($rss_news_id_array);
             if($rss_news_id_array) {
-                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->orderBy('public_date','DESC')->limit(10)->get();
+                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
                 // dd($RSSNews_last10);
             }
 
 
             $rss_news_id_all_array = [];
-            if($NewsTopics) {
-                foreach($NewsTopics as $NewsTopics_val) {
+            if($NewsCategory) {
+                foreach($NewsCategory as $NewsCategory_val) {
                     
-                        $rss_news_id_all_array[] = intval($NewsTopics_val->rss_news_id);
+                        $rss_news_id_all_array[] = intval($NewsCategory_val->rss_news_id);
                     
                     // dd($topic->topic->id);
                 }
             }
             // dd($rss_news_id_all_array);
             if($rss_news_id_all_array) {
-                $RSSNews_prev = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','<',$RSSNews->id)->orderBy('public_date','DESC')->limit(1)->first();
-                $RSSNews_next = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','>',$RSSNews->id)->orderBy('public_date','DESC')->limit(1)->first();
+                $RSSNews_prev = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','<',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                $RSSNews_next = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','>',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
                 // dd($RSSNews_last10);
             }
             
@@ -327,7 +331,10 @@ class NewsController extends Controller
 
     public function jqueryLoadMoreNews(Request $request){
         $html = '';
-        $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->get();
+
+        $news_all = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
+        $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(5);//->get()
+
         foreach($news as $data){
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
@@ -371,7 +378,7 @@ class NewsController extends Controller
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
-                "count" => count($news)
+                "count" => $news_all
             ];
             return response()->json($data); 
         }

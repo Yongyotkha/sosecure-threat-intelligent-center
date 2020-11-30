@@ -19,7 +19,7 @@
 
             {{-- Search --}}
             {{-- Tab Content --}}
-            <section class="scrollable wrapper bg-grey">
+            <section id="scrollable_news" class="scrollable wrapper bg-grey">
                 <section class="panel panel-default" id="hide-advance-search">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
@@ -27,13 +27,27 @@
                                 <div class="row d-flex align-items-center">
                                     <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
                                     <div class="col-sm-11 col-xs-12">
-                                        <input type="text" class="form-control">
+                                        <input type="text" id="news_title_search" class="form-control">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Category</label>
+                                    <div class="col-sm-9 col-xs-12">
+                                        <section id="news_category" class="select2-option form-control">
+                                            <option value="" >All</option>
+                                            @foreach(@$Category as $cate)
+                                                <option value="{{$cate->code}}" >{{$cate->name}}</option>
+                                            @endforeach
+                                            {{-- <option value="1" selected>All</option> --}}
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- <div class="col-lg-4">
                                 <div class="row d-flex align-items-center">
                                     <label for="" class="col-sm-3 col-xs-12 col-form-label">Sources</label>
                                     <div class="col-sm-9 col-xs-12">
@@ -42,7 +56,7 @@
                                         </section>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-lg-4 text-center">
                                 <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;
@@ -70,11 +84,11 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-12 text-right mt-2">
-                                <button class="btn btn-info btn-responsive">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive">
                                     <i class="fas fa-search"></i>
                                     Search
                                 </button>
-                                <button class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
@@ -83,37 +97,9 @@
                     </div>
                 </section>
 
-                <section class="panel panel-default">
-                    <div class="container-fluid" style="padding:1rem 2rem;">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h3 class="mb-3">Topics</h3>
-                            </div>
-                            <div class="col-lg-12">
-                                <ul class="topics-news-list">
-                                    @foreach($topic as $key => $data)
-                                    <li>
-                                        <a href="javascript:void(0);" onclick="load_more_topic({{{ $data -> id }}})">{{ $data -> name }} 
-                                            <?php $number[$data -> id] = 0 ?>
-                                            @if(@$NewsTopic[$key]->topic_id == $data -> id)
-                                                <?php $number[$data -> id]++ ?>
-                                                @if(@$ReadTopic[$key]->topic_id == $data -> id)
-                                                    <?php $number[$data -> id]-- ?>
-                                                @endif
-                                                @if(@$number[$data -> id] !== 0)
-                                                    <span id="count_topic_{{ $data -> id }}">
-                                                        <span class="count-alert">{{ $number[$data -> id] }}</span>
-                                                    </span> 
-                                                @endif
-                                            @endif
-                                        </a>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+             
+
+
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
@@ -200,8 +186,12 @@
     var page_stop = true;
     load_more(page);
     load_more_book_mark(page);
-    $('.tab-content').scroll(function(event) {
-        if($('.tab-content').scrollTop() + $('.tab-content').height() >= $(document).height()) {
+    $('#scrollable_news').scroll(function(event) {
+            let scrolltop = $('#scrollable_news').scrollTop();
+            let tab_height = $('#scrollable_news').height();
+            let docu_height = $(document).height();
+        console.log(scrolltop+'  '+tab_height+'   '+docu_height);
+        if($('#scrollable_news').scrollTop() + $('#scrollable_news').height() >= $(document).height()) {
             page++;
             if(page_stop){
                 load_more(page);
@@ -244,6 +234,37 @@
             url: "/news/jqueryLoadMoreNews?page=" + page,
             type: "get",
             datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                page_stop = false;
+                $('.ajax-loading').html("");
+                {{--$('#count_news').text(0);--}}
+                return;
+            }
+            $('#count_news').text(data.count);
+            $('.ajax-loading').hide();
+            $("#list_news").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+    $("#btn_news_search").click(function() {
+
+    });
+
+    function load_more_search(page,title=null,cate=null,related_news=null,th=null,en=null,date_start=null,date_end=null){
+        page = 1;
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/news/jqueryLoadMoreNews?page=" + page,
+            type: "get",
+            {{--datatype: "html",--}}
             beforeSend: function(){
                 $('.ajax-loading').show();
             },
