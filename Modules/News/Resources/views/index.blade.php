@@ -359,6 +359,6 @@
         cb(start, end);
     
     });
-    </script>
+</script>
 @endpush
 @endsection
