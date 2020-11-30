@@ -78,6 +78,7 @@ class CategorySettingApiController extends Controller
         // $this->authorize('create', CategorySettings::class);
         // $CategorySettings = $this->CategorySettings->create($request->all());
         $CategorySettings = $this->CategorySettings;
+        $CategorySettings->code = generator_uuid();
         $CategorySettings->name = $request->name;
         $CategorySettings->active = $request->active ? 1 : 0;
         $CategorySettings->save();
