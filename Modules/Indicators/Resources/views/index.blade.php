@@ -47,7 +47,7 @@
             </div>
 
         </header>
-        <section class="scrollable wrapper bg-white">
+        <section id="scroll_otx" class="scrollable wrapper bg-white">
             <div id="hide-search-advance">
                 <div class="row">
                     <div class="col-md-12">
@@ -101,7 +101,7 @@
             <section class="">
                 <div class="row header-badge">
                     <div class="col-md-6 p-l-r-0">
-                        <span class="font-weight-bold">We've found 29 indicators</span>
+                        <span class="font-weight-bold" id="count_otx"></span>
                     </div>
                     <div class="col-md-6 p-l-r-0 text-right">
                         <div class="btn-group">
@@ -124,46 +124,9 @@
                     </div>
                 </div>
 
-                <div class="show-indicators">
-                    <ul class="list-indicators">
-                        <li>
-                            <a href="{{route('indicators.detail_indicators')}}">
-                                <h1 class="primary-text">93.51.50.171</h1>
-                                <span class="secondary-text">Type : IPv4</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{route('indicators.detail_indicators')}}">
-                                <h1 class="primary-text">93.51.50.171</h1>
-                                <span class="secondary-text">Type : IPv4</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{route('indicators.detail_indicators')}}">
-                                <h1 class="primary-text">93.51.50.171</h1>
-                                <span class="secondary-text">Type : IPv4</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{route('indicators.detail_indicators')}}">
-                                <h1 class="primary-text">93.51.50.171</h1>
-                                <span class="secondary-text">Type : IPv4</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{route('indicators.detail_indicators')}}">
-                                <h1 class="primary-text">93.51.50.171</h1>
-                                <span class="secondary-text">Type : IPv4</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{route('indicators.detail_indicators')}}">
-                                <h1 class="primary-text">93.51.50.171</h1>
-                                <span class="secondary-text">Type : IPv4</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <section id="scrollable_otx" class="show-indicators">
+                    <div id="list_otx"></div>
+                </section>
             </section>
         </section>
     </section>
@@ -246,13 +209,58 @@
 
     }
 
-    function clear_data(){
-        
-     
-      
-
+    function clear_data(){        
     }
 </script>
+
+<script>
+    var page = 1; 
+    var page_stop = true;
+    load_more(page);
+    $('#scroll_otx').scroll(function(event) {
+            let scrolltop = $('#scroll_otx').scrollTop();
+            let tab_height = $('#scroll_otx').height();
+            let docu_height = $(document).height();
+        console.log(scrolltop+'  '+tab_height+'   '+docu_height);
+        if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
+            page++;
+            if(page_stop){
+                load_more(page);
+            }
+        }
+    });
+
+  
+
+    function load_more(page){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/LoadMoreOTX?page=" + page,
+            type: "get",
+            datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                page_stop = false;
+                $('.ajax-loading').html("");
+                {{--$('#count_otx').text(0);--}}
+                return;
+            }
+            $('#count_otx').text(data.count+'fgfdgfdg');
+            $('.ajax-loading').hide();
+            $("#list_otx").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+
+</script>
+
 
 
 @endpush
