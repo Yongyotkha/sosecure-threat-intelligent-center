@@ -330,10 +330,40 @@ class NewsController extends Controller
     }
 
     public function jqueryLoadMoreNews(Request $request){
+
+        $date_start = $request->date_start;
+
+        $date_start_explode = explode(" ",$date_start);
+        $date_start_time = $date_start_explode[1].' '.$date_start_explode[2];
+        // dd($date_start_time);
+        $date_start_time_time = date("H:i", strtotime($date_start_time));
+        dd($date_start_time_time);
+
+        // date("H:i", strtotime("04:25 PM"))
         $html = '';
 
         $news_all = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
-        $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(10);//->get()
+
+        if($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end){
+
+            $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+            if($request -> title){
+                $news = $news -> where('title_th', 'LIKE' ,'%'.$request -> title.'%');
+            }
+             $news = $news->orderBy('created_at','desc')->paginate(10);
+            // $news->orderBy('created_at','desc')->paginate(10);
+            // $news = RSSNews::where('save_draft', 0);//->get()
+            // $news -> paginate(10);//->get()
+            // $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(10);//->get()
+            // $news = $news->get();
+            // dd($news->get());
+            // dd($news);
+            $news_all = $news->count();
+        }else{
+            $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(10);//->get()
+        }
+
+        // dd($news);
 
         foreach($news as $data){
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();

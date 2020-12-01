@@ -37,13 +37,13 @@
                                 <div class="row d-flex align-items-center">
                                     <label for="" class="col-sm-3 col-xs-12 col-form-label">Category</label>
                                     <div class="col-sm-9 col-xs-12">
-                                        <section id="news_category" class="select2-option form-control">
+                                        <select id="news_category" class="select2-option form-control">
                                             <option value="" >All</option>
                                             @foreach(@$Category as $cate)
                                                 <option value="{{$cate->code}}" >{{$cate->name}}</option>
                                             @endforeach
                                             {{-- <option value="1" selected>All</option> --}}
-                                        </section>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -66,17 +66,17 @@
                             <div class="col-lg-4 text-center">
                                 <div style="margin-top: 8px;">
                                     <label class="mr-3">
-                                        <input type="checkbox" name="" value="TRUE">
+                                        <input type="checkbox" name="related_news" id="related_news" value="TRUE">
                                         <span class="label-text" style="font-size: 16px;">Related News</span>
                                     </label>
     
                                     <label class="mr-3">
-                                        <input type="checkbox" name="" value="TRUE">
+                                        <input type="checkbox" name="lang_th" id="lang_th" value="TRUE">
                                         <span class="label-text" style="font-size: 16px;">Thai</span>
                                     </label>
     
                                     <label class="mr-3">
-                                        <input type="checkbox" name="" value="TRUE">
+                                        <input type="checkbox" name="lang_en" id="lang_en" value="TRUE">
                                         <span class="label-text" style="font-size: 16px;">English</span>
                                     </label>
                                 </div>
@@ -252,18 +252,26 @@
         });
     }
 
-    $("#btn_news_search").click(function() {
-
-    });
 
     function load_more_search(page,title=null,cate=null,related_news=null,th=null,en=null,date_start=null,date_end=null){
-        page = 1;
+        if(page == 1) {
+            $("#list_news").html('');   
+        }
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             url: "/news/jqueryLoadMoreNews?page=" + page,
             type: "get",
+            data: ({
+                title:title,
+                cate:cate,
+                related_news:related_news,
+                lang_th:th,
+                lang_en:en,
+                date_start:date_start,
+                date_end:date_end
+            }),
             {{--datatype: "html",--}}
             beforeSend: function(){
                 $('.ajax-loading').show();
@@ -358,14 +366,16 @@
     
         function cb(start, end) {
             $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            console.log(start.format('YYYY-MM-DD hh:mm A'));
         }
     
         $('#newsrange').daterangepicker({
             timePicker: true,
+            {{--timePicker24Hour: true,--}}
             startDate: start,
             endDate: end,
             locale: {
-                format: 'M/DD hh:mm A'
+                format: 'M/DD hh:mm A'{{--format: 'M/DD HH:mm A'--}}
             },
             ranges: {
                'Today': [moment(), moment()],
@@ -378,8 +388,38 @@
         }, cb);
     
         cb(start, end);
+
+        $("#btn_news_search").click(function() {
+            {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
+            let startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+            let endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+            console.log(startDate);
+            console.log(endDate);
+            let news_title_search = $("#news_title_search").val();
+            let news_category = $("#news_category").val();
+            let related_news = false;
+            if($("#related_news").is(":checked")) {
+                related_news = true;
+            }
+            let lang_th = false;
+            if($("#lang_th").is(":checked")) {
+                lang_th = true;
+            }
+            let lang_en = false;
+            if($("#lang_en").is(":checked")) {
+                lang_en = true;
+            }
+            console.log(news_category);
+            console.log('related_news '+related_news);
+            console.log('lang_th '+lang_th);
+            console.log('lang_en '+lang_en);
+            page = 1;
+            load_more_search(page,news_title_search,news_category,related_news,lang_th,lang_en,startDate,endDate)
+        });
     
     });
+
+
 </script>
 @endpush
 @endsection
