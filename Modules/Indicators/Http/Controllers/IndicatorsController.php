@@ -149,7 +149,7 @@ class IndicatorsController extends Controller
 
         // dd($news);
         $count = OtxIndicatiorData::where("status", '=', 1)->count();
-        $data = OtxIndicatiorData::where("status", '=', 1)->get();
+        $data = OtxIndicatiorData::where("status", '=', 1)->paginate(10);
         foreach ($data as $data) {
             $html .= ' <ul class="list-indicators">
                         <li>

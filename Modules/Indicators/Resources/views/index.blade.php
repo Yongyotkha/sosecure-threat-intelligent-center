@@ -250,7 +250,7 @@
                 {{--$('#count_otx').text(0);--}}
                 return;
             }
-            $('#count_otx').text(data.count+'fgfdgfdg');
+            $('#count_otx').text("We've found "+data.count+" indicators" );
             $('.ajax-loading').hide();
             $("#list_otx").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
