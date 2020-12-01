@@ -12,7 +12,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use App\Entities\OtxIndicatiorStamp;
 use App\Entities\OtxIndicatiorData;
-
+use App\Entities\OtxIndicatiorType;
 
 class OTXFeedData extends Command
 {
@@ -58,7 +58,7 @@ class OTXFeedData extends Command
         $inputOTXStamp->save();
 
         $client = new \GuzzleHttp\Client();
-        $otxModifiedDate =  gmdate("c", time() - 60 * 60 * 24 *2) ;
+        $otxModifiedDate =  gmdate("c", time() - 60 * 60 * 24 * 1) ;
         $bodyData   = $client->request(
             'GET',
             'https://otx.alienvault.com/api/v1/indicators/export?modified_since='.$otxModifiedDate,
@@ -67,7 +67,8 @@ class OTXFeedData extends Command
                     'Accept'       => 'application/json',
                     'Content-type' => 'application/json',
                     'X-OTX-API-KEY' => $OTX_KEY,
-                ]]
+                ]
+            ]
         )->getBody();
         $otxFeedData = json_decode($bodyData,true);
         $otxFeedDataCheck = true;
@@ -76,7 +77,6 @@ class OTXFeedData extends Command
 
             foreach ($otxFeedData["results"] as $value) {
                 try {
-                    echo json_encode($value["id"]);
                     $inputOTXData = OtxIndicatiorData::updateOrCreate(
                         [
                             'id' => $value["id"]
@@ -119,6 +119,18 @@ class OTXFeedData extends Command
             }
             
         }
-        $this->info("SUCCESS FULLY");
+
+        $loopOTXType = OtxIndicatiorData::select(DB::raw('count(*) as type_count, type'))->groupBy('type')->get();
+        foreach ($loopOTXType as $value) {
+            try {
+                $updateOTXtype = OtxIndicatiorType::where('name',$value["type"])->update(['element_count' => $value["type_count"]]);
+            } catch (Exception $e) {
+                $error["Exception"] = $e;
+            } catch (\Throwable $ex) {
+                $error["Throwable"] = $ex;
+            }
+        }
+
+       //$this->info("SUCCESS FULLY");
     }
 }
