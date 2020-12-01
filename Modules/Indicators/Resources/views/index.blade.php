@@ -53,13 +53,13 @@
                     <div class="col-md-12">
                         <div class="form-group m-b-md">
                             <label for="" class="">Keyword</label>
-                            <input type="text" class="form-control" name="keyword" placeholder="Search">
+                            <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="" class="">Indicator Type</label>
-                            <select name="" id="role" class="select2-option form-control" multiple="multiple">
+                            <select name="type[]" id="type" class="select2-option form-control" multiple="multiple">
                                 <option value="1">All</option>
                                 <option value="2">CIDR</option>
                                 <option value="3">CVE</option>
@@ -96,12 +96,12 @@
                     </div>
                     <div class="col-md-4">
                         <label for="" class="d-block">&nbsp;</label>
-                        <button class="btn btn-info">
+                        <button class="btn btn-info" onclick="search()">
                             <i class="fas fa-search"></i>
                             <span> Search </span>
                         </button>
-                        <button class="btn btn-default">
-                            <i class="fas fa-broom"></i>
+                        <button class="btn btn-default" onclick="clear_data()">
+                            <i class=" fas fa-broom"></i>
                             <span> Clear </span>
                         </button>
                     </div>
@@ -197,6 +197,10 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 <script>
+    var keywords = null;
+    var type = null;
+    var startDate;
+    var endDate;
     $(document).ready(function () {
 
         $('#hide-search-advance').hide();
@@ -219,6 +223,8 @@
 
         function cb(start, end) {
             $('#indicator-date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            startDate = start;
+            endDate = end;
         }
 
         $('#indicator-date').daterangepicker({
@@ -239,8 +245,26 @@
         }, cb);
 
         cb(start, end);
+        
 
     });
+    function search(){
+        
+        keywords = $('#keyword').val();
+        type = $('#type').val();
+        console.log(keywords);
+        console.log(type);
+        console.log(startDate.format('Y-M-D') + ' - ' + endDate.format('D MMMM YYYY'));
+      
+
+    }
+
+    function clear_data(){
+        
+      document.getElementById("selectID").options.length = 0;
+      
+
+    }
 </script>
 
 

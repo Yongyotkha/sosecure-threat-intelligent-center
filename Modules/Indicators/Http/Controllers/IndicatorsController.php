@@ -5,6 +5,7 @@ namespace Modules\Indicators\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\indicators\Entities\OTXtypeData;
 
 class IndicatorsController extends Controller
 {
@@ -33,6 +34,7 @@ class IndicatorsController extends Controller
     public function index()
     {
         $data['page'] = langapp('indicators');
+        $data['otx_type'] = OTXtypeData::all()->toArray();
         return view('indicators::index')->with($data);
     }
 
@@ -92,9 +94,10 @@ class IndicatorsController extends Controller
         //
     }
 
-    public function search(Request $request, $id)
+    public function typeData()
     {
-        echo ('aaa');
+        $data = OTXtypeData::all()->toArray();
+        return view('indicators::index', compact('data'));
     }
 
     /**
