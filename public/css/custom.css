@@ -1935,3 +1935,9 @@ ul.topics-news-list li a:hover{
 .scrollable {
     width: 100%;
 }
+.d-inline{
+    display: inline-block;
+}
+#fullscreen-modal{
+    width: 100% !important;
+}

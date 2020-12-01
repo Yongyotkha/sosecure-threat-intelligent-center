@@ -1,8 +1,8 @@
-<div class="modal-dialog">
+<div id="fullscreen-modal" class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> News</h4>
+            <h4 class="modal-title">News</h4>
         </div>
         {!! Form::open(['route' => ['rssfeedsettings.rss_data_store_news'], 'class' => 'ajaxifyForm', 'method' => 'POST', 'files' => true]) !!}
                  <div class="modal-body">
@@ -16,9 +16,12 @@
                                  <h5>Name : {{ $rss -> title }}</h5>
                              </div>
                              <div class="col-md-12">
-                                <h5>URL : <a href="{{ $rss -> link }}" target="_blank" class="d-inline">{{ $rss -> link }}</a></h5>
-                                <a href="{{ $rss -> link }}" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>
-                                <button type="button" class="btn btn-xs btn-info" onclick="copy_link('{{ $rss -> link }}');"><i class="fas fa-copy"></i> Copy</button>
+                                <h5>URL : {{ $rss -> link }}
+                                    <div class="d-inline">
+                                        <a href="{{ $rss -> link }}" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>
+                                        <button type="button" class="btn btn-xs btn-info" onclick="copy_link('{{ $rss -> link }}');"><i class="fas fa-copy"></i> Copy</button>
+                                    </div>
+                                </h5>
                              </div>
                              <div class="col-xs-12">
                                  <hr>
@@ -132,7 +135,7 @@
 
                         <br>
                          <div class="form-group row">
-                             <div class="col-lg-6">
+                             <div class="col-lg-4">
                                 <label class="control-label">Public Date </label>
                                 <div class="input-group date">
                                     <input id="send_date" type="text" class="form-control datetimepicker-input"
@@ -143,10 +146,10 @@
                                     </div>
                                 </div>
                              </div>
-                             <div class="col-lg-6">
+                             <div class="col-lg-4">
                                 <label class="control-label">Status </label>
                                 <br>
-                                <label class="switch">
+                                <label class="switch" style="margin-top: 7px">
                                     <input type="hidden" value="FALSE" name="">
                                     <input type="checkbox" name="status" checked value="TRUE">
                                     <span></span>
@@ -179,7 +182,6 @@
  @endpush
  @push('pagescript')
  @include('stacks.js.form')
- @include('stacks.js.fullscreen')
  @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('scripts.summernote')
