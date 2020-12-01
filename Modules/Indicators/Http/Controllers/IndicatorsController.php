@@ -8,12 +8,12 @@ use Illuminate\Routing\Controller;
 
 class IndicatorsController extends Controller
 {
-          /**
+    /**
      * Item Model
      *
      * @var \Modules\Items\Entities\Item
      */
-          protected $item;
+    protected $item;
     /**
      * Request instance
      *
@@ -90,6 +90,11 @@ class IndicatorsController extends Controller
     public function update(Request $request, $id)
     {
         //
+    }
+
+    public function search(Request $request, $id)
+    {
+        echo ('aaa');
     }
 
     /**

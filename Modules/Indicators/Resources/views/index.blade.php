@@ -4,43 +4,47 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light">
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
+            @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">@langapp('indicators')</div>
             {{-- <div class="btn-group pull-right">
 
                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">
-                    @langapp('filter')
-                    <span class="caret"></span>
-                </button>
+            @langapp('filter')
+            <span class="caret"></span>
+            </button>
 
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="#">
-                            @langapp('Last Hour')
-                        </a>
-                    </li>
-                    <li><a href="#">@langapp('all') </a></li>
-                </ul>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="#">
+                        @langapp('Last Hour')
+                    </a>
+                </li>
+                <li><a href="#">@langapp('all') </a></li>
+            </ul>
 
-                <a href="{{  route('clients.create') }}"
+            <a href="{{  route('clients.create') }}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
                 title="@langapp('create') " data-placement="bottom">
                 @icon('solid/plus') @langapp('create')
-                </a>
-                
-                <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
-                    @icon('solid/cloud-upload-alt') @langapp('import')
-                </a>
-                <a href="{{  route('clients.export')  }}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
-                    @icon('solid/cloud-download-alt') CSV
-                </a>
+            </a>
+
+            <a href="{{  route('clients.import')  }}"
+                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive"
+                title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
+                @icon('solid/cloud-upload-alt') @langapp('import')
+            </a>
+            <a href="{{  route('clients.export')  }}"
+                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV"
+                data-placement="bottom">
+                @icon('solid/cloud-download-alt') CSV
+            </a>
             </div> --}}
 
         </header>
         <section class="scrollable wrapper bg-white">
             <div class="row">
+
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="" class="">Indicator Type</label>
@@ -100,37 +104,38 @@
                         </select>
                     </div>
                 </div>
-               
-                <div class="col-md-3">
-                    <div class="form-group">
-                      <label for="" class="">Date</label>
-                      <select name="" id="date" class="select2-option form-control">
-                          <option value="Last 24 hours">Last hour</option>
-                          <option value="Last 24 hours">Last 24 hours</option>
-                          <option value="Last 24 hours">Last 7 days</option>
-                          <option value="Last 24 hours">Last 30 days</option>
-                          <option value="Last 24 hours" selected>All Time</option>
-                      </select>
-                    </div>
-                </div>
 
                 <div class="col-md-3">
-                    <div class="form-group m-b-md">
-                        <label for="" class="">Keyword</label>
-                        <input type="text" class="form-control" name="keyword" placeholder="Search">
-                        {{-- <div class="input-group">
+                    <div class="form-group">
+                        <label for="" class="">Date</label>
+                        <select name="" id="date" class="select2-option form-control">
+                            <option value="Last 24 hours">Last hour</option>
+                            <option value="Last 24 hours">Last 24 hours</option>
+                            <option value="Last 24 hours">Last 7 days</option>
+                            <option value="Last 24 hours">Last 30 days</option>
+                            <option value="Last 24 hours" selected>All Time</option>
+                        </select>
+                    </div>
+                </div>
+                <form action="submit" method="POST">
+                    @csrf
+                    <div class="col-md-3">
+                        <div class="form-group m-b-md">
+                            <label for="" class="">Keyword</label>
+                            <input type="text" class="form-control" name="keyword" placeholder="Search">
+                            {{-- <div class="input-group">
                             <span class="input-group-btn">
                                 <button type="submit" class="btn btn-info btn-icon">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </span>
                         </div> --}}
+                        </div>
                     </div>
-                </div>
             </div>
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <button class="btn btn-info">
+                    <button class="btn btn-info" type="submit">
                         <i class="fas fa-search"></i>
                         <span> Search </span>
                     </button>
@@ -140,6 +145,7 @@
                     </button>
                 </div>
             </div>
+            </form>
             <section class="">
                 <div class="row header-badge">
                     <div class="col-md-6 p-l-r-0">
@@ -165,57 +171,57 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="show-indicators">
                     <ul class="list-indicators">
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                     </ul>
                 </div>
             </section>
         </section>
     </section>
-    
+
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.form')
+@include('stacks.css.datatables')
+@include('stacks.css.form')
 @endpush
 
 @push('pagescript')
@@ -224,13 +230,13 @@
 <script>
     $(document).ready(function () {
         $('#indicator_type').select2({
-            placeholder:'Indicator Type',
+            placeholder: 'Indicator Type',
         });
         $('#role').select2({
-            placeholder:'Role',
+            placeholder: 'Role',
         });
         $('#date').select2({
-            placeholder:'Role',
+            placeholder: 'Role',
         });
     });
 </script>

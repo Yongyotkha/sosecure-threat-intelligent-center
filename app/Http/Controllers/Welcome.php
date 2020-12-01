@@ -21,9 +21,9 @@ class Welcome extends Controller
 
     public function test(Request $request)
     {
-                $user = $this->jwt(12345);
-                return $user;
-                // return $this->responseRequestSuccess($user);   
+        $user = $this->jwt(12345);
+        return $user;
+        // return $this->responseRequestSuccess($user);   
     }
 
     protected function jwt($user)
@@ -48,5 +48,9 @@ class Welcome extends Controller
     public function emailtest()
     {
         return view('emails.template_email');
+    }
+    public function search(Request $request)
+    {
+        print_r($request->input());
     }
 }
