@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
 use Illuminate\Console\Command;
-
+use Illuminate\Support\Facades\DB;
 use App\Entities\OtxIndicatiorStamp;
 use App\Entities\OtxIndicatiorData;
 
@@ -54,11 +55,10 @@ class OTXFeedData extends Command
         $inputOTXStamp -> status = 1;
         $inputOTXStamp -> created_by = "system";
         $inputOTXStamp -> updated_by = "system";
-       // $inputOTXStamp->save();
-
+        $inputOTXStamp->save();
 
         $client = new \GuzzleHttp\Client();
-        $otxModifiedDate =  gmdate("c", time() - 60 * 60 * 24) ;
+        $otxModifiedDate =  gmdate("c", time() - 60 * 60 * 24 *2) ;
         $bodyData   = $client->request(
             'GET',
             'https://otx.alienvault.com/api/v1/indicators/export?modified_since='.$otxModifiedDate,
@@ -69,15 +69,56 @@ class OTXFeedData extends Command
                     'X-OTX-API-KEY' => $OTX_KEY,
                 ]]
         )->getBody();
-        
+        $otxFeedData = json_decode($bodyData,true);
+        $otxFeedDataCheck = true;
 
-        // foreach ($xrates->rates as $key => $rate) {
-        //     $this->updateRate($key, $rate);
-        // }
-        echo json_encode($inputOTXStamp->id);
-        echo json_encode($otxModifiedDate);
-        echo json_encode(json_decode($bodyData,true)["next"]);
+        while ($otxFeedDataCheck) {
 
-        $this->info($OTX_KEY);
+            foreach ($otxFeedData["results"] as $value) {
+                try {
+                    echo json_encode($value["id"]);
+                    $inputOTXData = OtxIndicatiorData::updateOrCreate(
+                        [
+                            'id' => $value["id"]
+                        ],
+                        [
+                            'created_by' => "system",
+                            'indicatior' => $value["indicator"],
+                            'type' => $value["type"],
+                            'tile' => $value["title"],
+                            'desciption' => $value["description"],
+                            'content' => $value["content"],
+                            'status' => 1,
+                            'updated_by' => "system",
+                            'transaction_date' => $inputOTXStamp->transaction_date,
+                            'transcation_id' => $inputOTXStamp->id,
+                        ]
+                    );
+                } catch (Exception $e) {
+                    $error["Exception"] = $e;
+                } catch (\Throwable $ex) {
+                    $error["Throwable"] = $ex;
+                }
+            }
+
+            if(isset($otxFeedData["next"])){
+                $bodyData   = $client->request(
+                    'GET',
+                    $otxFeedData["next"],
+                    [
+                        'headers' => [
+                            'Accept'       => 'application/json',
+                            'Content-type' => 'application/json',
+                            'X-OTX-API-KEY' => $OTX_KEY,
+                        ]]
+                )->getBody();
+                $otxFeedData = json_decode($bodyData,true);
+                $otxFeedDataCheck = true;
+            }else{
+                $otxFeedDataCheck = false;
+            }
+            
+        }
+        $this->info("SUCCESS FULLY");
     }
 }

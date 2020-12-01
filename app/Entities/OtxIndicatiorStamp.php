@@ -11,6 +11,6 @@ class OtxIndicatiorStamp extends Model
     protected $attributes = [
         'status' => 1,
     ];
-    protected $fillable = ['code' ,'transaction_date','created_by','updated_by'];
+    protected $fillable = ['code' ,'transaction_date','created_by','updated_by','status'];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
 }
