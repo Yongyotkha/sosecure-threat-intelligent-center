@@ -34,7 +34,8 @@ class IndicatorsController extends Controller
     public function index()
     {
         $data['page'] = langapp('indicators');
-        $data['otx_type'] = OTXtypeData::all()->toArray();
+        $data['otx_type'] = OTXtypeData::where("status", '=', 1)->get();
+        // dd($data['otx_type']);
         return view('indicators::index')->with($data);
     }
 
