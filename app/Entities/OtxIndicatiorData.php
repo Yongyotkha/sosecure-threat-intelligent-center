@@ -14,4 +14,5 @@ class OtxIndicatiorData extends Model
     ];
     protected $fillable = ['id' ,'indicatior','type','tile','desciption','content','status','created_by','updated_by','transaction_date','transcation_id'];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
+    
 }
