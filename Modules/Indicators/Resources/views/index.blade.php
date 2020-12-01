@@ -60,28 +60,15 @@
                         <div class="form-group">
                             <label for="" class="">Indicator Type</label>
                             <select name="type[]" id="type" class="select2-option form-control" multiple="multiple">
-                                <option value="1">All</option>
-                                <option value="2">CIDR</option>
-                                <option value="3">CVE</option>
-                                <option value="4">Domain</option>
-                                <option value="5">Email</option>
-                                <option value="6">FileHash-IMPHASH</option>
-                                <option value="7">FileHash-MD5</option>
-                                <option value="8">FileHash-PEHASH</option>
-                                <option value="9">FileHash-SHA1</option>
-                                <option value="10">FileHash-SHA256</option>
-                                <option value="11">FilePath</option>
-                                <option value="12">Hostname</option>
-                                <option value="13">IPv4</option>
-                                <option value="14">IPv6</option>
-                                <option value="15">Mutex</option>
-                                <option value="16">NIDS</option>
-                                <option value="17">URI</option>
-                                <option value="18">URL</option>
-                                <option value="19">YARA</option>
-                                <option value="20">Osquery</option>
-                                <option value="21">Bitcoinaddress</option>
-                                <option value="22">Ssl Certfinger Print</option>
+
+                                @if ($otx_type)
+
+                                @foreach ($otx_type as $otx_type)
+                                <option value="{{$otx_type->code}}">{{$otx_type->name}}</option>
+                                @endforeach
+
+                                @endif
+
                             </select>
                         </div>
                     </div>
@@ -261,7 +248,7 @@
 
     function clear_data(){
         
-      document.getElementById("selectID").options.length = 0;
+     
       
 
     }

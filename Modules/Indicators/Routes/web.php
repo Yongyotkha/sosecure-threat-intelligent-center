@@ -20,6 +20,5 @@ Route::group(
         Route::get('/', 'IndicatorsController@index')->name('indicators.index')->middleware('can:menu_items');
         Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
         Route::get('/', 'IndicatorsController@index')->name('indicators.index')->middleware('can:menu_items');
-        Route::post('indicators_data_table', 'IndicatorsController@tableIndicators')->name('indicators.indicators_data_table')->middleware('can:menu_items');
     }
 );
