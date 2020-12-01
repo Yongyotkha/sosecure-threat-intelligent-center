@@ -55,7 +55,7 @@ Route::get('support', 'SupportController@ticket')->name('support.ticket')->middl
 Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
 
 
-Route::get('phpinfo', function() {
+Route::get('phpinfo', function () {
     phpinfo();
 });
 

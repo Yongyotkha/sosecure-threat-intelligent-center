@@ -4,14 +4,15 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light">
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
+            @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">@langapp('indicators')</div>
             <div class="btn-group pull-right">
 
-                {{-- <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">
-                    @langapp('filter')
-                    <span class="caret"></span>
+                {{-- <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle"
+                data-toggle="dropdown">
+                @langapp('filter')
+                <span class="caret"></span>
                 </button>
 
                 <ul class="dropdown-menu">
@@ -24,19 +25,23 @@
                 </ul>
 
                 <a href="{{  route('clients.create') }}"
-                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
-                title="@langapp('create') " data-placement="bottom">
-                @icon('solid/plus') @langapp('create')
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
+                    title="@langapp('create') " data-placement="bottom">
+                    @icon('solid/plus') @langapp('create')
                 </a>
-                
-                <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
+
+                <a href="{{  route('clients.import')  }}"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive"
+                    title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
                     @icon('solid/cloud-upload-alt') @langapp('import')
                 </a>
                 <a href="{{  route('clients.export')  }}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV"
+                    data-placement="bottom">
                     @icon('solid/cloud-download-alt') CSV
                 </a> --}}
-                <a href="#" id="seach-advance" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="Advance Search" data-placement="bottom">
+                <a href="#" id="seach-advance" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive"
+                    title="Advance Search" data-placement="bottom">
                     <i class="fas fa-search"></i> Search
                 </a>
             </div>
@@ -48,13 +53,13 @@
                     <div class="col-md-12">
                         <div class="form-group m-b-md">
                             <label for="" class="">Keyword</label>
-                            <input type="text" class="form-control" name="keyword" placeholder="Search">
+                            <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="" class="">Indicator Type</label>
-                            <select name="" id="role" class="select2-option form-control" multiple="multiple">
+                            <select name="type[]" id="type" class="select2-option form-control" multiple="multiple">
                                 <option value="1">All</option>
                                 <option value="2">CIDR</option>
                                 <option value="3">CVE</option>
@@ -80,22 +85,23 @@
                             </select>
                         </div>
                     </div>
-                   
+
                     <div class="col-md-4">
                         <label for="" class="">Date</label>
-                        <div id="indicator-date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                        <div id="indicator-date" class="text-center"
+                            style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                             <i class="fa fa-calendar"></i>&nbsp;
                             <span></span> <i class="fa fa-caret-down"></i>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label for="" class="d-block">&nbsp;</label>
-                        <button class="btn btn-info">
+                        <button class="btn btn-info" onclick="search()">
                             <i class="fas fa-search"></i>
                             <span> Search </span>
                         </button>
-                        <button class="btn btn-default">
-                            <i class="fas fa-broom"></i>
+                        <button class="btn btn-default" onclick="clear_data()">
+                            <i class=" fas fa-broom"></i>
                             <span> Clear </span>
                         </button>
                     </div>
@@ -130,59 +136,59 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="show-indicators">
                     <ul class="list-indicators">
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('indicators.detail_indicators')}}">
                                 <h1 class="primary-text">93.51.50.171</h1>
                                 <span class="secondary-text">Type : IPv4</span>
-                            </a>  
+                            </a>
                         </li>
                     </ul>
                 </div>
             </section>
         </section>
     </section>
-    
+
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.form')
-    @include('stacks.css.datepicker')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+@include('stacks.css.datatables')
+@include('stacks.css.form')
+@include('stacks.css.datepicker')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -191,6 +197,10 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 <script>
+    var keywords = null;
+    var type = null;
+    var startDate;
+    var endDate;
     $(document).ready(function () {
 
         $('#hide-search-advance').hide();
@@ -199,10 +209,10 @@
         });
 
         $('#indicator_type').select2({
-            placeholder:'Indicator Type',
+            placeholder: 'Indicator Type',
         });
         $('#date').select2({
-            placeholder:'Role',
+            placeholder: 'Role',
         });
     });
 
@@ -213,6 +223,8 @@
 
         function cb(start, end) {
             $('#indicator-date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            startDate = start;
+            endDate = end;
         }
 
         $('#indicator-date').daterangepicker({
@@ -233,8 +245,26 @@
         }, cb);
 
         cb(start, end);
+        
 
     });
+    function search(){
+        
+        keywords = $('#keyword').val();
+        type = $('#type').val();
+        console.log(keywords);
+        console.log(type);
+        console.log(startDate.format('Y-M-D') + ' - ' + endDate.format('D MMMM YYYY'));
+      
+
+    }
+
+    function clear_data(){
+        
+      document.getElementById("selectID").options.length = 0;
+      
+
+    }
 </script>
 
 
