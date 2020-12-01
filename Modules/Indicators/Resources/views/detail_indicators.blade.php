@@ -41,10 +41,6 @@
                                 <a href="#files">Files</a>
                                 <div class="underline"></div>
                             </li>
-                            <li  class="nav-link">
-                                <a href="#comments">Comments</a>
-                                <div class="underline"></div>
-                            </li>
                         </ul>
                     </div>
                 </div>
@@ -366,61 +362,6 @@
                                 <span>CONTENT-TYPE: <span class="text-dark fz-10">text/plain; charset=UTF-8</span></span>
                             </div>
                         </div>
-                    </div>
-                </section>
-                
-                <section id="comments" class="m-t-lg">
-                    <div class="row header-badge-full">
-                        <div class="col-md-12">
-                            <span class="font-weight-bold">Comment</span>
-                        </div>
-                    </div>
-                    <div class="form-group pd-15">
-                        <textarea name="" id="" cols="30" rows="10" class="form-control" placeholder="LEAVE A COMMENT.."></textarea>
-                    </div>
-                </section>
-                {{-- หลังจาก Comment --}}
-                <section id="comments" class="m-t-lg">
-                    <div class="row header-badge-full">
-                        <div class="col-md-12">
-                            <span class="font-weight-bold">Show Comments</span>
-                        </div>
-                    </div>
-                    <div class="row pd-15">
-                        <ul class="show-comments">
-                            <li>
-                                <div class="responsive-img">
-                                    <div class="image-rouded">
-                                        <img src="{{asset('images/broken_robot.png')}}" alt="" width="80px">
-                                    </div>
-                                </div>
-                                <div class="detail-comments">
-                                    <h4 class="text-info">John Doe</h4>
-                                    <p>
-                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Fugiat, maiores velit. Dignissimos a
-                                        culpa facere corporis nostrum aspernatur recusandae assumenda totam nam, dolor est repellat itaque dolores vero cum nulla.
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem voluptate saepe, quod eius animi nihil obcaecati, repellendus explicabo vitae nesciunt pariatur deserunt distinctio! Velit voluptatum autem suscipit eius quam quaerat!
-                                    </p>
-                                    <span>Date : 05/08/63</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="responsive-img">
-                                    <div class="image-rouded">
-                                        <img src="{{asset('images/broken_robot.png')}}" alt="" width="80px">
-                                    </div>
-                                </div>
-                                <div class="detail-comments">
-                                    <h4 class="text-info">John Doe</h4>
-                                    <p>
-                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Fugiat, maiores velit. Dignissimos a
-                                        culpa facere corporis nostrum aspernatur recusandae assumenda totam nam, dolor est repellat itaque dolores vero cum nulla.
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem voluptate saepe, quod eius animi nihil obcaecati, repellendus explicabo vitae nesciunt pariatur deserunt distinctio! Velit voluptatum autem suscipit eius quam quaerat!
-                                    </p>
-                                    <span>Date : 05/08/63</span>
-                                </div>
-                            </li>
-                        </ul>
                     </div>
                 </section>
             </section>
