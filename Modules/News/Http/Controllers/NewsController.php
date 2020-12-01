@@ -334,10 +334,10 @@ class NewsController extends Controller
         $date_start = $request->date_start;
 
         $date_start_explode = explode(" ",$date_start);
-        $date_start_time = $date_start_explode[1].' '.$date_start_explode[2];
+        $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
         // dd($date_start_time);
         $date_start_time_time = date("H:i", strtotime($date_start_time));
-        dd($date_start_time_time);
+        // dd($date_start_time_time);
 
         // date("H:i", strtotime("04:25 PM"))
         $html = '';

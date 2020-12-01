@@ -71,7 +71,7 @@ class DumpServer
                 continue;
             }
 
-            [$data, $context] = $payload;
+            list($data, $context) = $payload;
 
             $callback($data, $context, $clientId);
         }
