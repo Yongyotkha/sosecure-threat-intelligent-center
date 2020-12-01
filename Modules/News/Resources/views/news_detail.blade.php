@@ -46,12 +46,12 @@
                         <div class="mobi-d-block">
                             {{-- @php(dd($RSSNews)) --}}
                             {{-- @$RSSNews->get_topic->topic->name --}}
-                            @if(@$RSSNews->get_topic_multi)
-                                @foreach(@$RSSNews->get_topic_multi as $topic)
+                            @if(@$RSSNews->get_cate)
+                                @foreach(@$RSSNews->get_cate as $cate)
                                 {{-- 1 --}}
-                                {{-- {{@var_dump($topic)}} --}}
-                                    {{-- {{@$topic->topic->name}} --}}
-                                    <span class="badeg-news"><i class="fas fa-newspaper"></i> {{@$topic->topic->name}}</span>&nbsp;
+                                {{-- {{@var_dump($cate)}} --}}
+                                    {{-- {{@$cate->cate->name}} --}}
+                                    <span class="badeg-news"><i class="fas fa-newspaper"></i> {{@$cate->get_cate_name->name}}</span>&nbsp;
                                 @endforeach
 
                             @endif
