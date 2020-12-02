@@ -115,25 +115,14 @@ class IndicatorsController extends Controller
     public function LoadMoreOTX(Request $request)
     {
 
-        // $date_start = $request->date_start;
 
-        // $date_start_explode = explode(" ",$date_start);
-        // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-        // // dd($date_start_time);
-        // $date_start_time_time = date("H:i", strtotime($date_start_time));
-        // // dd($date_start_time_time);
-
-        // date("H:i", strtotime("04:25 PM"))
         $html = '';
 
-        // $news_all = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
 
         // if($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end){
 
         //     $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
-        //     if($request -> title){
-        //         $news = $news -> where('title_th', 'LIKE' ,'%'.$request -> title.'%');
-        //     }
+
         //      $news = $news->orderBy('created_at','desc')->paginate(10);
         //     // $news->orderBy('created_at','desc')->paginate(10);
         //     // $news = RSSNews::where('save_draft', 0);//->get()
@@ -148,13 +137,24 @@ class IndicatorsController extends Controller
         // }
 
         // dd($news);
-        $count = OtxIndicatiorData::where("status", '=', 1)->count();
-        $data = OtxIndicatiorData::where("status", '=', 1)->paginate(10);
+
+        if ($request->keywords) {
+
+            $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->paginate(10);
+            $count = $data->count();
+        } else {
+            $count = OtxIndicatiorData::where("status", '=', 1)->count();
+            $data = OtxIndicatiorData::where("status", '=', 1)->paginate(10);
+        }
+
         foreach ($data as $data) {
             $html .= ' <ul class="list-indicators">
                         <li>
                             <a href="">
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
+                              
+                               
+                              
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
                         </li></ul>';

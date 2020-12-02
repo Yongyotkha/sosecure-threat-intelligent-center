@@ -200,11 +200,11 @@
     });
     function search(){
         
+        
         keywords = $('#keyword').val();
         type = $('#type').val();
-        console.log(keywords);
-        console.log(type);
-        console.log(startDate.format('Y-M-D') + ' - ' + endDate.format('D MMMM YYYY'));
+        
+        load_more_search(page)
       
 
     }
@@ -221,7 +221,7 @@
             let scrolltop = $('#scroll_otx').scrollTop();
             let tab_height = $('#scroll_otx').height();
             let docu_height = $(document).height();
-        console.log(scrolltop+'  '+tab_height+'   '+docu_height);
+        
         if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
             page++;
             if(page_stop){
@@ -256,6 +256,47 @@
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
+    }
+
+    function load_more_search(page){
+        if(page == 1) {
+            $("#list_otx").html('');   
+        }
+
+        console.log(startDate.format('YYYY-MM-DD hh:mm A') + ' - ' + endDate.format('D MMMM YYYY')); 
+        console.log(keywords);
+        console.log(type);
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/LoadMoreOTX?page=" + page,
+            type: "get",
+            data: ({
+                keywords:keywords,
+                type:type,
+                startDate:startDate.format('YYYY-MM-DD hh:mm A'),
+                endDate:endDate.format('YYYY-MM-DD hh:mm A'),
+           
+            }),
+            {{--datatype: "html",--}}
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                page_stop = false;
+                $('.ajax-loading').html("");
+                {{--$('#count_otx').text(0);--}}
+                return;
+            }
+            $('#count_otx').text("We've found "+data.count+" indicators");
+            $('.ajax-loading').hide();
+            $("#list_otx").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response");
+        });
+
     }
 
 
