@@ -110,9 +110,9 @@
                         <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
                         <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
                         <li class="pull-right">
-                            <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                            {{-- <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                                 <span>Bookmarks</span>
-                             </button>
+                             </button> --}}
                         </li>
                     </ul>
                     <div class="tab-content">

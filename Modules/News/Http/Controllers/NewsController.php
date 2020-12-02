@@ -447,12 +447,12 @@ class NewsController extends Controller
                 $html .= '<div class="list-news">';
             }
             $html .= '
-                <div class="checkbox-news-select">
+                <!--<div class="checkbox-news-select">
                     <label class="mr-3">
                         <input type="checkbox" name="" class="chk-bookmark">
                         <span class="label-text checkbox-news-input"></span>
                     </label>
-                </div>
+                </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
                         <span class="head-news-text">'.$data -> title_th.'</span>
@@ -562,12 +562,12 @@ class NewsController extends Controller
                 $html .= '<div class="list-news">';
             }
             $html .= '
-                <div class="checkbox-news-select">
+            <!--<div class="checkbox-news-select">
                     <label class="mr-3">
                         <input type="checkbox" name="" class="chk-bookmark">
                         <span class="label-text checkbox-news-input"></span>
                     </label>
-                </div>
+                </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
                         <span class="head-news-text">'.$data -> news -> title_th.'</span>
