@@ -137,23 +137,35 @@ class IndicatorsController extends Controller
         // }else{
         //     $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(10);//->get()
         // }
-
+        $data = '';
         // dd($news);
+        if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
+            if ($request->type && $request->keywords) {
 
-        if ($request->keywords) {
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->where('type', '=', $request->type)->paginate(10);
+                $count = $data->count();
+            } else if ($request->keywords) {
 
-            $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->paginate(10);
-            $count = $data->count();
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->paginate(10);
+                $count = $data->count();
+            } else if ($request->type) {
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('type', '=', $request->type)->paginate(10);
+                $count = $data->count();
+            }
         } else {
-            $count = OtxIndicatiorData::where("status", '=', 1)->count();
+
             $data = OtxIndicatiorData::where("status", '=', 1)->paginate(10);
+            $count = OtxIndicatiorData::where("status", '=', 1)->count();
         }
 
         foreach ($data as $data) {
+
             $html .= ' <ul class="list-indicators">
                         <li>
                             <a href="' . route('indicators.detail_indicators', ['id' => $data->id, 'type' => $data->type, 'indicatior' => $data->indicatior]) . '">
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
+                           
                               
                                
                               

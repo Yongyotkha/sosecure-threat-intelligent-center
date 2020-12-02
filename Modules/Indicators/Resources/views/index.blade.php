@@ -64,7 +64,7 @@
                                 @if ($otx_type)
 
                                 @foreach ($otx_type as $otx_type)
-                                <option value="{{$otx_type->code}}">{{$otx_type->name}}</option>
+                                <option value="{{$otx_type->name}}">{{$otx_type->name}}</option>
                                 @endforeach
 
                                 @endif
@@ -263,7 +263,7 @@
             $("#list_otx").html('');   
         }
 
-        console.log(startDate.format('YYYY-MM-DD hh:mm A') + ' - ' + endDate.format('D MMMM YYYY')); 
+        console.log(startDate.format('YYYY-MM-DD hh:mm:ss ') + ' - ' + endDate.format('YYYY-MM-DD hh:mm:ss')); 
         console.log(keywords);
         console.log(type);
         $.ajax({

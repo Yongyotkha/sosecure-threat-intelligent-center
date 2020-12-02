@@ -6,7 +6,7 @@
 
             {{-- Head --}}
             <header class="header panel-heading bg-white b-b b-light">
-                <div class="bc-head">@langapp('news')</div>    
+                <div class="bc-head">@langapp('news')</div>
                 <div class="pull-right" style="margin-top: 8px;">
                     <select name="" id="" class="select2-option form-control select-site" style="min-width: 100px">
                         <option value="1">All Site</option>
@@ -14,7 +14,7 @@
                 </div>
                 <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span>Search Advance</span>
-                 </button>
+                </button>
             </header>
 
             {{-- Search --}}
@@ -38,9 +38,9 @@
                                     <label for="" class="col-sm-3 col-xs-12 col-form-label">Category</label>
                                     <div class="col-sm-9 col-xs-12">
                                         <select id="news_category" class="select2-option form-control">
-                                            <option value="" >All</option>
+                                            <option value="">All</option>
                                             @foreach(@$Category as $cate)
-                                                <option value="{{$cate->code}}" >{{$cate->name}}</option>
+                                            <option value="{{$cate->code}}">{{$cate->name}}</option>
                                             @endforeach
                                             {{-- <option value="1" selected>All</option> --}}
                                         </select>
@@ -58,7 +58,8 @@
                                 </div>
                             </div> --}}
                             <div class="col-lg-4 text-center">
-                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                <div id="newsrange"
+                                    style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;
                                     <span></span> <i class="fa fa-caret-down"></i>
                                 </div>
@@ -69,12 +70,12 @@
                                         <input type="checkbox" name="related_news" id="related_news" value="TRUE">
                                         <span class="label-text" style="font-size: 16px;">Related News</span>
                                     </label>
-    
+
                                     <label class="mr-3">
                                         <input type="checkbox" name="lang_th" id="lang_th" value="TRUE">
                                         <span class="label-text" style="font-size: 16px;">Thai</span>
                                     </label>
-    
+
                                     <label class="mr-3">
                                         <input type="checkbox" name="lang_en" id="lang_en" value="TRUE">
                                         <span class="label-text" style="font-size: 16px;">English</span>
@@ -88,7 +89,8 @@
                                     <i class="fas fa-search"></i>
                                     Search
                                 </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive"
+                                    style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
@@ -97,17 +99,19 @@
                     </div>
                 </section>
 
-             
+
 
 
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
-                        <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
-                        <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
+                        <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span
+                                    id="count_news"></span>)</a></li>
+                        <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span
+                                    id="count_news_bookmark"></span>)</a></li>
                         <li class="pull-right">
                             <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                                 <span>Bookmarks</span>
-                             </button>
+                            </button>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -116,7 +120,8 @@
                                 <div id="main-list" class="row m-b-md">
                                     <div class="col-md-12">
                                         <div id="list_news"></div>
-                                        <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading</div>
+                                        <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">
+                                            Loading</div>
                                         {{-- <div class="list-news">
                                             <div class="checkbox-news-select">
                                                 <label class="mr-3">
@@ -126,53 +131,59 @@
                                             </div>
                                             <div class="content-news-text">
                                                 <a href="{{route('news.news_detail')}}">
-                                                    <a href="{{route('news.news_detail')}}">
-                                                    <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
-                                                </a>
-                                                </a>
-                                                <div class="entry-meta">
-                                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th, 2020</span>
-                                                    <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
-                                                    <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat voluptates delectus praesentium architecto iure reprehenderit soluta qui sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur itaque, iusto ad quas.</span>
-                                                </div>
-                                            </div>
-                                            <div class="content-news-image">
-                                                <a href="{{route('news.news_detail')}}">
-                                                    <img src="https://images.unsplash.com/photo-1602524207251-8ad5d2b2c303?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="action-bookmark">
-                                                <i class="fas fa-bookmark" id="mark1" onclick="Bookmarks(this)"></i>
-                                            </div>
-                                        </div> --}}
-                                        
-                                        
+                                        <a href="{{route('news.news_detail')}}">
+                                            <span class="head-news-text">WhatsApp’s new fact-check feature lets users
+                                                identify fake information</span>
+                                        </a>
+                                        </a>
+                                        <div class="entry-meta">
+                                            <span class="entry-date"> <i class="fas fa-calendar-alt"></i> August 4th,
+                                                2020</span>
+                                            <span class="entry-view"> <i class="fas fa-eye"></i> 300</span>
+                                            <span>&nbsp;Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat
+                                                voluptates delectus praesentium architecto iure reprehenderit soluta qui
+                                                sapiente quaerat, explicabo non mollitia officiis sit porro consequuntur
+                                                itaque, iusto ad quas.</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </section>
-                        </div>
-                        <div class="tab-pane" id="tab_lastest_news">
-                            <section class="panel panel-default">
-                                <div class="row m-b-md">
-                                    <div class="col-sm-12">
-                                        <div id="list_news_book_mark"></div>
+                                    <div class="content-news-image">
+                                        <a href="{{route('news.news_detail')}}">
+                                            <img src="https://images.unsplash.com/photo-1602524207251-8ad5d2b2c303?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80"
+                                                alt="">
+                                        </a>
                                     </div>
-                                </div>
-                            </section>  
+                                    <div class="action-bookmark">
+                                        <i class="fas fa-bookmark" id="mark1" onclick="Bookmarks(this)"></i>
+                                    </div>
+                                </div> --}}
+
+
                         </div>
                     </div>
-                </div>
             </section>
+            </div>
+            <div class="tab-pane" id="tab_lastest_news">
+                <section class="panel panel-default">
+                    <div class="row m-b-md">
+                        <div class="col-sm-12">
+                            <div id="list_news_book_mark"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            </div>
+            </div>
         </section>
     </section>
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+</section>
+<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+@include('stacks.css.datatables')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -316,7 +327,7 @@
             $('#count_news').text(data.count);
             $('.ajax-loading').hide();
             $('.ajax-loading').addClass('d-none');
-            $("#list_news").append(data.html);   
+            $("#list_news").text(data.html);  
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
