@@ -464,8 +464,29 @@
             page_stop = true;
             load_more_search(page,f_search)
         });
+
+
+        $("#btn_news_reset").click(function() {
+            $("#news_title_search").val('');
+            $("#news_category").val('').trigger("change");
+            $("#related_news").prop("checked",false);
+            $("#lang_th").prop("checked",false);
+            $("#lang_en").prop("checked",false);
+            start = moment();
+            end = moment();
+            cb(start, end);
+
+            f_search = 0;
+            page = 1;
+            $('#count_news').text(0);
+            page_stop = true;
+            load_more_search(page,f_search)
+
+        });
     
     });
+
+
 
 
 </script>
