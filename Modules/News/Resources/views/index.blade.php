@@ -116,7 +116,7 @@
                                 <div id="main-list" class="row m-b-md">
                                     <div class="col-md-12">
                                         <div id="list_news"></div>
-                                        
+                                        <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading</div>
                                         {{-- <div class="list-news">
                                             <div class="checkbox-news-select">
                                                 <label class="mr-3">
@@ -184,7 +184,8 @@
 <script>
     var page = 1; 
     var page_stop = true;
-    load_more(page);
+    {{--load_more(page);--}}
+    load_more_search(page)
     load_more_book_mark(page);
     $('#scrollable_news').scroll(function(event) {
             let scrolltop = $('#scrollable_news').scrollTop();
@@ -193,8 +194,9 @@
         console.log(scrolltop+'  '+tab_height+'   '+docu_height);
         if($('#scrollable_news').scrollTop() + $('#scrollable_news').height() >= $(document).height()) {
             page++;
+            console.log(555);
             if(page_stop){
-                {{--load_more(page);--}} 
+                load_more(page);
                 load_more_search(page);
             }
         }
@@ -215,12 +217,13 @@
         }).done(function(data){
             if(data.html.length == 0){
                 page_stop = false;
-                $('.ajax-loading').html("");
+                $('.ajax-loading').hide();
                 $('#count_news_bookmark').text(0);
                 return;
             }
             $('#count_news_bookmark').text(data.count);
             $('.ajax-loading').hide();
+            $('.ajax-loading').addClass('d-none');
             $("#list_news_book_mark").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
@@ -241,7 +244,7 @@
         }).done(function(data){
             if(data.html.length == 0){
                 page_stop = false;
-                $('.ajax-loading').html("");
+                $('.ajax-loading').hide();
                 {{--$('#count_news').text(0);--}}
                 return;
             }
@@ -302,12 +305,17 @@
         }).done(function(data){
             if(data.html.length == 0){
                 page_stop = false;
-                $('.ajax-loading').html("");
+                $('.ajax-loading').hide();
                 {{--$('#count_news').text(0);--}}
                 return;
             }
+            let count_n = $('#count_news').text();
+            let count_search = data.count;
+            let count_n_all = parseInt(count_n) + parseInt(count_search);
+            {{--$('#count_news').text(data.count);--}}
             $('#count_news').text(data.count);
             $('.ajax-loading').hide();
+            $('.ajax-loading').addClass('d-none');
             $("#list_news").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
@@ -330,7 +338,7 @@
         }).done(function(data){
             if(data.html.length == 0){
                 page_stop = false;
-                $('.ajax-loading').html("");
+                $('.ajax-loading').hide();
                 $('#count_news').text(0);
                 return;
             }
@@ -384,8 +392,8 @@
 <script type="text/javascript">
     $(function() {
     
-        var start = moment().startOf('hour');
-        var end = moment().startOf('hour').add(32, 'hour');
+        var start = moment().subtract(1, 'year').startOf('year');{{--moment().startOf('hour')--}}
+        var end = moment().subtract(0, 'year').endOf('year');{{--moment().startOf('hour').add(32, 'hour')--}}
     
         function cb(start, end) {
             $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -437,6 +445,8 @@
             console.log('lang_th '+lang_th);
             console.log('lang_en '+lang_en);
             page = 1;
+            $('#count_news').text(0);
+            page_stop = true;
             load_more_search(page)
         });
     

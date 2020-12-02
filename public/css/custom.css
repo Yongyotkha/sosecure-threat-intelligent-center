@@ -1941,3 +1941,12 @@ ul.topics-news-list li a:hover{
 #fullscreen-modal{
     width: 100% !important;
 }
+
+.ajax-loading{
+    width: 100%;
+    padding: 1rem;
+    color: #fff;
+    background: #333;
+    font-size: 20px;
+    text-align: center;
+}
