@@ -332,12 +332,32 @@ class NewsController extends Controller
     public function jqueryLoadMoreNews(Request $request){
 
         $date_start = $request->date_start;
+        $date_end = $request->date_end;
+
+        $title = $request ->title;
+        $cate = $request ->cate;
+        $related_news = $request ->related_news;
+        $lang_th = $request ->lang_th;
+        $lang_en = $request ->lang_en;
 
         $date_start_explode = explode(" ",$date_start);
+        $date_start_date = @$date_start_explode[0];
         $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
         // dd($date_start_time);
+        $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+        // dd($date_start_date_format);
         $date_start_time_time = date("H:i", strtotime($date_start_time));
+        $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
         // dd($date_start_time_time);
+
+        $date_end_explode = explode(" ",$date_end);
+        $date_end_date = @$date_end_explode[0];
+        $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+        // dd($date_end_time);
+        $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        $date_end_time_time = date("H:i", strtotime($date_end_time));
+        $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+        // dd($date_end_time_time);
 
         // date("H:i", strtotime("04:25 PM"))
         $html = '';
@@ -350,7 +370,56 @@ class NewsController extends Controller
             if($request -> title){
                 $news = $news -> where('title_th', 'LIKE' ,'%'.$request -> title.'%');
             }
-             $news = $news->orderBy('created_at','desc')->paginate(10);
+
+            if($lang_th=='true' && $lang_en=='true') {
+                $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%')->orwhere('title_en', 'LIKE' ,'%'.$title.'%');
+            } else if($lang_th || $lang_en) {
+                if($lang_th=='true') {
+                    $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%');
+                } else if ($lang_en=='true') {
+                    $news = $news -> where('title_en', 'LIKE' ,'%'.$title.'%');
+                }
+            } else {
+                if($title) {
+                    $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%')->orwhere('title_en', 'LIKE' ,'%'.$title.'%');
+                } else {
+
+                }
+                
+            }
+
+            if($related_news) {
+
+            }
+
+            if($cate) {
+                // dd($cate);
+                $cate_id_m = CategorySettings::where('code',$cate)->first();
+                $cate_id = @$cate_id_m->id;
+                // dd($cate_id);
+                $news = $news->whereHas('get_cate', function ($query) use ($cate_id) {
+                    $query->where('news_category_id', '=', $cate_id);
+                });
+
+            }
+
+            if($date_start) {
+                // $news = $news -> whereDate('created_at','>', $date_start_datetime_format);
+                $news = $news -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+            //     ->where(function($query) use ($date_start_datetime_format,$date_end_datetime_format){
+            //         $query->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
+            //               ->whereBetween('time',array($timfrom,$timto));
+            //    })
+
+            }
+
+            if($date_end) {
+
+            }
+
+            // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+
+            //  $news = $news->get();
             // $news->orderBy('created_at','desc')->paginate(10);
             // $news = RSSNews::where('save_draft', 0);//->get()
             // $news -> paginate(10);//->get()
@@ -358,9 +427,11 @@ class NewsController extends Controller
             // $news = $news->get();
             // dd($news->get());
             // dd($news);
+            // dd($news->total);
             $news_all = $news->count();
+            $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(10);//->get()
+            $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(PAGINATE_NUM);//->get()
         }
 
         // dd($news);

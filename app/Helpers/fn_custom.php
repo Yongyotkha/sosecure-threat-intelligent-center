@@ -15,6 +15,8 @@ use Modules\Users\Entities\User;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Stringy\Stringy as S;
 
+define("PAGINATE_NUM", 10);
+
 
 function gen_uuid() {
     return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',

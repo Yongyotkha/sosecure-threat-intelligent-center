@@ -193,6 +193,7 @@
         console.log(scrolltop+'  '+tab_height+'   '+docu_height);
         if($('#scrollable_news').scrollTop() + $('#scrollable_news').height() >= $(document).height()) {
             page++;
+            console.log(555);
             if(page_stop){
                 {{--load_more(page);--}} 
                 load_more_search(page);
@@ -306,6 +307,10 @@
                 {{--$('#count_news').text(0);--}}
                 return;
             }
+            let count_n = $('#count_news').text();
+            let count_search = data.count;
+            let count_n_all = parseInt(count_n) + parseInt(count_search);
+            {{--$('#count_news').text(data.count);--}}
             $('#count_news').text(data.count);
             $('.ajax-loading').hide();
             $("#list_news").append(data.html);   
@@ -437,6 +442,8 @@
             console.log('lang_th '+lang_th);
             console.log('lang_en '+lang_en);
             page = 1;
+            $('#count_news').text(0);
+            page_stop = true;
             load_more_search(page)
         });
     
