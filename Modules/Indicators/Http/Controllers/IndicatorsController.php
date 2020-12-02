@@ -40,8 +40,10 @@ class IndicatorsController extends Controller
         return view('indicators::index')->with($data);
     }
 
-    public function show_detail_indicators()
+    public function show_detail_indicators($otxid, $otxtype, $otxindicatior)
     {
+        // dd(1);
+
         $data['page'] = langapp('indicators');
         return view('indicators::detail_indicators')->with($data);
     }
@@ -150,7 +152,7 @@ class IndicatorsController extends Controller
         foreach ($data as $data) {
             $html .= ' <ul class="list-indicators">
                         <li>
-                            <a href="">
+                            <a href="' . route('indicators.detail_indicators', ['id' => $data->id, 'type' => $data->type, 'indicatior' => $data->indicatior]) . '">
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
                               
                                

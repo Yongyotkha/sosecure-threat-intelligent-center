@@ -18,8 +18,9 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'indicators'],
     function () {
         Route::get('/', 'IndicatorsController@index')->name('indicators.index')->middleware('can:menu_items');
-        Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
+        // Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
         Route::get('/', 'IndicatorsController@index')->name('indicators.index')->middleware('can:menu_items');
         Route::get('/LoadMoreOTX', 'IndicatorsController@LoadMoreOTX')->name('LoadMoreOTX');
+        Route::get('/details/{id}/{type}/{indicatior}', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators');
     }
 );

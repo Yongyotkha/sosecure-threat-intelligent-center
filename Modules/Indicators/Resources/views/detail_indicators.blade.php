@@ -3,17 +3,18 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         <section class="vbox">
-            <header class="header bg-white b-b b-light head-d-flex-nowrap" style="white-space: nowrap;overflow-x: auto;">
+            <header class="header bg-white b-b b-light head-d-flex-nowrap"
+                style="white-space: nowrap;overflow-x: auto;">
                 <div class="bc-head m-none">
                     <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                     @langapp('indicators') : Type:URL,http://hwsrv-706090.hostwindsdns.com/bns/gang12
-                     <a href="" class="btn btn-default m-t-0 m-l-5">
+                    @langapp('indicators') : Type:URL,http://hwsrv-706090.hostwindsdns.com/bns/gang12
+                    <a href="" class="btn btn-default m-t-0 m-l-5">
                         @icon('solid/copy')
                     </a>
                 </div>
-                    
+
                 &nbsp;
 
             </header>
@@ -25,19 +26,19 @@
                                 <a href="#general_details">General Detail</a>
                                 <div class="underline"></div>
                             </li>
-                            <li  class="nav-link">
+                            <li class="nav-link">
                                 <a href="#pulses">Pulses</a>
                                 <div class="underline"></div>
                             </li>
-                            <li  class="nav-link">
+                            <li class="nav-link">
                                 <a href="#adhesive_dns">Adhesive DNS</a>
                                 <div class="underline"></div>
                             </li>
-                            <li  class="nav-link">
+                            <li class="nav-link">
                                 <a href="#urls">URLs</a>
                                 <div class="underline"></div>
                             </li>
-                            <li  class="nav-link">
+                            <li class="nav-link">
                                 <a href="#files">Files</a>
                                 <div class="underline"></div>
                             </li>
@@ -48,14 +49,14 @@
                     <div class="row m-b-lg">
                         {{-- Basic Information --}}
                         <div class="col-md-6">
-                            <h1 class="b-b">Basic Information</h1> 
+                            <h1 class="b-b">Basic Information</h1>
                             {{-- Inner Basic Information--}}
                             <div class="row m-b-xs">
                                 <div class="col-md-4">
                                     IP ADDRESS:
                                 </div>
                                 <div class="col-md-8 text-right">
-                                <a href="">46.166.128.234</a> 
+                                    <a href="">46.166.128.234</a>
                                 </div>
                             </div>
                             <div class="row m-b-xs">
@@ -63,7 +64,7 @@
                                     HOSTNAME:
                                 </div>
                                 <div class="col-md-8 text-right">
-                                <a href="">hwsrv-706090.hostwindsdns.com</a> 
+                                    <a href="">hwsrv-706090.hostwindsdns.com</a>
                                 </div>
                             </div>
                             <div class="row m-b-xs">
@@ -71,7 +72,7 @@
                                     DOMAIN:
                                 </div>
                                 <div class="col-md-8 text-right">
-                                <a href="">hostwindsdns.com</a> 
+                                    <a href="">hostwindsdns.com</a>
                                 </div>
                             </div>
                             <div class="row m-b-xs">
@@ -93,7 +94,7 @@
                         </div>
                         {{-- File Identification --}}
                         <div class="col-md-6">
-                            <h1 class="b-b">File Identification</h1> 
+                            <h1 class="b-b">File Identification</h1>
                             {{-- Inner File Identification--}}
                             <div class="row m-b-xs">
                                 <div class="col-md-3">
@@ -105,7 +106,7 @@
                             </div>
                             <div class="row m-b-xs">
                                 <div class="col-md-3">
-                                    FILEMAGIC: 
+                                    FILEMAGIC:
                                 </div>
                                 <div class="col-md-9 text-right">
                                     ELF 32-bit MSB executable, SPARC, version 1 (SYSV)
@@ -113,7 +114,7 @@
                             </div>
                             <div class="row m-b-xs">
                                 <div class="col-md-3">
-                                    MD5: 
+                                    MD5:
                                 </div>
                                 <div class="col-md-9 text-right">
                                     <a href="">439cc55e2e5cd09ccec453f166e34daa</a>
@@ -121,7 +122,7 @@
                             </div>
                             <div class="row m-b-xs">
                                 <div class="col-md-3">
-                                    SHA256: 
+                                    SHA256:
                                 </div>
                                 <div class="col-md-9 text-right">
                                     <a href="">1bd1822b6799615b5c7fc13bf219a9f15722d16cc2070256c46437684276ab5b</a>
@@ -132,13 +133,13 @@
                     <div class="row m-b-lg">
                         {{-- Validation --}}
                         <div class="col-md-6">
-                            <h1 class="b-b">Validation</h1> 
+                            <h1 class="b-b">Validation</h1>
                             {{-- Inner Validation--}}
                             <div class="row m-b-xs">
                                 <div class="col-md-6">
                                     WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
                                 </div>
-                                <div class="col-md-6">               
+                                <div class="col-md-6">
                                     WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
                                 </div>
                             </div>
@@ -146,7 +147,7 @@
                                 <div class="col-md-6">
                                     WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
                                 </div>
-                                <div class="col-md-6">               
+                                <div class="col-md-6">
                                     WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
                                 </div>
                             </div>
@@ -187,14 +188,14 @@
                                     </div>
                                     <div class="related-content">
                                         <div class="related-title">
-                                            <a href="{{route('indicators.detail_indicators')}}">
+                                            <a href="pulsedetail">
                                                 <h1 class="related-title">
                                                     The Gafgyt variant vbot seen in its 31 campaigns
                                                 </h1>
                                             </a>
                                             <div class="active-indicator">
                                                 <div class="dot green"></div>
-                                                <div > URL Indicator Active </div>
+                                                <div> URL Indicator Active </div>
                                             </div>
                                         </div>
                                         <div class="details-wrapper">
@@ -208,7 +209,7 @@
                                                     <span class="stat-label"> Public </span>
                                                 </li>
                                                 <li>
-                                                    <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>: 
+                                                    <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
                                                     <span><i class="fas fa-circle white"></i> White </span>
                                                 </li>
                                             </ul>
@@ -230,11 +231,16 @@
                                                         <strong>URL:</strong>
                                                         <span>94</span>
                                                     </span>
-                                                </span>   
+                                                </span>
                                             </div>
                                             <div class="indicator-description">
                                                 <span class="nowrap ellipsis">
-                                                    Gafgyt botnets have a long history of infecting Linux devices to launch DDoS attacks. While dozens of variants have been detected, new variants are constantly emerging with changes in terms of register message, exploits, and attacking methods. On the other hand, their new botnets are usually short lived, with most of the C2s watched keeping active for only a few days.
+                                                    Gafgyt botnets have a long history of infecting Linux devices to
+                                                    launch DDoS attacks. While dozens of variants have been detected,
+                                                    new variants are constantly emerging with changes in terms of
+                                                    register message, exploits, and attacking methods. On the other
+                                                    hand, their new botnets are usually short lived, with most of the
+                                                    C2s watched keeping active for only a few days.
                                                 </span>
                                             </div>
                                             <div class="by-items">
@@ -251,7 +257,7 @@
                                         </span>
                                     </div>
                                 </div>
-                                
+
                             </li>
                             <li>
                                 <div class="related-pulses">
@@ -260,14 +266,14 @@
                                     </div>
                                     <div class="related-content">
                                         <div class="related-title">
-                                            <a href="{{route('indicators.detail_indicators')}}">
+                                            <a href="pulsedetail">
                                                 <h1 class="related-title">
                                                     The Gafgyt variant vbot seen in its 31 campaigns
                                                 </h1>
                                             </a>
                                             <div class="active-indicator">
                                                 <div class="dot green"></div>
-                                                <div > URL Indicator Active </div>
+                                                <div> URL Indicator Active </div>
                                             </div>
                                         </div>
                                         <div class="details-wrapper">
@@ -281,7 +287,7 @@
                                                     <span class="stat-label"> Public </span>
                                                 </li>
                                                 <li>
-                                                    <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>: 
+                                                    <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
                                                     <span><i class="fas fa-circle white"></i> White </span>
                                                 </li>
                                             </ul>
@@ -303,11 +309,16 @@
                                                         <strong>URL:</strong>
                                                         <span>94</span>
                                                     </span>
-                                                </span>   
+                                                </span>
                                             </div>
                                             <div class="indicator-description">
                                                 <span class="nowrap ellipsis">
-                                                    Gafgyt botnets have a long history of infecting Linux devices to launch DDoS attacks. While dozens of variants have been detected, new variants are constantly emerging with changes in terms of register message, exploits, and attacking methods. On the other hand, their new botnets are usually short lived, with most of the C2s watched keeping active for only a few days.
+                                                    Gafgyt botnets have a long history of infecting Linux devices to
+                                                    launch DDoS attacks. While dozens of variants have been detected,
+                                                    new variants are constantly emerging with changes in terms of
+                                                    register message, exploits, and attacking methods. On the other
+                                                    hand, their new botnets are usually short lived, with most of the
+                                                    C2s watched keeping active for only a few days.
                                                 </span>
                                             </div>
                                             <div class="by-items">
@@ -323,7 +334,7 @@
                                             <i></i>&nbsp;SUBSCRIBERS
                                         </span>
                                     </div>
-                                </div>  
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -341,13 +352,14 @@
                                 <span>CONTENT-LENGTH: <span class="text-dark fz-10">76160</span></span>
                             </div>
                             <div class="data-server-response m-b-xs">
-                                <span>ACCEPT-RANGES:  <span class="text-dark fz-10">bytes</span></span>
+                                <span>ACCEPT-RANGES: <span class="text-dark fz-10">bytes</span></span>
                             </div>
                             <div class="data-server-response m-b-xs">
                                 <span>SERVER: <span class="text-dark fz-10">Apache/2.2.15 (CentOS)</span></span>
                             </div>
                             <div class="data-server-response m-b-xs">
-                                <span>CLAST-MODIFIED: <span class="text-dark fz-10">Fri, 27 Mar 2020 04:49:10 GMT</span></span>
+                                <span>CLAST-MODIFIED: <span class="text-dark fz-10">Fri, 27 Mar 2020 04:49:10
+                                        GMT</span></span>
                             </div>
                             <div class="data-server-response m-b-xs">
                                 <span>CONNECTION: <span class="text-dark fz-10">close</span></span>
@@ -359,7 +371,8 @@
                                 <span>DATE: <span class="text-dark fz-10">Mon, 30 Mar 2020 16:48:58 GMT</span></span>
                             </div>
                             <div class="data-server-response m-b-xs">
-                                <span>CONTENT-TYPE: <span class="text-dark fz-10">text/plain; charset=UTF-8</span></span>
+                                <span>CONTENT-TYPE: <span class="text-dark fz-10">text/plain;
+                                        charset=UTF-8</span></span>
                             </div>
                         </div>
                     </div>
@@ -371,8 +384,8 @@
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.form')
+@include('stacks.css.datatables')
+@include('stacks.css.form')
 @endpush
 
 @push('pagescript')
