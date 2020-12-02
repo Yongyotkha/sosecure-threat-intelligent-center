@@ -8,12 +8,13 @@
             <header class="header panel-heading bg-white b-b b-light">
                 <div class="bc-head">@langapp('news')</div>
                 <div class="pull-right" style="margin-top: 8px;">
-                    <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 100px">
+                    <select name="site" id="site" class="select2-option form-control select-site"
+                        style="min-width: 100px">
                         <option value="">All Site</option>
                         @if($SiteSettings)
-                            @foreach($SiteSettings as $SiteSettings_val)
-                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                            @endforeach
+                        @foreach($SiteSettings as $SiteSettings_val)
+                        <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                        @endforeach
                         @endif
                     </select>
                 </div>
@@ -115,12 +116,8 @@
                                     id="count_news_bookmark"></span>)</a></li>
                         <li class="pull-right">
                             {{-- <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                                <span>Bookmarks</span>
-<<<<<<< HEAD
-                            </button>
-=======
-                             </button> --}}
->>>>>>> master
+                            <span>Bookmarks</span>
+                            </button> --}}
                         </li>
                     </ul>
                     <div class="tab-content">
