@@ -182,10 +182,11 @@
 @include('stacks.js.form')
 
 <script>
+    var f_search = 0;
     var page = 1; 
     var page_stop = true;
-    {{--load_more(page);--}}
-    load_more_search(page)
+    load_more(page);
+    {{--load_more_search(page);--}}
     load_more_book_mark(page);
     $('#scrollable_news').scroll(function(event) {
             let scrolltop = $('#scrollable_news').scrollTop();
@@ -196,8 +197,8 @@
             page++;
             console.log(555);
             if(page_stop){
-                load_more(page);
-                load_more_search(page);
+                {{--load_more(page);--}}
+                load_more_search(page,f_search);
             }
         }
     });
@@ -224,7 +225,7 @@
             $('#count_news_bookmark').text(data.count);
             $('.ajax-loading').hide();
             $('.ajax-loading').addClass('d-none');
-            $("#list_news_book_mark").append(data.html);   
+            $("#list_news_book_mark").append(data.html);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -250,14 +251,14 @@
             }
             $('#count_news').text(data.count);
             $('.ajax-loading').hide();
-            $("#list_news").append(data.html);   
+            $("#list_news").append(data.html);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
     }
 
 
-    function load_more_search(page){
+    function load_more_search(page,f_search=0){
         if(page == 1) {
             $("#list_news").html('');   
         }
@@ -296,7 +297,8 @@
                 lang_th:lang_th,
                 lang_en:lang_en,
                 date_start:startDate,
-                date_end:endDate
+                date_end:endDate,
+                f_search:f_search
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
@@ -392,8 +394,8 @@
 <script type="text/javascript">
     $(function() {
     
-        var start = moment().subtract(1, 'year').startOf('year');{{--moment().startOf('hour')--}}
-        var end = moment().subtract(0, 'year').endOf('year');{{--moment().startOf('hour').add(32, 'hour')--}}
+        var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+        var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
     
         function cb(start, end) {
             $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -444,10 +446,11 @@
             console.log('related_news '+related_news);
             console.log('lang_th '+lang_th);
             console.log('lang_en '+lang_en);
+            f_search = 1;
             page = 1;
             $('#count_news').text(0);
             page_stop = true;
-            load_more_search(page)
+            load_more_search(page,f_search)
         });
     
     });
