@@ -8,8 +8,13 @@
             <header class="header panel-heading bg-white b-b b-light">
                 <div class="bc-head">@langapp('news')</div>    
                 <div class="pull-right" style="margin-top: 8px;">
-                    <select name="" id="" class="select2-option form-control select-site" style="min-width: 100px">
-                        <option value="1">All Site</option>
+                    <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 100px">
+                        <option value="">All Site</option>
+                        @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
                 <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -352,6 +357,8 @@
         });
     }
     function Bookmarks(ele, news_id){
+        {{--page_stop = true;--}}
+        {{--page = 1;--}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -360,8 +367,13 @@
             type: "get",
             datatype: "json",
         }).done(function(data){
-            $(ele).addClass("bookmark-active"); 
+            if($(ele).hasClass("bookmark-active")) {
+                $(ele).removeClass("bookmark-active"); 
+            } else {
+                $(ele).addClass("bookmark-active"); 
+            }
             load_more_book_mark(page);
+            {{--load_more_search(page,f_search);--}}
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });

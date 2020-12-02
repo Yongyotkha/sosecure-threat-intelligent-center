@@ -130,6 +130,8 @@ class NewsController extends Controller
         // dd($news_all);
         // $RSSNews_count = RSSNews::count("id");
         $RSSNews_all = RSSNews::all();
+
+        $SiteSettings = SiteSettings::where("active",1)->get();
         // dd($RSSNews_all[0]->get_cate);
         // dd($RSSNews_all[0]->get_cate[0]->get_cate_name->name);
         // dd($RSSNews_count);
@@ -156,7 +158,7 @@ class NewsController extends Controller
        $Category = $Category;
        $NewsCategory = $NewsCategory;
        $ReadCategories = $ReadCategories;
-       return view('news::index',compact('RSSNews_all','RSSNews_count','page','Category','NewsCategory','ReadCategories'));
+       return view('news::index',compact('RSSNews_all','RSSNews_count','page','Category','NewsCategory','ReadCategories','SiteSettings'));
     }
 
     public function news_detail()
