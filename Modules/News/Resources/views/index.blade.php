@@ -184,7 +184,8 @@
 <script>
     var page = 1; 
     var page_stop = true;
-    load_more(page);
+    {{--load_more(page);--}}
+    load_more_search(page)
     load_more_book_mark(page);
     $('#scrollable_news').scroll(function(event) {
             let scrolltop = $('#scrollable_news').scrollTop();
@@ -391,8 +392,8 @@
 <script type="text/javascript">
     $(function() {
     
-        var start = moment().startOf('hour');
-        var end = moment().startOf('hour').add(32, 'hour');
+        var start = moment().subtract(1, 'year').startOf('year');{{--moment().startOf('hour')--}}
+        var end = moment().subtract(0, 'year').endOf('year');{{--moment().startOf('hour').add(32, 'hour')--}}
     
         function cb(start, end) {
             $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
