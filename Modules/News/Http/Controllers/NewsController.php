@@ -130,6 +130,8 @@ class NewsController extends Controller
         // dd($news_all);
         // $RSSNews_count = RSSNews::count("id");
         $RSSNews_all = RSSNews::all();
+
+        $SiteSettings = SiteSettings::where("active",1)->get();
         // dd($RSSNews_all[0]->get_cate);
         // dd($RSSNews_all[0]->get_cate[0]->get_cate_name->name);
         // dd($RSSNews_count);
@@ -156,7 +158,7 @@ class NewsController extends Controller
        $Category = $Category;
        $NewsCategory = $NewsCategory;
        $ReadCategories = $ReadCategories;
-       return view('news::index',compact('RSSNews_all','RSSNews_count','page','Category','NewsCategory','ReadCategories'));
+       return view('news::index',compact('RSSNews_all','RSSNews_count','page','Category','NewsCategory','ReadCategories','SiteSettings'));
     }
 
     public function news_detail()
@@ -364,7 +366,7 @@ class NewsController extends Controller
 
         $news_all = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
 
-        if($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end){
+        if(($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end) && $request -> f_search == 1){
 
             $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
             if($request -> title){
@@ -445,12 +447,12 @@ class NewsController extends Controller
                 $html .= '<div class="list-news">';
             }
             $html .= '
-                <div class="checkbox-news-select">
+                <!--<div class="checkbox-news-select">
                     <label class="mr-3">
                         <input type="checkbox" name="" class="chk-bookmark">
                         <span class="label-text checkbox-news-input"></span>
                     </label>
-                </div>
+                </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
                         <span class="head-news-text">'.$data -> title_th.'</span>
@@ -560,12 +562,12 @@ class NewsController extends Controller
                 $html .= '<div class="list-news">';
             }
             $html .= '
-                <div class="checkbox-news-select">
+            <!--<div class="checkbox-news-select">
                     <label class="mr-3">
                         <input type="checkbox" name="" class="chk-bookmark">
                         <span class="label-text checkbox-news-input"></span>
                     </label>
-                </div>
+                </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
                         <span class="head-news-text">'.$data -> news -> title_th.'</span>
