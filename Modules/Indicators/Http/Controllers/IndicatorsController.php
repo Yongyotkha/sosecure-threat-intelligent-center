@@ -141,17 +141,14 @@ class IndicatorsController extends Controller
         // dd($news);
         if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
             if ($request->type && $request->keywords) {
-
+                $count = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->where('type', '=', $request->type)->count();
                 $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->where('type', '=', $request->type)->paginate(10);
-                $count = $data->count();
             } else if ($request->keywords) {
-
+                $count = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->count();
                 $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->paginate(10);
-                $count = $data->count();
             } else if ($request->type) {
-
+                $count = OtxIndicatiorData::where("status", '=', 1)->where('type', '=', $request->type)->count();
                 $data = OtxIndicatiorData::where("status", '=', 1)->where('type', '=', $request->type)->paginate(10);
-                $count = $data->count();
             }
         } else {
 
