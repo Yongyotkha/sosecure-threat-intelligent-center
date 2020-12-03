@@ -109,7 +109,7 @@
                                         <i class="fas fa-search"></i>
                                         Search
                                     </button>
-                                    <button type="button" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
                                     </button>
@@ -180,6 +180,16 @@
         source = $('#source').val();
         datatable();
     }
+
+
+        $("#btn_rss_data_reset").click(function() {
+            $("#keywords").val('');
+            $("#public_date").val('');
+            $("#status").val('').trigger("change");
+            $("#source").val('');
+        });
+
+
     $(function () {
         $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
         datatable();
