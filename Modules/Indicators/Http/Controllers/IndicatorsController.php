@@ -40,14 +40,199 @@ class IndicatorsController extends Controller
         return view('indicators::index')->with($data);
     }
 
-    public function show_detail_indicators($otxid, $otxtype, $otxindicatior)
+    public function show_detail_indicators($otxid, $otxtype, $otxindicator)
     {
-        // dd(1);
-
         $data['page'] = langapp('indicators');
+        $data['otxid'] = $otxid;
+        $data['otxtype'] = $otxtype;
+        $data['otxindicator'] = $otxindicator;
         return view('indicators::detail_indicators')->with($data);
     }
 
+
+    public function load_general(Request $request)
+    {
+        // $OTX_KEY = env("OTX_KEY","");
+        // $client = new \GuzzleHttp\Client();
+        // $bodyData   = $client->request( 
+        //     'GET',
+        //     'https://otx.alienvault.com/api/v1/indicators/'.$otxtype.'/'.$otxindicator.'/general',
+        //     [
+        //         'headers' => [
+        //             'Accept'       => 'application/json',
+        //             'Content-type' => 'application/json',
+        //             'X-OTX-API-KEY' => $OTX_KEY,
+        //         ]
+        //     ]
+        // )->getBody();
+        // $DataotxIndicator = json_decode($bodyData,true);
+        $testto = '<ul class="list-indicators">
+        <li>
+            <div class="related-pulses">
+                <div class="related-img">
+                    <img src="{{asset(\'images/avatar_1.png\')}}" alt="">
+                </div>
+                <div class="related-content">
+                    <div class="related-title">
+                        <a href="pulsedetail">
+                            <h1 class="related-title">
+                                The Gafgyt variant vbot seen in its 31 campaigns
+                            </h1>
+                        </a>
+                        <div class="active-indicator">
+                            <div class="dot green"></div>
+                            <div> URL Indicator Active </div>
+                        </div>
+                    </div>
+                    <div class="details-wrapper">
+                        <ul class="detail-show">
+                            <li>
+                                <span class="modified"> Modified </span>
+                                <span class="pulse-ago"> 3 HOURS AGO </span>
+                                by <a href="" class="pulse-author">MTSC</a>
+                            </li>
+                            <li>
+                                <span class="stat-label"> Public </span>
+                            </li>
+                            <li>
+                                <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
+                                <span><i class="fas fa-circle white"></i> White </span>
+                            </li>
+                        </ul>
+                        <div class="pulse-indicator-counts">
+                            <span class="nowrap ellipsis">
+                                <span class="insered">
+                                    <strong>FileHash-MD5:</strong>
+                                    <span class="br-last">48</span>
+                                </span>
+                                <span class="insered">
+                                    <strong>FileHash-SHA1:</strong>
+                                    <span class="br-last">3</span>
+                                </span>
+                                <span class="insered">
+                                    <strong>FileHash-SHA256:</strong>
+                                    <span class="br-last">17</span>
+                                </span>
+                                <span class="insered">
+                                    <strong>URL:</strong>
+                                    <span>94</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="indicator-description">
+                            <span class="nowrap ellipsis">
+                                Gafgyt botnets have a long history of infecting Linux devices to
+                                launch DDoS attacks. While dozens of variants have been detected,
+                                new variants are constantly emerging with changes in terms of
+                                register message, exploits, and attacking methods. On the other
+                                hand, their new botnets are usually short lived, with most of the
+                                C2s watched keeping active for only a few days.
+                            </span>
+                        </div>
+                        <div class="by-items">
+                            <a href="#"><span>linux</span></a>,
+                            <a href="#"><span>iot</span></a>,
+                            <a href="#"><span>malware</span></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="related-subscribers">
+                    <span class="star-count">116,017</span>
+                    <span class="subscribers">
+                        <i></i>&nbsp;SUBSCRIBERS
+                    </span>
+                </div>
+            </div>
+        </li>
+
+
+        <li>
+            <div class="related-pulses">
+                <div class="related-img">
+                    <img src="{{asset(\'images/avatar_1.png\')}}" alt="">
+                </div>
+                <div class="related-content">
+                    <div class="related-title">
+                        <a href="pulsedetail">
+                            <h1 class="related-title">
+                                The Gafgyt variant vbot seen in its 31 campaigns
+                            </h1>
+                        </a>
+                        <div class="active-indicator">
+                            <div class="dot green"></div>
+                            <div> URL Indicator Active </div>
+                        </div>
+                    </div>
+                    <div class="details-wrapper">
+                        <ul class="detail-show">
+                            <li>
+                                <span class="modified"> Modified </span>
+                                <span class="pulse-ago"> 3 HOURS AGO </span>
+                                by <a href="" class="pulse-author">MTSC</a>
+                            </li>
+                            <li>
+                                <span class="stat-label"> Public </span>
+                            </li>
+                            <li>
+                                <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
+                                <span><i class="fas fa-circle white"></i> White </span>
+                            </li>
+                        </ul>
+                        <div class="pulse-indicator-counts">
+                            <span class="nowrap ellipsis">
+                                <span class="insered">
+                                    <strong>FileHash-MD5:</strong>
+                                    <span class="br-last">48</span>
+                                </span>
+                                <span class="insered">
+                                    <strong>FileHash-SHA1:</strong>
+                                    <span class="br-last">3</span>
+                                </span>
+                                <span class="insered">
+                                    <strong>FileHash-SHA256:</strong>
+                                    <span class="br-last">17</span>
+                                </span>
+                                <span class="insered">
+                                    <strong>URL:</strong>
+                                    <span>94</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="indicator-description">
+                            <span class="nowrap ellipsis">
+                                Gafgyt botnets have a long history of infecting Linux devices to
+                                launch DDoS attacks. While dozens of variants have been detected,
+                                new variants are constantly emerging with changes in terms of
+                                register message, exploits, and attacking methods. On the other
+                                hand, their new botnets are usually short lived, with most of the
+                                C2s watched keeping active for only a few days.
+                            </span>
+                        </div>
+                        <div class="by-items">
+                            <a href="#"><span>linux</span></a>,
+                            <a href="#"><span>iot</span></a>,
+                            <a href="#"><span>malware</span></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="related-subscribers">
+                    <span class="star-count">116,017</span>
+                    <span class="subscribers">
+                        <i></i>&nbsp;SUBSCRIBERS
+                    </span>
+                </div>
+            </div>
+        </li>
+    </ul>' ;
+
+        if ($request->ajax()) {
+            $data = [
+                "html" => $testto,
+                "count" => 0
+            ];
+            return response()->json($data); 
+        }
+    }
     /**
      * Show the form for creating a new resource.
      * @return Response
