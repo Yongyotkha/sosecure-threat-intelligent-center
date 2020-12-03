@@ -308,9 +308,22 @@ ul.list-indicators li:not(:last-child){
     margin:1rem 0;
     border-bottom: unset !important;
 }
+
 .fas.fa-circle.white
 {
     color: #d6d6d6 !important
+}
+.fas.fa-circle.green
+{
+    color: #94cf05 !important
+}
+.fas.fa-circle.yellow
+{
+    color: #faf603 !important
+}
+.fas.fa-circle.red
+{
+    color: #e61d0f !important
 }
 
 .indicator-description{
@@ -322,6 +335,12 @@ ul.list-indicators li:not(:last-child){
 }
 .modified{
     border: 1px solid #3869d4;
+    padding: 0.5rem;
+    text-align: center;
+    margin-right: 5px;
+}
+.created{
+    border: 1px solid #76d438;
     padding: 0.5rem;
     text-align: center;
     margin-right: 5px;
@@ -350,6 +369,10 @@ ul.detail-show{
 .dot.red{
     background: #e61d0f;
 } 
+.dot.grey{
+    background: #aca4a39f;
+} 
+
 
 .fz-10{
     font-size: 10px;
@@ -1949,4 +1972,22 @@ ul.topics-news-list li a:hover{
     background: #333;
     font-size: 20px;
     text-align: center;
+}
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
+   
+.content-spinner-loading:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    border-top-color: #000;
+    animation: spinner .6s linear infinite;
 }
