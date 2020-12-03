@@ -184,9 +184,8 @@ class IndicatorsController extends Controller
 
                 $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
             }
-
-            $data = $data->orderBy('updated_at', 'desc')->paginate(PAGINATE_NUM);
             $count = $data->count();
+            $data = $data->orderBy('updated_at', 'desc')->paginate(PAGINATE_NUM);
         } else {
 
             $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc')->paginate(PAGINATE_NUM);

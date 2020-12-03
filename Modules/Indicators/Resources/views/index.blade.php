@@ -113,13 +113,8 @@
                             <ul class="dropdown-menu">
                                 <li><a href="#">Recently Modified</a></li>
                                 <li><a href="#">Least Recently Modified</a></li>
-                                <li><a href="#">Recently Created</a></li>
-                                <li><a href="#">Least Recently Created</a></li>
                                 <li><a href="#">Name Ascending</a></li>
                                 <li><a href="">Name Descending</a></li>
-                                <li><a href="">Type Ascending</a></li>
-                                <li><a href="">Tyoe Decending</a></li>
-                                <li><a href="{{ route('clients.index') }}">@langapp('all') </a></li>
                             </ul>
                         </div>
                     </div>
@@ -127,6 +122,7 @@
 
                 <section id="scrollable_otx" class="show-indicators">
                     <div id="list_otx"></div>
+                    <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading</div>
                 </section>
             </section>
         </section>
@@ -219,8 +215,8 @@
         cb(start, end);
 
         $("#clear_data").click(function() {
-            keywords = $('#keyword').val('');
-            type = $('#type').val('');
+            $('#keyword').val('');
+            
             start = moment();
             end = moment();
                 cb(start, end);
@@ -228,9 +224,9 @@
             page = 1;
             page_stop = true;
 
-            $('#type').val(null).trigger('change');
-            clear_load_more(page,f_search);
-
+            $('#type').val('').trigger('change');
+            
+            load_more_search(page,f_search);
           
 
 
@@ -261,11 +257,11 @@
             type: "get",
             datatype: "html",
             beforeSend: function(){
-                loading('load');
+                {{--loading('load');--}}
                 $('.ajax-loading').show();
             },
         }).done(function(data){
-            loading('stop_load');
+            {{--loading('stop_load');--}}
             if(data.html.length == 0){
                 
                 page_stop = false;
@@ -306,11 +302,11 @@
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
-                loading('load');
+                {{--loading('load');--}}
                 $('.ajax-loading').show();
             },
         }).done(function(data){
-            loading('stop_load');
+            {{--loading('stop_load');--}}
             if(data.html.length == 0){
                 page_stop = false;
                 $('.ajax-loading').hide();
