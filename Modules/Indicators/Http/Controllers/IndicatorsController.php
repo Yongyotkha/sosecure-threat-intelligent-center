@@ -40,194 +40,176 @@ class IndicatorsController extends Controller
         return view('indicators::index')->with($data);
     }
 
-    public function show_detail_indicators($otxid, $otxtype, $otxindicator)
+    public function show_detail_indicators(Request $request)
     {
         $data['page'] = langapp('indicators');
-        $data['otxid'] = $otxid;
-        $data['otxtype'] = $otxtype;
-        $data['otxindicator'] = $otxindicator;
+        $data['otxid'] = $request->id;
+        $data['otxtype'] = $request->type;
+        $data['otxindicator'] = $request->indicator;
         return view('indicators::detail_indicators')->with($data);
     }
 
 
     public function load_general(Request $request)
     {
-        // $OTX_KEY = env("OTX_KEY","");
-        // $client = new \GuzzleHttp\Client();
-        // $bodyData   = $client->request( 
-        //     'GET',
-        //     'https://otx.alienvault.com/api/v1/indicators/'.$otxtype.'/'.$otxindicator.'/general',
-        //     [
-        //         'headers' => [
-        //             'Accept'       => 'application/json',
-        //             'Content-type' => 'application/json',
-        //             'X-OTX-API-KEY' => $OTX_KEY,
-        //         ]
-        //     ]
-        // )->getBody();
-        // $DataotxIndicator = json_decode($bodyData,true);
-        $testto = '<ul class="list-indicators">
-        <li>
-            <div class="related-pulses">
-                <div class="related-img">
-                    <img src="{{asset(\'images/avatar_1.png\')}}" alt="">
-                </div>
-                <div class="related-content">
-                    <div class="related-title">
-                        <a href="pulsedetail">
-                            <h1 class="related-title">
-                                The Gafgyt variant vbot seen in its 31 campaigns
-                            </h1>
-                        </a>
-                        <div class="active-indicator">
-                            <div class="dot green"></div>
-                            <div> URL Indicator Active </div>
-                        </div>
-                    </div>
-                    <div class="details-wrapper">
-                        <ul class="detail-show">
-                            <li>
-                                <span class="modified"> Modified </span>
-                                <span class="pulse-ago"> 3 HOURS AGO </span>
-                                by <a href="" class="pulse-author">MTSC</a>
-                            </li>
-                            <li>
-                                <span class="stat-label"> Public </span>
-                            </li>
-                            <li>
-                                <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
-                                <span><i class="fas fa-circle white"></i> White </span>
-                            </li>
-                        </ul>
-                        <div class="pulse-indicator-counts">
-                            <span class="nowrap ellipsis">
-                                <span class="insered">
-                                    <strong>FileHash-MD5:</strong>
-                                    <span class="br-last">48</span>
-                                </span>
-                                <span class="insered">
-                                    <strong>FileHash-SHA1:</strong>
-                                    <span class="br-last">3</span>
-                                </span>
-                                <span class="insered">
-                                    <strong>FileHash-SHA256:</strong>
-                                    <span class="br-last">17</span>
-                                </span>
-                                <span class="insered">
-                                    <strong>URL:</strong>
-                                    <span>94</span>
-                                </span>
-                            </span>
-                        </div>
-                        <div class="indicator-description">
-                            <span class="nowrap ellipsis">
-                                Gafgyt botnets have a long history of infecting Linux devices to
-                                launch DDoS attacks. While dozens of variants have been detected,
-                                new variants are constantly emerging with changes in terms of
-                                register message, exploits, and attacking methods. On the other
-                                hand, their new botnets are usually short lived, with most of the
-                                C2s watched keeping active for only a few days.
-                            </span>
-                        </div>
-                        <div class="by-items">
-                            <a href="#"><span>linux</span></a>,
-                            <a href="#"><span>iot</span></a>,
-                            <a href="#"><span>malware</span></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="related-subscribers">
-                    <span class="star-count">116,017</span>
-                    <span class="subscribers">
-                        <i></i>&nbsp;SUBSCRIBERS
-                    </span>
-                </div>
-            </div>
-        </li>
+        $OTX_KEY = env("OTX_KEY","");
+        $client = new \GuzzleHttp\Client();
+        $reqType = $request->type;
+        if (stripos( $request->type, "file") !== false) {
+            $reqType = 'file';
+        }else if($reqType == "CVE"){
+            $reqType = "cve";
+        }else if($reqType == "URL"){
+            $reqType = 'url';
+        }else if($reqType == "NIDS"){
+            $reqType = 'nids';
+        }else if($reqType == "YARA"){
+            $reqType = 'yara';
+        }else if($reqType == "BitcoinAddress"){
+            $reqType = 'bitcoin-address';
+        }else if($reqType == "SSLCertFingerprint"){
+            $reqType = 'ssl-cert-fingerprint';
+        }
+        $reqIndicator = $request->indicator;
+        $bodyData   = $client->request( 
+            'GET',
+            'https://otx.alienvault.com/otxapi/indicator/'.$reqType.'/general'.'/'.$reqIndicator,
+            [
+                'headers' => [
+                    'Accept'       => 'application/json',
+                    'Content-type' => 'application/json',
+                    'X-OTX-API-KEY' => $OTX_KEY,
+                ]
+            ]
+        )->getBody();
+          $DataotxIndicator = json_decode($bodyData,true);
 
 
-        <li>
+        $pulseInfo = $DataotxIndicator["pulse_info"];
+        $validationInfo = $DataotxIndicator["validation"];
+
+        //pulse info HTML
+        $html = '';
+        $html .= '<ul class="list-indicators">';
+        if(!empty($pulseInfo["pulses"])){
+            foreach ($pulseInfo["pulses"] as $value) {
+                $html .= '
+                <li>
+                    <div class="related-pulses">
+                        <div class="related-img">
+                            <img src="' . $value["author"]["avatar_url"] . '" alt="">
+                        </div>
+                        <div class="related-content">
+                            <div class="related-title">
+                                <a href="pulsedetail">
+                                    <h1 class="related-title">
+                                        '. $value["name"] .'
+                                    </h1>
+                                </a>
+                                <div class="active-indicator">
+                                    <div class="'.($value["related_indicator_is_active"]==1?"dot green":"dot grey"). '"></div>
+                                    <div>
+                                        '.$request->type. ' Indicator ' .($value["related_indicator_is_active"]==1?"Active":"Inactive").'
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="details-wrapper">
+                                <ul class="detail-show">
+                                    <li>
+                                        <span class="'.($value["is_modified"]==false?"created":"modified").'"> 
+                                        '.($value["is_modified"]==false?"Created":"Modified").' 
+                                        </span>
+                                        <span class="pulse-ago"> 
+                                            '.$value["modified_text"].'
+                                        </span>
+                                        by <a href="https://otx.alienvault.com/user/'.$value["author"]["username"].'/pulses" class="pulse-author">
+                                        '.$value["author"]["username"].'
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <span class="stat-label"> Public </span>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
+                                      <span>
+                                        <i class="fas fa-circle '.$value["TLP"].'">
+                                        </i> 
+                                        '.ucwords($value["TLP"]).'
+                                      </span>
+                                    </li>
+                                </ul>
+                                <div class="pulse-indicator-counts">
+                                    <span class="nowrap ellipsis">';
+                    if(!empty($value["indicator_type_counts"])){
+                        foreach ($value["indicator_type_counts"]  as $key => $typeCount) {
+                            $html .= '<span class="insered">
+                            <strong>'.$key.':</strong>
+                                <span class="br-last">'.$typeCount.'</span>
+                            </span>';
+                        }
+                    }
+                $html .= '          </span>
+                                </div>
+                                <div class="indicator-description">
+                                    <span class="nowrap ellipsis">
+                                    '.(isset($value["description"])?$value["description"]:"").'
+                                    </span>
+                                </div>
+                                <div class="by-items">';
+                                
+                                if(!empty($value["tags"])){
+                                    $html_sub = '';
+                                    foreach ($value["tags"]  as $tag) {
+                                        $html_sub .= ',<a href="https://otx.alienvault.com/browse/pulses?q=tag:'.$tag.' "><span>'.$tag.'</span></a>';
+                                    }
+                                    $html .= substr($html_sub,1);
+                                }
+
+                $html .=        '</div>
+                            </div>
+                        </div>
+                        <div class="related-subscribers">
+                            <span class="star-count">'.$value["subscriber_count"].'</span>
+                            <span class="subscribers">
+                                <i></i>&nbsp;SUBSCRIBERS
+                            </span>
+                        </div>
+                    </div>
+                </li>';
+            }
+        }else{
+            $html .= '<li>
             <div class="related-pulses">
-                <div class="related-img">
-                    <img src="{{asset(\'images/avatar_1.png\')}}" alt="">
-                </div>
-                <div class="related-content">
-                    <div class="related-title">
-                        <a href="pulsedetail">
-                            <h1 class="related-title">
-                                The Gafgyt variant vbot seen in its 31 campaigns
-                            </h1>
-                        </a>
-                        <div class="active-indicator">
-                            <div class="dot green"></div>
-                            <div> URL Indicator Active </div>
-                        </div>
-                    </div>
-                    <div class="details-wrapper">
-                        <ul class="detail-show">
-                            <li>
-                                <span class="modified"> Modified </span>
-                                <span class="pulse-ago"> 3 HOURS AGO </span>
-                                by <a href="" class="pulse-author">MTSC</a>
-                            </li>
-                            <li>
-                                <span class="stat-label"> Public </span>
-                            </li>
-                            <li>
-                                <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
-                                <span><i class="fas fa-circle white"></i> White </span>
-                            </li>
-                        </ul>
-                        <div class="pulse-indicator-counts">
-                            <span class="nowrap ellipsis">
-                                <span class="insered">
-                                    <strong>FileHash-MD5:</strong>
-                                    <span class="br-last">48</span>
-                                </span>
-                                <span class="insered">
-                                    <strong>FileHash-SHA1:</strong>
-                                    <span class="br-last">3</span>
-                                </span>
-                                <span class="insered">
-                                    <strong>FileHash-SHA256:</strong>
-                                    <span class="br-last">17</span>
-                                </span>
-                                <span class="insered">
-                                    <strong>URL:</strong>
-                                    <span>94</span>
-                                </span>
-                            </span>
-                        </div>
-                        <div class="indicator-description">
-                            <span class="nowrap ellipsis">
-                                Gafgyt botnets have a long history of infecting Linux devices to
-                                launch DDoS attacks. While dozens of variants have been detected,
-                                new variants are constantly emerging with changes in terms of
-                                register message, exploits, and attacking methods. On the other
-                                hand, their new botnets are usually short lived, with most of the
-                                C2s watched keeping active for only a few days.
-                            </span>
-                        </div>
-                        <div class="by-items">
-                            <a href="#"><span>linux</span></a>,
-                            <a href="#"><span>iot</span></a>,
-                            <a href="#"><span>malware</span></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="related-subscribers">
-                    <span class="star-count">116,017</span>
-                    <span class="subscribers">
-                        <i></i>&nbsp;SUBSCRIBERS
-                    </span>
-                </div>
+                no Data
             </div>
-        </li>
-    </ul>' ;
+            </li>';
+        }
+        $html .= '</ul>';
+
+        $html2 = '';
+        if(!empty($validationInfo)){
+            foreach ($validationInfo as $value) {
+                $html2 .= '
+                <div class="row m-b-xs">
+                    <div class="col-md-6">
+                        '.$value["name"].'
+                    </div>
+                    <div class="col-md-6">
+                        '.$value["message"].'
+                    </div>
+                </div>';
+            }
+        }else{
+            $html2 .= '';
+        }
+
 
         if ($request->ajax()) {
             $data = [
-                "html" => $testto,
+                "html" =>  $html,
+                "html2" =>  $html2,
+                "sections" =>  $DataotxIndicator["sections"],
+                "testdata" =>  $DataotxIndicator,
                 "count" => 0
             ];
             return response()->json($data); 
@@ -342,18 +324,27 @@ class IndicatorsController extends Controller
         }
 
         foreach ($data as $data) {
+            //FileHash-PEHASH ไม่มีตัวอย่าง
+             //Osquery
+             //Ja3
 
+            //ถ้าเป็น NIDS เอา Title มาแทน indicatior
+           
+            if($data->type == "CIDR"||$data->type == "FilePath"||$data->type == "FileHash-IMPHASH"||$data->type == "Mutex"||$data->type == "URI"){
+                $linkIndicator =  '<a>';
+            }else{
+                $linkIndicator =  '<a href="'.route('indicators.detail_indicators').'?id='.$data->id.'&&type='.$data->type.'&&indicator='.$data->indicatior.'">';
+            }
             $html .= ' <ul class="list-indicators">
                         <li>
-                            <a href="' . route('indicators.detail_indicators', ['id' => $data->id, 'type' => $data->type, 'indicatior' => $data->indicatior]) . '">
+                            '.$linkIndicator.'
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
                            
-                              
-                               
-                              
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
                         </li></ul>';
+
+            
         }
         if ($request->ajax()) {
             $data = [

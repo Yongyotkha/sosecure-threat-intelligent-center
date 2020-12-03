@@ -132,23 +132,15 @@
                     </div>
                     <div class="row m-b-lg">
                         {{-- Validation --}}
-                        <div class="col-md-6">
+                        <div id="indicator_validation" class="col-md-6">
                             <h1 class="b-b">Validation</h1>
                             {{-- Inner Validation--}}
-                            <div class="row m-b-xs">
+                            <div id="loadspinner_indicator_validation" class="row m-b-xs">
                                 <div class="col-md-6">
-                                    WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
+                                    
                                 </div>
                                 <div class="col-md-6">
-                                    WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
-                                </div>
-                            </div>
-                            <div class="row m-b-xs">
-                                <div class="col-md-6">
-                                    WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
-                                </div>
-                                <div class="col-md-6">
-                                    WHITELISTED DOMAIN:Whitelisted Domain Appspot.Com
+                                    
                                 </div>
                             </div>
                         </div>
@@ -179,7 +171,7 @@
                             <span class="font-weight-bold">Related Pulses</span>
                         </div>
                     </div>
-                    <div id="yareyare" class="show-indicators">
+                    <div id="pulses_related" class="show-indicators">
                        
                     </div>
                 </section>
@@ -257,16 +249,24 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            url: "/indicators/load/general/"+"{{$otxtype}}"+"/"+"{{$otxindicator}}",
+            url: "/indicators/load/general",
             type: "get",
+            data: ({
+                type:"{{$otxtype}}",
+                indicator:"{{$otxindicator}}",
+            }),
             datatype: "html",
             beforeSend: function(){
                 $('.ajax-loading').show();
-               
+                $('#loadspinner_indicator_validation').addClass('content-spinner-loading');
+                
             },
         }).done(function(data){
             $('.ajax-loading').hide();
-            $("#yareyare").append(data.html);
+            $('#loadspinner_indicator_validation').removeClass('content-spinner-loading');
+            $("#indicator_validation").append(data.html2);
+            $("#pulses_related").append(data.html);
+            if(data.sections.indexOf("url_list")!= -1){console.log("sec","url_list")}
             console.log(data);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
