@@ -73,9 +73,10 @@
                         </div>
                     </div>
 
+
                     <div class="col-md-4">
                         <label for="" class="">Date</label>
-                        <div id="indicator-date" class="text-center"
+                        <div id="indicator_date" class="text-center"
                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                             <i class="fa fa-calendar"></i>&nbsp;
                             <span></span> <i class="fa fa-caret-down"></i>
@@ -83,11 +84,11 @@
                     </div>
                     <div class="col-md-4">
                         <label for="" class="d-block">&nbsp;</label>
-                        <button class="btn btn-info" onclick="search()">
+                        <button class="btn btn-info" id="search_data">
                             <i class="fas fa-search"></i>
                             <span> Search </span>
                         </button>
-                        <button class="btn btn-default" onclick="clear_data()">
+                        <button class="btn btn-default" id="clear_data">
                             <i class=" fas fa-broom"></i>
                             <span> Clear </span>
                         </button>
@@ -151,6 +152,27 @@
     var type = null;
     var startDate;
     var endDate;
+
+    var f_search = 0;
+
+    var page = 1; 
+    var page_stop = true;
+    load_more(page);
+    $('#scroll_otx').scroll(function(event) {
+            let scrolltop = $('#scroll_otx').scrollTop();
+            let tab_height = $('#scroll_otx').height();
+            let docu_height = $(document).height();
+        console.log(scrolltop+'  '+tab_height+'   '+docu_height);
+        if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
+            page++;
+            console.log(555);
+            if(page_stop){
+                {{--load_more(page);--}}
+                load_more_search(page,f_search);
+            }
+        }
+    });
+
     $(document).ready(function () {
 
         $('#hide-search-advance').hide();
@@ -172,12 +194,12 @@
         var end = moment().startOf('hour').add(32, 'hour');
 
         function cb(start, end) {
-            $('#indicator-date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            $('#indicator_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
             startDate = start;
             endDate = end;
         }
 
-        $('#indicator-date').daterangepicker({
+        $('#indicator_date').daterangepicker({
             timePicker: true,
             startDate: start,
             endDate: end,
@@ -195,42 +217,40 @@
         }, cb);
 
         cb(start, end);
-        
 
-    });
-    function search(){
-        
-        
+        $("#clear_data").click(function() {
+            keywords = $('#keyword').val('');
+            type = $('#type').val('');
+            start = moment();
+            end = moment();
+                cb(start, end);
+            f_search = 0;
+            page = 1;
+            page_stop = true;
+
+            $('#type').val(null).trigger('change');
+            clear_load_more(page,f_search);
+
+          
+
+
+        });
+        $("#search_data").click(function() {
         keywords = $('#keyword').val();
         type = $('#type').val();
-        
-        load_more_search(page)
-      
+        f_search = 1;
+        page = 1;
+        $('#count_news').text(0);
+        page_stop = true;
+        load_more_search(page,f_search);
+          
 
-    }
 
-    function clear_data(){        
-    }
-</script>
-
-<script>
-    var page = 1; 
-    var page_stop = true;
-    load_more(page);
-    $('#scroll_otx').scroll(function(event) {
-            let scrolltop = $('#scroll_otx').scrollTop();
-            let tab_height = $('#scroll_otx').height();
-            let docu_height = $(document).height();
-        
-        if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
-            page++;
-            if(page_stop){
-                load_more(page);
-            }
-        }
+        });
+    
     });
 
-  
+    
 
     function load_more(page){
         $.ajax({
@@ -241,13 +261,99 @@
             type: "get",
             datatype: "html",
             beforeSend: function(){
+                loading('load');
                 $('.ajax-loading').show();
             },
         }).done(function(data){
+            loading('stop_load');
+            if(data.html.length == 0){
+                
+                page_stop = false;
+                $('.ajax-loading').hide();
+                $('#count_otx').text("We've found "+data.count+" indicators");
+                return;
+            }
+            $('#count_otx').text("We've found "+data.count+" indicators" );
+            $('.ajax-loading').hide();
+            $("#list_otx").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+    function load_more_search(page,f_search){
+        if(page == 1) {
+            $("#list_otx").html('');   
+        }
+        startDate=  $("#indicator_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm:ss A');
+        endDate=  $("#indicator_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm:ss A');
+        console.log(startDate);
+    console.log(endDate);
+    console.log(keywords);
+    console.log(type);
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/LoadMoreOTX?page=" + page,
+            type: "get",
+            data: ({
+                startDate:startDate,
+                endDate:endDate,
+                keywords:keywords,
+                type:type,
+                f_search:f_search
+            }),
+            {{--datatype: "html",--}}
+            beforeSend: function(){
+                loading('load');
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            loading('stop_load');
             if(data.html.length == 0){
                 page_stop = false;
-                $('.ajax-loading').html("");
-                {{--$('#count_otx').text(0);--}}
+                $('.ajax-loading').hide();
+                $('#count_otx').text("We've found "+data.count+" indicators");
+                return;
+            }
+            console.log(data.html.length);
+            let count_n = $('#count_otx').text();
+            let count_search = data.count;
+            let count_n_all = parseInt(count_n) + parseInt(count_search);
+            {{--$('#count_otx').text(data.count);--}}
+            $('#count_otx').text("We've found "+data.count+" indicators");
+            $('.ajax-loading').hide();
+            $('.ajax-loading').addClass('d-none');
+            $("#list_otx").append(data.html);   
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+    function clear_load_more(page,f_search){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/LoadMoreOTX?page=" + page,
+            type: "get",
+            datatype: "html",
+            data: ({
+                
+                f_search:f_search,
+            }),
+            beforeSend: function(){
+                loading('load');
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            loading('stop_load');
+            if(data.html.length == 0){
+                
+                page_stop = false;
+                $('.ajax-loading').hide();
+                $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
             }
             $('#count_otx').text("We've found "+data.count+" indicators" );
@@ -258,49 +364,11 @@
         });
     }
 
-    function load_more_search(page){
-        if(page == 1) {
-            $("#list_otx").html('');   
-        }
-
-        console.log(startDate.format('YYYY-MM-DD hh:mm:ss ') + ' - ' + endDate.format('YYYY-MM-DD hh:mm:ss')); 
-        console.log(keywords);
-        console.log(type);
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/indicators/LoadMoreOTX?page=" + page,
-            type: "get",
-            data: ({
-                keywords:keywords,
-                type:type,
-                startDate:startDate.format('YYYY-MM-DD hh:mm A'),
-                endDate:endDate.format('YYYY-MM-DD hh:mm A'),
-           
-            }),
-            {{--datatype: "html",--}}
-            beforeSend: function(){
-                $('.ajax-loading').show();
-            },
-        }).done(function(data){
-            if(data.html.length == 0){
-                page_stop = false;
-                $('.ajax-loading').html("");
-                {{--$('#count_otx').text(0);--}}
-                return;
-            }
-            $('#count_otx').text("We've found "+data.count+" indicators");
-            $('.ajax-loading').hide();
-            $("#list_otx").append(data.html);   
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response");
-        });
-
-    }
 
 
 </script>
+
+
 
 
 

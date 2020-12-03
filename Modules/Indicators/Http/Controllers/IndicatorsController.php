@@ -117,6 +117,27 @@ class IndicatorsController extends Controller
     public function LoadMoreOTX(Request $request)
     {
 
+        $date_start = $request->startDate;
+        $date_end = $request->endDate;
+
+        $date_start_explode = explode(" ", $date_start);
+        $date_start_date = @$date_start_explode[0];
+        $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
+
+        $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+
+        $date_start_time_time = date("H:i", strtotime($date_start_time));
+        $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+
+
+        $date_end_explode = explode(" ", $date_end);
+        $date_end_date = @$date_end_explode[0];
+        $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
+        // dd($date_end_time);
+        $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        $date_end_time_time = date("H:i", strtotime($date_end_time));
+        $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+
 
         $html = '';
 
@@ -139,20 +160,36 @@ class IndicatorsController extends Controller
         // }
         $data = '';
         // dd($news);
-        if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
-            if ($request->type && $request->keywords) {
-                $count = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->where('type', '=', $request->type)->count();
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->where('type', '=', $request->type)->paginate(10);
+        if ($request->keywords || $request->type || $request->startDate || $request->endDate && $request->f_search == 1) {
+
+            if ($request->type && $request->keywords && $request->startDate) {
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+            } else if ($request->type && $request->keywords) {
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type);
+            } else if ($request->startDate && $request->keywords) {
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+            } else if ($request->startDate && $request->type) {
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
             } else if ($request->keywords) {
-                $count = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->count();
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->paginate(10);
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%');
             } else if ($request->type) {
-                $count = OtxIndicatiorData::where("status", '=', 1)->where('type', '=', $request->type)->count();
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('type', '=', $request->type)->paginate(10);
+
+                $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type);
+            } else if ($request->startDate) {
+
+                $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
             }
+
+            $data = $data->orderBy('updated_at', 'desc')->paginate(PAGINATE_NUM);
+            $count = $data->count();
         } else {
 
-            $data = OtxIndicatiorData::where("status", '=', 1)->paginate(10);
+            $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc')->paginate(PAGINATE_NUM);
             $count = OtxIndicatiorData::where("status", '=', 1)->count();
         }
 
@@ -162,10 +199,6 @@ class IndicatorsController extends Controller
                         <li>
                             <a href="' . route('indicators.detail_indicators', ['id' => $data->id, 'type' => $data->type, 'indicatior' => $data->indicatior]) . '">
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
-                           
-                              
-                               
-                              
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
                         </li></ul>';
