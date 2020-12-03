@@ -2,6 +2,7 @@
 
 namespace Modules\RSSFeedSettings\Entities;
 
+use Modules\SiteSettings\Entities\SiteNewsRelated;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,5 +20,9 @@ class RSSNews extends Model
 
     public function get_topic_multi(){
         return $this->hasMany(NewsTopics::class, 'rss_news_id', 'id');
+    }
+
+    public function get_site_news_related(){
+        return $this->hasMany(SiteNewsRelated::class, 'news_id', 'id');
     }
 }

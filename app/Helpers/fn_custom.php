@@ -128,3 +128,16 @@ function encrypt_decrypt($action, $string, $public_key, $ip, $mac) {
     }
     return $output;
 }
+
+function utf8_strlen($str) {
+      $c = strlen($str);
+            $l = 0;
+      for ($i = 0; $i < $c; ++$i)
+      {
+         if ((ord($str[$i]) & 0xC0) != 0x80)
+         {
+            ++$l;
+         }
+      }
+      return $l;
+}

@@ -1,5 +1,11 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .w-100{
+        width: 100px;
+    }
+
+</style>
 <section id="content" class="bg">
 
     <section class="hbox stretch">      
@@ -57,10 +63,10 @@
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                             @langapp('delete')</span>
                     </button>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         data-target="#rss_modal">
                         @icon('solid/plus') @langapp('create')
-                    </a>
+                    </a> --}}
                 </header>
 
                 <section class="scrollable wrapper">
@@ -215,7 +221,7 @@
                 {
                     data: 'pubDate',
                     name: 'pubDate',
-                    className: 'text-center'
+                    className: 'w-100 text-center'
                 },
                 {
                     data: 'status',

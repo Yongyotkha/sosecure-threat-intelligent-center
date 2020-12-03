@@ -287,6 +287,7 @@
             if($("#lang_en").is(":checked")) {
                 lang_en = true;
             }
+            let site_id = $("#site").val();
 
 
         $.ajax({
@@ -303,7 +304,8 @@
                 lang_en:lang_en,
                 date_start:startDate,
                 date_end:endDate,
-                f_search:f_search
+                f_search:f_search,
+                site_id:site_id
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
