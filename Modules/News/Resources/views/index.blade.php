@@ -8,8 +8,13 @@
             <header class="header panel-heading bg-white b-b b-light">
                 <div class="bc-head">@langapp('news')</div>    
                 <div class="pull-right" style="margin-top: 8px;">
-                    <select name="" id="" class="select2-option form-control select-site" style="min-width: 100px">
-                        <option value="1">All Site</option>
+                    <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 100px">
+                        <option value="">All Site</option>
+                        @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
                 <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -105,9 +110,9 @@
                         <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
                         <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
                         <li class="pull-right">
-                            <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                            {{-- <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                                 <span>Bookmarks</span>
-                             </button>
+                             </button> --}}
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -182,10 +187,11 @@
 @include('stacks.js.form')
 
 <script>
+    var f_search = 0;
     var page = 1; 
     var page_stop = true;
-    {{--load_more(page);--}}
-    load_more_search(page)
+    load_more(page);
+    {{--load_more_search(page);--}}
     load_more_book_mark(page);
     $('#scrollable_news').scroll(function(event) {
             let scrolltop = $('#scrollable_news').scrollTop();
@@ -196,8 +202,8 @@
             page++;
             console.log(555);
             if(page_stop){
-                load_more(page);
-                load_more_search(page);
+                {{--load_more(page);--}}
+                load_more_search(page,f_search);
             }
         }
     });
@@ -224,7 +230,7 @@
             $('#count_news_bookmark').text(data.count);
             $('.ajax-loading').hide();
             $('.ajax-loading').addClass('d-none');
-            $("#list_news_book_mark").append(data.html);   
+            $("#list_news_book_mark").append(data.html);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -250,14 +256,14 @@
             }
             $('#count_news').text(data.count);
             $('.ajax-loading').hide();
-            $("#list_news").append(data.html);   
+            $("#list_news").append(data.html);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
     }
 
 
-    function load_more_search(page){
+    function load_more_search(page,f_search=0){
         if(page == 1) {
             $("#list_news").html('');   
         }
@@ -296,7 +302,8 @@
                 lang_th:lang_th,
                 lang_en:lang_en,
                 date_start:startDate,
-                date_end:endDate
+                date_end:endDate,
+                f_search:f_search
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
@@ -350,6 +357,8 @@
         });
     }
     function Bookmarks(ele, news_id){
+        {{--page_stop = true;--}}
+        {{--page = 1;--}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -358,8 +367,13 @@
             type: "get",
             datatype: "json",
         }).done(function(data){
-            $(ele).addClass("bookmark-active"); 
+            if($(ele).hasClass("bookmark-active")) {
+                $(ele).removeClass("bookmark-active"); 
+            } else {
+                $(ele).addClass("bookmark-active"); 
+            }
             load_more_book_mark(page);
+            {{--load_more_search(page,f_search);--}}
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -392,8 +406,8 @@
 <script type="text/javascript">
     $(function() {
     
-        var start = moment().subtract(1, 'year').startOf('year');{{--moment().startOf('hour')--}}
-        var end = moment().subtract(0, 'year').endOf('year');{{--moment().startOf('hour').add(32, 'hour')--}}
+        var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+        var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
     
         function cb(start, end) {
             $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -444,13 +458,35 @@
             console.log('related_news '+related_news);
             console.log('lang_th '+lang_th);
             console.log('lang_en '+lang_en);
+            f_search = 1;
             page = 1;
             $('#count_news').text(0);
             page_stop = true;
-            load_more_search(page)
+            load_more_search(page,f_search)
+        });
+
+
+        $("#btn_news_reset").click(function() {
+            $("#news_title_search").val('');
+            $("#news_category").val('').trigger("change");
+            $("#related_news").prop("checked",false);
+            $("#lang_th").prop("checked",false);
+            $("#lang_en").prop("checked",false);
+            start = moment();
+            end = moment();
+            cb(start, end);
+
+            f_search = 0;
+            page = 1;
+            $('#count_news').text(0);
+            page_stop = true;
+            load_more_search(page,f_search)
+
         });
     
     });
+
+
 
 
 </script>
