@@ -2,7 +2,8 @@
 
 return [
 
-    'Create_User'                            => 'Create User',
+    'Search_Advance'                            => 'Search Advance',
+    'Create_User'                               => 'Create User',
     'account_details'                            => 'Account Details',
     'activities'                                 => 'Activity Feed',
     'activity'                                   => 'Activity',
