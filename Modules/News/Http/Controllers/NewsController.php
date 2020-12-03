@@ -335,6 +335,13 @@ class NewsController extends Controller
 
         $date_start = $request->date_start;
         $date_end = $request->date_end;
+        $site_id = '';
+
+        $site_code = $request ->site_id;
+        if($site_code) {
+            $site_id_m = SiteSettings::where('code',$site_code)->first();
+            $site_id = @$site_id_m->id;
+        }
 
         $title = $request ->title;
         $cate = $request ->cate;
@@ -390,7 +397,15 @@ class NewsController extends Controller
                 
             }
 
-            if($related_news) {
+            if($related_news == 'true') {
+                if($site_code) {
+                    $site_id_m = SiteSettings::where('code',$site_code)->first();
+                    $site_id = @$site_id_m->id;
+
+                    $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
+                        $q->where('site_id', $site_id)->where('deleted_at', null);
+                    });
+                }
 
             }
 
@@ -437,8 +452,18 @@ class NewsController extends Controller
         }
 
         // dd($news);
-
+        $icon_related= '';
         foreach($news as $data){
+            $related_news_site = '';
+            if($site_id) {
+                $related_news_site = SiteNewsRelated::where("news_id",$data -> id)->where("site_id",$site_id)->first();
+            }
+            
+            if($related_news_site) {
+                $icon_related = '<i class="fas fa-newspaper"></i>';
+            } else {
+                $icon_related = '';
+            }
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             if($check_read_news){
@@ -455,7 +480,7 @@ class NewsController extends Controller
                 </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <span class="head-news-text">'.$data -> title_th.'</span>
+                        <span class="head-news-text">'.$icon_related.' '.$data -> title_th.'</span>
                     </a>
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
