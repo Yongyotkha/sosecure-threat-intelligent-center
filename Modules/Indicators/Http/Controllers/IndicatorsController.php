@@ -96,13 +96,13 @@ class IndicatorsController extends Controller
                 <li>
                     <div class="related-pulses">
                         <div class="related-img">
-                            <img src="' . $value["author"]["avatar_url"] . '" alt="">
+                            <img src="' . (isset($value["author"]["avatar_url"])?$value["author"]["avatar_url"]:"") . '" alt="">
                         </div>
                         <div class="related-content">
                             <div class="related-title">
                                 <a href="pulsedetail">
                                     <h1 class="related-title">
-                                        ' . $value["name"] . '
+                                        ' . (isset($value["name"])?$value["name"]:"") . '
                                     </h1>
                                 </a>
                                 <div class="active-indicator">
@@ -119,10 +119,10 @@ class IndicatorsController extends Controller
                                         ' . ($value["is_modified"] == false ? "Created" : "Modified") . ' 
                                         </span>
                                         <span class="pulse-ago"> 
-                                            ' . $value["modified_text"] . '
+                                            ' . (isset($value["modified_text"])?$value["modified_text"]:"") . '
                                         </span>
-                                        by <a href="https://otx.alienvault.com/user/' . $value["author"]["username"] . '/pulses" class="pulse-author">
-                                        ' . $value["author"]["username"] . '
+                                        by <a href="https://otx.alienvault.com/user/' . (isset($value["author"]["username"])?$value["author"]["username"]:"") . '/pulses" class="pulse-author">
+                                        ' . (isset($value["author"]["username"])?$value["author"]["username"]:"") . '
                                         </a>
                                     </li>
                                     <li>
@@ -270,11 +270,11 @@ class IndicatorsController extends Controller
                     IP ADDRESS:
                 </div>            
                 <div class="col-md-8 text-right">
-                    <a href="">'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"].'</a>
+                    <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"].'</a>
                 </div>
             </div>';
         }
-
+//<img src="' . (isset($DataotxIndicator["flag_url"])?("https://otx.alienvault.com/".$DataotxIndicator["flag_url"]):"") . '" alt="">
         if(isset($DataotxIndicator["flag_title"])){
             $isUrl_list = 1;
             $html .= ' 
@@ -283,46 +283,94 @@ class IndicatorsController extends Controller
                     LOCATION:
                 </div>            
                 <div class="col-md-8 text-right">
-                    <a href="">'.$DataotxIndicator["flag_title"].'</a>
+                    <a >'.$DataotxIndicator["flag_title"].'</a>
                 </div>
             </div>';
         }
 
-        
-        $html .= '                            
+        if(isset($request->data_general["hostname"])){
+            $isUrl_list = 1;
+            $html .= ' 
             <div class="row m-b-xs">
                 <div class="col-md-4">
                     HOSTNAME:
-                </div>
+                </div>            
                 <div class="col-md-8 text-right">
-                    <a href="">hwsrv-706090.hostwindsdns.com</a>
+                    <a >'.$request->data_general["hostname"].'</a>
                 </div>
-            </div>
+            </div>';
+        }
+        
+        if(isset($request->data_general["domain"])){
+            $isUrl_list = 1;
+            $html .= ' 
+            <div class="row m-b-xs">
+                <div class="col-md-4">
+                    DOMAIN:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a >'.$request->data_general["domain"].'</a>
+                </div>
+            </div>';
+        }
 
+        if(isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"])){
+            $isUrl_list = 1;
+            $html .= ' 
             <div class="row m-b-xs">
-            <div class="col-md-4">
-                DOMAIN:
-            </div>
-            <div class="col-md-8 text-right">
-                <a href="">hostwindsdns.com</a>
-            </div>
-            </div>
+                <div class="col-md-4">
+                    LAST ANALYZED DATE:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"].'</a>
+                </div>
+            </div>';
+        }
+
+        if(isset($DataotxIndicator["url_list"][0]["checked"])){
+            $isUrl_list = 1;
+            $html .= ' 
             <div class="row m-b-xs">
-            <div class="col-md-4">
-                LAST ANALYZED DATE:
-            </div>
-            <div class="col-md-8 text-right">
-                Mar. 30, 2020, 4:44 PM
-            </div>
-            </div>
+                <div class="col-md-4">
+                    GOOGLE SAFE BROWSING:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a >';
+            
+            if(empty($DataotxIndicator["url_list"][0]["safebrowsing"]["matches"])){
+                // @icon(\'solid/check\') Not identified as malicious
+                $html .= 'Not identified as malicious';
+            }else{
+                foreach ($DataotxIndicator["url_list"][0]["safebrowsing"]["matches"] as $value) {
+                    $html .= $value.' ';
+                }
+            }
+            $html .='</a>
+                </div>
+            </div>';
+        }else{
+            $html .= ' 
             <div class="row m-b-xs">
-            <div class="col-md-4">
-                GOOGLE SAFE BROWSING:
-            </div>
-            <div class="col-md-8 text-right">
-                @icon("solid/check") Not identified as malicious
-            </div>
-        </div>';
+                <div class="col-md-4">
+                    GOOGLE SAFE BROWSING:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a >Not analyzed</a>
+                </div>
+            </div>';
+        }
+        if(isset($DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"])){
+            $isUrl_list = 1;
+            $html .= ' 
+            <div class="row m-b-xs">
+                <div class="col-md-4">
+                    ANTIVIRUS:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a >'.$DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"].'</a>
+                </div>
+            </div>';
+        }
 
         if ($request->ajax()) {
             $data = [

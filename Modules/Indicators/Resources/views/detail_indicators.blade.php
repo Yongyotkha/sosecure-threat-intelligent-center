@@ -50,6 +50,8 @@
                         {{-- Basic Information --}}
                         <div id="indicator_basic_info" class="col-md-6">
                             <h1 class="b-b">Basic Information</h1>
+                            <div id="loadspinner_basic_info" class="content-spinner-loading">
+                            </div>
                             {{-- Inner Basic Information--}}
 
                         </div>
@@ -213,12 +215,13 @@
             
 
 
-
+            
             if("{{$otxtype}}"=="CVE"){
                 console.log("CVE");
             }else{
                 {{--ajax type URL--}}
                 $.ajax(req_load_url_list(data.generalData)).done(function(data2){
+                    $('#loadspinner_basic_info').hide();
                     console.log(data2);
                     $("#indicator_basic_info").append(data2.html);
                 }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -250,6 +253,7 @@
             beforeSend: function(){
                 $('#loadspinner_indicator_validation').show();
                 $('#loadspinner_related_pulse').show();
+                $('#loadspinner_basic_info').show();
             },
         };
         return dataout;
