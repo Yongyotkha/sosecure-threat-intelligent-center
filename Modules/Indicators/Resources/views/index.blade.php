@@ -237,7 +237,8 @@
 
     function sort_by(event) {
     target = event.target.innerHTML;
-    
+    page = 1;
+    page_stop = true;
     if(f_search == 0){
 
         load_more(page);
