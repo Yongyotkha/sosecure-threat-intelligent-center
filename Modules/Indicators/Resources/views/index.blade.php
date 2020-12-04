@@ -165,7 +165,6 @@
         $('#seach-advance').click(function(){
             $('#hide-search-advance').toggle();
         });
-
         $('#indicator_type').select2({
             placeholder: 'Indicator Type',
         });

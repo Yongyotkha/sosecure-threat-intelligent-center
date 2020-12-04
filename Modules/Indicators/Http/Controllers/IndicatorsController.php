@@ -84,14 +84,13 @@ class IndicatorsController extends Controller
         )->getBody();
         $DataotxIndicator = json_decode($bodyData, true);
 
-
-        $pulseInfo = $DataotxIndicator["pulse_info"];
-        $validationInfo = $DataotxIndicator["validation"];
-
         //pulse info HTML
         $html = '';
         $html .= '<ul class="list-indicators">';
-        if (!empty($pulseInfo["pulses"])) {
+        $isPulse_info = 0;
+        if(!empty($DataotxIndicator["pulse_info"])){
+            $isPulse_info = 1;
+            $pulseInfo = $DataotxIndicator["pulse_info"];
             foreach ($pulseInfo["pulses"] as $value) {
                 $html .= '
                 <li>
@@ -187,7 +186,10 @@ class IndicatorsController extends Controller
         $html .= '</ul>';
 
         $html2 = '';
-        if (!empty($validationInfo)) {
+        $isValidation = 0;
+        if(!empty($DataotxIndicator["validation"])){
+            $isValidation = 1;
+            $validationInfo = $DataotxIndicator["validation"];
             foreach ($validationInfo as $value) {
                 $html2 .= '
                 <div class="row m-b-xs">
@@ -202,19 +204,138 @@ class IndicatorsController extends Controller
         } else {
             $html2 .= '';
         }
-
-
         if ($request->ajax()) {
             $data = [
                 "html" =>  $html,
                 "html2" =>  $html2,
+                "generalData" =>  $DataotxIndicator,
                 "sections" =>  $DataotxIndicator["sections"],
-                "testdata" =>  $DataotxIndicator,
-                "count" => 0
+                "isValidation" =>  $isValidation,
+                "isPulse_info" =>  $isPulse_info,
             ];
             return response()->json($data);
         }
+
     }
+
+    public function load_url_list(Request $request)
+    {
+        $OTX_KEY = env("OTX_KEY","");
+        $client = new \GuzzleHttp\Client();
+
+        $reqType = $request->type;
+        if (stripos( $request->type, "file") !== false) {
+            $reqType = 'file';
+        }else if($reqType == "CVE"){
+            $reqType = "cve";
+        }else if($reqType == "URL"){
+            $reqType = 'url';
+        }else if($reqType == "NIDS"){
+            $reqType = 'nids';
+        }else if($reqType == "YARA"){
+            $reqType = 'yara';
+        }else if($reqType == "BitcoinAddress"){
+            $reqType = 'bitcoin-address';
+        }else if($reqType == "SSLCertFingerprint"){
+            $reqType = 'ssl-cert-fingerprint';
+        }
+        $reqIndicator = $request->indicator;
+
+       // https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.bonanzadesign-my.com%2Fgrace%2FMasterNewShit.exe?limit=10&page=1
+       $isUrl_list = 0; 
+       if(isset($request->data_general["sections"])&&in_array("url_list", $request->data_general["sections"]) ){
+            $bodyData   = $client->request( 
+                'GET',
+                'https://otx.alienvault.com/otxapi/indicator/'.$reqType.'/url_list'.'/'.$reqIndicator,
+                [
+                    'headers' => [
+                        'Accept'       => 'application/json',
+                        'Content-type' => 'application/json',
+                        'X-OTX-API-KEY' => $OTX_KEY,
+                    ]
+                ]
+            )->getBody();
+            $DataotxIndicator = json_decode($bodyData,true);
+        }else{
+            $DataotxIndicator = null;
+        }
+
+        $html = '<div class="row m-b-xs">';
+
+        if(isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"])){
+            $isUrl_list = 1;
+            $html .= '
+            <div class="row m-b-xs">
+                <div class="col-md-4">
+                    IP ADDRESS:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a href="">'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"].'</a>
+                </div>
+            </div>';
+        }
+
+        if(isset($DataotxIndicator["flag_title"])){
+            $isUrl_list = 1;
+            $html .= ' 
+            <div class="row m-b-xs">
+                <div class="col-md-4">
+                    LOCATION:
+                </div>            
+                <div class="col-md-8 text-right">
+                    <a href="">'.$DataotxIndicator["flag_title"].'</a>
+                </div>
+            </div>';
+        }
+
+        
+        $html .= '                            
+            <div class="row m-b-xs">
+                <div class="col-md-4">
+                    HOSTNAME:
+                </div>
+                <div class="col-md-8 text-right">
+                    <a href="">hwsrv-706090.hostwindsdns.com</a>
+                </div>
+            </div>
+
+            <div class="row m-b-xs">
+            <div class="col-md-4">
+                DOMAIN:
+            </div>
+            <div class="col-md-8 text-right">
+                <a href="">hostwindsdns.com</a>
+            </div>
+            </div>
+            <div class="row m-b-xs">
+            <div class="col-md-4">
+                LAST ANALYZED DATE:
+            </div>
+            <div class="col-md-8 text-right">
+                Mar. 30, 2020, 4:44 PM
+            </div>
+            </div>
+            <div class="row m-b-xs">
+            <div class="col-md-4">
+                GOOGLE SAFE BROWSING:
+            </div>
+            <div class="col-md-8 text-right">
+                @icon("solid/check") Not identified as malicious
+            </div>
+        </div>';
+
+        if ($request->ajax()) {
+            $data = [
+                "html" =>  $html,
+                "out" =>  $DataotxIndicator,
+            ];
+            return response()->json($data); 
+        }
+        
+    }
+
+
+
     /**
      * Show the form for creating a new resource.
      * @return Response
