@@ -66,12 +66,12 @@
                                 <input type="text" class="form-control" name="source" value="{{ $rss -> get_rss -> name }}" readonly>
                             </div>
                         </div>
-                         <div class="row d-none">
+                         {{-- <div class="row d-none">
                             <label for="" class="col-md-12 control-label" id="label_topic">Topic <span class="text-danger">*</span></label>
                             <div class="col-md-12">
                                <select name="topic[]" id="topic" class="select2-option form-control" multiple="multiple"></select>
                             </div>
-                        </div>
+                        </div> --}}
                          {{-- 
                          <div class="row">
                              <div class="col-lg-12">
@@ -139,11 +139,11 @@
                         <div class="row d-none">
                             <label for="" class="col-md-12 control-label">Tag
                         </div>
-                        <div class="row d-none">
-                        <div class="col-md-12">
+                        {{-- <div class="row d-none">
+                            <div class="col-md-12">
                                 <select name="tags[]" id="tags" class="select2-option form-control" multiple="multiple"></select>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <br>
                          <div class="form-group row">
@@ -278,7 +278,7 @@
         
     });
     $(document).ready(function(){
-        $("#topic").select2({
+        {{--$("#topic").select2({
             allowClear: true,
             tags: true,
             width: '100%',
@@ -308,8 +308,8 @@
                     };
                 },
             }
-        });
-        $("#tags").select2({
+        });--}}
+        {{--$("#tags").select2({
             allowClear: true,
             tags: true,
             width: '100%',
@@ -339,7 +339,7 @@
                     };
                 },
             }
-        });
+        });--}}
         $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
     }); 
     function copy_link(value) {

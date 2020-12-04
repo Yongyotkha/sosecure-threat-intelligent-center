@@ -451,6 +451,12 @@ class RSSFeedSettingsController extends Controller
     {
         $model = TransactionRssData::where("code",$id);
         $model->delete();
+
+        // $check_TransactionRssData = TransactionRssData::where("code",$id);
+
+        // $RSSNews = RSSNews::where("transaction_rss_id",)->
+        // RSSNewsCategory
+
         return ajaxResponse(
             [
                 'message'  => langapp('deleted_successfully'),
