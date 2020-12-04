@@ -9,10 +9,10 @@
                     <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                    @langapp('indicators') : Type:URL,http://hwsrv-706090.hostwindsdns.com/bns/gang12
-                    <a href="" class="btn btn-default m-t-0 m-l-5">
+                    @langapp('indicators') : Type:{{$otxtype}},<span id="otxindicator_text">{{$otxindicator}}</span>
+                    <button id="copy_button" class="btn btn-default m-t-0 m-l-5">
                         @icon('solid/copy')
-                    </a>
+                    </button>
                 </div>
 
                 &nbsp;
@@ -48,49 +48,10 @@
                 <div id="general_details" class="pd-15">
                     <div class="row m-b-lg">
                         {{-- Basic Information --}}
-                        <div class="col-md-6">
+                        <div id="indicator_basic_info" class="col-md-6">
                             <h1 class="b-b">Basic Information</h1>
                             {{-- Inner Basic Information--}}
-                            <div class="row m-b-xs">
-                                <div class="col-md-4">
-                                    IP ADDRESS:
-                                </div>
-                                <div class="col-md-8 text-right">
-                                    <a href="">46.166.128.234</a>
-                                </div>
-                            </div>
-                            <div class="row m-b-xs">
-                                <div class="col-md-4">
-                                    HOSTNAME:
-                                </div>
-                                <div class="col-md-8 text-right">
-                                    <a href="">hwsrv-706090.hostwindsdns.com</a>
-                                </div>
-                            </div>
-                            <div class="row m-b-xs">
-                                <div class="col-md-4">
-                                    DOMAIN:
-                                </div>
-                                <div class="col-md-8 text-right">
-                                    <a href="">hostwindsdns.com</a>
-                                </div>
-                            </div>
-                            <div class="row m-b-xs">
-                                <div class="col-md-4">
-                                    LAST ANALYZED DATE:
-                                </div>
-                                <div class="col-md-8 text-right">
-                                    Mar. 30, 2020, 4:44 PM
-                                </div>
-                            </div>
-                            <div class="row m-b-xs">
-                                <div class="col-md-4">
-                                    GOOGLE SAFE BROWSING:
-                                </div>
-                                <div class="col-md-8 text-right">
-                                    @icon('solid/check') Not identified as malicious
-                                </div>
-                            </div>
+
                         </div>
                         {{-- File Identification --}}
                         <div class="col-md-6">
@@ -236,10 +197,46 @@
             $('.active-link').removeClass();
             $(this).addClass('active-link')
         });
+
+        $("#copy_button").click(function(){
+            copy_clipboard("otxindicator_text");
+        });
+
     });
     
     function detail_load_general(){
-        $.ajax({
+        $.ajax(req_load_general()).done(function(data){
+            $('#loadspinner_related_pulse').hide();
+            $('#loadspinner_indicator_validation').hide();
+            $("#indicator_validation").append(data.html2);
+            $("#pulses_related").append(data.html);
+            
+
+
+
+            if("{{$otxtype}}"=="CVE"){
+                console.log("CVE");
+            }else{
+                {{--ajax type URL--}}
+                $.ajax(req_load_url_list(data.generalData)).done(function(data2){
+                    console.log(data2);
+                    $("#indicator_basic_info").append(data2.html);
+                }).fail(function(jqXHR, ajaxOptions, thrownError){
+                    console.log("No response from server2");
+                });
+
+                if(data.sections.indexOf("url_list")!= -1){
+                    console.log("sec","url_list");
+                }
+
+            }
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+    function req_load_general(){
+        dataout = {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -254,16 +251,37 @@
                 $('#loadspinner_indicator_validation').show();
                 $('#loadspinner_related_pulse').show();
             },
-        }).done(function(data){
-            $('#loadspinner_indicator_validation').hide();
-            $('#loadspinner_related_pulse').hide();
+        };
+        return dataout;
+    }
 
-            $("#indicator_validation").append(data.html2);
-            $("#pulses_related").append(data.html);
-            if(data.sections.indexOf("url_list")!= -1){console.log("sec","url_list")}
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
-        });
+    function req_load_url_list(data_general){
+        dataout = {
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/load/url_list",
+            type: "post",
+            data: ({
+                type:"{{$otxtype}}",
+                indicator:"{{$otxindicator}}",
+                data_general:data_general,
+            }),
+            datatype: "html",
+            beforeSend: function(){
+            },
+        };
+        return dataout;
+    }
+
+    function copy_clipboard(id) {
+        var copyText = document.getElementById(id);
+        var textArea = document.createElement("textarea");
+        textArea.value = copyText.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
     }
 </script>
 @endpush
