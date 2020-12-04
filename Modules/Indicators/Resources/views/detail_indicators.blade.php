@@ -225,6 +225,7 @@
                     console.log(data2);
                     $("#indicator_basic_info").append(data2.html);
                 }).fail(function(jqXHR, ajaxOptions, thrownError){
+                    $('#loadspinner_basic_info').hide();
                     console.log("No response from server2");
                 });
 
@@ -234,6 +235,7 @@
 
             }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
+
             console.log("No response from server");
         });
     }
