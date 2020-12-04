@@ -44,7 +44,7 @@
             {{-- <div class="thumnail-img" style="background-image:url('https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')"></div> --}}
             <div class="jumborton-description">
                 <div class="container-description">
-                    <div class="headding-secondary-text" id="test">
+                    <div class="headding-secondary-text" id="detial_new">
 
                         <div class="mobi-d-block">
                             <span
@@ -197,20 +197,20 @@
     function printDiv() { 
         var divContents = document.getElementById("content_news").innerHTML; 
         var divTopic = document.getElementById("topic_news").innerHTML; 
-        var test = document.getElementById("test").innerHTML; 
+        var divDetail = document.getElementById("detial_new").innerHTML; 
         var a = window.open('', '', 'height=500, width=1000'); 
         a.document.write('<html>'); 
         a.document.write('<body > <h1>'); 
         a.document.write(divTopic);
         a.document.write('</h1> ');
-        a.document.write(test);
+        a.document.write(divDetail);
         a.document.write('<p>'); 
         a.document.write(divContents); 
         a.document.write('</p>'); 
         a.document.write('</body></html>'); 
         a.document.close(); 
         a.print();
-        console.log(test )
+
     }
 
 </script>
