@@ -111,10 +111,10 @@
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Recently Modified</a></li>
-                                <li><a href="#">Least Recently Modified</a></li>
-                                <li><a href="#">Name Ascending</a></li>
-                                <li><a href="">Name Descending</a></li>
+                                <li value="1"><a href="#">Recently Modified</a></li>
+                                <li value="2"><a href="#">Least Recently Modified</a></li>
+                                <li value="3">><a href="#">Name Ascending</a></li>
+                                <li value="4">><a href="">Name Descending</a></li>
                             </ul>
                         </div>
                     </div>

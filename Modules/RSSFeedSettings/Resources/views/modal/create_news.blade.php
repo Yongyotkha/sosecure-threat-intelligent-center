@@ -42,6 +42,13 @@
                              <div class="col-md-12">
                                 <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple">
                                     @foreach ($category as $item)
+                                        @if($data['RSSNews'])
+                                            @foreach($data['RSSNews']->get_cate as $news_cate_val)
+                                                @if($item->id == $news_cate_val->news_category_id )
+                                                    <option value="{{ $item -> id }}" selected>{{ $item -> name }}</option>
+                                                @endif
+                                            @endforeach
+                                        @endif
                                         <option value="{{ $item -> id }}">{{ $item -> name }}</option>
                                     @endforeach
                                 </select>

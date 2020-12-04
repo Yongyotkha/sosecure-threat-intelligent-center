@@ -452,9 +452,12 @@ class NewsController extends Controller
         }
 
         // dd($news);
-        $icon_related= '';
+        
         foreach($news as $data){
             $related_news_site = '';
+            $icon_related= '';
+            $n_title ='';
+            $n_detail = '';
             if($site_id) {
                 $related_news_site = SiteNewsRelated::where("news_id",$data -> id)->where("site_id",$site_id)->first();
             }
@@ -464,6 +467,26 @@ class NewsController extends Controller
             } else {
                 $icon_related = '';
             }
+
+            if($lang_th=='true' && $lang_en=='true') {
+                $n_title = $data -> title_th;
+                $n_detail = $data -> detail_th;
+            } else if($lang_th || $lang_en) {
+                if($lang_th=='true') {
+                    $n_title = $data -> title_th;
+                    $n_detail = $data -> detail_th;
+                } else if ($lang_en=='true') {
+                    $n_title = $data -> title_en;
+                    $n_detail = $data -> detail_en;
+                }
+            } else {
+                $n_title = $data -> title_th;
+                $n_detail = $data -> detail_th;
+                
+                
+            }
+
+
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             if($check_read_news){
@@ -480,12 +503,12 @@ class NewsController extends Controller
                 </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <span class="head-news-text">'.$icon_related.' '.$data -> title_th.'</span>
+                        <span class="head-news-text">'.$icon_related.' '.$n_title.'</span>
                     </a>
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
                         <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
-                        <span>&nbsp;'.$data -> detail_th.'</span>
+                        <span>&nbsp;'.$n_detail.'</span>
                     </div>
                 </div>
                 <div class="content-news-image">
