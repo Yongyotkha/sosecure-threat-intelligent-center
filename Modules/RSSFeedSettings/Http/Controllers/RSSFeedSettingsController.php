@@ -231,12 +231,17 @@ class RSSFeedSettingsController extends Controller
                     return '-';
                 }
             })
-            ->addColumn('topic', function (RSSNews $model) {
-                if(empty($model->get_topic->topic)){
-                    return '-';
+            ->addColumn('cate', function (RSSNews $model) {
+                $html = '';
+                if(empty($model->get_cate)){
+                    $html = '-';
                 }else{
-                    return $model->get_topic->topic->name;
+                    foreach($model->get_cate as $cate_val) {
+                        $html .= $cate_val->get_cate_name->name.', ';
+                    }
+                    $html = rtrim($html,", ");
                 }
+                return $html;
             })
             ->addColumn('data_status', function (RSSNews $model) {
                 $html = '';
@@ -277,7 +282,7 @@ class RSSFeedSettingsController extends Controller
                 return $html;
                
             })
-            ->rawColumns(['chk','site_name','source','title','topic','data_status','link','status','action'])
+            ->rawColumns(['chk','site_name','source','title','cate','data_status','link','status','action'])
             ->toJson();
     }
 

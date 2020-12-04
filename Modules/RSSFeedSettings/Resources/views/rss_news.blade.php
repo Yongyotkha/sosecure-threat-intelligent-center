@@ -142,7 +142,7 @@
                                         <th>Site Name</th>
                                         <th width="20px">Source name</th>
                                         <th width="20%">Title</th>
-                                        <th>Topic</th>
+                                        <th>Category</th>
                                         <th width="20px">Data Satatus</th>
                                         <th width="30px">Public Date</th>
                                         <th>View Count</th>
@@ -426,8 +426,8 @@ $(function() {
                     name: 'title',
                 },
                 {
-                    data: 'topic',
-                    name: 'topic',
+                    data: 'cate',
+                    name: 'cate',
                     className: 'w-10 text-center'
                 },
                 {
