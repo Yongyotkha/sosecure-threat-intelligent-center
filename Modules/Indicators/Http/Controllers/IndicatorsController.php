@@ -327,43 +327,47 @@ class IndicatorsController extends Controller
         // }
         $data = '';
         // dd($news);
-        if ($request->keywords || $request->type || $request->startDate || $request->endDate && $request->f_search == 1) {
+        if ($request->f_search == 1) {
 
-            if ($request->type && $request->keywords && $request->startDate) {
+            if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
 
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-            } else if ($request->type && $request->keywords) {
+                if ($request->type && $request->keywords && $request->startDate) {
 
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type);
-            } else if ($request->startDate && $request->keywords) {
+                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                } else if ($request->type && $request->keywords) {
 
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-            } else if ($request->startDate && $request->type) {
+                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type);
+                } else if ($request->startDate && $request->keywords) {
 
-                $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-            } else if ($request->keywords) {
+                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                } else if ($request->startDate && $request->type) {
 
-                $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%');
-            } else if ($request->type) {
+                    $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                } else if ($request->keywords) {
 
-                $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type);
-            } else if ($request->startDate) {
+                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%');
+                } else if ($request->type) {
 
-                $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                    $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type);
+                } else if ($request->startDate) {
+
+                    $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                }
+                if ($request->target == 'Recently Modified') {
+                    $data = $data->orderBy('updated_at', 'desc');
+                } else if ($request->target == 'Least Recently Modified') {
+                    $data = $data->orderBy('updated_at', 'asc');
+                } else if ($request->target == 'Name Descending') {
+                    $data = $data->orderBy('indicatior', 'desc');
+                } else if ($request->target == 'Name Ascending') {
+                    $data = $data->orderBy('indicatior', 'asc');
+                }
+
+                $count = $data->count();
+                $data = $data->paginate(PAGINATE_NUM);
             }
-            if ($request->target == 'Recently Modified') {
-                $data = $data->orderBy('updated_at', 'desc');
-            } else if ($request->target == 'Least Recently Modified') {
-                $data = $data->orderBy('updated_at', 'asc');
-            } else if ($request->target == 'Name Descending') {
-                $data = $data->orderBy('indicatior', 'desc');
-            } else if ($request->target == 'Name Ascending') {
-                $data = $data->orderBy('indicatior', 'asc');
-            }
-
-            $count = $data->count();
-            $data = $data->paginate(PAGINATE_NUM);
         } else {
+
             if ($request->target == 'Recently Modified') {
                 $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
             } else if ($request->target == 'Least Recently Modified') {
@@ -379,6 +383,23 @@ class IndicatorsController extends Controller
             $data = $data->paginate(PAGINATE_NUM);
             $count = OtxIndicatiorData::where("status", '=', 1)->count();
         }
+        //    else {
+
+        //         if ($request->target == 'Recently Modified') {
+        //             $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
+        //         } else if ($request->target == 'Least Recently Modified') {
+        //             $data =  OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'asc');
+        //         } else if ($request->target == 'Name Descending') {
+        //             $data =  OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'desc');
+        //         } else if ($request->target == 'Name Ascending') {
+        //             $data =  OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'asc');
+        //         } else {
+        //             $data = OtxIndicatiorData::where("status", '=', 1);
+        //         }
+
+        //         $data = $data->paginate(PAGINATE_NUM);
+        //         $count = OtxIndicatiorData::where("status", '=', 1)->count();
+        //     }
 
         foreach ($data as $data) {
             //FileHash-PEHASH ไม่มีตัวอย่าง
@@ -396,6 +417,8 @@ class IndicatorsController extends Controller
                         <li>
                             ' . $linkIndicator . '
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
+                                
+                                
                                
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>

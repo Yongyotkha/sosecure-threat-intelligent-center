@@ -206,16 +206,14 @@
 
         $("#clear_data").click(function() {
             $('#keyword').val('');
-            
             start = moment();
             end = moment();
-                cb(start, end);
+            cb(start, end);
             f_search = 0;
             page = 1;
             page_stop = true;
-
-            $('#type').val('').trigger('change');
             
+            $('#type').val('').trigger('change');
             load_more_search(page,f_search);
           
 
@@ -333,42 +331,11 @@
             $('.ajax-loading').addClass('d-none');
             $("#list_otx").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
+            console.log("No response from server : search");
         });
     }
 
-    function clear_load_more(page,f_search){
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/indicators/LoadMoreOTX?page=" + page,
-            type: "get",
-            datatype: "html",
-            data: ({
-                
-                f_search:f_search,
-            }),
-            beforeSend: function(){
-                loading('load');
-                $('.ajax-loading').show();
-            },
-        }).done(function(data){
-            loading('stop_load');
-            if(data.html.length == 0){
-                
-                page_stop = false;
-                $('.ajax-loading').hide();
-                $('#count_otx').text("We've found "+data.count+" indicators");
-                return;
-            }
-            $('#count_otx').text("We've found "+data.count+" indicators" );
-            $('.ajax-loading').hide();
-            $("#list_otx").append(data.html);   
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
-        });
-    }
+   
 
 
 

@@ -71,7 +71,8 @@
                     </div>
                     <div class="shared-news">
                         <div class="pos-rlt">
-                            <button class="btn-shared" onclick="shared_news('178.128.208.129:8082/public/news/detail')"
+                            <button class="btn-shared"
+                                onclick="shared_news('{{route('news.news_detail_code',@$RSSNews->code)}}')"
                                 data-toggle="tooltip" data-placement="top" data-original-title="Shared">
                                 <i class="fas fa-share-square"></i>
                             </button>
@@ -83,7 +84,8 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="javascript:void(0)" id="share_line" target="_blank">
+                                        <a href="javascript:void(0)" id="share_line" target="_blank"
+                                            onclick="shared_news('{{route('news.news_detail_code',@$RSSNews->code)}}')">
                                             <i class="fab fa-line icon-sc line"></i>
                                         </a>
                                     </li>
