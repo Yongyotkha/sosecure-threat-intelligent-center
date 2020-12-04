@@ -68,18 +68,14 @@
                         <div class="row m-b-md">
                             
                             <div class="col-lg-3">
-                                <label for="">Keywords</label>
-                                <select name="" id="keywords" class="select2-option form-control" multiple="multiple">
-                                    <option value="1">a</option>
-                                    <option value="2">b</option>
-                                </select>
+                                <label for="">Title</label>
+                                <input type="text" class="form-control" name="keywords" id="keywords">
                             </div>
                             <div class="col-lg-3">
                                 <label for="">Start Date</label>
                                 <div class="input-group date">
-                                    <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                    value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
-                                    data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
+                                    {{-- <input id="start_date" type="text" class="form-control datetimepicker-input" value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date" data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required> --}}
+                                    <input id="start_date" type="text" class="form-control datetimepicker-input" value="{{  timePickerFormat(now()->addHours(0)) }}" name="start_date" data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
                                     <div class="input-group-addon">
                                         @icon('solid/calendar-alt', 'text-muted')
                                     </div>
@@ -88,7 +84,7 @@
                             <div class="col-lg-3">
                                 <label for="">End Date</label>
                                 <div class="input-group date">
-                                    <input id="send_date" type="text" class="form-control datetimepicker-input"
+                                    <input id="end_date" type="text" class="form-control datetimepicker-input"
                                     value="{{  timePickerFormat(now()->addHours(1)) }}" name="end_date"
                                     data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
                                     <div class="input-group-addon">
@@ -98,27 +94,40 @@
                             </div>
                             <div class="col-lg-3">
                                 <label for="">Status</label>
-                                <section id="select_news" class="select2-option form-control" multiple="multiple">
-                                    <option value="1" selected>All</option>
-                                </section>
+                                <select id="status_news" class="select2-option form-control">
+                                    <option value="">All</option>
+                                    <option value="1">Public</option>
+                                    <option value="2">Darft</option>
+                                </select>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-3">
                                 <label for="">Source</label>
-                                <select name="" id="source" class="select2-option form-control" multiple="multiple">
-                                    <option value="1">a</option>
-                                    <option value="2">b</option>
+                                <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
+                                   
                                 </select>
                             </div>
+                            <div class="col-lg-3">
+                                <label for="">Category</label>
+                                <select name="news_category[]" id="news_category" class="select2-option form-control" multiple="multiple">
+                                    {{-- <option value="" >All</option> --}}
+                                    @foreach(@$category as $cate)
+                                        <option value="{{$cate->id}}" >{{$cate->name}}</option>
+                                    @endforeach
+                                    {{-- <option value="1" selected>All</option> --}}
+                                </select>
+                            </div>
+                           
+                            
                         </div>
                         <div class="row">
                             <div class="col-lg-12 text-right">
-                                <button class="btn btn-info btn-responsive">
+                                <button type="button" class="btn btn-info btn-responsive" onclick="search()">
                                     <i class="fas fa-search"></i>
                                     Search
                                 </button>
-                                <button class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
@@ -142,7 +151,7 @@
                                         <th>Site Name</th>
                                         <th width="20px">Source name</th>
                                         <th width="20%">Title</th>
-                                        <th>Topic</th>
+                                        <th>Category</th>
                                         <th width="20px">Data Satatus</th>
                                         <th width="30px">Public Date</th>
                                         <th>View Count</th>
@@ -359,6 +368,38 @@
 @include('stacks.js.hidesettings')
 
 <script>
+
+    var keywords = null;
+    var start_date = null;
+    var end_date = null;
+    var status_news = null;
+    var news_source = null;
+    var news_category = null;
+    function search(){
+        keywords = $('#keywords').val();
+        start_date = $('#start_date').val();
+        end_date = $('#end_date').val();
+        status_news = $('#status_news').val();
+        news_source = $('#news_source').val();
+        news_category = $('#news_category').val();
+        console.log(start_date);
+        console.log(status_news);
+        console.log(news_source);
+        console.log(news_category);
+        datatable();
+    }
+
+        $("#btn_rss_news_reset").click(function() {
+            $("#keywords").val('');
+            $("#start_date").val('');
+            $("#end_date").val('');
+            $("#status_news").val('').trigger("change");
+            $("#news_source").val('');
+            $("#news_category").val('');
+            datatable();
+        });
+
+
     function change_news_active(code) {
         let checkState = $("#news-active-" + code).is(":checked") ? 1 : 0;
         axios.post('{{route('rssfeedsettings.change_status_news')}}', {
@@ -378,19 +419,24 @@
     }
 $(function() {
 
-    $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+    $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
     $(document).ready(function () {
         $('#keywords').select2({
             tags: true,
             tokenSeparators: [' ']
         });
-        $('#source').select2();
+        $('#news_source').select2();
+
+
     });
 
 
     $(function () {
         datatable();
     });
+
+});
+
     function datatable(){
         $('#table-rss-news-template').DataTable({
             processing: true,
@@ -402,6 +448,12 @@ $(function() {
                 type: "POST",
                 url: '{!! route('rssfeedsettings.rss_news_table') !!}',
                 data: function ( d ) {
+                    d.keywords = keywords;
+                    d.start_date = start_date;
+                    d.end_date = end_date;
+                    d.status_news = status_news;
+                    d.news_source = news_source;
+                    d.news_category = news_category;
                     return JSON.stringify( d );
                 },
             },
@@ -426,8 +478,8 @@ $(function() {
                     name: 'title',
                 },
                 {
-                    data: 'topic',
-                    name: 'topic',
+                    data: 'cate',
+                    name: 'cate',
                     className: 'w-10 text-center'
                 },
                 {
@@ -462,39 +514,10 @@ $(function() {
             ]
         });
     }
-});
+
+
 $(document).ready(function(){
-        $("#topic").select2({
-            allowClear: true,
-            tags: true,
-            width: '100%',
-            ajax: {
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: 'post',
-                dataType: "json",
-                url: '/rssfeedsettings/rss_data/topic',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        searchTerm: params.term || '',
-                        pageNum: params.page || 1,
-                    }
-                },
-                processResults: function (data) {
-                    return {
-                    results:  $.map(data, function (item) {
-                            return {
-                                text: item.name,
-                                id: item.id,
-                                value: item.name
-                            }
-                        })
-                    };
-                },
-            }
-        });
+       
         $('#source_create').select2({
             allowClear: true,
             tags: true,
@@ -526,7 +549,8 @@ $(document).ready(function(){
                 },
             }
         });
-        $("#tags").select2({
+
+        $('#news_source').select2({
             allowClear: true,
             tags: true,
             width: '100%',
@@ -536,7 +560,7 @@ $(document).ready(function(){
                 },
                 type: 'post',
                 dataType: "json",
-                url: '/rssfeedsettings/rss_data/tags',
+                url: '/rssfeedsettings/rss_data/source',
                 delay: 250,
                 data: function (params) {
                     return {
@@ -549,7 +573,7 @@ $(document).ready(function(){
                     results:  $.map(data, function (item) {
                             return {
                                 text: item.name,
-                                id: item.id,
+                                id: item.name,
                                 value: item.name
                             }
                         })
@@ -557,7 +581,9 @@ $(document).ready(function(){
                 },
             }
         });
-        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+ 
+        {{--$('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });--}}
+        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
     }); 
     var form_save = '.formSaving';
     $('.formPreview').click(function() {
@@ -571,7 +597,7 @@ $(document).ready(function(){
         number++;
         if(number == 1){
             let category = $('#category option:selected').val();
-            let topic = $('#topic option:selected').val();
+            {{--let topic = $('#topic option:selected').val();--}}
             let title_th = $('#title_th').val();
             let detail_th = $('#detail_th').val();
             let source = $('#source_create').val();
@@ -612,7 +638,7 @@ $(document).ready(function(){
                     $('#detail_th').css('border-color', '#656d78');
                 }
 
-                if(topic == undefined || category == undefined || title_th == '' || detail_th == '' || source == undefined){
+                if(category == undefined || title_th == '' || detail_th == '' || source == undefined){
                     return false;
                 }
             }else if(form_save == '.formDraft'){

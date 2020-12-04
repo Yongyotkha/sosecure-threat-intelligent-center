@@ -202,7 +202,67 @@ class RSSFeedSettingsController extends Controller
         // }else{
         //     $model = TransactionRssData::all();
         // }
-        $model = RSSNews::all();
+
+        if($request -> keywords || $request -> start_date || $request -> end_date || $request -> status_news || $request -> news_source || $request -> news_category){
+            $model = RSSNews::where('status', 1);
+            if($request -> keywords){
+                $model_where = RSSNews::where('status', 1)->where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
+                
+                if($model_where) {
+                    $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
+                } else {
+                    $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
+                }
+                
+            }
+            if($request -> start_date){
+                $start_date = date("Y-m-d H:i:s",strtotime($request -> start_date));
+                $end_date = date("Y-m-d H:i:s",strtotime($request -> end_date));
+                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                $model -> whereBetween('created_at',array($start_date,$end_date));
+            }
+            // dd($request -> status_news);
+            if($request -> status_news){
+                if($request -> status_news == 1 || $request -> status_news == 2){
+                    if($request -> status_news == 1) {
+                        $model -> where('save_draft','=',0);
+                        
+                    } else if ($request -> status_news == 2) {
+                        $model -> where('save_draft',1);
+                        // dd($model);
+                    }
+                    
+                }  
+            }
+            if($request -> news_source){
+
+                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+                $model -> whereIn('source', $request -> news_source);
+            }
+            if($request -> news_category){
+                $news_cate_id = $request -> news_category;
+                // CategorySettings::where("code",)->first();
+                // dd($news_cate_id);
+
+                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+                // $model -> whereIn('source', $request -> news_source);
+                foreach($news_cate_id as $news_cate_id_val) {
+                    // dd($news_cate_id_val);
+                    $model -> whereHas('get_cate', function ($query) use ($news_cate_id_val) {
+                        $query->where('news_category_id', $news_cate_id_val);
+                    });
+                }
+
+
+
+            }
+            $model -> get();
+        }else{
+            $model = RSSNews::all();
+        }
+
+
+        // $model = RSSNews::all();
         return DataTables::of($model)
             ->editColumn('chk', function (RSSNews $model) {
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
@@ -231,12 +291,17 @@ class RSSFeedSettingsController extends Controller
                     return '-';
                 }
             })
-            ->addColumn('topic', function (RSSNews $model) {
-                if(empty($model->get_topic->topic)){
-                    return '-';
+            ->addColumn('cate', function (RSSNews $model) {
+                $html = '';
+                if(empty($model->get_cate)){
+                    $html = '-';
                 }else{
-                    return $model->get_topic->topic->name;
+                    foreach($model->get_cate as $cate_val) {
+                        $html .= $cate_val->get_cate_name->name.', ';
+                    }
+                    $html = rtrim($html,", ");
                 }
+                return $html;
             })
             ->addColumn('data_status', function (RSSNews $model) {
                 $html = '';
@@ -277,7 +342,7 @@ class RSSFeedSettingsController extends Controller
                 return $html;
                
             })
-            ->rawColumns(['chk','site_name','source','title','topic','data_status','link','status','action'])
+            ->rawColumns(['chk','site_name','source','title','cate','data_status','link','status','action'])
             ->toJson();
     }
 
@@ -800,6 +865,7 @@ class RSSFeedSettingsController extends Controller
     public function rss_news()
     {
         $data['page'] = langapp('rss_logs');
+        // $data['Category'] = CategorySettings::where('active',1)->get();
         $data['category'] = CategorySettings::where('active',1)->get();
         return view('rssfeedsettings::rss_news')->with($data);
     }
