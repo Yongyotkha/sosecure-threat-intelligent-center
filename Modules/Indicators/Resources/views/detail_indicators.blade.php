@@ -135,13 +135,7 @@
                         <div id="indicator_validation" class="col-md-6">
                             <h1 class="b-b">Validation</h1>
                             {{-- Inner Validation--}}
-                            <div id="loadspinner_indicator_validation" class="row m-b-xs">
-                                <div class="col-md-6">
-                                    
-                                </div>
-                                <div class="col-md-6">
-                                    
-                                </div>
+                            <div id="loadspinner_indicator_validation" class="content-spinner-loading">
                             </div>
                         </div>
                         {{-- Inner External Sources--}}
@@ -172,7 +166,7 @@
                         </div>
                     </div>
                     <div id="pulses_related" class="show-indicators">
-                       
+                        <div id="loadspinner_related_pulse" class="content-spinner-loading">
                     </div>
                 </section>
 
@@ -257,17 +251,16 @@
             }),
             datatype: "html",
             beforeSend: function(){
-                $('.ajax-loading').show();
-                $('#loadspinner_indicator_validation').addClass('content-spinner-loading');
-                
+                $('#loadspinner_indicator_validation').show();
+                $('#loadspinner_related_pulse').show();
             },
         }).done(function(data){
-            $('.ajax-loading').hide();
-            $('#loadspinner_indicator_validation').removeClass('content-spinner-loading');
+            $('#loadspinner_indicator_validation').hide();
+            $('#loadspinner_related_pulse').hide();
+
             $("#indicator_validation").append(data.html2);
             $("#pulses_related").append(data.html);
             if(data.sections.indexOf("url_list")!= -1){console.log("sec","url_list")}
-            console.log(data);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
