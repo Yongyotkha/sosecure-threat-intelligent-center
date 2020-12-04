@@ -44,6 +44,7 @@
                                     @foreach ($category as $item)
                                         
                                         <option value="{{ $item -> id }}"
+                                            @if($RSSNews)
                                             @foreach(@$RSSNews->get_cate as $news_cate_val)
                                                 @if($item->id == $news_cate_val->news_category_id)
                                                     selected
@@ -51,6 +52,7 @@
                                                     
                                                 @endif
                                             @endforeach
+                                            @endif
                                             >{{ $item -> name }}</option>
                                     @endforeach
 
