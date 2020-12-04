@@ -8,63 +8,71 @@
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            <a href="{{route('news.index')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+            <a href="{{route('news.index')}}"
+                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            <div class="bc-head">@langapp('news') > {{@$RSSNews->title_th}}</div>   
+            <div class="bc-head">@langapp('news') > {{@$RSSNews->title_th}}</div>
 
             @if($RSSNews_next)
-                <a href="{{route('news.news_detail_code',['code' => @$RSSNews_next->code])}}"><button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
+            <a href="{{route('news.news_detail_code',['code' => @$RSSNews_next->code])}}"><button
+                    class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
                     <span><i class="fas fa-arrow-right"></i></span>
                 </button></a>
-            @else 
-                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
-                    <span><i class="fas fa-arrow-right"></i></span>
-                </button>
-             @endif
+            @else
+            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </button>
+            @endif
 
-             @if($RSSNews_prev)
-                <a href="{{route('news.news_detail_code',['code' => @$RSSNews_prev->code])}}"><button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
+            @if($RSSNews_prev)
+            <a href="{{route('news.news_detail_code',['code' => @$RSSNews_prev->code])}}"><button
+                    class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
                     <span><i class="fas fa-arrow-left"></i></span>
                 </button></a>
-             @else 
-                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
-                    <span><i class="fas fa-arrow-left"></i></span>
-                </button>
-             @endif
-             <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            @else
+            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
+                <span><i class="fas fa-arrow-left"></i></span>
+            </button>
+            @endif
+            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" onclick="printDiv()">
                 <span><i class="fas fa-print"></i></span>
-             </button>
+            </button>
         </header>
 
         <div class="section-jumborton">
             {{-- <div class="thumnail-img" style="background-image:url('https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')"></div> --}}
             <div class="jumborton-description">
                 <div class="container-description">
-                    <div class="headding-secondary-text">
-                        <span class="text-date">{{--August 4th, 2020--}}{{@date("F d",strtotime($RSSNews->public_date))}}th{{@date(", Y",strtotime($RSSNews->public_date))}}</span>
+                    <div class="headding-secondary-text" id="test">
+
                         <div class="mobi-d-block">
+                            <span
+                                class="text-date">{{--August 4th, 2020--}}{{@date("F d",strtotime($RSSNews->public_date))}}th{{@date(", Y",strtotime($RSSNews->public_date))}}</span>
                             {{-- @php(dd($RSSNews)) --}}
                             {{-- @$RSSNews->get_topic->topic->name --}}
                             @if(@$RSSNews->get_cate)
-                                @foreach(@$RSSNews->get_cate as $cate)
-                                {{-- 1 --}}
-                                {{-- {{@var_dump($cate)}} --}}
-                                    {{-- {{@$cate->cate->name}} --}}
-                                    <span class="badeg-news"><i class="fas fa-newspaper"></i> {{@$cate->get_cate_name->name}}</span>&nbsp;
-                                @endforeach
+                            @foreach(@$RSSNews->get_cate as $cate)
+                            {{-- 1 --}}
+                            {{-- {{@var_dump($cate)}} --}}
+                            {{-- {{@$cate->cate->name}} --}}
+                            <span class="badeg-news"><i class="fas fa-newspaper"></i>
+                                {{@$cate->get_cate_name->name}}</span>&nbsp;
+                            @endforeach
 
                             @endif
                             {{-- <span class="badeg-news"><i class="fas fa-newspaper"></i> NEWS</span> --}}
-                            <span class="badeg-view"><i class="fas fa-eye"></i> Views {{@$RSSNews->view ? $RSSNews->view : 0}}</span>
+                            <span class="badeg-view"><i class="fas fa-eye"></i> Views
+                                {{@$RSSNews->view ? $RSSNews->view : 0}}</span>
                         </div>
                     </div>
-                    <div class="headding-primary-text">
+                    <div class="headding-primary-text" id="topic_news">
                         {{@$RSSNews->title_th}}
                     </div>
                     <div class="shared-news">
                         <div class="pos-rlt">
-                            <button class="btn-shared" onclick="shared_news('178.128.208.129:8082/public/news/detail')" data-toggle="tooltip" data-placement="top" data-original-title="Shared">
+                            <button class="btn-shared" onclick="shared_news('178.128.208.129:8082/public/news/detail')"
+                                data-toggle="tooltip" data-placement="top" data-original-title="Shared">
                                 <i class="fas fa-share-square"></i>
                             </button>
                             <div class="menu-shared-main d-none">
@@ -81,17 +89,18 @@
                                     </li>
                                 </ul>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                 </div>
-            </div>  
+            </div>
         </div>
 
         <div class="container-fluid" style="background: #fff;">
             <div class="row">
                 <div class="col-md-8">
-                    <div class="show-content-news">
+                    <div class="show-content-news" id="content_news">
                         {!!@$RSSNews->detail_th!!}
+
                         {{-- <p>Intel is currently looking into how 20GB of sensitive internal data came to find its way online.</p>
 
                         <p>The range of documents — some marked “confidential,” “under NDA” or “restricted secret”— were uploaded to file hosting service MEGA by Swiss Android developer Till Kottmann.</p>
@@ -124,15 +133,19 @@
                             <h2>Related to This Story</h2>
                         </li>
                         @if(@$RSSNews_last10)
-                            @if($lang == 'th')
-                                @foreach($RSSNews_last10 as $RSSNews_last10_val)
-                                    <li><a href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_th}}</a></li>
-                                @endforeach
-                            @else
-                                 @foreach($RSSNews_last10 as $RSSNews_last10_val)
-                                    <li><a href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_en}}</a></li>
-                                @endforeach
-                            @endif
+                        @if($lang == 'th')
+                        @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                        <li><a
+                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_th}}</a>
+                        </li>
+                        @endforeach
+                        @else
+                        @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                        <li><a
+                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_en}}</a>
+                        </li>
+                        @endforeach
+                        @endif
                         @endif
                         {{-- <li><a href="">Lorem ipsum dolor, sit amet consectetur Lorem ipsum dolor, sit amet consectetur </a></li>
                         <li><a href="">adipisicing elit. Autem quis cum veniam Autem quis cum veniam</a> </li>
@@ -151,8 +164,8 @@
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.form')
+@include('stacks.css.datatables')
+@include('stacks.css.form')
 @endpush
 
 @push('pagescript')
@@ -180,6 +193,26 @@
         toppos = (screen.availHeight - height) / 2;
         window.open(theURL, "viewdetails","width=" + width + ",height=" + height + ",left=" + leftpos + ",top=" + toppos);
     }
+
+    function printDiv() { 
+        var divContents = document.getElementById("content_news").innerHTML; 
+        var divTopic = document.getElementById("topic_news").innerHTML; 
+        var test = document.getElementById("test").innerHTML; 
+        var a = window.open('', '', 'height=500, width=1000'); 
+        a.document.write('<html>'); 
+        a.document.write('<body > <h1>'); 
+        a.document.write(divTopic);
+        a.document.write('</h1> ');
+        a.document.write(test);
+        a.document.write('<p>'); 
+        a.document.write(divContents); 
+        a.document.write('</p>'); 
+        a.document.write('</body></html>'); 
+        a.document.close(); 
+        a.print();
+        console.log(test )
+    }
+
 </script>
 @endpush
 @endsection

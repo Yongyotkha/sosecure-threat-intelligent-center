@@ -3,47 +3,36 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-            @icon('solid/arrow-left')
-            </a> --}}
-            <div class="bc-head">@langapp('indicators')</div>
+
+            {{-- <div class="bc-head">@langapp('indicators')</div>
             <div class="btn-group pull-right">
+                <div class="pull-right" style="margin-bottom: 8px; width: 300px;">
+                    <select name="site" id="site" class="select2-option form-control select-site"
+                        style="min-width: 300px">
+                        <option value="">All Site</option>
 
-                {{-- <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle"
-                data-toggle="dropdown">
-                @langapp('filter')
-                <span class="caret"></span>
-                </button>
-
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="#">
-                            @langapp('Last Hour')
-                        </a>
-                    </li>
-                    <li><a href="#">@langapp('all') </a></li>
-                </ul>
-
-                <a href="{{  route('clients.create') }}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" data-toggle="ajaxModal"
-                    title="@langapp('create') " data-placement="bottom">
-                    @icon('solid/plus') @langapp('create')
-                </a>
-
-                <a href="{{  route('clients.import')  }}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive"
-                    title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
-                    @icon('solid/cloud-upload-alt') @langapp('import')
-                </a>
-                <a href="{{  route('clients.export')  }}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV"
-                    data-placement="bottom">
-                    @icon('solid/cloud-download-alt') CSV
-                </a> --}}
+                    </select>
+                </div>
                 <a href="#" id="seach-advance" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive"
-                    title="Advance Search" data-placement="bottom">
-                    <i class="fas fa-search"></i> Search
-                </a>
+            title="Advance Search" data-placement="bottom">
+            <i class="fas fa-search"></i> Search
+            </a>
+
+            </div> --}}
+            <div class="bc-head">@langapp('indicators')</div>
+
+            <button id="seach-advance" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span>@langapp('Search_Advance')</span>
+            </button>
+            <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                    <option value="">All Site</option>
+                    {{-- @if($SiteSettings)
+                    @foreach($SiteSettings as $SiteSettings_val)
+                    <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                    @endforeach
+                    @endif --}}
+                </select>
             </div>
 
         </header>
@@ -110,11 +99,11 @@
                                 @langapp('sort_by')
                                 <span class="caret"></span>
                             </button>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu" onclick="sort_by(event)">
                                 <li value="1"><a href="#">Recently Modified</a></li>
                                 <li value="2"><a href="#">Least Recently Modified</a></li>
-                                <li value="3">><a href="#">Name Ascending</a></li>
-                                <li value="4">><a href="">Name Descending</a></li>
+                                <li value="3"><a href="#">Name Ascending</a></li>
+                                <li value="4"><a href="#">Name Descending</a></li>
                             </ul>
                         </div>
                     </div>
@@ -146,22 +135,23 @@
 <script>
     var keywords = null;
     var type = null;
-    var startDate;
-    var endDate;
-
+    var startDate= null;
+    var endDate= null;
+    var target=null;
     var f_search = 0;
 
     var page = 1; 
     var page_stop = true;
+
     load_more(page);
     $('#scroll_otx').scroll(function(event) {
             let scrolltop = $('#scroll_otx').scrollTop();
             let tab_height = $('#scroll_otx').height();
             let docu_height = $(document).height();
-        console.log(scrolltop+'  '+tab_height+'   '+docu_height);
+
         if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
             page++;
-            console.log(555);
+
             if(page_stop){
                 {{--load_more(page);--}}
                 load_more_search(page,f_search);
@@ -246,15 +236,37 @@
     
     });
 
+
+    function sort_by(event) {
+    target = event.target.innerHTML;
+    
+    if(f_search == 0){
+
+        load_more(page);
+    }else{
+        load_more_search(page,f_search);
+
+        
+    }
+    
+}
+
     
 
     function load_more(page){
+        if(page == 1) {
+            $("#list_otx").html('');   
+        }
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             url: "/indicators/LoadMoreOTX?page=" + page,
             type: "get",
+            data: ({
+
+                target:target,
+            }),
             datatype: "html",
             beforeSend: function(){
                 {{--loading('load');--}}
@@ -282,10 +294,7 @@
         }
         startDate=  $("#indicator_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm:ss A');
         endDate=  $("#indicator_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm:ss A');
-        console.log(startDate);
-    console.log(endDate);
-    console.log(keywords);
-    console.log(type);
+
 
         $.ajax({
             headers: {
@@ -298,7 +307,8 @@
                 endDate:endDate,
                 keywords:keywords,
                 type:type,
-                f_search:f_search
+                f_search:f_search,
+                target:target,
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
@@ -313,7 +323,7 @@
                 $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
             }
-            console.log(data.html.length);
+
             let count_n = $('#count_otx').text();
             let count_search = data.count;
             let count_n_all = parseInt(count_n) + parseInt(count_search);
