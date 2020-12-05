@@ -102,14 +102,22 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <input type="text" class="form-control" name="title_th" id="title_th">
+                                                        @php
+                                                            $title_default = '';
+                                                            if(@$RSSNews->title_th) {
+                                                                $title_default = $RSSNews->title_th;
+                                                            } else if ($rss->title) {
+                                                                $title_default = $rss->title;
+                                                            }
+                                                        @endphp
+                                                        <input type="text" class="form-control" name="title_th" id="title_th" value="{{$title_default}}">
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1"></textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1">{!!@$RSSNews->detail_th!!}</textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -119,7 +127,7 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Text (EN) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <input type="text" class="form-control" name="title_en" id="title_en">
+                                                        <input type="text" class="form-control" name="title_en" id="title_en" {{@$RSSNews->title_en}}>
                                                     </div>
                                                 </div>
             
@@ -150,8 +158,16 @@
                              <div class="col-lg-4">
                                 <label class="control-label">Public Date </label>
                                 <div class="input-group date">
-                                    <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                    value="{{  timePickerFormat($rss -> pubDate) }}" name="public_date"
+                                    <input id="public_date" type="text" class="form-control datetimepicker-input"
+                                    @php
+                                        $date_public = '';
+                                        if(@$RSSNews -> public_date) {
+                                            $date_public = timePickerFormat($RSSNews -> public_date);
+                                        } else if ($rss -> pubDate){
+                                            $date_public = timePickerFormat($rss -> pubDate);
+                                        }
+                                    @endphp
+                                    value="{{  @$date_public }}" name="public_date"
                                     data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()">
                                     <div class="input-group-addon">
                                         @icon('solid/calendar-alt', 'text-muted')
@@ -198,6 +214,18 @@
 @include('stacks.js.datepicker')
 @include('scripts.summernote')
 <script>
+
+$('form').each(function () {
+    if ($(this).data('validator'))
+        $(this).data('validator').settings.ignore = ".note-editor *";
+});
+
+$('#detail_th').summernote('destroy');
+var markupStr = '{{@$RSSNews->detail_th}}';
+{{--$('#detail_th').summernote();--}}
+{{--$('#detail_th').summernote('code', markupStr);--}}
+
+
      var form_save = '.formSaving';
     $('.formPreview').click(function() {
         form_save = '.formPreview';
@@ -211,6 +239,8 @@
             let topic = $('#topic option:selected').val();
             let title_th = $('#title_th').val();
             let detail_th = $('#detail_th').val();
+            var detail_th_code = $('#detail_th').summernote('code');
+            console.log(detail_th_code);
             if(category == undefined){
                 $('#label_category').css('color', '#a94442');
                 $('#category').css('border-color', '#a94442');
@@ -218,13 +248,13 @@
                 $('#label_category').css('color', '#656d78');
                 $('#category').css('border-color', '#656d78');
             }
-            if(topic == undefined){
+            {{--if(topic == undefined){
                 $('#label_topic').css('color', '#a94442');
                 $('#topic').css('border-color', '#a94442');
             }else{
                 $('#label_topic').css('color', '#656d78');
                 $('#topic').css('border-color', '#656d78');
-            }
+            }--}}
             if(title_th == ''){
                 $('#label_title_th').css('color', '#a94442');
                 $('#title_th').css('border-color', '#a94442');
@@ -240,21 +270,28 @@
                 $('#detail_th').css('border-color', '#656d78');
             }
 
-            if(topic == undefined || category == undefined || title_th == '' || detail_th == ''){
+            if(category == undefined || title_th == '' || detail_th == ''){
                 return false;
             }
         }
 
         $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
         event.preventDefault();
+        var detail_th_code2 = $('#detail_th').summernote('code');
+            console.log(detail_th_code2);
+
         var data = new FormData(this);
         if(form_save == '.formPreview'){
             data.append('formsubmit', 'formPreview');
+            data.append('detail_th_code2', detail_th_code2);
         }else if(form_save == '.formDraft'){
             data.append('formsubmit', 'formDraft');
+            data.append('detail_th_code2', detail_th_code2);
+            
         }
         axios.post($(this).attr("action"), data)
             .then(function (response) {
+                console.log(response);
                     toastr.success(response.data.message, '@langapp('response_status') ');
                     $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
                     window.location.href = response.data.redirect;
@@ -274,7 +311,7 @@
             }
             
             
-        }); 
+        });
         
     });
     $(document).ready(function(){

@@ -132,6 +132,7 @@ class CategorySettingsController extends Controller
     public function delete(CategorySettings $id)
     {
         $data['categorySettings'] = $id;
+        dd($id);
         return view('categorysettings::modal.delete')->with($data);
     }
 

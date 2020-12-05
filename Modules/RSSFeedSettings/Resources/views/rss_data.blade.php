@@ -189,10 +189,13 @@
             $("#source").val('');
         });
 
-
+        
     $(function () {
         $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
         datatable();
+        {{--loading('load');--}}
+        {{--f_loading(null, '.vbox');--}}
+
     });
     function datatable(){
         $('#table-rss-data').DataTable({

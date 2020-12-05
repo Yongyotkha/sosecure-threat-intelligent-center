@@ -82,6 +82,7 @@
     <link rel="stylesheet" href="{{ getAsset('storage/css/style.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/sofia.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.css') }}" type="text/css"/>
+
     {{-- <link rel="stylesheet" href="{{ getAsset('plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css') }}" type="text/css"/> --}}
     <?php
     $family = 'Sofia';
@@ -279,6 +280,8 @@
 
 <script src="{{ getAsset('js/theme.js') }}"></script>
 
+<script src="{{ getAsset('jquery-easy-loading/dist/jquery.loading.js') }}" type="text/javascript"></script>
+
 
 <script>
     var locale = '@langapp('lang_code') ';
@@ -294,6 +297,114 @@
             $('#nest6').css('display', 'none');
         }
     }
+
+    
+        function f_loading(type, control_id){
+            if(type == 1){
+                $('body').loading({
+                    message: f_loading_style(0)
+                });
+            }else if(type == 2){
+                $('body').loading({
+                    message: f_loading_style(2)
+                });
+            }else if(type == 9){
+                $('body').loading({
+                    message: f_loading_style(9),
+                    theme: "dark"
+                });
+            }else if(type == 10){
+                $('body').loading({
+                    message: f_loading_style(10),
+                    theme: "dark"
+                });
+            }else{
+                $(control_id).loading({
+                    message: f_loading_style(1)
+                });
+            }
+        }
+
+        function f_loading_stop(type, control_id){
+            if(type == 1){
+                $('body').loading('stop');
+            }else if(type == 2){
+                $('body').loading('stop');
+            }else if(type == 9){
+                $('body').loading('stop');
+            }else if(type == 10){
+                $('body').loading('stop');
+            }else{
+                $(control_id).loading('stop');
+            }
+        }
+
+        function f_loading_style(mode){
+            var msg = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
+            if(mode == 1){
+                msg =  '<div class="spinner-1"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
+            }else if(mode == 2){
+                msg =  '<div class="spinner-1"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
+            }else if(mode == 9){
+                msg =  '<div class="spinnerClock"><div class="spinnerClock__clock"></div><div class="spinnerClock__minHand"></div> <div class="spinnerClock__secHand"></div></div><h3 style="letter-spacing: 1px;">กรุณารอสักครู่...</h3>';
+            }else if(mode == 10){
+                msg =  '<div class="spinnerClock"><div class="spinnerClock__clock"></div><div class="spinnerClock__minHand"></div> <div class="spinnerClock__secHand"></div></div><h3 style="letter-spacing: 1px;">ระบบกำลัง Duplicate Course กรุณารอสักครู่...</h3>';
+            }else if(mode == 0){
+                msg = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
+            }else{
+
+            }
+            return msg;
+        }
+    {{--
+        function f_msg(lang, mode, message){
+            var msg;
+            if(mode == 1){
+                msg =  'Success';
+            }else if(mode == 2){
+                msg =  'Warning';
+            }else if(mode == 0){
+                msg =  'Error';
+            }else if(mode == 3){
+                msg =  'Info';
+            }else{
+                msg =  message;
+            }
+            return msg;
+        }
+
+        function f_noti(mode){
+            var msg = f_msg(lang, mode, null);
+            if(mode == 1){
+                toastr.success(msg);
+            }else if(mode == 2){
+                toastr.warning(msg);
+            }else if(mode == 0){
+                toastr.error(msg);
+            }else if(mode == 3){
+                toastr.info(msg);
+            }else{
+                //
+            }
+        }
+
+        function f_noti_message(mode, message){
+            var msg = message;
+            if(mode == 1){
+                toastr.success(msg);
+            }else if(mode == 2){
+                toastr.warning(msg);
+            }else if(mode == 0){
+                toastr.error(msg);
+            }else if(mode == 3){
+                toastr.info(msg);
+            }else{
+                //
+            }
+        }
+    --}}
+
+
 </script>
 
 @if (config('system.pusher_enabled'))
@@ -358,6 +469,9 @@ $(document).ready(function(){
 });
 
 </script>
+
+
+
 
 </body>
 </html>

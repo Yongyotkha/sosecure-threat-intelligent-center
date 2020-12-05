@@ -311,6 +311,8 @@
             {{--datatype: "html",--}}
             beforeSend: function(){
                 $('.ajax-loading').show();
+                {{--loading('load');--}}
+                {{--f_loading(1);--}}
             },
         }).done(function(data){
             if(data.html.length == 0){
