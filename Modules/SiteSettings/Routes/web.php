@@ -74,7 +74,10 @@ Route::group(
 
         Route::get('/vulnerability_assets/{id}', 'VulnerabilityController@vulassets')->name('vulsetting.vul_assets')->middleware('can:menu_items');
         Route::get('/vulnerability_assets/cve_assets/data', 'VulnerabilityController@tableData')->name('cve_assets.data')->middleware('can:menu_items');
-        Route::get('/keywordsetting/{id}', 'KeywordSettingController@index')->name('keyword.index')->middleware('can:menu_items');
+        Route::get('/keywordsetting/{id}', 'DataLeakController@keyword')->name('keyword.index')->middleware('can:menu_items');
+
+        Route::get('/datafeed/{id}', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
+        Route::get('/socialdatas/{id}', 'DataLeakController@socialdatas')->name('socialdatas.index')->middleware('can:menu_items');
     }
 );
 

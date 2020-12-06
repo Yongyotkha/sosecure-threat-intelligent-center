@@ -58,10 +58,20 @@
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     Data Leak
                                 </a>
-                                <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+                               <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
                                     <li style="padding-left:2rem">
                                         <a href="{{route('keyword.index', ['id' => $siteSettings->code])}}">
-                                            Keyboard Setting
+                                            Keyword Setting
+                                        </a>
+                                    </li>
+                                    <li style="padding-left:2rem">
+                                        <a href="{{route('datafeed.index', ['id' => $siteSettings->code])}}">
+                                            Data Feed(Social)
+                                        </a>
+                                    </li>
+                                    <li style="padding-left:2rem">
+                                        <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
+                                            Social Datas
                                         </a>
                                     </li>
                                 </ul>
