@@ -127,14 +127,14 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Text (EN) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <input type="text" class="form-control" name="title_en" id="title_en" {{@$RSSNews->title_en}}>
+                                                        <input type="text" class="form-control" name="title_en" id="title_en" value="{{@$RSSNews->title_en}}">
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Detail (EN) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1"></textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1">{!!@$RSSNews->detail_en!!}</textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -178,8 +178,16 @@
                                 <label class="control-label">Status </label>
                                 <br>
                                 <label class="switch" style="margin-top: 7px">
-                                    <input type="hidden" value="FALSE" name="">
-                                    <input type="checkbox" name="status" checked value="TRUE">
+                                    @php
+                                    $checked_val = '';
+                                        if(@$RSSNews -> status == 1) {
+                                            $checked_val = 'checked';
+                                        } else {
+                                            
+                                        }
+                                    @endphp
+
+                                    <input type="checkbox" name="status" {{@$checked_val}} value="TRUE">
                                     <span></span>
                                 </label>
                              </div>
