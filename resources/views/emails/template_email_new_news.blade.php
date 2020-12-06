@@ -18,26 +18,54 @@
                 <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
                   <td class="miro__col-header-logo" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:32px;text-align:left;vertical-align:top;width:50%;word-wrap:break-word">
                     <a href="{{route('index')}}" target="_blank" style="Margin:0;color:#2a79ff;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.43;margin:0;padding:0;text-align:left;text-decoration:none">
-						<img src="{{asset('images/logo_site.png')}}" style="-ms-interpolation-mode:bicubic;border:none;clear:both;display:block;font-family:Helvetica,Arial,sans-serif;height:45px;max-height:100%;max-width:100%;outline:0;text-decoration:none;width:auto">
+					          	<img src="{{asset('images/logo_site.png')}}" style="-ms-interpolation-mode:bicubic;border:none;clear:both;display:block;font-family:Helvetica,Arial,sans-serif;height:45px;max-height:100%;max-width:100%;outline:0;text-decoration:none;width:auto">
                     </a>
                   </td>
                   <td class="miro__col-header-btn" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:26px;text-align:right;vertical-align:top;width:50%;word-wrap:break-word">
                   <a href="{{route('index')}}" class="miro-btn" target="_blank" style="Margin:0;background-color:#fff;border:1px solid #050038;border-radius:4px;box-sizing:border-box;color:#050038!important;cursor:pointer;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:16px!important;font-stretch:normal;font-style:normal;font-weight:400;height:48px;letter-spacing:normal;line-height:48px!important;margin:0;padding:0;text-align:center;text-decoration:none;white-space:nowrap;width:170px">
-						<span style="font-family:Helvetica,Arial,sans-serif">
-							GO TO Threat inSight
-						</span>
+                    <span style="font-family:Helvetica,Arial,sans-serif">
+                      GO TO Threat inSight
+                    </span>
                     </a>
                   </td>
                 </tr>
               </table>
             </div>
             <div class="miro__content-body" style="font-family:Helvetica,Arial,sans-serif">
-              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:40px 40px 36px">
-                <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24">There is new news</div>
+                {{-- Section TH --}}
+              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 0px">
                 <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-              <br> The new news is : <span style="font-weight:700">{{$news['news']->title_th}}</span>
-				</div>
+                  <br><span style="font-weight:700">หัวข้อข่าวสารภาษาไทย</span>
+                  <br><span style="font-weight:500;font-size:14px;">Date: 2020-11-29 09:43:48 View: 9 
+                    <a href="#" style="margin: 0 5px;">Link</a> 
+                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Accounting Services</span>
+                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Home Office</span>
+                  </span>
+                </div>
+                
+                <div style="margin-top:10px;text-indent:10px;line-height:1.5">
+                  ไฟไหม้ร้าน ATV ADVENTURE ที่ตั้งอยู่ในลานเนินนุ่ม ที่ อ.แม่ริม จ.เชียงใหม่ ส่งผลทำให้รถเอทีวี ยูทีวี และ จยย.ในร้านเสียหายหมดทั้งหมด คาดเสียหายกว่า 8 ล้านบาทคาดเหตุจากไฟฟ้าลัดวงจร
+                </div>
               </div>
+
+              {{-- Under Line --}}
+              <div style="border: 1px solid rgb(241, 241, 241);margin-top:30px;"></div>
+
+              {{-- Section EN --}}
+              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 36px">
+                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
+                  <br><span style="font-weight:700">Title En</span>
+                  <br><span style="font-weight:500;font-size:14px;">Date: 2020-11-29 09:43:48 View: 9 
+                    <a href="#" style="margin: 0 5px;">Link</a> 
+                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Accounting Services</span>
+                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Home Office</span>
+                  </span>
+                </div>
+                <div style="margin-top:10px;text-indent:10px;line-height:1.5">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur excepturi sit dignissimos beatae quis minima ipsam voluptas velit cupiditate aliquam, accusamus architecto esse, repellendus modi, iure saepe eaque tempore totam?
+                </div>
+              </div>
+
               <div class="miro__sep" style="background-color:#e1e0e7;font-family:Helvetica,Arial,sans-serif;height:1px"></div>
             </div>
           </div>
