@@ -71,6 +71,7 @@ class IndicatorsController extends Controller
             $reqType = 'ssl-cert-fingerprint';
         }
         $reqIndicator = $request->indicator;
+        
         $bodyData   = $client->request(
             'GET',
             'https://otx.alienvault.com/otxapi/indicator/' . $reqType . '/general' . '/' . $reqIndicator,
@@ -194,10 +195,10 @@ class IndicatorsController extends Controller
                 $html2 .= '
                 <div class="row m-b-xs">
                     <div class="col-md-6">
-                        ' . $value["name"] . '
+                        ' . (isset($value["name"])?$value["name"]:"") . '
                     </div>
                     <div class="col-md-6">
-                        ' . $value["message"] . '
+                        ' . (isset($value["message"])?$value["message"]:"") . '
                     </div>
                 </div>';
             }
@@ -243,6 +244,7 @@ class IndicatorsController extends Controller
 
        // https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.bonanzadesign-my.com%2Fgrace%2FMasterNewShit.exe?limit=10&page=1
        $isUrl_list = 0; 
+       $testt = 'https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.haromaain.com%2Fovhcloud.ovh.com%2Fmanager%2Fmoncompte%2Frenouvellement%2Fvos-service%2Fwebdomaine%2FOVHCloud%2F4870031649701203465875104976045875%2F48700316497012034658751049760%2Fgi1ztq%253D%2F?limit=10&page=1';
        if(isset($request->data_general["sections"])&&in_array("url_list", $request->data_general["sections"]) ){
             $bodyData   = $client->request( 
                 'GET',
@@ -259,8 +261,7 @@ class IndicatorsController extends Controller
         }else{
             $DataotxIndicator = null;
         }
-
-        $html = '<div class="row m-b-xs">';
+        $html = '';
 
         if(isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"])){
             $isUrl_list = 1;
@@ -327,7 +328,7 @@ class IndicatorsController extends Controller
             </div>';
         }
 
-        if(isset($DataotxIndicator["url_list"][0]["checked"])){
+        if(isset($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])){
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
@@ -337,11 +338,11 @@ class IndicatorsController extends Controller
                 <div class="col-md-8 text-right">
                     <a >';
             
-            if(empty($DataotxIndicator["url_list"][0]["safebrowsing"]["matches"])){
+            if(empty($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])){
                 // @icon(\'solid/check\') Not identified as malicious
                 $html .= 'Not identified as malicious';
             }else{
-                foreach ($DataotxIndicator["url_list"][0]["safebrowsing"]["matches"] as $value) {
+                foreach ($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"] as $value) {
                     $html .= $value.' ';
                 }
             }
@@ -359,6 +360,8 @@ class IndicatorsController extends Controller
                 </div>
             </div>';
         }
+
+
         if(isset($DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"])){
             $isUrl_list = 1;
             $html .= ' 
@@ -372,10 +375,13 @@ class IndicatorsController extends Controller
             </div>';
         }
 
+
         if ($request->ajax()) {
             $data = [
                 "html" =>  $html,
                 "out" =>  $DataotxIndicator,
+                "rtt" => 'https://otx.alienvault.com/otxapi/indicator/'.$reqType.'/url_list'.'/'.$reqIndicator,
+                "rtt2" => $testt
             ];
             return response()->json($data); 
         }
