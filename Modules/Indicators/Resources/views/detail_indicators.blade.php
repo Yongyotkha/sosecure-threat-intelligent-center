@@ -213,7 +213,7 @@
             $("#indicator_validation").append(data.html2);
             $("#pulses_related").append(data.html);
             
-
+            console.log("data1",data);
 
             
             if("{{$otxtype}}"=="CVE"){
@@ -235,7 +235,9 @@
 
             }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-
+            $('#loadspinner_related_pulse').hide();
+            $('#loadspinner_indicator_validation').hide();
+            $('#loadspinner_basic_info').hide();
             console.log("No response from server");
         });
     }
