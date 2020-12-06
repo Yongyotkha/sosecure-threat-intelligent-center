@@ -1,3 +1,27 @@
+@php
+$title_th = '';
+$detail_th = '';
+$title_en = '';
+$detail_en = '';
+$date_create = @$news['news']->public_date;
+$news_view = @$news['news']->view;
+  if(@$news['news']->title_th) {
+    $title_th = $news['news']->title_th;
+    $detail_th = $news['news']->detail_th;
+  }
+  if(@$news['news']->title_en) {
+    $title_en = $news['news']->title_en;
+    $detail_en = $news['news']->detail_en;
+  }
+
+  $cate_html = '';
+  if(@$news['news']) {
+      foreach($news['news']->get_cate as $cate) {
+        $cate_html .= '<span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">'.@$cate->get_cate_name->name.'</span>';
+      }
+  }
+
+@endphp
 
 <!DOCTYPE html>
 <html lang="en" class="miro" style="background-color:#f3f4f8;font-size:0;line-height:0">
@@ -31,40 +55,43 @@
                 </tr>
               </table>
             </div>
+
             <div class="miro__content-body" style="font-family:Helvetica,Arial,sans-serif">
                 {{-- Section TH --}}
-              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 0px">
-                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-                  <br><span style="font-weight:700">หัวข้อข่าวสารภาษาไทย</span>
-                  <br><span style="font-weight:500;font-size:14px;">Date: 2020-11-29 09:43:48 View: 9 
-                    <a href="#" style="margin: 0 5px;">Link</a> 
-                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Accounting Services</span>
-                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Home Office</span>
-                  </span>
+              @if($title_th)
+                <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 0px">
+                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
+                    <br><span style="font-weight:700">{{$title_th}}</span>
+                    <br><span style="font-weight:500;font-size:14px;">Date: {{$date_create}} View: {{$news_view}} 
+                      <a href="#" style="margin: 0 5px;">Link</a> 
+                      {!!$cate_html!!}
+                    </span>
+                  </div>
+                  
+                  <div style="margin-top:10px;text-indent:10px;line-height:1.5">
+                    {!!$detail_th!!}
+                  </div>
                 </div>
-                
-                <div style="margin-top:10px;text-indent:10px;line-height:1.5">
-                  ไฟไหม้ร้าน ATV ADVENTURE ที่ตั้งอยู่ในลานเนินนุ่ม ที่ อ.แม่ริม จ.เชียงใหม่ ส่งผลทำให้รถเอทีวี ยูทีวี และ จยย.ในร้านเสียหายหมดทั้งหมด คาดเสียหายกว่า 8 ล้านบาทคาดเหตุจากไฟฟ้าลัดวงจร
-                </div>
-              </div>
+              @endif
 
               {{-- Under Line --}}
               <div style="border: 1px solid rgb(241, 241, 241);margin-top:30px;"></div>
 
               {{-- Section EN --}}
-              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 36px">
-                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-                  <br><span style="font-weight:700">Title En</span>
-                  <br><span style="font-weight:500;font-size:14px;">Date: 2020-11-29 09:43:48 View: 9 
-                    <a href="#" style="margin: 0 5px;">Link</a> 
-                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Accounting Services</span>
-                    <span style="background: #e6033c;color:#fff;padding:5px;margin-right:5px">Home Office</span>
-                  </span>
+              @if($title_en)
+                <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 36px">
+                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
+                    <br><span style="font-weight:700">{{$title_en}}</span>
+                    <br><span style="font-weight:500;font-size:14px;">Date: {{$date_create}} View: {{$news_view}} 
+                      <a href="#" style="margin: 0 5px;">Link</a> 
+                      {!!$cate_html!!}
+                    </span>
+                  </div>
+                  <div style="margin-top:10px;text-indent:10px;line-height:1.5">
+                    {!!$detail_en!!}
+                  </div>
                 </div>
-                <div style="margin-top:10px;text-indent:10px;line-height:1.5">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur excepturi sit dignissimos beatae quis minima ipsam voluptas velit cupiditate aliquam, accusamus architecto esse, repellendus modi, iure saepe eaque tempore totam?
-                </div>
-              </div>
+              @endif
 
               <div class="miro__sep" style="background-color:#e1e0e7;font-family:Helvetica,Arial,sans-serif;height:1px"></div>
             </div>
