@@ -38,15 +38,13 @@ class DataLeakController extends Controller
     {
        $get_data = $this->siteSettings->get_data($id);
        $data['siteSettings'] = $get_data;
-       $data['page'] = 'Vulnerability Logs';
+       $data['page'] = 'Keyword Setting';
        return view('sitesettings::keyword_setting')->with($data);
     }
 
-    public function datafeed($id)
+    public function datafeed()
     {
-       $get_data = $this->siteSettings->get_data($id);
-       $data['siteSettings'] = $get_data;
-       $data['page'] = 'Vulnerability Logs';
+       $data['page'] = 'Data Feed(Social)';
        return view('sitesettings::datafeed')->with($data);
     }
 
@@ -54,7 +52,7 @@ class DataLeakController extends Controller
     {
        $get_data = $this->siteSettings->get_data($id);
        $data['siteSettings'] = $get_data;
-       $data['page'] = 'Vulnerability Logs';
+       $data['page'] = 'Social Datas';
        return view('sitesettings::social-datas')->with($data);
     }
 

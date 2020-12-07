@@ -63,11 +63,6 @@
                                         </a>
                                     </li>
                                     <li style="padding-left:2rem">
-                                        <a href="{{route('datafeed.index', ['id' => $siteSettings->code])}}">
-                                            Data Feed(Social)
-                                        </a>
-                                    </li>
-                                    <li style="padding-left:2rem">
                                         <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
                                             Social Datas
                                         </a>

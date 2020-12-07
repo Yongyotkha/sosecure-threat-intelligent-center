@@ -261,6 +261,14 @@
                                         <span>@langapp('scans')</span>
                                     </a>
                                 </li>
+
+                                <li class="{{ $page === 'Data Feed(Social)' ? 'active' : '' }}">
+                                    <a href="{{route('datafeed.index')}}">
+                                        <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                        <span>Data Feed(Social)</span>
+                                    </a>
+                                </li>
+
                                 <li class="{{ $page === langapp('assets') ? 'active' : '' }}">
                                     <a href="{{ site_url('/assets') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
