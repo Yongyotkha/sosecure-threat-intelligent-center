@@ -262,11 +262,21 @@
                                     </a>
                                 </li>
 
-                                <li class="{{ $page === 'Data Feed(Social)' ? 'active' : '' }}">
-                                    <a href="{{route('datafeed.index')}}">
+                                <li class="nav-w-children {{ $page === langapp('data_leak') ? 'active' : '' }}">
+                                    <a href="#" class="">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
-                                        <span>Data Feed(Social)</span>
+                                        <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                        <i class="fas fa-angle-up text-active"></i></span>
+                                        <span> @langapp('data_leak') </span>
                                     </a>
+                                    <ul class="nav lt">
+                                        <li class="{{ $page === 'Data Feed(Social)' ? 'active' : '' }}">
+                                            <a href="{{route('datafeed.index')}}">
+                                                <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
+                                                <span>Data Feed(Social)</span>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
 
                                 <li class="{{ $page === langapp('assets') ? 'active' : '' }}">
