@@ -482,7 +482,7 @@ class NewsController extends Controller
         }
 
         // dd($news);
-        
+        $content = [];
         foreach($news as $data){
             $related_news_site = '';
             $icon_related= '';
@@ -536,6 +536,13 @@ class NewsController extends Controller
  
             }
 
+            // $n_detail = strip_tags($n_detail);
+            // dd($n_detail);
+
+            $content[] = strip_tags($n_detail);
+            // $content[] = $data -> detail_en;
+            // dd($content);
+
             
 
 
@@ -560,7 +567,7 @@ class NewsController extends Controller
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
                         <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
-                        <span>&nbsp;'.$n_detail.'</span>
+                        <span><p>&nbsp;'.strip_tags($n_detail).'</p></span>
                     </div>
                 </div>
                 <div class="content-news-image">
@@ -578,6 +585,7 @@ class NewsController extends Controller
             </div>
             ';
         }
+        // dd($content);
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
@@ -624,7 +632,7 @@ class NewsController extends Controller
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
                         <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> news -> view.'</span>
-                        <span>&nbsp;'.$data -> news -> detail_th.'</span>
+                        <span>&nbsp;'.strip_tags($data -> news -> detail_th).'</span>
                     </div>
                 </div>
                 <div class="content-news-image">
@@ -675,7 +683,7 @@ class NewsController extends Controller
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
                         <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> news -> view.'</span>
-                        <span>&nbsp;'.$data -> news -> detail_th.'</span>
+                        <span><p></p>&nbsp;'.strip_tags($data -> news -> detail_th).'</p></span>
                     </div>
                 </div>
                 <div class="content-news-image">
