@@ -102,10 +102,6 @@
                         </div>
                     </div>
                 </section>
-
-             
-
-
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
@@ -318,9 +314,11 @@
             if(data.html.length == 0){
                 page_stop = false;
                 $('.ajax-loading').hide();
+                f_loading_stop(1);
                 {{--$('#count_news').text(0);--}}
                 return;
             }
+            f_loading_stop(1);
             let count_n = $('#count_news').text();
             let count_search = data.count;
             let count_n_all = parseInt(count_n) + parseInt(count_search);
