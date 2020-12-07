@@ -179,7 +179,7 @@ class NewsController extends Controller
        if(!empty($NewsCategory)){
             foreach($NewsCategory as $data){
                 $ReadCategories[] = ReadCategories::where('categories_id', '=',@$data['news_category_id'])->where('news_id', '=',@$data['rss_news_id'])->first();
-           }
+            }
        }
 
        $RSSNews_all = $RSSNews_all;
@@ -411,7 +411,7 @@ class NewsController extends Controller
             }
 
             if($lang_th=='true' && $lang_en=='true') {
-                $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%')->orwhere('title_en', 'LIKE' ,'%'.$title.'%');
+                $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%');
             } else if($lang_th || $lang_en) {
                 if($lang_th=='true') {
                     $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%');
@@ -420,7 +420,7 @@ class NewsController extends Controller
                 }
             } else {
                 if($title) {
-                    $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%')->orwhere('title_en', 'LIKE' ,'%'.$title.'%');
+                    $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%');
                 } else {
 
                 }
@@ -486,8 +486,8 @@ class NewsController extends Controller
         foreach($news as $data){
             $related_news_site = '';
             $icon_related= '';
-            $n_title ='';
-            $n_detail = '';
+            $n_title = @$data -> title_th;
+            $n_detail = @$data -> detail_th;
             if($site_id) {
                 $related_news_site = SiteNewsRelated::where("news_id",$data -> id)->where("site_id",$site_id)->first();
             }
@@ -501,7 +501,9 @@ class NewsController extends Controller
             if($lang_th=='true' && $lang_en=='true') {
                 $n_title = $data -> title_th;
                 $n_detail = $data -> detail_th;
-            } else if($lang_th || $lang_en) {
+
+                // $n_title = $data -> title_en;
+            } else if($lang_th=='true') {
                 if($lang_th=='true') {
                     $n_title = $data -> title_th;
                     $n_detail = $data -> detail_th;
@@ -509,12 +511,32 @@ class NewsController extends Controller
                     $n_title = $data -> title_en;
                     $n_detail = $data -> detail_en;
                 }
+
+                // $n_title = $data -> title_en;
+            } else if ($lang_en=='true') {
+                if ($lang_en=='true') {
+                    $n_title = $data -> title_en;
+                    $n_detail = $data -> detail_en;
+                } else if ($lang_th=='true') {
+                    $n_title = $data -> title_th;
+                    $n_detail = $data -> detail_th;
+                }
+
+                // $n_title = $data -> title_en;
             } else {
-                $n_title = $data -> title_th;
-                $n_detail = $data -> detail_th;
-                
-                
+                if(@$data -> title_th) {
+                    $n_title = $data -> title_th;
+                    $n_detail = $data -> detail_th;
+                } else {
+                    $n_title = $data -> title_en;
+                    $n_detail = $data -> detail_en;
+                }
+
+                // $n_title = $data -> title_en;
+ 
             }
+
+            
 
 
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
