@@ -39,7 +39,7 @@ class IndicatorsController extends Controller
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);
     }
-    
+
     public function events_detail()
     {
         $data['page'] = langapp('indicators');
@@ -280,12 +280,9 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= '
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    IP ADDRESS:
+                <div class="col-md-12">
+                    IP ADDRESS: <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"].'</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"].'</a>
-                </div>
             </div>';
         }
 //<img src="' . (isset($DataotxIndicator["flag_url"])?("https://otx.alienvault.com/".$DataotxIndicator["flag_url"]):"") . '" alt="">
@@ -293,12 +290,9 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    LOCATION:
+                <div class="col-md-12">
+                    LOCATION:  <a >'.$DataotxIndicator["flag_title"].'</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >'.$DataotxIndicator["flag_title"].'</a>
-                </div>
             </div>';
         }
 
@@ -306,12 +300,9 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    HOSTNAME:
+                <div class="col-md-12">
+                    HOSTNAME: <a >'.$request->data_general["hostname"].'</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >'.$request->data_general["hostname"].'</a>
-                </div>
             </div>';
         }
         
@@ -319,12 +310,9 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    DOMAIN:
+                <div class="col-md-12">
+                    DOMAIN: <a>'.$request->data_general["domain"].'</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >'.$request->data_general["domain"].'</a>
-                </div>
             </div>';
         }
 
@@ -332,12 +320,9 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    LAST ANALYZED DATE:
+                <div class="col-md-12">
+                    LAST ANALYZED DATE: <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"].'</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"].'</a>
-                </div>
             </div>';
         }
 
@@ -345,32 +330,29 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
+                <div class="col-md-12">
                     GOOGLE SAFE BROWSING:
-                </div>            
-                <div class="col-md-8 text-right">
+
                     <a >';
             
-            if(empty($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])){
-                // @icon(\'solid/check\') Not identified as malicious
-                $html .= 'Not identified as malicious';
-            }else{
-                foreach ($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"] as $value) {
-                    $html .= $value.' ';
-                }
-            }
-            $html .='</a>
-                </div>
+                    if(empty($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])){
+                        // @icon(\'solid/check\') Not identified as malicious
+                        $html .= 'Not identified as malicious';
+                    }else{
+                        foreach ($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"] as $value) {
+                            $html .= $value.' ';
+                        }
+                    }
+                    $html .='</a>
+
+                </div>            
             </div>';
         }else{
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    GOOGLE SAFE BROWSING:
+                <div class="col-md-12">
+                    GOOGLE SAFE BROWSING:  <a>Not analyzed</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >Not analyzed</a>
-                </div>
             </div>';
         }
 
@@ -379,12 +361,9 @@ class IndicatorsController extends Controller
             $isUrl_list = 1;
             $html .= ' 
             <div class="row m-b-xs">
-                <div class="col-md-4">
-                    ANTIVIRUS:
+                <div class="col-md-12">
+                    ANTIVIRUS: <a >'.$DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"].'</a>
                 </div>            
-                <div class="col-md-8 text-right">
-                    <a >'.$DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"].'</a>
-                </div>
             </div>';
         }
 
