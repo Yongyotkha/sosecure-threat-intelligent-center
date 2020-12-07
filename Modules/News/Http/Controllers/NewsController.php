@@ -122,15 +122,15 @@ class NewsController extends Controller
                         $site_and_news_array = [];
                         foreach($site_array as $site_key => $site_val) {
                             if($site_val) {
-                                if($news_val['cate_id'] == $site_val['cate_id']) {
-                                    if(@$site_val['cate_id'] && @$site_val['site_id']) {
-                                        if(in_array(@$site_and_news_array['cate_id'], @$site_val['cate_id']) && in_array(@$site_and_news_array['news_id'], @$news_val['news_id']) && in_array(@$site_and_news_array['site_id'], @$site_val['site_id'])) {
- 
-                                        } else {
-                                            $site_and_news_array['site_id'] = $site_val['site_id'];
-                                            $site_and_news_array['cate_id'] = $site_val['cate_id'];
-                                            $site_and_news_array['news_id'] = $news_val['news_id'];
-                                        }
+                                if(@$news_val['cate_id'] == @$site_val['cate_id']) {
+                                    if(@$site_val['cate_id'] && @$site_val['site_id'] && @$news_val['news_id'] && @$news_val['cate_id']) {
+
+                                        
+                                                $site_and_news_array['site_id'] = $site_val['site_id'];
+                                                $site_and_news_array['cate_id'] = $site_val['cate_id'];
+                                                $site_and_news_array['news_id'] = $news_val['news_id'];
+                                        
+                                        
                                     }
                   
     
@@ -146,6 +146,7 @@ class NewsController extends Controller
         // dd($news_array);
         // dd($site_array);
         dd($site_and_news_array_all);
+        // dd(array_unique($site_and_news_array_all));
         // dd($SiteNewsRelated[0]->get_news[0]->get_cate);
         // dd($SiteNewsRelated[0]->get_news->get_cate);
 
