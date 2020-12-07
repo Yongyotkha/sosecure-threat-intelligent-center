@@ -124,7 +124,7 @@
                                     <div class="row d-flex align-items-center">
                                         <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
                                         <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="news_title_search" class="form-control">
+                                            <input type="text" id="search" class="form-control">
                                         </div>
                                     </div>
                                 </div>
@@ -149,7 +149,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive">
+                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="table_social_data()">
                                         <i class="fas fa-search"></i>
                                         Search
                                     </button>
@@ -174,17 +174,17 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th>Source</th>
-                                        <th>Keyword Red</th>
+                                        <th width="10%">Source</th>
+                                        <th width="15%">Keyword Ref</th>
                                         <th>Content</th>
-                                        <th>Data Feed</th>
-                                        <th>View Count</th>
-                                        <th>Status</th>
-                                        <th class="no-sort">@langapp('action')</th>
+                                        <th width="10%">Data Feed</th>
+                                        <th width="3%">View</th>
+                                        <th width="5%">Status</th>
+                                        <th class="no-sort" width="5%">@langapp('action')</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    {{-- <tr>
                                         <td>
                                             <label>
                                                 <input name="select_all" value="1" type="checkbox" class="select-chk"/>
@@ -218,7 +218,7 @@
                                                 @icon('solid/trash-alt')
                                             </button>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
                             </table>
                         </div>
@@ -285,9 +285,65 @@
 <script>
 
 $(function() {
-    var table = $('#table_social_datas').DataTable({
-    });
+    table_social_data();
 });
+
+function table_social_data(){
+    let search = $('#search').val();
+    $('#table_social_datas').DataTable({
+        processing: true,
+        serverSide: true,
+        destroy: true,
+        ajax: {
+            url: '{!! route('socialdatas.socialdatas_datatables') !!}',
+            data: {
+                "site_code":'{{ Request::segment(3) }}',
+                "search" : search,
+            },
+            type: "POST",
+        },
+        order: [
+            [0, "desc"]
+        ],
+        columns: [
+            {
+                data: 'chk',
+                orderable: false,
+                searchable: false,
+                sortable: false,
+                className: 'w-10'
+            },  
+            {
+                data: 'source',
+                name: 'source'
+            },
+            {
+                data: 'keyword',
+                name: 'keyword'
+            },
+            {
+                data: 'content',
+                name: 'content'
+            },
+            {
+                data: 'data_feed',
+                name: 'data_feed'
+            },
+            {
+                data: 'view_count',
+                name: 'view_count'
+            },
+            {
+                data: 'status',
+                name: 'status'
+            },
+            {
+                data: 'action',
+                name: 'action'
+            },
+        ]
+    });
+}
 
 $(function() { 
     var start = moment().startOf('hour');
@@ -313,6 +369,24 @@ $(function() {
     }, cb);
     cb(start, end);
 });
+
+function change_status(code) {
+    let checkState = $("#status_" + code).is(":checked") ? 1 : 0;
+    axios.post('{{route('socialdatas.change_status')}}', {
+        status: checkState,
+        code: code,
+    }).then(function (response) {
+        toastr.success(response.data.message, '@langapp('response_status')');
+        window.location.href = response.data.redirect;
+    }).catch(function (error) {
+        var errors = error.response.data.errors;
+        var errorsHtml = "";
+        $.each(errors, function (key, value) {
+            errorsHtml += "<li>" + value[0] + "</li>";
+        });
+        toastr.error(errorsHtml, '@langapp('response_status')');
+    });
+}
 
 </script>
 @endpush
