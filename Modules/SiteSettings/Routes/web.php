@@ -78,6 +78,10 @@ Route::group(
 
         Route::get('/datafeed/{id}', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
         Route::get('/socialdatas/{id}', 'DataLeakController@socialdatas')->name('socialdatas.index')->middleware('can:menu_items');
+        Route::post('/socialdatas/datatables', 'DataLeakController@socialdatas_datatables')->name('socialdatas.socialdatas_datatables')->middleware('can:menu_items');
+        Route::post('/socialdatas/change_status', 'DataLeakController@change_status')->name('socialdatas.change_status');
+        Route::get('/socialdatas/delete_socialdatas/{code}', 'DataLeakController@delete_socialdatas')->name('socialdatas.delete');
+        Route::delete('/socialdatas/delete_socialdata/{code}', 'DataLeakController@delete_socialdata')->name('socialdatas.delete_socialdata');
     }
 );
 
