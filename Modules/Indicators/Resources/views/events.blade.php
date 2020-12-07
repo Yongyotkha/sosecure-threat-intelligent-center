@@ -156,7 +156,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
-
+@include('stacks.js.advanced_search')
 <script>
   $('.select2-option').select2();
 
