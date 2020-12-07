@@ -33,11 +33,24 @@ class IndicatorsController extends Controller
      * Display a listing of the resource.
      * @return Response
      */
-    public function index()
+
+    public function events()
+    {
+        $data['page'] = langapp('indicators');
+        return view('indicators::events')->with($data);
+    }
+    
+    public function events_detail()
+    {
+        $data['page'] = langapp('indicators');
+        return view('indicators::events_detail')->with($data);
+    }
+
+    public function attributes()
     {
         $data['page'] = langapp('indicators');
         $data['otx_type'] = OTXtypeData::where("status", '=', 1)->get();
-        return view('indicators::index')->with($data);
+        return view('indicators::attributes')->with($data);
     }
 
     public function show_detail_indicators(Request $request)
@@ -443,7 +456,7 @@ class IndicatorsController extends Controller
     // public function typeData()
     // {
     //     $data = OTXtypeData::all()->toArray();
-    //     return view('indicators::index', compact('data'));
+    //     return view('indicators::attributes', compact('data'));
     // }
 
     /**

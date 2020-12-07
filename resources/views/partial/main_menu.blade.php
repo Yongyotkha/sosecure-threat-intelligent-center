@@ -122,7 +122,7 @@
                         </li> --}}
                         
                         <li class="{{ $page === langapp('indicators') ? 'active' : '' }}">
-                            <a href="{{ site_url('/indicators') }}">
+                            <a href="{{ route('indicators.events') }}">
                                 <i class="fab fa-searchengin icon"><b class="bg-info"></b></i>
                                 <span> @langapp('indicators') </span>
                             </a>
