@@ -38,7 +38,7 @@
                                     <div class="row d-flex align-items-center">
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                         <div class="col-sm-9 col-xs-12">
-                                            <select id="source" class="select2-option form-control">
+                                            <select id="source_select" class="form-control">
                                                 <option value="1" selected>All</option>
                                             </select>
                                         </div>
@@ -219,7 +219,7 @@ $(function() {
     });
 });
 
-$('.select2').select2();
+$('#source_select').select2();
 
 $('#table_data_feed').on('click', '.select-chk', function () {
     if ($(this).is(':checked')) {
