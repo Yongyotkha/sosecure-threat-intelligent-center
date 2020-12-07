@@ -29,5 +29,3 @@ class ClassConstBowOutTest {
     const // phpcs:ignore Standard.Category.Sniff
         some_constant = 2;
 }
-
-$foo->getBar()?->define('foo');

@@ -33,7 +33,6 @@ class ObjectOperatorSpacingSniff implements Sniff
         return [
             T_OBJECT_OPERATOR,
             T_DOUBLE_COLON,
-            T_NULLSAFE_OBJECT_OPERATOR,
         ];
 
     }//end register()

@@ -21,7 +21,6 @@ final class Closure
 {
 	use Nette\SmartObject;
 	use Traits\FunctionLike;
-	use Traits\AttributeAware;
 
 	/** @var Parameter[] */
 	private $uses = [];

@@ -63,22 +63,6 @@ $array = [
   $c ? $d : $e,
 ];
 
-$foo =
-[
-    'bar' =>
-   [
-    ],
-];
-
-$foo = [
-    'foo'
-        . 'bar',
-    [
-            'baz',
-            'qux',
-        ],
-];
-
 // phpcs:set Generic.Arrays.ArrayIndent indent 2
 
 $var = [

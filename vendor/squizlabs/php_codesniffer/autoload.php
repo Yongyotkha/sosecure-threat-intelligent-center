@@ -160,55 +160,14 @@ if (class_exists('PHP_CodeSniffer\Autoload', false) === false) {
                 return self::$loadedClasses[$path];
             }
 
-            $classesBeforeLoad = [
-                'classes'    => get_declared_classes(),
-                'interfaces' => get_declared_interfaces(),
-                'traits'     => get_declared_traits(),
-            ];
+            $classes    = get_declared_classes();
+            $interfaces = get_declared_interfaces();
+            $traits     = get_declared_traits();
 
             include $path;
 
-            $classesAfterLoad = [
-                'classes'    => get_declared_classes(),
-                'interfaces' => get_declared_interfaces(),
-                'traits'     => get_declared_traits(),
-            ];
-
-            $className = self::determineLoadedClass($classesBeforeLoad, $classesAfterLoad);
-
-            self::$loadedClasses[$path]    = $className;
-            self::$loadedFiles[$className] = $path;
-            return self::$loadedClasses[$path];
-
-        }//end loadFile()
-
-
-        /**
-         * Determine which class was loaded based on the before and after lists of loaded classes.
-         *
-         * @param array $classesBeforeLoad The classes/interfaces/traits before the file was included.
-         * @param array $classesAfterLoad  The classes/interfaces/traits after the file was included.
-         *
-         * @return string The fully qualified name of the class in the loaded file.
-         */
-        public static function determineLoadedClass($classesBeforeLoad, $classesAfterLoad)
-        {
-            $className = null;
-
-            $newClasses = array_diff($classesAfterLoad['classes'], $classesBeforeLoad['classes']);
-
-            // Since PHP 7.4 get_declared_classes() does not guarantee any order, making
-            // it impossible to use order to determine which is the parent an which is the child.
-            // Let's reduce the list of candidates by removing all the classes known to be "parents".
-            // That way, at the end, only the "main" class just included will remain.
-            $newClasses = array_reduce(
-                $newClasses,
-                function ($remaining, $current) {
-                    return array_diff($remaining, class_parents($current));
-                },
-                $newClasses
-            );
-
+            $className  = null;
+            $newClasses = array_reverse(array_diff(get_declared_classes(), $classes));
             foreach ($newClasses as $name) {
                 if (isset(self::$loadedFiles[$name]) === false) {
                     $className = $name;
@@ -217,7 +176,7 @@ if (class_exists('PHP_CodeSniffer\Autoload', false) === false) {
             }
 
             if ($className === null) {
-                $newClasses = array_reverse(array_diff($classesAfterLoad['interfaces'], $classesBeforeLoad['interfaces']));
+                $newClasses = array_reverse(array_diff(get_declared_interfaces(), $interfaces));
                 foreach ($newClasses as $name) {
                     if (isset(self::$loadedFiles[$name]) === false) {
                         $className = $name;
@@ -227,7 +186,7 @@ if (class_exists('PHP_CodeSniffer\Autoload', false) === false) {
             }
 
             if ($className === null) {
-                $newClasses = array_reverse(array_diff($classesAfterLoad['traits'], $classesBeforeLoad['traits']));
+                $newClasses = array_reverse(array_diff(get_declared_traits(), $traits));
                 foreach ($newClasses as $name) {
                     if (isset(self::$loadedFiles[$name]) === false) {
                         $className = $name;
@@ -236,9 +195,11 @@ if (class_exists('PHP_CodeSniffer\Autoload', false) === false) {
                 }
             }
 
-            return $className;
+            self::$loadedClasses[$path]    = $className;
+            self::$loadedFiles[$className] = $path;
+            return self::$loadedClasses[$path];
 
-        }//end determineLoadedClass()
+        }//end loadFile()
 
 
         /**

@@ -116,7 +116,3 @@ $anonClass = new class() {
         $bar_foo = 3;
     }
 };
-
-echo $obj?->varName;
-echo $obj?->var_name;
-echo $obj?->varName;

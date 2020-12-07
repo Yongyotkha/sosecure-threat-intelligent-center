@@ -743,7 +743,7 @@ class Fixer
      * @param int $change The number of spaces to adjust the indent by
      *                    (positive or negative).
      *
-     * @return void
+     * @return bool If the change was accepted.
      */
     public function changeCodeBlockIndent($start, $end, $change)
     {

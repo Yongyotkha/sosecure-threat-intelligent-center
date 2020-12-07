@@ -2,10 +2,6 @@
 
 All notable changes to `db-dumper` will be documented in this file
 
-## 2.18.0 - 2020-10-10
-
-- support PHP 8
-
 ## 2.17.0 - 2020-09-10
 
 - add `doNotUseColumnStatistics`

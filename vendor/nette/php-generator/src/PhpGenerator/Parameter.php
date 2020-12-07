@@ -13,15 +13,14 @@ use Nette;
 
 
 /**
- * Function/Method parameter description.
+ * Method parameter description.
  *
  * @property mixed $defaultValue
  */
-class Parameter
+final class Parameter
 {
 	use Nette\SmartObject;
 	use Traits\NameAware;
-	use Traits\AttributeAware;
 
 	/** @var bool */
 	private $reference = false;

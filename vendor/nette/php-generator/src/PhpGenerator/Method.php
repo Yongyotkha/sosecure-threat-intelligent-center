@@ -24,7 +24,6 @@ final class Method
 	use Traits\NameAware;
 	use Traits\VisibilityAware;
 	use Traits\CommentAware;
-	use Traits\AttributeAware;
 
 	/** @var string|null */
 	private $body = '';
@@ -65,9 +64,7 @@ final class Method
 	/** @return static */
 	public function setBody(?string $code, array $args = null): self
 	{
-		$this->body = $args === null || $code === null
-			? $code
-			: (new Dumper)->format($code, ...$args);
+		$this->body = $args === null || $code === null ? $code : (new Dumper)->format($code, ...$args);
 		return $this;
 	}
 
@@ -117,19 +114,6 @@ final class Method
 	public function isAbstract(): bool
 	{
 		return $this->abstract;
-	}
-
-
-	/**
-	 * @param  string  $name without $
-	 */
-	public function addPromotedParameter(string $name, $defaultValue = null): PromotedParameter
-	{
-		$param = new PromotedParameter($name);
-		if (func_num_args() > 1) {
-			$param->setDefaultValue($defaultValue);
-		}
-		return $this->parameters[$name] = $param;
 	}
 
 

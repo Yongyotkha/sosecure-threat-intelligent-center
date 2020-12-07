@@ -37,6 +37,4 @@ $var = (1 + $var);
 $expected[$i]['sort_order'] = ($i + 1);
 $expected[($i + 1)]['sort_order'] = ($i + 1);
 
-$id = $id.($obj->i++).$id;
-$id = $obj?->i++.$id;
-$id = $obj?->i++*10;
+$id = $id.($this->i++).$id;

@@ -62,6 +62,3 @@ $a = [
 $a = [
     'a' => ($foo) ? fn() => return 1 : fn() => return 2,
 ];
-
-$var = $foo->something(!$var);
-$var = $foo?->something(!$var);

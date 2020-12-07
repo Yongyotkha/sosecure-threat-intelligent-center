@@ -43,9 +43,7 @@ final class LocatorDefinition extends Definition
 			)) {
 				throw new Nette\InvalidArgumentException(sprintf(
 					"Service '%s': Method %s::%s() does not meet the requirements: is create(\$name), get(\$name), create*() or get*() and is non-static.",
-					$this->getName(),
-					$type,
-					$method->name
+					$this->getName(), $type, $method->name
 				));
 			}
 		}

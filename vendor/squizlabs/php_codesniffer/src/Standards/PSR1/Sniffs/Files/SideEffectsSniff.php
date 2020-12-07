@@ -193,7 +193,6 @@ class SideEffectsSniff implements Sniff
             ) {
                 $prev = $phpcsFile->findPrevious(Tokens::$emptyTokens, ($i - 1), null, true);
                 if ($tokens[$prev]['code'] !== T_OBJECT_OPERATOR
-                    && $tokens[$prev]['code'] !== T_NULLSAFE_OBJECT_OPERATOR
                     && $tokens[$prev]['code'] !== T_DOUBLE_COLON
                     && $tokens[$prev]['code'] !== T_FUNCTION
                 ) {
@@ -217,13 +216,11 @@ class SideEffectsSniff implements Sniff
                 && strtolower($tokens[$i]['content']) === 'defined'
             ) {
                 $openBracket = $phpcsFile->findNext(Tokens::$emptyTokens, ($i + 1), null, true);
-                if ($openBracket !== false
-                    && $tokens[$openBracket]['code'] === T_OPEN_PARENTHESIS
+                if ($tokens[$openBracket]['code'] === T_OPEN_PARENTHESIS
                     && isset($tokens[$openBracket]['parenthesis_closer']) === true
                 ) {
                     $prev = $phpcsFile->findPrevious(Tokens::$emptyTokens, ($i - 1), null, true);
                     if ($tokens[$prev]['code'] !== T_OBJECT_OPERATOR
-                        && $tokens[$prev]['code'] !== T_NULLSAFE_OBJECT_OPERATOR
                         && $tokens[$prev]['code'] !== T_DOUBLE_COLON
                         && $tokens[$prev]['code'] !== T_FUNCTION
                     ) {
