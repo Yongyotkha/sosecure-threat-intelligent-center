@@ -45,7 +45,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="{{ getAsset('css/theme.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/custom.css') }}" type="text/css"/>
-    
+    <link rel="stylesheet" href="{{ getAsset('jquery-easy-loading/src/loading.css') }}" type="text/css"/>
+
     <link rel="stylesheet" href="{{ getAsset('plugins/apps/pace.css') }}" type="text/css"/>
 
     @if(config('system.material_design'))
