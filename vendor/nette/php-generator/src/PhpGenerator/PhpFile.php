@@ -56,23 +56,15 @@ final class PhpFile
 	}
 
 
-	/** @param  string|PhpNamespace  $namespace */
-	public function addNamespace($namespace): PhpNamespace
+	public function addNamespace(string $name): PhpNamespace
 	{
-		if ($namespace instanceof PhpNamespace) {
-			$res = $this->namespaces[$namespace->getName()] = $namespace;
-
-		} elseif (is_string($namespace)) {
-			$res = $this->namespaces[$namespace] = $this->namespaces[$namespace] ?? new PhpNamespace($namespace);
-
-		} else {
-			throw new Nette\InvalidArgumentException('Argument must be string|PhpNamespace.');
+		if (!isset($this->namespaces[$name])) {
+			$this->namespaces[$name] = new PhpNamespace($name);
+			foreach ($this->namespaces as $namespace) {
+				$namespace->setBracketedSyntax(count($this->namespaces) > 1 && isset($this->namespaces['']));
+			}
 		}
-
-		foreach ($this->namespaces as $namespace) {
-			$namespace->setBracketedSyntax(count($this->namespaces) > 1 && isset($this->namespaces['']));
-		}
-		return $res;
+		return $this->namespaces[$name];
 	}
 
 

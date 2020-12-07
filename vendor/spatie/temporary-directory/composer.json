@@ -3,7 +3,6 @@
     "description": "Easily create, use and destroy temporary directories",
     "keywords": [
         "spatie",
-        "php",
         "temporary-directory"
     ],
     "homepage": "https://github.com/spatie/temporary-directory",
@@ -17,10 +16,10 @@
         }
     ],
     "require": {
-        "php": "^7.2|^8.0"
+        "php": "^7.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.0|^9.0"
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "psr-4": {

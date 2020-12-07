@@ -44,7 +44,7 @@ final class PhpExtension extends Nette\DI\CompilerExtension
 			} elseif (function_exists('ini_set')) {
 				$this->initialization->addBody('ini_set(?, ?);', [$name, $value === false ? '0' : (string) $value]);
 
-			} elseif (ini_get($name) !== (string) $value) {
+			} elseif (ini_get($name) != $value) { // intentionally ==
 				throw new Nette\NotSupportedException('Required function ini_set() is disabled.');
 			}
 		}

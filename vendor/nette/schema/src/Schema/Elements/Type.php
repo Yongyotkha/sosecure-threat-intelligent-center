@@ -72,7 +72,6 @@ final class Type implements Schema
 
 	/**
 	 * @param  string|Schema  $type
-	 * @internal  use arrayOf() or listOf()
 	 */
 	public function items($type = 'mixed'): self
 	{

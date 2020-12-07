@@ -230,26 +230,21 @@ final class FactoryDefinition extends Definition
 		}
 
 		foreach ($method->getParameters() as $param) {
-			$methodHint = Reflection::getParameterTypes($param);
+			$hint = Reflection::getParameterType($param);
 			if (isset($ctorParams[$param->name])) {
-				$ctorParam = $ctorParams[$param->name];
-				$ctorHint = Reflection::getParameterTypes($ctorParam);
-				if ($methodHint !== $ctorHint
-					&& !is_a((string) reset($methodHint), (string) reset($ctorHint), true)
-				) {
+				$arg = $ctorParams[$param->name];
+				$argHint = Reflection::getParameterType($arg);
+				if ($hint !== $argHint && !is_a($hint, (string) $argHint, true)) {
 					throw new ServiceCreationException("Type hint for \${$param->name} in $interface::create() doesn't match type hint in $class constructor.");
 				}
-				$this->resultDefinition->getFactory()->arguments[$ctorParam->getPosition()] = Nette\DI\ContainerBuilder::literal('$' . $ctorParam->name);
+				$this->resultDefinition->getFactory()->arguments[$arg->getPosition()] = Nette\DI\ContainerBuilder::literal('$' . $arg->name);
 
 			} elseif (!$this->resultDefinition->getSetup()) {
 				$hint = Nette\Utils\Helpers::getSuggestion(array_keys($ctorParams), $param->name);
 				throw new ServiceCreationException("Unused parameter \${$param->name} when implementing method $interface::create()" . ($hint ? ", did you mean \${$hint}?" : '.'));
 			}
-
-			$paramDef = PHP_VERSION_ID < 80000
-				? ($methodHint && $param->allowsNull() ? '?' : '') . reset($methodHint)
-				: implode('|', $methodHint);
-			$paramDef .= ' ' . $param->name;
+			$nullable = $hint && $param->allowsNull() && (!$param->isDefaultValueAvailable() || $param->getDefaultValue() !== null);
+			$paramDef = ($nullable ? '?' : '') . $hint . ' ' . $param->name;
 			if ($param->isDefaultValueAvailable()) {
 				$this->parameters[$paramDef] = Reflection::getParameterDefaultValue($param);
 			} else {

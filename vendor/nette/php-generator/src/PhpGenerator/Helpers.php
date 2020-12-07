@@ -88,9 +88,7 @@ final class Helpers
 
 	public static function extractShortName(string $name): string
 	{
-		return ($pos = strrpos($name, '\\')) === false
-			? $name
-			: substr($name, $pos + 1);
+		return ($pos = strrpos($name, '\\')) === false ? $name : substr($name, $pos + 1);
 	}
 
 

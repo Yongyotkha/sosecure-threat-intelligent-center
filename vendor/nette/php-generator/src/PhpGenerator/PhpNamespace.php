@@ -126,12 +126,6 @@ final class PhpNamespace
 	}
 
 
-	public function unresolveUnionType(string $type): string
-	{
-		return implode('|', array_map([$this, 'unresolveName'], explode('|', $type)));
-	}
-
-
 	public function unresolveName(string $name): string
 	{
 		if (isset(self::KEYWORDS[strtolower($name)]) || $name === '') {

@@ -29,16 +29,6 @@ class ObjectOperatorIndentSniff implements Sniff
      */
     public $multilevel = false;
 
-    /**
-     * Tokens to listen for.
-     *
-     * @var array
-     */
-    private $targets = [
-        T_OBJECT_OPERATOR,
-        T_NULLSAFE_OBJECT_OPERATOR,
-    ];
-
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -47,7 +37,7 @@ class ObjectOperatorIndentSniff implements Sniff
      */
     public function register()
     {
-        return $this->targets;
+        return [T_OBJECT_OPERATOR];
 
     }//end register()
 
@@ -67,14 +57,14 @@ class ObjectOperatorIndentSniff implements Sniff
 
         // Make sure this is the first object operator in a chain of them.
         $start = $phpcsFile->findStartOfStatement($stackPtr);
-        $prev  = $phpcsFile->findPrevious($this->targets, ($stackPtr - 1), $start);
+        $prev  = $phpcsFile->findPrevious(T_OBJECT_OPERATOR, ($stackPtr - 1), $start);
         if ($prev !== false) {
             return;
         }
 
         // Make sure this is a chained call.
         $end  = $phpcsFile->findEndOfStatement($stackPtr);
-        $next = $phpcsFile->findNext($this->targets, ($stackPtr + 1), $end);
+        $next = $phpcsFile->findNext(T_OBJECT_OPERATOR, ($stackPtr + 1), $end);
         if ($next === false) {
             // Not a chained call.
             return;
@@ -189,7 +179,7 @@ class ObjectOperatorIndentSniff implements Sniff
             }//end if
 
             $next = $phpcsFile->findNext(
-                $this->targets,
+                T_OBJECT_OPERATOR,
                 ($next + 1),
                 null,
                 false,
