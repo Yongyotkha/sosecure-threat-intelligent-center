@@ -4,6 +4,7 @@ namespace Modules\SiteSettings\Http\Controllers;
 
 use App\DataLeakFeed;
 use App\DataLeakFeedTemp;
+use App\DataLeakSocial;
 use App\DataLeakSocialRef;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -232,7 +233,7 @@ class DataLeakController extends Controller
         ->editColumn(
             'data_feed',
             function (DataLeakFeedTemp $model) {
-                return '';
+                return $model -> feedtimestamp;
             }
         )
         ->editColumn(
@@ -291,7 +292,7 @@ class DataLeakController extends Controller
     public function approve_data_feed(Request $request){
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request -> id)->get();
         foreach($DataLeakFeedTemps as $DataLeakFeedTemp){
-            $source = $this->getDomain($DataLeakFeedTemp -> feedlink);
+            $source = DataLeakSocial::select('tag')->find($DataLeakFeedTemp -> sourceid);
             $DataLeakFeed = new DataLeakFeed();
             $DataLeakFeed -> code = generator_uuid();
             $DataLeakFeed -> sourceid = $DataLeakFeedTemp -> sourceid;
@@ -300,7 +301,7 @@ class DataLeakController extends Controller
             $DataLeakFeed -> feedtimepost = $DataLeakFeedTemp -> feedtimepost;
             $DataLeakFeed -> feedtimestamp = $DataLeakFeedTemp -> feedtimestamp;
             $DataLeakFeed -> feeduser = $DataLeakFeedTemp -> feeduser;
-            $DataLeakFeed -> tag = substr($source, 0, strpos($source, "."));
+            $DataLeakFeed -> tag = $source -> tag;
             $DataLeakFeed -> status = 1;
             $DataLeakFeed->save();
 
@@ -315,14 +316,5 @@ class DataLeakController extends Controller
             true,
             Response::HTTP_OK
         );
-    }
-
-    public function getDomain($url){
-        $pieces = parse_url($url);
-        $domain = isset($pieces['host']) ? $pieces['host'] : '';
-        if(preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)){
-            return $regs['domain'];
-        }
-        return FALSE;
     }
 }
