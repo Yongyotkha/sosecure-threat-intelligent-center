@@ -94,6 +94,7 @@
                                         <th>Keyword Ref</th>
                                         <th>Content</th>
                                         <th>Data Feed</th>
+                                        <th>url</th>
                                         <th class="no-sort">@langapp('action')</th>
                                     </tr>
                                 </thead>
@@ -122,8 +123,9 @@
                     <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
-                            <select name="" id="" class="form-control select2">
+                            <select id="status_action" class="form-control select2">
                                 <option value="1">Approved</option>
+                                <option value="2">Cancle</option>
                             </select>
                         </div>
                     </div>
@@ -133,7 +135,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
+                    <button type="button" onclick="change_status()" class="btn btn-info btn-rounded">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>
@@ -157,7 +159,31 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" id="confirm_approve" class="btn btn-info btn-rounded">
+                    <button type="submit" class="btn btn-info btn-rounded" onclick="confirm_approve()">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="modal modal-slide" id="confirm-change-status-cancle" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="exampleModalLabel">Confirm Information</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-info btn-rounded" onclick="confirm_cancle()">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>
@@ -230,6 +256,10 @@ function table_social_data(){
                 name: 'data_feed'
             },
             {
+                data: 'url',
+                name: 'url'
+            },
+            {
                 data: 'action',
                 name: 'action'
             },
@@ -238,7 +268,7 @@ function table_social_data(){
 }
 
 $('#source_select').select2();
-
+var data_feed_id = [];
 $('#table_data_feed').on('click', '.select-chk', function () {
     if ($(this).is(':checked')) {
         $('#btn-change-status').prop("disabled", false);
@@ -273,13 +303,21 @@ $(function() {
     }, cb);
     cb(start, end);
 });
-var data_feed_id = [];
+
 function approve_dataFeed(id){
+    data_feed_id = [];
     data_feed_id.push(id);
 }
 
-$('#confirm_approve').click(function(event){
-    event.preventDefault();
+function cancle_dataFeed(id){
+    data_feed_id = [];
+    data_feed_id.push(id);
+}
+
+function confirm_approve(){
+    $('.data_feed_id:checked').each(function () {
+        data_feed_id.push(this.value);
+    });
     $.ajax({
         type:"POST",
         url:"{{ route('socialdatas.approve_data_feed') }}",
@@ -302,7 +340,44 @@ $('#confirm_approve').click(function(event){
             toastr.error(errorsHtml, '@langapp('response_status') ');
         }
     });
-}); 
+}
+
+function confirm_cancle(){
+    $('.data_feed_id:checked').each(function () {
+        data_feed_id.push(this.value);
+    });
+    $.ajax({
+        type:"POST",
+        url:"{{ route('socialdatas.cancle_data_feed') }}",
+        data:{id: data_feed_id},
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            toastr.success(response.message, '@langapp('response_status')');
+            window.location.href = response.redirect;
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+}
+
+function change_status(){
+    let status_action = $('#status_action :selected').val();
+    if(status_action == 1){
+        confirm_approve();
+    }else{
+        confirm_cancle();
+    }
+}
 
 </script>
 @endpush
