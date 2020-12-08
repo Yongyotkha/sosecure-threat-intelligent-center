@@ -305,7 +305,7 @@ class DataLeakController extends Controller
     public function delete_socialdata(Request $request){
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $request -> code)->first();
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $DataLeakSocialRef -> temp_id)->get();
-        DataLeakFeed::where('temp_id', $DataLeakSocialRef -> temp_id)->delete();
+        DataLeakFeed::where('id', $DataLeakSocialRef -> data_leak_feed_id)->delete();
         DataLeakSocialRef::where('temp_id', $DataLeakSocialRef -> temp_id)->delete();
         $DataLeakFeedTemps -> approve = 0;
         $DataLeakFeedTemps -> save();
