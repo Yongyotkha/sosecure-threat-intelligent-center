@@ -40,7 +40,7 @@ class SocialController extends Controller
     public function index()
     {
 
-        $SiteSettings = SiteSettings::where("active",1)->get();
+        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         $Data_leak_social = Data_leak_social::where("deleted_at",null)->where("status",1)->get();
         $data['Data_leak_social'] = $Data_leak_social;
         $data['SiteSettings'] = $SiteSettings;

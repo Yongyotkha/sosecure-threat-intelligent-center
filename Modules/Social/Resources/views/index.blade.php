@@ -274,7 +274,11 @@
                 $('#count_news_bookmark').text(0);
                 return;
             }
-            $('#count_news_bookmark').text(data.count);
+            if(data.count) {
+                $('#count_news_bookmark').text(data.count);
+            } else {
+                $('#count_news_bookmark').text(0);
+            }
             $('.ajax-loading').hide();
             $('.ajax-loading').addClass('d-none');
             $("#list_news_book_mark").append(data.html);
