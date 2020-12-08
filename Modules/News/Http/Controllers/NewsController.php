@@ -77,20 +77,21 @@ class NewsController extends Controller
         $site_array = [];
         if($SiteSettings) {
             foreach($SiteSettings as $key => $val) {
-                $val_news_id = $val->id;
+                
                 // $val->get_cate[0]->get_cate_name->id;
                 $site_array_sub = [];
-                if($val->get_categorys) {
-                    foreach($val->get_categorys as $key2 => $val2) {
-
-               
-                        $site_array_sub['site_id'] = $val_news_id;
-                        $site_array_sub['cate_id'] = $val2->category_id;
-
+                if($val) {
+                    $val_news_id = $val->id;
+                    if($val->get_categorys) {
+                        foreach($val->get_categorys as $key2 => $val2) {
+                            if($val2) {
+                                $site_array_sub['site_id'] = $val_news_id;
+                                $site_array_sub['cate_id'] = $val2->category_id;
+                            }
+                        }
+                        array_push($site_array, $site_array_sub);
                     }
-                    array_push($site_array, $site_array_sub);
                 }
-
             }
         }
 
@@ -98,6 +99,7 @@ class NewsController extends Controller
         if($SiteNewsRelated) {
             foreach($SiteNewsRelated as $key => $val) {
                 $val_news_related_id = $val->site_id;
+                $val_news_id = $val->news_id;
                 // $val->get_cate[0]->get_cate_name->id;
                 $news_related_array_sub = [];
                 if($val->get_news) {
@@ -105,6 +107,7 @@ class NewsController extends Controller
 
                         $news_related_array_sub['site_id'] = $val_news_related_id;
                         $news_related_array_sub['cate_id'] = $val2->news_category_id;
+                        $news_related_array_sub['news_id'] = $val_news_id;
 
                     }
                     array_push($site_news_related, $news_related_array_sub);
@@ -162,7 +165,7 @@ class NewsController extends Controller
         // $RSSNews_count = RSSNews::count("id");
         $RSSNews_all = RSSNews::all();
 
-        $SiteSettings = SiteSettings::where("active",1)->get();
+        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         // dd($RSSNews_all[0]->get_cate);
         // dd($RSSNews_all[0]->get_cate[0]->get_cate_name->name);
         // dd($RSSNews_count);
