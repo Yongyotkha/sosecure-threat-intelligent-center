@@ -13,6 +13,8 @@
 
 Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
 
+// Route::get('/clientlogin', 'Auth\LoginController@login');
+Route::get('/clientlogin', 'Welcome@clientlogin');
 Route::get('/test', 'Welcome@test');
 
 Auth::routes(['verify' => true, 'register' => settingEnabled('allow_client_registration')]);

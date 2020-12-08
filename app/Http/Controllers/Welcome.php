@@ -49,6 +49,11 @@ class Welcome extends Controller
     {
         return view('emails.template_email_new_news');
     }
+
+    public function clientlogin()
+    {
+        return view('auth.client_login');
+    }
     public function search(Request $request)
     {
         print_r($request->input());
