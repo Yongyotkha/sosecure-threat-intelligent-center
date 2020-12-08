@@ -14,5 +14,8 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'social'],
     function () {
         Route::get('/', 'SocialController@index')->name('social.index')->middleware('can:menu_items');
+        Route::get('/jqueryLoadMoreNewsBookmark', 'SocialController@jqueryLoadMoreNewsBookmark')->name('social.jqueryLoadMoreNewsBookmark');
+        Route::get('/jqueryLoadMoreNews', 'SocialController@jqueryLoadMoreNews')->name('social.jqueryLoadMoreNews');
+        Route::get('/bookmark', 'SocialController@bookmark')->name('social.bookmark');
     }
 );
