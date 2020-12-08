@@ -206,7 +206,49 @@
 @include('stacks.js.hidesettings')
 <script>
 $(function() {
+
+
         var table = $('#table_cve_assets').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{!! route('KeywordsController.data') !!}',
+                data: {
+                    "site_code":'{{ Request::segment(3) }}'
+                },
+                type: "POST",
+            },
+            order: [
+                [0, "desc"]
+            ],
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'last_update',
+                    name: 'created_at'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },
+                
+            ]
         });
 });
 

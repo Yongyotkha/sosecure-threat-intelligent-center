@@ -256,9 +256,9 @@ class SocialController extends Controller
                         <article class="def-rlt">
                             <div class="entry">
                                 <span class="entry-category">
-                                    <a href="#">'.$data -> tag.'</a>
+                                    <a href="#">'.$data -> source_name.'</a>
                                 </span>
-                                <h3>
+                                <h3 style="font-size: 16px;">
                                     <a href="'.$data -> feedlink.'" target="_blank">
                                     '.$n_title.'
                                     </a>
@@ -267,9 +267,9 @@ class SocialController extends Controller
                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
                                     <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
                                 </div>
-                                <div class="description-text hidden-xs">
+                                <!--<div class="description-text hidden-xs">
                                 <span><p>&nbsp;'.strip_tags($n_title).'</p></span>
-                                </div>
+                                </div>-->
                             </div>
                         </article>
                     

@@ -50,8 +50,11 @@ Route::group(
         Route::post('/domain-setting/domain/change_status', 'DomainSettingsController@change_status')->name('domainsettings.change_status')->middleware(['can:categorysettings_update']);
         Route::post('/domain-setting/domain/bulk-delete', 'DomainSettingsController@bulkDelete')->name('domainsettings.bulk.delete')->middleware(['can:categorysettings_delete']);//->middleware(['can:categorysettings_delete', 'demo']);
         Route::post('/domain-setting/domain/data', 'DomainSettingsController@tableData')->name('domainsettings.data')->middleware('can:menu_items');
+        // Route::post('/dataleak/social/data', 'KeywordsController@tableData')->name('KeywordsController.data')->middleware('can:menu_items');
         Route::get('/domain-setting/domain/test', 'DomainSettingsController@test')->name('domainsettings.test')->middleware('can:menu_items');
         Route::get('/domain-setting/domain/edit/{id}', 'DomainSettingsController@edit')->name('domainsettings.edit')->middleware('can:categorysettings_update');
+        // Route::get('/dataleak/social/edit/{id}', 'KeywordsController@edit')->name('KeywordsController.edit')->middleware('can:menu_items');
+        // Route::get('/dataleak/social/delete/{id}', 'KeywordsController@delete')->name('KeywordsController.delete')->middleware('can:menu_items');
         Route::get('/domain-setting/domain/delete/{id}', 'DomainSettingsController@delete')->name('domainsettings.delete')->middleware('can:categorysettings_delete');
         Route::put('/domain-setting/domain/update/{id}', 'DomainSettingsController@update')->name('domainsettings.update')->middleware('can:sitesettings_update');
         Route::delete('/domain-setting/domain/delete_process/{id}', 'DomainSettingsController@delete_process')->name('domainsettings.delete_process')->middleware('can:categorysettings_delete');
