@@ -82,7 +82,10 @@ Route::group(
         Route::post('/socialdatas/change_status', 'DataLeakController@change_status')->name('socialdatas.change_status');
         Route::get('/socialdatas/delete_socialdatas/{code}', 'DataLeakController@delete_socialdatas')->name('socialdatas.delete');
         Route::delete('/socialdatas/delete_socialdata/{code}', 'DataLeakController@delete_socialdata')->name('socialdatas.delete_socialdata');
+
     }
 );
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
+Route::post('/datafeedsocial/datatables', 'DataLeakController@datafeedsocial_datatables')->name('socialdatas.datafeedsocial_datatables');
+Route::post('/datafeedsocial/approve/dataFeed', 'DataLeakController@approve_data_feed')->name('socialdatas.approve_data_feed');
 Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_details')->name('vulsetting.detail')->middleware('can:menu_items');

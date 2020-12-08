@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\DataLeakFeedTemp;
+use App\DataLeakSocial;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use DB;
@@ -76,14 +77,18 @@ class data_leak_social extends Command
         $where = array(
             'sourceid' => 1,
         );
-        $cursor = $collection->find($where, ['limit' => 10]);   //This is the main line
+        $cursor = $collection->find([], ['sort' => ['feedtimepost' => -1], 'limit' => 1000]);   //This is the main line
         $docs = $cursor->toArray();
         foreach($docs as $data){
+            $source = DataLeakSocial::select('source')->find($data -> sourceid);
             $DataLeakFeedTemp = new DataLeakFeedTemp();
+            $DataLeakFeedTemp -> data_id = $data -> _id;
             $DataLeakFeedTemp -> sourceid = $data -> sourceid;
-            $DataLeakFeedTemp -> feedtimepost = $data -> feedtimepost;
+            $DataLeakFeedTemp -> source_name = $source -> source;
+            $DataLeakFeedTemp -> tag = $source -> tag;
+            $DataLeakFeedTemp -> feedtimepost = Carbon::now();
             $DataLeakFeedTemp -> feedcontent = $data -> feedcontent;
-            $DataLeakFeedTemp -> feedtimestamp =$data -> feedtimestamp;
+            $DataLeakFeedTemp -> feedtimestamp = Carbon::now();
             $DataLeakFeedTemp -> feedlink = $data -> feedlink;
             $DataLeakFeedTemp -> feeduser = $data -> feeduser;
             $DataLeakFeedTemp -> save();
