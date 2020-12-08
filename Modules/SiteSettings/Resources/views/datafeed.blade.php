@@ -28,7 +28,7 @@
                                     <div class="row d-flex align-items-center">
                                         <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
                                         <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="news_title_search" class="form-control">
+                                            <input type="text" id="search" class="form-control">
                                         </div>
                                     </div>
                                 </div>
@@ -91,42 +91,13 @@
                                             </label>
                                         </th>
                                         <th>Source</th>
-                                        <th>Keyword Red</th>
+                                        <th>Keyword Ref</th>
                                         <th>Content</th>
                                         <th>Data Feed</th>
                                         <th class="no-sort">@langapp('action')</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <label>
-                                                <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            Pantip
-                                        </td>
-                                        <td>
-                                            Fibre
-                                        </td>
-                                        <td>
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                        </td>
-                                        <td>
-                                            2020-12-2020 12:12
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status">
-                                                @icon('solid/check') Approved
-                                            </button>
-                                            <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status">
-                                                @icon('solid/times') Cancel
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </section>
@@ -186,7 +157,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
+                    <button type="submit" id="confirm_approve" class="btn btn-info btn-rounded">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>
@@ -215,9 +186,56 @@
 <script>
 
 $(function() {
-    var table = $('#table_data_feed').DataTable({
-    });
+    table_social_data();
 });
+
+function table_social_data(){
+    let search = $('#search').val();
+    $('#table_data_feed').DataTable({
+        processing: true,
+        serverSide: true,
+        destroy: true,
+        ajax: {
+            url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
+            data: {
+                "search" : search,
+            },
+            type: "POST",
+        },
+        order: [
+            [0, "desc"]
+        ],
+        columns: [
+            {
+                data: 'chk',
+                orderable: false,
+                searchable: false,
+                sortable: false,
+                className: 'w-10'
+            },  
+            {
+                data: 'source',
+                name: 'source'
+            },
+            {
+                data: 'keyword',
+                name: 'keyword'
+            },
+            {
+                data: 'content',
+                name: 'content'
+            },
+            {
+                data: 'data_feed',
+                name: 'data_feed'
+            },
+            {
+                data: 'action',
+                name: 'action'
+            },
+        ]
+    });
+}
 
 $('#source_select').select2();
 
@@ -255,6 +273,36 @@ $(function() {
     }, cb);
     cb(start, end);
 });
+var data_feed_id = [];
+function approve_dataFeed(id){
+    data_feed_id.push(id);
+}
+
+$('#confirm_approve').click(function(event){
+    event.preventDefault();
+    $.ajax({
+        type:"POST",
+        url:"{{ route('socialdatas.approve_data_feed') }}",
+        data:{id: data_feed_id},
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            toastr.success(response.message, '@langapp('response_status')');
+            window.location.href = response.redirect;
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+}); 
 
 </script>
 @endpush

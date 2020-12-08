@@ -2,6 +2,8 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use App\DataLeakFeed;
+use App\DataLeakFeedTemp;
 use App\DataLeakSocialRef;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -200,6 +202,54 @@ class DataLeakController extends Controller
         ->make(true);
     }
 
+    public function datafeedsocial_datatables(Request $request){
+        $model = DataLeakFeedTemp::all();
+        return DataTables::of($model)
+        ->editColumn(
+            'chk',
+            function (DataLeakFeedTemp $model) {
+                return '<label><input type="checkbox" name="checked" value="' . $model->id . '"><span class="label-text"></span></label>';
+            }
+        )
+        ->editColumn(
+            'source',
+            function (DataLeakFeedTemp $model) {
+                return '';
+            }
+        )
+        ->editColumn(
+            'keyword',
+            function (DataLeakFeedTemp $model) {
+                return '';
+            }
+        )
+        ->editColumn(
+            'content',
+            function (DataLeakFeedTemp $model) {
+                return $model -> feedcontent;
+            }
+        )
+        ->editColumn(
+            'data_feed',
+            function (DataLeakFeedTemp $model) {
+                return '';
+            }
+        )
+        ->editColumn(
+            'action',
+            function (DataLeakFeedTemp $model) {
+                return '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed('.$model -> id.')">
+                    Approved
+                </button>
+                <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status">
+                    Cancel
+                </button>';
+            }
+        )
+        ->rawColumns(['chk','source','keyword','content','data_feed','action'])
+        ->make(true);
+    }
+
     public function change_status(Request $request){
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $request -> code)->first();
         $DataLeakSocialRef->status = $request->status;
@@ -236,5 +286,43 @@ class DataLeakController extends Controller
             true,
             Response::HTTP_OK
         );
+    }
+
+    public function approve_data_feed(Request $request){
+        $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request -> id)->get();
+        foreach($DataLeakFeedTemps as $DataLeakFeedTemp){
+            $source = $this->getDomain($DataLeakFeedTemp -> feedlink);
+            $DataLeakFeed = new DataLeakFeed();
+            $DataLeakFeed -> code = generator_uuid();
+            $DataLeakFeed -> sourceid = $DataLeakFeedTemp -> sourceid;
+            $DataLeakFeed -> feedcontent = $DataLeakFeedTemp -> feedcontent;
+            $DataLeakFeed -> feedlink = $DataLeakFeedTemp -> feedlink;
+            $DataLeakFeed -> feedtimepost = $DataLeakFeedTemp -> feedtimepost;
+            $DataLeakFeed -> feedtimestamp = $DataLeakFeedTemp -> feedtimestamp;
+            $DataLeakFeed -> feeduser = $DataLeakFeedTemp -> feeduser;
+            $DataLeakFeed -> tag = substr($source, 0, strpos($source, "."));
+            $DataLeakFeed -> status = 1;
+            $DataLeakFeed->save();
+
+            $DataLeakFeedTemp -> delete();
+        }
+        
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('datafeed.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function getDomain($url){
+        $pieces = parse_url($url);
+        $domain = isset($pieces['host']) ? $pieces['host'] : '';
+        if(preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)){
+            return $regs['domain'];
+        }
+        return FALSE;
     }
 }
