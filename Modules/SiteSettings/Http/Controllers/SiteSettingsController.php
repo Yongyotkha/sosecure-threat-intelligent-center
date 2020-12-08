@@ -355,6 +355,14 @@ class SiteSettingsController extends Controller
     public function tableData()
     {
         $model = $this->siteSettings->query();
+        $test = 1;
+        $model->when(
+            $test == 1,
+            function ($q) {
+                return $q->where("deleted_at",null);
+            }
+        );
+
         return DataTables::eloquent($model)
             ->editColumn('no', function ($siteSettings) {
                     return $siteSettings->code;

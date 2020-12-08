@@ -163,28 +163,33 @@ class DataSettingsController extends Controller
             //     $SiteCategory->save();
             // }
             site_menu_permission::where('site_id', $SiteSettings -> id)->delete();
-            if(count($request->menu) > 0) {
-                foreach($request->menu AS $menu) {
-                    $tb_menu = Menu::select("id")->where("code",$menu)->first();
-                    $site_menu_permission = new site_menu_permission;
-                    $site_menu_permission->site_id = $SiteSettings->id;
-                    $site_menu_permission->menu_id = $tb_menu->id;
-                    $site_menu_permission->menu_code = $menu;
-                    $site_menu_permission->save();
+            if($request->menu) {
+                if(count($request->menu) > 0) {
+                    foreach($request->menu AS $menu) {
+                        $tb_menu = Menu::select("id")->where("code",$menu)->first();
+                        $site_menu_permission = new site_menu_permission;
+                        $site_menu_permission->site_id = $SiteSettings->id;
+                        $site_menu_permission->menu_id = $tb_menu->id;
+                        $site_menu_permission->menu_code = $menu;
+                        $site_menu_permission->save();
+                    }
                 }
             }
 
             site_menu_sub_permission::where('site_id', $SiteSettings -> id)->delete();
-            if(count($request->menu_sub) > 0) {
-                foreach($request->menu_sub AS $menu_sub) {
-                    $tb_menu_sub = Menu_sub::select("id")->where("code",$menu_sub)->first();
-                    $site_menu_sub_permission = new site_menu_sub_permission;
-                    $site_menu_sub_permission->site_id = $SiteSettings->id;
-                    $site_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
-                    $site_menu_sub_permission->menu_sub_code = $menu_sub;
-                    $site_menu_sub_permission->save();
+            if($request->menu_sub) {
+                if(count($request->menu_sub) > 0) {
+                    foreach($request->menu_sub AS $menu_sub) {
+                        $tb_menu_sub = Menu_sub::select("id")->where("code",$menu_sub)->first();
+                        $site_menu_sub_permission = new site_menu_sub_permission;
+                        $site_menu_sub_permission->site_id = $SiteSettings->id;
+                        $site_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
+                        $site_menu_sub_permission->menu_sub_code = $menu_sub;
+                        $site_menu_sub_permission->save();
+                    }
                 }
             }
+
             site_config_email_alert::where('site_id', $SiteSettings -> id)->delete();
             if($request->email_alert) {
                 if(count($request->email_alert) > 0) {
