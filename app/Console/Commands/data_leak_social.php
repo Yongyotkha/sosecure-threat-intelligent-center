@@ -7,6 +7,8 @@ use App\DataLeakSocial;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use DB;
+use App\leak_socail_ref_temp;
+use Modules\SiteSettings\Entities\Site_keywords;
 
 class data_leak_social extends Command
 {
@@ -80,10 +82,25 @@ class data_leak_social extends Command
         $cursor = $collection->find([], ['sort' => ['feedtimepost' => -1], 'limit' => 1000]);   //This is the main line
         $docs = $cursor->toArray();
         foreach($docs as $data){
-            $source = DataLeakSocial::select('source')->find($data -> sourceid);
+            $source = DataLeakSocial::select('source', 'tag')->find($data -> sourceid);
+            $site_id = '';
+            $keyword = '';
+            $Site_keywords = Site_keywords::where('status', 1)->where('deleted_at', null)->get();
+            foreach($Site_keywords as $item){
+                $site_id .= $item -> site_id . ',';
+                if (strpos($data -> feedcontent, $item -> name) !== false) {
+                    $keyword .= $item -> name . ',';
+                }
+            }
+            $site_id = rtrim($site_id, ",");
+            $keyword = rtrim($keyword, ",");
+
             $DataLeakFeedTemp = new DataLeakFeedTemp();
             $DataLeakFeedTemp -> data_id = $data -> _id;
             $DataLeakFeedTemp -> sourceid = $data -> sourceid;
+            // if(!empty($keyword)){
+                $DataLeakFeedTemp -> keyword = $keyword;
+            // }
             $DataLeakFeedTemp -> source_name = $source -> source;
             $DataLeakFeedTemp -> tag = $source -> tag;
             $DataLeakFeedTemp -> feedtimepost = Carbon::now();
@@ -92,6 +109,15 @@ class data_leak_social extends Command
             $DataLeakFeedTemp -> feedlink = $data -> feedlink;
             $DataLeakFeedTemp -> feeduser = $data -> feeduser;
             $DataLeakFeedTemp -> save();
+
+            // if(!empty($site_id) && !empty($keyword)){
+                $leak_socail_ref_temp = new leak_socail_ref_temp();
+                $leak_socail_ref_temp -> data_leak_feed_id = $DataLeakFeedTemp -> id;
+                $leak_socail_ref_temp -> site_id = $site_id;
+                $leak_socail_ref_temp -> keyword = $keyword;
+                $leak_socail_ref_temp -> status = 1;
+                $leak_socail_ref_temp -> save();
+            // }
         } 
     }
 }

@@ -6,6 +6,7 @@ use App\DataLeakFeed;
 use App\DataLeakFeedTemp;
 use App\DataLeakSocial;
 use App\DataLeakSocialRef;
+use App\leak_socail_ref_temp;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -124,7 +125,7 @@ class DataLeakController extends Controller
 
     public function socialdatas_datatables(Request $request){
         $site =  $this->siteSettings->get_data($request->site_code);
-        $model = DataLeakSocialRef::where('site_id', $site->id)->where('deleted_at', null)->orderBy('id', 'desc');
+        $model = DataLeakSocialRef::where('site_id', 'LIKE' , '%'.$site->id.'%')->where('deleted_at', null)->orderBy('id', 'desc');
         if($request -> search){
             if($request -> search){
                 $search = $request -> search;
@@ -141,31 +142,39 @@ class DataLeakController extends Controller
         ->editColumn(
             'chk',
             function (DataLeakSocialRef $model) {
-                return '<label><input type="checkbox" name="checked" value="' . $model->id . '"><span class="label-text"></span></label>';
+                return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id" value="' . $model->id . '"><span class="label-text"></span></label>';
             }
         )
         ->editColumn(
             'source',
             function (DataLeakSocialRef $model) {
-                return $model -> get_data_leak_feed -> tag;
+                if(@$model -> get_data_leak_feed -> source_name){
+                    return @$model -> get_data_leak_feed -> source_name;
+                }else{
+                    return '-';
+                }
             }
         )
         ->editColumn(
             'keyword',
             function (DataLeakSocialRef $model) {
-                return $model -> keyword;
+                if($model -> keyword){
+                    return $model -> keyword;
+                }else{
+                    return '-';
+                }
             }
         )
         ->editColumn(
             'content',
             function (DataLeakSocialRef $model) {
-                return $model -> get_data_leak_feed -> feedcontent;
+                return @$model -> get_data_leak_feed -> feedcontent;
             }
         )
         ->editColumn(
             'data_feed',
             function (DataLeakSocialRef $model) {
-                return $model -> get_data_leak_feed -> feedtimestamp;
+                return @$model -> get_data_leak_feed -> feedtimestamp;
             }
         )
         ->editColumn(
@@ -209,19 +218,28 @@ class DataLeakController extends Controller
         ->editColumn(
             'chk',
             function (DataLeakFeedTemp $model) {
-                return '<label><input type="checkbox" name="checked" value="' . $model->id . '"><span class="label-text"></span></label>';
+                return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id" value="' . $model->id . '"><span class="label-text"></span></label>';
             }
         )
         ->editColumn(
             'source',
             function (DataLeakFeedTemp $model) {
-                return '';
+                if($model -> source_name){
+                    return $model -> source_name;
+                }else{
+                    return '-';
+                }
+                
             }
         )
         ->editColumn(
             'keyword',
             function (DataLeakFeedTemp $model) {
-                return '';
+                if($model -> keyword){
+                    return $model -> keyword;
+                }else{
+                    return '-';
+                }
             }
         )
         ->editColumn(
@@ -237,17 +255,28 @@ class DataLeakController extends Controller
             }
         )
         ->editColumn(
-            'action',
+            'url',
             function (DataLeakFeedTemp $model) {
-                return '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed('.$model -> id.')">
-                    Approved
-                </button>
-                <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status">
-                    Cancel
-                </button>';
+                return '<a href="'.$model -> feedlink.'" target="_blank"><i class="fas fa-link"></i></a>';
             }
         )
-        ->rawColumns(['chk','source','keyword','content','data_feed','action'])
+        ->editColumn(
+            'action',
+            function (DataLeakFeedTemp $model) {
+                $html = '';
+                if($model -> approve == 0){
+                    $html .= '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed('.$model -> id.')">
+                        Approved
+                    </button>';
+                }else{
+                    $html .= '<button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status-cancle" onclick="cancle_dataFeed('.$model -> id.')">
+                        Cancel
+                    </button>';
+                }
+                return $html;
+            }
+        )
+        ->rawColumns(['chk','source','keyword','content','data_feed','url','action'])
         ->make(true);
     }
 
@@ -275,9 +304,11 @@ class DataLeakController extends Controller
 
     public function delete_socialdata(Request $request){
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $request -> code)->first();
-        $DataLeakSocialRef->deleted_at = Carbon::now();
-        $DataLeakSocialRef->save();
-
+        $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $DataLeakSocialRef -> temp_id)->get();
+        DataLeakFeed::where('temp_id', $DataLeakSocialRef -> temp_id)->delete();
+        DataLeakSocialRef::where('temp_id', $DataLeakSocialRef -> temp_id)->delete();
+        $DataLeakFeedTemps -> approve = 0;
+        $DataLeakFeedTemps -> save();
         $site_code = $this->siteSettings->find_code($DataLeakSocialRef->site_id);
         return ajaxResponse(
             [
@@ -292,22 +323,60 @@ class DataLeakController extends Controller
     public function approve_data_feed(Request $request){
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request -> id)->get();
         foreach($DataLeakFeedTemps as $DataLeakFeedTemp){
-            $source = DataLeakSocial::select('tag')->find($DataLeakFeedTemp -> sourceid);
-            $DataLeakFeed = new DataLeakFeed();
-            $DataLeakFeed -> code = generator_uuid();
-            $DataLeakFeed -> sourceid = $DataLeakFeedTemp -> sourceid;
-            $DataLeakFeed -> feedcontent = $DataLeakFeedTemp -> feedcontent;
-            $DataLeakFeed -> feedlink = $DataLeakFeedTemp -> feedlink;
-            $DataLeakFeed -> feedtimepost = $DataLeakFeedTemp -> feedtimepost;
-            $DataLeakFeed -> feedtimestamp = $DataLeakFeedTemp -> feedtimestamp;
-            $DataLeakFeed -> feeduser = $DataLeakFeedTemp -> feeduser;
-            $DataLeakFeed -> tag = $source -> tag;
-            $DataLeakFeed -> status = 1;
-            $DataLeakFeed->save();
+            $check_DataLeakFeed = DataLeakFeed::where('temp_id', $DataLeakFeedTemp -> id)->first();
+            if(empty($check_DataLeakFeed)){
+                $DataLeakFeed = new DataLeakFeed();
+                $DataLeakFeed -> code = generator_uuid();
+                $DataLeakFeed -> temp_id = $DataLeakFeedTemp -> id;
+                $DataLeakFeed -> data_id = $DataLeakFeedTemp -> data_id;
+                $DataLeakFeed -> sourceid = $DataLeakFeedTemp -> sourceid;
+                $DataLeakFeed -> keyword = $DataLeakFeedTemp -> keyword;
+                $DataLeakFeed -> source_name = $DataLeakFeedTemp -> source_name;
+                $DataLeakFeed -> feedcontent = $DataLeakFeedTemp -> feedcontent;
+                $DataLeakFeed -> feedlink = $DataLeakFeedTemp -> feedlink;
+                $DataLeakFeed -> feedtimepost = $DataLeakFeedTemp -> feedtimepost;
+                $DataLeakFeed -> feedtimestamp = $DataLeakFeedTemp -> feedtimestamp;
+                $DataLeakFeed -> feeduser = $DataLeakFeedTemp -> feeduser;
+                $DataLeakFeed -> tag = $DataLeakFeedTemp -> tag;
+                $DataLeakFeed -> status = 1;
+                $DataLeakFeed->save();
 
-            $DataLeakFeedTemp -> delete();
+                $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp -> id)->first();
+                if(!empty($leak_socail_ref_temp)){
+                    $DataLeakSocialRef = new DataLeakSocialRef;
+                    $DataLeakSocialRef -> code = generator_uuid();
+                    $DataLeakSocialRef -> temp_id = $DataLeakFeedTemp -> id;
+                    $DataLeakSocialRef -> data_leak_feed_id = $DataLeakFeed -> id;
+                    $DataLeakSocialRef -> site_id = $leak_socail_ref_temp -> site_id;
+                    $DataLeakSocialRef -> keyword = $leak_socail_ref_temp -> keyword;
+                    $DataLeakSocialRef -> status = 1;
+                    $DataLeakSocialRef -> view = 0;
+                    $DataLeakSocialRef -> save();
+                }
+
+                $DataLeakFeedTemp -> approve = 1;
+                $DataLeakFeedTemp -> save();
+            }
         }
         
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('datafeed.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function cancle_data_feed(Request $request){
+        $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request -> id)->get();
+        foreach($DataLeakFeedTemps as $DataLeakFeedTemp){
+            DataLeakFeed::where('temp_id', $DataLeakFeedTemp -> id)->delete();
+            DataLeakSocialRef::where('temp_id', $DataLeakFeedTemp -> id)->delete();
+            $DataLeakFeedTemp -> approve = 0;
+            $DataLeakFeedTemp -> save();
+        }
         return ajaxResponse(
             [
                 'message'  => langapp('changes_saved_successful'),
