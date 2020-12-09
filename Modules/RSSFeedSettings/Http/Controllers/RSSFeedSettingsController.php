@@ -120,7 +120,7 @@ class RSSFeedSettingsController extends Controller
                     // } else {
                     //     $html .= $model->link; 
                     // }
-                    $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>';
+                    $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
                 }else{
                     // if($word_leng > 30) {
                     //     $html .= iconv_substr($model->link, 0, 30, "UTF-8");
@@ -128,7 +128,7 @@ class RSSFeedSettingsController extends Controller
                     // } else {
                     //     $html .= $model->link; 
                     // }
-                    $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>';
+                    $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
                     // $html .= iconv_substr($model->link, 0, 30, "UTF-8"); 
                     // $html .= $word_leng; 
                 }
@@ -286,13 +286,13 @@ class RSSFeedSettingsController extends Controller
                 return rtrim($html, ' , ');
             })
             ->addColumn('source', function (RSSNews $model) {
-                return $model -> source;
+                return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
             })
             ->addColumn('title', function (RSSNews $model) {
                 if($model -> title_th){
-                    return $model -> title_th;
+                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</div>';
                 }else if($model -> title_en){
-                    return $model -> title_en;
+                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</div>';
                 }else{
                     return '-';
                 }
