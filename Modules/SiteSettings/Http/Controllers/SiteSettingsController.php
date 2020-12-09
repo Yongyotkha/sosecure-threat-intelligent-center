@@ -231,10 +231,16 @@ class SiteSettingsController extends Controller
         if($request->page_setting == 'site_settings'){
             SiteCategory::where('site_id', $SiteSettings -> id)->delete();
             foreach($request->category AS $category) {
-                $SiteCategory = new SiteCategory;
-                $SiteCategory->site_id = $SiteSettings->id;
-                $SiteCategory->category_id = $category;
-                $SiteCategory->save();
+                $SiteCategory_check = SiteCategory::where('site_id', $SiteSettings -> id)->where("category_id",$category)->first();
+                if($SiteCategory_check) {
+
+                } else {
+                    $SiteCategory = new SiteCategory;
+                    $SiteCategory->site_id = $SiteSettings->id;
+                    $SiteCategory->category_id = $category;
+                    $SiteCategory->save();
+                }
+               
             }
             Tags_site::where('site_id', $SiteSettings -> id)->delete();
             if($request->tag) {

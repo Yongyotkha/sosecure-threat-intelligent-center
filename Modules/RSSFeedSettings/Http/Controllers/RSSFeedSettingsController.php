@@ -576,11 +576,21 @@ class RSSFeedSettingsController extends Controller
         if($SiteCategory) {
             foreach($SiteCategory as $SiteCategory_val) {
                 if($SiteCategory_val) {
-                    if(@$SiteCategory_val->site_email_alert->email) {
-                        $email_site_alert[] = @$SiteCategory_val->site_email_alert->email;
+
+                    $site_email_alert = site_config_email_alert::where("site_id",$SiteCategory_val->site_id)->get();
+
+                    if($site_email_alert) {
+                        foreach($site_email_alert as $site_email_alert_val) {
+                            $email_site_alert[] = $site_email_alert_val->email;
+                        }
                     }
+                    // if(@$SiteCategory_val->site_email_alert->email) {
+                    //     $email_site_alert[] = @$SiteCategory_val->site_email_alert->email;
+                    // }
                 }
             }
+
+
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // dd($email_site_alert);
         }
@@ -758,6 +768,7 @@ class RSSFeedSettingsController extends Controller
             if($request->formsubmit !== 'formDraft'){
                 if($email_site_alert) {
                     foreach($email_site_alert as $data){
+                        // var_dump($data);
                         $this->news = [
                             'news' => $RSSNews_check,
                         ];
@@ -954,6 +965,8 @@ class RSSFeedSettingsController extends Controller
         
         return ajaxResponse(
             [
+                // 'cate' => $SiteCategory,
+                // 'test' => $email_site_alert,
                 'message'  => "Successfully",
                 'redirect' => route('rssfeedsettings.news'),
             ],
