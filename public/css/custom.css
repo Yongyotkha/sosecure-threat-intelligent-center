@@ -2092,3 +2092,24 @@ ul.topics-news-list li a:hover{
         width: 100% !important;
     }
 }
+
+.text-elip{
+    display: block;
+    display: -webkit-box;
+    max-width: 100%;
+    height: 55px;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+}
+.text-elip-line-1{
+    display: block;
+    display: -webkit-box;
+    max-width: 100%;
+    height: 55px;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+}

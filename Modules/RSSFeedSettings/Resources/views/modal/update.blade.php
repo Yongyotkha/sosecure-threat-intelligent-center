@@ -22,7 +22,7 @@
                     <span class="text-danger">*</span>
                 </label>
                 <div class="col-lg-9">
-                            <input type="url" class="form-control" id="url_rss" name="url_rss" value="{{@$rssfeedsettings->url}}" >
+                    <input type="url" class="form-control" id="url_rss" name="url_rss" value="{{@$rssfeedsettings->url}}" >
                 </div>
             </div>
 

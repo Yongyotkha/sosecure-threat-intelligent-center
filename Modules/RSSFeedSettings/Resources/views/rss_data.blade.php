@@ -226,6 +226,7 @@
                 {
                     data: 'title',
                     name: 'title'
+                    className: 'w-100'
                 },
                 {
                     data: 'link',
@@ -234,7 +235,7 @@
                 {
                     data: 'pubDate',
                     name: 'pubDate',
-                    className: 'w-100 text-center'
+                    className: 'text-center'
                 },
                 {
                     data: 'status',
