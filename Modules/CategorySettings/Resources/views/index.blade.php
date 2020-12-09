@@ -179,7 +179,7 @@
                         orderable: false,
                         searchable: false,
                         sortable: false,
-                        className:'w-80',
+                        className:'w-80 no-wrap',
                     }
                 ]
             });

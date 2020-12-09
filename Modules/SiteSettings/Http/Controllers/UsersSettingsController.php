@@ -51,7 +51,7 @@ class UsersSettingsController extends Controller
     {
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
-        $data['page'] = 'Users Settings';
+        $data['page'] = 'Users';
         return view('sitesettings::users')->with($data);
     }
 

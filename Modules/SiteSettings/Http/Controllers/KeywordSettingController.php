@@ -37,7 +37,7 @@ class KeywordSettingController extends Controller
     {
        $get_data = $this->siteSettings->get_data($id);
        $data['siteSettings'] = $get_data;
-       $data['page'] = 'Vulnerability Logs';
+       $data['page'] = 'KeywordSettings';
        return view('sitesettings::keyword_setting')->with($data);
     }
 

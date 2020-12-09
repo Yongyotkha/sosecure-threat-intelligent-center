@@ -50,7 +50,7 @@ class DomainSettingsController extends Controller
         // dd(1);
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
-        $data['page'] = 'Domain Settings';
+        $data['page'] = 'Domain';
         return view('sitesettings::domain')->with($data);
     }
 
@@ -59,7 +59,7 @@ class DomainSettingsController extends Controller
     {
         $allowed      = ['overview', 'datatype', 'settings', 'logs'];
         $tab          = in_array($tab, $allowed) ? $tab : 'overview';
-        $data['page'] = 'Domain Settings';
+        $data['page'] = 'Domain';
         $data['tab']  = $tab;
         return view('sitesettings::domain_detail')->with($data);
     }
