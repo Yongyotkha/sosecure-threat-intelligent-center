@@ -50,7 +50,7 @@ class SiteSettingsController extends Controller
     public function index()
     {
        $data['filter'] = $this->request->filter;
-       $data['page']   = $this->getPage();
+       $data['page']   = 'SiteSettings';
        return view('sitesettings::index')->with($data);
     }
 
