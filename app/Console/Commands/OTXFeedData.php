@@ -56,7 +56,6 @@ class OTXFeedData extends Command
         $inputOTXStamp -> created_by = "system";
         $inputOTXStamp -> updated_by = "system";
         $inputOTXStamp->save();
-
         $client = new \GuzzleHttp\Client();
         $otxModifiedDate =  gmdate("c", time() - 60 * 60 * 24 * 1) ;
         $bodyData   = $client->request(
