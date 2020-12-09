@@ -48,9 +48,7 @@ class OTXFeedType extends Command
     public function handle()
     {
         $OTX_KEY = env("OTX_KEY","");
-
         $client = new \GuzzleHttp\Client();
-
         $bodyData   = $client->request(
             'GET',
             'https://otx.alienvault.com/api/v1/pulses/indicators/types',
