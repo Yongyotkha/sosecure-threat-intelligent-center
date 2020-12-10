@@ -14,7 +14,7 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'categorysettings'],
     function () {
         Route::get('/', 'CategorySettingsController@index')->name('categorysettings.index')->middleware('can:menu_items');
-        Route::get('data', 'CategorySettingsController@tableData')->name('categorysettings.data')->middleware('can:menu_items');
+        Route::post('data', 'CategorySettingsController@tableData')->name('categorysettings.data')->middleware('can:menu_items');
         Route::get('create', 'CategorySettingsController@create')->name('categorysettings.create')->middleware('can:settings');
         Route::post('bulk-delete', 'CategorySettingsController@bulkDelete')->name('categorysettings.bulk.delete')->middleware(['can:categorysettings_delete']);//->middleware(['can:categorysettings_delete', 'demo']);
         // Route::post('change_status', 'CategorySettingsController@change_status')->name('categorysettings.change_status')->middleware(['can:categorysettings_update']);

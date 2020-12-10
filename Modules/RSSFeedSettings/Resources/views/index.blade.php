@@ -286,12 +286,18 @@
 
 
         var table = $('#table-rss-setting-template').DataTable({
+            pageLength: 50,
             processing: true,
             serverSide: true,
+            destroy: true,
             ajax: {
                 url: '{!! route('rssfeedsettings.rss_setting_table') !!}',
-                "type": "POST",
-                data: ''
+                data: function ( d ) {
+                    {{--d.keywords = keywords;--}}
+                    {{--return JSON.stringify( d );--}}
+                    return d;
+                },
+                type: "POST",
             },
             order: [[ 0, "desc" ]],
             columns: [

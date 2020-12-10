@@ -90,12 +90,16 @@
     <script>
         $(function () {
             var table = $('#table-site-template').DataTable({
+                pageLength: 50,
                 processing: true,
                 serverSide: true,
                 destroy: true,
                 ajax: {
                     url: '{!! route('sitesettings.data') !!}',
-                    data: ""
+                    data: ({
+                        
+                    }),
+                    type: "POST",
                 },
                 columns: [
                     {
@@ -122,19 +126,21 @@
                     },
                     {
                         data: 'categorys',
-                        name: 'categorys'
+                        name: 'categorys',
+                        searchable: false
                     },
                     {
                         data: 'assets_use',
-                        name: 'assets_use'
+                        name: 'assets_use',
+                        searchable: false
                     },
                     {
-                        data: 'start_date',
-                        name: 'start_date'
+                        data: 'start_active',
+                        name: 'start_active'
                     },
                     {
-                        data: 'exp_date',
-                        name: 'exp_date'
+                        data: 'end_active',
+                        name: 'end_active'
                     },
                     {
                         data: 'status',

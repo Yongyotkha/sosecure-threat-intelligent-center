@@ -199,12 +199,13 @@
     });
     function datatable(){
         $('#table-rss-data').DataTable({
+            pageLength: 50,
             processing: true,
             serverSide: true,
             destroy: true,
             ajax: {
-                contentType: "application/json",
-                dataType: 'JSON',
+                {{--contentType: "application/json",
+                dataType: 'JSON',--}}
                 type: "POST",
                 url: '{!! route('rssfeedsettings.rss_data_table') !!}',
                 data: function ( d ) {
@@ -212,7 +213,8 @@
                     d.public_date = public_date;
                     d.status = status;
                     d.source = source;
-                    return JSON.stringify( d );
+                    {{--return JSON.stringify( d );--}}
+                    return d;
                 },
             },
             columns: [
@@ -226,7 +228,6 @@
                 {
                     data: 'title',
                     name: 'title'
-                    className: 'w-100'
                 },
                 {
                     data: 'link',
@@ -235,7 +236,7 @@
                 {
                     data: 'pubDate',
                     name: 'pubDate',
-                    className: 'text-center'
+                    className: 'w-10 text-center'
                 },
                 {
                     data: 'status',

@@ -140,11 +140,16 @@
 
 
             var table = $('#table-category-template').DataTable({
+                pageLength: 50,
                 processing: true,
                 serverSide: true,
+                destroy: true,
                 ajax: {
                     url: '{!! route('categorysettings.data') !!}',
-                    data: ""
+                    data: ({
+                        
+                    }),
+                    type: "POST",
                 },
                 order: [
                     [0, "desc"]

@@ -148,14 +148,14 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th>Site Name</th>
+                                        {{-- <th>Site Name</th> --}}
                                         <th width="20px">Source name</th>
                                         <th width="20%">Title</th>
                                         <th>Category</th>
                                         <th width="20px">Data Satatus</th>
                                         <th width="30px">Public Date</th>
                                         <th>View Count</th>
-                                        <th>Link</th>
+                                        <th width="40px">Link</th>
                                         <th>Status</th>
                                         <th width="5%">Action</th>
                                     </tr>
@@ -266,12 +266,13 @@ $(function() {
 
     function datatable(){
         $('#table-rss-news-template').DataTable({
+            pageLength: 50,
             processing: true,
             serverSide: true,
             destroy: true,
             ajax: {
-                contentType: "application/json",
-                dataType: 'JSON',
+                {{--contentType: "application/json",
+                dataType: 'JSON',--}}
                 type: "POST",
                 url: '{!! route('rssfeedsettings.rss_news_table') !!}',
                 data: function ( d ) {
@@ -281,7 +282,9 @@ $(function() {
                     d.status_news = status_news;
                     d.news_source = news_source;
                     d.news_category = news_category;
-                    return JSON.stringify( d );
+                    {{--return JSON.stringify( d );--}}
+                    return d;
+
                 },
             },
             columns: [
@@ -292,10 +295,10 @@ $(function() {
                     sortable: false,
                     className: 'w-10'
                 },
-                {
+                {{--{
                     data: 'site_name',
                     name: 'site_name'
-                },
+                },--}}
                 {
                     data: 'source',
                     name: 'source'

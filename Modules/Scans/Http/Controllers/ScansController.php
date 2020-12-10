@@ -345,10 +345,10 @@ class ScansController extends Controller
                     return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
             ->addColumn('name', function (TransactionTimeStampScans $model) {
-                return '<label>'.$model -> get_site -> name.'</label>';
+                return '<label>'.@$model -> get_site -> name.'</label>';
             })
             ->addColumn('domain', function (TransactionTimeStampScans $model) {
-                return '<label>'.$model -> get_domain -> name.'</label>';
+                return '<label>'.@$model -> get_domain -> name.'</label>';
             })
             ->addColumn('progress', function (TransactionTimeStampScans $model) {
                 $html = '';

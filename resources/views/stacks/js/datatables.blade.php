@@ -1,5 +1,5 @@
 @php $sort = strtoupper(get_option('date_picker_format')); @endphp
-    <script src="{{ getAsset('plugins/datatables/datatables.min.js') }}"></script>
+    <script src="{{ getAsset('plugins/datatables/DataTables/datatables.min.js') }}"></script>
     <script src="{{ getAsset('plugins/datatables/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ getAsset('plugins/datatables/datetime-moment.js') }}"></script>
 

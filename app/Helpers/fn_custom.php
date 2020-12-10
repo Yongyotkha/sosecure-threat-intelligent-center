@@ -77,6 +77,36 @@ function get_name_scan_status($status_id,$badg='') {
     return $html;
 }
 
+function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
+    $html = '';
+    if($badg == 'badg') {
+        if(strtolower($status_id) == strtolower("CRITICAL")) {
+            $html = '<span class="badge badge-secondary" style="background-color: #b30000;">'.$num_val.' CRITICAL</span>';
+        } else if(strtolower($status_id) == strtolower("HIGH")) {
+            $html = '<span class="badge badge-Warning" style="background-color: #d9534f;">'.$num_val.' HIGH</span>';
+        } else if(strtolower($status_id) == strtolower("MEDIUM")) {
+            $html = '<span class="badge badge-Warning" style="background-color: #ec971f;">'.$num_val.' MEDIUM</span>';
+        } else if(strtolower($status_id) == strtolower("LOW")) {
+            $html = '<span class="badge badge-Success" style="background-color: #bfff00;">'.$num_val.' LOW</span>';
+        } else if(strtolower($status_id) == strtolower("NONE")) {
+            $html = '<span class="badge badge-Success" style="background-color: #40ff00;">'.$num_val.' NONE</span>';
+        }
+    } else {
+        if(strtolower($status_id) == strtolower("CRITICAL")) {
+            $html = 'CRITICAL';
+        } else if(strtolower($status_id) == strtolower("HIGH")) {
+            $html = 'HIGH';
+        } else if(strtolower($status_id) == strtolower("MEDIUM")) {
+            $html = 'MEDIUM';
+        } else if(strtolower($status_id) == strtolower("LOW")) {
+            $html = 'LOW';
+        } else if(strtolower($status_id) == strtolower("NONE")) {
+            $html = 'NONE';
+        }
+    }
+    return $html;
+}
+
 
 function generator_uuid(){
     return Str::uuid()->toString();
