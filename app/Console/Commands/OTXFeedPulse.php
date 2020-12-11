@@ -44,8 +44,22 @@ class OTXFeedPulse extends Command
         $roundRetry = 0;
         $loop = 0;
         //https://otx.alienvault.com/otxapi/indicators/cve/general/CVE-2017-0199
+
         //echo json_encode($this->caseByType("CVE","CVE-2017-0199","11502",$urlLimit));
-        $this->testfun();
+        //echo json_encode($this->caseByType("domain","strtbiz.site","2701613156",$urlLimit));
+        //echo json_encode($this->caseByType("email","ganaolian0439@163.com","2735305400",$urlLimit));
+        
+        //echo json_encode($this->caseByType("FileHash-MD5","f1b6ed2624583c913392dcd7e3ea6ae1","1",$urlLimit));
+        //echo json_encode($this->caseByType("FileHash-MD5","277c10ae03a3921e32a583433bf9da1b","2",$urlLimit));
+        //echo json_encode($this->caseByType("FileHash-MD5","81232f4c5c7810939b3486fa78d666c2","2",$urlLimit));
+        //echo json_encode($this->caseByType("hostname","sdvsrgter.gb.net","2",$urlLimit));
+        //echo json_encode($this->caseByType("IPv4","91.62.197.13","2",$urlLimit));
+        // echo json_encode($this->caseByType("IPv6","2604:a880:0:1010::b:4001","2",$urlLimit));
+        // echo json_encode($this->caseByType("NIDS","2808228","2",$urlLimit));
+
+        // echo json_encode($this->caseByType("URL","http%3A%252F%252Fwww.pooya.novin52.com%252F","2",$urlLimit));
+        echo json_encode($this->caseByType("YARA","e0f74136e9edcb8b4c67274fb5c3f5885270de33","2",$urlLimit));
+        //$this->testfun();
     }
 
     public function testfun(){
@@ -124,9 +138,10 @@ class OTXFeedPulse extends Command
                 //nodata
             } else if ($type == "SSLCertFingerprint" || $type == "BitcoinAddress") {
                 //canclick but nodata
+                $allRow = (object) array();
+                $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+
             } else if ($type == "CVE") {
-                //caseByType
-                //https://otx.alienvault.com/otxapi/indicators/cve/general/CVE-2017-0199
                 $url_1 = "https://otx.alienvault.com/otxapi/indicators/cve/general/" . $indicatorName;
                 $reconCall = $this->reconnnect($url_1, $urlLimit);
                 if ($reconCall["success"]) {
@@ -140,6 +155,212 @@ class OTXFeedPulse extends Command
                     $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
                     if(!empty($otxBasicData["pulse_info"]["pulses"])){
                        $checkSuccess = $this->savePulseRef($otxBasicData["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "domain") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicators/domain/general/" . $indicatorName;
+                $url_2 = "https://otx.alienvault.com/otxapi/indicators/domain/url_list/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = json_decode($reconCall_2["result"], true);
+                    $allRow = (object) array(
+                    "IP ADDRESS" => isset($otxBasicData_2["url_list"][0]["result"]["urlworker"]["ip"])?$otxBasicData_2["url_list"][0]["result"]["urlworker"]["ip"]:""
+                    );
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "email") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicators/email/general/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                if ($reconCall_1["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+
+                    $allRow = (object) array();
+
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "FileHash-MD5" ||$type == "FileHash-SHA1" ||$type == "FileHash-SHA256") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/file/general/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+
+                $url_2 = "https://otx.alienvault.com/otxapi/indicator/file/analysis/" . $indicatorName;
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = json_decode($reconCall_2["result"], true);
+
+                    if($otxBasicData_2["analysis"] != null){
+                        $External_Hosts = implode(', ', array_column(isset($otxBasicData_2["analysis"]["plugins"]["cuckoo"]["result"]["network"]["tcp"])?$otxBasicData_2["analysis"]["plugins"]["cuckoo"]["result"]["network"]["tcp"]:[] , 'dst'));
+                        $External_Domains = implode(', ', array_column(isset($otxBasicData_2["analysis"]["plugins"]["cuckoo"]["result"]["network"]["domains"])?$otxBasicData_2["analysis"]["plugins"]["cuckoo"]["result"]["network"]["domains"]:[] , 'domain'));
+                        $File_Type = (!empty($otxBasicData_2["analysis"]["info"]["results"]["file_class"])?$otxBasicData_2["analysis"]["info"]["results"]["file_class"]." - ":"").(isset($otxBasicData_2["analysis"]["info"]["results"]["file_type"])?$otxBasicData_2["analysis"]["info"]["results"]["file_type"]:"");
+                        $Antivirus_Detection = isset($otxBasicData_2["analysis"]["plugins"]["msdefender"]["results"]["detection"])?$otxBasicData_2["analysis"]["plugins"]["msdefender"]["results"]["detection"]:"";
+                        if($Antivirus_Detection=="")
+                            $Antivirus_Detection = isset($otxBasicData_2["analysis"]["plugins"]["avast"]["results"]["detection"])?$otxBasicData_2["analysis"]["plugins"]["avast"]["results"]["detection"]:"";
+                        $allRow = (object) array(
+                            "Analysis Date" => isset($otxBasicData_2["analysis"]["datetime_int"])?$otxBasicData_2["analysis"]["datetime_int"]:"",
+                            "Score" => isset($otxBasicData_2["analysis"]["plugins"]["cuckoo"]["result"]["info"]["combined_score"])?$otxBasicData_2["analysis"]["plugins"]["cuckoo"]["result"]["info"]["combined_score"]:"",
+                            "Antivirus Detection" => $Antivirus_Detection,
+                            "External Hosts" => $External_Hosts,
+                            "External Domains" =>  $External_Domains,
+                            "File Type" => $File_Type,
+                            "Size" => isset($otxBasicData_2["analysis"]["info"]["results"]["filesize"])?$otxBasicData_2["analysis"]["info"]["results"]["filesize"]:"",
+                            "MD5" => isset($otxBasicData_2["analysis"]["info"]["results"]["md5"])?$otxBasicData_2["analysis"]["info"]["results"]["md5"]:"",
+                            "SHA1" => isset($otxBasicData_2["analysis"]["info"]["results"]["sha1"])?$otxBasicData_2["analysis"]["info"]["results"]["sha1"]:"",
+                            "SHA256" => isset($otxBasicData_2["analysis"]["info"]["results"]["sha256"])?$otxBasicData_2["analysis"]["info"]["results"]["sha256"]:"",
+                            "IMPHASH" => isset($otxBasicData_2["analysis"]["plugins"]["pe32info"]["results"]["imphash"])?$otxBasicData_2["analysis"]["plugins"]["pe32info"]["results"]["imphash"]:"",
+                            "PEHASH" => isset($otxBasicData_2["analysis"]["plugins"]["pe32info"]["results"]["pehash"])?$otxBasicData_2["analysis"]["plugins"]["pe32info"]["results"]["pehash"]:"",
+                            "RichHash" => isset($otxBasicData_2["analysis"]["plugins"]["pe32info"]["results"]["richhash"])?$otxBasicData_2["analysis"]["plugins"]["pe32info"]["results"]["richhash"]:""
+                        );
+                    }else{
+                        $allRow = (object) array();
+                    }
+                   
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "hostname") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/hostname/general/" . $indicatorName;
+                $url_2 = "https://otx.alienvault.com/otxapi/indicator/hostname/url_list/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = json_decode($reconCall_2["result"], true);
+                    $allRow = (object) array(
+                    "IP ADDRESS" => isset($otxBasicData_2["url_list"][0]["result"]["urlworker"]["ip"])?$otxBasicData_2["url_list"][0]["result"]["urlworker"]["ip"]:"",
+                    "DOMAIN" => isset($otxBasicData_2["url_list"][0]["domain"])?$otxBasicData_2["url_list"][0]["domain"]:""
+                    );
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "IPv4") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/IPv4/general/" . $indicatorName;
+                $url_2 = "https://otx.alienvault.com/otxapi/indicator/IPv4/geo/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = json_decode($reconCall_2["result"], true);
+                    $LOCATION =  (isset($otxBasicData_2["city"])?$otxBasicData_2["city"].", ":"").
+                    (isset($otxBasicData_2["country_name"])?$otxBasicData_2["country_name"]:"").
+                    (isset($otxBasicData_2["country_code"])?" --".$otxBasicData_2["country_code"]:"");
+                    $allRow = (object) array(
+                    "LOCATION" => $LOCATION,
+                    "ASN/OWNER" => isset($otxBasicData_2["asn"])?$otxBasicData_2["asn"]:""
+                    );
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "IPv6") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/IPv6/general/" . $indicatorName;
+                $url_2 = "https://otx.alienvault.com/otxapi/indicator/IPv6/geo/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = json_decode($reconCall_2["result"], true);
+                    $LOCATION =  (isset($otxBasicData_2["city"])?$otxBasicData_2["city"].", ":"").
+                    (isset($otxBasicData_2["country_name"])?$otxBasicData_2["country_name"]:"").
+                    (isset($otxBasicData_2["country_code"])?" --".$otxBasicData_2["country_code"]:"");
+                    $allRow = (object) array(
+                    "LOCATION" => $LOCATION,
+                    "ASN/OWNER" => isset($otxBasicData_2["asn"])?$otxBasicData_2["asn"]:""
+                    );
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "NIDS") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/nids/general/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                if ($reconCall_1["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+
+                    $description = isset($otxBasicData_1["base_indicator"]["description"])?$otxBasicData_1["base_indicator"]["description"]:"";
+                    $allRow = (object) array(
+                        "CATEGORY" => isset($otxBasicData_1["category"])?$otxBasicData_1["category"]:"",
+                        "SUBCATION" => isset($otxBasicData_1["subcategory"])?$otxBasicData_1["subcategory"]:"",
+                        "ACTIVITY" => isset($otxBasicData_1["event_activity"])?$otxBasicData_1["event_activity"]:"",
+                        "MALWARE NAME" => isset($otxBasicData_1["malware_name"])?$otxBasicData_1["malware_name"]:""
+                    );
+                    $checkSuccess = $this->saveIndicator_detail_description($indicatorID,$indicatorName,$type,$allRow,$description,'rowDescription')["success"];
+
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "URL") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/url/general/" . $indicatorName;
+                $url_2 = "https://otx.alienvault.com/otxapi/indicator/url/url_list/" . $indicatorName . "?limit=10&page=1";
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = json_decode($reconCall_2["result"], true);
+
+                    $LOCATION =  (isset($otxBasicData_2["city"])?$otxBasicData_2["city"].", ":"").
+                    (isset($otxBasicData_2["country_name"])?$otxBasicData_2["country_name"]:"").
+                    (isset($otxBasicData_2["country_code"])?" --".$otxBasicData_2["country_code"]:"");
+
+                    $allRow = (object) array(
+                    "IP ADDRESS" => isset($otxBasicData_2["url_list"][0]["result"]["urlworker"]["ip"])?$otxBasicData_2["url_list"][0]["result"]["urlworker"]["ip"]:"",
+                    "LOCATION" => $LOCATION,
+                    "HOSTNAME" => isset($otxBasicData_1["hostname"])?$otxBasicData_1["hostname"]:"",
+                    "DOMAIN" => isset($otxBasicData_1["domain"])?$otxBasicData_1["domain"]:"",
+                    "LAST ANALYZED DATE" => isset($otxBasicData_2["url_list"][0]["date"])?$otxBasicData_2["url_list"][0]["date"]:""
+                    );
+                    $checkSuccess = $this->saveIndicator_detail($indicatorID,$indicatorName,$type,$allRow)["success"];
+
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
+                    }
+                } else {
+                    $checkSuccess = false;
+                }
+            } else if ($type == "YARA") {
+                $url_1 = "https://otx.alienvault.com/otxapi/indicator/yara/general/" . $indicatorName;
+                $url_2 = "https://otx.alienvault.com/otxapi/indicator/yara/raw/" . $indicatorName;
+                $reconCall_1 = $this->reconnnect($url_1, $urlLimit);
+                $reconCall_2 = $this->reconnnect($url_2, $urlLimit);
+                if ($reconCall_2["success"]) {
+                    $otxBasicData_1 = json_decode($reconCall_1["result"], true);
+                    $otxBasicData_2 = (string)$reconCall_2["result"];
+                    $allRow = (object) array();
+                    $checkSuccess = $this->saveIndicator_detail_description($indicatorID,$indicatorName,$type,$allRow,$otxBasicData_2,'ruleRow')["success"];
+                    if(!empty($otxBasicData_1["pulse_info"]["pulses"])){
+                       $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"],$indicatorID,$urlLimit)["success"];
                     }
                 } else {
                     $checkSuccess = false;
@@ -188,6 +409,40 @@ class OTXFeedPulse extends Command
         return $dataOut;
     }
 
+    public function saveIndicator_detail_description($indicatorID,$indicatorName,$type,$allRow,$description,$nameDescription)
+    {
+        try{
+            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $updateResult = $collectionBasic->updateOne(
+                ['indicator_id' => $indicatorID],
+                ['$set' => [
+                    'indicatior_name' => $indicatorName,
+                    'type' => $type,
+                    'allrow' => $allRow,
+                    $nameDescription => $description,
+                    'updated_at' => date("Y-m-d H:i:s"),
+                    'updated_by' => "system",
+                ],
+                    '$setOnInsert' => [
+                        'status' => 1,
+                        'created_at' => date("Y-m-d H:i:s"),
+                        'created_by' => "system",
+                        'deleted_at' => null,
+                        'transaction_date' => date("Y-m-d"),
+                    ],
+                ],
+                ['upsert' => true]
+            );
+            $checkSuccess = true;
+        } catch (Exception $e) {
+            $checkSuccess = false;
+        }
+
+        $dataOut["success"] = $checkSuccess;
+        return $dataOut;
+    }
 
     public function savePulseRef($pulses, $indicatorID,$urlLimit)
     { 
