@@ -68,8 +68,8 @@ class OTXMDFeedIndicator extends Command
                         'deleted_at' => null,
                     ]);
                 }
-                //$reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C3h&page=1&limit=100', $urlLimit);
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?type=CVE&include_inactive=0&sort=-modified&q=modified:""&page=1&limit=100', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C12h&page=1&limit=100', $urlLimit);
+                //$reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?type=CVE&include_inactive=0&sort=-modified&q=modified:""&page=1&limit=100', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                 } else {
@@ -563,7 +563,6 @@ class OTXMDFeedIndicator extends Command
                             'indicator_type_counts' => isset($value["indicator_type_counts"]) ? $value["indicator_type_counts"] : "",
                             'references' => isset($references) ? $references : "",
                             'tags' => isset($tags) ? $tags : "",
-                            'groups' => isset($groups) ? $groups : "",
                             'industries' => isset($industries) ? $industries : "",
                             'malware_families' => isset($malware_families) ? $malware_families : "",
                             'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
@@ -571,6 +570,7 @@ class OTXMDFeedIndicator extends Command
                             'updated_by' => "system",
                         ],
                             '$setOnInsert' => [
+                                'groups' => isset($groups) ? $groups : "",
                                 'transcation_id' => null,
                                 'status' => 1,
                                 'created_at' => date("Y-m-d H:i:s"),
