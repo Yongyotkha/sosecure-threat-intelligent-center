@@ -665,7 +665,7 @@ class NewsController extends Controller
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
         $html = '';
-        $Bookmark = Bookmark::orderBy('created_at','desc')->get();
+        $Bookmark = Bookmark::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();
         foreach($Bookmark as $data){
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
             if($check_read_news){

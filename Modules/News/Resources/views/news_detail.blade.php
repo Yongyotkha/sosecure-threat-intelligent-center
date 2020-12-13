@@ -76,7 +76,7 @@
                                 data-toggle="tooltip" data-placement="top" data-original-title="Shared">
                                 <i class="fas fa-share-square"></i>
                             </button>
-                            <div class="menu-shared-main d-none">
+                            <div class="menu-shared-main <!--d-none-->">
                                 <ul class="menu-shared">
                                     <li>
                                         <a href="javascript:void(0)" id="share_facebook" target="_blank">
