@@ -213,7 +213,16 @@ class DataLeakController extends Controller
     }
 
     public function datafeedsocial_datatables(Request $request){
-        $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '')->get();
+        if($request -> search){
+            $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '');
+            if($request -> search){
+                $model = $model->where('keyword', 'LIKE', '%'.$request -> search.'%');
+            }
+            $model = $model->get();
+        }else{
+            $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '')->get();
+        }
+        
         return DataTables::of($model)
         ->editColumn(
             'chk',
