@@ -31,7 +31,7 @@
                     <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create_assets_vulnerability">
+                    <a href="{{route('keyword.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
                         @icon('solid/plus') @langapp('create')
                     </a>
                 </header>
@@ -48,9 +48,9 @@
                                             </label>
                                         </th>
                                         <th>@langapp('keyword')</th>
-                                        <th>Last @langapp('update')</th>
-                                        <th>@langapp('status')</th>
-                                        <th class="no-sort">@langapp('action')</th>
+                                        <th style="width: 150px;">Last @langapp('update')</th>
+                                        <th style="width: 100px;">@langapp('status')</th>
+                                        <th class="no-sort" style="width: 100px;">@langapp('action')</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -128,8 +128,10 @@ $(function() {
 
 
         var table = $('#table_cve_assets').DataTable({
+            pageLength: 50,
             processing: true,
             serverSide: true,
+            destroy: true,
             ajax: {
                 url: '{!! route('KeywordsController.data') !!}',
                 data: {
@@ -170,6 +172,24 @@ $(function() {
             ]
         });
 });
+
+    function change_keyword_active(code) {
+        let checkState = $("#keyword_active_" + code).is(":checked") ? 1 : 0;
+        axios.post('{{route('keyword.change_status')}}', {
+            active: checkState,
+            code: code,
+        }).then(function (response) {
+            toastr.success(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        }).catch(function (error) {
+            var errors = error.response.data.errors;
+            var errorsHtml = "";
+            $.each(errors, function (key, value) {
+                errorsHtml += "<li>" + value[0] + "</li>";
+            });
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
 
 </script>
 @endpush

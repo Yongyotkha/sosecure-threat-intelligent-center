@@ -191,7 +191,7 @@ class KeywordsController extends Controller
     {
         $data['Site_keywords'] = $id;
         // dd($id);
-        return view('sitesettings::modal.update_domain')->with($data);
+        return view('sitesettings::modal.update_keyword')->with($data);
     }
 
     public function delete(Site_keywords $id)//del_domain
