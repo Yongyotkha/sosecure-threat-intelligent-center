@@ -202,17 +202,18 @@ class KeywordsController extends Controller
 
     public function delete_process($id = null)
     {
-
+        $Site_keywords = Site_keywords::where("id",$id)->first();
         $model = Site_keywords::where("id",$id);
         // dd($model);
         $model->delete();
 
-        $site_code = $this->siteSettings->find_code($model->$site_id);
+        // $site_code = $this->siteSettings->find_code($model->$site_id);
+        $SiteSettings = SiteSettings::where('id',$Site_keywords->site_id)->first();
 
         return ajaxResponse(
             [
                 'message'  => langapp('deleted_successfully'),
-                'redirect' => route('keyword.index',['id' => $site_code->code]),
+                'redirect' => route('keyword.index',['id' => @$SiteSettings->code]),
             ],
             true,
             Response::HTTP_OK

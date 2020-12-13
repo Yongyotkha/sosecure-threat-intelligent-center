@@ -365,7 +365,8 @@ class SocialController extends Controller
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
         $html = '';
-        $Bookmark = Bookmarks_social::orderBy('created_at','desc')->get();
+        $Bookmark = Bookmarks_social::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();//->paginate(PAGINATE_NUM);//->get()
+        // $Bookmark = Bookmarks_social::orderBy('created_at','desc')->get();
         foreach($Bookmark as $data){
             $count_view = 0;
             if($data -> data_leak_feed) {
@@ -391,23 +392,34 @@ class SocialController extends Controller
                         <span class="label-text checkbox-news-input"></span>
                     </label>
                 </div>-->
-                <div class="content-news-text">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> data_leak_feed -> code]).'">
-                        <span class="head-news-text">'.$data -> data_leak_feed -> feedcontent.'</span>
-                    </a>
-                    <div class="entry-meta">
-                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> data_leak_feed -> feedtimepost.'</span>
-                        <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
-                        <span><p></p>&nbsp;'.strip_tags($data -> data_leak_feed -> feedcontent).'</p></span>
+
+                <article class="def-rlt">
+                    <div class="entry">
+                        <span class="entry-category">
+                            <a href="#">'.@$data -> data_leak_feed -> source_name.'</a>
+                        </span>
+                        <h3 style="font-size: 16px;">
+                            <a href="'.@$data -> data_leak_feed -> feedlink.'" target="_blank">
+                            '.@$data -> data_leak_feed -> feedcontent.'
+                            </a>
+                        </h3>
+                        <div class="entry-meta">
+                            <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> data_leak_feed -> feedtimepost.'</span>
+                            <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
+                        </div>
+                        <!--<div class="description-text hidden-xs">
+                        <span><p>&nbsp;'.strip_tags(@$data -> data_leak_feed -> feedcontent).'</p></span>
+                        </div>-->
                     </div>
-                </div>
+                </article>
+
                 <!--<div class="content-news-image">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> data_leak_feed -> code]).'">
-                        <img src="'.$data -> data_leak_feed -> logo.'" alt="">
+                    <a href="'.route('news.news_detail_code',['code' => @$data -> data_leak_feed -> code]).'">
+                        <img src="'.@$data -> data_leak_feed -> logo.'" alt="">
                     </a>
                 </div>-->
                 <div class="action-bookmark">';
-                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$data -> data_leak_feed -> id.'" onclick="Bookmarks(this, '.$data -> data_leak_feed -> id.')"></i>';
+                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.@$data -> data_leak_feed -> id.'" onclick="Bookmarks(this, '.@$data -> data_leak_feed -> id.')"></i>';
                     $html .= '</div>
             </div>
             ';
