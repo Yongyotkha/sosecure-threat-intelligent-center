@@ -785,6 +785,8 @@ class RSSFeedSettingsController extends Controller
                         $this->news = [
                             'news' => $RSSNews_check,
                         ];
+
+                        // dd($this->news);
                         Mail::to($data)->send(new NewsMail($this->news));
                     }
                 }
@@ -960,7 +962,7 @@ class RSSFeedSettingsController extends Controller
                 if($email_site_alert) {
                     foreach($email_site_alert as $data){
                         $this->news = [
-                            'news' => $RSSNews_check,
+                            'news' => $RSSNews,
                         ];
                         Mail::to($data)->send(new NewsMail($this->news));
                     }
@@ -1153,6 +1155,7 @@ class RSSFeedSettingsController extends Controller
                                 $this->news = [
                                     'news' => $RSSNews_check,
                                 ];
+                                // dd($this->news);
                                 Mail::to($data)->send(new NewsMail($this->news));
                             }
                         }
@@ -1334,8 +1337,9 @@ class RSSFeedSettingsController extends Controller
                         if($email_site_alert) {
                             foreach($email_site_alert as $data){
                                 $this->news = [
-                                    'news' => $RSSNews_check,
+                                    'news' => $RSSNews,
                                 ];
+                                // dd($this->news);
                                 Mail::to($data)->send(new NewsMail($this->news));
                             }
                         }
