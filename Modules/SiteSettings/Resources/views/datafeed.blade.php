@@ -269,11 +269,11 @@ function table_social_data(){
 
 $('#source_select').select2();
 var data_feed_id = [];
-$('#table_data_feed').on('click', '.select-chk', function () {
+$('#table_data_feed').on('click', '.data_feed_id', function () {
     if ($(this).is(':checked')) {
         $('#btn-change-status').prop("disabled", false);
     } else {
-        if ($('.select-chk').filter(':checked').length < 1){
+        if ($('.data_feed_id').filter(':checked').length < 1){
             $('#btn-change-status').attr('disabled',true);
         }
     }
