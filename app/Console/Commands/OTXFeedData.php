@@ -133,3 +133,15 @@ class OTXFeedData extends Command
        //$this->info("SUCCESS FULLY");
     }
 }
+
+
+//      //$date_now = new \MongoDB\BSON\UTCDateTime(strtotime('now') * 1000);
+ //      $date = date("Y-m-d h:i:sa"); //Current Date
+ //      $tz = new DateTimeZone('Asia/Bangkok'); //Change your timezone
+ //      $date_now = new MongoDB\BSON\UTCDateTime(strtotime($date)*1000);
+ //      // $date_now = $date_now->setTimezone($tz);
+ //      // $date_now->setTimezone($tz);
+ //      // $datetime = $a->toDateTime();
+ //      // $tz = new DateTimeZone('Asia/Bangkok'); //Change your timezone
+ //      // $datetime->setTimezone($tz); //Set timezone
+ //      // $date_now=$datetime->format(DATE_ATOM);

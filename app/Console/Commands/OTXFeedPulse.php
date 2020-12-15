@@ -58,24 +58,37 @@ class OTXFeedPulse extends Command
         // echo json_encode($this->caseByType("NIDS","2808228","2",$urlLimit));
 
         // echo json_encode($this->caseByType("URL","http%3A%252F%252Fwww.pooya.novin52.com%252F","2",$urlLimit));
-        echo json_encode($this->caseByType("YARA","e0f74136e9edcb8b4c67274fb5c3f5885270de33","2",$urlLimit));
-        //$this->testfun();
+        //echo json_encode($this->caseByType("YARA","e0f74136e9edcb8b4c67274fb5c3f5885270de33","2",$urlLimit));
+        $this->testfun();
     }
 
     public function testfun(){
-        $dayMoreThan = 31;
+        $dayMoreThan = 29;
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
         $document = "5555";
-        $document = $collectionBasic->findOne(['indicator_id' => 9992680006873], [
+        $options = [];
+        $document = $collectionBasic->findOne(['indicator_id' => 1679044], [
+           
             'projection' => [
                 "updated_at" => 1,
             ]]);
-
+           // $document->_id->__toString()
+        //echo json_encode(date("Y-m-d H:i:s", $document->updated_at->__toString()));
+       // echo json_encode($document->updated_at->toDateTime()['date']);
+       //echo json_encode($document->updated_at->__toString()/1000);
         if(!empty($document)){
-            $date1 = date_create($document->updated_at);
-            $date2 = date_create(date("Y-m-d H:i:s"));
+            
+            $date1 = $document->updated_at->toDateTime();
+            //$date2 = date_create(date("Y-m-d H:i:s"));  
+            $date2 = date_create("2020-11-10T03:16:54"); 
+            // $date1 = date_create("2020-12-14T03:16:54");
+            echo json_encode($date1);
+            // $date2 = date_create(gmdate("c"));
+            echo json_encode($date2);
+            // $date3 = date_create(date("Y-m-d H:i:s"));
+            // echo json_encode($date3);
             $diff = date_diff($date1, $date2);
             if ($diff->format("%R%a") > $dayMoreThan) {
                 echo ($diff->format("%R%a")."");
