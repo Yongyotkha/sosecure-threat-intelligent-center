@@ -78,11 +78,12 @@ class OTXFeedPulse extends Command
         //echo json_encode(date("Y-m-d H:i:s", $document->updated_at->__toString()));
        // echo json_encode($document->updated_at->toDateTime()['date']);
        //echo json_encode($document->updated_at->__toString()/1000);
-        if(!empty($document)){
+        if(empty($document)){
             
-            $date1 = $document->updated_at->toDateTime();
-            //$date2 = date_create(date("Y-m-d H:i:s"));  
-            $date2 = date_create("2020-11-10T03:16:54"); 
+            // $date1 = $document->updated_at->toDateTime();
+            $date1 = date_create("2018-02-10T23:01:05.367000"); 
+            $date2 = date_create(date("Y-m-d H:i:s"));  
+          
             // $date1 = date_create("2020-12-14T03:16:54");
             echo json_encode($date1);
             // $date2 = date_create(gmdate("c"));
