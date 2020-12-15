@@ -104,9 +104,13 @@ class OTXMDFeedType extends Command
         }
 
         if(isset($error["Exception"])){
-            $this->info(json_encode($error));
+            $this->info("OTX FEED TYPE ERROR SOME CONTENT");
         }else{
-            $this->info("Success Fully");
+            $updateResult2 = $collectionStamp->updateOne(
+                ['_id' => $insertOneResult->getInsertedId()],
+                ['$set' => ['status' => 2]]
+            );
+            $this->info("OTX FEED TYPE SUCCESS");
         }
        
     }

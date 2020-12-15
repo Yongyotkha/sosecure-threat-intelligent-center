@@ -73,6 +73,11 @@
                     Assets
                 </a>
             </li>
+            <li style="padding-left:2rem">
+                <a href="{{route('vulsetting.vul_logs', ['id' => $siteSettings->code])}}">
+                    Logs
+                </a>
+            </li>
         </ul>
     </li>
 

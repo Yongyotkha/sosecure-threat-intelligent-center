@@ -71,26 +71,12 @@
                                 <label for="">Title</label>
                                 <input type="text" class="form-control" name="keywords" id="keywords">
                             </div>
-                            <div class="col-lg-3">
-                                <label for="">Start Date</label>
-                                <div class="input-group date">
-                                    {{-- <input id="start_date" type="text" class="form-control datetimepicker-input" value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date" data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required> --}}
-                                    <input id="start_date" type="text" class="form-control datetimepicker-input" value="{{  timePickerFormat(now()->addHours(0)) }}" name="start_date" data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
-                                    <div class="input-group-addon">
-                                        @icon('solid/calendar-alt', 'text-muted')
+                            <div class="col-lg-6">
+                                <label for="">Select Date</label>
+                                    <div id="date_srange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="">End Date</label>
-                                <div class="input-group date">
-                                    <input id="end_date" type="text" class="form-control datetimepicker-input"
-                                    value="{{  timePickerFormat(now()->addHours(1)) }}" name="end_date"
-                                    data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
-                                    <div class="input-group-addon">
-                                        @icon('solid/calendar-alt', 'text-muted')
-                                    </div>
-                                </div>
                             </div>
                             <div class="col-lg-3">
                                 <label for="">Status</label>
@@ -184,6 +170,7 @@
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
 @include('stacks.css.summernote')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
 @push('pagescript')
@@ -193,22 +180,29 @@
 @include('scripts.summernote')
 @include('stacks.js.markdown')
 @include('stacks.js.hidesettings')
+@include('stacks.js.daterangpicker')
 
 <script>
 
+    var search_val = false;
     var keywords = null;
     var start_date = null;
     var end_date = null;
     var status_news = null;
     var news_source = null;
     var news_category = null;
+    var startDate = null;
+    var endDate = null;
     function search(){
+        search_val = true;
         keywords = $('#keywords').val();
         start_date = $('#start_date').val();
         end_date = $('#end_date').val();
         status_news = $('#status_news').val();
         news_source = $('#news_source').val();
         news_category = $('#news_category').val();
+        startDate =  $("#date_srange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        endDate =  $("#date_srange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         console.log(start_date);
         console.log(status_news);
         console.log(news_source);
@@ -217,6 +211,7 @@
     }
 
         $("#btn_rss_news_reset").click(function() {
+            search_val = false;
             $("#keywords").val('');
             $("#start_date").val('');
             $("#end_date").val('');
@@ -282,6 +277,9 @@ $(function() {
                     d.status_news = status_news;
                     d.news_source = news_source;
                     d.news_category = news_category;
+                    d.search_val = search_val;
+                    d.startDate = startDate;
+                    d.endDate = endDate;
                     {{--return JSON.stringify( d );--}}
                     return d;
 
@@ -527,6 +525,39 @@ $(document).ready(function(){
         document.execCommand("copy");
         document.body.removeChild(tempInput);
     }
+
+
+    $(function() {
+    
+        var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+        var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
+
+        function cb(start, end) {
+            $('#date_srange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            console.log(start.format('YYYY-MM-DD hh:mm A'));
+        }
+
+        $('#date_srange').daterangepicker({
+            timePicker: true,
+            {{--timePicker24Hour: true,--}}
+            startDate: start,
+            endDate: end,
+            locale: {
+                format: 'M/DD hh:mm A'{{--format: 'M/DD HH:mm A'--}}
+            },
+            ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        cb(start, end);
+
+    });
 </script>
 @endpush
 @endsection
