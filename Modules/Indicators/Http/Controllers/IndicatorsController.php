@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\indicators\Entities\OTXtypeData;
 use MongoDB\Client;
+use MongoDB\Client as MongoClient;
 
 class IndicatorsController extends Controller
 {
@@ -468,7 +469,10 @@ class IndicatorsController extends Controller
     }
 
     public function LoadMoreOTX(Request $request)
-    {
+    { //"someField" => array('$ne' => null),   
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new MongoClient("mongodb://10.104.0.7:27017");
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
 
         $date_start = $request->startDate;
         $date_end = $request->endDate;
@@ -510,12 +514,51 @@ class IndicatorsController extends Controller
         // }
         $data = '';
         // dd($news);
+        $_search = array('status' => 1,
+            'deleted_at' => null);
+        $_sort = [];
+        if ($request->target == 'Recently Modified') {
+            $_sort = [
+                'transcation_id' => -1,
+                '_id' => 1,
+            ];
+        } else if ($request->target == 'Least Recently Modified') {
+            $_sort = [
+                'transcation_id' => 1,
+                '_id' => -1,
+            ];
+        } else if ($request->target == 'Name Descending') {
+            $_sort = [
+                'indicator' => -1,
+            ];
+        } else if ($request->target == 'Name Ascending') {
+            $_sort = [
+                'indicator' => 1,
+            ];
+        } else {
+            $_sort = [
+                'transcation_id' => -1,
+                '_id' => 1,
+            ];
+        }
+
         if ($request->f_search == 1) {
 
             if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
+                
+                if ($request->keywords) {
+                    $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
+                } 
 
+                if ($request->type) {
+                    $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
+                }
+
+                if ($request->startDate&&$request->endDate) {
+                    $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
+                }
+                
                 if ($request->type && $request->keywords && $request->startDate) {
-
                     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
                 } else if ($request->type && $request->keywords) {
 
@@ -536,6 +579,8 @@ class IndicatorsController extends Controller
 
                     $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
                 }
+
+
                 if ($request->target == 'Recently Modified') {
                     $data = $data->orderBy('updated_at', 'desc');
                 } else if ($request->target == 'Least Recently Modified') {
@@ -550,7 +595,7 @@ class IndicatorsController extends Controller
                 $data = $data->paginate(PAGINATE_NUM);
             }
         } else {
-
+            
             if ($request->target == 'Recently Modified') {
                 $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
             } else if ($request->target == 'Least Recently Modified') {
@@ -563,9 +608,24 @@ class IndicatorsController extends Controller
                 $data = OtxIndicatiorData::where("status", '=', 1);
             }
 
+            
+
             $data = $data->paginate(PAGINATE_NUM);
             $count = OtxIndicatiorData::where("status", '=', 1)->count();
         }
+        $cursor = $col_fx_transaction_otx_indicators_data->find(
+           
+        $_search,
+            [
+                'limit' => PAGINATE_NUM,
+                'skip' => ($request->page-1)*PAGINATE_NUM,
+                'sort' => $_sort,
+            ]
+        );
+        //dd($cursor->count());
+        //dateATOM
+        $documentAll = $cursor->toArray();
+        
         //    else {
 
         //         if ($request->target == 'Recently Modified') {
@@ -584,29 +644,47 @@ class IndicatorsController extends Controller
         //         $count = OtxIndicatiorData::where("status", '=', 1)->count();
         //     }
 
-        foreach ($data as $data) {
-            //FileHash-PEHASH ไม่มีตัวอย่าง
-            //Osquery
-            //Ja3
+        // foreach ($data as $data) {
+
+        //     //ถ้าเป็น NIDS เอา Title มาแทน indicatior
+
+        //     if ($data->type == "CIDR" || $data->type == "FilePath" || $data->type == "FileHash-IMPHASH" || $data->type == "Mutex" || $data->type == "URI") {
+        //         $linkIndicator =  '<a>';
+        //     } else {
+        //         $linkIndicator =  '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->id . '&&type=' . $data->type . '&&indicator=' . $data->indicatior . '">';
+        //     }
+        //     $html .= ' <ul class="list-indicators">
+        //                 <li>
+        //                     ' . $linkIndicator . '
+        //                         <h1 class="primary-text">' . $data->indicatior . '</h1>
+                                
+                                
+                               
+        //                         <span class="secondary-text">Type : ' . $data->type . '</span>
+        //                     </a>
+        //                 </li></ul>';
+        // }
+        if(!empty($documentAll))
+        foreach ($documentAll as $data) {
 
             //ถ้าเป็น NIDS เอา Title มาแทน indicatior
-
-            if ($data->type == "CIDR" || $data->type == "FilePath" || $data->type == "FileHash-IMPHASH" || $data->type == "Mutex" || $data->type == "URI") {
-                $linkIndicator = '<a>';
+            if ($data->type == "CIDR"  || $data->type == "FileHash-IMPHASH"|| $data->type == "FileHash-PEHASH" || $data->type == "FilePath" || $data->type == "Mutex" || $data->type == "URI"|| $data->type == "JA3"|| $data->type == "osquery") {
+                $linkIndicator =  '<a>';
             } else {
-                $linkIndicator = '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->id . '&&type=' . $data->type . '&&indicator=' . $data->indicatior . '">';
+                $linkIndicator =  '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->indicator_id . '&&type=' . $data->type . '&&indicator=' . $data->indicator . '">';
             }
             $html .= ' <ul class="list-indicators">
                         <li>
                             ' . $linkIndicator . '
-                                <h1 class="primary-text">' . $data->indicatior . '</h1>
-
-
-
+                                <h1 class="primary-text">' . $data->indicator . '</h1>
+                                
+                                
+                               
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
                         </li></ul>';
         }
+
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
@@ -628,20 +706,133 @@ class IndicatorsController extends Controller
         $db_name = 'sosecure_threatintelligent';
         $db = $client->$db_name;
         $collection = $db->fx_otx_events;
-        $where = array(
-            'status' => 1,
-        );
+        // $where = array(
+        //     'status' => 1,
+        // );
+
+        $query = [
+            'status' => 1
+        ];
+        
+        $options = [
+            'sort' => [
+                'modified' => -1
+            ],
+            'skip' => 10,
+            'limit' => 5
+        ];
+        
+        $cursor = $collection->find($query, $options);
+
+        $html = '';
+        $head_table = '';
+        $head_table .= '<table class="table table-striped" id="table_events">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>No</th>
+                                    <th>Event Name</th>
+                                    <th>Group</th>
+                                    <th>Tags</th>
+                                    <th>Attr</th>
+                                    <th>Published</th>
+                                    <th>Last Status</th>
+                                    <th>DateTime</th>
+                                    <th>View</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        <tbody>';
+
+        $html .= $head_table;
+
+        function check_publish($val) {
+            if($val==1) {
+                $result = '<i class="fas fa-check"></i>';
+            } else {
+                $result = '';
+            }
+            return $result;
+        }
+        function check_last_status($val) {
+            if($val== true) {
+                $result = 'Modified';
+            } else {
+                $result = 'Created';
+            }
+            return $result;
+        }
+        function change_date_utc_to_thai($val) {
+            // if($val== true) {
+            //     $result = 'Modified';
+            // } else {
+            //     $result = 'Created';
+            // }
+
+
+            $tz = new \DateTimeZone('Asia/Bangkok');
+            // $start = '2020-01-01 00:00:00';
+            // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
+    
+            // print_r($dateStart->toDateTime()->format(DATE_RSS));
+            $date_start = $val->toDateTime();
+    
+            $date_start->setTimezone($tz);
+    
+            $start = $date_start->format(DATE_ATOM);
+            $return_date = date("Y-m-d",strtotime($start));
+    
+            // echo $start;
+
+
+            return $return_date;
+        }
+        foreach ($cursor as $document) {
+            $html .= '
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input value="'.$document['_id'].'" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </td>
+                                <td>1</td>
+                                <td>'.$document['name'].'</td>
+                                <td>'.$document['groups'].'</td>
+                                <td>'.$document['tags'].'</td>
+                                <td>
+                                    <a href="">5421</a>
+                                </td>
+                                <td>'.check_publish($document['public']).'</td>
+                                <td>'.check_last_status($document['is_modified']).'</td>
+                                <td>'.change_date_utc_to_thai($document['modified']).'</td>
+                                <td>'.$document['count_view'].'</td>
+                                <td>
+                                    <a href="#" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                </td>
+                            </tr>
+                        ';
+            // dd($document['_id']);
+        }
+
+        $html .= '</tbody>
+            </table>';
+
+        // dd($cursor);
         // $cursor = $collection->find($where,['projection'=>['_id'=>0]]);
-        $cursor = $collection->find($where);
-        $model= $cursor->toArray();
+        // $cursor = $collection->find($where);
+
+        // $model= $cursor->toArray();
+
+        // dd($model);
         // $model = $model[0];
         // unset($model['_id']);
-        if($model) {
-            // foreach($model as $key => $model_val) {
-            //     dd($model_val->name);
-            //     dd($model_val->name);
-            // }
-        }
+
 
         // $collection = collect(['name', 'public']);
         // $collection = collect([
@@ -651,8 +842,6 @@ class IndicatorsController extends Controller
 
         // $collection->paginate(15);
         // dd($collection);
-        $test = mysqli_num_rows($model);
-        dd($test);
 
         // $combined = $collection->combine(['George', 1]);
         // $combined->all();
@@ -661,47 +850,54 @@ class IndicatorsController extends Controller
         // $model = collect($model);
         //dd($model[0]->TLP);
 
-        return DataTables::of($collection->toJson())
-        ->editColumn('chk', function ( $collection) {
-            return '<label><input type="checkbox"  name="events_id" class="events_id" value=""><span class="label-text"></span></label>';
-        })
-        ->addColumn('no', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('even_name', function ( $collection) {
+        // return DataTables::of($collection->toJson())
+        // ->editColumn('chk', function ( $collection) {
+        //     return '<label><input type="checkbox"  name="events_id" class="events_id" value=""><span class="label-text"></span></label>';
+        // })
+        // ->addColumn('no', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('even_name', function ( $collection) {
             
-            return $collection->product;
-        })
+        //     return $collection->product;
+        // })
 
-        ->addColumn('group', function ( $collection) {
+        // ->addColumn('group', function ( $collection) {
         
-            return "-";
-        })
-        ->addColumn('tags', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('attr', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('published', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('last_status', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('date_time', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('view', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('action', function ( $collection) {
-            return '-';
-        })
+        //     return "-";
+        // })
+        // ->addColumn('tags', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('attr', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('published', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('last_status', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('date_time', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('view', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('action', function ( $collection) {
+        //     return '-';
+        // })
 
 
-        ->rawColumns(['chk', 'no', 'even_name', 'group', 'tags', 'attr', 'published', 'last_status', 'date_time', 'view', 'action'])
-        ->toJson();
+        // ->rawColumns(['chk', 'no', 'even_name', 'group', 'tags', 'attr', 'published', 'last_status', 'date_time', 'view', 'action'])
+        // ->toJson();
+        // return $html;
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+            ];
+            return response()->json($data);
+        }
      
     }
 

@@ -196,88 +196,37 @@
         cb(start, end);
     });
 
-    $(function () {
-        datatable();
+    $(function() {
+        load_table(1);
     });
 
-    function datatable(){
 
-
-        $('#table_events').DataTable({
-            pageLength: 50,
-            processing: true,
-            serverSide: true,
-            destroy: true,
-            dom: 'Blfrtip',
-
-            ajax: {
-                url: '{!! route('indicators.events_table') !!}',       
-                type: "POST",
-
-                initComplete : function( settings, json){
-                $('[data-toggle="tooltip"]').tooltip(); 
-                },
-                columns: [
-                {
-                    data: 'chk',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                    className: 'w-10'
-                },
-                {
-                    data: 'no',
-                    name: 'no',
-
-                },
-                {
-                    data: 'even_name',
-                    name: 'even_name'
-                },
-                {
-                    data: 'group',
-                    name: 'group'
-                },
-                {
-                    data: 'tags',
-                    name: 'tags',
-                },
-                {
-                    data: 'attr',
-                    name: 'attr',
-
-                },
-                {
-                    data: 'published',
-                    name: 'published',
-
-                },
-                {
-                    data: 'last_status',
-                    name: 'last_status',
-
-                },
-                {
-                    data: 'date_time',
-                    name: 'date_time',
-
-                },
-                {
-                    data: 'view',
-                    name: 'view',
-
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-
-                },
-
-                ]
-            }
-
+    function load_table(page=1){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.events_table')!!}',
+            type: "post",
+            data:({
+                page : page
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+        }).done(function(data){
+	    loading('stop_load');
+            
+            {{--$('#count_news').text(data.count);--}}
+            $("#table_events").html(data.html);
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+	    loading('stop_load');
+            console.log("No response from server");
         });
     }
+
+
+
     
    
     

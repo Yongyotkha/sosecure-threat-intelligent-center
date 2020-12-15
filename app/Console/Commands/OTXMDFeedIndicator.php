@@ -83,11 +83,11 @@ class OTXMDFeedIndicator extends Command
                     if (!empty($otxFeedData["results"])) {
                         foreach ($otxFeedData["results"] as $value) {
                             try {
-                                $collectionData = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicatiors_data;
+                                $collectionData = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
                                 $updateResult = $collectionData->updateOne(
                                     ['indicator_id' => $value["id"]],
                                     ['$set' => [
-                                        'indicatior' => $value["indicator"],
+                                        'indicator' => $value["indicator"],
                                         'type' => $value["type"],
                                         'tile' => $value["title"],
                                         'desciption' => $value["description"],
@@ -472,7 +472,7 @@ class OTXMDFeedIndicator extends Command
             $updateResult = $collectionBasic->updateOne(
                 ['indicator_id' => $indicatorID],
                 ['$set' => [
-                    'indicatior_name' => $indicatorName,
+                    'indicator_name' => $indicatorName,
                     'type' => $type,
                     'allrow' => $allRow,
                     'updated_at' => $date_now,
@@ -507,7 +507,7 @@ class OTXMDFeedIndicator extends Command
             $updateResult = $collectionBasic->updateOne(
                 ['indicator_id' => $indicatorID],
                 ['$set' => [
-                    'indicatior_name' => $indicatorName,
+                    'indicator_name' => $indicatorName,
                     'type' => $type,
                     'allrow' => $allRow,
                     $nameDescription => $description,
@@ -603,6 +603,7 @@ class OTXMDFeedIndicator extends Command
                             '$setOnInsert' => [
                                 'created' => null,
                                 'expiration' => null,
+                                'is_active' => null,
                                 'status' => 1,
                                 'created_at' => $date_now ,
                                 'created_by' => "system",

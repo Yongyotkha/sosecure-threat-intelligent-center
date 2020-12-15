@@ -53,6 +53,7 @@ class NewsController extends Controller
         $SiteSettings = SiteSettings::all();
         $RSSNews_all = RSSNews::all();
         $SiteNewsRelated = SiteNewsRelated::all();
+        $SiteCategory = SiteCategory::all();
 
         $news_array = array();
         // $new_array_sub = [];
@@ -68,88 +69,121 @@ class NewsController extends Controller
                         $new_array_sub['cate_id'] = $val2->news_category_id;
        
                     }
-                    array_push($news_array, $new_array_sub);
+                    $new_array_sub_cal = array_filter($new_array_sub);
+                    array_push($news_array, $new_array_sub_cal);
                 }
 
             }
         }
 
         $site_array = [];
-        if($SiteSettings) {
-            foreach($SiteSettings as $key => $val) {
+        // if($SiteSettings) {
+        //     foreach($SiteSettings as $key => $val) {
+                
+        //         // $val->get_cate[0]->get_cate_name->id;
+        //         // $site_array_sub = [];
+        //         if($val) {
+        //             $val_news_id = $val->id;
+        //             if($val->get_categorys) {
+        //                 foreach($val->get_categorys as $key2 => $val2) {
+        //                     if($val2) {
+        //                         $site_array_sub['site_id'] = $val_news_id;
+        //                         $site_array_sub['cate_id'] = $val2->category_id;
+        //                     }
+        //                 }
+        //                 $site_array_sub_cal = array_filter($site_array_sub);
+        //                 array_push($site_array, $site_array_sub_cal);
+        //             }
+        //         }
+        //     }
+        // }
+
+        if($SiteCategory) {
+            foreach($SiteCategory as $key => $val) {
                 
                 // $val->get_cate[0]->get_cate_name->id;
-                $site_array_sub = [];
+                // $site_array_sub = [];
                 if($val) {
-                    $val_news_id = $val->id;
-                    if($val->get_categorys) {
-                        foreach($val->get_categorys as $key2 => $val2) {
-                            if($val2) {
-                                $site_array_sub['site_id'] = $val_news_id;
-                                $site_array_sub['cate_id'] = $val2->category_id;
-                            }
-                        }
-                        array_push($site_array, $site_array_sub);
+                    $val_site_id = $val->site_id;
+                    if($val->site_id) {
+                        
+                                $site_array_sub['site_id'] = $val_site_id;
+                                $site_array_sub['cate_id'] = $val->category_id;
+                            
+                        $site_array_sub_cal = array_filter($site_array_sub);
+                        array_push($site_array, $site_array_sub_cal);
                     }
                 }
             }
         }
+        
 
         $site_news_related = [];
         if($SiteNewsRelated) {
             foreach($SiteNewsRelated as $key => $val) {
-                $val_news_related_id = $val->site_id;
-                $val_news_id = $val->news_id;
-                // $val->get_cate[0]->get_cate_name->id;
-                $news_related_array_sub = [];
-                if($val->get_news) {
-                    foreach($val->get_news[0]->get_cate as $key2 => $val2) {
-
-                        $news_related_array_sub['site_id'] = $val_news_related_id;
-                        $news_related_array_sub['cate_id'] = $val2->news_category_id;
-                        $news_related_array_sub['news_id'] = $val_news_id;
-
+                if($val) {
+                    $val_news_related_id = $val->site_id;
+                    $val_news_id = $val->news_id;
+                    // $val->get_cate[0]->get_cate_name->id;
+                    
+                    if($val->get_news) {
+                        $news_related_array_sub = [];
+                        foreach(@$val->get_news as $key2 => $val2) {
+    
+                            $news_related_array_sub['site_id'] = $val_news_related_id;
+                            // $news_related_array_sub['cate_id'] = @$val2->news_category_id;
+                            $news_related_array_sub['cate_id'] = @$val2->get_cate[0]->news_category_id;
+                            $news_related_array_sub['news_id'] = $val_news_id;
+    
+                        }
+                        $news_related_array_sub_cal = array_filter($news_related_array_sub);
+                        array_push($site_news_related, $news_related_array_sub_cal);
                     }
-                    array_push($site_news_related, $news_related_array_sub);
                 }
-
             }
         }
 
-        // $site_and_news_array_all = [];
-        // if($news_array) {
-        //     foreach($news_array as $news_key => $news_val) {
-        //         // dd($news_val['news_id']);
-        //         if($news_val) {
-        //             if($site_array) {
-        //                 $site_and_news_array = [];
-        //                 foreach($site_array as $site_key => $site_val) {
-        //                     if($site_val) {
-        //                         if(@$news_val['cate_id'] == @$site_val['cate_id']) {
-        //                             if(@$site_val['cate_id'] && @$site_val['site_id'] && @$news_val['news_id'] && @$news_val['cate_id']) {
+        $site_and_news_array_all = [];
+        if($news_array) {
+            foreach($news_array as $news_key => $news_val) {
+                // dd($news_val['news_id']);
+                if($news_val) {
+                    if($site_array) {
+                        $site_and_news_array = [];
+                        foreach($site_array as $site_key => $site_val) {
+                            if($site_val) {
+                                if(@$news_val['cate_id'] == @$site_val['cate_id']) {
+                                    if(@$site_val['cate_id'] && @$site_val['site_id'] && @$news_val['news_id'] && @$news_val['cate_id']) {
 
                                         
-        //                                         $site_and_news_array['site_id'] = $site_val['site_id'];
-        //                                         $site_and_news_array['cate_id'] = $site_val['cate_id'];
-        //                                         $site_and_news_array['news_id'] = $news_val['news_id'];
+                                                $site_and_news_array['site_id'] = $site_val['site_id'];
+                                                $site_and_news_array['cate_id'] = $site_val['cate_id'];
+                                                $site_and_news_array['news_id'] = $news_val['news_id'];
                                         
                                         
-        //                             }
+                                    }
                   
     
-        //                         }
-        //                         array_push($site_and_news_array_all, $site_and_news_array);
-        //                     }
-        //                 }
-        //             }
-        //         }  
-        //     }
-        // }
+                                }
+                                
+                            }
+                        }
+                        array_push($site_and_news_array_all, $site_and_news_array);
+                    }
+                }  
+            }
+        }
+
+        // $site_array = array_filter($site_array);
+        // $result=array_diff($site_news_related[0],$site_and_news_array_all[0]);
+        $result=array_diff($news_related_array_sub_cal,$site_and_news_array);
+
 
         // dd($news_array);
         // dd($site_array);
-        dd($site_news_related);
-        // dd($site_and_news_array_all);
+        // dd($site_news_related);
+        // print_r($result);
+        dd($site_and_news_array_all);
         // dd(array_unique($site_and_news_array_all));
         // dd($SiteNewsRelated[0]->get_news[0]->get_cate);
         // dd($SiteNewsRelated[0]->get_news->get_cate);
