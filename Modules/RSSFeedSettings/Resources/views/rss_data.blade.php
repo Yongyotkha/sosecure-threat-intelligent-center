@@ -73,7 +73,7 @@
                     <section class="panel panel-default">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
-                                <div class="col-lg-4">
+                                <div class="col-lg-3">
                                     <label for="">Keywords</label>
                                    <input type="text" class="form-control" name="keywords" id="keywords">
                                 </div>
@@ -87,14 +87,14 @@
                                         </div>
                                     </div>
                                 </div> --}}
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <label for="">Select Date</label>
                                     <div id="date_srange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-3">
                                     <label for="">Status</label>
                                     <select id="status" class="select2-option form-control">
                                         <option value="1" selected>All</option>
@@ -105,7 +105,7 @@
                                 
                             </div>
                             <div class="row">
-                                <div class="col-lg-4">
+                                <div class="col-lg-3">
                                     <label for="">Source</label>
                                     <input type="text" class="form-control" name="source" id="source">
                                 </div>
