@@ -245,7 +245,7 @@ class RSSFeedSettingsController extends Controller
         //     $model = TransactionRssData::all();
         // }
 
-        if($request -> keywords || $request -> start_date || $request -> end_date || $request -> status_news || $request -> news_source || $request -> news_category){
+        if(($request -> keywords || $request -> startDate || $request -> endDate || $request -> status_news || $request -> news_source || $request -> news_category) && $request -> search_val == true){
             $model = RSSNews::where('status', 1);
             if($request -> keywords){
                 $model_where = RSSNews::where('status', 1)->where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
@@ -257,12 +257,41 @@ class RSSFeedSettingsController extends Controller
                 }
                 
             }
-            if($request -> start_date){
-                $start_date = date("Y-m-d H:i:s",strtotime($request -> start_date));
-                $end_date = date("Y-m-d H:i:s",strtotime($request -> end_date));
+            // if($request -> start_date){
+            //     $start_date = date("Y-m-d H:i:s",strtotime($request -> start_date));
+            //     $end_date = date("Y-m-d H:i:s",strtotime($request -> end_date));
+            //     // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+            //     $model -> whereBetween('created_at',array($start_date,$end_date));
+            // }
+
+            if($request -> startDate){
+                $date_start = $request->startDate;
+                $date_end = $request->endDate;
+
+                $date_start_explode = explode(" ",$date_start);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start);
+
+                $date_end_explode = explode(" ",$date_end);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // dd($date_end_time_time);
+
                 // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                $model -> whereBetween('created_at',array($start_date,$end_date));
+                $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
             }
+
+
             // dd($request -> status_news);
             if($request -> status_news){
                 if($request -> status_news == 1 || $request -> status_news == 2){
