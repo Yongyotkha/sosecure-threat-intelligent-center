@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\indicators\Entities\OTXtypeData;
 use MongoDB\Client;
+use MongoDB\Client as MongoClient;
 
 class IndicatorsController extends Controller
 {
@@ -468,7 +469,10 @@ class IndicatorsController extends Controller
     }
 
     public function LoadMoreOTX(Request $request)
-    {
+    { //"someField" => array('$ne' => null),   
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new MongoClient("mongodb://10.104.0.7:27017");
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
 
         $date_start = $request->startDate;
         $date_end = $request->endDate;
@@ -510,12 +514,51 @@ class IndicatorsController extends Controller
         // }
         $data = '';
         // dd($news);
+        $_search = array('status' => 1,
+            'deleted_at' => null);
+        $_sort = [];
+        if ($request->target == 'Recently Modified') {
+            $_sort = [
+                'transcation_id' => -1,
+                '_id' => 1,
+            ];
+        } else if ($request->target == 'Least Recently Modified') {
+            $_sort = [
+                'transcation_id' => 1,
+                '_id' => -1,
+            ];
+        } else if ($request->target == 'Name Descending') {
+            $_sort = [
+                'indicator' => -1,
+            ];
+        } else if ($request->target == 'Name Ascending') {
+            $_sort = [
+                'indicator' => 1,
+            ];
+        } else {
+            $_sort = [
+                'transcation_id' => -1,
+                '_id' => 1,
+            ];
+        }
+
         if ($request->f_search == 1) {
 
             if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
+                
+                if ($request->keywords) {
+                    $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
+                } 
 
+                if ($request->type) {
+                    $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
+                }
+
+                if ($request->startDate&&$request->endDate) {
+                    $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
+                }
+                
                 if ($request->type && $request->keywords && $request->startDate) {
-
                     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
                 } else if ($request->type && $request->keywords) {
 
@@ -536,6 +579,8 @@ class IndicatorsController extends Controller
 
                     $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
                 }
+
+
                 if ($request->target == 'Recently Modified') {
                     $data = $data->orderBy('updated_at', 'desc');
                 } else if ($request->target == 'Least Recently Modified') {
@@ -550,7 +595,7 @@ class IndicatorsController extends Controller
                 $data = $data->paginate(PAGINATE_NUM);
             }
         } else {
-
+            
             if ($request->target == 'Recently Modified') {
                 $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
             } else if ($request->target == 'Least Recently Modified') {
@@ -563,9 +608,24 @@ class IndicatorsController extends Controller
                 $data = OtxIndicatiorData::where("status", '=', 1);
             }
 
+            
+
             $data = $data->paginate(PAGINATE_NUM);
             $count = OtxIndicatiorData::where("status", '=', 1)->count();
         }
+        $cursor = $col_fx_transaction_otx_indicators_data->find(
+           
+        $_search,
+            [
+                'limit' => PAGINATE_NUM,
+                'skip' => ($request->page-1)*PAGINATE_NUM,
+                'sort' => $_sort,
+            ]
+        );
+        //dd($cursor->count());
+        //dateATOM
+        $documentAll = $cursor->toArray();
+        
         //    else {
 
         //         if ($request->target == 'Recently Modified') {
@@ -584,29 +644,47 @@ class IndicatorsController extends Controller
         //         $count = OtxIndicatiorData::where("status", '=', 1)->count();
         //     }
 
-        foreach ($data as $data) {
-            //FileHash-PEHASH ไม่มีตัวอย่าง
-            //Osquery
-            //Ja3
+        // foreach ($data as $data) {
+
+        //     //ถ้าเป็น NIDS เอา Title มาแทน indicatior
+
+        //     if ($data->type == "CIDR" || $data->type == "FilePath" || $data->type == "FileHash-IMPHASH" || $data->type == "Mutex" || $data->type == "URI") {
+        //         $linkIndicator =  '<a>';
+        //     } else {
+        //         $linkIndicator =  '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->id . '&&type=' . $data->type . '&&indicator=' . $data->indicatior . '">';
+        //     }
+        //     $html .= ' <ul class="list-indicators">
+        //                 <li>
+        //                     ' . $linkIndicator . '
+        //                         <h1 class="primary-text">' . $data->indicatior . '</h1>
+                                
+                                
+                               
+        //                         <span class="secondary-text">Type : ' . $data->type . '</span>
+        //                     </a>
+        //                 </li></ul>';
+        // }
+        if(!empty($documentAll))
+        foreach ($documentAll as $data) {
 
             //ถ้าเป็น NIDS เอา Title มาแทน indicatior
-
-            if ($data->type == "CIDR" || $data->type == "FilePath" || $data->type == "FileHash-IMPHASH" || $data->type == "Mutex" || $data->type == "URI") {
-                $linkIndicator = '<a>';
+            if ($data->type == "CIDR"  || $data->type == "FileHash-IMPHASH"|| $data->type == "FileHash-PEHASH" || $data->type == "FilePath" || $data->type == "Mutex" || $data->type == "URI"|| $data->type == "JA3"|| $data->type == "osquery") {
+                $linkIndicator =  '<a>';
             } else {
-                $linkIndicator = '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->id . '&&type=' . $data->type . '&&indicator=' . $data->indicatior . '">';
+                $linkIndicator =  '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->indicator_id . '&&type=' . $data->type . '&&indicator=' . $data->indicator . '">';
             }
             $html .= ' <ul class="list-indicators">
                         <li>
                             ' . $linkIndicator . '
-                                <h1 class="primary-text">' . $data->indicatior . '</h1>
-
-
-
+                                <h1 class="primary-text">' . $data->indicator . '</h1>
+                                
+                                
+                               
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
                         </li></ul>';
         }
+
         if ($request->ajax()) {
             $data = [
                 "html" => $html,

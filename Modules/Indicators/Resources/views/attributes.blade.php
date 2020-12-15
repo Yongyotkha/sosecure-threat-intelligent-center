@@ -125,7 +125,8 @@
 
                 <section id="scrollable_otx" class="show-indicators">
                     <div id="list_otx"></div>
-                    <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading</div>
+                    <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading&nbsp;<span
+                            class="content-spinner-loading-inline"></span></div>
                 </section>
             </section>
         </section>
@@ -165,11 +166,11 @@
 
         if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
             page++;
-
             if(page_stop){
                 {{--load_more(page);--}}
                 load_more_search(page,f_search);
             }
+            
         }
     });
 
@@ -250,19 +251,15 @@
 
 
     function sort_by(event) {
-    target = event.target.innerHTML;
-    page = 1;
-    page_stop = true;
-    if(f_search == 0){
-
-        load_more(page);
-    }else{
-        load_more_search(page,f_search);
-
-        
+        target = event.target.innerHTML;
+        page = 1;
+        page_stop = true;
+        if(f_search == 0){
+            load_more(page);
+        }else{
+            load_more_search(page,f_search);
+        }
     }
-    
-}
 
     
 
@@ -287,6 +284,7 @@
             },
         }).done(function(data){
             {{--loading('stop_load');--}}
+            console.log(data);
             if(data.html.length == 0){
                 
                 page_stop = false;
@@ -301,6 +299,8 @@
             console.log("No response from server");
         });
     }
+
+    
     function load_more_search(page,f_search){
         if(page == 1) {
             $("#list_otx").html('');   
@@ -329,6 +329,7 @@
                 $('.ajax-loading').show();
             },
         }).done(function(data){
+            console.log(data);
             {{--loading('stop_load');--}}
             if(data.html.length == 0){
                 page_stop = false;
