@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
-
+use MongoDB\BSON\UTCDateTime;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -38,8 +38,9 @@ class OTXMDFeedType extends Command
      */
     public function handle()
     {
-
+        
         try {
+            $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
             $OTX_KEY = env("OTX_KEY", "");
             $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -62,9 +63,9 @@ class OTXMDFeedType extends Command
                 'code' => generator_uuid(),
                 'transaction_date' => date("Y-m-d"),
                 'status' => 1,
-                'created_at' => date("Y-m-d H:i:s"),
+                'created_at' => $date_now,
                 'created_by' => "system",
-                'updated_at' => date("Y-m-d H:i:s"),
+                'updated_at' => $date_now,
                 'updated_by' => "system",
                 'deleted_at' => null,
             ]);
@@ -79,7 +80,7 @@ class OTXMDFeedType extends Command
                         $updateResult = $collection->updateOne(
                             ['name' => $value["name"]],
                             ['$set' => [
-                                'updated_at' => date("Y-m-d H:i:s"),
+                                'updated_at' => $date_now,
                                 'updated_by' => "system",
                                 'slug' => $value["slug"],
                                 'description' => $value["description"],
@@ -90,7 +91,7 @@ class OTXMDFeedType extends Command
                                     'remark' => "system",
                                     'element_count' => 0,
                                     'status' => 1,
-                                    'created_at' => date("Y-m-d H:i:s"),
+                                    'created_at' => $date_now,
                                     'created_by' => "system",
                                     'deleted_at' => null,
                                 ],
