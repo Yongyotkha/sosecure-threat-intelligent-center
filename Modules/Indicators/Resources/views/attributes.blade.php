@@ -39,8 +39,8 @@
         <section id="scroll_otx" class="scrollable wrapper bg-white">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <a class="text-muted" href="{{ route('indicators.events') }}">Events</a> 
-                    | 
+                    <a class="text-muted" href="{{ route('indicators.events') }}">Events</a>
+                    |
                     <a href="{{ route('indicators.attributes') }}" class="text-primary">Attributes</a>
                 </div>
                 <div id="hide-search-advance" class="container-fluid" style="padding: 2rem">
@@ -48,21 +48,28 @@
                         <div class="col-md-12">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search">
+                                <input type="text" class="form-control" name="keyword" id="keyword"
+                                    placeholder="Search">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="">Indicator Type</label>
-                                <select name="type[]" id="type" class="select2-option form-control" multiple="multiple">
+                                <select name="type[]" id="type" class="select2-option form-control" multiple="multiple"
+                                    onchange="changeSite(value)">
 
-                                    @if ($otx_type)
+                                    @if ($cursor)
 
-                                    @foreach ($otx_type as $otx_type)
+                                    {{-- @foreach ($otx_type as $otx_type)
                                     <option value="{{$otx_type->name}}">{{$otx_type->name}}</option>
+                                    @endforeach --}}
+                                    @foreach ($cursor as $document) {
+                                    <option value="{{$document->name}}">{{$document->name}}</option>
+                                    }
                                     @endforeach
-
                                     @endif
+
+
 
                                 </select>
                             </div>
@@ -232,7 +239,8 @@
         page = 1;
         $('#count_news').text(0);
         page_stop = true;
-        load_more_search(page,f_search);
+    
+       
           
 
 
@@ -341,6 +349,12 @@
             console.log("No response from server : search");
         });
     }
+
+    function changeSite(value) {
+        console.log($('#type').val());
+   
+
+   }
 
    
 

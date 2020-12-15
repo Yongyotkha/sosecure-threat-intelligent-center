@@ -23,8 +23,8 @@
         <section class="scrollable wrapper">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a> 
-                    | 
+                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
+                    |
                     <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
                 </div>
                 <div id="hide-advance-search" class="container-fluid" style="padding: 2rem">
@@ -32,14 +32,16 @@
                         <div class="col-md-12">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Event Name</label>
-                                <input type="text" class="form-control" name="event_name" id="event_name" placeholder="Search">
+                                <input type="text" class="form-control" name="event_name" id="event_name"
+                                    placeholder="Search">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="">Group</label>
-                                <select name="group[]" id="type" class="select2-option form-control" multiple="multiple">
-    
+                                <select name="group[]" id="type" class="select2-option form-control"
+                                    multiple="multiple">
+
                                 </select>
                             </div>
                         </div>
@@ -47,7 +49,7 @@
                             <div class="form-group">
                                 <label for="" class="">Tag</label>
                                 <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple">
-    
+
                                 </select>
                             </div>
                         </div>
@@ -70,12 +72,12 @@
                             </button>
                         </div>
                     </div>
-                </div>      
+                </div>
             </section>
 
             <section class="panel panel-default">
                 <div class="table-responsive">
-                    <table class="table table-striped" id="table-events-template">
+                    <table class="table table-striped" id="table_events">
                         <thead>
                             <tr>
                                 <th>
@@ -95,9 +97,9 @@
                                 <th>View</th>
                                 <th>Action</th>
                             </tr>
-                        </thead>   
+                        </thead>
                         <tbody>
-                            <tr>
+                            {{-- <tr>
                                 <td>
                                     <label>
                                         <input value="" type="checkbox" />
@@ -130,10 +132,11 @@
                                     152
                                 </td>
                                 <td>
-                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                            </tr>    
-                        </tbody> 
+                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs btn-info"><i
+                                class="far fa-eye"></i> View</a>
+                            </td>
+                            </tr> --}}
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -158,11 +161,12 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.advanced_search')
 <script>
-  $('.select2-option').select2();
+    $('.select2-option').select2();
 
-  $('#table-events-template').DataTable();
+
 
   $(function() {
+  
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');
 
@@ -191,6 +195,93 @@
 
         cb(start, end);
     });
+
+    $(function () {
+        datatable();
+    });
+
+    function datatable(){
+
+
+        $('#table_events').DataTable({
+            pageLength: 50,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            dom: 'Blfrtip',
+
+            ajax: {
+                url: '{!! route('indicators.events_table') !!}',       
+                type: "POST",
+
+                initComplete : function( settings, json){
+                $('[data-toggle="tooltip"]').tooltip(); 
+                },
+                columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },
+                {
+                    data: 'no',
+                    name: 'no',
+
+                },
+                {
+                    data: 'even_name',
+                    name: 'even_name'
+                },
+                {
+                    data: 'group',
+                    name: 'group'
+                },
+                {
+                    data: 'tags',
+                    name: 'tags',
+                },
+                {
+                    data: 'attr',
+                    name: 'attr',
+
+                },
+                {
+                    data: 'published',
+                    name: 'published',
+
+                },
+                {
+                    data: 'last_status',
+                    name: 'last_status',
+
+                },
+                {
+                    data: 'date_time',
+                    name: 'date_time',
+
+                },
+                {
+                    data: 'view',
+                    name: 'view',
+
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+
+                },
+
+                ]
+            }
+
+        });
+    }
+    
+   
+    
+
 </script>
 
 @endpush

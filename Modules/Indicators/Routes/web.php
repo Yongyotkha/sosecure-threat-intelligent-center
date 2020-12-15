@@ -28,5 +28,6 @@ Route::group(
         Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
         Route::get('/load/general', 'IndicatorsController@load_general')->name('indicators.load_general');
         Route::post('/load/url_list', 'IndicatorsController@load_url_list')->name('indicators.load_url_list');
+        Route::post('events_table', 'IndicatorsController@tableEvents')->name('indicators.events_table')->middleware('can:menu_items');
     }
 );

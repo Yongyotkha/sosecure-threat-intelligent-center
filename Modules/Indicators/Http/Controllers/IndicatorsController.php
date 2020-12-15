@@ -1,13 +1,13 @@
 <?php
 
 namespace Modules\Indicators\Http\Controllers;
-
+use Yajra\DataTables\DataTables;
 use App\Entities\OtxIndicatiorData;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\indicators\Entities\OTXtypeData;
-
+use MongoDB\Client;
 
 class IndicatorsController extends Controller
 {
@@ -35,7 +35,9 @@ class IndicatorsController extends Controller
      */
 
     public function events()
+    
     {
+        
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);
     }
@@ -48,8 +50,30 @@ class IndicatorsController extends Controller
 
     public function attributes()
     {
+        // $client = new Client('mongodb://10.104.0.10:27017');
+        // $collection = $client->sosecure_threatintelligent->fx_otx_type;
+
+        // $query = [
+        //     'status' => 1,
+        // ];
+
+        // $options = [];
+
+        // $cursor = $collection->find($query, $options);
+        // $docs = $cursor->toArray();
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $db_name = 'sosecure_threatintelligent';
+        $db = $client->$db_name;
+        $collection = $db->fx_otx_type;
+        $where = array(
+            'status' => 1,
+        );
+        $cursor = $collection->find($where);   //This is the main line
+        $data['cursor']= $cursor->toArray();
         $data['page'] = langapp('indicators');
         $data['otx_type'] = OTXtypeData::where("status", '=', 1)->get();
+        
         return view('indicators::attributes')->with($data);
     }
 
@@ -61,7 +85,6 @@ class IndicatorsController extends Controller
         $data['otxindicator'] = $request->indicator;
         return view('indicators::detail_indicators')->with($data);
     }
-
 
     public function load_general(Request $request)
     {
@@ -84,16 +107,16 @@ class IndicatorsController extends Controller
             $reqType = 'ssl-cert-fingerprint';
         }
         $reqIndicator = $request->indicator;
-        
-        $bodyData   = $client->request(
+
+        $bodyData = $client->request(
             'GET',
             'https://otx.alienvault.com/otxapi/indicator/' . $reqType . '/general' . '/' . $reqIndicator,
             [
                 'headers' => [
-                    'Accept'       => 'application/json',
+                    'Accept' => 'application/json',
                     'Content-type' => 'application/json',
                     'X-OTX-API-KEY' => $OTX_KEY,
-                ]
+                ],
             ]
         )->getBody();
         $DataotxIndicator = json_decode($bodyData, true);
@@ -102,7 +125,7 @@ class IndicatorsController extends Controller
         $html = '';
         $html .= '<ul class="list-indicators">';
         $isPulse_info = 0;
-        if(!empty($DataotxIndicator["pulse_info"])){
+        if (!empty($DataotxIndicator["pulse_info"])) {
             $isPulse_info = 1;
             $pulseInfo = $DataotxIndicator["pulse_info"];
             foreach ($pulseInfo["pulses"] as $value) {
@@ -110,13 +133,13 @@ class IndicatorsController extends Controller
                 <li>
                     <div class="related-pulses">
                         <div class="related-img">
-                            <img src="' . (isset($value["author"]["avatar_url"])?$value["author"]["avatar_url"]:"") . '" alt="">
+                            <img src="' . (isset($value["author"]["avatar_url"]) ? $value["author"]["avatar_url"] : "") . '" alt="">
                         </div>
                         <div class="related-content">
                             <div class="related-title">
                                 <a href="pulsedetail">
                                     <h1 class="related-title">
-                                        ' . (isset($value["name"])?$value["name"]:"") . '
+                                        ' . (isset($value["name"]) ? $value["name"] : "") . '
                                     </h1>
                                 </a>
                                 <div class="active-indicator">
@@ -129,14 +152,14 @@ class IndicatorsController extends Controller
                             <div class="details-wrapper">
                                 <ul class="detail-show">
                                     <li>
-                                        <span class="' . ($value["is_modified"] == false ? "created" : "modified") . '"> 
-                                        ' . ($value["is_modified"] == false ? "Created" : "Modified") . ' 
+                                        <span class="' . ($value["is_modified"] == false ? "created" : "modified") . '">
+                                        ' . ($value["is_modified"] == false ? "Created" : "Modified") . '
                                         </span>
-                                        <span class="pulse-ago"> 
-                                            ' . (isset($value["modified_text"])?$value["modified_text"]:"") . '
+                                        <span class="pulse-ago">
+                                            ' . (isset($value["modified_text"]) ? $value["modified_text"] : "") . '
                                         </span>
-                                        by <a href="https://otx.alienvault.com/user/' . (isset($value["author"]["username"])?$value["author"]["username"]:"") . '/pulses" class="pulse-author">
-                                        ' . (isset($value["author"]["username"])?$value["author"]["username"]:"") . '
+                                        by <a href="https://otx.alienvault.com/user/' . (isset($value["author"]["username"]) ? $value["author"]["username"] : "") . '/pulses" class="pulse-author">
+                                        ' . (isset($value["author"]["username"]) ? $value["author"]["username"] : "") . '
                                         </a>
                                     </li>
                                     <li>
@@ -146,7 +169,7 @@ class IndicatorsController extends Controller
                                         <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
                                       <span>
                                         <i class="fas fa-circle ' . $value["TLP"] . '">
-                                        </i> 
+                                        </i>
                                         ' . ucwords($value["TLP"]) . '
                                       </span>
                                     </li>
@@ -154,7 +177,7 @@ class IndicatorsController extends Controller
                                 <div class="pulse-indicator-counts">
                                     <span class="nowrap ellipsis">';
                 if (!empty($value["indicator_type_counts"])) {
-                    foreach ($value["indicator_type_counts"]  as $key => $typeCount) {
+                    foreach ($value["indicator_type_counts"] as $key => $typeCount) {
                         $html .= '<span class="insered">
                             <strong>' . $key . ':</strong>
                                 <span class="br-last">' . $typeCount . '</span>
@@ -172,13 +195,13 @@ class IndicatorsController extends Controller
 
                 if (!empty($value["tags"])) {
                     $html_sub = '';
-                    foreach ($value["tags"]  as $tag) {
+                    foreach ($value["tags"] as $tag) {
                         $html_sub .= ',<a href="https://otx.alienvault.com/browse/pulses?q=tag:' . $tag . ' "><span>' . $tag . '</span></a>';
                     }
                     $html .= substr($html_sub, 1);
                 }
 
-                $html .=        '</div>
+                $html .= '</div>
                             </div>
                         </div>
                         <div class="related-subscribers">
@@ -201,17 +224,17 @@ class IndicatorsController extends Controller
 
         $html2 = '';
         $isValidation = 0;
-        if(!empty($DataotxIndicator["validation"])){
+        if (!empty($DataotxIndicator["validation"])) {
             $isValidation = 1;
             $validationInfo = $DataotxIndicator["validation"];
             foreach ($validationInfo as $value) {
                 $html2 .= '
                 <div class="row m-b-xs">
                     <div class="col-md-6">
-                        ' . (isset($value["name"])?$value["name"]:"") . '
+                        ' . (isset($value["name"]) ? $value["name"] : "") . '
                     </div>
                     <div class="col-md-6">
-                        ' . (isset($value["message"])?$value["message"]:"") . '
+                        ' . (isset($value["message"]) ? $value["message"] : "") . '
                     </div>
                 </div>';
             }
@@ -220,12 +243,12 @@ class IndicatorsController extends Controller
         }
         if ($request->ajax()) {
             $data = [
-                "html" =>  $html,
-                "html2" =>  $html2,
-                "generalData" =>  $DataotxIndicator,
-                "sections" =>  $DataotxIndicator["sections"],
-                "isValidation" =>  $isValidation,
-                "isPulse_info" =>  $isPulse_info,
+                "html" => $html,
+                "html2" => $html2,
+                "generalData" => $DataotxIndicator,
+                "sections" => $DataotxIndicator["sections"],
+                "isValidation" => $isValidation,
+                "isPulse_info" => $isPulse_info,
             ];
             return response()->json($data);
         }
@@ -234,153 +257,149 @@ class IndicatorsController extends Controller
 
     public function load_url_list(Request $request)
     {
-        $OTX_KEY = env("OTX_KEY","");
+        $OTX_KEY = env("OTX_KEY", "");
         $client = new \GuzzleHttp\Client();
 
         $reqType = $request->type;
-        if (stripos( $request->type, "file") !== false) {
+        if (stripos($request->type, "file") !== false) {
             $reqType = 'file';
-        }else if($reqType == "CVE"){
+        } else if ($reqType == "CVE") {
             $reqType = "cve";
-        }else if($reqType == "URL"){
+        } else if ($reqType == "URL") {
             $reqType = 'url';
-        }else if($reqType == "NIDS"){
+        } else if ($reqType == "NIDS") {
             $reqType = 'nids';
-        }else if($reqType == "YARA"){
+        } else if ($reqType == "YARA") {
             $reqType = 'yara';
-        }else if($reqType == "BitcoinAddress"){
+        } else if ($reqType == "BitcoinAddress") {
             $reqType = 'bitcoin-address';
-        }else if($reqType == "SSLCertFingerprint"){
+        } else if ($reqType == "SSLCertFingerprint") {
             $reqType = 'ssl-cert-fingerprint';
         }
         $reqIndicator = $request->indicator;
 
-       // https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.bonanzadesign-my.com%2Fgrace%2FMasterNewShit.exe?limit=10&page=1
-       $isUrl_list = 0; 
-       $testt = 'https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.haromaain.com%2Fovhcloud.ovh.com%2Fmanager%2Fmoncompte%2Frenouvellement%2Fvos-service%2Fwebdomaine%2FOVHCloud%2F4870031649701203465875104976045875%2F48700316497012034658751049760%2Fgi1ztq%253D%2F?limit=10&page=1';
-       if(isset($request->data_general["sections"])&&in_array("url_list", $request->data_general["sections"]) ){
-            $bodyData   = $client->request( 
+        // https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.bonanzadesign-my.com%2Fgrace%2FMasterNewShit.exe?limit=10&page=1
+        $isUrl_list = 0;
+        $testt = 'https://otx.alienvault.com/otxapi/indicator/url/url_list/http%3A%2F%2Fwww.haromaain.com%2Fovhcloud.ovh.com%2Fmanager%2Fmoncompte%2Frenouvellement%2Fvos-service%2Fwebdomaine%2FOVHCloud%2F4870031649701203465875104976045875%2F48700316497012034658751049760%2Fgi1ztq%253D%2F?limit=10&page=1';
+        if (isset($request->data_general["sections"]) && in_array("url_list", $request->data_general["sections"])) {
+            $bodyData = $client->request(
                 'GET',
-                'https://otx.alienvault.com/otxapi/indicator/'.$reqType.'/url_list'.'/'.$reqIndicator,
+                'https://otx.alienvault.com/otxapi/indicator/' . $reqType . '/url_list' . '/' . $reqIndicator,
                 [
                     'headers' => [
-                        'Accept'       => 'application/json',
+                        'Accept' => 'application/json',
                         'Content-type' => 'application/json',
                         'X-OTX-API-KEY' => $OTX_KEY,
-                    ]
+                    ],
                 ]
             )->getBody();
-            $DataotxIndicator = json_decode($bodyData,true);
-        }else{
+            $DataotxIndicator = json_decode($bodyData, true);
+        } else {
             $DataotxIndicator = null;
         }
         $html = '';
 
-        if(isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"])){
+        if (isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"])) {
             $isUrl_list = 1;
             $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
-                    IP ADDRESS: <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"].'</a>
-                </div>            
+                    IP ADDRESS: <a >' . $DataotxIndicator["url_list"][0]["result"]["urlworker"]["ip"] . '</a>
+                </div>
             </div>';
         }
 //<img src="' . (isset($DataotxIndicator["flag_url"])?("https://otx.alienvault.com/".$DataotxIndicator["flag_url"]):"") . '" alt="">
-        if(isset($DataotxIndicator["flag_title"])){
+        if (isset($DataotxIndicator["flag_title"])) {
             $isUrl_list = 1;
-            $html .= ' 
+            $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
-                    LOCATION:  <a >'.$DataotxIndicator["flag_title"].'</a>
-                </div>            
+                    LOCATION:  <a >' . $DataotxIndicator["flag_title"] . '</a>
+                </div>
             </div>';
         }
 
-        if(isset($request->data_general["hostname"])){
+        if (isset($request->data_general["hostname"])) {
             $isUrl_list = 1;
-            $html .= ' 
+            $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
-                    HOSTNAME: <a >'.$request->data_general["hostname"].'</a>
-                </div>            
-            </div>';
-        }
-        
-        if(isset($request->data_general["domain"])){
-            $isUrl_list = 1;
-            $html .= ' 
-            <div class="row m-b-xs">
-                <div class="col-md-12">
-                    DOMAIN: <a>'.$request->data_general["domain"].'</a>
-                </div>            
+                    HOSTNAME: <a >' . $request->data_general["hostname"] . '</a>
+                </div>
             </div>';
         }
 
-        if(isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"])){
+        if (isset($request->data_general["domain"])) {
             $isUrl_list = 1;
-            $html .= ' 
+            $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
-                    LAST ANALYZED DATE: <a >'.$DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"].'</a>
-                </div>            
+                    DOMAIN: <a>' . $request->data_general["domain"] . '</a>
+                </div>
             </div>';
         }
 
-        if(isset($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])){
+        if (isset($DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"])) {
             $isUrl_list = 1;
-            $html .= ' 
+            $html .= '
+            <div class="row m-b-xs">
+                <div class="col-md-12">
+                    LAST ANALYZED DATE: <a >' . $DataotxIndicator["url_list"][0]["result"]["urlworker"]["Date"] . '</a>
+                </div>
+            </div>';
+        }
+
+        if (isset($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])) {
+            $isUrl_list = 1;
+            $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
                     GOOGLE SAFE BROWSING:
 
                     <a >';
-            
-                    if(empty($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])){
-                        // @icon(\'solid/check\') Not identified as malicious
-                        $html .= 'Not identified as malicious';
-                    }else{
-                        foreach ($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"] as $value) {
-                            $html .= $value.' ';
-                        }
-                    }
-                    $html .='</a>
 
-                </div>            
+            if (empty($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"])) {
+                // @icon(\'solid/check\') Not identified as malicious
+                $html .= 'Not identified as malicious';
+            } else {
+                foreach ($DataotxIndicator["url_list"][0]["result"]["safebrowsing"]["matches"] as $value) {
+                    $html .= $value . ' ';
+                }
+            }
+            $html .= '</a>
+
+                </div>
             </div>';
-        }else{
-            $html .= ' 
+        } else {
+            $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
                     GOOGLE SAFE BROWSING:  <a>Not analyzed</a>
-                </div>            
+                </div>
             </div>';
         }
 
-
-        if(isset($DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"])){
+        if (isset($DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"])) {
             $isUrl_list = 1;
-            $html .= ' 
+            $html .= '
             <div class="row m-b-xs">
                 <div class="col-md-12">
-                    ANTIVIRUS: <a >'.$DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"].'</a>
-                </div>            
+                    ANTIVIRUS: <a >' . $DataotxIndicator["url_list"][0]["result"]["multiav"]["matches"]["matches"] . '</a>
+                </div>
             </div>';
         }
-
 
         if ($request->ajax()) {
             $data = [
-                "html" =>  $html,
-                "out" =>  $DataotxIndicator,
-                "rtt" => 'https://otx.alienvault.com/otxapi/indicator/'.$reqType.'/url_list'.'/'.$reqIndicator,
-                "rtt2" => $testt
+                "html" => $html,
+                "out" => $DataotxIndicator,
+                "rtt" => 'https://otx.alienvault.com/otxapi/indicator/' . $reqType . '/url_list' . '/' . $reqIndicator,
+                "rtt2" => $testt,
             ];
-            return response()->json($data); 
+            return response()->json($data);
         }
-        
+
     }
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -463,7 +482,6 @@ class IndicatorsController extends Controller
         $date_start_time_time = date("H:i", strtotime($date_start_time));
         $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
 
-
         $date_end_explode = explode(" ", $date_end);
         $date_end_date = @$date_end_explode[0];
         $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
@@ -472,9 +490,7 @@ class IndicatorsController extends Controller
         $date_end_time_time = date("H:i", strtotime($date_end_time));
         $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
 
-
         $html = '';
-
 
         // if($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end){
 
@@ -538,11 +554,11 @@ class IndicatorsController extends Controller
             if ($request->target == 'Recently Modified') {
                 $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
             } else if ($request->target == 'Least Recently Modified') {
-                $data =  OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'asc');
+                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'asc');
             } else if ($request->target == 'Name Descending') {
-                $data =  OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'desc');
+                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'desc');
             } else if ($request->target == 'Name Ascending') {
-                $data =  OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'asc');
+                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'asc');
             } else {
                 $data = OtxIndicatiorData::where("status", '=', 1);
             }
@@ -576,17 +592,17 @@ class IndicatorsController extends Controller
             //ถ้าเป็น NIDS เอา Title มาแทน indicatior
 
             if ($data->type == "CIDR" || $data->type == "FilePath" || $data->type == "FileHash-IMPHASH" || $data->type == "Mutex" || $data->type == "URI") {
-                $linkIndicator =  '<a>';
+                $linkIndicator = '<a>';
             } else {
-                $linkIndicator =  '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->id . '&&type=' . $data->type . '&&indicator=' . $data->indicatior . '">';
+                $linkIndicator = '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->id . '&&type=' . $data->type . '&&indicator=' . $data->indicatior . '">';
             }
             $html .= ' <ul class="list-indicators">
                         <li>
                             ' . $linkIndicator . '
                                 <h1 class="primary-text">' . $data->indicatior . '</h1>
-                                
-                                
-                               
+
+
+
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
                         </li></ul>';
@@ -594,9 +610,99 @@ class IndicatorsController extends Controller
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
-                "count" => $count
+                "count" => $count,
             ];
             return response()->json($data);
         }
     }
+
+
+    public function tableEvents(Request $request)
+    {
+        
+        // $DB_MONGO_KEY = env("DB_MONGO_DEV", "mongodb://10.104.0.7:27017");
+        
+        // $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $mongo_url = 'mongodb://10.104.0.7:27017';
+        $client = new \MongoDB\Client($mongo_url);
+        $db_name = 'sosecure_threatintelligent';
+        $db = $client->$db_name;
+        $collection = $db->fx_otx_events;
+        $where = array(
+            'status' => 1,
+        );
+        // $cursor = $collection->find($where,['projection'=>['_id'=>0]]);
+        $cursor = $collection->find($where);
+        $model= $cursor->toArray();
+        // $model = $model[0];
+        // unset($model['_id']);
+        if($model) {
+            // foreach($model as $key => $model_val) {
+            //     dd($model_val->name);
+            //     dd($model_val->name);
+            // }
+        }
+
+        // $collection = collect(['name', 'public']);
+        // $collection = collect([
+        //     ['product' => 'Desk', 'price' => 200],
+        //     ['product' => 'Chair', 'price' => 100],
+        // ]);
+
+        // $collection->paginate(15);
+        // dd($collection);
+        $test = mysqli_num_rows($model);
+        dd($test);
+
+        // $combined = $collection->combine(['George', 1]);
+        // $combined->all();
+        // dd($combined);
+        //  dd($model[0]['TLP']);
+        // $model = collect($model);
+        //dd($model[0]->TLP);
+
+        return DataTables::of($collection->toJson())
+        ->editColumn('chk', function ( $collection) {
+            return '<label><input type="checkbox"  name="events_id" class="events_id" value=""><span class="label-text"></span></label>';
+        })
+        ->addColumn('no', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('even_name', function ( $collection) {
+            
+            return $collection->product;
+        })
+
+        ->addColumn('group', function ( $collection) {
+        
+            return "-";
+        })
+        ->addColumn('tags', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('attr', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('published', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('last_status', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('date_time', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('view', function ( $collection) {
+            return '-';
+        })
+        ->addColumn('action', function ( $collection) {
+            return '-';
+        })
+
+
+        ->rawColumns(['chk', 'no', 'even_name', 'group', 'tags', 'attr', 'published', 'last_status', 'date_time', 'view', 'action'])
+        ->toJson();
+     
+    }
+
 }
