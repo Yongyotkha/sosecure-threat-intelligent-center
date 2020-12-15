@@ -628,20 +628,133 @@ class IndicatorsController extends Controller
         $db_name = 'sosecure_threatintelligent';
         $db = $client->$db_name;
         $collection = $db->fx_otx_events;
-        $where = array(
-            'status' => 1,
-        );
+        // $where = array(
+        //     'status' => 1,
+        // );
+
+        $query = [
+            'status' => 1
+        ];
+        
+        $options = [
+            'sort' => [
+                'modified' => -1
+            ],
+            'skip' => 10,
+            'limit' => 5
+        ];
+        
+        $cursor = $collection->find($query, $options);
+
+        $html = '';
+        $head_table = '';
+        $head_table .= '<table class="table table-striped" id="table_events">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>No</th>
+                                    <th>Event Name</th>
+                                    <th>Group</th>
+                                    <th>Tags</th>
+                                    <th>Attr</th>
+                                    <th>Published</th>
+                                    <th>Last Status</th>
+                                    <th>DateTime</th>
+                                    <th>View</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        <tbody>';
+
+        $html .= $head_table;
+
+        function check_publish($val) {
+            if($val==1) {
+                $result = '<i class="fas fa-check"></i>';
+            } else {
+                $result = '';
+            }
+            return $result;
+        }
+        function check_last_status($val) {
+            if($val== true) {
+                $result = 'Modified';
+            } else {
+                $result = 'Created';
+            }
+            return $result;
+        }
+        function change_date_utc_to_thai($val) {
+            // if($val== true) {
+            //     $result = 'Modified';
+            // } else {
+            //     $result = 'Created';
+            // }
+
+
+            $tz = new \DateTimeZone('Asia/Bangkok');
+            // $start = '2020-01-01 00:00:00';
+            // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
+    
+            // print_r($dateStart->toDateTime()->format(DATE_RSS));
+            $date_start = $val->toDateTime();
+    
+            $date_start->setTimezone($tz);
+    
+            $start = $date_start->format(DATE_ATOM);
+            $return_date = date("Y-m-d",strtotime($start));
+    
+            // echo $start;
+
+
+            return $return_date;
+        }
+        foreach ($cursor as $document) {
+            $html .= '
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input value="'.$document['_id'].'" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </td>
+                                <td>1</td>
+                                <td>'.$document['name'].'</td>
+                                <td>'.$document['groups'].'</td>
+                                <td>'.$document['tags'].'</td>
+                                <td>
+                                    <a href="">5421</a>
+                                </td>
+                                <td>'.check_publish($document['public']).'</td>
+                                <td>'.check_last_status($document['is_modified']).'</td>
+                                <td>'.change_date_utc_to_thai($document['modified']).'</td>
+                                <td>'.$document['count_view'].'</td>
+                                <td>
+                                    <a href="#" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                </td>
+                            </tr>
+                        ';
+            // dd($document['_id']);
+        }
+
+        $html .= '</tbody>
+            </table>';
+
+        // dd($cursor);
         // $cursor = $collection->find($where,['projection'=>['_id'=>0]]);
-        $cursor = $collection->find($where);
-        $model= $cursor->toArray();
+        // $cursor = $collection->find($where);
+
+        // $model= $cursor->toArray();
+
+        // dd($model);
         // $model = $model[0];
         // unset($model['_id']);
-        if($model) {
-            // foreach($model as $key => $model_val) {
-            //     dd($model_val->name);
-            //     dd($model_val->name);
-            // }
-        }
+
 
         // $collection = collect(['name', 'public']);
         // $collection = collect([
@@ -651,8 +764,6 @@ class IndicatorsController extends Controller
 
         // $collection->paginate(15);
         // dd($collection);
-        $test = mysqli_num_rows($model);
-        dd($test);
 
         // $combined = $collection->combine(['George', 1]);
         // $combined->all();
@@ -661,47 +772,54 @@ class IndicatorsController extends Controller
         // $model = collect($model);
         //dd($model[0]->TLP);
 
-        return DataTables::of($collection->toJson())
-        ->editColumn('chk', function ( $collection) {
-            return '<label><input type="checkbox"  name="events_id" class="events_id" value=""><span class="label-text"></span></label>';
-        })
-        ->addColumn('no', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('even_name', function ( $collection) {
+        // return DataTables::of($collection->toJson())
+        // ->editColumn('chk', function ( $collection) {
+        //     return '<label><input type="checkbox"  name="events_id" class="events_id" value=""><span class="label-text"></span></label>';
+        // })
+        // ->addColumn('no', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('even_name', function ( $collection) {
             
-            return $collection->product;
-        })
+        //     return $collection->product;
+        // })
 
-        ->addColumn('group', function ( $collection) {
+        // ->addColumn('group', function ( $collection) {
         
-            return "-";
-        })
-        ->addColumn('tags', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('attr', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('published', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('last_status', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('date_time', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('view', function ( $collection) {
-            return '-';
-        })
-        ->addColumn('action', function ( $collection) {
-            return '-';
-        })
+        //     return "-";
+        // })
+        // ->addColumn('tags', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('attr', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('published', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('last_status', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('date_time', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('view', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('action', function ( $collection) {
+        //     return '-';
+        // })
 
 
-        ->rawColumns(['chk', 'no', 'even_name', 'group', 'tags', 'attr', 'published', 'last_status', 'date_time', 'view', 'action'])
-        ->toJson();
+        // ->rawColumns(['chk', 'no', 'even_name', 'group', 'tags', 'attr', 'published', 'last_status', 'date_time', 'view', 'action'])
+        // ->toJson();
+        // return $html;
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+            ];
+            return response()->json($data);
+        }
      
     }
 
