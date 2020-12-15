@@ -72,13 +72,36 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function tableRssData(Request $request){
-        if($request -> keywords || $request -> public_date || $request -> status !== "null" || $request -> source){
+        if(($request -> keywords || $request -> startDate || $request -> status !== "null" || $request -> source) && $request -> search_val == true){
             $model = TransactionRssData::where('status', 1);
             if($request -> keywords){
                 $model -> where('title', 'LIKE' ,'%'.$request -> keywords.'%');
             }
-            if($request -> public_date){
-                $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+            if($request -> startDate){
+                $date_start = $request->startDate;
+                $date_end = $request->endDate;
+
+                $date_start_explode = explode(" ",$date_start);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start);
+
+                $date_end_explode = explode(" ",$date_end);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // dd($date_end_time_time);
+
+                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                $model -> whereBetween('transcation_date',array($date_start_datetime_format,$date_end_datetime_format));
             }
             if($request -> status){
                 if($request -> status == '2' || $request -> status == '3'){

@@ -77,7 +77,7 @@
                                     <label for="">Keywords</label>
                                    <input type="text" class="form-control" name="keywords" id="keywords">
                                 </div>
-                                <div class="col-lg-4">
+                                {{-- <div class="col-lg-8">
                                     <label for="">Public Date</label>
                                     <div class="input-group date">
                                         <input id="public_date" type="text" class="form-control datetimepicker-input" name="public_date"
@@ -85,6 +85,13 @@
                                         <div class="input-group-addon">
                                             @icon('solid/calendar-alt', 'text-muted')
                                         </div>
+                                    </div>
+                                </div> --}}
+                                <div class="col-lg-4">
+                                    <label for="">Select Date</label>
+                                    <div id="date_srange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -95,12 +102,21 @@
                                         <option value="3">Not Used</option>
                                     </select>
                                 </div>
+                                
                             </div>
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-4">
                                     <label for="">Source</label>
                                     <input type="text" class="form-control" name="source" id="source">
                                 </div>
+                                {{-- <div class="col-lg-4">
+                                    <label for="">Status</label>
+                                    <select id="status" class="select2-option form-control">
+                                        <option value="1" selected>All</option>
+                                        <option value="2">Used</option>
+                                        <option value="3">Not Used</option>
+                                    </select>
+                                </div> --}}
                             </div>
                             <br>
                             <div class="row">
@@ -160,29 +176,38 @@
 @include('stacks.css.datatables')
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
+@include('stacks.js.daterangpicker')
 @include('stacks.js.hidesettings');
 
 <script>
+    var search_val = false;
     var keywords = null;
     var public_date = null;
     var status = null;
     var source = null;
+    var startDate = null;
+    var endDate = null;
     function search(){
+        search_val = true;
         keywords = $('#keywords').val();
         public_date = $('#public_date').val();
         status = $('#status option:selected').val();
         source = $('#source').val();
+        startDate =  $("#date_srange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        endDate =  $("#date_srange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         datatable();
     }
 
 
         $("#btn_rss_data_reset").click(function() {
+            search_val = false;
             $("#keywords").val('');
             $("#public_date").val('');
             $("#status").val('').trigger("change");
@@ -213,6 +238,9 @@
                     d.public_date = public_date;
                     d.status = status;
                     d.source = source;
+                    d.search_val = search_val;
+                    d.startDate = startDate;
+                    d.endDate = endDate;
                     {{--return JSON.stringify( d );--}}
                     return d;
                 },
@@ -252,6 +280,39 @@
             ]
         });
     }
+
+
+    $(function() {
+    
+        var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+        var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
+
+        function cb(start, end) {
+            $('#date_srange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            console.log(start.format('YYYY-MM-DD hh:mm A'));
+        }
+
+        $('#date_srange').daterangepicker({
+            timePicker: true,
+            {{--timePicker24Hour: true,--}}
+            startDate: start,
+            endDate: end,
+            locale: {
+                format: 'M/DD hh:mm A'{{--format: 'M/DD HH:mm A'--}}
+            },
+            ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        cb(start, end);
+
+    });
 </script>
 @endpush
 @endsection
