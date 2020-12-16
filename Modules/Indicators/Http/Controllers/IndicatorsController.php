@@ -713,6 +713,15 @@ class IndicatorsController extends Controller
         // $DB_MONGO_KEY = env("DB_MONGO_DEV", "mongodb://10.104.0.7:27017");
         
         // $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $perpage = 25;
+
+        if (isset($_POST['page'])) {
+            $page = $_POST['page'];
+        } else {
+            $page = 1;
+        }
+        $start = ($page - 1) * $perpage;
+
         $mongo_url = 'mongodb://10.104.0.7:27017';
         $client = new \MongoDB\Client($mongo_url);
         $db_name = 'sosecure_threatintelligent';
@@ -723,30 +732,164 @@ class IndicatorsController extends Controller
         // );
 
         $query = [
-            'status' => 1
+            'status' => 1//,
+            // 'tags' => new Regex('^.*webscanner.*$', 'i')//LIKE
+            // 'tags' => [//IN
+            //     '$in' => [
+            //         'webscanner',
+            //         'test'
+            //     ]
+            // ]
         ];
         
         $options = [
             'sort' => [
                 'modified' => -1
             ],
-            'skip' => 10,
-            'limit' => 5
+            'skip' => $start,//10
+            'limit' => $perpage//5
         ];
         
         $cursor = $collection->find($query, $options);
+
+        $query2 = [];
+        $options2 = [
+            'projection' => [
+                '_id' => '$_id'
+            ]
+        ];
+
+        $cursor_all = $collection->find($query2, $options2);
+
+        $total_record = count($cursor_all->toArray());
+        // dd($total_record);
+        // $total_record = mysqli_num_rows($query2);
+        $total_page = ceil($total_record / $perpage);
+        $second_last = $total_page - 1; // total pages minus 1
+
+        $offset = ($page-1) * $perpage;
+        $previous_page = $page - 1;
+        $next_page = $page + 1;
+        $adjacents = "2";
+
+
+        $pagination = '<nav>
+                        <ul class="pagination">';
+
+            if($page > 1) {
+                $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">First Page</a></li>';
+            }
+
+            $pagination .= '<li onclick="pagination_goto('.$previous_page.')" data-page="'.@$previous_page.'"';
+                if($page <= 1) {
+                    $pagination .= 'class="disabled"';
+                }
+            $pagination .= '>';
+
+            $pagination .= '<a ';
+                if($page > 1) {
+                    $pagination .= 'href="#"';
+                }
+
+                $pagination .= '>Previous</a></li>';
+
+                if ($total_page <= 10){   
+                    for ($counter = 1; $counter <= $total_page; $counter++){
+                        if ($counter == $page) {
+                            $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                        }else{
+                            $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                        }
+                    }
+                } elseif ($total_page > 10){
+                    if($page <= 4) { 
+                        for ($counter = 1; $counter < 8; $counter++){ 
+                            if ($counter == $page) {
+                                $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                            }else{
+                                $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                            }
+                        }
+                       $pagination .= '<li><a>...</a></li>';
+                       $pagination .= '<li onclick="pagination_goto('.$second_last.')" data_page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
+                       $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
+                    } elseif ($page > 4 && $page < $total_page - 4) { 
+                        $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
+                        $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
+                        $pagination .= "<li><a>...</a></li>";
+                        for (
+                             $counter = $page - $adjacents;
+                             $counter <= $page + $adjacents;
+                             $counter++
+                        ) { 
+                                if ($counter == $page) {
+                                    $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                                }else{
+                                    $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                                }                  
+                        }   
+                               $pagination .= "<li><a>...</a></li>";
+                               $pagination .= '<li onclick="pagination_goto('.$second_last.')" data-page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
+                               $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
+                    } else {
+                        $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
+                        $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
+                        $pagination .= '<li><a>...</a></li>';
+                        for (
+                             $counter = $total_page - 6;
+                             $counter <= $total_page;
+                             $counter++
+                        ) {
+                                if ($counter == $page) {
+                                $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                                }else{
+                                    $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                                }                   
+                        }
+                    }
+                }
+
+                $pagination .= '<li onclick="pagination_goto('.$next_page.')" data-page="'.@$next_page.'"';
+
+                if($page >= $total_page){
+                    $pagination .= 'class="disabled"';
+                } 
+                $pagination .= ' >';
+
+                $pagination .= '<a ';
+                if($page < $total_page) {
+                    $pagination .= 'href="#"';
+                }
+                $pagination .= '>Next</a></li>';
+
+                if($page < $total_page){
+                    $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
+                } 
+                $pagination .= '</ul></nav>';
+
+
+
+
+
+           
+        $start_first_in_page = $start+1;
+        $end_last_in_page = $start+$perpage;
+
+        $showing_amount_text = '<div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">Showing '.$start_first_in_page.' to '.$end_last_in_page.' of '.$total_record.' entries</div>';
+
+
 
         $html = '';
         $head_table = '';
         $head_table .= '<table class="table table-striped" id="table_events">
                             <thead>
                                 <tr>
-                                    <th>
+                                    <!--<th>
                                         <label>
                                             <input name="select_all" value="1" id="select-all" type="checkbox" />
                                             <span class="label-text"></span>
                                         </label>
-                                    </th>
+                                    </th>-->
                                     <th>No</th>
                                     <th>Event Name</th>
                                     <th>Group</th>
@@ -754,7 +897,7 @@ class IndicatorsController extends Controller
                                     <th>Attr</th>
                                     <th>Published</th>
                                     <th>Last Status</th>
-                                    <th>DateTime</th>
+                                    <th style="width: 100px;">DateTime</th>
                                     <th>View</th>
                                     <th>Action</th>
                                 </tr>
@@ -804,21 +947,23 @@ class IndicatorsController extends Controller
 
             return $return_date;
         }
+        $i = $start;
         foreach ($cursor as $document) {
+            $i++;
             $html .= '
                             <tr>
-                                <td>
+                                <!--<td>
                                     <label>
                                         <input value="'.$document['_id'].'" type="checkbox" />
                                         <span class="label-text"></span>
                                     </label>
-                                </td>
-                                <td>1</td>
+                                </td>-->
+                                <td>'.$i.'</td>
                                 <td>'.$document['name'].'</td>
                                 <td>'.$document['groups'].'</td>
                                 <td>'.$document['tags'].'</td>
                                 <td>
-                                    <a href="">5421</a>
+                                    <a href="#"></a>
                                 </td>
                                 <td>'.check_publish($document['public']).'</td>
                                 <td>'.check_last_status($document['is_modified']).'</td>
@@ -907,6 +1052,8 @@ class IndicatorsController extends Controller
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
+                "pagination" => $pagination,
+                "showing_amount_text" => $showing_amount_text,
             ];
             return response()->json($data);
         }

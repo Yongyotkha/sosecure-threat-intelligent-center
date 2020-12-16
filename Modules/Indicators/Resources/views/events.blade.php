@@ -5,9 +5,14 @@
         <header class="header bg-white b-b b-light">
             <div class="bc-head">Events</div>
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
-            </button>
+            </button> --}}
+
+            <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span>@langapp('Search_Advance')</span>
+            </a>
+            <a id="to_top" href="#area_search" class="">test</a>
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
@@ -21,7 +26,7 @@
 
         </header>
         <section class="scrollable wrapper">
-            <section class="panel panel-default">
+            <section id="area_search" class="panel panel-default" style="display: none;">
                 <div class="panel-heading">
                     <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
                     |
@@ -29,30 +34,30 @@
                 </div>
                 <div id="hide-advance-search" class="container-fluid" style="padding: 2rem">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-8">
                             <div class="form-group m-b-md">
-                                <label for="" class="">Event Name</label>
-                                <input type="text" class="form-control" name="event_name" id="event_name"
-                                    placeholder="Search">
+                                <label for="" class="">Keyword</label>
+                                <input type="text" class="form-control" name="event_name" id="event_name" placeholder="Search">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <!--<div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="">Group</label>
-                                <select name="group[]" id="type" class="select2-option form-control"
+                                {{-- <select name="group[]" id="type" class="select2-option form-control"
                                     multiple="multiple">
 
-                                </select>
+                                </select> --}}
+                                <input type="text" class="form-control" name="group" id="group" placeholder="Search">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="">Tag</label>
-                                <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple">
-
+                                {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
+                                    <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
                                 </select>
                             </div>
-                        </div>
+                        </div>-->
                         <div class="col-md-4">
                             <label for="" class="">Date</label>
                             <div id="event_date" class="text-center"
@@ -93,7 +98,7 @@
                                 <th>Attr</th>
                                 <th>Published</th>
                                 <th>Last Status</th>
-                                <th>DateTime</th>
+                                <th style="width: 200px;">DateTime</th>
                                 <th>View</th>
                                 <th>Action</th>
                             </tr>
@@ -138,6 +143,8 @@
                             </tr> --}}
                         </tbody>
                     </table>
+                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;"></div>
+                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
                 </div>
             </section>
 
@@ -201,6 +208,7 @@
     });
 
 
+
     function load_table(page=1){
         $.ajax({
             headers: {
@@ -219,11 +227,52 @@
             
             {{--$('#count_news').text(data.count);--}}
             $("#table_events").html(data.html);
+            $("#pagination_custom").html(data.pagination);
+            $("#showing_amount_text").html(data.showing_amount_text);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
 	    loading('stop_load');
             console.log("No response from server");
         });
     }
+
+    function pagination_goto(page=null) {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.events_table')!!}',
+            type: "post",
+            data:({
+                page : page
+            }),
+            beforeSend: function(){
+                {{--loading('load');--}}
+                f_loading(null, '#table_events');
+            },
+        }).done(function(data){
+	    {{--loading('stop_load');--}}
+        f_loading_stop(null, '#table_events');
+            
+            {{--$('#count_news').text(data.count);--}}
+            $("#table_events").html(data.html);
+            $("#pagination_custom").html(data.pagination);
+            $("#showing_amount_text").html(data.showing_amount_text);
+            $("#to_top").trigger("click");
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+	    {{--loading('stop_load');--}}
+        f_loading_stop(null, '#table_events');
+            console.log("No response from server");
+        });
+
+    }
+
+
+    
+
+    $("#advance-search").click(function() {
+        $("#area_search").css("display","block");
+
+    });
 
 
 
