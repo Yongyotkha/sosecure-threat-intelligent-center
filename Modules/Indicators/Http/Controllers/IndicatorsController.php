@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller;
 use Modules\indicators\Entities\OTXtypeData;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
-
+use MongoDB\BSON\UTCDateTime;
 class IndicatorsController extends Controller
 {
     /**
@@ -470,8 +470,8 @@ class IndicatorsController extends Controller
 
     public function LoadMoreOTX(Request $request)
     { //"someField" => array('$ne' => null),   
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
-        $clientMD = new MongoClient("mongodb://10.104.0.7:27017");
+        $DB_MONGO_KEY = "mongodb://10.104.0.7:27017";
+        $clientMD = new MongoClient($DB_MONGO_KEY);
         $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
 
         $date_start = $request->startDate;
@@ -493,7 +493,7 @@ class IndicatorsController extends Controller
         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
         $date_end_time_time = date("H:i", strtotime($date_end_time));
         $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
-
+// dd($date_end_datetime_format);
         $html = '';
 
         // if($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end){
@@ -514,9 +514,18 @@ class IndicatorsController extends Controller
         // }
         $data = '';
         // dd($news);
-        $_search = array('status' => 1,
-            'deleted_at' => null);
         $_sort = [];
+        $_search = array(
+            'status' => 1,
+            'deleted_at' => null
+        );
+        $_option = array(
+            'limit' => PAGINATE_NUM,
+            'skip' => ($request->page-1)*PAGINATE_NUM,
+            'sort' => $_sort
+        );
+        
+
         if ($request->target == 'Recently Modified') {
             $_sort = [
                 'transcation_id' => -1,
@@ -544,88 +553,91 @@ class IndicatorsController extends Controller
 
         if ($request->f_search == 1) {
 
-            if ($request->keywords || $request->type || $request->startDate || $request->endDate) {
-                
+            if ($request->keywords || $request->type || $request->startDate || $request->endDate) {      
+                // if ($request->type && $request->keywords && $request->startDate) {
+                //     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                // } else if ($request->type && $request->keywords) {
+
+                //     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type);
+                // } else if ($request->startDate && $request->keywords) {
+
+                //     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                // } else if ($request->startDate && $request->type) {
+
+                //     $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                // } else if ($request->keywords) {
+
+                //     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%');
+                // } else if ($request->type) {
+
+                //     $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type);
+                // } else if ($request->startDate) {
+
+                //     $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
+                // }
+                // $count = $data->count();
+                // $data = $data->paginate(PAGINATE_NUM);
+                // if ($request->target == 'Recently Modified') {
+                //     $data = $data->orderBy('updated_at', 'desc');
+                // } else if ($request->target == 'Least Recently Modified') {
+                //     $data = $data->orderBy('updated_at', 'asc');
+                // } else if ($request->target == 'Name Descending') {
+                //     $data = $data->orderBy('indicatior', 'desc');
+                // } else if ($request->target == 'Name Ascending') {
+                //     $data = $data->orderBy('indicatior', 'asc');
+                // }
+
                 if ($request->keywords) {
-                    $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
+                    $_search['indicator'] = ['$regex'=>$request->keywords, '$options' => 'i'];
+                    // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
                 } 
-
                 if ($request->type) {
-                    $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
+                    $_search['type'] = ['$in'=>$request->type];
+                    // $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
                 }
 
-                if ($request->startDate&&$request->endDate) {
-                    $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
+                $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);  
+                if($isDateSearch){
+                    if ($request->startDate&&$request->endDate) {
+                        $_search['updated_at'] = ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)];
+                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                    }else if($request->startDate){
+                        $_search['updated_at'] = ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)];
+                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
+                    }else if($request->endDate){
+                        $_search['updated_at'] = ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)];
+                        // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                    }
                 }
                 
-                if ($request->type && $request->keywords && $request->startDate) {
-                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-                } else if ($request->type && $request->keywords) {
-
-                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type);
-                } else if ($request->startDate && $request->keywords) {
-
-                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-                } else if ($request->startDate && $request->type) {
-
-                    $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-                } else if ($request->keywords) {
-
-                    $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%');
-                } else if ($request->type) {
-
-                    $data = OtxIndicatiorData::where("status", '=', 1)->whereIn('type', $request->type);
-                } else if ($request->startDate) {
-
-                    $data = OtxIndicatiorData::whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
-                }
-
-
-                if ($request->target == 'Recently Modified') {
-                    $data = $data->orderBy('updated_at', 'desc');
-                } else if ($request->target == 'Least Recently Modified') {
-                    $data = $data->orderBy('updated_at', 'asc');
-                } else if ($request->target == 'Name Descending') {
-                    $data = $data->orderBy('indicatior', 'desc');
-                } else if ($request->target == 'Name Ascending') {
-                    $data = $data->orderBy('indicatior', 'asc');
-                }
-
-                $count = $data->count();
-                $data = $data->paginate(PAGINATE_NUM);
             }
         } else {
             
-            if ($request->target == 'Recently Modified') {
-                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
-            } else if ($request->target == 'Least Recently Modified') {
-                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'asc');
-            } else if ($request->target == 'Name Descending') {
-                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'desc');
-            } else if ($request->target == 'Name Ascending') {
-                $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'asc');
-            } else {
-                $data = OtxIndicatiorData::where("status", '=', 1);
-            }
+            // if ($request->target == 'Recently Modified') {
+            //     $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'desc');
+            // } else if ($request->target == 'Least Recently Modified') {
+            //     $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('updated_at', 'asc');
+            // } else if ($request->target == 'Name Descending') {
+            //     $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'desc');
+            // } else if ($request->target == 'Name Ascending') {
+            //     $data = OtxIndicatiorData::where("status", '=', 1)->orderBy('indicatior', 'asc');
+            // } else {
+            //     $data = OtxIndicatiorData::where("status", '=', 1);
+            // }
+            // $data = $data->paginate(PAGINATE_NUM);
+            // $count = OtxIndicatiorData::where("status", '=', 1)->count();
 
-            
-
-            $data = $data->paginate(PAGINATE_NUM);
-            $count = OtxIndicatiorData::where("status", '=', 1)->count();
         }
+        $_option['sort'] = $_sort;
         $cursor = $col_fx_transaction_otx_indicators_data->find(
-           
-        $_search,
-            [
-                'limit' => PAGINATE_NUM,
-                'skip' => ($request->page-1)*PAGINATE_NUM,
-                'sort' => $_sort,
-            ]
+            $_search,
+            $_option
         );
+        $count = $col_fx_transaction_otx_indicators_data->count($_search);
         //dd($cursor->count());
         //dateATOM
+       
         $documentAll = $cursor->toArray();
-        
         //    else {
 
         //         if ($request->target == 'Recently Modified') {
@@ -664,7 +676,7 @@ class IndicatorsController extends Controller
         //                     </a>
         //                 </li></ul>';
         // }
-        if(!empty($documentAll))
+        // if(!empty($documentAll))
         foreach ($documentAll as $data) {
 
             //ถ้าเป็น NIDS เอา Title มาแทน indicatior
