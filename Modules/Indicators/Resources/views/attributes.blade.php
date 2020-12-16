@@ -126,7 +126,8 @@
                 <section id="scrollable_otx" class="show-indicators">
                     <div id="list_otx"></div>
                     <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading&nbsp;<span
-                            class="content-spinner-loading-inline"></span></div>
+                            class="content-spinner-loading-inline"></span>
+                    </div>
                 </section>
             </section>
         </section>
@@ -363,7 +364,7 @@
             {{--$('#count_otx').text(data.count);--}}
             $('#count_otx').text("We've found "+data.count+" indicators");
             $('.ajax-loading').hide();
-            $('.ajax-loading').addClass('d-none');
+            {{--$('.ajax-loading').addClass('d-none');--}}
             $("#list_otx").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             $('.ajax-loading').hide();

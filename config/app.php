@@ -108,6 +108,11 @@ return [
 
     'cipher'          => 'AES-256-CBC',
 
+    'OTX_KEY'         => env('OTX_KEY'),
+    'OTX_KEY_store'   => env('OTX_KEY_store'),
+    'DB_MONGO_DEV'    => env('DB_MONGO_DEV'),
+    'DB_MONGO'        => env('DB_MONGO'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

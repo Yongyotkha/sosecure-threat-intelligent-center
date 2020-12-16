@@ -69,14 +69,14 @@ class OTXMDFeedIndicator extends Command
                         'deleted_at' => null,
                     ]);
                 }
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C1d&page=1&limit=100', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C12h&page=1&limit=100', $urlLimit);
                 //$reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?type=CVE&include_inactive=0&sort=-modified&q=modified:""&page=1&limit=100', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                 } else {
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
-                    $this->info("FAIL");
+                    // $this->info("FAIL");
                 }
 
                 while ($otxFeedDataCheck) {
@@ -116,21 +116,22 @@ class OTXMDFeedIndicator extends Command
                             } catch (Exception $e) {
                                 $error["Exception"] = $e;
                                 $otxSuccessCheck = false;
-                                $this->info("FAIL");
+                                // $this->info("FAIL");
                             }
                         }}
 
                     $loop++;
                     //echo $loop . "-";
                     if (isset($otxFeedData["next"])) {
-                        echo ($otxFeedData["next"]);
+                        // echo ($otxFeedData["next"]);
+                        $this->info($otxFeedData["next"]);
                         $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
                         if ($reconCall["success"]) {
                             $otxFeedData = json_decode($reconCall["result"], true);
                         } else {
                             $otxSuccessCheck = false;
                             $otxFeedDataCheck = false;
-                            $this->info("FAIL");
+                            // $this->info("FAIL");
                         }
                     } else {
                         $otxFeedDataCheck = false;
@@ -140,7 +141,7 @@ class OTXMDFeedIndicator extends Command
             } catch (Exception $e) {
                 $error["Exception"] = $e;
                 $otxSuccessCheck = false;
-                $this->info("FAIL");
+                // $this->info("FAIL");
             }
             $roundRetry++;
         } while ($roundRetry < $retryLimit && !$otxSuccessCheck);
