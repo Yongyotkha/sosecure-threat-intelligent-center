@@ -20,10 +20,10 @@ Route::group(
 
         Route::get('/events', 'IndicatorsController@events')->name('indicators.events')->middleware('can:menu_items');
         Route::get('/events/events_detail', 'IndicatorsController@events_detail')->name('indicators.events_detail')->middleware('can:menu_items');
+        // Route::get('/events/events_detail', 'IndicatorsController@events_detail')->name('indicators.events_detail')->middleware('can:menu_items');
 
         Route::get('/attributes', 'IndicatorsController@attributes')->name('indicators.attributes')->middleware('can:menu_items');
         // Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
-        Route::get('/attributes', 'IndicatorsController@attributes')->name('indicators.attributes')->middleware('can:menu_items');
         Route::get('/LoadMoreOTX', 'IndicatorsController@LoadMoreOTX')->name('LoadMoreOTX');
         Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
         Route::get('/load/general', 'IndicatorsController@load_general')->name('indicators.load_general');
