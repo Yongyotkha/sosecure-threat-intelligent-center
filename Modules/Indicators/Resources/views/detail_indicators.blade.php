@@ -6,7 +6,7 @@
             <header class="header bg-white b-b b-light head-d-flex-nowrap"
                 style="white-space: nowrap;overflow-x: auto;">
                 <div class="bc-head m-none">
-                    <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                    <a href="{{route('indicators.attributes')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
                     @langapp('indicators') : Type:{{$otxtype}},<span id="otxindicator_text">{{$otxindicator}}</span>
@@ -48,13 +48,24 @@
                 <div id="general_details" class="pd-15">
                     <div class="row m-b-lg">
                         {{-- Basic Information --}}
-                        <div id="indicator_basic_info" class="col-md-12">
-                            <h1 class="b-b">Basic Information</h1>
+                        
+                        @if($otxtype=="NIDS")
+                        <div id="indicator_description" class="col-md-12">
+                            <h1 class="b-b">Description</h1>
                             <div id="loadspinner_basic_info" class="content-spinner-loading">
                             </div>
                             {{-- Inner Basic Information--}}
 
                         </div>
+                        @endif
+                        <div id="indicator_basic_info" class="col-md-12">
+                            <h1 class="b-b">{{($otxtype=="YARA")?"Rule":"Basic Information"}}</h1>
+                            <div id="loadspinner_basic_info" class="content-spinner-loading">
+                            </div>
+                            {{-- Inner Basic Information--}}
+
+                        </div>
+                       
                         {{-- File Identification --}}
                     </div>
                 </div>
@@ -159,34 +170,19 @@
     function detail_load_general(){
         $.ajax(req_load_general()).done(function(data){
             $('#loadspinner_related_pulse').hide();
-            $('#loadspinner_indicator_validation').hide();
-            $("#indicator_validation").append(data.html2);
-            $("#pulses_related").append(data.html);
-            
-            console.log("data1",data);
+            $('#loadspinner_basic_info').hide();
+            $("#indicator_basic_info").append(data.html);
+
+            {{--$("#pulses_related").append(data.html);--}}
 
             
             if("{{$otxtype}}"=="CVE"){
                 console.log("CVE");
             }else{
-                {{--ajax type URL--}}
-                $.ajax(req_load_url_list(data.generalData)).done(function(data2){
-                    $('#loadspinner_basic_info').hide();
-                    console.log(data2);
-                    $("#indicator_basic_info").append(data2.html);
-                }).fail(function(jqXHR, ajaxOptions, thrownError){
-                    $('#loadspinner_basic_info').hide();
-                    console.log("No response from server2");
-                });
-
-                if(data.sections.indexOf("url_list")!= -1){
-                    console.log("sec","url_list");
-                }
 
             }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             $('#loadspinner_related_pulse').hide();
-            $('#loadspinner_indicator_validation').hide();
             $('#loadspinner_basic_info').hide();
             console.log("No response from server");
         });
@@ -202,10 +198,10 @@
             data: ({
                 type:"{{$otxtype}}",
                 indicator:"{{$otxindicator}}",
+                id:"{{$otxid}}",
             }),
             datatype: "html",
             beforeSend: function(){
-                $('#loadspinner_indicator_validation').show();
                 $('#loadspinner_related_pulse').show();
                 $('#loadspinner_basic_info').show();
             },

@@ -78,7 +78,7 @@ class IndicatorsController extends Controller
         return view('indicators::attributes')->with($data);
     }
 
-    public function show_detail_indicators(Request $request)
+    public function show_detail_indicator(Request $request)
     {
         $data['page'] = langapp('indicators');
         $data['otxid'] = $request->id;
@@ -87,7 +87,59 @@ class IndicatorsController extends Controller
         return view('indicators::detail_indicators')->with($data);
     }
 
+
     public function load_general(Request $request)
+    {   
+        $reqType = $request->type;
+        $reqIndicator = $request->indicator;
+        $reqId = $request->id;
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $html = '';
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+
+        $options = array(
+            'typeMap' => array(
+                'root' => 'array',
+                'document' => 'array',
+            ),
+        );
+
+        $document = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => (int)$reqId),$options);
+        if(!empty($document)){
+            if(!empty($document["allrow"])){
+                foreach ($document["allrow"] as $key => $value) {
+                    if($key=="LOCATION"){
+                        $value = explode("--",$value)[0];    
+                    }
+                    $html .= '
+                    <div class="row m-b-xs">
+                        <div class="col-md-12">
+                            '.$key.': <a >' . $value . '</a>
+                        </div>
+                    </div>';
+                }
+            }else{
+                $html .= '
+                <div class="row m-b-xs">
+                    <div class="col-md-12">
+                        No Detail
+                    </div>
+                </div>';
+            }
+        }
+
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+            ];
+            return response()->json($data);
+        }
+
+    }
+
+
+    public function load_general2(Request $request)
     {
         $OTX_KEY = env("OTX_KEY", "");
         $client = new \GuzzleHttp\Client();
@@ -253,7 +305,6 @@ class IndicatorsController extends Controller
             ];
             return response()->json($data);
         }
-
     }
 
     public function load_url_list(Request $request)
@@ -470,7 +521,8 @@ class IndicatorsController extends Controller
 
     public function LoadMoreOTX(Request $request)
     { //"someField" => array('$ne' => null),   
-        $DB_MONGO_KEY = "mongodb://10.104.0.7:27017";
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        // $DB_MONGO_KEY = "mongodb://10.104.0.7:27017";
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
 
@@ -683,7 +735,7 @@ class IndicatorsController extends Controller
             if ($data->type == "CIDR"  || $data->type == "FileHash-IMPHASH"|| $data->type == "FileHash-PEHASH" || $data->type == "FilePath" || $data->type == "Mutex" || $data->type == "URI"|| $data->type == "JA3"|| $data->type == "osquery") {
                 $linkIndicator =  '<a>';
             } else {
-                $linkIndicator =  '<a href="' . route('indicators.detail_indicators') . '?id=' . $data->indicator_id . '&&type=' . $data->type . '&&indicator=' . $data->indicator . '">';
+                $linkIndicator =  '<a href="' . route('indicators.detail_indicator') . '?id=' . $data->indicator_id . '&&type=' . $data->type . '&&indicator=' . $data->indicator . '">';
             }
             $html .= ' <ul class="list-indicators">
                         <li>

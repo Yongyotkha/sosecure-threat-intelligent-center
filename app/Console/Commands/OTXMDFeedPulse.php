@@ -68,13 +68,13 @@ class OTXMDFeedPulse extends Command
                         'deleted_at' => null,
                     ]);
                 }//modified:%3C1d
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=100&page=1&sort=-modified&q=modified:%3C1d', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=100&page=1&sort=-modified&q=modified:%3C12h', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                 } else {
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
-                    $this->info("FAIL1");
+                    // $this->info("FAIL1");
                 }
 
                 while ($otxFeedDataCheck) {
@@ -93,7 +93,7 @@ class OTXMDFeedPulse extends Command
                         } else {
                             $otxSuccessCheck = false;
                             $otxFeedDataCheck = false;
-                            $this->info("FAIL2");
+                            // $this->info("FAIL2");
                         }
                     } else {
                         $otxFeedDataCheck = false;
@@ -103,7 +103,7 @@ class OTXMDFeedPulse extends Command
             } catch (Exception $e) {
                 $error["Exception"] = $e->getMessage();
                 $otxSuccessCheck = false;
-                $this->info("FAIL3");
+                // $this->info("FAIL3");
             }
             $roundRetry++;
         } while ($roundRetry < $retryLimit && !$otxSuccessCheck);
@@ -235,7 +235,7 @@ class OTXMDFeedPulse extends Command
     public function saveIndicator_ref($pulseID,$urlLimit)
     {
         $allRow = (object) array();
-        $dayMoreThan = 9;
+        $dayMoreThan = 30;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         try {
             $otxSuccessCheck = true;
@@ -251,8 +251,8 @@ class OTXMDFeedPulse extends Command
             } else {
                 $otxFeedDataCheck = false;
                 $otxSuccessCheck = false;
-                $this->info("FAIL41");
-                echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=5000&page=1';
+                // $this->info("FAIL41");
+                // echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=5000&page=1';
             }
             while ($otxFeedDataCheck) {
                 $loop++;
@@ -316,7 +316,7 @@ class OTXMDFeedPulse extends Command
                             $otxFeedDataCheck = false;
                             $error["Exception"] = $e->getMessage();
                             $otxSuccessCheck = false;
-                            $this->info("FAIL5");
+                            // $this->info("FAIL5");
                             // echo json_encode($error["Exception"]);
                             // echo json_encode($value);
                             break;
@@ -326,14 +326,14 @@ class OTXMDFeedPulse extends Command
 
                
                 if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
-                    echo ($otxFeedData["next"]);
+                    // echo ($otxFeedData["next"]);
                     $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
                     if ($reconCall["success"]) {
                         $otxFeedData = json_decode($reconCall["result"], true);
                     } else {
                         $otxSuccessCheck = false;
                         $otxFeedDataCheck = false;
-                        $this->info("FAIL6");
+                        // $this->info("FAIL6");
                     }
                 } else {
                     $otxFeedDataCheck = false;
@@ -349,7 +349,7 @@ class OTXMDFeedPulse extends Command
     public function savePulse_related($pulseID,$urlLimit)
     {
         $allRow = (object) array();
-        $dayMoreThan = 9;
+        $dayMoreThan = 30;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         try {
             $otxSuccessCheck = true;
@@ -365,8 +365,8 @@ class OTXMDFeedPulse extends Command
             } else {
                 $otxFeedDataCheck = false;
                 $otxSuccessCheck = false;
-                $this->info("FAIL42");
-                echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100';
+                // $this->info("FAIL42");
+                // echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100';
             }
             while ($otxFeedDataCheck) {
                 $loop++;
@@ -445,7 +445,7 @@ class OTXMDFeedPulse extends Command
                             $otxFeedDataCheck = false;
                             $error["Exception"] = $e->getMessage();
                             $otxSuccessCheck = false;
-                            $this->info("FAIL9");
+                            // $this->info("FAIL9");
                             // echo json_encode($error["Exception"]);
                             // echo json_encode($value);
                             break;
@@ -462,7 +462,7 @@ class OTXMDFeedPulse extends Command
                     } else {
                         $otxSuccessCheck = false;
                         $otxFeedDataCheck = false;
-                        $this->info("FAIL10");
+                        // $this->info("FAIL10");
                     }
                 } else {
                     $otxFeedDataCheck = false;
