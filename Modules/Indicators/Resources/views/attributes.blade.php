@@ -158,6 +158,7 @@
     var page = 1; 
     var page_stop = true;
 
+    var isDateSearch = false;
     load_more(page);
     $('#scroll_otx').scroll(function(event) {
             let scrolltop = $('#scroll_otx').scrollTop();
@@ -165,8 +166,10 @@
             let docu_height = $(document).height();
 
         if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
+
             page++;
             if(page_stop){
+                
                 {{--load_more(page);--}}
                 load_more_search(page,f_search);
             }
@@ -186,6 +189,8 @@
         $('#date').select2({
             placeholder: 'Role',
         });
+
+        
     });
 
 
@@ -198,7 +203,7 @@
             startDate = start;
             endDate = end;
         }
-
+        
         $('#indicator_date').daterangepicker({
             timePicker: true,
             startDate: start,
@@ -215,6 +220,14 @@
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
         }, cb);
+        $('#indicator_date').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = true;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+            }
+        });
+        
+        
 
         cb(start, end);
 
@@ -233,14 +246,17 @@
 
 
         });
+
         $("#search_data").click(function() {
-        keywords = $('#keyword').val();
-        type = $('#type').val();
-        f_search = 1;
-        page = 1;
-        $('#count_news').text(0);
-        page_stop = true;
-    
+           
+            keywords = $('#keyword').val();
+            type = $('#type').val();
+            f_search = 1;
+            page = 1;
+            {{--$('#count_news').text(0);--}}
+            page_stop = true;
+            load_more_search(page,f_search);
+        
        
           
 
@@ -296,6 +312,7 @@
             $('.ajax-loading').hide();
             $("#list_otx").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.ajax-loading').hide();
             console.log("No response from server");
         });
     }
@@ -321,19 +338,21 @@
                 keywords:keywords,
                 type:type,
                 f_search:f_search,
+                isDateSearch:isDateSearch,
                 target:target,
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
-                {{--loading('load');--}}
                 $('.ajax-loading').show();
+                {{--loading('load');--}}
+                
             },
         }).done(function(data){
             console.log(data);
             {{--loading('stop_load');--}}
             if(data.html.length == 0){
-                page_stop = false;
                 $('.ajax-loading').hide();
+                page_stop = false;
                 $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
             }
@@ -347,6 +366,7 @@
             $('.ajax-loading').addClass('d-none');
             $("#list_otx").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.ajax-loading').hide();
             console.log("No response from server : search");
         });
     }

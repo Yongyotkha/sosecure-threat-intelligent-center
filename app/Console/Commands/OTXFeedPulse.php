@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
-
+use Modules\RSSFeedSettings\Entities\RSS;
+use Modules\RSSFeedSettings\Entities\TransactionRssData;
+use MongoDB\BSON\UTCDateTime;
 class OTXFeedPulse extends Command
 {
     /**
@@ -59,9 +61,43 @@ class OTXFeedPulse extends Command
 
         // echo json_encode($this->caseByType("URL","http%3A%252F%252Fwww.pooya.novin52.com%252F","2",$urlLimit));
         //echo json_encode($this->caseByType("YARA","e0f74136e9edcb8b4c67274fb5c3f5885270de33","2",$urlLimit));
-        $this->testfun();
+        //$this->testfun();
+        // $this->queryModel();
+        $this->queryMD();
     }
 
+    public function queryModel(){
+        $RSSList = TransactionRssData::where('link', 'https://krebsonsecurity.com/2020/11/godaddy-employees-used-in-attacks-on-multiple-cryptocurrency-services/')->first();
+        if($RSSList){
+            echo json_encode($RSSList);
+            echo "have";
+        }else{
+            echo json_encode($RSSList);
+            echo "not have";
+        }
+    }
+
+    public function queryMD(){
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client("mongodb://10.104.0.7:27017");
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+        $cursor = $col_fx_transaction_otx_indicators_data->find(
+        ['333'=>'44']
+        ,[
+            'limit' => 10,
+        ]
+        );
+
+        $cursor2 = $col_fx_transaction_otx_indicators_data->count(
+            []
+            );
+        echo json_encode( $cursor2);
+        $documentAll = $cursor->toArray();
+        // $ttest = new UTCDateTime(strtotime("2020-12-13 11:00:00")*1000);
+        // echo json_encode( $ttest->toDateTime());
+       echo json_encode($documentAll);
+    }
+    //
     public function testfun(){
         $dayMoreThan = 29;
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
