@@ -12,27 +12,27 @@
             <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
             </a>
-            <a id="to_top" href="#area_search" class="">test</a>
+            {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
-                    {{-- @if($SiteSettings)
+                    @if($SiteSettings)
                     @foreach($SiteSettings as $SiteSettings_val)
                     <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                     @endforeach
-                    @endif --}}
+                    @endif
                 </select>
             </div>
 
         </header>
         <section class="scrollable wrapper">
-            <section id="area_search" class="panel panel-default" style="display: none;">
+            <section id="area_search" class="panel panel-default">
                 <div class="panel-heading">
                     <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
                     |
                     <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
                 </div>
-                <div id="hide-advance-search" class="container-fluid" style="padding: 2rem">
+                <div id="hide-advance-search" class="container-fluid" style="padding: 2rem; display: none;">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
@@ -67,11 +67,11 @@
                             </div>
                         </div>
                         <div class="col-md-12 text-right">
-                            <button class="btn btn-info" id="search_data">
+                            <button class="btn btn-info" id="btn_search_data">
                                 <i class="fas fa-search"></i>
                                 <span> Search </span>
                             </button>
-                            <button class="btn btn-default" id="clear_data">
+                            <button class="btn btn-default" id="btn_reset">
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
@@ -170,6 +170,11 @@
 <script>
     $('.select2-option').select2();
 
+    var start_date = '';
+    var end_date = '';
+    var f_search=false;
+    var event_name = '';
+
 
 
   $(function() {
@@ -201,6 +206,36 @@
         }, cb);
 
         cb(start, end);
+
+        $("#btn_search_data").click(function() {
+            {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
+            let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+            let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+            console.log(startDate);
+            console.log(endDate);
+
+            start_date = startDate;
+            end_date = endDate;
+
+            event_name = $("#event_name").val();
+            
+            f_search = true;
+            pagination_goto(1);
+        });
+
+
+        $("#btn_reset").click(function() {
+            $("#event_name").val('');
+      
+            start = moment();
+            end = moment();
+            cb(start, end);
+
+            f_search = false;
+
+        });
+
+
     });
 
     $(function() {
@@ -243,7 +278,11 @@
             url: '{!! route('indicators.events_table')!!}',
             type: "post",
             data:({
-                page : page
+                page : page,
+                start_date : start_date,
+                end_date : end_date,
+                f_search : f_search,
+                keyword : event_name
             }),
             beforeSend: function(){
                 {{--loading('load');--}}
@@ -269,15 +308,6 @@
 
     
 
-    $("#advance-search").click(function() {
-        $("#area_search").css("display","block");
-
-    });
-
-
-
-    
-   
     
 
 </script>
