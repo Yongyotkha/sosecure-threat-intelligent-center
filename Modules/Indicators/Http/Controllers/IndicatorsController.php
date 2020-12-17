@@ -53,6 +53,24 @@ class IndicatorsController extends Controller
         return view('indicators::events_detail')->with($data);
     }
 
+    public function events_detail_select($id)
+    {
+        $client = new Client(DB_MONGO_01);
+        $collection = $client->sosecure_threatintelligent->fx_otx_events;
+
+        $query = [
+            'pulse_id' => '5c76b2acd1420a1aac451307'
+        ];
+
+        $options = [];
+
+        $cursor = $collection->find($query, $options);
+
+
+        $data['page'] = langapp('indicators');
+        return view('indicators::events_detail')->with($data);
+    }
+
     public function attributes()
     {
         // $client = new Client('mongodb://10.104.0.10:27017');
@@ -817,7 +835,7 @@ class IndicatorsController extends Controller
         }
         $start = ($page - 1) * $perpage;
 
-        $mongo_url = 'mongodb://10.104.0.7:27017';
+        $mongo_url = DB_MONGO_01;
         $client = new \MongoDB\Client($mongo_url);
         $db_name = 'sosecure_threatintelligent';
         $db = $client->$db_name;
@@ -1121,7 +1139,7 @@ class IndicatorsController extends Controller
                                 <td>'.change_date_utc_to_thai($document['modified']).'</td>
                                 <td>'.$document['count_view'].'</td>
                                 <td>
-                                    <a href="#" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                    <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
                                 </td>
                             </tr>
                         ';

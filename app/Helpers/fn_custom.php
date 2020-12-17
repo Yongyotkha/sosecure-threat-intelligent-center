@@ -16,6 +16,7 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Stringy\Stringy as S;
 
 define("PAGINATE_NUM", 10);
+define("DB_MONGO_01", 'mongodb://10.104.0.7:27017');
 
 
 function gen_uuid() {
