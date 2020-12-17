@@ -205,6 +205,7 @@ class OTXMDFeedIndicator extends Command
             $document = $collectionBasic->findOne(['indicator_id' => $indicatorID], [
                 'projection' => [
                     "updated_at" => 1,
+                    "transcation_id" => 1
                 ]]
             );
             $goOn = true;
@@ -212,7 +213,7 @@ class OTXMDFeedIndicator extends Command
                 $date1 = $document->updated_at->toDateTime();
                 $date2 = date_create(date("Y-m-d H:i:s"));
                 $diff = date_diff($date1, $date2);
-                if ($diff->format("%R%a") > $dayMoreThan) {
+                if ( $document->transcation_id==null || $diff->format("%R%a") > $dayMoreThan ) {
                     $goOn = true;
                 } else {
                     $goOn = false;

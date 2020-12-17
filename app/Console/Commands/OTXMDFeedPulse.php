@@ -275,8 +275,8 @@ class OTXMDFeedPulse extends Command
                                 ['$set' => [
                                     'indicator_name' => $value["indicator"],
                                     'type' => $value["type"],
-                                    'updated_at' => $date_now,
                                     'updated_by' => "system",
+                                    'updated_at' => $date_now,
                                 ],
                                     '$setOnInsert' => [
                                         'transcation_id' => null,
