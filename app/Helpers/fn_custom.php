@@ -15,6 +15,12 @@ use Modules\Users\Entities\User;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Stringy\Stringy as S;
 
+use MongoDB\BSON\Regex;
+use MongoDB\Client;
+use MongoDB\Client as MongoClient;
+use MongoDB\BSON\UTCDateTime;
+
+
 define("PAGINATE_NUM", 10);
 define("DB_MONGO_01", 'mongodb://10.104.0.7:27017');
 
@@ -194,4 +200,49 @@ function explode_val($val,$type=null) {
         $result = '';
     }
     return $result;
+}
+
+
+function check_publish($val) {
+    if($val==1) {
+        $result = '<i class="fas fa-check"></i>';
+    } else {
+        $result = '';
+    }
+    return $result;
+}
+function check_last_status($val) {
+    if($val== true) {
+        $result = 'Modified';
+    } else {
+        $result = 'Created';
+    }
+    return $result;
+}
+
+
+function change_date_utc_to_thai($val) {
+    // if($val== true) {
+    //     $result = 'Modified';
+    // } else {
+    //     $result = 'Created';
+    // }
+
+
+    $tz = new \DateTimeZone('Asia/Bangkok');
+    // $start = '2020-01-01 00:00:00';
+    // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
+
+    // print_r($dateStart->toDateTime()->format(DATE_RSS));
+    $date_start = $val->toDateTime();
+
+    $date_start->setTimezone($tz);
+
+    $start = $date_start->format(DATE_ATOM);
+    $return_date = date("Y-m-d H:i",strtotime($start));
+
+    // echo $start;
+
+
+    return $return_date;
 }

@@ -1,3 +1,8 @@
+@php
+    // dd($otx_events[0]['name']);
+@endphp
+
+
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
@@ -7,7 +12,7 @@
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            <div class="bc-head">Events > SSH-US...</div>
+            <div class="bc-head">Events > {{@$otx_events[0]['name']}}</div>
 
             <!--<button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
@@ -34,12 +39,12 @@
                 <div class="container-fluid" style="padding: 2rem">
                     <div class="row">
                         <div class="col-md-6">
-                            <h1>SSH - US Honeypot loCs 2020-12-04</h1>
-                            <p>Last Status : Modified | Public : <i class="fas fa-check"></i></p>
-                            <p>Created : 2020-12-12 11:12 | Modified : 2020-12-11:12</p>
+                            <h1>{{@$otx_events[0]['name']}}</h1>
+                            <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public : {!!check_publish(@$otx_events[0]['public'])!!}</p>
+                            <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified : {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
                             <p>Daily SSH brutefoce logs from a honeypot in the US on a/32</p>
-                            <p>Tags : <a href="">honeypot</a>,<a href="">ssh</a>,<a href="">cowrie</a></p>
-                            <p>Groups : <a href="">honeypot</a>,<a href="">ssh</a>,<a href="">cowrie</a></p>
+                            <p>Tags : {!!explode_val(@$otx_events[0]['tags'],'tags')!!}</p>
+                            <p>Groups : {!!explode_val(@$otx_events[0]['groups'],'groups')!!}</p>
                         </div>
                         <div class="col-md-6">
                             <h1 class="text-center">Type Attributes 5 (5210)</h1>
