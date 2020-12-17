@@ -171,3 +171,26 @@ function utf8_strlen($str) {
       }
       return $l;
 }
+
+function explode_val($val,$type=null) {
+    $result = '';
+    if($val) {
+        $val_arr = explode(",",$val);
+        if($val_arr) {
+            foreach($val_arr as $tag) {
+                if($type == 'tags') {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                } else if ($type == 'groups') {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                } else {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                }
+                
+            }
+            $result = rtrim($result,',');
+        }
+    } else {
+        $result = '';
+    }
+    return $result;
+}

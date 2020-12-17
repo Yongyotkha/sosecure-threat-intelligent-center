@@ -1,12 +1,15 @@
 <?php
 
 namespace Modules\Indicators\Http\Controllers;
+
+use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\DataTables;
 use App\Entities\OtxIndicatiorData;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\indicators\Entities\OTXtypeData;
+use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
@@ -36,9 +39,10 @@ class IndicatorsController extends Controller
      */
 
     public function events()
-    
     {
+        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         
+        $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);
     }
@@ -765,6 +769,45 @@ class IndicatorsController extends Controller
         // $DB_MONGO_KEY = env("DB_MONGO_DEV", "mongodb://10.104.0.7:27017");
         
         // $client = new \MongoDB\Client($DB_MONGO_KEY);
+
+        $f_search = $request->f_search;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $keyword = $request->keyword;
+
+        if($start_date) {
+            $date_start_explode = explode(" ",$start_date);
+            $date_start_date = @$date_start_explode[0];
+            $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+            // dd($date_start_time);
+            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+            // dd($date_start_date_format);
+            $date_start_time_time = date("H:i", strtotime($date_start_time));
+            $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+            // dd($date_start_time_time);
+
+
+            $date_end_explode = explode(" ",$end_date);
+            $date_end_date = @$date_end_explode[0];
+            $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+            // dd($date_end_time);
+            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+            $date_end_time_time = date("H:i", strtotime($date_end_time));
+            $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+            // dd($date_end_time_time);
+
+
+
+            $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($date_start_datetime_format)*1000);
+            $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($date_end_datetime_format)*1000);
+            // dd($dateStart);
+        }
+
+
+
+
+
+
         $perpage = 25;
 
         if (isset($_POST['page'])) {
@@ -783,16 +826,70 @@ class IndicatorsController extends Controller
         //     'status' => 1,
         // );
 
-        $query = [
-            'status' => 1//,
-            // 'tags' => new Regex('^.*webscanner.*$', 'i')//LIKE
-            // 'tags' => [//IN
-            //     '$in' => [
-            //         'webscanner',
-            //         'test'
-            //     ]
-            // ]
-        ];
+        if($f_search == 'true') {
+            $query = [
+                '$and' => [
+                    [
+                        '$or' => [
+                            [
+                                '$and' => [
+                                    [
+                                        'name' => new Regex('^.*'.$keyword.'.*$', 'i')
+                                    ],
+                                    [
+                                        'status' => 1
+                                    ]
+                                ]
+                            ],
+                            [
+                                '$and' => [
+                                    [
+                                        'tags' => new Regex('^.*'.$keyword.'.*$', 'i')
+                                    ],
+                                    [
+                                        'status' => 1
+                                    ]
+                                ]
+                            ],
+                            [
+                                '$and' => [
+                                    [
+                                        'groups' => new Regex('^.*'.$keyword.'.*$', 'i')
+                                    ],
+                                    [
+                                        'status' => 1
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'created_at' => [
+                            '$gte' => $dateStart//new UTCDateTime(-15644559600000)
+                        ]
+                    ],
+                    [
+                        'created_at' => [
+                            '$lte' => $dateEnd//new UTCDateTime(-15644559600000)
+                        ]
+                    ]
+                ]
+            ];
+
+
+        } else {
+            $query = [
+                'status' => 1//,
+                // 'tags' => new Regex('^.*webscanner.*$', 'i')//LIKE
+                // 'tags' => [//IN
+                //     '$in' => [
+                //         'webscanner',
+                //         'test'
+                //     ]
+                // ]
+            ];
+        }
+
         
         $options = [
             'sort' => [
@@ -811,7 +908,7 @@ class IndicatorsController extends Controller
             ]
         ];
 
-        $cursor_all = $collection->find($query2, $options2);
+        $cursor_all = $collection->find($query, $options2);
 
         $total_record = count($cursor_all->toArray());
         // dd($total_record);
@@ -942,21 +1039,23 @@ class IndicatorsController extends Controller
                                             <span class="label-text"></span>
                                         </label>
                                     </th>-->
-                                    <th>No</th>
-                                    <th>Event Name</th>
-                                    <th>Group</th>
-                                    <th>Tags</th>
-                                    <th>Attr</th>
-                                    <th>Published</th>
-                                    <th>Last Status</th>
-                                    <th style="width: 100px;">DateTime</th>
-                                    <th>View</th>
-                                    <th>Action</th>
+                                    <th style="width: 50px;">No</th>
+                                    <th style="width: 500px;">Event Name</th>
+                                    <th style="width: 200px;">Group</th>
+                                    <th style="width: 200px;">Tags</th>
+                                    <!--<th>Attr</th>-->
+                                    <th style="width: 100px;">Published</th>
+                                    <th style="width: 120px;">Last Status</th>
+                                    <th style="width: 120px;">DateTime</th>
+                                    <th style="width: 100px;">View</th>
+                                    <th style="width: 120px;">Action</th>
                                 </tr>
                             </thead>
                         <tbody>';
 
         $html .= $head_table;
+
+
 
         function check_publish($val) {
             if($val==1) {
@@ -1011,12 +1110,12 @@ class IndicatorsController extends Controller
                                     </label>
                                 </td>-->
                                 <td>'.$i.'</td>
-                                <td>'.$document['name'].'</td>
-                                <td>'.$document['groups'].'</td>
-                                <td>'.$document['tags'].'</td>
-                                <td>
+                                <td style="width: 500px;">'.$document['name'].'</td>
+                                <td>'.explode_val($document['groups'],'groups').'</td>
+                                <td>'.explode_val($document['tags'],'tags').'</td>
+                                <!--<td>
                                     <a href="#"></a>
-                                </td>
+                                </td>-->
                                 <td>'.check_publish($document['public']).'</td>
                                 <td>'.check_last_status($document['is_modified']).'</td>
                                 <td>'.change_date_utc_to_thai($document['modified']).'</td>
