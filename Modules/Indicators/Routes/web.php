@@ -27,7 +27,8 @@ Route::group(
         Route::get('/LoadMoreOTX', 'IndicatorsController@LoadMoreOTX')->name('LoadMoreOTX');
        
         Route::get('/load/general', 'IndicatorsController@load_general')->name('indicators.load_general');
-        Route::post('/load/url_list', 'IndicatorsController@load_url_list')->name('indicators.load_url_list');
+        Route::post('/load/pulses', 'IndicatorsController@load_relatedPulse')->name('indicators.load_pulses');
+        Route::get('/load/pulses_tb', 'IndicatorsController@load_relatedPulse_tb')->name('indicators.load_pulses_tb');
         Route::post('events_table', 'IndicatorsController@tableEvents')->name('indicators.events_table')->middleware('can:menu_items');
     }
 );

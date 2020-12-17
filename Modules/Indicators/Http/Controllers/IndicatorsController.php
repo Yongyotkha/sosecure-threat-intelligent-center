@@ -10,6 +10,7 @@ use Modules\indicators\Entities\OTXtypeData;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
+use Modules\SiteSettings\Entities\SiteSettings;
 class IndicatorsController extends Controller
 {
     /**
@@ -70,11 +71,12 @@ class IndicatorsController extends Controller
         $where = array(
             'status' => 1,
         );
+
         $cursor = $collection->find($where);   //This is the main line
         $data['cursor']= $cursor->toArray();
         $data['page'] = langapp('indicators');
-        $data['otx_type'] = OTXtypeData::where("status", '=', 1)->get();
-        
+        //$data['otx_type'] = OTXtypeData::where("status", '=', 1)->get();
+        $data['SiteSettings'] = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         return view('indicators::attributes')->with($data);
     }
 
@@ -107,10 +109,14 @@ class IndicatorsController extends Controller
 
         $document = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => (int)$reqId),$options);
         if(!empty($document)){
+
+
             if(!empty($document["allrow"])){
                 foreach ($document["allrow"] as $key => $value) {
                     if($key=="LOCATION"){
                         $value = explode("--",$value)[0];    
+                    }else if($key=="CREATION DATE"||$key=="LAST MODIFIED DATE"||$key=="LAST ANALYZED DATE"||$key=="Analysis Date"){    
+                        $value = date_format(date_create($value), 'l jS F Y g:ia');
                     }
                     $html .= '
                     <div class="row m-b-xs">
@@ -119,6 +125,13 @@ class IndicatorsController extends Controller
                         </div>
                     </div>';
                 }
+            }else if($reqType=="YARA"&&isset($document["ruleRow"])){
+                $html .= '
+                <div class="row m-b-xs">
+                    <div class="col-md-12">
+                        <a >' . $document["ruleRow"] . '</a>
+                    </div>
+                </div>';
             }else{
                 $html .= '
                 <div class="row m-b-xs">
@@ -132,6 +145,405 @@ class IndicatorsController extends Controller
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
+            ];
+            return response()->json($data);
+        }
+
+    }
+
+    public function load_relatedPulse(Request $request)
+    {
+        $perpage = 25;
+
+        if (isset($_POST['page'])) {
+            $page = $_POST['page'];
+        } else {
+            $page = 1;
+        }
+
+        $reqId = (int)($request->id);
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $html = '';
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $options = [
+            'sort' => [
+                '$b.modified' => -1
+            ],
+            'allowDiskUse' => TRUE
+        ];
+        
+        // $pipeline_count = [
+        //     [
+        //         '$project' => [
+        //             '_id' => '$_id',
+        //             'a' => '$$ROOT'
+        //         ]
+        //     ]
+        //     ,
+        //     [
+        //         '$lookup' => [
+        //             'localField' => 'a.pulse_id',
+        //             'from' => 'fx_otx_events',
+        //             'foreignField' => 'pulse_id',
+        //             'as' => 'b'
+        //         ]
+        //     ]
+        //     ,
+        //     [
+        //         '$unwind' => [
+        //             'path' => '$b',
+        //             'preserveNullAndEmptyArrays' => TRUE
+        //         ]
+        //     ]
+        //     ,
+        //     [
+        //         '$match' => [
+        //             'a.indicator_id'  => $reqId,
+        //             'a.status'  => 1,
+        //         ]
+        //     ]
+        // ];
+        // $cursor_count = $col_fx_otx_events_indicator_ref->aggregate($pipeline_count, $options);
+        // $countAll = count($cursor_count->toArray());
+        // // $_search['type'] = ['$in'=>$request->type];
+        // $page = $page<1?1:$page;
+        // $start = ($page - 1) * $perpage;
+        // if($start>$countAll&&$countAll>0){
+        //     $page = $page-1;
+        //     $start = ($page - 1) * $perpage;
+        // }
+
+        $pipeline = [
+            [
+                '$project' => [
+                    '_id' => '$_id',
+                    'a' => '$$ROOT'
+                ]
+            ]
+            ,
+            [
+                '$lookup' => [
+                    'localField' => 'a.pulse_id',
+                    'from' => 'fx_otx_events',
+                    'foreignField' => 'pulse_id',
+                    'as' => 'b'
+                ]
+            ]
+            ,
+            [
+                '$unwind' => [
+                    'path' => '$b',
+                    'preserveNullAndEmptyArrays' => TRUE
+                ]
+            ]
+            ,
+            [
+                '$match' => [
+                    'a.indicator_id'  => $reqId,
+                    'a.status'  => 1,
+                ]
+            ],
+            [
+                '$sort' => [
+                    'b.modified'  => -1,
+                ]
+            ]
+            // ,
+            // [
+            //     '$skip' => $start
+            // ],
+            // [
+            //     '$limit' => $perpage
+            // ]
+        ];
+        $cursor = $col_fx_otx_events_indicator_ref->aggregate($pipeline, $options);
+        
+        $document_all = $cursor->toArray();
+        // $total_record = $countAll;
+        // $total_page = ceil($total_record / $perpage);
+        // $second_last = $total_page - 1;
+        // $offset = ($page-1) * $perpage;
+        // $previous_page = $page - 1;
+        // $next_page = $page + 1;
+        // $adjacents = "2";
+
+        // $pagination = '<nav>
+        //             <ul class="pagination">';
+
+        // if($page > 1) {
+        //     $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">First Page</a></li>';
+        // }
+
+        // $pagination .= '<li onclick="pagination_goto('.$previous_page.')" data-page="'.@$previous_page.'"';
+        //     if($page <= 1) {
+        //         $pagination .= 'class="disabled"';
+        //     }
+        // $pagination .= '>';
+
+        // $pagination .= '<a ';
+        //     if($page > 1) {
+        //         $pagination .= 'href="#"';
+        //     }
+
+        //     $pagination .= '>Previous</a></li>';
+
+        //     if ($total_page <= 10){   
+        //         for ($counter = 1; $counter <= $total_page; $counter++){
+        //             if ($counter == $page) {
+        //                 $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+        //             }else{
+        //                 $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+        //             }
+        //         }
+        //     } elseif ($total_page > 10){
+        //         if($page <= 4) { 
+        //             for ($counter = 1; $counter < 8; $counter++){ 
+        //                 if ($counter == $page) {
+        //                     $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+        //                 }else{
+        //                     $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+        //                 }
+        //             }
+        //            $pagination .= '<li><a>...</a></li>';
+        //            $pagination .= '<li onclick="pagination_goto('.$second_last.')" data_page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
+        //            $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
+        //         } elseif ($page > 4 && $page < $total_page - 4) { 
+        //             $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
+        //             $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
+        //             $pagination .= "<li><a>...</a></li>";
+        //             for (
+        //                  $counter = $page - $adjacents;
+        //                  $counter <= $page + $adjacents;
+        //                  $counter++
+        //             ) { 
+        //                     if ($counter == $page) {
+        //                         $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+        //                     }else{
+        //                         $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+        //                     }                  
+        //             }   
+        //                    $pagination .= "<li><a>...</a></li>";
+        //                    $pagination .= '<li onclick="pagination_goto('.$second_last.')" data-page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
+        //                    $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
+        //         } else {
+        //             $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
+        //             $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
+        //             $pagination .= '<li><a>...</a></li>';
+        //             for (
+        //                  $counter = $total_page - 6;
+        //                  $counter <= $total_page;
+        //                  $counter++
+        //             ) {
+        //                     if ($counter == $page) {
+        //                     $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+        //                     }else{
+        //                         $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+        //                     }                   
+        //             }
+        //         }
+        //     }
+
+        //     $pagination .= '<li onclick="pagination_goto('.$next_page.')" data-page="'.@$next_page.'"';
+
+        //     if($page >= $total_page){
+        //         $pagination .= 'class="disabled"';
+        //     } 
+        //     $pagination .= ' >';
+
+        //     $pagination .= '<a ';
+        //     if($page < $total_page) {
+        //         $pagination .= 'href="#"';
+        //     }
+        //     $pagination .= '>Next</a></li>';
+
+        //     if($page < $total_page){
+        //         $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
+        //     } 
+        //     $pagination .= '</ul></nav>';
+
+        // if(!empty($document)){
+        //     //dd($document[0]["b"]["pulse_id"]);
+            
+        // }else{
+
+            
+        // }
+        $html = '';
+        $head_table = '';
+        $head_table .= '<table class="table table-striped" id="table-related-event">
+                            <thead>
+                                <tr>
+                                    <!--<th>
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>-->
+                                    <th>No</th>
+                                    <th>Event Name</th>
+                                    <th>Group</th>
+                                    <th>Tags</th>
+                                    <th>Attr</th>
+                                    <th>Published</th>
+                                    <th>Last Status</th>
+                                    <th style="width: 100px;">DateTime</th>
+                                    <th>View</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        <tbody>';
+        // $head_table = '<tbody>';
+        $html .= $head_table;
+        function check_publish($val) {
+            if($val==1) {
+                $result = '<i class="fas fa-check"></i>';
+            } else {
+                $result = '';
+            }
+            return $result;
+        }
+        function check_last_status($val) {
+            if($val== true) {
+                $result = 'Modified';
+            } else {
+                $result = 'Created';
+            }
+            return $result;
+        }
+        function change_date_utc_to_thai($val) {
+            // if($val== true) {
+            //     $result = 'Modified';
+            // } else {
+            //     $result = 'Created';
+            // }
+    
+    
+            $tz = new \DateTimeZone('Asia/Bangkok');
+            // $start = '2020-01-01 00:00:00';
+            // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
+    
+            // print_r($dateStart->toDateTime()->format(DATE_RSS));
+            $date_start = $val->toDateTime();
+    
+            $date_start->setTimezone($tz);
+    
+            $start = $date_start->format(DATE_ATOM);
+            $return_date = date("Y-m-d",strtotime($start));
+    
+            // echo $start;
+    
+    
+            return $return_date;
+        }
+        // $i = $start;
+        $i = 0;
+
+        foreach ($document_all as $document) {
+            $i++;
+            $html .= '
+                            <tr>
+                                <!--<td>
+                                    <label>
+                                        <input value="'.$document['b']['_id'].'" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </td>-->
+                                <td>'.$i.'</td>
+                                <td>'.$document['b']['name'].'</td>
+                                <td>'.$document['b']['groups'].'</td>
+                                <td>'.$document['b']['tags'].'</td>
+                                <td>
+                                    <a href="#"></a>
+                                </td>
+                                <td>'.check_publish($document['b']['public']).'</td>
+                                <td>'.check_last_status($document['b']['is_modified']).'</td>
+                                <td>'.change_date_utc_to_thai($document['b']['modified']).'</td>
+                                <td>'.$document['b']['count_view'].'</td>
+                                <td>
+                                    <a href="#" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                </td>
+                            </tr>
+                        ';
+            // dd($document['_id']);
+        }
+    
+        $html .= '</tbody>
+            </table>';
+
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+                // "pagination" => $pagination,
+            ];
+            return response()->json($data);
+        }
+
+    }
+
+    public function load_relatedPulse_tb(Request $request)
+    {
+        $reqId = (int)($request->id);
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $html = '';
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $options = [
+            'sort' => [
+                '$b.modified' => -1
+            ],
+            'allowDiskUse' => TRUE
+        ];
+
+        $pipeline = [
+            [
+                '$project' => [
+                    '_id' => '$_id',
+                    'a' => '$$ROOT'
+                ]
+            ]
+            ,
+            [
+                '$lookup' => [
+                    'localField' => 'a.pulse_id',
+                    'from' => 'fx_otx_events',
+                    'foreignField' => 'pulse_id',
+                    'as' => 'b'
+                ]
+            ]
+            ,
+            [
+                '$unwind' => [
+                    'path' => '$b',
+                    'preserveNullAndEmptyArrays' => TRUE
+                ]
+            ]
+            ,
+            [
+                '$match' => [
+                    'a.indicator_id'  => $reqId,
+                    'a.status'  => 1,
+                ]
+            ],
+            [
+                '$sort' => [
+                    'b.modified'  => -1,
+                ]
+            ]
+        ];
+        $cursor = $col_fx_otx_events_indicator_ref->aggregate($pipeline, $options);
+        $document_all = $cursor->toArray();
+        
+        
+        $dataOut["draw"] = 1;
+        $dataOut["recordsTotal"] = count($document_all);
+        $dataOut["recordsFiltered"] = count($document_all);
+        $dataOut["data"] = array_column($document_all, 'b');
+        dd($dataOut);
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+                // "pagination" => $pagination,
             ];
             return response()->json($data);
         }
@@ -688,7 +1100,6 @@ class IndicatorsController extends Controller
         $count = $col_fx_transaction_otx_indicators_data->count($_search);
         //dd($cursor->count());
         //dateATOM
-       
         $documentAll = $cursor->toArray();
         //    else {
 

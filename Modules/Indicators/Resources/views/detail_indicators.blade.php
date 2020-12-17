@@ -23,7 +23,7 @@
                     <div class="nav-menu-btn">
                         <ul>
                             <li class="nav-link active-link">
-                                <a href="#general_details">General Detail</a>
+                                <a id="to_top" href="#general_details">General Detail</a>
                                 <div class="underline"></div>
                             </li>
                             <li class="nav-link">
@@ -89,35 +89,21 @@
                                                             <span class="label-text"></span>
                                                         </label>
                                                     </th>
-                                                    <th>TYPE</th>
-                                                    <th>Attribute Name</th>
-                                                    <th>ROLE</th>
-                                                    <th>Date</th>
+                                                    <th>No</th>
+                                                    <th>Event Name</th>
+                                                    <th>Group</th>
+                                                    <th>Tags</th>
+                                                    <th>Attr</th>
+                                                    <th>Published</th>
+                                                    <th>Last Status</th>
+                                                    <th style="width: 200px;">DateTime</th>
+                                                    <th>View</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>   
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <label>
-                                                            <input value="" type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </td>
-                                                    <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.</a></td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                                    </td>
-                                                </tr>    
-                                            </tbody> 
+                                            
                                         </table>
+                                       {{--<div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>--}}
                                     </div>
                                 </div>
                             </div>
@@ -145,9 +131,12 @@
 
 <script>
 
-    $('#table-related-event').DataTable();
+    {{--$('#table-related-event').DataTable();--}}
 
     detail_load_general();
+    detail_load_pulses();
+
+
     $(document).ready(function () {
         $('#indicator_type').select2({
             placeholder:'Indicator Type',
@@ -168,28 +157,7 @@
     });
     
     function detail_load_general(){
-        $.ajax(req_load_general()).done(function(data){
-            $('#loadspinner_related_pulse').hide();
-            $('#loadspinner_basic_info').hide();
-            $("#indicator_basic_info").append(data.html);
-
-            {{--$("#pulses_related").append(data.html);--}}
-
-            
-            if("{{$otxtype}}"=="CVE"){
-                console.log("CVE");
-            }else{
-
-            }
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('#loadspinner_related_pulse').hide();
-            $('#loadspinner_basic_info').hide();
-            console.log("No response from server");
-        });
-    }
-
-    function req_load_general(){
-        dataout = {
+        $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -202,30 +170,108 @@
             }),
             datatype: "html",
             beforeSend: function(){
-                $('#loadspinner_related_pulse').show();
                 $('#loadspinner_basic_info').show();
             },
-        };
-        return dataout;
+        }).done(function(data){
+            $('#loadspinner_basic_info').hide();
+            $("#indicator_basic_info").append(data.html);
+
+            {{--$("#pulses_related").append(data.html);--}}
+
+            
+            if("{{$otxtype}}"=="CVE"){
+                console.log("CVE");
+            }else{
+
+            }
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('#loadspinner_basic_info').hide();
+            console.log("No response from server");
+        });
     }
 
-    function req_load_url_list(data_general){
-        dataout = {
+    $(function() {
+        load_table(1);
+    });
+
+
+
+    function detail_load_pulses(page=1){
+        $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            url: "/indicators/load/url_list",
+            url: '{!! route('indicators.load_pulses')!!}',
+            type: "post",
+            data:({
+                page : page,
+                id:"{{$otxid}}"
+            }),
+            beforeSend: function(){
+                f_loading(null,'#table-related-event');
+            },
+        }).done(function(data){
+            f_loading_stop(null,'#table-related-event');
+            $("#table-related-event").html(data.html);
+            {{--$("#pagination_custom").html(data.pagination);--}}
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+	    loading('stop_load');
+            f_loading_stop(null,'#table-related-event');
+            console.log("No response from server");
+        });
+    }
+
+    function pagination_goto(page=null) {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.load_pulses')!!}',
+            type: "post",
+            data:({
+                page : page,
+                id:"{{$otxid}}"
+
+            }),
+            beforeSend: function(){
+                f_loading(null, '#table-related-event');
+            },
+        }).done(function(data){
+        f_loading_stop(null, '#table-related-event');
+            
+            $("#table-related-event").html(data.html);
+            {{--$("#pagination_custom").html(data.pagination);--}}
+            $("#to_top").trigger("click");
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+	    {{--loading('stop_load');--}}
+        f_loading_stop(null, '#table-related-event');
+            console.log("No response from server");
+        });
+    }
+
+    function detail_load_pulses1(){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/load/pulses",
             type: "post",
             data: ({
-                type:"{{$otxtype}}",
-                indicator:"{{$otxindicator}}",
-                data_general:data_general,
+                id:"{{$otxid}}",
             }),
             datatype: "html",
             beforeSend: function(){
+                $('#loadspinner_related_pulse').show();
             },
-        };
-        return dataout;
+        }).done(function(data){
+            $('#loadspinner_related_pulse').hide();
+
+            {{--$("#pulses_related").append(data.html);--}}
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('#loadspinner_related_pulse').hide();
+            console.log("No response from server");
+        });
     }
 
     function copy_clipboard(id) {
