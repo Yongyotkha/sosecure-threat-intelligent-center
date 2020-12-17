@@ -62,11 +62,20 @@ class IndicatorsController extends Controller
             'pulse_id' => '5c76b2acd1420a1aac451307'
         ];
 
-        $options = [];
+        $options = [
+            'limit' => 1
+        ];
 
-        $cursor = $collection->find($query, $options);
+        $cursor = $collection->find($query, $options)->toArray();
+
+        // dd($cursor->toArray()[0]->name);
+
+        // foreach ($cursor as $document) {
+        //     dd($document['name']);
+        // }
 
 
+        $data['otx_events'] = $cursor;
         $data['page'] = langapp('indicators');
         return view('indicators::events_detail')->with($data);
     }
@@ -1075,47 +1084,8 @@ class IndicatorsController extends Controller
 
 
 
-        function check_publish($val) {
-            if($val==1) {
-                $result = '<i class="fas fa-check"></i>';
-            } else {
-                $result = '';
-            }
-            return $result;
-        }
-        function check_last_status($val) {
-            if($val== true) {
-                $result = 'Modified';
-            } else {
-                $result = 'Created';
-            }
-            return $result;
-        }
-        function change_date_utc_to_thai($val) {
-            // if($val== true) {
-            //     $result = 'Modified';
-            // } else {
-            //     $result = 'Created';
-            // }
 
-
-            $tz = new \DateTimeZone('Asia/Bangkok');
-            // $start = '2020-01-01 00:00:00';
-            // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
-    
-            // print_r($dateStart->toDateTime()->format(DATE_RSS));
-            $date_start = $val->toDateTime();
-    
-            $date_start->setTimezone($tz);
-    
-            $start = $date_start->format(DATE_ATOM);
-            $return_date = date("Y-m-d",strtotime($start));
-    
-            // echo $start;
-
-
-            return $return_date;
-        }
+ 
         $i = $start;
         foreach ($cursor as $document) {
             $i++;
