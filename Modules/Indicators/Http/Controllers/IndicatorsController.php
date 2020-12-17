@@ -13,7 +13,6 @@ use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
-use Modules\SiteSettings\Entities\SiteSettings;
 class IndicatorsController extends Controller
 {
     /**
