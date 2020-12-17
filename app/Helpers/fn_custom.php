@@ -16,6 +16,7 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Stringy\Stringy as S;
 
 define("PAGINATE_NUM", 10);
+define("DB_MONGO_01", 'mongodb://10.104.0.7:27017');
 
 
 function gen_uuid() {
@@ -170,4 +171,27 @@ function utf8_strlen($str) {
          }
       }
       return $l;
+}
+
+function explode_val($val,$type=null) {
+    $result = '';
+    if($val) {
+        $val_arr = explode(",",$val);
+        if($val_arr) {
+            foreach($val_arr as $tag) {
+                if($type == 'tags') {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                } else if ($type == 'groups') {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                } else {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                }
+                
+            }
+            $result = rtrim($result,',');
+        }
+    } else {
+        $result = '';
+    }
+    return $result;
 }

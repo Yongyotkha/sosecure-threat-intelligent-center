@@ -9,7 +9,7 @@
             </a>
             <div class="bc-head">Events > SSH-US...</div>
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <!--<button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
             </button>
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
@@ -21,7 +21,7 @@
                     @endforeach
                     @endif --}}
                 </select>
-            </div>
+            </div>-->
 
         </header>
         <section class="scrollable wrapper">
