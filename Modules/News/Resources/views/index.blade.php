@@ -182,6 +182,7 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.form')
+@include('stacks.js.advanced_search')
 
 <script>
     var f_search = 0;
@@ -393,12 +394,6 @@
                 $('#link_tab_bookmark').attr("href","#");
             }
         }
-    });
-
-
-    $('#hide-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#hide-advance-search').toggle();
     });
 
     $('#sources_select').select2();
