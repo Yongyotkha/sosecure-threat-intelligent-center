@@ -68,7 +68,7 @@ class OTXMDFeedPulse extends Command
                         'deleted_at' => null,
                     ]);
                 }//modified:%3C1d
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=100&page=1&sort=-modified&q=modified:%3C12h', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified&q=modified:%3C12h', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                 } else {
@@ -455,7 +455,7 @@ class OTXMDFeedPulse extends Command
 
                
                 if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
-                    echo ($otxFeedData["next"]);
+                    //echo ($otxFeedData["next"]);
                     $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
                     if ($reconCall["success"]) {
                         $otxFeedData = json_decode($reconCall["result"], true);

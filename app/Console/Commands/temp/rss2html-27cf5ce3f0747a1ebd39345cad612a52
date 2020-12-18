@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" version="2.0">
+
+<channel>
+	<title>Krebs on Security</title>
+	<atom:link href="https://krebsonsecurity.com/feed/" rel="self" type="application/rss+xml"/>
+	<link>https://krebsonsecurity.com</link>
+	<description>In-depth security news and investigation</description>
+	<lastBuildDate>Wed, 16 Dec 2020 18:37:47 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=5.5.3</generator>
+	<item>
+		<title>Malicious Domain in SolarWinds Hack Turned into ‘Killswitch’</title>
+		<link>https://krebsonsecurity.com/2020/12/malicious-domain-in-solarwinds-hack-turned-into-killswitch/</link>
+					<comments>https://krebsonsecurity.com/2020/12/malicious-domain-in-solarwinds-hack-turned-into-killswitch/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Wed, 16 Dec 2020 18:37:47 +0000</pubDate>
+				<category><![CDATA[Data Breaches]]></category>
+		<category><![CDATA[FireEye]]></category>
+		<category><![CDATA[GoDaddy]]></category>
+		<category><![CDATA[microsoft]]></category>
+		<category><![CDATA[Orion]]></category>
+		<category><![CDATA[RedDrip Team]]></category>
+		<category><![CDATA[SolarWinds breach]]></category>
+		<category><![CDATA[SUNBURST]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53838</guid>
+
+					<description><![CDATA[A key malicious domain name used to control potentially thousands of computer systems compromised via the months-long breach at network monitoring software vendor SolarWinds was commandeered by security experts and used as a "killswitch" designed to turn the sprawling cybercrime operation against itself, KrebsOnSecurity has learned.]]></description>
+										<content:encoded><![CDATA[<p>A key malicious domain name used to control potentially thousands of computer systems compromised via the months-long breach at network monitoring software vendor <strong>SolarWinds</strong> was commandeered by security experts and used as a &#8220;killswitch&#8221; designed to turn the sprawling cybercrime operation against itself, KrebsOnSecurity has learned.</p>
+<p><img loading="lazy" class="aligncenter wp-image-53842" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/ks-red.png" alt="" width="597" height="597" /></p>
+<p>Austin, Texas-based SolarWinds disclosed this week that a compromise of its software update servers earlier this year may have resulted in <a href="https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/" target="_blank" rel="noopener noreferrer">malicious code being pushed to nearly 18,000 customers of its <strong>Orion</strong> platform</a>. Many <a href="https://web.archive.org/web/20201214065921/https://www.solarwinds.com/company/customers" target="_blank" rel="noopener noreferrer">U.S. federal agencies and Fortune 500 firms</a> use(d) Orion to monitor the health of their IT networks.</p>
+<p>On Dec. 13, cyber incident response firm <strong>FireEye</strong> <a href="https://www.fireeye.com/blog/threat-research/2020/12/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor.html" target="_blank" rel="noopener noreferrer">published a detailed writeup</a> on the malware infrastructure used in the SolarWinds compromise, presenting evidence that the Orion software was first compromised back in March 2020. FireEye said hacked networks were seen communicating with a malicious domain name &#8212; <strong>avsvmcloud[.]com</strong> &#8212; one of several domains the attackers had set up to control affected systems.</p>
+<p>As <a href="https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/" target="_blank" rel="noopener noreferrer">first reported here on Tuesday</a>, there were signs over the past few days that control over the domain had been transferred to <strong>Microsoft</strong>. Asked about the changeover, Microsoft referred questions to FireEye and to <strong>GoDaddy</strong>, the current domain name registrar for the malicious site.</p>
+<p>Today, FireEye responded that the domain seizure was part of a collaborative effort to prevent networks that may have been affected by the compromised SolarWinds software update from communicating with the attackers. What&#8217;s more, the company said the domain was reconfigured to act as a &#8220;killswitch&#8221; that would prevent the malware from continuing to operate in some circumstances.</p>
+<p>&#8220;SUNBURST is the malware that was distributed through SolarWinds software,&#8221; FireEye said in a statement shared with KrebsOnSecurity. &#8220;As part of FireEye&#8217;s analysis of SUNBURST, we identified a killswitch that would prevent SUNBURST from continuing to operate.&#8221;</p>
+<p>The statement continues:</p>
+<blockquote><p>&#8220;Depending on the IP address returned when the malware resolves avsvmcloud[.]com, under certain conditions, the malware would terminate itself and prevent further execution. FireEye collaborated with GoDaddy and Microsoft to deactivate SUNBURST infections.&#8221;</p>
+<p>&#8220;This killswitch will affect new and previous SUNBURST infections by disabling SUNBURST deployments that are still beaconing to avsvmcloud[.]com. However, in the intrusions FireEye has seen, this actor moved quickly to establish additional persistent mechanisms to access to victim networks beyond the SUNBURST backdoor.</p>
+<p>This killswitch will not remove the actor from victim networks where they have established other backdoors. However, it will make it more difficult to for the actor to leverage the previously distributed versions of SUNBURST.&#8221;</p></blockquote>
+<p>It is likely that given their visibility into and control over the malicious domain, Microsoft, FireEye, GoDaddy and others now have a decent idea which companies may still be struggling with SUNBURST infections.</p>
+<p>The killswitch revelations came as security researchers said they&#8217;d <a href="https://twitter.com/RedDrip7/status/1339168187619790848" target="_blank" rel="noopener noreferrer">made progress in decoding SUNBURST&#8217;s obfuscated communications methods</a>. Chinese cybersecurity firm <strong>RedDrip Team</strong> published their findings <a href="https://t.co/jsnOldynCV?amp=1" target="_blank" rel="noopener noreferrer">on Github</a>, saying its decoder tool had identified nearly a hundred suspected victims of the SolarWinds/Orion breach, including universities, governments and high tech companies.</p>
+<p>Meanwhile, the potential legal fallout for SolarWinds in the wake of this breach continues to worsen. <em>The Washington Post</em> <a href="https://www.washingtonpost.com/technology/2020/12/15/solarwinds-russia-breach-stock-trades/?itid=sf_business-technology" target="_blank" rel="noopener noreferrer">reported Tuesday</a> that top investors in SolarWinds sold millions of dollars in stock in the days before the intrusion was revealed. SolarWinds&#8217;s stock price has fallen more than 20 percent in the past few days. The Post cited former enforcement officials at the <strong>U.S. Securities and Exchange Commission</strong> (SEC) saying the sales were likely to prompt an insider trading investigation.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/malicious-domain-in-solarwinds-hack-turned-into-killswitch/feed/</wfw:commentRss>
+			<slash:comments>47</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SolarWinds Hack Could Affect 18K Customers</title>
+		<link>https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/</link>
+					<comments>https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Tue, 15 Dec 2020 17:41:37 +0000</pubDate>
+				<category><![CDATA[Data Breaches]]></category>
+		<category><![CDATA[Alan Paller]]></category>
+		<category><![CDATA[Andrew Morris]]></category>
+		<category><![CDATA[Center for Strategic and International Studies]]></category>
+		<category><![CDATA[CISA]]></category>
+		<category><![CDATA[Cybersecurity and Infrastructure Security Agency]]></category>
+		<category><![CDATA[FireEye]]></category>
+		<category><![CDATA[GreyNoise Intelligence]]></category>
+		<category><![CDATA[James Lewis]]></category>
+		<category><![CDATA[microsoft]]></category>
+		<category><![CDATA[Orion software]]></category>
+		<category><![CDATA[SANS Institute]]></category>
+		<category><![CDATA[SolarWinds breach]]></category>
+		<category><![CDATA[U.S. Securities and Exchange Commission]]></category>
+		<category><![CDATA[Vinoth Kumar]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53791</guid>
+
+					<description><![CDATA[The still-unfolding breach at network management software firm SolarWinds may have resulted in malicious code being pushed to nearly 18,000 customers, the company said in a legal filing on Monday. Meanwhile, Microsoft should soon have some idea which and how many SolarWinds customers were affected, as it recently took possession of a key domain name used by the intruders to control infected systems.]]></description>
+										<content:encoded><![CDATA[<p>The still-unfolding breach at network management software firm <strong>SolarWinds</strong> may have resulted in malicious code being pushed to nearly 18,000 customers, the company said in a legal filing on Monday. Meanwhile, <strong>Microsoft</strong> should soon have some idea which and how many SolarWinds customers were affected, as it recently took possession of a key domain name used by the intruders to control infected systems.</p>
+<p><img loading="lazy" class="aligncenter size-full wp-image-53813" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/swlogo.png" alt="" width="512" height="120" /></p>
+<p>On Dec. 13, SolarWinds acknowledged that hackers had inserted malware into a service that provided software updates for its <strong>Orion</strong> platform, a suite of products <a href="https://web.archive.org/web/20201214065921/https://www.solarwinds.com/company/customers" target="_blank" rel="noopener noreferrer">broadly used across the U.S. federal government and Fortune 500 firms</a> to monitor the health of their IT networks.</p>
+<p>In <a href="https://d18rn0p25nwr6d.cloudfront.net/CIK-0001739942/57108215-4458-4dd8-a5bf-55bd5e34d451.pdf" target="_blank" rel="noopener noreferrer">a Dec. 14 filing</a> with the <strong>U.S. Securities and Exchange Commission</strong> (SEC), SolarWinds said roughly 33,000 of its more than 300,000 customers were Orion customers, and that fewer than 18,000 customers may have had an installation of the Orion product that contained the malicious code. SolarWinds said the intrusion also compromised its Microsoft Office 365 accounts.</p>
+<p>The initial breach disclosure from SolarWinds came five days after cybersecurity incident response firm <strong>FireEye</strong> announced it had suffered an intrusion that resulted in the theft of some 300 proprietary software tools the company provides to clients to help secure their IT operations.</p>
+<p>On Dec. 13, FireEye <a href="https://www.fireeye.com/blog/threat-research/2020/12/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor.html" target="_blank" rel="noopener noreferrer">published a detailed writeup</a> on the malware infrastructure used in the SolarWinds compromise, presenting evidence that the Orion software was first compromised back in March 2020. FireEye didn&#8217;t explicitly say its own intrusion was the result of the SolarWinds hack, but the company confirmed as much to KrebsOnSecurity earlier today.</p>
+<p>Also on Dec. 13, news broke that the SolarWinds hack resulted in attackers reading the email communications at the <strong>U.S. Treasury</strong> and <strong>Commerce</strong> departments.</p>
+<p>On Dec. 14, Reuters <a href="https://www.reuters.com/article/us-global-cyber-usa-dhs-idUSKBN28O2LY" target="_blank" rel="noopener noreferrer">reported</a> the SolarWinds intrusion also had been used to infiltrate computer networks at the <strong>U.S. Department of Homeland Security</strong> (DHS). That disclosure came less than 24 hours after DHS&#8217;s <strong>Cybersecurity and Infrastructure Security Agency</strong> (CISA) took the unusual step of issuing <a href="https://cyber.dhs.gov/ed/21-01/" target="_blank" rel="noopener noreferrer">an emergency directive</a> ordering all federal agencies to immediately disconnect the affected Orion products from their networks.</p>
+<h4>ANALYSIS</h4>
+<p>Security experts have been speculating as to the extent of the damage from the SolarWinds hack, combing through details in the FireEye analysis and elsewhere for <a href="https://github.com/bambenek/research/tree/main/sunburst" target="_blank" rel="noopener noreferrer">clues about how many other organizations may have been hit</a>.</p>
+<p>And it seems that Microsoft may now be in perhaps the best position to take stock of the carnage. That&#8217;s because sometime on Dec. 14, the software giant took control over a key domain name &#8212; <strong>avsvmcloud[.]com</strong> &#8212; that was used by the SolarWinds hackers to communicate with systems compromised by the backdoored Orion product updates.</p>
+
+<a href='https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/whois-avsv/'><img width="128" height="82" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/whois-avsv.png" class="attachment-thumbnail size-thumbnail" alt="" loading="lazy" /></a>
+<a href='https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/pdns-lookup-e/'><img width="124" height="96" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/pdns-lookup-e.png" class="attachment-thumbnail size-thumbnail" alt="" loading="lazy" /></a>
+<a href='https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/pdns-e2/'><img width="108" height="96" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/pdns-e2.png" class="attachment-thumbnail size-thumbnail" alt="" loading="lazy" /></a>
+
+<p>Armed with that access, Microsoft should be able to tell which organizations have IT systems that are still trying to ping the malicious domain. However, because many Internet service providers and affected companies are already blocking systems from accessing that malicious control domain or have disconnected the vulnerable Orion services, Microsoft&#8217;s visibility may be somewhat limited.</p>
+<p>Microsoft has a long history of working with federal investigators and the U.S. courts <a href="https://krebsonsecurity.com/?s=microsoft+takedown&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">to seize control over domains involved in global malware menaces</a>, particularly when those sites are being used primarily to attack Microsoft Windows customers.</p>
+<p>Microsoft dodged direct questions about its visibility into the malware control domain, suggesting those queries would be better put to FireEye or <strong>GoDaddy</strong> (the current domain registrar for the malware control server). But in <a href="https://twitter.com/securityjones/status/1338885261460008960" target="_blank" rel="noopener noreferrer">a response on Twitter</a>, Microsoft spokesperson <strong>Jeff Jones</strong> seemed to confirm that control of the malicious domain had changed hands.<span id="more-53791"></span></p>
+<p>&#8220;We worked closely with FireEye, Microsoft and others to help keep the internet safe and secure,&#8221; GoDaddy said in a written statement. &#8220;Due to an ongoing investigation and our customer privacy policy, we can’t comment further at this time.&#8221;</p>
+<p>FireEye declined to answer questions about exactly when it learned of its own intrusion via the Orion compromise, or approximately when attackers first started offloading sensitive tools from FireEye&#8217;s network. But the question is an interesting one because its answer may speak to the motivations and priorities of the hackers.</p>
+<p>Based on the timeline known so far, the perpetrators of this elaborate hack would have had a fairly good idea back in March which of SolarWinds&#8217; 18,000 Orion customers were worth targeting, and perhaps even in what order.</p>
+<p><strong>Alan Paller</strong>, director of research for the <strong>SANS Institute</strong>, a security education and training company based in Maryland, said the attackers likely chose to prioritize their targets based on some calculation of risk versus reward.</p>
+<p>Paller said the bad guys probably sought to balance the perceived strategic value of compromising each target with the relative likelihood that exploiting them might result in the entire operation being found out and dismantled.</p>
+<p>&#8220;The way this probably played out is the guy running the cybercrime team asked his people to build a spreadsheet where they ranked targets by the value of what they could get from each victim,&#8221; Paller said. &#8220;And then next to that they likely put a score for how good the malware hunters are at the targets, and said let&#8217;s first go after the highest priority ones that have a hunter score of less than a certain amount.&#8221;</p>
+<p>The breach at SolarWinds could well turn into an existential event for the company, depending on how customers react and how SolarWinds is able to weather the lawsuits that will almost certainly ensue.</p>
+<p>&#8220;The lawsuits are coming, and I hope they have a good general counsel,&#8221; said <strong>James Lewis</strong>, senior vice president at the <strong>Center for Strategic and International Studies</strong>. &#8220;Now that the government is telling people to turn off [the SolarWinds] software, the question is will anyone turn it back on?&#8221;</p>
+<p>According to its SEC filing, total revenue from the Orion products across all customers &#8212; including those who may have had an installation of the Orion products that contained the malicious update &#8212; was approximately $343 million, or roughly 45 percent of the firm&#8217;s total revenue. SolarWinds&#8217; stock price has fallen 25 percent since news of the breach first broke.</p>
+<p>Some of the legal and regulatory fallout may hinge on what SolarWinds knew or should have known about the incident, when, and how it responded. For example,<strong> Vinoth Kumar</strong>, a cybersecurity &#8220;bug hunter&#8221; who has earned cash bounties and recognition from multiple companies for reporting security flaws in their products and services, <a href="https://twitter.com/briankrebs/status/1338549067924770817" target="_blank" rel="noopener noreferrer">posted on Twitter</a> that he notified SolarWinds in November 2019 that the company&#8217;s software download website was protected by a simple password that was published in the clear on SolarWinds&#8217; code repository at Github.</p>
+<p><a href="https://krebsonsecurity.com/wp-content/uploads/2020/12/kumartweet.png"><img loading="lazy" class="aligncenter wp-image-53805" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/kumartweet.png" alt="" width="593" height="473" /></a></p>
+<p><strong>Andrew Morris</strong>, founder of the security firm <strong>GreyNoise Intelligence</strong>, on <a href="https://twitter.com/Andrew___Morris/status/1338614208905302021" target="_blank" rel="noopener noreferrer">said that as of Tuesday evening</a> SolarWinds still hadn&#8217;t removed the compromised Orion software updates from its distribution server.</p>
+<p><a href="https://krebsonsecurity.com/wp-content/uploads/2020/12/morristweet.png"><img loading="lazy" class="aligncenter wp-image-53806" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/morristweet.png" alt="" width="594" height="446" /></a></p>
+<p>Another open question is how or whether the incoming U.S. Congress and presidential administration will react to this apparently broad cybersecurity event. CSIS&#8217;s Lewis says he doubts lawmakers will be able to agree on any legislative response, but he said it&#8217;s likely the Biden administration will do something.</p>
+<p>&#8220;It will be a good new focus for DHS, and the administration can issue an executive order that says federal agencies with regulatory authority need to manage these things better,&#8221; Lewis said. &#8220;But whoever did this couldn&#8217;t have picked a better time to cause a problem, because their timing almost guarantees a fumbled U.S. response.&#8221;</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/solarwinds-hack-could-affect-18k-customers/feed/</wfw:commentRss>
+			<slash:comments>86</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>U.S. Treasury, Commerce Depts. Hacked Through SolarWinds Compromise</title>
+		<link>https://krebsonsecurity.com/2020/12/u-s-treasury-commerce-depts-hacked-through-solarwinds-compromise/</link>
+					<comments>https://krebsonsecurity.com/2020/12/u-s-treasury-commerce-depts-hacked-through-solarwinds-compromise/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Mon, 14 Dec 2020 16:26:43 +0000</pubDate>
+				<category><![CDATA[Data Breaches]]></category>
+		<category><![CDATA[The Coming Storm]]></category>
+		<category><![CDATA[APT29]]></category>
+		<category><![CDATA[Cybersecurity and Infrastructure Security Agency]]></category>
+		<category><![CDATA[Department of Commerce]]></category>
+		<category><![CDATA[FireEye hack]]></category>
+		<category><![CDATA[microsoft]]></category>
+		<category><![CDATA[Orion]]></category>
+		<category><![CDATA[Reuters]]></category>
+		<category><![CDATA[SolarWinds breach]]></category>
+		<category><![CDATA[U.S. Treasury Department]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53771</guid>
+
+					<description><![CDATA[Communications at the U.S. Treasury and Commerce Departments were reportedly compromised by a supply chain attack on SolarWinds, a security vendor that helps the federal government and a range of Fortune 500 companies monitor the health of their IT networks. Given the breadth of the company's customer base, experts say the incident may be just the first of many such disclosures.]]></description>
+										<content:encoded><![CDATA[<p>Communications at the <strong>U.S. Treasury</strong> and <strong>Commerce Departments</strong> were reportedly compromised by a supply chain attack on <strong>SolarWinds</strong>, a security vendor that helps the federal government and a range of Fortune 500 companies monitor the health of their IT networks. Given the breadth of the company&#8217;s customer base, experts say the incident may be just the first of many such disclosures.</p>
+<div id="attachment_53774" style="width: 607px" class="wp-caption aligncenter"><img aria-describedby="caption-attachment-53774" loading="lazy" class=" wp-image-53774" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/solarwindscustomers.png" alt="" width="597" height="679" /><p id="caption-attachment-53774" class="wp-caption-text">Some of SolarWinds&#8217; customers. Source: solarwinds.com</p></div>
+<p>According to <a href="https://www.reuters.com/article/BigStory12/idUSKBN28N0PG" target="_blank" rel="noopener noreferrer">a Reuters story</a>, hackers believed to be working for Russia have been monitoring internal email traffic at the U.S. Treasury and Commerce departments. Reuters reports the attackers were able to surreptitiously tamper with updates released by SolarWinds for its <a href="https://documentation.solarwinds.com/en/Success_Center/orionplatform/Content/Core-How-Orion-Works-sw1625.htm" target="_blank" rel="noopener noreferrer">Orion platform</a>, a suite of network management tools.</p>
+<p>In <a href="https://www.solarwinds.com/securityadvisory" target="_blank" rel="noopener noreferrer">a security advisory</a>, Austin, Texas based SolarWinds acknowledged its systems &#8220;experienced a highly sophisticated, manual supply chain attack on SolarWinds Orion Platform software builds for versions 2019.4 HF 5 through 2020.2.1, released between March 2020 and June 2020.&#8221;</p>
+<p>In response to the intrusions at Treasury and Commerce, the Department of Homeland Security&#8217;s <strong>Cybersecurity and Infrastructure Security Agency</strong> (CISA) took the unusual step of issuing <a href="https://cyber.dhs.gov/ed/21-01/" target="_blank" rel="noopener noreferrer">an emergency directive</a> ordering all federal agencies to immediately disconnect the affected Orion products from their networks.</p>
+<p>&#8220;Treat all hosts monitored by the SolarWinds Orion monitoring software as compromised by threat actors and assume that further persistence mechanisms have been deployed,&#8221; CISA advised.</p>
+<p>A <a href="https://blogs.microsoft.com/on-the-issues/2020/12/13/customers-protect-nation-state-cyberattacks/" target="_blank" rel="noopener noreferrer">blog post</a> by <strong>Microsoft</strong> says the attackers were able to add malicious code to software updates provided by SolarWinds for Orion users. &#8220;This results in the attacker gaining a foothold in the network, which the attacker can use to gain elevated credentials,&#8221; Microsoft wrote.</p>
+<p>From there, the attackers would be able to forge single sign-on tokens that impersonate any of the organization&#8217;s existing users and accounts, including highly privileged accounts on the network.</p>
+<p>&#8220;Using highly privileged accounts acquired through the technique above or other means, attackers may add their own credentials to existing application service principals, enabling them to call APIs with the permission assigned to that application,&#8221; Microsoft explained.</p>
+<p>Malicious code added to an Orion software update may have gone undetected by antivirus software and other security tools on host systems thanks in part to guidance from SolarWinds itself. In <a href="https://support.solarwinds.com/SuccessCenter/s/article/Files-and-directories-to-exclude-from-antivirus-scanning-for-Orion-Platform-products?language=en_US" target="_blank" rel="noopener noreferrer">this support advisory</a>, SolarWinds says its products may not work properly unless their file directories are exempted from antivirus scans and group policy object restrictions.<span id="more-53771"></span></p>
+<p>The Reuters story quotes several anonymous sources saying the intrusions at the Commerce and Treasury departments could be just the tip of the iceberg. That seems like a fair bet.</p>
+<p>SolarWinds <a href="https://www.solarwinds.com/company/customers" target="_blank" rel="noopener noreferrer">says</a> it has over 300,000 customers including:</p>
+<p>-more than 425 of the U.S. Fortune 500<br />
+-all ten of the top ten US telecommunications companies<br />
+-all five branches of the U.S. military<br />
+-all five of the top five U.S. accounting firms<br />
+-the Pentagon<br />
+-the State Department<br />
+-the National Security Agency<br />
+-the Department of Justice<br />
+-The White House.</p>
+<p>It&#8217;s unclear how many of the customers listed on SolarWinds&#8217; website are users of the affected Orion products. But Reuters reports the supply chain attack on SolarWinds is connected to a broad campaign that also involved <a href="https://www.fireeye.com/blog/products-and-services/2020/12/fireeye-shares-details-of-recent-cyber-attack-actions-to-protect-community.html" target="_blank" rel="noopener noreferrer">the recently disclosed hack at FireEye</a>, wherein hackers gained access to a slew of proprietary tools the company uses to help customers find security weaknesses in their computers and networks.</p>
+<p>The compromises at the U.S. federal agencies are thought to date back to earlier this summer, and are being blamed on hackers working for the Russian government. </p>
+<p>In its own advisory, FireEye <a href="https://www.fireeye.com/blog/threat-research/2020/12/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor.html" target="_blank" rel="noopener noreferrer">said</a> multiple updates poisoned with a malicious backdoor program were digitally signed with a SolarWinds certificate from March through May 2020, and posted to the SolarWindws update website. </p>
+<p>FireEye posits the impact of the hack on SolarWinds is widespread, affecting public and private organizations around the world.</p>
+<p>&#8220;The victims have included government, consulting, technology, telecom and extractive entities in North America, Europe, Asia and the Middle East,&#8221; the company&#8217;s analysts wrote. &#8220;We anticipate there are additional victims in other countries and verticals.&#8221;</p>
+<p><strong>Update, 8:30 p.m. ET: </strong>An earlier version of this story incorrectly stated that FireEye attributed the SolarWinds attack to APT29. That information has been removed from the story. </p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/u-s-treasury-commerce-depts-hacked-through-solarwinds-compromise/feed/</wfw:commentRss>
+			<slash:comments>166</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Payment Processing Giant TSYS: Ransomware Incident “Immaterial” to Company</title>
+		<link>https://krebsonsecurity.com/2020/12/payment-processing-giant-tsys-ransomware-incident-immaterial-to-company/</link>
+					<comments>https://krebsonsecurity.com/2020/12/payment-processing-giant-tsys-ransomware-incident-immaterial-to-company/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Thu, 10 Dec 2020 17:45:36 +0000</pubDate>
+				<category><![CDATA[Data Breaches]]></category>
+		<category><![CDATA[Ransomware]]></category>
+		<category><![CDATA[Conti]]></category>
+		<category><![CDATA[fs-isac]]></category>
+		<category><![CDATA[global payments]]></category>
+		<category><![CDATA[Ryuk]]></category>
+		<category><![CDATA[Total Systems Services Inc.]]></category>
+		<category><![CDATA[TSYS]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53731</guid>
+
+					<description><![CDATA[Payment card processing giant TSYS suffered a ransomware attack earlier this month. Since then reams of data stolen from the company have been posted online, with the attackers promising to publish more in the coming days. But the company says the malware did not jeopardize card data, and that the incident was limited to administrative areas of its business.]]></description>
+										<content:encoded><![CDATA[<p>Payment card processing giant <strong>TSYS</strong> suffered a ransomware attack earlier this month. Since then reams of data stolen from the company have been posted online, with the attackers promising to publish more in the coming days. But the company says the malware did not jeopardize card data, and that the incident was limited to administrative areas of its business.</p>
+<p><img loading="lazy" class="aligncenter wp-image-53747" src="https://krebsonsecurity.com/wp-content/uploads/2020/12/tsys.png" alt="" width="593" height="390" /></p>
+<p>Headquartered in Columbus, Ga., <a href="https://www.tsys.com" target="_blank" rel="noopener noreferrer">Total System Services Inc.</a> (TSYS) is the third-largest third-party payment processor for financial institutions in North America, and a major processor in Europe.</p>
+<p>TSYS provides payment processing services, merchant services and other payment solutions, including prepaid debit cards and payroll cards. In 2019, TSYS was acquired by financial services firm <a href="https://krebsonsecurity.com/?s=global+payments&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">Global Payments Inc.</a> [<a href="https://www.marketwatch.com/investing/stock/gpn" target="_blank" rel="noopener noreferrer">NYSE:GPN</a>].</p>
+<p>On December 8, the cybercriminal gang responsible for deploying the <strong>Conti</strong> ransomware strain (also known as &#8220;<a href="https://krebsonsecurity.com/?s=ryuk&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">Ryuk</a>&#8220;) published more than 10 gigabytes of data that it claimed to have removed from TSYS&#8217;s networks.</p>
+<p>Conti is one of several cybercriminal groups that maintains a blog which publishes data stolen from victims in a bid to force the negotiation of ransom payments. The gang claims the data published so far represents just 15 percent of the information it offloaded from TSYS before detonating its ransomware inside the company.</p>
+<p>In a written response to requests for comment, TSYS said the attack did not affect systems that handle payment card processing.</p>
+<p>&#8220;We experienced a ransomware attack involving systems that support certain corporate back office functions of a legacy <span class="il">TSYS</span> merchant business,&#8221; TSYS said. &#8220;We immediately contained the suspicious activity and the business is operating normally.&#8221;<span id="more-53731"></span></p>
+<p>According to Conti, the &#8220;legacy&#8221; TSYS business unit hit was <a href="https://en.wikipedia.org/wiki/Cayan" target="_blank" rel="noopener noreferrer">Cayan</a>, an entity acquired by TSYS in 2018 that enables payments in physical stores and mobile locations, as well as e-commerce.</p>
+<p>Conti claims prepaid card data was compromised, but TSYS says this is not the case.</p>
+<p>&#8220;Transaction processing is conducted on separate systems, has continued without interruption and no card data was impacted,&#8221; the statement continued. &#8220;We regret any inconvenience this issue may have caused. This matter is immaterial to the company.&#8221;</p>
+<p>TSYS declined to say whether it paid any ransom. But according to <strong>Fabian Wosar</strong>, chief technology officer at computer security firm <a href="https://www.emsisoft.com" target="_blank" rel="noopener noreferrer">Emsisoft</a>, Conti typically only publishes data from victims that refuse to negotiate a ransom payment.</p>
+<p>Some ransomware groups have shifted to demanding two separate ransom payments; one to secure a digital key that unlocks access to servers and computers held hostage by the ransomware, and a second in return for a promise not to publish or sell any stolen data. However, Conti so far has not adopted the latter tactic, Wosar said.</p>
+<p>&#8220;Conti almost always does steal data, but we haven&#8217;t seen them negotiating for leaks and keys separately,&#8221; he explained. &#8220;For the negotiations we have seen it has always been one price for everything (keys, deletion of data, no leaks etc.).&#8221;</p>
+<p>According to a report released last month by the <strong>Financial Services Information Sharing and Analysis Center</strong> (FS-ISAC), an industry consortium aimed at fighting cyber threats, the banking industry remains a primary target of ransomware groups. FS-ISAC said at least eight financial institutions were hit with ransomware attacks in the previous four months. The report notes that by a wide margin, Ryuk continues to be the most prolific ransomware threat targeting financial services firms.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/payment-processing-giant-tsys-ransomware-incident-immaterial-to-company/feed/</wfw:commentRss>
+			<slash:comments>16</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Patch Tuesday, Good Riddance 2020 Edition</title>
+		<link>https://krebsonsecurity.com/2020/12/patch-tuesday-good-riddance-2020-edition/</link>
+					<comments>https://krebsonsecurity.com/2020/12/patch-tuesday-good-riddance-2020-edition/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Tue, 08 Dec 2020 23:47:38 +0000</pubDate>
+				<category><![CDATA[Security Tools]]></category>
+		<category><![CDATA[Time to Patch]]></category>
+		<category><![CDATA[adobe]]></category>
+		<category><![CDATA[Allan Liska]]></category>
+		<category><![CDATA[Microsoft Office]]></category>
+		<category><![CDATA[Microsoft Patch Tuesday December 2020]]></category>
+		<category><![CDATA[Microsoft Teams]]></category>
+		<category><![CDATA[Oskars Vegeris]]></category>
+		<category><![CDATA[Recorded Future]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53728</guid>
+
+					<description><![CDATA[Microsoft today issued its final batch of security updates for Windows PCs in 2020, ending the year with a relatively light patch load. Nine of the 58 security vulnerabilities addressed this month earned Microsoft's most-dire "critical" label, meaning they can be abused by malware or miscreants to seize remote control over PCs without any help from users.]]></description>
+										<content:encoded><![CDATA[<p><strong>Microsoft</strong> today issued its final batch of security updates for <strong>Windows</strong> PCs in 2020, ending the year with a relatively light patch load. Nine of the 58 security vulnerabilities addressed this month earned Microsoft&#8217;s most-dire &#8220;critical&#8221; label, meaning they can be abused by malware or miscreants to seize remote control over PCs without any help from users.</p>
+<p><img loading="lazy" class="aligncenter size-full wp-image-52647" src="https://krebsonsecurity.com/wp-content/uploads/2020/08/windowsec.png" alt="" width="579" height="425" /></p>
+<p>Mercifully, it does not appear that any of the flaws fixed this month are being actively exploited, nor have any them been detailed publicly prior to today.</p>
+<p>The critical bits reside in updates for <strong>Microsoft Exchange Server</strong>, <strong>Sharepoint Server</strong>, and <strong>Windows 10</strong> and <strong>Server 2016</strong> systems. Additionally, Microsoft <a href="https://msrc.microsoft.com/update-guide/vulnerability/ADV200013" target="_blank" rel="noopener noreferrer">released an advisory</a> on how to minimize the risk from a DNS spoofing weakness in Windows Server 2008 through 2019.</p>
+<p>Some of the sub-critical &#8220;important&#8221; flaws addressed this month also probably deserve prompt patching in enterprise environments, including a trio of updates tackling security issues with <strong>Microsoft Office</strong>.</p>
+<p>&#8220;Given the speed with which attackers often weaponize Microsoft Office vulnerabilities, these should be prioritized in patching,&#8221; said <strong>Allan Liska</strong>, senior security architect at <strong>Recorded Future</strong>. &#8220;The vulnerabilities, if exploited, would allow an attacker to execute arbitrary code on a victim’s machine. These vulnerabilities affect Microsoft Excel 2013 through 2019, Microsoft 365 32 and 64 bit versions, Microsoft Office 2019 32 and 64 bit versions, and Microsoft Excel for Mac 2019.&#8221;</p>
+<p>We also learned this week that Redmond quietly addressed a scary <a href="https://thehackernews.com/2020/12/zero-click-wormable-rce-vulnerability.html" target="_blank" rel="noopener noreferrer">&#8220;zero-click&#8221; vulnerability</a> in its <strong>Microsoft Teams</strong> platform that would have let anyone execute code of their choosing just by sending the target a specially-crafted chat message to a Teams users. The bug was cross-platform, meaning it could also have been used to deliver malicious code to people using Teams on non-Windows devices.<span id="more-53728"></span></p>
+<p>Researcher <strong>Oskars Vegeris</strong> <a href="https://github.com/oskarsve/ms-teams-rce/blob/main/README.md" target="_blank" rel="noopener noreferrer">said in a proof-of-concept post to Github</a> that he reported the flaw to Microsoft at the end of August, but that Microsoft didn&#8217;t assign the bug a Common Vulnerabilities and Exposure (CVE) rating because it has a policy of not doing so for bugs that can be fixed from Microsoft&#8217;s end without user interaction.</p>
+<p>According to Vegeris, Microsoft addressed the Teams flaw at the end of October. But he said the bug they fixed was the first of five zero or one-click remote code execution flaws he has found and reported in Teams. Reached via LinkedIn, Vegeris declined to say whether Microsoft has yet addressed the remaining Teams issues.</p>
+<p>Separately, <strong>Adobe</strong> <a href="https://blogs.adobe.com/psirt/?p=1947" target="_blank" rel="noopener noreferrer">issued security updates</a> for its <strong>Prelude</strong>, <strong>Experience Manager</strong> and <strong>Lightroom software</strong>. There were no security updates for Adobe Flash Player, which is fitting considering Adobe is sunsetting the program at the end of the year. Microsoft is taking steps to remove Flash from its Windows browsers, and Google and Firefox already block Flash by default.</p>
+<p>It’s a good idea for Windows users to get in the habit of updating at least once a month, but for regular users (read: not enterprises) it’s usually safe to wait a few days until after the patches are released, so that Microsoft has time to iron out any chinks in the new armor.</p>
+<p>But before you update, <em>please</em> make sure you have backed up your system and/or important files. It’s not uncommon for a Windows update package to hose one’s system or prevent it from booting properly, and some updates have been known to erase or corrupt files.</p>
+<p>So do yourself a favor and backup before installing any patches. Windows 10 even has some <a href="https://lifehacker.com/how-to-back-up-your-computer-automatically-with-windows-1762867473" target="_blank" rel="noopener noreferrer">built-in tools</a> to help you do that, either on a per-file/folder basis or by making a complete and bootable copy of your hard drive all at once.</p>
+<p>And if you wish to ensure Windows has been set to pause updating so you can back up your files and/or system before the operating system decides to reboot and install patches on its own schedule, <a href="https://www.computerworld.com/article/3543189/check-to-make-sure-you-have-windows-updates-paused.html" target="_blank" rel="noopener noreferrer">see this guide</a>.</p>
+<p>As always, if you experience glitches or problems installing any of these patches this month, please consider leaving a comment about it below; there’s a better-than-even chance other readers have experienced the same and may chime in here with some helpful tips.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/patch-tuesday-good-riddance-2020-edition/feed/</wfw:commentRss>
+			<slash:comments>26</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>IRS to Make ID Protection PIN Open to All</title>
+		<link>https://krebsonsecurity.com/2020/12/irs-to-make-id-protection-pin-open-to-all/</link>
+					<comments>https://krebsonsecurity.com/2020/12/irs-to-make-id-protection-pin-open-to-all/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Fri, 04 Dec 2020 14:50:05 +0000</pubDate>
+				<category><![CDATA[Security Tools]]></category>
+		<category><![CDATA[Tax Refund Fraud]]></category>
+		<category><![CDATA[Identity Protection Personal Identification Number]]></category>
+		<category><![CDATA[Internal Revenue Service]]></category>
+		<category><![CDATA[IP PIN]]></category>
+		<category><![CDATA[irs]]></category>
+		<category><![CDATA[tax refund fraud]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53716</guid>
+
+					<description><![CDATA[The U.S. Internal Revenue Service (IRS) said this week that beginning in 2021 it will allow all taxpayers to apply for an identity protection personal identification number (IP PIN), a single-use code designed to block identity thieves from falsely claiming a tax refund in your name. Currently, IP PINs are issued only to those who fill out an ID theft affidavit, or to taxpayers who've experienced tax refund fraud in previous years.]]></description>
+										<content:encoded><![CDATA[<p>The <strong>U.S. Internal Revenue Service</strong> (IRS) said this week that beginning in 2021 it will allow all taxpayers to apply for an identity protection personal identification number (IP PIN), a single-use code designed to block identity thieves from falsely claiming a tax refund in your name. Currently, IP PINs are issued only to those who fill out an ID theft affidavit, or to taxpayers who&#8217;ve experienced tax refund fraud in previous years.</p>
+<p><img loading="lazy" class="aligncenter wp-image-42398" src="https://krebsonsecurity.com/wp-content/uploads/2018/01/taxthiefa.png" alt="" width="594" height="218" /></p>
+<p>Tax refund fraud is <a href="https://krebsonsecurity.com/?s=tax+refund+fraud&amp;x=0&amp;y=0">a perennial problem</a> involving the use of identity information and often stolen or misdirected W-2 forms to electronically file an unauthorized tax return for the purposes of claiming a refund in the name of a taxpayer.</p>
+<p>Victims usually first learn of the crime after having their returns rejected because scammers beat them to it. <em>Even those who are not required to file a return can be victims of refund fraud, as can those who are not actually due a refund from the IRS.  </em></p>
+<p>Many of the reasons why refund fraud remains a problem have to do with timing, and some of them are described in more detail <a href="https://taxpayeradvocate.irs.gov/news/nta-blog-irs-fraud-detection-process-is-challenging-for-taxpayers-to-navigate-part-1" target="_blank" rel="noopener noreferrer">here</a>. But the short answer is the IRS is under tremendous pressure to issue refunds quickly and to minimize &#8220;false positives&#8221; (flagging legitimate claims as fraud) &#8212; even when it may not yet have all of the information needed to accurately distinguish phony filings from legitimate ones. <span id="more-53716"></span></p>
+<p>One way the IRS has sought to stem the flow of bogus tax refund applications is to issue the IP PIN, which is a six-digit number assigned to eligible taxpayers to help prevent the use of their Social Security number on a fraudulent income tax return. Each PIN is good only for the tax year for which it was issued.</p>
+<p>But up until now, the IRS has restricted who can apply for an IP PIN, although it has over the past few years issued them proactively to some taxpayers as part of a multi-state experiment to determine if doing so more widely might reduce the overall incidence of refund fraud.</p>
+<p>The IRS <a href="https://www.irs.gov/newsroom/national-tax-security-awareness-week-day-3-irs-expands-identity-protection-pin-opt-in-program-to-taxpayers-nationwide" target="_blank" rel="noopener noreferrer">says</a> it will make its Get IP PIN tool available to all taxpayers in mid-January. Until then, if you haven&#8217;t already done so <a href="https://krebsonsecurity.com/2020/08/why-where-you-should-you-plant-your-flag/" target="_blank" rel="noopener noreferrer">you should plant your flag</a> at the IRS by stepping through the agency&#8217;s &#8220;secure access authentication&#8221; process.</p>
+<p><a href="https://sa.www4.irs.gov/ola/" target="_blank" rel="noopener noreferrer">Creating an account</a> requires supplying a great deal of personal data; the information that will be requested is <a href="https://www.irs.gov/individuals/secure-access-how-to-register-for-certain-online-self-help-tools" target="_blank" rel="noopener noreferrer">listed here</a>.</p>
+<p>The signup process requires one to validate ownership of a mobile phone number in one&#8217;s name, and it will reject any voice-over-IP-based numbers such as those tied to Skype or Google Voice. If the process fails at this point, the site should offer to send an activation code via postal mail to your address on file.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/irs-to-make-id-protection-pin-open-to-all/feed/</wfw:commentRss>
+			<slash:comments>82</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Account Hijacking Site OGUsers Hacked, Again</title>
+		<link>https://krebsonsecurity.com/2020/12/account-hijacking-site-ogusers-hacked-again/</link>
+					<comments>https://krebsonsecurity.com/2020/12/account-hijacking-site-ogusers-hacked-again/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Wed, 02 Dec 2020 16:29:13 +0000</pubDate>
+				<category><![CDATA[Data Breaches]]></category>
+		<category><![CDATA[Ne'er-Do-Well News]]></category>
+		<category><![CDATA[Disco Payments]]></category>
+		<category><![CDATA[Discoli]]></category>
+		<category><![CDATA[ogusers]]></category>
+		<category><![CDATA[OGusers breach]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53685</guid>
+
+					<description><![CDATA[For at least the third time in its existence, OGUsers -- a forum overrun with people looking to buy, sell and trade access to compromised social media accounts -- has been hacked.]]></description>
+										<content:encoded><![CDATA[<p>For at least the third time in its existence,<strong> OGUsers</strong> &#8212; a forum overrun with people looking to buy, sell and trade access to compromised social media accounts &#8212; has been hacked.</p>
+<div id="attachment_53695" style="width: 606px" class="wp-caption aligncenter"><a class="lightbox" href="https://krebsonsecurity.com/wp-content/uploads/2020/11/oguoffer.png"><img aria-describedby="caption-attachment-53695" loading="lazy" class="wp-image-53695" src="https://krebsonsecurity.com/wp-content/uploads/2020/11/oguoffer.png" alt="" width="596" height="422" srcset="https://krebsonsecurity.com/wp-content/uploads/2020/11/oguoffer.png 1040w, https://krebsonsecurity.com/wp-content/uploads/2020/11/oguoffer-768x544.png 768w" sizes="(max-width: 596px) 100vw, 596px" /></a><p id="caption-attachment-53695" class="wp-caption-text">An offer by the apparent hackers of OGUsers, offering to remove account information from the eventual database leak in exchange for payment.</p></div>
+<p>Roughly a week ago, the OGUsers homepage was defaced with a message stating the forum&#8217;s user database had been compromised. The hack was acknowledged by the forum&#8217;s current administrator, who assured members that their passwords were protected with a password obfuscation technology that was extremely difficult to crack.</p>
+<p>But unlike in previous breaches at OGUsers, the perpetrators of this latest incident have not yet released the forum database. In the meantime, someone has been taunting forum members, saying they can have their profiles and private messages removed from an impending database leak by paying between $50 and $100.</p>
+<p>OGUsers was hacked at least twice previously, <a href="https://krebsonsecurity.com/2019/05/account-hijacking-forum-ogusers-hacked/" target="_blank" rel="noopener noreferrer">in May 2019</a> and again in March 2020. In the wake of both incidents, the compromised OGUsers databases were made available for public download.<span id="more-53685"></span></p>
+<p>The leaked databases have been useful in reconstructing who&#8217;s behind several high-profile incidents involving compromised social media accounts and virtual currency heists that leveraged <a href="https://krebsonsecurity.com/?s=sim+swapping&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">SIM swapping</a>, a crime that centers around convincing mobile phone company employees to transfer ownership of the target’s phone number to a device the attackers control.</p>
+<p>For example, when <a href="https://krebsonsecurity.com/?s=twitter+hack&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">several high-profile Twitter accounts were hacked in July 2020</a> and used to promote bitcoin scams, the profile and private message data from previous OGUser forum compromises proved invaluable in piecing together the &#8220;who&#8221; behind that scam.</p>
+<p>The hacker handles featured in the defacement message left on OGUsers &#8212; &#8220;<strong>Chinese</strong>&#8221; and &#8220;<strong>Disco</strong>&#8221; &#8212; correspond to two nicknames used by banned OGUser members who have been trying to generate interest for their own forum that seeks to emulate OGUsers.</p>
+<p>Disco, a.k.a &#8220;<strong>Discoli</strong>&#8221; a.k.a. &#8220;Disco Dog,&#8221; is a young man from the United Kingdom who has marketed an automated bot program and service advertised as a way for customers to &#8220;cash out&#8221; illicit access to OneVanilla Visa prepaid card accounts using PayPal. The same individual also earlier this year founded a corporation in the U.K. called <a href="https://find-and-update.company-information.service.gov.uk/company/12490733" target="_blank" rel="noopener noreferrer">Disco Payments</a>.</p>
+<p>Reached via Twitter, Discoli said he and his friends hacked OGUsers via an outdated plugin used by the site. But he claims they have no plans to sell the stolen user data, and said the company was registered as a joke.</p>
+<p>&#8220;I had a sort of feud with the administrator in the past but this one was more for fun,&#8221; Discoli said. &#8220;Not too interested in doing damage by releasing database or anything like that.&#8221;</p>
+<p>As I noted the first time OGUsers got hacked, it’s difficult not to admit feeling a bit of <a href="https://en.wikipedia.org/wiki/Schadenfreude" target="_blank" rel="noopener noreferrer">schadenfreude</a> in the continued exposure of a community that has largely specialized in hacking others. Or perhaps in the case of OGUsers, the sentiment may more aptly be described as &#8220;schadenfraud.&#8221;</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/account-hijacking-site-ogusers-hacked-again/feed/</wfw:commentRss>
+			<slash:comments>34</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Bomb Threat, DDoS Purveyor Gets Eight Years</title>
+		<link>https://krebsonsecurity.com/2020/12/bomb-threat-ddos-purveyor-gets-eight-years/</link>
+					<comments>https://krebsonsecurity.com/2020/12/bomb-threat-ddos-purveyor-gets-eight-years/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Tue, 01 Dec 2020 14:01:14 +0000</pubDate>
+				<category><![CDATA[DDoS-for-Hire]]></category>
+		<category><![CDATA[Ne'er-Do-Well News]]></category>
+		<category><![CDATA[Apophis Squad]]></category>
+		<category><![CDATA[HDGZero]]></category>
+		<category><![CDATA[Nicola Hanna]]></category>
+		<category><![CDATA[Otis D. Wright II]]></category>
+		<category><![CDATA[Protonmail]]></category>
+		<category><![CDATA[Timothy Dalton Vaughn]]></category>
+		<category><![CDATA[WantedByFeds]]></category>
+		<category><![CDATA[Xavier Farbel]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53698</guid>
+
+					<description><![CDATA[A 22-year-old North Carolina man has been sentenced to nearly eight years in prison for conducting bomb threats against thousands of schools in the U.S. and United Kingdom, launching distributed denial-of-service (DDoS) attacks, and for possessing sexually explicit images of minors.]]></description>
+										<content:encoded><![CDATA[<p>A 22-year-old North Carolina man has been sentenced to nearly eight years in prison for conducting bomb threats against thousands of schools in the U.S. and United Kingdom, running a service that launched distributed denial-of-service (DDoS) attacks, and for possessing sexually explicit images of minors.</p>
+<p><strong>Timothy Dalton Vaughn</strong> from Winston-Salem, N.C. was a key member of the <strong>Apophis Squad</strong>, a gang of young ne’er-do-wells who made bomb threats to more than 2,400 schools and launched DDoS attacks against countless Web sites — including KrebsOnSecurity on multiple occasions.</p>
+<p>The Justice Department says Vaughn and his gang ran a DDoS-for-hire service that they used to shake down victims.</p>
+<p>&#8220;In early 2018, Vaughn demanded 1.5 bitcoin (then worth approximately $20,000) from a Long Beach company, to prevent denial-of-service attacks on its website,&#8221; reads a statement from <strong>Nicola Hanna</strong>, U.S. attorney for the Central District of California. &#8220;When the company refused to pay, he launched a DDoS attack that disabled the company’s website.&#8221;</p>
+<div id="attachment_45027" style="width: 580px" class="wp-caption aligncenter"><img aria-describedby="caption-attachment-45027" loading="lazy" class=" wp-image-45027" src="https://krebsonsecurity.com/wp-content/uploads/2018/09/apophis-tweet.png" alt="" width="570" height="460" /><p id="caption-attachment-45027" class="wp-caption-text">One of many tweets from the attention-starved Apophis Squad, which launched multiple DDoS attacks against KrebsOnSecurity over the past few months.</p></div>
+<p>Dalton, whose online aliases included “WantedbyFeds” and “Hacker_R_US,” pleaded guilty last year to one count of conspiracy to convey threats to injure, convey false information concerning use of explosive device, and intentionally damage a computer; one count of computer hacking; and one count of possession of child pornography.</p>
+<p>Federal judge <strong>Otis D. Wright II</strong> sentenced Vaughn to 95 months for possessing 200 sexually explicit images and videos depicting children, including at least one toddler, the Justice Department said. Vaughn was sentenced to 60 months in federal prison for the remaining charge. The sentences will be served concurrently. <span id="more-53698"></span></p>
+<p>As <a href="https://krebsonsecurity.com/2019/02/bomb-threat-hoaxer-exposed-by-hacked-gaming-site/" target="_blank" rel="noopener noreferrer">KrebsOnSecurity noted in 2019</a>, Vaughn&#8217;s identity was revealed by following the trail of clues from a gaming website he used that later got hacked.</p>
+<p>Vaughn used multiple aliases on Twitter and elsewhere to crow about his attacks, including “<strong>HDGZero</strong>,” “<strong>WantedByFeds</strong>,” and “<strong>Xavier Farbel</strong>.” Among the Apophis Squad’s targets was encrypted mail service Protonmail, which reached out to this author in 2018 for clues about the identities of the Apophis Squad members after noticing we were both being targeted by them and receiving demands for money in exchange for calling off the attacks.</p>
+<p>Protonmail later <a href="https://krebsonsecurity.com/2018/09/leader-of-ddos-for-hire-gang-pleads-guilty-to-bomb-threats/" target="_blank" rel="noopener noreferrer">publicly thanked KrebsOnSecurity</a> for helping to bring about the arrest of Apophis Squad leader <strong>George Duke-Cohan</strong> — a.k.a. “opt1cz,” “7R1D3n7,” and “Pl3xl3t,” — a 19-year-old from the United Kingdom who was convicted in December 2018 and <a href="https://krebsonsecurity.com/2018/12/bomb-threat-hoaxer-ddos-boss-gets-3-years/" target="_blank" rel="noopener noreferrer">sentenced to three years in prison</a>. But the real-life identity of HDGZero remained a mystery to both of us, as there was little publicly available information at the time connecting that moniker to anyone.</p>
+<div id="attachment_45028" style="width: 605px" class="wp-caption aligncenter"><img aria-describedby="caption-attachment-45028" loading="lazy" class=" wp-image-45028" src="https://krebsonsecurity.com/wp-content/uploads/2018/09/as-booter.png" alt="" width="595" height="524" /><p id="caption-attachment-45028" class="wp-caption-text">The DDoS-for-hire service run by Apophis Squad listed their members.</p></div>
+<p>That is, until early January 2019, when news broke that hackers had broken into the servers of computer game maker BlankMediaGames and made off with account details of some 7.6 million people who had signed up to play “Town of Salem,” a browser-based role playing game. That stolen information has since been posted and resold in underground forums.</p>
+<p>A review of the leaked BlankMediaGames user database shows that in late 2018, someone who selected the username “hdgzero” signed up to play Town of Salem, registering with the email address xavierfarbel@gmail.com. The data also showed this person registered at the site using a Sprint mobile device with an Internet address that traced back to the Carolinas.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/12/bomb-threat-ddos-purveyor-gets-eight-years/feed/</wfw:commentRss>
+			<slash:comments>26</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>GoDaddy Employees Used in Attacks on Multiple Cryptocurrency Services</title>
+		<link>https://krebsonsecurity.com/2020/11/godaddy-employees-used-in-attacks-on-multiple-cryptocurrency-services/</link>
+					<comments>https://krebsonsecurity.com/2020/11/godaddy-employees-used-in-attacks-on-multiple-cryptocurrency-services/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Sat, 21 Nov 2020 18:15:49 +0000</pubDate>
+				<category><![CDATA[A Little Sunshine]]></category>
+		<category><![CDATA[Web Fraud 2.0]]></category>
+		<category><![CDATA[Bibox]]></category>
+		<category><![CDATA[Celcius.network]]></category>
+		<category><![CDATA[Dan Race]]></category>
+		<category><![CDATA[Farsight Security]]></category>
+		<category><![CDATA[GitHub]]></category>
+		<category><![CDATA[GoDaddy]]></category>
+		<category><![CDATA[Namecheap]]></category>
+		<category><![CDATA[phishing]]></category>
+		<category><![CDATA[privateemail.com]]></category>
+		<category><![CDATA[Slack]]></category>
+		<category><![CDATA[vishing]]></category>
+		<category><![CDATA[Wirex.app]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53649</guid>
+
+					<description><![CDATA[Fraudsters redirected email and web traffic destined for several cryptocurrency trading platforms over the past week. The attacks were facilitated by scams targeting employees at GoDaddy, the world's largest domain name registrar, KrebsOnSecurity has learned.]]></description>
+										<content:encoded><![CDATA[<p>Fraudsters redirected email and web traffic destined for several cryptocurrency trading platforms over the past week. The attacks were facilitated by scams targeting employees at <strong>GoDaddy</strong>, the world&#8217;s largest domain name registrar, KrebsOnSecurity has learned.</p>
+<p><img loading="lazy" class="aligncenter wp-image-46446" src="https://krebsonsecurity.com/wp-content/uploads/2019/02/godaddy.jpg" alt="" width="599" height="312" /></p>
+<p>The incident is the latest incursion at GoDaddy that relied on tricking employees into transferring ownership and/or control over targeted domains to fraudsters. In March, a voice phishing scam targeting GoDaddy support employees <a href="https://krebsonsecurity.com/2020/03/phish-of-godaddy-employee-jeopardized-escrow-com-among-others/" target="_blank" rel="noopener noreferrer">allowed attackers to assume control over at least a half-dozen domain names, including transaction brokering site escrow.com</a>.</p>
+<p>And in May of this year, GoDaddy <a href="https://securityboulevard.com/2020/05/godaddy-data-breach-affects-28000-user-accounts/" target="_blank" rel="noopener noreferrer">disclosed that 28,000 of its customers&#8217; web hosting accounts were compromised</a> following a security incident in Oct. 2019 that wasn&#8217;t discovered until April 2020.</p>
+<p>This latest campaign appears to have begun on or around Nov. 13, with an attack on cryptocurrency trading platform <strong>liquid.com</strong>.</p>
+<p>&#8220;A domain hosting provider &#8216;GoDaddy&#8217; that manages one of our core domain names incorrectly transferred control of the account and domain to a malicious actor,&#8221; <strong>Liquid CEO Mike Kayamori</strong> said in <a href="https://blog.liquid.com/security-incident-november-13-2020?=11172020" target="_blank" rel="noopener noreferrer">a blog post</a>. &#8220;This gave the actor the ability to change DNS records and in turn, take control of a number of internal email accounts. In due course, the malicious actor was able to partially compromise our infrastructure, and gain access to document storage.&#8221;</p>
+<p>In the early morning hours of Nov. 18 Central European Time (CET), cyptocurrency mining service <a href="https://www.nicehash.com" target="_blank" rel="noopener noreferrer">NiceHash</a> disccovered that some of the settings for its domain registration records at GoDaddy were changed without authorization, briefly redirecting email and web traffic for the site. NiceHash froze all customer funds for roughly 24 hours until it was able to verify that its domain settings had been changed back to their original settings.</p>
+<p>&#8220;At this moment in time, it looks like no emails, passwords, or any personal data were accessed, but we do suggest resetting your password and activate 2FA security,&#8221; the company wrote <a href="https://www.nicehash.com/blog/post/nicehash-is-back-online-what-happened" target="_blank" rel="noopener noreferrer">in a blog post</a>.</p>
+<p>NiceHash founder <a href="https://krebsonsecurity.com/?s=Matjaz+Skorjanc&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">Matjaz Skorjanc</a> said the unauthorized changes were made from an Internet address at GoDaddy, and that the attackers tried to use their access to its incoming NiceHash emails to perform password resets on various third-party services, including <strong>Slack</strong> and <strong>Github</strong>. But he said GoDaddy was impossible to reach at the time because <a href="https://domainnamewire.com/2020/11/17/godaddy-is-down/" target="_blank" rel="noopener noreferrer">it was undergoing a widespread system outage in which phone and email systems were unresponsive</a>.</p>
+<p>&#8220;We detected this almost immediately [and] started to mitigate [the] attack,&#8221; Skorjanc said in an email to this author. &#8220;Luckily, we fought them off well and they did not gain access to any important service. Nothing was stolen.&#8221;</p>
+<p>Skorjanc said NiceHash&#8217;s email service was redirected to <strong>privateemail.com</strong>, an email platform run by <a href="https://krebsonsecurity.com/?s=namecheap&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">Namecheap Inc.</a>, another large domain name registrar. Using <a href="https://www.farsightsecurity.com" target="_blank" rel="noopener noreferrer">Farsight Security</a>, a service which maps changes to domain name records over time, KrebsOnSecurity instructed the service to show all domains registered at GoDaddy that had alterations to their email records in the past week which pointed them to privateemail.com. Those results were then indexed against the top one million most popular websites according to Alexa.com.</p>
+<p>The result shows that several other cryptocurrency platforms also may have been targeted by the same group, including <a href="https://www.bibox.com" target="_blank" rel="noopener noreferrer">Bibox.com</a>, <a href="https://www.celsius.network" target="_blank" rel="noopener noreferrer">Celsius.network</a>, and <a href="https://www.wirex.app" target="_blank" rel="noopener noreferrer">Wirex.app</a>. None of these companies responded to requests for comment.</p>
+<p>In response to questions from KrebsOnSecurity, GoDaddy acknowledged that &#8220;a small number&#8221; of customer domain names had been modified after a &#8220;limited&#8221; number of GoDaddy employees fell for a social engineering scam. GoDaddy said the outage between 7:00 p.m. and 11:00 p.m. PST on Nov. 17 was not related to a security incident, but rather a technical issue that materialized during planned network maintenance.</p>
+<p>&#8220;Separately, and unrelated to the outage, a routine audit of account activity identified potential unauthorized changes to a small number of customer domains and/or account information,&#8221; GoDaddy spokesperson <strong>Dan Race</strong> said. <span class="pullquote pqleft">&#8220;Our security team investigated and confirmed threat actor activity, including social engineering of a limited number of GoDaddy employees.</span>&#8221;</p>
+<p>&#8220;We immediately locked down the accounts involved in this incident, reverted any changes that took place to accounts, and assisted affected customers with regaining access to their accounts,&#8221; GoDaddy&#8217;s statement continued. &#8220;As threat actors become increasingly sophisticated and aggressive in their attacks, we are constantly educating employees about new tactics that might be used against them and adopting new security measures to prevent future attacks.&#8221;</p>
+<p>Race declined to specify how its employees were tricked into making the unauthorized changes, saying the matter was still under investigation. But <a href="https://krebsonsecurity.com/2020/03/phish-of-godaddy-employee-jeopardized-escrow-com-among-others/" target="_blank" rel="noopener noreferrer">in the attacks earlier this year that affected escrow.com and several other GoDaddy customer domains</a>, the assailants targeted employees over the phone, and were able to read internal notes that GoDaddy employees had left on customer accounts.</p>
+<p>What&#8217;s more, the attack on escrow.com redirected the site to an Internet address in Malaysia that hosted fewer than a dozen other domains, including the phishing website <strong>servicenow-godaddy.com</strong>. This suggests the attackers behind the March incident &#8212; and possibly this latest one &#8212; succeeded by calling GoDaddy employees and convincing them to use their employee credentials at a fraudulent GoDaddy login page.<span id="more-53649"></span></p>
+<p>In August 2020, KrebsOnSecurity warned about a marked increase in large corporations <a href="https://krebsonsecurity.com/2020/08/voice-phishers-targeting-corporate-vpns/" target="_blank" rel="noopener noreferrer">being targeted in sophisticated voice phishing or &#8220;vishing&#8221; scams</a>. Experts say the success of these scams has been aided greatly by many employees working remotely thanks to the ongoing Coronavirus pandemic.</p>
+<p>A typical vishing scam begins with a series of phone calls to employees working remotely at a targeted organization. The phishers often will explain that they’re calling from the employer’s IT department to help troubleshoot issues with the company’s email or virtual private networking (VPN) technology.</p>
+<p>The goal is to convince the target either to divulge their credentials over the phone or to input them manually at a website set up by the attackers that mimics the organization’s corporate email or VPN portal.</p>
+<p>On July 15, a number of high-profile Twitter accounts were used <a href="https://krebsonsecurity.com/2020/07/whos-behind-wednesdays-epic-twitter-hack/" target="_blank" rel="noopener noreferrer">to tweet out a bitcoin scam that earned more than $100,000 in a few hours</a>. According to Twitter, that attack succeeded because the perpetrators were able to social engineer several Twitter employees over the phone into giving away access to internal Twitter tools.</p>
+<p><a href="https://krebsonsecurity.com/2020/08/fbi-cisa-echo-warnings-on-vishing-threat/" target="_blank" rel="noopener noreferrer">An alert</a> issued jointly by the <strong>FBI</strong> and the <strong>Cybersecurity and Infrastructure Security Agency</strong> (CISA) says the perpetrators of these vishing attacks compile dossiers on employees at their targeted companies using mass scraping of public profiles on social media platforms, recruiter and marketing tools, publicly available background check services, and open-source research.</p>
+<p>The FBI/CISA advisory includes a number of suggestions that companies can implement to help mitigate the threat from vishing attacks, including:</p>
+<p>• Restrict VPN connections to managed devices only, using mechanisms like hardware checks or installed certificates, so user input alone is not enough to access the corporate VPN.</p>
+<p>• Restrict VPN access hours, where applicable, to mitigate access outside of allowed times.</p>
+<p>• Employ domain monitoring to track the creation of, or changes to, corporate, brand-name domains.</p>
+<p>• Actively scan and monitor web applications for unauthorized access, modification, and anomalous activities.</p>
+<p>• Employ the principle of least privilege and implement software restriction policies or other controls; monitor authorized user accesses and usage.</p>
+<p>• Consider using a formalized authentication process for employee-to-employee communications made over the public telephone network where a second factor is used to<br />
+authenticate the phone call before sensitive information can be discussed.</p>
+<p>• Improve 2FA and OTP messaging to reduce confusion about employee authentication attempts.</p>
+<p>• Verify web links do not have misspellings or contain the wrong domain.</p>
+<p>• Bookmark the correct corporate VPN URL and do not visit alternative URLs on the sole basis of an inbound phone call.</p>
+<p>• Be suspicious of unsolicited phone calls, visits, or email messages from unknown individuals claiming to be from a legitimate organization. Do not provide personal information or information about your organization, including its structure or networks, unless you are certain of a person’s authority to have the information. If possible, try to verify the caller’s identity directly with the company.</p>
+<p>• If you receive a vishing call, document the phone number of the caller as well as the domain that the actor tried to send you to and relay this information to law enforcement.</p>
+<p>• Limit the amount of personal information you post on social networking sites. The internet is a public resource; only post information you are comfortable with anyone seeing.</p>
+<p>• Evaluate your settings: sites may change their options periodically, so review your security and privacy settings regularly to make sure that your choices are still appropriate.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/11/godaddy-employees-used-in-attacks-on-multiple-cryptocurrency-services/feed/</wfw:commentRss>
+			<slash:comments>44</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Convicted SIM Swapper Gets 3 Years in Jail</title>
+		<link>https://krebsonsecurity.com/2020/11/convicted-sim-swapper-gets-3-years-in-jail/</link>
+					<comments>https://krebsonsecurity.com/2020/11/convicted-sim-swapper-gets-3-years-in-jail/#comments</comments>
+		
+		<dc:creator><![CDATA[BrianKrebs]]></dc:creator>
+		<pubDate>Fri, 20 Nov 2020 15:05:15 +0000</pubDate>
+				<category><![CDATA[Ne'er-Do-Well News]]></category>
+		<category><![CDATA[SIM Swapping]]></category>
+		<guid isPermaLink="false">https://krebsonsecurity.com/?p=53615</guid>
+
+					<description><![CDATA[A 21-year-old Irishman who pleaded guilty to charges of helping to steal millions of dollars in cryptocurrencies from victims has been sentenced to just under three years in prison. The defendant is part of an alleged conspiracy involving at least eight others in the United States who stand accused of theft via SIM swapping, a [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p>A 21-year-old Irishman who pleaded guilty to charges of helping to steal millions of dollars in cryptocurrencies from victims has been sentenced to just under three years in prison. The defendant is part of an alleged conspiracy involving at least eight others in the United States who stand accused of theft via <strong>SIM swapping</strong>, a crime that involves convincing mobile phone company employees to transfer ownership of the target&#8217;s phone number to a device the attackers control.</p>
+<p><img loading="lazy" class="aligncenter  wp-image-40415" src="https://krebsonsecurity.com/wp-content/uploads/2017/08/phonefraudsmaller.png" alt="" width="598" height="302" srcset="https://krebsonsecurity.com/wp-content/uploads/2017/08/phonefraudsmaller.png 609w, https://krebsonsecurity.com/wp-content/uploads/2017/08/phonefraudsmaller-580x292.png 580w" sizes="(max-width: 598px) 100vw, 598px" /></p>
+<p><strong>Conor Freeman</strong> of Dublin took part in the theft of more than two million dollars worth of cryptocurrency from different victims throughout 2018. Freeman was named as a member of a group of alleged SIM swappers called &#8220;The Community&#8221; <a href="https://krebsonsecurity.com/2019/05/nine-charged-in-alleged-sim-swapping-ring/" target="_blank" rel="noopener noreferrer">charged last year with wire fraud in connection with SIM swapping attacks that netted in excess of $2.4 million</a>.</p>
+<p>Among the eight others accused are three former wireless phone company employees who allegedly helped the gang hijack mobile numbers tied to their targets. Prosecutors say the men would identify people likely to have significant cryptocurrency holdings, then pay their phone company cohorts to transfer the victim&#8217;s mobile service to a new SIM card &#8212; the smart chip in each phone that ties a customer&#8217;s device to their number.</p>
+<p>A fraudulent SIM swap allows the bad guys to intercept a target&#8217;s incoming phone calls and text messages. This is dangerous because a great many sites and services still allow customers to reset their passwords simply by clicking on a link sent via SMS. From there, attackers can gain access to any accounts that allow password resets via SMS or automated calls, from email and social media profiles to virtual currency trading platforms.</p>
+<p>Like other accused members of The Community, Freeman was an active member of <a href="https://krebsonsecurity.com/?s=ogusers&amp;x=0&amp;y=0" target="_blank" rel="noopener noreferrer">OGUsers</a>, a forum that caters to people selling access to hijacked social media and other online accounts. But unlike others in the group, Freeman used his real name (username: Conor), and disclosed his hometown and date of birth to others on the forum. At least twice in the past few years <a href="https://krebsonsecurity.com/2019/05/account-hijacking-forum-ogusers-hacked/" target="_blank" rel="noopener noreferrer">OGUsers was hacked</a>, and its database of profiles and user messages posted online.</p>
+<p>According to a report in <a href="https://www.irishtimes.com/news/crime-and-law/courts/circuit-court/man-jailed-for-role-in-2-million-cryptocurrency-theft-1.4411641?mode=amp" target="_blank" rel="noopener noreferrer">The Irish Times</a>, Freeman spent approximately €130,000, which he had converted into cash from the stolen cryptocurrency. Conor posted on OGUsers that he spent approximately $14,000 on a Rolex watch. The rest was handed over to the police in the form of an electronic wallet that held the equivalent of more than $2 million.<span id="more-53615"></span></p>
+<p>The Irish Times says the judge in the case insisted the three-year sentence was warranted in order to deter the defendant and to prevent others from following in his footsteps. The judge said stealing money of this order is serious because no one can know the effect it will have on the victim, noting that one victim&#8217;s life savings were taken and the proceeds of the sale of his house were stolen.</p>
+<p>One way to protect your accounts against SIM swappers is to remove your phone number as a primary or secondary authentication mechanism wherever possible. Many online services require you to provide a phone number upon registering an account, but in many cases that number can be removed from your profile afterwards.</p>
+<p>It&#8217;s also important for people to use something other than text messages for two-factor authentication on their email accounts when stronger authentication options are available. Consider instead using a mobile app like <strong>Authy</strong>, <strong>Duo</strong>, or <strong>Google Authenticator</strong> to generate the one-time code. Or better yet, <a href="https://krebsonsecurity.com/2018/07/google-security-keys-neutralized-employee-phishing/" target="_blank" rel="noopener noreferrer">a physical security key</a> if that’s an option.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://krebsonsecurity.com/2020/11/convicted-sim-swapper-gets-3-years-in-jail/feed/</wfw:commentRss>
+			<slash:comments>27</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>
+<!--
+Performance optimized by W3 Total Cache. Learn more: https://www.boldgrid.com/w3-total-cache/
+
+Object Caching 167/167 objects using memcached
+Page Caching using memcached (User agent is rejected) 
+Database Caching 1/4 queries in 0.001 seconds using memcached
+
+Served from: krebsonsecurity.com @ 2020-12-17 19:22:28 by W3 Total Cache
+-->
