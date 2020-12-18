@@ -53,13 +53,16 @@ class IndicatorsController extends Controller
         return view('indicators::events_detail')->with($data);
     }
 
-    public function events_detail_select($id)
+    public function events_detail_select(Request $request,$id)
+
     {
+        // dd($request->id);
+     
         $client = new Client(DB_MONGO_01);
         $collection = $client->sosecure_threatintelligent->fx_otx_events;
 
         $query = [
-            'pulse_id' => '5c76b2acd1420a1aac451307'
+            'pulse_id' => $id
         ];
 
         $options = [
@@ -68,15 +71,48 @@ class IndicatorsController extends Controller
 
         $cursor = $collection->find($query, $options)->toArray();
 
-        // dd($cursor->toArray()[0]->name);
 
-        // foreach ($cursor as $document) {
-        //     dd($document['name']);
+        $_array = array();
+
+        // dd($cursor[0]->indicator_type_counts);
+        // if($cursor[0]->indicator_count){
+
+            
+        //     dd($cursor[0]->indicator_type_counts->count());
+        //     foreach ($cursor as $document) {
+
+        //         $test = $document['indicator_type_counts'];
+                
+        //         array_push($_array, $test);
+                
+        //     }
+        //     dd($_array);
+
         // }
+        // else{
+        //     $data['indicator_count'] = '';
+        //     $_array = [];
+        //     dd($_array);
+        // }
+        
 
 
+       
         $data['otx_events'] = $cursor;
         $data['page'] = langapp('indicators');
+        $data['indicator_type_counts'] = $cursor[0]->indicator_type_counts->count();
+        $countKey = array();
+        $countVal = array();
+        foreach ($cursor[0]->indicator_type_counts as $key => $value) {
+            $countKey[]= $key;
+            $countVal[]= $value;
+        }
+        $data['countKey'] = $countKey;
+        $data['countVal'] = $countVal;
+
+        $data['indicator_id'] = $request->id;
+        $data['type'] = $request->type;
+        $data['indicator'] = $request->indicator;
         return view('indicators::events_detail')->with($data);
     }
 
@@ -253,6 +289,13 @@ class IndicatorsController extends Controller
             ]
             ,
             [
+                '$match' => [
+                    'a.indicator_id'  => $reqId,
+                    'a.status'  => 1,
+                ]
+            ]
+            ,
+            [
                 '$lookup' => [
                     'localField' => 'a.pulse_id',
                     'from' => 'fx_otx_events',
@@ -268,12 +311,6 @@ class IndicatorsController extends Controller
                 ]
             ]
             ,
-            [
-                '$match' => [
-                    'a.indicator_id'  => $reqId,
-                    'a.status'  => 1,
-                ]
-            ],
             [
                 '$sort' => [
                     'b.modified'  => -1,
@@ -468,8 +505,9 @@ class IndicatorsController extends Controller
         }
         // $i = $start;
         $i = 0;
-
+       
         foreach ($document_all as $document) {
+            
             $i++;
             $html .= '
                             <tr>
@@ -491,12 +529,13 @@ class IndicatorsController extends Controller
                                 <td>'.change_date_utc_to_thai($document['b']['modified']).'</td>
                                 <td>'.$document['b']['count_view'].'</td>
                                 <td>
-                                    <a href="#" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                    <a href="'.route('indicators.events_detail_select',['id' => $document['b']['pulse_id']]).'?id='.$request->id.'&type='.$request->type.'&indicator='.$request->indicator.'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
                                 </td>
                             </tr>
                         ';
             // dd($document['_id']);
         }
+
     
         $html .= '</tbody>
             </table>';
@@ -519,9 +558,6 @@ class IndicatorsController extends Controller
         $html = '';
         $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
         $options = [
-            'sort' => [
-                '$b.modified' => -1
-            ],
             'allowDiskUse' => TRUE
         ];
 
@@ -563,190 +599,19 @@ class IndicatorsController extends Controller
         ];
         $cursor = $col_fx_otx_events_indicator_ref->aggregate($pipeline, $options);
         $document_all = $cursor->toArray();
+        $count_doc = count($document_all);
         
         
         $dataOut["draw"] = 1;
-        $dataOut["recordsTotal"] = count($document_all);
-        $dataOut["recordsFiltered"] = count($document_all);
+        $dataOut["recordsTotal"] = $count_doc;
+        $dataOut["recordsFiltered"] = $count_doc;
         $dataOut["data"] = array_column($document_all, 'b');
-        dd($dataOut);
+        //dd($dataOut);
+        return response()->json($dataOut);
         if ($request->ajax()) {
-            $data = [
-                "html" => $html,
-                // "pagination" => $pagination,
-            ];
-            return response()->json($data);
+           return response()->json($dataOut);
         }
 
-    }
-
-
-    public function load_general2(Request $request)
-    {
-        $OTX_KEY = env("OTX_KEY", "");
-        $client = new \GuzzleHttp\Client();
-        $reqType = $request->type;
-        if (stripos($request->type, "file") !== false) {
-            $reqType = 'file';
-        } else if ($reqType == "CVE") {
-            $reqType = "cve";
-        } else if ($reqType == "URL") {
-            $reqType = 'url';
-        } else if ($reqType == "NIDS") {
-            $reqType = 'nids';
-        } else if ($reqType == "YARA") {
-            $reqType = 'yara';
-        } else if ($reqType == "BitcoinAddress") {
-            $reqType = 'bitcoin-address';
-        } else if ($reqType == "SSLCertFingerprint") {
-            $reqType = 'ssl-cert-fingerprint';
-        }
-        $reqIndicator = $request->indicator;
-
-        $bodyData = $client->request(
-            'GET',
-            'https://otx.alienvault.com/otxapi/indicator/' . $reqType . '/general' . '/' . $reqIndicator,
-            [
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Content-type' => 'application/json',
-                    'X-OTX-API-KEY' => $OTX_KEY,
-                ],
-            ]
-        )->getBody();
-        $DataotxIndicator = json_decode($bodyData, true);
-
-        //pulse info HTML
-        $html = '';
-        $html .= '<ul class="list-indicators">';
-        $isPulse_info = 0;
-        if (!empty($DataotxIndicator["pulse_info"])) {
-            $isPulse_info = 1;
-            $pulseInfo = $DataotxIndicator["pulse_info"];
-            foreach ($pulseInfo["pulses"] as $value) {
-                $html .= '
-                <li>
-                    <div class="related-pulses">
-                        <div class="related-img">
-                            <img src="' . (isset($value["author"]["avatar_url"]) ? $value["author"]["avatar_url"] : "") . '" alt="">
-                        </div>
-                        <div class="related-content">
-                            <div class="related-title">
-                                <a href="pulsedetail">
-                                    <h1 class="related-title">
-                                        ' . (isset($value["name"]) ? $value["name"] : "") . '
-                                    </h1>
-                                </a>
-                                <div class="active-indicator">
-                                    <div class="' . ($value["related_indicator_is_active"] == 1 ? "dot green" : "dot grey") . '"></div>
-                                    <div>
-                                        ' . $request->type . ' Indicator ' . ($value["related_indicator_is_active"] == 1 ? "Active" : "Inactive") . '
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="details-wrapper">
-                                <ul class="detail-show">
-                                    <li>
-                                        <span class="' . ($value["is_modified"] == false ? "created" : "modified") . '">
-                                        ' . ($value["is_modified"] == false ? "Created" : "Modified") . '
-                                        </span>
-                                        <span class="pulse-ago">
-                                            ' . (isset($value["modified_text"]) ? $value["modified_text"] : "") . '
-                                        </span>
-                                        by <a href="https://otx.alienvault.com/user/' . (isset($value["author"]["username"]) ? $value["author"]["username"] : "") . '/pulses" class="pulse-author">
-                                        ' . (isset($value["author"]["username"]) ? $value["author"]["username"] : "") . '
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <span class="stat-label"> Public </span>
-                                    </li>
-                                    <li>
-                                        <a href="https://www.us-cert.gov/tlp" target="_new">TLP</a>:
-                                      <span>
-                                        <i class="fas fa-circle ' . $value["TLP"] . '">
-                                        </i>
-                                        ' . ucwords($value["TLP"]) . '
-                                      </span>
-                                    </li>
-                                </ul>
-                                <div class="pulse-indicator-counts">
-                                    <span class="nowrap ellipsis">';
-                if (!empty($value["indicator_type_counts"])) {
-                    foreach ($value["indicator_type_counts"] as $key => $typeCount) {
-                        $html .= '<span class="insered">
-                            <strong>' . $key . ':</strong>
-                                <span class="br-last">' . $typeCount . '</span>
-                            </span>';
-                    }
-                }
-                $html .= '          </span>
-                                </div>
-                                <div class="indicator-description">
-                                    <span class="nowrap ellipsis">
-                                    ' . (isset($value["description"]) ? $value["description"] : "") . '
-                                    </span>
-                                </div>
-                                <div class="by-items">';
-
-                if (!empty($value["tags"])) {
-                    $html_sub = '';
-                    foreach ($value["tags"] as $tag) {
-                        $html_sub .= ',<a href="https://otx.alienvault.com/browse/pulses?q=tag:' . $tag . ' "><span>' . $tag . '</span></a>';
-                    }
-                    $html .= substr($html_sub, 1);
-                }
-
-                $html .= '</div>
-                            </div>
-                        </div>
-                        <div class="related-subscribers">
-                            <span class="star-count">' . $value["subscriber_count"] . '</span>
-                            <span class="subscribers">
-                                <i></i>&nbsp;SUBSCRIBERS
-                            </span>
-                        </div>
-                    </div>
-                </li>';
-            }
-        } else {
-            $html .= '<li>
-            <div class="related-pulses">
-                no Data
-            </div>
-            </li>';
-        }
-        $html .= '</ul>';
-
-        $html2 = '';
-        $isValidation = 0;
-        if (!empty($DataotxIndicator["validation"])) {
-            $isValidation = 1;
-            $validationInfo = $DataotxIndicator["validation"];
-            foreach ($validationInfo as $value) {
-                $html2 .= '
-                <div class="row m-b-xs">
-                    <div class="col-md-6">
-                        ' . (isset($value["name"]) ? $value["name"] : "") . '
-                    </div>
-                    <div class="col-md-6">
-                        ' . (isset($value["message"]) ? $value["message"] : "") . '
-                    </div>
-                </div>';
-            }
-        } else {
-            $html2 .= '';
-        }
-        if ($request->ajax()) {
-            $data = [
-                "html" => $html,
-                "html2" => $html2,
-                "generalData" => $DataotxIndicator,
-                "sections" => $DataotxIndicator["sections"],
-                "isValidation" => $isValidation,
-                "isPulse_info" => $isPulse_info,
-            ];
-            return response()->json($data);
-        }
     }
 
     public function load_url_list(Request $request)
@@ -1085,6 +950,7 @@ class IndicatorsController extends Controller
                     $_search['indicator'] = ['$regex'=>$request->keywords, '$options' => 'i'];
                     // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
                 } 
+                
                 if ($request->type) {
                     $_search['type'] = ['$in'=>$request->type];
                     // $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
@@ -1176,7 +1042,7 @@ class IndicatorsController extends Controller
             if ($data->type == "CIDR"  || $data->type == "FileHash-IMPHASH"|| $data->type == "FileHash-PEHASH" || $data->type == "FilePath" || $data->type == "Mutex" || $data->type == "URI"|| $data->type == "JA3"|| $data->type == "osquery") {
                 $linkIndicator =  '<a>';
             } else {
-                $linkIndicator =  '<a href="' . route('indicators.detail_indicator') . '?id=' . $data->indicator_id . '&&type=' . $data->type . '&&indicator=' . $data->indicator . '">';
+                $linkIndicator =  '<a href="' . route('indicators.detail_indicator') . '?id=' . $data->indicator_id . '&type=' . $data->type . '&indicator=' . $data->indicator . '">';
             }
             $html .= ' <ul class="list-indicators">
                         <li>
@@ -1497,6 +1363,7 @@ class IndicatorsController extends Controller
 
  
         $i = $start;
+        // dd($cursor->toArray());
         foreach ($cursor as $document) {
             $i++;
             $html .= '

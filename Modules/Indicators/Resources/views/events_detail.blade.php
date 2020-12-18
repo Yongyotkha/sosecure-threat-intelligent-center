@@ -1,5 +1,5 @@
 @php
-    // dd($otx_events[0]['name']);
+// dd($otx_events[0]['name']);
 @endphp
 
 
@@ -8,11 +8,23 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
+            @if ($indicator_id)
+            <a href="{{ route('indicators.detail_indicator').'?id='.$indicator_id.'&type='.$type.'&indicator='.$indicator }}"
+                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+            </a>
+            <div class="bc-head">{{@$indicator}} > {{@$otx_events[0]['name']}}</div>
+            @else
             <a href="{{ route('indicators.events') }}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
             <div class="bc-head">Events > {{@$otx_events[0]['name']}}</div>
+            @endif
+
+
+
+
 
             <!--<button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
@@ -32,33 +44,36 @@
         <section class="scrollable wrapper">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a> 
-                    | 
+                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
+                    |
                     <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
                 </div>
                 <div class="container-fluid" style="padding: 2rem">
                     <div class="row">
                         <div class="col-md-6">
                             <h1>{{@$otx_events[0]['name']}}</h1>
-                            <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public : {!!check_publish(@$otx_events[0]['public'])!!}</p>
-                            <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified : {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
-                            <p>Daily SSH brutefoce logs from a honeypot in the US on a/32</p>
+                            <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public :
+                                {!!check_publish(@$otx_events[0]['public'])!!}</p>
+                            <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified :
+                                {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
                             <p>Tags : {!!explode_val(@$otx_events[0]['tags'],'tags')!!}</p>
                             <p>Groups : {!!explode_val(@$otx_events[0]['groups'],'groups')!!}</p>
                         </div>
                         <div class="col-md-6">
-                            <h1 class="text-center">Type Attributes 5 (5210)</h1>
+                            <h1 class="text-center">Type Attributes {{@$indicator_type_counts}}
+                                ({{@$otx_events[0]['indicator_count']}})
+                            </h1>
                             <div id="chart-show-bar"></div>
                         </div>
                     </div>
-                </div>        
+                </div>
             </section>
 
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
                     <li class="active"><a href="#tab_attributes" data-toggle="tab">Attributes (442)</a></li>
-                    <li id="tab-bookmark"><a href="#tab_related_event" data-toggle="tab">Related Event (905)</a></li>   
+                    <li id="tab-bookmark"><a href="#tab_related_event" data-toggle="tab">Related Event (905)</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_attributes">
@@ -71,7 +86,8 @@
                                                 <tr>
                                                     <th>
                                                         <label>
-                                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                            <input name="select_all" value="1" id="select-all"
+                                                                type="checkbox" />
                                                             <span class="label-text"></span>
                                                         </label>
                                                     </th>
@@ -81,7 +97,7 @@
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
-                                            </thead>   
+                                            </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
@@ -91,7 +107,8 @@
                                                         </label>
                                                     </td>
                                                     <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.</a></td>
+                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit
+                                                            amet.</a></td>
                                                     <td>
                                                         -
                                                     </td>
@@ -99,10 +116,11 @@
                                                         -
                                                     </td>
                                                     <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                                        <a href="" class="btn btn-xs btn-info"><i
+                                                                class="far fa-eye"></i> View</a>
                                                     </td>
-                                                </tr>    
-                                            </tbody> 
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -119,7 +137,8 @@
                                                 <tr>
                                                     <th>
                                                         <label>
-                                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                            <input name="select_all" value="1" id="select-all"
+                                                                type="checkbox" />
                                                             <span class="label-text"></span>
                                                         </label>
                                                     </th>
@@ -129,7 +148,7 @@
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
-                                            </thead>   
+                                            </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
@@ -139,7 +158,8 @@
                                                         </label>
                                                     </td>
                                                     <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.</a></td>
+                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit
+                                                            amet.</a></td>
                                                     <td>
                                                         -
                                                     </td>
@@ -147,15 +167,16 @@
                                                         -
                                                     </td>
                                                     <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                                                        <a href="" class="btn btn-xs btn-info"><i
+                                                                class="far fa-eye"></i> View</a>
                                                     </td>
-                                                </tr>    
-                                            </tbody> 
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
-                        </section>  
+                        </section>
                     </div>
                 </div>
             </div>
@@ -256,9 +277,9 @@
     const chart = new frappe.Chart("#chart-show-bar", { 
         title: "",
         data:{
-            labels: ["IPv4", "URL" , "FileHash-SHA256",],
+            labels: {!! json_encode($countKey) !!},
             datasets: [
-                { values: [254, 2, 185] }
+                { values: {!! json_encode($countVal) !!}}
             ]
         },
         type: 'percentage',

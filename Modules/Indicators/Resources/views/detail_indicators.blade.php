@@ -6,7 +6,8 @@
             <header class="header bg-white b-b b-light head-d-flex-nowrap"
                 style="white-space: nowrap;overflow-x: auto;">
                 <div class="bc-head m-none">
-                    <a href="{{route('indicators.attributes')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                    <a href="{{route('indicators.attributes')}}"
+                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
                     @langapp('indicators') : Type:{{$otxtype}},<span id="otxindicator_text">{{$otxindicator}}</span>
@@ -27,7 +28,7 @@
                                 <div class="underline"></div>
                             </li>
                             <li class="nav-link">
-                                <a href="#event">Pulses</a>
+                                <a href="#related_event" id="event_tag">Event</a>
                                 <div class="underline"></div>
                             </li>
                             {{-- <li class="nav-link">
@@ -45,31 +46,33 @@
                         </ul>
                     </div>
                 </div>
-                <div id="general_details" class="pd-15">
-                    <div class="row m-b-lg">
-                        {{-- Basic Information --}}
-                        
-                        @if($otxtype=="NIDS")
-                        <div id="indicator_description" class="col-md-12">
-                            <h1 class="b-b">Description</h1>
-                            <div id="loadspinner_basic_info" class="content-spinner-loading">
-                            </div>
-                            {{-- Inner Basic Information--}}
+                <section id="general_details" class="">
+                    <div class="pd-15">
+                        <div class="row m-b-lg">
+                            {{-- Basic Information --}}
 
-                        </div>
-                        @endif
-                        <div id="indicator_basic_info" class="col-md-12">
-                            <h1 class="b-b">{{($otxtype=="YARA")?"Rule":"Basic Information"}}</h1>
-                            <div id="loadspinner_basic_info" class="content-spinner-loading">
-                            </div>
-                            {{-- Inner Basic Information--}}
+                            @if($otxtype=="NIDS")
+                            <div id="indicator_description" class="col-md-12">
+                                <h1 class="b-b">Description</h1>
+                                <div id="loadspinner_basic_info" class="content-spinner-loading">
+                                </div>
+                                {{-- Inner Basic Information--}}
 
+                            </div>
+                            @endif
+                            <div id="indicator_basic_info" class="col-md-12">
+                                <h1 class="b-b">{{($otxtype=="YARA")?"Rule":"Basic Information"}}</h1>
+                                <div id="loadspinner_basic_info" class="content-spinner-loading">
+                                </div>
+                                {{-- Inner Basic Information--}}
+
+                            </div>
+
+                            {{-- File Identification --}}
                         </div>
-                       
-                        {{-- File Identification --}}
                     </div>
-                </div>
-                <section id="#event" class="">
+                </section>
+                <section id="related_event" class="">
                     <div class="row header-badge-full">
                         <div class="col-md-12">
                             <span class="font-weight-bold">Related Event</span>
@@ -85,7 +88,8 @@
                                                 <tr>
                                                     <th>
                                                         <label>
-                                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                            <input name="select_all" value="1" id="select-all"
+                                                                type="checkbox" />
                                                             <span class="label-text"></span>
                                                         </label>
                                                     </th>
@@ -100,10 +104,10 @@
                                                     <th>View</th>
                                                     <th>Action</th>
                                                 </tr>
-                                            </thead>   
-                                            
+                                            </thead>
+
                                         </table>
-                                       {{--<div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>--}}
+                                        {{--<div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>--}}
                                     </div>
                                 </div>
                             </div>
@@ -116,6 +120,7 @@
                 </section>
             </section>
         </section>
+
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
@@ -130,7 +135,6 @@
 @include('stacks.js.form')
 
 <script>
-
     {{--$('#table-related-event').DataTable();--}}
 
     detail_load_general();
@@ -153,6 +157,7 @@
         $("#copy_button").click(function(){
             copy_clipboard("otxindicator_text");
         });
+
 
     });
     
@@ -205,7 +210,9 @@
             type: "post",
             data:({
                 page : page,
-                id:"{{$otxid}}"
+                id:"{{$otxid}}",
+                type:"{{$otxtype}}",
+                indicator:"{{$otxindicator}}"
             }),
             beforeSend: function(){
                 f_loading(null,'#table-related-event');
@@ -230,7 +237,9 @@
             type: "post",
             data:({
                 page : page,
-                id:"{{$otxid}}"
+                id:"{{$otxid}}",
+                type:"{{$otxtype}}",
+                indicator:"{{$otxindicator}}"
 
             }),
             beforeSend: function(){
@@ -245,31 +254,6 @@
         }).fail(function(jqXHR, ajaxOptions, thrownError){
 	    {{--loading('stop_load');--}}
         f_loading_stop(null, '#table-related-event');
-            console.log("No response from server");
-        });
-    }
-
-    function detail_load_pulses1(){
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/indicators/load/pulses",
-            type: "post",
-            data: ({
-                id:"{{$otxid}}",
-            }),
-            datatype: "html",
-            beforeSend: function(){
-                $('#loadspinner_related_pulse').show();
-            },
-        }).done(function(data){
-            $('#loadspinner_related_pulse').hide();
-
-            {{--$("#pulses_related").append(data.html);--}}
-
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('#loadspinner_related_pulse').hide();
             console.log("No response from server");
         });
     }
