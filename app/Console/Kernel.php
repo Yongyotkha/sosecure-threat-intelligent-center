@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         
         $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
         $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
+        $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
 
         // $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
         // $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
