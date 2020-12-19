@@ -8,9 +8,12 @@
             <header class="header panel-heading bg-white b-b b-light">
                 <div class="bc-head">@langapp('news')</div>    
                 
-                <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span>@langapp('Search_Advance')</span>
-                 </button>
+                 </button> --}}
+                 <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <span>@langapp('Search_Advance')</span>
+                </a>
                  <div class="pull-right" style="margin-top: 8px; width: 300px;">
                     <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                         <option value="">All Site</option>
@@ -26,7 +29,7 @@
             {{-- Search --}}
             {{-- Tab Content --}}
             <section id="scrollable_news" class="scrollable wrapper bg-grey">
-                <section class="panel panel-default" id="hide-advance-search">
+                <section class="panel panel-default" id="area-advance-search" style="display: none;">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
                             <div class="col-lg-12">
@@ -185,6 +188,13 @@
 @include('stacks.js.advanced_search')
 
 <script>
+
+    $('#area-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#area-advance-search').toggle();
+    });
+
+
     var f_search = 0;
     var page = 1; 
     var page_stop = true;
