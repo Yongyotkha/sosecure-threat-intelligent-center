@@ -112,6 +112,8 @@ return [
     'OTX_KEY_store'   => env('OTX_KEY_store'),
     'DB_MONGO_DEV'    => env('DB_MONGO_DEV'),
     'DB_MONGO'        => env('DB_MONGO'),
+    'DARKOWL_PUBLIC_KEY'    => env('DARKOWL_PUBLIC_KEY'),
+    'DARKOWL_PRIVATE_KEY'   => env('DARKOWL_PRIVATE_KEY'),
 
     /*
     |--------------------------------------------------------------------------
