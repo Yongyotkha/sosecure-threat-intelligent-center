@@ -122,12 +122,15 @@ class SiteSettingsController extends Controller
         $SiteSettings->public_key = str_random(135);
         $SiteSettings->save();
 
-        foreach($request->category AS $category) {
-            $SiteCategory = new SiteCategory;
-            $SiteCategory->site_id = $SiteSettings->id;
-            $SiteCategory->category_id = $category;
-            $SiteCategory->save();
+        if($$request->category) {
+            foreach($request->category AS $category) {
+                $SiteCategory = new SiteCategory;
+                $SiteCategory->site_id = $SiteSettings->id;
+                $SiteCategory->category_id = $category;
+                $SiteCategory->save();
+            }
         }
+
 
         if ($request->hasFile('logo')) {
             $this->uploadLogo($request, $SiteSettings);
