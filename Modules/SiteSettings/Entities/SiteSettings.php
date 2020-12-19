@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\Tags_site;
 use Modules\SiteSettings\Entities\site_config_email_alert;
-
+use Modules\SiteSettings\Entities\Site_keywords;
+use Modules\SiteSettings\Entities\Domain;
 class SiteSettings extends Model{
     protected $table = "site";
     public $timestamps = true;
@@ -41,6 +42,14 @@ class SiteSettings extends Model{
 
     public function get_categorys(){
         return $this->hasMany(SiteCategory::class, 'site_id', 'id');
+    }
+
+    public function get_keywords_darkweb(){
+        return $this->hasMany(Site_keywords::class, 'site_id', 'id')->where('type','darkweb');
+    }
+
+    public function get_domains_default(){
+        return $this->hasMany(Domain::class, 'site_id', 'id')->where('domain_default',1);
     }
 
     public function get_tags(){
