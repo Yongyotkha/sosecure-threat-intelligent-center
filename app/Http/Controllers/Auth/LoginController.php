@@ -12,6 +12,9 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Modules\Users\Entities\User;
 
+use App\Menu;
+use App\Menu_sub;
+
 class LoginController extends Controller
 {
     /*
@@ -69,6 +72,10 @@ class LoginController extends Controller
         if ($this->attemptLogin($request) || $this->oldLogin($request)) {
             // $user = $this->guard('api')->user();
             // $user->generateToken();
+
+            $menu = Menu::all();
+            // dd($menu);
+            // dd(55);
             
             return $this->sendLoginResponse($request);
         }
