@@ -295,6 +295,7 @@ class OTXMDFeedPulse extends Command
                                 ['indicator_id' => (isset($value["id"]) ? $value["id"] : ""),
                                     'pulse_id' => (isset($pulseID) ? $pulseID : "")],
                                 ['$set' => [
+                                    'role' => (isset($value["role"]) ? $value["role"] : ""),
                                     'created' => (isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null),
                                     'expiration' => (isset($value["expiration"]) ? new UTCDateTime(strtotime($value["expiration"])*1000) : null),
                                     'is_active' => (isset($value["is_active"]) ? $value["is_active"] : ""),
@@ -362,6 +363,14 @@ class OTXMDFeedPulse extends Command
             $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100', $urlLimit);
             if ($reconCall["success"]) {
                 $otxFeedData = json_decode($reconCall["result"], true);
+                $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                        [   'pulse_id' => isset($pulseID) ? $pulseID : ""
+                        ],
+                        [   '$set' => [
+                                'count_related_pulse' => isset($otxFeedData["count"]) ? $otxFeedData["count"] : 0
+                            ],
+                        ]
+                );
             } else {
                 $otxFeedDataCheck = false;
                 $otxSuccessCheck = false;

@@ -48,8 +48,17 @@ class MDFeedDarkWeb extends Command
         ];
         $SiteSettings = SiteSettings::where('active', '1')->whereNull('deleted_at')->with('get_keywords_darkweb')->with('get_domains_default');
         $SiteSettings = $SiteSettings->get();
+        
+        // $time_stamp = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
+        // $time_stamp = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
+
         foreach ($SiteSettings as $value) {
-            $response = $this->perform_query($value);
+            try{
+                $response = $this->perform_query($value);
+               
+            } catch (Exception $e) {
+                echo "Fail handle : " . $e->getMessage();
+            }
         }
         //use ($site_id)
 
@@ -84,7 +93,6 @@ class MDFeedDarkWeb extends Command
         $search = '';
         $count = 0;
         foreach ($payload as $value) {
-            //echo json_encode($value);
             foreach ($value as $key => $value2) {
                 if ($count == 0) {
                     $count = 1;
@@ -100,11 +108,20 @@ class MDFeedDarkWeb extends Command
         return $search;
     }
 
+    public function addOffset($search, $offset)
+    {
+        $search = $search;
+        $search .= '&offset=' . $offset;
+        return $search;
+    }
+
     public function perform_query($Site_payload)
     {
         // $publicKey = '+x4QtLeFMejTD6kYel4aYA==';
         // $privateKey = 'L57IL/Kt7PMZFMrZXNiSD5YFZrMSc6kQUmAu6/oS9Qk=';
-        //$search = $this->querysToString($payload,'d',500);
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
         $reconnectLimit = 3;
         if (!empty($Site_payload["get_keywords_darkweb"]) > 0) {
             foreach ($Site_payload["get_keywords_darkweb"] as $value) {
@@ -119,44 +136,205 @@ class MDFeedDarkWeb extends Command
                     }
                     $payload[] = array('count' => '20');
                     $payload[] = array('sort' => 'd');
-                    $search = $this->querysToString($payload, '0000-12-18T00:00:00Z', '3000-01-01T00:00:00Z');
+                    $search = $this->querysToString($payload, '2020-12-17T00:00:00Z', '3000-01-01T00:00:00Z');
                     $_clientHttp = $this->getInitialNumbers($search, 'GET', $reconnectLimit);
-                    echo $_clientHttp["total"] . "";
-                    if ($_clientHttp["total"] <= 20) {
-                        //echo json_encode($_clientHttp["alldata"]);
-                        $saveCheck = $this->saveDarkwebDetail($_clientHttp["alldata"],
-                        $value["name"], $value["site_id"],$Site_payload["name"], $Site_payload["get_domains_default"][0]["domain"], $Site_payload["get_domains_default"][0]["name"]
+                    $site_Data["site_type_search"] = $value["name"];
+                    $site_Data["site_id"] = $value["site_id"];
+                    $site_Data["site_name"] = $Site_payload["name"];
+                    $site_Data["site_domain"] = $Site_payload["get_domains_default"][0]["domain"];
+                    $site_Data["site_domain_name"] = $Site_payload["get_domains_default"][0]["name"];
+                    $getIDStamp = $this->createStamp($site_Data);
+                    $saveCheck = $_clientHttp["success"];
+                    echo $_clientHttp["total"] . "All_DATA";
+                    if($_clientHttp["total"]>0){
+                        if ($_clientHttp["total"] <= 20) {
+                            //echo json_encode($_clientHttp["alldata"]);
+                            $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                            // $saveCheck = $this->saveDarkwebDetail($_clientHttp["alldata"],
+                            // $value["name"], $value["site_id"],$Site_payload["name"], $Site_payload["get_domains_default"][0]["domain"], $Site_payload["get_domains_default"][0]["name"]
+                            // );
+                        } else {
+                            $firstCrawlDate  = $_clientHttp["alldata"]["results"][0]["crawlDate"];
+                            $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                            $saveCheck = $this->paginate($site_Data,$getIDStamp,
+                            $_clientHttp["total"],$payload,$search, 'GET', $reconnectLimit,2,$firstCrawlDate
+                            );
+                        }
+                    }
+                    if ($saveCheck==true) {
+                        $updateResult2 = $col_fx_transaction_darkweb_stamp->updateOne(
+                            ['_id' => $getIDStamp],
+                            ['$set' => ['status' => 2]]
                         );
+                        $this->info("app:OTXMDFeedIndicator SUCCESS");
                     } else {
-
+                        $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
                     }
                 } catch (Exception $e) {
-                    echo "  Fail : " . $e->getMessage();
+                    echo "Fail Perform : " . $e->getMessage();
                 }
 
             }
         }
 
-        $this->info('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Update check completed');
+        $this->info('SUCCESS ONE SEARCH');
 
     }
 
     public function getInitialNumbers($search, $http_method, $reconnectLimit)
     {
-        //offset 0
         $authHeader_url = $this->generate_auth_header_URL($search, $http_method);
         $_clientHttp = $this->reconnnect($authHeader_url["header"], $authHeader_url["url"], $reconnectLimit);
         if ($_clientHttp["success"]) {
-            $this->info('PASS');
+            //$this->info('PASS');
             $data_clientHttp = json_decode($_clientHttp["result"], true);
+            $data["resultCount"] = $data_clientHttp["resultCount"];
             $data["total"] = $data_clientHttp["total"];
             $data["alldata"] = $data_clientHttp;
+            $data["success"] = $_clientHttp["success"];
         } else {
-            $this->info('ERROR' . $_clientHttp["exception"]);
+            $this->info('Fail getData:' . $search);
+            $this->info($_clientHttp["exception"]);
+            $data["resultCount"] = 0;
             $data["total"] = 0;
             $data["alldata"] = null;
+            $data["success"] = $_clientHttp["success"];
         }
         return $data;
+    }
+
+    public function createStamp($site_Data)
+    {
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
+        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+        $insertStamp = $col_fx_transaction_darkweb_stamp->insertOne([
+            'code' => generator_uuid(),
+            'transaction_site_type_search' => @$site_Data["site_type_search"],
+            'transaction_site_id' => @$site_Data["site_id"],
+            'transaction_site_name' => @$site_Data["site_name"],
+            'transaction_site_domain' => @$site_Data["site_domain"],
+            'transaction_site_domain_name' => @$site_Data["site_domain_name"],
+            'transaction_date' => date("Y-m-d"),
+            'status' => 1,
+            'created_at' => $date_now,
+            'created_by' => "system",
+            'updated_at' => $date_now,
+            'updated_by' => "system",
+            'deleted_at' => null,
+        ]);
+        $get_InsertedId = $insertStamp->getInsertedId();
+        return $get_InsertedId;
+    }
+
+    public function paginate($site_Data,$getIDStamp,$totalResults,$payload,$search, $http_method, $reconnectLimit,$masterPage,$firstCrawlDate)
+    {
+        $offset = 0;
+        $lastCrawlDate = '';
+        if($masterPage==2){
+            $offset = 20;
+        }
+
+        $_clientHttp["success"] = true;
+        while ($offset < 5000) {
+            if($masterPage==9){ //*20 data and break;
+                return $_clientHttp["success"];
+            }
+            $search_offset = $this->addOffset($search, $offset);
+            $_clientHttp = $this->getInitialNumbers($search_offset, 'GET', $reconnectLimit);
+            
+            if($_clientHttp["resultCount"]< 1){
+                $this->info("GET_OUT:".$search);
+                return $_clientHttp["success"];
+            }else if($_clientHttp["resultCount"]<20){
+                $saveCheck = $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                return $_clientHttp["success"];
+            }
+            $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+            
+            $offset =  $offset + 20;
+            $masterPage = $masterPage + 1;
+            if($offset==5000) {
+                $lastCrawlDate = $_clientHttp["alldata"]["results"][count($_clientHttp["alldata"]["results"])-1]["crawlDate"];
+                if($firstCrawlDate==$lastCrawlDate){
+                    return $_clientHttp["success"];
+                }
+            }
+        }
+
+        return $_clientHttp["success"];//comment and uncomment below line for save all data if get unlimit id user
+        // $boolResult = $this->paginate($site_Data,$getIDStamp,
+        // $totalResults,$payload,$this->querysToString($payload, '2020-12-17T00:00:00Z', $lastCrawlDate), $http_method, $reconnectLimit,$masterPage,$firstCrawlDate
+        // );
+        // return $boolResult;
+    }
+
+    public function saveDarkwebDetail_2($getIDStamp,$site_Data,$all_data)
+    {
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_data;//*9000
+        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+        $get_InsertedId = $getIDStamp;
+        if (count($all_data["results"]) > 0) {
+            foreach ($all_data["results"] as $value) {
+                $implodeValue = preg_split("/\\r\\n|\\r|\\n/", $value["body"]);
+                $site_domain = $site_Data["site_domain"];
+                $keyIndex = array_keys(array_filter($implodeValue, function($var) use ($site_domain){
+                    return stripos($var, $site_domain) !== false;
+                }));
+                if (!is_bool($keyIndex)) {
+                    $body_search = array();
+                    foreach ($keyIndex as $index_key) {
+                        $body_search[] = $implodeValue[$index_key];
+                    }
+                   
+                    $findUnique = $col_fx_transaction_darkweb_data->findOne(
+                        [
+                            'darkweb_id' => @$value["id"]
+                        ], 
+                        [
+                            'projection' => [
+                                "_id" => 1
+                            ]
+                        ]
+                    );
+
+                    if (empty($findUnique)) {
+                        $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
+                            'darkweb_id' => @$value["id"],
+                            'body_search' => @$body_search,
+                            //'body' => @$value["body"],
+                            'hackishness' => @$value["hackishness"],
+                            'title' => @$value["title"],
+                            'url' => @$value["url"],
+                            'crawlDate' => @$value["crawlDate"],
+                            'fileSize' => @$value["fileSize"],
+                            'domain' => @$value["domain"],
+                            'emails' => @$value["emails"],
+                            'headers' => @$value["headers"],
+                            'transaction_site_type_search' => @$site_Data["site_type_search"],
+                            'transaction_site_id' => @$site_Data["site_id"],
+                            'transaction_site_name' => @$site_Data["site_name"],
+                            'transaction_site_domain' => @$site_Data["site_domain"],
+                            'transaction_site_domain_name' => @$site_Data["site_domain_name"],
+                            'updated_at' => $date_now,
+                            'updated_by' => "system",
+                            'transcation_id' => $get_InsertedId,
+                            'status' => 1,
+                            'created_at' => $date_now,
+                            'created_by' => "system",
+                            'deleted_at' => null,
+                            'transaction_date' => date("Y-m-d"),
+                            'count_view' => 0,
+                        ]);
+                    }
+                }
+
+            }
+        }
+        return 0;
     }
 
     public function saveDarkwebDetail($all_data, $site_type_search, $site_id, $site_name, $site_domain, $site_domain_name)
@@ -164,8 +342,8 @@ class MDFeedDarkWeb extends Command
         //offset 0
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_data_nodata;
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;
+        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_data;//*9000
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $insertStamp = $col_fx_transaction_darkweb_stamp->insertOne([
             'code' => generator_uuid(),
@@ -204,9 +382,8 @@ class MDFeedDarkWeb extends Command
                     );
                     if (empty($findUnique)) {
                         $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
-                            'darkweb_id' => $value["id"],
+                            'darkweb_id' => @$value["id"],
                             'body_search' => @$body_search,
-                            'site_get' =>  $site_id,
                             //'body' => @$value["body"],
                             'hackishness' => @$value["hackishness"],
                             'title' => @$value["title"],
@@ -236,8 +413,7 @@ class MDFeedDarkWeb extends Command
 
             }
         }
-
-        return $get_InsertedId;
+        return 0;
     }
 
     public function generate_auth_header_URL($search, $http_method)
@@ -278,13 +454,14 @@ class MDFeedDarkWeb extends Command
         $_dataOut["result"] = "";
         $_dataOut["success"] = false;
         while ($_otxReconnect && $_reconnect < $limit) {
+            sleep(1);
             try {
                 $_bodyData = $_clientHttp->request(
                     'GET',
                     $url,
                     [
                         'headers' => $header,
-                        'delay' => 200, //millisec == 1sec
+                        'delay' => 1000, //millisec == 1sec
                         'timeout' => 59, //sec == 100sec
                     ]
                 )->getBody();
