@@ -73,7 +73,10 @@ class LoginController extends Controller
             // $user = $this->guard('api')->user();
             // $user->generateToken();
 
-            $menu = Menu::all();
+            $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+            // session_start();
+            $_SESSION["menu"] = $menu;
+            // session('menu', $menu);
             // dd($menu);
             // dd(55);
             

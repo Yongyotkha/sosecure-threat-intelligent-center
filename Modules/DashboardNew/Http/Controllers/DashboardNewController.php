@@ -32,6 +32,15 @@ class DashboardNewController extends Controller
      */
     public function index()
     {
+        // session_start();
+        // $menu = session('menu');
+        $menu = array();
+        if(isset($_SESSION["menu"])){
+            // unset($_SESSION["lastname"]);
+            $menu = $_SESSION["menu"];
+        }
+        
+        // dd($menu[4]->get_menu_sub);
         $data['page'] = langapp('dashboard');
         return view('dashboardnew::index')->with($data);
     }
