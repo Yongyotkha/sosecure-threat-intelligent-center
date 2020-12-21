@@ -8,7 +8,7 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            @if ($indicator_id)
+            @if ($indicator)
             <a href="{{ route('indicators.detail_indicator').'?id='.$indicator_id.'&type='.$type.'&indicator='.$indicator }}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
@@ -72,8 +72,10 @@
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
-                    <li class="active"><a href="#tab_attributes" data-toggle="tab">Attributes (442)</a></li>
-                    <li id="tab-bookmark"><a href="#tab_related_event" data-toggle="tab">Related Event (905)</a></li>
+                    <li id="tab-attributes" class="active"><a href="#tab_attributes" data-toggle="tab">Attributes
+                            ({{@$otx_events[0]['indicator_count']}})</a></li>
+                    <li id="tab-event"><a href="#tab_related_event" data-toggle="tab">Related Event
+                            ({{@$count_related_pulse}})</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_attributes">
@@ -99,32 +101,14 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <label>
-                                                            <input value="" type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </td>
-                                                    <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit
-                                                            amet.</a></td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i
-                                                                class="far fa-eye"></i> View</a>
-                                                    </td>
-                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div id="showing_amount_text" class="pull-left"
+                                        style="margin-top: 5px; margin-left: 15px;"></div>
+                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom">
+                                    </div>
                                 </div>
-                            </div>
                         </section>
                     </div>
                     <div class="tab-pane" id="tab_related_event">
@@ -150,102 +134,18 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <label>
-                                                            <input value="" type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </td>
-                                                    <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit
-                                                            amet.</a></td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i
-                                                                class="far fa-eye"></i> View</a>
-                                                    </td>
-                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div id="showing_amount_text_pulse" class="pull-left"
+                                        style="margin-top: 5px; margin-left: 15px;"></div>
+                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom_pulse">
+                                    </div>
                                 </div>
-                            </div>
                         </section>
                     </div>
                 </div>
             </div>
-
-            {{-- <section class="panel panel-default">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table-events-template">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>No</th>
-                                <th>Event Name</th>
-                                <th>Group</th>
-                                <th>Tags</th>
-                                <th>Attr</th>
-                                <th>Published</th>
-                                <th>Last Status</th>
-                                <th>DateTime</th>
-                                <th>View</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>   
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <label>
-                                        <input value="" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </td>
-                                <td>1</td>
-                                <td>Suspicious proxy agent</td>
-                                <td>
-                                    <a href="">MIST FEED</a>
-                                    <a href="">Phishing,UW</a>
-                                </td>
-                                <td>
-                                    <a href="">Scan,Agent,</a>
-                                    <a href="">Proxy,Spider</a>
-                                </td>
-                                <td>
-                                    <a href="">5421</a>
-                                </td>
-                                <td>
-                                    <i class="fas fa-check"></i>
-                                </td>
-                                <td>
-                                    Modified
-                                </td>
-                                <td>
-                                    2020-12-07 11:11
-                                </td>
-                                <td>
-                                    152
-                                </td>
-                                <td>
-                                    <a href="" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                            </tr>    
-                        </tbody> 
-                    </table>
-                </div>
-            </section> --}}
-
         </section>
     </section>
 
@@ -270,8 +170,8 @@
 <script>
     $('.select2-option').select2();
 
-    $('#table-attributes-template').DataTable();
-    $('#table-related-event').DataTable();
+    {{--$('#table-attributes-template').DataTable();
+    $('#table-related-event').DataTable();--}}
 
 
     const chart = new frappe.Chart("#chart-show-bar", { 
@@ -285,6 +185,8 @@
         type: 'percentage',
         colors: ['#743ee2']
     });
+
+  
 
   $(function() {
         var start = moment().startOf('hour');
@@ -315,6 +217,144 @@
 
         cb(start, end);
     });
+
+    var pulse_id={!! json_encode($pulse_id) !!};
+
+    $(function() {
+        load_table_attributes(1,-1);
+        load_table_pulse(1,-1);
+    });
+
+    function load_table_attributes(page=1,count_page=-1){
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.events_attributes_table')!!}',
+            type: "get",
+            data:({
+                pulse_id:pulse_id,
+                page : page,
+                count_page : count_page
+                
+            }),
+            beforeSend: function(){
+
+            },
+        }).done(function(data){
+        
+            $("#table-attributes-template").html(data.html);
+            $("#pagination_custom").html(data.pagination);
+            $("#showing_amount_text").html(data.showing_amount_text);
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+
+            console.log("No response from server");
+        });
+    }
+
+    function pagination_goto(page=null,count_page=-1) {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.events_attributes_table')!!}',
+            type: "get",
+            data:({
+                pulse_id:pulse_id,
+                page : page,
+                count_page : count_page
+
+            }),
+            beforeSend: function(){
+                {{--loading('load');--}}
+
+            },
+        }).done(function(data){
+	    {{--loading('stop_load');--}}
+   
+            
+            {{--$('#count_news').text(data.count);--}}
+            $("#table-attributes-template").html(data.html);
+            $("#pagination_custom").html(data.pagination);
+            $("#showing_amount_text").html(data.showing_amount_text);
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+	    {{--loading('stop_load');--}}
+
+            console.log("No response from server");
+        });
+
+    }
+
+      function load_table_pulse(page=1,count_page=-1){
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.events_pulse_table')!!}',
+            type: "get",
+            data:({
+                pulse_id:pulse_id,
+                page : page,
+                count_page : count_page
+                
+            }),
+            beforeSend: function(){
+
+            },
+        }).done(function(data){
+        
+            $("#table-related-event").html(data.html);
+            $("#pagination_custom_pulse").html(data.pagination);
+            $("#showing_amount_text_pulse").html(data.showing_amount_text);
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+
+            console.log("No response from server");
+        });
+    }
+
+    function pagination_goto_pulse(page=null,count_page=-1) {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('indicators.events_pulse_table')!!}',
+            type: "get",
+            data:({
+                pulse_id:pulse_id,
+                page : page,
+                count_page : count_page
+
+            }),
+            beforeSend: function(){
+                {{--loading('load');--}}
+
+            },
+        }).done(function(data){
+	    {{--loading('stop_load');--}}
+   
+            
+            {{--$('#count_news').text(data.count);--}}
+            $("#table-related-event").html(data.html);
+            $("#pagination_custom_pulse").html(data.pagination);
+            $("#showing_amount_text_pulse").html(data.showing_amount_text);
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+	    {{--loading('stop_load');--}}
+
+            console.log("No response from server");
+        });
+
+    }
+
+   
+
+
+    
+
+            
 </script>
 
 @endpush
