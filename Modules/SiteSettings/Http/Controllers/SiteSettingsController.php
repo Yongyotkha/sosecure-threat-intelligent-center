@@ -122,12 +122,15 @@ class SiteSettingsController extends Controller
         $SiteSettings->public_key = str_random(135);
         $SiteSettings->save();
 
-        foreach($request->category AS $category) {
-            $SiteCategory = new SiteCategory;
-            $SiteCategory->site_id = $SiteSettings->id;
-            $SiteCategory->category_id = $category;
-            $SiteCategory->save();
+        if($request->category) {
+            foreach($request->category AS $category) {
+                $SiteCategory = new SiteCategory;
+                $SiteCategory->site_id = $SiteSettings->id;
+                $SiteCategory->category_id = $category;
+                $SiteCategory->save();
+            }
         }
+
 
         if ($request->hasFile('logo')) {
             $this->uploadLogo($request, $SiteSettings);
@@ -136,8 +139,8 @@ class SiteSettingsController extends Controller
         //---start---gen user_support-------//
         $user = new User;
         $user->code = generator_uuid();
-        $user->username = 'support@'.$SiteCategory->id.'.com';
-        $user->email = 'support@'.$SiteCategory->id.'.com';
+        $user->username = 'support@'.$SiteSettings->id.'.com';
+        $user->email = 'support@'.$SiteSettings->id.'.com';
         $user->email_verified_at = Carbon::now();
         $user->name = 'Admin Support';
         $user->password = 'support';
@@ -307,9 +310,12 @@ class SiteSettingsController extends Controller
         }
     }
 
-    public function delete(SiteSettings $id)
+    public function delete($id)
     {
-        $data['siteSettings'] = $id;
+        // dd($id);
+        $SiteSettings = SiteSettings::where('code', $id)->first();
+
+        $data['siteSettings'] = $SiteSettings;
         return view('sitesettings::modal.delete')->with($data);
     }
 

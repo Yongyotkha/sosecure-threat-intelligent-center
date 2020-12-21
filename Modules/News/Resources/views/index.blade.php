@@ -8,9 +8,12 @@
             <header class="header panel-heading bg-white b-b b-light">
                 <div class="bc-head">@langapp('news')</div>    
                 
-                <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span>@langapp('Search_Advance')</span>
-                 </button>
+                 </button> --}}
+                 <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <span>@langapp('Search_Advance')</span>
+                </a>
                  <div class="pull-right" style="margin-top: 8px; width: 300px;">
                     <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                         <option value="">All Site</option>
@@ -26,7 +29,7 @@
             {{-- Search --}}
             {{-- Tab Content --}}
             <section id="scrollable_news" class="scrollable wrapper bg-grey">
-                <section class="panel panel-default" id="hide-advance-search">
+                <section class="panel panel-default" id="area-advance-search" style="display: none;">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
                             <div class="col-lg-12">
@@ -118,7 +121,7 @@
                                 <div id="main-list" class="row m-b-md">
                                     <div class="col-md-12">
                                         <div id="list_news"></div>
-                                        <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading</div>
+                                        <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading&nbsp;<span class="content-spinner-loading-inline"></span></div>
                                         {{-- <div class="list-news">
                                             <div class="checkbox-news-select">
                                                 <label class="mr-3">
@@ -185,23 +188,42 @@
 @include('stacks.js.advanced_search')
 
 <script>
+
+    $('#area-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#area-advance-search').toggle();
+    });
+
+
     var f_search = 0;
     var page = 1; 
     var page_stop = true;
-    load_more(page);
-    {{--load_more_search(page);--}}
+    {{--load_more(page);--}}
+    load_more_search(page);
     load_more_book_mark(page);
+    var ck = 1;
     $('#scrollable_news').scroll(function(event) {
             let scrolltop = $('#scrollable_news').scrollTop();
             let tab_height = $('#scrollable_news').height();
             let docu_height = $(document).height();
         console.log(scrolltop+'  '+tab_height+'   '+docu_height);
         if($('#scrollable_news').scrollTop() + $('#scrollable_news').height() >= $(document).height()) {
-            page++;
+            
             console.log(555);
             if(page_stop){
+                if(ck == 1) {
+                    page = page+1;
+                    load_more_search(page,f_search);
+                    
+                    ck++;
+                    
+                }
+                
                 {{--load_more(page);--}}
-                load_more_search(page,f_search);
+                
+                setTimeout(function(){ 
+                
+                }, 10000);
             }
         }
     });
@@ -220,15 +242,15 @@
             },
         }).done(function(data){
             if(data.html.length == 0){
-                page_stop = false;
+                {{--page_stop = false;--}}
                 $('.ajax-loading').hide();
                 $('#count_news_bookmark').text(0);
                 return;
             }
             $('#count_news_bookmark').text(data.count);
             $('.ajax-loading').hide();
-            $('.ajax-loading').addClass('d-none');
-            $("#list_news_book_mark").append(data.html);
+            {{--$("#list_news_book_mark").append(data.html);--}}
+            $("#list_news_book_mark").html(data.html);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -255,6 +277,8 @@
             $('#count_news').text(data.count);
             $('.ajax-loading').hide();
             $("#list_news").append(data.html);
+            page++;
+            
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -267,10 +291,15 @@
         }
 
         {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-            let startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-            let endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+            let startDate = '';
+            let endDate = '';
+            if(f_search == 1) {
+                startDate =  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+                endDate =  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+            }
             console.log(startDate);
             console.log(endDate);
+
             let news_title_search = $("#news_title_search").val();
             let news_category = $("#news_category").val();
             let related_news = false;
@@ -313,21 +342,24 @@
             },
         }).done(function(data){
             if(data.html.length == 0){
+                ck = 0;
                 page_stop = false;
                 $('.ajax-loading').hide();
                 f_loading_stop(1);
                 {{--$('#count_news').text(0);--}}
                 return;
+            } else {
+                ck = 1;
+                f_loading_stop(1);
+                let count_n = $('#count_news').text();
+                let count_search = data.count;
+                let count_n_all = parseInt(count_n) + parseInt(count_search);
+                {{--$('#count_news').text(data.count);--}}
+                $('#count_news').text(data.count);
+                $('.ajax-loading').hide();
+                $("#list_news").append(data.html); 
             }
-            f_loading_stop(1);
-            let count_n = $('#count_news').text();
-            let count_search = data.count;
-            let count_n_all = parseInt(count_n) + parseInt(count_search);
-            {{--$('#count_news').text(data.count);--}}
-            $('#count_news').text(data.count);
-            $('.ajax-loading').hide();
-            $('.ajax-loading').addClass('d-none');
-            $("#list_news").append(data.html);   
+  
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -378,6 +410,9 @@
             }
             load_more_book_mark(page);
             {{--load_more_search(page,f_search);--}}
+            page = 1;
+            page_stop = true;
+            load_more_search(page,f_search);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
@@ -404,7 +439,7 @@
 <script type="text/javascript">
     $(function() {
     
-        var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+        var start = moment().subtract(1, 'month');{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
         var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
     
         function cb(start, end) {

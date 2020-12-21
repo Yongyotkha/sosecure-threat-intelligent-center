@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 use App\Entities\Hook;
 use App\Entities\Language;
 use App\Entities\Local;

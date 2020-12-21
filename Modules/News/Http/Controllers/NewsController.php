@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
+use Modules\SiteSettings\Entities\SiteNewsRelatedTemp;
 use Modules\RSSFeedSettings\Entities\NewsTopics;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
@@ -118,6 +119,7 @@ class NewsController extends Controller
         }
         
 
+        //site_news_related จาก db
         $site_news_related = [];
         if($SiteNewsRelated) {
             foreach($SiteNewsRelated as $key => $val) {
@@ -129,11 +131,15 @@ class NewsController extends Controller
                     if($val->get_news) {
                         $news_related_array_sub = [];
                         foreach(@$val->get_news as $key2 => $val2) {
+
+                            if($val2) {
+                                $news_related_array_sub['site_id'] = $val_news_related_id;
+                                // $news_related_array_sub['cate_id'] = @$val2->news_category_id;
+                                $news_related_array_sub['cate_id'] = @$val2->get_cate[0]->news_category_id;
+                                $news_related_array_sub['news_id'] = $val_news_id;
+                            }
     
-                            $news_related_array_sub['site_id'] = $val_news_related_id;
-                            // $news_related_array_sub['cate_id'] = @$val2->news_category_id;
-                            $news_related_array_sub['cate_id'] = @$val2->get_cate[0]->news_category_id;
-                            $news_related_array_sub['news_id'] = $val_news_id;
+                 
     
                         }
                         $news_related_array_sub_cal = array_filter($news_related_array_sub);
@@ -143,6 +149,10 @@ class NewsController extends Controller
             }
         }
 
+
+
+
+        //site news
         $site_and_news_array_all = [];
         if($news_array) {
             foreach($news_array as $news_key => $news_val) {
@@ -174,23 +184,102 @@ class NewsController extends Controller
             }
         }
 
+
+
+
+        // $site_news_related_insert_all = [];
+        // $site_news_related_insert = [];
+        // $site_news_related_insert_sub = [];
+        // if($site_news_related) {
+        //     foreach($site_news_related as $key => $val) {
+        //         if($val) {
+
+        //             if($site_and_news_array_all) {
+        //                 foreach($site_and_news_array_all as $key2 => $val2) {
+        //                     if(@$val['site_id'] == @$val2['site_id'] && @$val['cate_id'] == @$val2['cate_id'] && @$val['news_id'] == @$val2['news_id']) {
+                                
+
+        //                     } else {
+        //                         $site_news_related_insert_sub['site_id'] = @$val2['site_id'];
+        //                         $site_news_related_insert_sub['cate_id'] = @$val2['cate_id'];
+        //                         $site_news_related_insert_sub['news_id'] = @$val2['news_id'];
+
+        //                         // dd($site_news_related_insert_sub);
+
+        //                         $site_news_related_insert_sub_cal = array_filter($site_news_related_insert_sub);
+        //                         array_push($site_news_related_insert, $site_news_related_insert_sub_cal);
+        //                     }
+
+        //                 }
+        //             }
+
+
+        //         }
+        //     }
+
+        //     $site_news_related_insert_cal = array_filter($site_news_related_insert);
+        //     array_push($site_news_related_insert_all, $site_news_related_insert_cal);
+
+
+        // }
+
+        SiteNewsRelatedTemp::truncate();
+        if($site_and_news_array_all) {
+            // dd($site_and_news_array_all);
+            foreach($site_and_news_array_all as $key => $val) {
+                // dd($val);
+                if($val) {
+                    $SiteNewsRelatedTemp = new SiteNewsRelatedTemp;
+                    $SiteNewsRelatedTemp->site_id = @$val['site_id'];
+                    // $SiteNewsRelatedTemp->cate_id = $val['cate_id'];
+                    $SiteNewsRelatedTemp->news_id = @$val['news_id'];
+                    $SiteNewsRelatedTemp->save();
+                }
+            }
+        }
+
+        $SiteNewsRelatedTemp = SiteNewsRelatedTemp::all();
+        if($SiteNewsRelatedTemp) {
+            if($site_and_news_array_all) {
+                SiteNewsRelated::truncate();
+                foreach($site_and_news_array_all as $key => $val) {
+                    if($val) {
+                        $SiteNewsRelatedTemp = new SiteNewsRelated;
+                        $SiteNewsRelatedTemp->site_id = @$val['site_id'];
+                        // $SiteNewsRelatedTemp->cate_id = $val['cate_id'];
+                        $SiteNewsRelatedTemp->news_id = @$val['news_id'];
+                        $SiteNewsRelatedTemp->save();
+                    }
+                }
+            }
+        }
+
+
+
+
+
         // $site_array = array_filter($site_array);
         // $result=array_diff($site_news_related[0],$site_and_news_array_all[0]);
-        $result=array_diff($news_related_array_sub_cal,$site_and_news_array);
+
+        // $result=array_diff($news_related_array_sub_cal,$site_and_news_array);
+
+
+        
+
 
 
         // dd($news_array);
         // dd($site_array);
         // dd($site_news_related);
         // print_r($result);
-        dd($site_and_news_array_all);
+        // dd($site_news_related_insert_all);
         // dd(array_unique($site_and_news_array_all));
         // dd($SiteNewsRelated[0]->get_news[0]->get_cate);
         // dd($SiteNewsRelated[0]->get_news->get_cate);
 
 
         
-       return view('news::index')->with($data);
+    //    return view('news::index')->with($data);
     }
 
     public function index()
