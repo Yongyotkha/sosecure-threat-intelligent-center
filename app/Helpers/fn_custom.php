@@ -248,3 +248,142 @@ function change_date_utc_to_thai($val) {
 
     return $return_date;
 }
+
+
+
+function get_menu_html() {
+    $html_all = '';
+
+    $html_all .= '
+    <nav class="nav-primary hidden-xs">
+    <ul class="nav">
+    ';
+
+            $menu = [];
+            $menu_html = '';
+        if(isset($_SESSION["menu"])){
+            // unset($_SESSION["lastname"]);
+            $menu = $_SESSION["menu"];
+
+
+            if($menu) {
+                foreach($menu as $menu_val) {
+                    $active = '';
+                    $url = '#';
+                    $check_menu_active = '';
+                    $name_val = '';
+                    
+                    if($menu_val->url) {// url
+                        if($menu_val->type_url == 'site_url') {
+                            $url = site_url($menu_val->url);
+                        } else if ($menu_val->type_url == 'route') {
+                            $url = route($menu_val->url);
+                        }
+                    }
+
+                    if($menu_val->check_menu_active) {// check active
+                        if($menu_val->type_check_menu_active == 'langapp') {
+                            $check_menu_active = langapp($menu_val->check_menu_active);
+                        } else if ($menu_val->type_check_menu_active == '') {
+                            $check_menu_active = $menu_val->check_menu_active;
+                        }
+                    }
+
+                    if(@$page == $check_menu_active) {
+                        $active = 'active';
+                    }
+
+                    if($menu_val->langapp) {//ชื่อเมนู
+                        $name_val = langapp($menu_val->langapp);
+                    }
+
+                    if(@$menu_val->get_menu_sub) {
+
+
+                        
+                        $menu_sub_html = '';
+                        foreach($menu_val->get_menu_sub as $menu_sub_val) {
+
+
+                            $active_sub = '';
+                            $url_sub = '#';
+                            $check_menu_active_sub = '';
+                            $name_val_sub = '';
+                            
+
+                            if($menu_sub_val->url) {// url
+                                if($menu_sub_val->type_url == 'site_url') {
+                                    $url_sub = site_url($menu_sub_val->url);
+                                } else if ($menu_sub_val->type_url == 'route') {
+                                    $url_sub = route($menu_sub_val->url);
+                                }
+                            }
+
+                            if($menu_sub_val->check_menu_active) {// check active
+                                if($menu_sub_val->type_check_menu_active == 'langapp') {
+                                    $check_menu_active_sub = langapp($menu_sub_val->check_menu_active);
+                                } else if ($menu_sub_val->type_check_menu_active == '') {
+                                    $check_menu_active_sub = $menu_sub_val->check_menu_active;
+                                }
+                            }
+
+                            if(@$page == $check_menu_active_sub) {
+                                $active_sub = 'active';
+                            }
+
+                            if($menu_sub_val->langapp) {//ชื่อเมนู
+                                $name_val_sub = langapp($menu_sub_val->langapp);
+                            }
+
+
+
+
+                            $menu_sub_html .= '<li class="'. $active_sub .'">
+                                                    <a href="'. $url_sub .'">
+                                                        <i class="'.@$menu_sub_val->icon.'"><b class="bg-info"></b></i>
+                                                        <span>'.$name_val_sub.'</span>
+                                                    </a>
+                                                </li>';
+                        }
+
+                    }
+                        if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
+                            $is_have_sub = '<a href="'. $url .'" class="'. $active_sub .'">
+                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                                <i class="fas fa-angle-up text-active"></i></span>
+                                                <span> '.$name_val.' </span>
+                                            </a>
+                                        <ul class="nav lt">'.$menu_sub_html.'</ul>
+                                        ';
+                        } else {
+                            $is_have_sub = '<a href="'. $url .'" class="'. $active .'">
+                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                    
+                                                <span> '.$name_val.' </span>
+                                            </a>';
+                        }
+                            
+
+                    
+           
+
+                    $menu_html .=    '<li class="'. $active .'">
+                                        '.$is_have_sub.'
+                                      </li>';
+
+                }
+
+                $html_all .= $menu_html;
+            }
+
+        }
+
+       
+
+    $html_all .= '
+            </ul>
+        </nav>';
+
+    echo $html_all;
+}
