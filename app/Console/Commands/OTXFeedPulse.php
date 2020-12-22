@@ -63,7 +63,8 @@ class OTXFeedPulse extends Command
         //echo json_encode($this->caseByType("YARA","e0f74136e9edcb8b4c67274fb5c3f5885270de33","2",$urlLimit));
         //$this->testfun();
         // $this->queryModel();
-        $this->queryMD();
+        // $this->queryMD();
+        $this->queryMD2();
     }
 
     public function queryModel(){
@@ -76,6 +77,45 @@ class OTXFeedPulse extends Command
             echo "not have";
         }
     }
+
+    public function queryMD2(){
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $col_Feed = $clientMD->social->Feed;
+        $_search = array();
+
+        $keywords = "\bPTTGC\b";
+        $keywords = "(?=.*\bPTT\b)(?=.*\bPTTGC\b)";
+        $keywords = "(?=.*\bPTTGC\b)";
+
+        $_search['feedcontent'] = ['$regex'=> $keywords
+        , '$options' => 's'];
+        
+        $text = "sdaaหหsdad";
+        if (preg_match('/\p{Thai}/u', $text) === 1) {
+            echo 'Contains a Thai character';
+        }
+
+
+        // $cursor = $col_Feed->find(
+        //     $_search
+        // ,
+        // [
+        //     'limit' => 10,
+        // ]
+        // );
+        // $documentAll = $cursor->toArray();
+
+        $cursor = $col_Feed->count(
+            $_search
+        
+        );
+        $documentAll = $cursor;
+        // $ttest = new UTCDateTime(strtotime("2020-12-13 11:00:00")*1000);
+        // echo json_encode( $ttest->toDateTime());
+        echo json_encode($documentAll);
+    }
+
 
     public function queryMD(){
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
