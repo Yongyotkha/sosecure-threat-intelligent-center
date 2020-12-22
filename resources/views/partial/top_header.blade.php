@@ -65,12 +65,12 @@
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
 
             @if(count(runningTimers()) > 0)
-            {{-- <li class="">
+            <li class="">
                 <a href="{{ route('timetracking.timers') }}" title="@langapp('timers')" data-toggle="ajaxModal" data-rel="tooltip" data-placement="bottom">  
                     @icon('solid/clock', 'fa-spin fa-lg text-warning')
                     <span class="badge badge-sm up bg-info m-l-n-sm display-inline">{{ count(runningTimers()) }}</span>
                 </a>
-            </li> --}}
+            </li>
             @endif
 
             @include('partial.notifications')
