@@ -65,12 +65,12 @@
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
 
             @if(count(runningTimers()) > 0)
-            <li class="">
+            {{-- <li class="">
                 <a href="{{ route('timetracking.timers') }}" title="@langapp('timers')" data-toggle="ajaxModal" data-rel="tooltip" data-placement="bottom">  
                     @icon('solid/clock', 'fa-spin fa-lg text-warning')
                     <span class="badge badge-sm up bg-info m-l-n-sm display-inline">{{ count(runningTimers()) }}</span>
                 </a>
-            </li>
+            </li> --}}
             @endif
 
             @include('partial.notifications')
@@ -88,12 +88,12 @@
                 <ul class="dropdown-menu animated fadeInRight">
                     <li class="arrow top"></li>
                     <li><a href="{{ route('users.profile') }}">@langapp('settings')</a></li>
-                    <li><a href="{{ route('tell.friend') }}" data-toggle="ajaxModal">@langapp('tell_friend')  </a></li>
-                    <li><a href="{{ route('users.reminders') }}">@langapp('reminders')</a></li>
+                    {{-- <li><a href="{{ route('tell.friend') }}" data-toggle="ajaxModal">@langapp('tell_friend')  </a></li>
+                    <li><a href="{{ route('users.reminders') }}">@langapp('reminders')</a></li> --}}
                     <li><a href="{{ route('users.notifications') }}">@langapp('notifications') </a></li>
-                    <li><a href="{{ route('extras.user.templates') }}">@langapp('canned_responses')</a></li>
+                    {{-- <li><a href="{{ route('extras.user.templates') }}">@langapp('canned_responses')</a></li> --}}
                     @admin
-                    <li><a href="{{ route('support.ticket') }}" data-toggle="ajaxModal">Need Help?</a></li>
+                    {{-- <li><a href="{{ route('support.ticket') }}" data-toggle="ajaxModal">Need Help?</a></li> --}}
                     @endadmin
                     <li class="divider"></li>
                     @if(Auth::user()->isImpersonating())
