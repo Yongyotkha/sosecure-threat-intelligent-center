@@ -1538,15 +1538,15 @@ class IndicatorsController extends Controller
             $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
            
             //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
-            $view = '<a href="'.route('indicators.detail_indicator').
-                    '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
-                    class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
+            // $view = '<a href="'.route('indicators.detail_indicator').
+            //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
+            //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
             $data[] = array( 
                 "TYPE"=>@$cursor_2['type'],
                 "Attribute Name"=>@$cursor_2['indicator_name'],
                 "ROLE"=>@$value['role'],
                 "Date"=>(isset($cursor_2['created'])?change_date_utc_to_thai($cursor_2['created']):""),
-                "Action"=>$view
+                "Action"=>''
                 
              );
    
