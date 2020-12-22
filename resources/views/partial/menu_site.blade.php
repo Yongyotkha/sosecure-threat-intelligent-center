@@ -55,12 +55,12 @@
             </li>
         </ul>
     </li>
-    <li {{ $page === 'News' ? 'active' : '' }}>
+    {{-- <li {{ $page === 'News' ? 'active' : '' }}>
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             News
         </a>
-    </li>
+    </li> --}}
 
     <li class="{{ $page === 'Vulnerability Assets' ? 'active' : '' }} main-link">
         <a href="#">
