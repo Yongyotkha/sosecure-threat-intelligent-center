@@ -42,13 +42,12 @@ class MDFeedDarkWeb extends Command
      */
     public function handle()
     {
-        $payload = [
-            'domain' => 't.me',
-            'q' => 't.me',
-        ];
+        // $payload = [
+        //     'domain' => 't.me',
+        //     'q' => 't.me',
+        // ];
         $SiteSettings = SiteSettings::where('active', '1')->whereNull('deleted_at')->with('get_keywords_darkweb')->with('get_domains_default');
         $SiteSettings = $SiteSettings->get();
-        
         // $time_stamp = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
         // $time_stamp = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
 
@@ -115,28 +114,60 @@ class MDFeedDarkWeb extends Command
         return $search;
     }
 
+    public function mapTypeDomain($typeSearch,$domain,$ip){
+        $payload = array();
+        if ($typeSearch == 'email') {
+            $payload[] = array('emailDomain' => $domain);
+            $payload[] = array('emailDomain' => '*.' . $domain);
+        } else if($typeSearch == 'ip') {
+            if(isset($ip)){
+                $payload[] = array($typeSearch => $ip);
+            }else{
+                $payload[] = array($typeSearch => "");
+            }
+        }else if($typeSearch == 'q') {
+            if(isset($ip)){
+                $payload[] = array($typeSearch =>  '"'.$domain.'" OR "'.$ip.'"');
+            }else{
+                $payload[] = array($typeSearch =>  '"'.$domain.'"');
+            }
+        }else {
+            //q only search domain
+            $payload[] = array($typeSearch => $domain);
+        }
+        $payload[] = array('count' => '20');
+        $payload[] = array('sort' => 'd');
+        return $payload;
+    }
+
     public function perform_query($Site_payload)
     {
         // $publicKey = '+x4QtLeFMejTD6kYel4aYA==';
         // $privateKey = 'L57IL/Kt7PMZFMrZXNiSD5YFZrMSc6kQUmAu6/oS9Qk=';
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_stamp;//*9000
         $reconnectLimit = 3;
         if (!empty($Site_payload["get_keywords_darkweb"]) > 0) {
             foreach ($Site_payload["get_keywords_darkweb"] as $value) {
 
                 try {
-                    $payload = array();
-                    if ($value["name"] == 'email') {
-                        $payload[] = array('emailDomain' => $Site_payload["get_domains_default"][0]["domain"]);
-                        $payload[] = array('emailDomain' => '*.' . $Site_payload["get_domains_default"][0]["domain"]);
-                    } else {
-                        $payload[] = array($value["name"] => $Site_payload["get_domains_default"][0]["domain"]);
-                    }
-                    $payload[] = array('count' => '20');
-                    $payload[] = array('sort' => 'd');
-                    $search = $this->querysToString($payload, '2020-12-17T00:00:00Z', '3000-01-01T00:00:00Z');
+                    $payload = $this->mapTypeDomain($value["name"],$Site_payload["get_domains_default"][0]["domain"],$Site_payload["get_domains_default"][0]["IP"]);
+                    // $payload = array();
+                    // if ($value["name"] == 'email') {
+                    //     $payload[] = array('emailDomain' => $Site_payload["get_domains_default"][0]["domain"]);
+                    //     $payload[] = array('emailDomain' => '*.' . $Site_payload["get_domains_default"][0]["domain"]);
+                    // } else {
+                    //     $payload[] = array($value["name"] => $Site_payload["get_domains_default"][0]["domain"]);
+                    // }
+                    // $payload[] = array('count' => '20');
+                    // $payload[] = array('sort' => 'd');
+                    
+
+                    $time_stamp_from = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
+                    $time_stamp_from = "0001-08-26T00:00:00Z";
+                    $time_stamp_to = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
+                    $search = $this->querysToString($payload, $time_stamp_from, $time_stamp_to);
                     $_clientHttp = $this->getInitialNumbers($search, 'GET', $reconnectLimit);
                     $site_Data["site_type_search"] = $value["name"];
                     $site_Data["site_id"] = $value["site_id"];
@@ -207,7 +238,7 @@ class MDFeedDarkWeb extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_stamp;//*9000
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $insertStamp = $col_fx_transaction_darkweb_stamp->insertOne([
             'code' => generator_uuid(),
@@ -238,7 +269,7 @@ class MDFeedDarkWeb extends Command
 
         $_clientHttp["success"] = true;
         while ($offset < 5000) {
-            if($masterPage==9){ //*20 data and break;
+            if($masterPage==2){ //-1*20 data and break;
                 return $_clientHttp["success"];
             }
             $search_offset = $this->addOffset($search, $offset);
@@ -262,10 +293,13 @@ class MDFeedDarkWeb extends Command
                 }
             }
         }
-
+        
         return $_clientHttp["success"];//comment and uncomment below line for save all data if get unlimit id user
+        
+        // $time_stamp_from = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
+        // $time_stamp_from = "0001-08-26T00:00:00Z";
         // $boolResult = $this->paginate($site_Data,$getIDStamp,
-        // $totalResults,$payload,$this->querysToString($payload, '2020-12-17T00:00:00Z', $lastCrawlDate), $http_method, $reconnectLimit,$masterPage,$firstCrawlDate
+        // $totalResults,$payload,$this->querysToString($payload, $time_stamp_from, $lastCrawlDate), $http_method, $reconnectLimit,$masterPage,$firstCrawlDate
         // );
         // return $boolResult;
     }
@@ -274,7 +308,7 @@ class MDFeedDarkWeb extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_data;//*9000
+        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_data;//*9000
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $get_InsertedId = $getIDStamp;
         if (count($all_data["results"]) > 0) {
@@ -289,10 +323,12 @@ class MDFeedDarkWeb extends Command
                     foreach ($keyIndex as $index_key) {
                         $body_search[] = $implodeValue[$index_key];
                     }
-                   
+
                     $findUnique = $col_fx_transaction_darkweb_data->findOne(
                         [
-                            'darkweb_id' => @$value["id"]
+                            'darkweb_id' => @$value["id"],
+                            'transaction_site_id' => @$site_Data["site_id"],
+                            'transaction_site_type_search' => @$site_Data["site_type_search"]
                         ], 
                         [
                             'projection' => [
@@ -300,8 +336,9 @@ class MDFeedDarkWeb extends Command
                             ]
                         ]
                     );
-
+                    echo json_encode($findUnique);
                     if (empty($findUnique)) {
+                        $this->info(" : INSERTED");
                         $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
                             'darkweb_id' => @$value["id"],
                             'body_search' => @$body_search,
@@ -342,8 +379,8 @@ class MDFeedDarkWeb extends Command
         //offset 0
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_data;//*9000
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
+        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_data;//*9000
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_stamp;//*9000
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $insertStamp = $col_fx_transaction_darkweb_stamp->insertOne([
             'code' => generator_uuid(),
