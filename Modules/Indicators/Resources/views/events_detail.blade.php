@@ -86,13 +86,13 @@
                                         <table class="table table-striped" id="table-attributes-template">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         <label>
                                                             <input name="select_all" value="1" id="select-all"
                                                                 type="checkbox" />
                                                             <span class="label-text"></span>
                                                         </label>
-                                                    </th>
+                                                    </th> --}}
                                                     <th>TYPE</th>
                                                     <th>Attribute Name</th>
                                                     <th>ROLE</th>
@@ -119,13 +119,13 @@
                                         <table class="table table-striped" id="table-related-event">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         <label>
                                                             <input name="select_all" value="1" id="select-all"
                                                                 type="checkbox" />
                                                             <span class="label-text"></span>
                                                         </label>
-                                                    </th>
+                                                    </th> --}}
                                                     <th>TYPE</th>
                                                     <th>Attribute Name</th>
                                                     <th>ROLE</th>
@@ -173,7 +173,10 @@
     {{--$('#table-attributes-template').DataTable();
     $('#table-related-event').DataTable();--}}
 
-
+    var pulse_id={!! json_encode($pulse_id) !!};
+    var total_page = 0;
+    var a = -1;
+    console.log (a);
     const chart = new frappe.Chart("#chart-show-bar", { 
         title: "",
         data:{
@@ -218,40 +221,62 @@
         cb(start, end);
     });
 
-    var pulse_id={!! json_encode($pulse_id) !!};
+  
 
     $(function() {
-        load_table_attributes(1,-1);
-        load_table_pulse(1,-1);
+        load_table_attributes();
+        {{--load_table_pulse(1,-1);--}}
     });
 
-    function load_table_attributes(page=1,count_page=-1){
+    function load_table_attributes(){
 
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      
+       
+        $('#table-attributes-template').DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            dom: 'Blfrtip',
+            ajax: {
+                url: '{!! route('indicators.events_attributes_table')!!}',
+                type: "POST",
+                data:function(d){
+                    d.pulse_id = pulse_id;
+                    d.count_page = a;                
+                },
             },
-            url: '{!! route('indicators.events_attributes_table')!!}',
-            type: "get",
-            data:({
-                pulse_id:pulse_id,
-                page : page,
-                count_page : count_page
+            initComplete : function( settings, json){
                 
-            }),
-            beforeSend: function(){
-
+               a = JSON.stringify(json.recordsTotal);
+               console.log(a);
+                $('[data-toggle="tooltip"]').tooltip();
             },
-        }).done(function(data){
-        
-            $("#table-attributes-template").html(data.html);
-            $("#pagination_custom").html(data.pagination);
-            $("#showing_amount_text").html(data.showing_amount_text);
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            columns: [
 
-            console.log("No response from server");
+                {
+                    data: 'TYPE',
+                },
+                {
+                    data: 'Attribute Name',
+                },
+                {
+                    data: 'ROLE',
+                },
+                {
+                    data: 'Date',
+                },
+                {
+                    data: 'Action',
+                },
+
+            ]
         });
     }
+
+    
 
     function pagination_goto(page=null,count_page=-1) {
         $.ajax({
@@ -268,11 +293,12 @@
             }),
             beforeSend: function(){
                 {{--loading('load');--}}
+                f_loading(null, '#table-attributes-template');
 
             },
         }).done(function(data){
-	    {{--loading('stop_load');--}}
-   
+	        {{--loading('stop_load');--}}
+            f_loading_stop(null, '#table-attributes-template');
             
             {{--$('#count_news').text(data.count);--}}
             $("#table-attributes-template").html(data.html);
@@ -280,7 +306,8 @@
             $("#showing_amount_text").html(data.showing_amount_text);
 
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-	    {{--loading('stop_load');--}}
+	        {{--loading('stop_load');--}}
+            f_loading_stop(null, '#table-attributes-template');
 
             console.log("No response from server");
         });
@@ -330,12 +357,12 @@
             }),
             beforeSend: function(){
                 {{--loading('load');--}}
-
+                loading('load');
             },
         }).done(function(data){
 	    {{--loading('stop_load');--}}
    
-            
+        loading('stop_load');
             {{--$('#count_news').text(data.count);--}}
             $("#table-related-event").html(data.html);
             $("#pagination_custom_pulse").html(data.pagination);
@@ -343,7 +370,7 @@
 
         }).fail(function(jqXHR, ajaxOptions, thrownError){
 	    {{--loading('stop_load');--}}
-
+        loading('stop_load');
             console.log("No response from server");
         });
 
