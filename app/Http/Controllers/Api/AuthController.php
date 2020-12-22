@@ -47,10 +47,11 @@ class AuthController extends ApiController
 
                     $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
                     $menu_sub = Menu_sub::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
-                    $Menu_permission_site = Menu_permission_site::where('site_id',$user->site_id)->where('deleted_at',null)->get();
-                    $Menu_sub_permission_site = Menu_sub_permission_site::where('site_id',$user->site_id)->where('deleted_at',null)->get();
+                    $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
+                    // $Menu_permission_site = Menu_permission_site::all();
+                    $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
 
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'Menu_sub_permission_site' => $Menu_sub_permission_site , 'Menu_permission_site' => $Menu_permission_site]);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site]);
                     // return response()->json(['message' => 'Successful', 
                     //                             'error' => '', 
                     //                             'status_code' => '200', 
