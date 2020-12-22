@@ -2166,3 +2166,42 @@ ul.topics-news-list li a:hover{
 .highcharts-credits{
     display: none !important;
 }
+
+.panel-header-blue{
+    color:#fff !important;
+    background-color: #0077b6 !important;
+    border-color: #0077b6 !important;
+}
+
+.text-blue{
+    color: #63b8ff !important;
+}
+
+.dot{
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 5px;
+}
+.d-il-flex{
+    display: inline-flex;
+}
+.dot.critical{
+    background-color: #ff0000 !important;
+}
+.dot.high{
+    background-color: #ff6600 !important;
+}
+.dot.medium{
+    background-color: #ffcc00 !important;
+}
+.dot.low{
+    background-color: #ffffcc !important;
+}
+.dot.none{
+    background-color: #d3d3d3 !important;
+}
+.padding-3{
+    padding: 0 1rem;
+}

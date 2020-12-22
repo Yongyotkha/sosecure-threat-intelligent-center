@@ -39,6 +39,11 @@
         <section class="w-f scrollable">
             <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="5px">
                 
+
+                {{-- @php
+                    get_menu_html();
+                @endphp --}}
+
                 <nav class="nav-primary hidden-xs">
                     {{-- <ul class="nav">
 
