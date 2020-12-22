@@ -27,7 +27,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting > {{$siteSettings->name}}</div>
                 </header>
                 <section class="scrollable wrapper">

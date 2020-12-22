@@ -22,7 +22,7 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display: none">@icon('solid/bars')</a>
                     <div class="bc-head">Settings > Social Datas </div>
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -35,7 +35,7 @@
                      </button>
                 </header>
                 <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="hide-advance-search">
+                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
                                 <div class="col-lg-12">

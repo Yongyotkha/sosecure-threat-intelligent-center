@@ -2166,3 +2166,9 @@ ul.topics-news-list li a:hover{
 .highcharts-credits{
     display: none !important;
 }
+
+.panel-header-blue{
+    color:#fff !important;
+    background-color: #0077b6 !important;
+    border-color: #0077b6 !important;
+}
