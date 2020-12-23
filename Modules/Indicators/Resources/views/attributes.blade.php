@@ -158,6 +158,7 @@
 
     var page = 1; 
     var page_stop = true;
+    var ck = 1;
 
     var isDateSearch = false;
     load_more(page);
@@ -171,8 +172,17 @@
             page++;
             if(page_stop){
                 
-                {{--load_more(page);--}}
-                load_more_search(page,f_search);
+                if(ck == 1) {
+                    page = page+1;
+                    load_more_search(page,f_search);
+                    
+                    ck++;
+                    
+                }
+
+                setTimeout(function(){ 
+                
+                }, 10000);
             }
             
         }
@@ -301,17 +311,23 @@
             },
         }).done(function(data){
             {{--loading('stop_load');--}}
-            console.log(data);
+
             if(data.html.length == 0){
-                
+                ck = 0;
                 page_stop = false;
                 $('.ajax-loading').hide();
+                f_loading_stop(1);
                 $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
+            }else{
+                ck = 1;
+                f_loading_stop(1);
+                $('#count_otx').text("We've found "+data.count+" indicators" );
+                $('.ajax-loading').hide();
+                $("#list_otx").append(data.html);  
+
             }
-            $('#count_otx').text("We've found "+data.count+" indicators" );
-            $('.ajax-loading').hide();
-            $("#list_otx").append(data.html);   
+             
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             $('.ajax-loading').hide();
             console.log("No response from server");
@@ -349,15 +365,16 @@
                 
             },
         }).done(function(data){
-            console.log(data);
+
             {{--loading('stop_load');--}}
             if(data.html.length == 0){
                 $('.ajax-loading').hide();
+                ck = 0;
                 page_stop = false;
                 $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
             }
-
+            ck = 1;
             let count_n = $('#count_otx').text();
             let count_search = data.count;
             let count_n_all = parseInt(count_n) + parseInt(count_search);

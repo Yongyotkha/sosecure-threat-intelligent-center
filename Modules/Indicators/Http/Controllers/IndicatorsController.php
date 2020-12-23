@@ -918,6 +918,8 @@ class IndicatorsController extends Controller
 
         if ($request->f_search == 1) {
 
+            
+
             if ($request->keywords || $request->type || $request->startDate || $request->endDate) {      
                 // if ($request->type && $request->keywords && $request->startDate) {
                 //     $data = OtxIndicatiorData::where("status", '=', 1)->where('indicatior', 'LIKE', '%' . $request->keywords . '%')->whereIn('type', $request->type)->whereBetween('updated_at', array($date_start_datetime_format, $date_end_datetime_format));
@@ -958,6 +960,7 @@ class IndicatorsController extends Controller
                 } 
                 
                 if ($request->type) {
+                    
                     $_search['type'] = ['$in'=>$request->type];
                     // $_search =  array_merge($_search, array('type' => ['$in'=>$request->type]));
                 }
@@ -994,6 +997,7 @@ class IndicatorsController extends Controller
             // $count = OtxIndicatiorData::where("status", '=', 1)->count();
 
         }
+
         $_option['sort'] = $_sort;
         $cursor = $col_fx_transaction_otx_indicators_data->find(
             $_search,
