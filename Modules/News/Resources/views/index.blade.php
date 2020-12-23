@@ -345,12 +345,12 @@
                 ck = 0;
                 page_stop = false;
                 $('.ajax-loading').hide();
-                f_loading_stop(1);
+                {{--f_loading_stop(1);--}}
                 {{--$('#count_news').text(0);--}}
                 return;
             } else {
                 ck = 1;
-                f_loading_stop(1);
+                {{--f_loading_stop(1);--}}
                 let count_n = $('#count_news').text();
                 let count_search = data.count;
                 let count_n_all = parseInt(count_n) + parseInt(count_search);
