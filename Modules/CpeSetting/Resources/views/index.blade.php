@@ -22,58 +22,67 @@
 
             <section class="scrollable wrapper">
                 <section class="panel panel-default">
-                    <table class="table table-striped table-bordered" id="table-cpe-template">
-                        <thead>
-                            <tr>
-                                <th class="no-sort">
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>CPE Name</th>
-                                <th>OS</th>
-                                <th>Last Update</th>
-                                <th style="width: 20px" class="text-center">Status</th>
-                                <th style="width: 20px" class="text-center no-wrap">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <label>
-                                        <input name="select" value="1" id="" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </td>
-                                <td>
-                                    cpe:2.3:o:canonical:ubuntu_linux:5.04:*:*
-                                </td>
-                                <td>
-                                    Ubuntu_linux/5.05
-                                </td>
-                                <td>
-                                    2020-11-12 12:15
-                                </td>
-                                <td class="text-center">
-                                    <label class="switch">
-                                        <input type="hidden" value="FALSE" name="">
-                                        <input type="checkbox" name="" value="TRUE">
-                                        <span></span>
-                                    </label>
-                                </td>
-                                <td class="no-wrap">
-                                    <button type="submit" class="btn btn-sm btn-info m-xs">
-                                        <span>@icon('solid/edit')
-                                    </button>
-    
-                                    <button type="submit" class="btn btn-sm btn-danger m-xs">
-                                        <span>@icon('solid/trash-alt')
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table CPE
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body">
+                        <table class="table table-striped table-bordered" id="table-cpe-template">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>CPE Name</th>
+                                    <th>OS</th>
+                                    <th>Last Update</th>
+                                    <th style="width: 20px" class="text-center">Status</th>
+                                    <th style="width: 20px" class="text-center no-wrap">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <label>
+                                            <input name="select" value="1" id="" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        cpe:2.3:o:canonical:ubuntu_linux:5.04:*:*
+                                    </td>
+                                    <td>
+                                        Ubuntu_linux/5.05
+                                    </td>
+                                    <td>
+                                        2020-11-12 12:15
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="switch">
+                                            <input type="hidden" value="FALSE" name="">
+                                            <input type="checkbox" name="" value="TRUE">
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                    <td class="no-wrap">
+                                        <button type="submit" class="btn btn-sm btn-info m-xs">
+                                            <span>@icon('solid/edit')
+                                        </button>
+        
+                                        <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                            <span>@icon('solid/trash-alt')
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
             </section>
@@ -149,6 +158,7 @@
         
         $(function () {
             $('#table-cpe-template').DataTable({
+                "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
                 processing: true,
                 order: [[0, "desc"]],
             });

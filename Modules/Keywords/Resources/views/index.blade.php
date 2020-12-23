@@ -28,30 +28,38 @@
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-
-                <form id="frm-keywords" method="POST">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="table-keywords-template">
-                            <thead>
-                                <tr>
-                                    <th class="no-sort w-10">
-                                        <label>
-                                            <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
-                                    <th>No.</th>
-                                    <th>@langapp('name')</th>
-                                    <th>@langapp('status')</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Keywords
+                        </div>
                     </div>
-                </form>
+                </header>
+                <div class="panel-body">
+                    <form id="frm-keywords" method="POST">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-keywords-template">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort w-10">
+                                            <label>
+                                                <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th>No.</th>
+                                        <th>@langapp('name')</th>
+                                        <th>@langapp('status')</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
             </section>
         </section>
     </section>
@@ -118,6 +126,7 @@
     $('#select_source').select2();
     $(function () {
         $('#table-keywords-template').DataTable({
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             processing: true,
             order: [[0, "desc"]],
         });
