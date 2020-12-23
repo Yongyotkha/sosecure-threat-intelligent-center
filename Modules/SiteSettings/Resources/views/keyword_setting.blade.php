@@ -141,6 +141,7 @@ $(function() {
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('KeywordsController.data') !!}',
                 data: {

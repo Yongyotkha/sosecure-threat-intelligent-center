@@ -45,10 +45,15 @@
                     <div class="row">
                         <div class="col-lg-12">  
                             <section class="panel panel-default">
-
-                                <form id="frm-domain" method="POST"> 
-                                    <header class="panel-heading">@icon('solid/user') Domain</header>
-                                    <div class="panel-body">
+                                <header class="panel-heading font-bold panel-header-blue">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <i class="fas fa-table"></i> Table Domain
+                                        </div>
+                                    </div>
+                                </header>
+                                <div class="panel-body">
+                                    <form id="frm-domain" method="POST"> 
                                         <div class="table-responsive">
                                             <table  class="table table-striped" id="table-domain-template">
                                                 <thead>
@@ -76,12 +81,8 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                    </div>
-
-                                </form>
-                                {{-- <div class="panel-footer">
-                                
-                                </div> --}}
+                                    </form>
+                                </div>
                             </section>
                         </div>
                     </div>
@@ -133,6 +134,7 @@
         var table = $('#table-domain-template').DataTable({
             processing: true,
             serverSide: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('domainsettings.data') !!}',
                 data: {

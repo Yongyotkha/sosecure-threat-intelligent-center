@@ -35,7 +35,13 @@
                         <div class="col-lg-12">
                             {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT']) !!}
                             <section class="panel panel-default">
-                            <header class="panel-heading">@icon('solid/cogs') System Details  </header>
+                            <header class="panel-heading font-bold panel-header-blue">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        @icon('solid/cogs') System Settings
+                                    </div>
+                                </div>
+                            </header>
                             <input type="hidden" name="page_setting" value="system_settings">
                             <div class="panel-body">
                                 <div class="form-group row">
