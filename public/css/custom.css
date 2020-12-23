@@ -2256,3 +2256,18 @@ ul.topics-news-list li a:hover{
 .number-card.grey{
     color: rgb(70, 112, 167) !important;
 }
+
+@media screen and (max-width:1198px){
+    .card-dash{
+        box-shadow: 0 2px 3px rgba(0,0,0,.5);
+        display: flex;
+        min-height: 200px;
+        padding: 3rem;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-text-dashboard {
+        text-align: right;
+    }
+}
