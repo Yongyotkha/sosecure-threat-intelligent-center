@@ -84,7 +84,7 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-xs-12">
-                            <i class="fas fa-table"></i> Table Users
+                            <i class="fas fa-table"></i> Table Event
                         </div>
                     </div>
                 </header>
