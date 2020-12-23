@@ -308,7 +308,6 @@
             $("#table_events").html(data.html);
             $("#pagination_custom").html(data.pagination);
             $("#showing_amount_text").html(data.showing_amount_text);
-            $("#to_top").trigger("click");
         }).fail(function(jqXHR, ajaxOptions, thrownError){
 	    {{--loading('stop_load');--}}
         f_loading_stop(null, '#table_events');
