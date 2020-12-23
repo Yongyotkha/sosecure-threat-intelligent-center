@@ -94,7 +94,7 @@
                                         <tr>
                                             <th class="no-sort w-10">
                                                 <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="data_feed_id"/>
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
@@ -263,11 +263,12 @@ function table_social_data(){
             },
             {
                 data: 'data_feed',
-                name: 'data_feed'
+                name: 'data_feed',
+                className: 'no-wrap'
             },
             {
                 data: 'url',
-                name: 'url'
+                name: 'url',
             },
             {
                 data: 'action',
