@@ -1511,7 +1511,8 @@ class IndicatorsController extends Controller
         ];
 
        if($request->count_page==-1){
-        $cursor_count = $col_fx_otx_events_indicator_ref->count($query); 
+        $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+        // dd($cursor_count);
        }else{
         $cursor_count = $request->count_page;
        }
