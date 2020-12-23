@@ -97,7 +97,7 @@
             </header>
 
             <section class="scrollable wrapper">
-                <div class="hide-fillter" style="margin-bottom: 1rem;background:#fff;padding:1rem;">
+                <div class="hide-fillter" style="margin-bottom: 1rem;display:none;background:#fff;padding:1rem;">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
@@ -134,77 +134,92 @@
                 </div>
 
                 <section class="panel panel-default">
-                    <table class="table table-striped table-bordered" id="table-assets-template">
-                        <thead>
-                            <tr>
-                                <th class="no-sort">
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>Site Name</th>
-                                <th>Asset</th>
-                                <th>Referent</th>
-                                <th style="width: 20px" class="text-center">Status</th>
-                                <th style="width: 20px" class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    ออมสิน
-                                </td>
-                                <td>
-                                    secureserver.net
-                                </td>
-                                <td>
-                                    <ul class="asset-list-tb">
-                                        <li>Ip-166-62-28-135.ip.secureserver.net</li>
-                                        <li>admin.sosecure.co.th</li>
-                                    </ul>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge badge-success">Active</span>
-                                </td>
-                                <td class="no-wrap">
-                                    <button type="submit" class="btn btn-sm btn-info m-xs">
-                                        <span>@icon('solid/edit')
-                                    </button>
-    
-                                    <button type="submit" class="btn btn-sm btn-danger m-xs">
-                                        <span>@icon('solid/trash-alt')
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    ออมสิน
-                                </td>
-                                <td>
-                                    secureserver.net
-                                </td>
-                                <td>
-                                    <ul class="asset-list-tb">
-                                        <li>Ip-166-62-28-135.ip.secureserver.net</li>
-                                        <li>admin.sosecure.co.th</li>
-                                    </ul>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge badge-danger">Inactive</span>
-                                </td>
-                                <td class="no-wrap">
-                                    <button type="submit" class="btn btn-sm btn-info m-xs">
-                                        <span>@icon('solid/edit')
-                                    </button>
-    
-                                    <button type="submit" class="btn btn-sm btn-danger m-xs">
-                                        <span>@icon('solid/trash-alt')
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Assets
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body">
+                        <table class="table table-striped table-bordered" id="table-assets-template">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>Site Name</th>
+                                    <th>Asset</th>
+                                    <th>Referent</th>
+                                    <th style="width: 20px" class="text-center">Status</th>
+                                    <th style="width: 20px" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        ออมสิน
+                                    </td>
+                                    <td>
+                                        secureserver.net
+                                    </td>
+                                    <td>
+                                        <ul class="asset-list-tb">
+                                            <li>Ip-166-62-28-135.ip.secureserver.net</li>
+                                            <li>admin.sosecure.co.th</li>
+                                        </ul>
+                                    </td>
+                                    <td class="text-center">
+                                        -
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-success">Active</span>
+                                    </td>
+                                    <td class="no-wrap">
+                                        <button type="submit" class="btn btn-sm btn-info m-xs">
+                                            <span>@icon('solid/edit')
+                                        </button>
+        
+                                        <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                            <span>@icon('solid/trash-alt')
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        ออมสิน
+                                    </td>
+                                    <td>
+                                        secureserver.net
+                                    </td>
+                                    <td>
+                                        <ul class="asset-list-tb">
+                                            <li>Ip-166-62-28-135.ip.secureserver.net</li>
+                                            <li>admin.sosecure.co.th</li>
+                                        </ul>
+                                    </td>
+                                    <td class="text-center">
+                                        -
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-danger">Inactive</span>
+                                    </td>
+                                    <td class="no-wrap">
+                                        <button type="submit" class="btn btn-sm btn-info m-xs">
+                                            <span>@icon('solid/edit')
+                                        </button>
+        
+                                        <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                            <span>@icon('solid/trash-alt')
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
             </section>

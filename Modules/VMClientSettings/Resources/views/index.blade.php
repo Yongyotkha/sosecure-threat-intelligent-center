@@ -16,30 +16,39 @@
         </header>
         <section class="scrollable wrapper">              
             <section class="panel panel-default">
-                <div class="table-responsive">
-                    <table  class="table table-striped" id="table-vm-template">
-                        <thead>
-                            <tr>
-                                <th class="hide"></th>
-                                <th class="no-sort">
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>@langapp('key')  </th>
-                                <th>@langapp('key_vm')</th>
-                                <th>@langapp('update')   </th>
-                                <th>@langapp('last_online')   </th>
-                                <th>@langapp('version')   </th>
-                                <th>@langapp('status')   </th>
-                                <th class="no-sort"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table VMClient
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table  class="table table-striped" id="table-vm-template">
+                            <thead>
+                                <tr>
+                                    <th class="hide"></th>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>@langapp('key')  </th>
+                                    <th>@langapp('key_vm')</th>
+                                    <th>@langapp('update')   </th>
+                                    <th>@langapp('last_online')   </th>
+                                    <th>@langapp('version')   </th>
+                                    <th>@langapp('status')   </th>
+                                    <th class="no-sort"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </section>
@@ -108,6 +117,7 @@
 <script>
 $(function() {
     $('#table-vm-template').DataTable({
+        "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
         processing: true,
         order: [[ 0, "desc" ]],
     });
