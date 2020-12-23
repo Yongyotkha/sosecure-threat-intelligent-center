@@ -231,11 +231,11 @@ class SocialController extends Controller
 
             
             $count_view = 0;
-            if($data -> get_social) {
-                foreach($data -> get_social as $view_val) {
-                    $count_view += $view_val->view;
-                }
-            }
+            // if($data -> get_social) {
+            //     foreach($data -> get_social as $view_val) {
+            //         $count_view += $view_val->view;
+            //     }
+            // }
 
             $check_read_news = Read_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
             $checkBookmark = Bookmarks_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
@@ -259,13 +259,13 @@ class SocialController extends Controller
                                     <a href="#">'.$data -> source_name.'</a>
                                 </span>
                                 <h3 style="font-size: 16px;">
-                                    <a href="'.$data -> feedlink.'" target="_blank">
+                                    <a href="'.$data -> feedlink.'" target="_blank" onclick="add_read('.$data -> id.')">
                                     '.$n_title.'
                                     </a>
                                 </h3>
                                 <div class="entry-meta">
                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
-                                    <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
+                                    <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
                                 </div>
                                 <!--<div class="description-text hidden-xs">
                                 <span><p>&nbsp;'.strip_tags($n_title).'</p></span>
@@ -445,5 +445,52 @@ class SocialController extends Controller
             $Bookmark -> save();
         }
         return response()->json(); 
+    }
+
+    public function add_read(Request $request) {
+        $addread = $request->addread;
+
+        try {
+            //  Block of code to try
+        
+
+            if($addread) {
+                $RSSNews = Data_leak_feed::where("id",$addread)->first();
+
+                $RSSNews->view = $RSSNews->view+1;
+                $RSSNews->save();
+
+                $Read_social = new Read_social;
+                $Read_social->code = generator_uuid();
+                $Read_social->site_id = @Auth::user()->site_id;
+                $Read_social->user_id = @Auth::user()->id;
+                $Read_social->data_leak_feed_id = $addread;
+                $Read_social->status = 1;
+                $Read_social->save();
+            }
+
+
+            if ($request->ajax()) {
+                $data = [
+                    "message" => '',
+                    "success" => true
+                ];
+            }
+
+        }
+        catch(\Exception $e) {
+        //  Block of code to handle errors
+            $data = [
+                "message" => $e->getMessage(),
+                "success" => false
+            ];
+        }
+
+        if ($request->ajax()) {
+        
+            return response()->json($data); 
+        }
+
+        // dd($addread);
     }
 }
