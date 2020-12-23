@@ -2188,6 +2188,9 @@ ul.topics-news-list li a:hover{
 .d-il-flex{
     display: inline-flex;
 }
+a.d-il-flex{
+    color: #333333;
+}
 .dot.critical{
     background-color: #ff0000 !important;
 }
