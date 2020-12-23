@@ -1,5 +1,11 @@
 @extends('layouts.app')
 
+<style>
+    .w100px {
+        width: 100px;
+    }
+</style>
+
 @section('content')
 
 <section id="content" class="bg">
@@ -160,12 +166,12 @@
                 {
                     data: 'created_at',
                     name: 'created_at',
-                    className: 'text-center'
+                    className: 'text-center w100px'
                 },
                 {
                     data: 'updated_at',
                     name: 'updated_at',
-                    className: 'text-center'
+                    className: 'text-center w100px'
                 },
                 {
                     data: 'elements',
@@ -175,7 +181,7 @@
                 {
                     data: 'progress',
                     name: 'progress',
-                    className: 'w-10'
+                    className: 'w100px'
                 },
                 {
                     data: 'action',
