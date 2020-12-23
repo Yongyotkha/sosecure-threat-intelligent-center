@@ -51,7 +51,7 @@ class OTXMDFeedIndicator extends Command
                 $otxFeedDataCheck = true;
                 $otxSuccessCheck = true;
                 $OTX_KEY = env("OTX_KEY", "");
-                $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
 
                 $clientHttp = new \GuzzleHttp\Client();
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -195,7 +195,7 @@ class OTXMDFeedIndicator extends Command
 
     public function caseByType($type, $indicatorName, $indicatorID, $urlLimit)
     {
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $dayMoreThan = 29;
         $checkSuccess = true;
@@ -468,7 +468,7 @@ class OTXMDFeedIndicator extends Command
     {
         try {
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
-            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
             $updateResult = $collectionBasic->updateOne(
@@ -503,7 +503,7 @@ class OTXMDFeedIndicator extends Command
     {
         try {
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
-            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
             $updateResult = $collectionBasic->updateOne(
@@ -538,7 +538,7 @@ class OTXMDFeedIndicator extends Command
     public function savePulseRef($pulses, $indicatorID, $urlLimit)
     {
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $checkSuccess = true;
         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
@@ -603,6 +603,7 @@ class OTXMDFeedIndicator extends Command
                             'updated_by' => "system",
                         ],
                             '$setOnInsert' => [
+                                'role' => null,
                                 'created' => null,
                                 'expiration' => null,
                                 'is_active' => null,

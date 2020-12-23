@@ -144,9 +144,9 @@ class MDFeedDarkWeb extends Command
     {
         // $publicKey = '+x4QtLeFMejTD6kYel4aYA==';
         // $privateKey = 'L57IL/Kt7PMZFMrZXNiSD5YFZrMSc6kQUmAu6/oS9Qk=';
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_stamp;//*9000
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
         $reconnectLimit = 3;
         if (!empty($Site_payload["get_keywords_darkweb"]) > 0) {
             foreach ($Site_payload["get_keywords_darkweb"] as $value) {
@@ -236,9 +236,9 @@ class MDFeedDarkWeb extends Command
 
     public function createStamp($site_Data)
     {
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_stamp;//*9000
+        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $insertStamp = $col_fx_transaction_darkweb_stamp->insertOne([
             'code' => generator_uuid(),
@@ -306,23 +306,40 @@ class MDFeedDarkWeb extends Command
 
     public function saveDarkwebDetail_2($getIDStamp,$site_Data,$all_data)
     {
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_data;//*9000
+        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_data;//*9000
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $get_InsertedId = $getIDStamp;
         if (count($all_data["results"]) > 0) {
             foreach ($all_data["results"] as $value) {
                 $implodeValue = preg_split("/\\r\\n|\\r|\\n/", $value["body"]);
                 $site_domain = $site_Data["site_domain"];
+                
                 $keyIndex = array_keys(array_filter($implodeValue, function($var) use ($site_domain){
                     return stripos($var, $site_domain) !== false;
                 }));
-                if (!is_bool($keyIndex)) {
+
                     $body_search = array();
+                if (!is_bool($keyIndex)) {
                     foreach ($keyIndex as $index_key) {
                         $body_search[] = $implodeValue[$index_key];
                     }
+                }
+
+                
+                if(!empty($value["emails"])){
+                    $keyIndex_2 = array_keys(array_filter($value["emails"], function($var) use ($site_domain){
+                        return stripos($var, $site_domain) !== false;
+                    }));
+                }
+                    $emails_search = array();
+                if (!empty($keyIndex_2)) {
+                    foreach ($keyIndex_2 as $index_key) {
+                        $emails_search[] = $value["emails"][$index_key];
+                    }
+                }
+
 
                     $findUnique = $col_fx_transaction_darkweb_data->findOne(
                         [
@@ -349,7 +366,7 @@ class MDFeedDarkWeb extends Command
                             'crawlDate' => @$value["crawlDate"],
                             'fileSize' => @$value["fileSize"],
                             'domain' => @$value["domain"],
-                            'emails' => @$value["emails"],
+                            'emails' => @$emails_search,
                             'headers' => @$value["headers"],
                             'transaction_site_type_search' => @$site_Data["site_type_search"],
                             'transaction_site_id' => @$site_Data["site_id"],
@@ -367,91 +384,13 @@ class MDFeedDarkWeb extends Command
                             'count_view' => 0,
                         ]);
                     }
-                }
+                
 
             }
         }
         return 0;
     }
 
-    public function saveDarkwebDetail($all_data, $site_type_search, $site_id, $site_name, $site_domain, $site_domain_name)
-    {
-        //offset 0
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
-        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_darkweb_data = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_data;//*9000
-        $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_darkweb_stamp;//*9000
-        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
-        $insertStamp = $col_fx_transaction_darkweb_stamp->insertOne([
-            'code' => generator_uuid(),
-            'transaction_site_type_search' => @$site_type_search,
-            'transaction_site_id' => @$site_id,
-            'transaction_site_name' => @$site_name,
-            'transaction_site_domain' => @$site_domain,
-            'transaction_site_domain_name' => @$site_domain_name,
-            'transaction_date' => date("Y-m-d"),
-            'status' => 1,
-            'created_at' => $date_now,
-            'created_by' => "system",
-            'updated_at' => $date_now,
-            'updated_by' => "system",
-            'deleted_at' => null,
-        ]);
-        $get_InsertedId = $insertStamp->getInsertedId();
-        if (count($all_data["results"]) > 0) {
-            foreach ($all_data["results"] as $value) {
-               
-                //$implodeValue = explode("\n", $value["body"]);
-                $implodeValue = preg_split("/\\r\\n|\\r|\\n/", $value["body"]);
-                $keyIndex = array_keys(array_filter($implodeValue, function($var) use ($site_domain){
-                    return stripos($var, $site_domain) !== false;
-                }));
-                if (!is_bool($keyIndex)) {
-                    $body_search = array();
-                    foreach ($keyIndex as $index_key) {
-                        $body_search[] = $implodeValue[$index_key];
-                    }
-                   
-                    $findUnique = $col_fx_transaction_darkweb_data->findOne(
-                        [
-                            'darkweb_id' => @$value["id"]
-                        ]
-                    );
-                    if (empty($findUnique)) {
-                        $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
-                            'darkweb_id' => @$value["id"],
-                            'body_search' => @$body_search,
-                            //'body' => @$value["body"],
-                            'hackishness' => @$value["hackishness"],
-                            'title' => @$value["title"],
-                            'url' => @$value["url"],
-                            'crawlDate' => @$value["crawlDate"],
-                            'fileSize' => @$value["fileSize"],
-                            'domain' => @$value["domain"],
-                            'emails' => @$value["emails"],
-                            'headers' => @$value["headers"],
-                            'transaction_site_type_search' => @$site_type_search,
-                            'transaction_site_id' => @$site_id,
-                            'transaction_site_name' => @$site_name,
-                            'transaction_site_domain' => @$site_domain,
-                            'transaction_site_domain_name' => @$site_domain_name,
-                            'updated_at' => $date_now,
-                            'updated_by' => "system",
-                            'transcation_id' => $get_InsertedId,
-                            'status' => 1,
-                            'created_at' => $date_now,
-                            'created_by' => "system",
-                            'deleted_at' => null,
-                            'transaction_date' => date("Y-m-d"),
-                            'count_view' => 0,
-                        ]);
-                    }
-                }
-
-            }
-        }
-        return 0;
-    }
 
     public function generate_auth_header_URL($search, $http_method)
     {

@@ -73,7 +73,7 @@ class RSS_Feed extends Command
     public function get_rss_feed_as_html($get_InsertedId,$date_now,$rss_id, $feed_url, $max_item_cnt = 10, $show_date = true, $show_description = true, $max_words = 0, $cache_timeout = 7200, $cache_prefix = "")
     {
 
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $col_fx_transaction_rss_data = $clientMD->sosecure_threatintelligent->fx_transaction_rss_data;
         $cache_prefix = base_path() . "\\app\\Console\\Commands\\temp\\rss2html-";
@@ -206,7 +206,7 @@ class RSS_Feed extends Command
     public function output_rss_feed($rss_id, $feed_url, $rss_name, $max_item_cnt = 10, $show_date = true, $show_description = true, $max_words = 0,$date_now)
     {
         try {
-            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $collectionStamp = $clientMD->sosecure_threatintelligent->fx_transaction_rss_stamp;
             $insertOneResult = $collectionStamp->insertOne([

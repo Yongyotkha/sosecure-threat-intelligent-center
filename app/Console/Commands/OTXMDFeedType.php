@@ -42,7 +42,7 @@ class OTXMDFeedType extends Command
         try {
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
             $OTX_KEY = env("OTX_KEY", "");
-            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $clientHttp = new \GuzzleHttp\Client();
             $bodyData = $clientHttp->request(
