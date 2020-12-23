@@ -2121,7 +2121,7 @@ ul.topics-news-list li a:hover{
     display: block;
     display: -webkit-box;
     max-width: 100%;
-    height: 55px;
+    height: 14px;
     -webkit-line-clamp: 1;
     overflow: hidden;
     text-overflow: ellipsis;
