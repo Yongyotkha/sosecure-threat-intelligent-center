@@ -460,13 +460,19 @@ class SocialController extends Controller
                 $RSSNews->view = $RSSNews->view+1;
                 $RSSNews->save();
 
-                $Read_social = new Read_social;
-                $Read_social->code = generator_uuid();
-                $Read_social->site_id = @Auth::user()->site_id;
-                $Read_social->user_id = @Auth::user()->id;
-                $Read_social->data_leak_feed_id = $addread;
-                $Read_social->status = 1;
-                $Read_social->save();
+                $Read_social_check = Read_social::where("id",$addread)->where('user_id',@Auth::user()->id)->first();
+                if($Read_social_check) {
+
+                } else {
+                    $Read_social = new Read_social;
+                    $Read_social->code = generator_uuid();
+                    $Read_social->site_id = @Auth::user()->site_id;
+                    $Read_social->user_id = @Auth::user()->id;
+                    $Read_social->data_leak_feed_id = $addread;
+                    $Read_social->status = 1;
+                    $Read_social->save();
+                }
+    
             }
 
 

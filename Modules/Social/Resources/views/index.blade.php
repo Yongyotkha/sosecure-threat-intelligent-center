@@ -245,7 +245,7 @@
             let scrolltop = $('#scrollable_news').scrollTop();
             let tab_height = $('#scrollable_news').height();
             let docu_height = $(document).height();
-        console.log(scrolltop+'  '+tab_height+'   '+docu_height);
+            {{--console.log(scrolltop+'  '+tab_height+'   '+docu_height);--}}
         if($('#scrollable_news').scrollTop() + $('#scrollable_news').height() >= $(document).height()) {
             
             if(page_stop){
