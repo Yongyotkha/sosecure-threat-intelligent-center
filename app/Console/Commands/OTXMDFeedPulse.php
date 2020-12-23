@@ -50,7 +50,7 @@ class OTXMDFeedPulse extends Command
                 $otxFeedDataCheck = true;
                 $otxSuccessCheck = true;
                 $OTX_KEY = env("OTX_KEY", "");
-                $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
 
                 $clientHttp = new \GuzzleHttp\Client();
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -72,6 +72,7 @@ class OTXMDFeedPulse extends Command
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                 } else {
+                    
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
                     // $this->info("FAIL1");
@@ -155,7 +156,7 @@ class OTXMDFeedPulse extends Command
 
     public function savePulseRef($pulses,$InsertedId, $urlLimit)
     {
-        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $checkSuccess = true;
         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
@@ -240,12 +241,12 @@ class OTXMDFeedPulse extends Command
         try {
             $otxSuccessCheck = true;
             $otxFeedDataCheck = true;
-            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
             $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             $loop = 0;
-            $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=5000&page=1', $urlLimit);
+            $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1', $urlLimit);
             if ($reconCall["success"]) {
                 $otxFeedData = json_decode($reconCall["result"], true);
             } else {
@@ -355,7 +356,7 @@ class OTXMDFeedPulse extends Command
         try {
             $otxSuccessCheck = true;
             $otxFeedDataCheck = true;
-            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
             $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
