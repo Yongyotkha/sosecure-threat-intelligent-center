@@ -2017,4 +2017,12 @@ class IndicatorsController extends Controller
 
     }
 
+    public function link_group($id) {
+
+    }
+
+    public function link_tags($id) {
+
+    }
+
 }
