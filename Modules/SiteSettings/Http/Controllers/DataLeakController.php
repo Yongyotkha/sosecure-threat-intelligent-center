@@ -254,7 +254,7 @@ class DataLeakController extends Controller
         ->editColumn(
             'content',
             function (DataLeakFeedTemp $model) {
-                return $model -> feedcontent;
+                return '<div class="text-elip">'.$model -> feedcontent.'</div>';
             }
         )
         ->editColumn(

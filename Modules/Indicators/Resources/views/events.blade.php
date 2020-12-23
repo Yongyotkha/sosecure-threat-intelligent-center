@@ -81,70 +81,79 @@
             </section>
 
             <section class="panel panel-default">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table_events">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>No</th>
-                                <th>Event Name</th>
-                                <th>Group</th>
-                                <th>Tags</th>
-                                <th>Attr</th>
-                                <th>Published</th>
-                                <th>Last Status</th>
-                                <th style="width: 200px;">DateTime</th>
-                                <th>View</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{-- <tr>
-                                <td>
-                                    <label>
-                                        <input value="" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Event
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table_events">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>No</th>
+                                    <th>Event Name</th>
+                                    <th>Group</th>
+                                    <th>Tags</th>
+                                    <th>Attr</th>
+                                    <th>Published</th>
+                                    <th>Last Status</th>
+                                    <th style="width: 200px;">DateTime</th>
+                                    <th>View</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- <tr>
+                                    <td>
+                                        <label>
+                                            <input value="" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </td>
+                                    <td>1</td>
+                                    <td>Suspicious proxy agent</td>
+                                    <td>
+                                        <a href="">MIST FEED</a>
+                                        <a href="">Phishing,UW</a>
+                                    </td>
+                                    <td>
+                                        <a href="">Scan,Agent,</a>
+                                        <a href="">Proxy,Spider</a>
+                                    </td>
+                                    <td>
+                                        <a href="">5421</a>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-check"></i>
+                                    </td>
+                                    <td>
+                                        Modified
+                                    </td>
+                                    <td>
+                                        2020-12-07 11:11
+                                    </td>
+                                    <td>
+                                        152
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs btn-info"><i
+                                    class="far fa-eye"></i> View</a>
                                 </td>
-                                <td>1</td>
-                                <td>Suspicious proxy agent</td>
-                                <td>
-                                    <a href="">MIST FEED</a>
-                                    <a href="">Phishing,UW</a>
-                                </td>
-                                <td>
-                                    <a href="">Scan,Agent,</a>
-                                    <a href="">Proxy,Spider</a>
-                                </td>
-                                <td>
-                                    <a href="">5421</a>
-                                </td>
-                                <td>
-                                    <i class="fas fa-check"></i>
-                                </td>
-                                <td>
-                                    Modified
-                                </td>
-                                <td>
-                                    2020-12-07 11:11
-                                </td>
-                                <td>
-                                    152
-                                </td>
-                                <td>
-                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs btn-info"><i
-                                class="far fa-eye"></i> View</a>
-                            </td>
-                            </tr> --}}
-                        </tbody>
-                    </table>
-                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;"></div>
-                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
+                                </tr> --}}
+                            </tbody>
+                        </table>
+                        <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;"></div>
+                        <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
+                    </div>
                 </div>
             </section>
 
@@ -262,6 +271,9 @@
             
             {{--$('#count_news').text(data.count);--}}
             $("#table_events").html(data.html);
+            $('#table_events').DataTable({
+                "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
+            });
             $("#pagination_custom").html(data.pagination);
             $("#showing_amount_text").html(data.showing_amount_text);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -296,7 +308,6 @@
             $("#table_events").html(data.html);
             $("#pagination_custom").html(data.pagination);
             $("#showing_amount_text").html(data.showing_amount_text);
-            $("#to_top").trigger("click");
         }).fail(function(jqXHR, ajaxOptions, thrownError){
 	    {{--loading('stop_load');--}}
         f_loading_stop(null, '#table_events');

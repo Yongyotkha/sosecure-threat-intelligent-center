@@ -37,7 +37,7 @@
                             {!! Form::open(['route' => ['datasettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             <input type="hidden" name="page_setting" value="site_permission_settings">
                             <section class="panel panel-default">
-                            <header class="panel-heading">@icon('solid/cogs') Permission & Config Settings  </header>
+                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') Permission & Config Settings  </header>
                             <div class="panel-body">
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Permission Menu </label>

@@ -8,20 +8,19 @@
                  <div class="modal-body">
                      <div class="container-fluid">
                          <div class="row">
-                             <div class="col-md-3">
+                             <div class="col-md-4">
                                 <h5>Date : </h5>
                                 <h5>Update : {{ $rss -> transcation_datetime }}</h5>
                              </div>
-                             <div class="col-md-3">
+                             <div class="col-md-4">
                                  <h5 class="text-elip-line-1">Name : {{ $rss -> title }}</h5>
                              </div>
-                             <div class="col-md-3">
-                                <h5>URL : {{ $rss -> link }}
-                                    <div class="d-inline">
-                                        <a href="{{ $rss -> link }}" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>
-                                        <button type="button" class="btn btn-xs btn-info" onclick="copy_link('{{ $rss -> link }}');"><i class="fas fa-copy"></i> Copy</button>
-                                    </div>
-                                </h5>
+                             <div class="col-md-4" style="display: flex;align-items:center">
+                                <h5 class="text-elip-line-1">URL : {{ $rss -> link }}  </h5>
+                                <div style="display: flex;align-items:center">
+                                    <a href="{{ $rss -> link }}" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>
+                                    <button type="button" class="btn btn-xs btn-info" onclick="copy_link('{{ $rss -> link }}');"><i class="fas fa-copy"></i> Copy</button>
+                                </div>
                              </div>
                              <div class="col-xs-12">
                                  <hr>

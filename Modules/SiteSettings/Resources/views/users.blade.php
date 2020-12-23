@@ -47,7 +47,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                            <header class="panel-heading">@icon('solid/user') Users</header>
+                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/user') Users</header>
                             <div class="panel-body">
                                 <div class="table-responsive">
                                     <table  class="table table-striped" id="table-users-template">
@@ -246,6 +246,7 @@
         var table = $('#table-users-template').DataTable({
             processing: true,
             serverSide: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('user.data') !!}',
                 data: {

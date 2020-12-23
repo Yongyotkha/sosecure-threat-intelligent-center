@@ -37,26 +37,35 @@
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table  class="table table-striped" id="table_cve_assets">
-                                <thead>
-                                    <tr>
-                                        <th class="no-sort w-10">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        <th>@langapp('keyword')</th>
-                                        <th style="width: 150px;">Last @langapp('update')</th>
-                                        <th style="width: 100px;">@langapp('status')</th>
-                                        <th class="no-sort" style="width: 100px;">@langapp('action')</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Keywords
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table  class="table table-striped" id="table_cve_assets">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort w-10">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            <th>@langapp('keyword')</th>
+                                            <th style="width: 150px;">Last @langapp('update')</th>
+                                            <th style="width: 100px;">@langapp('status')</th>
+                                            <th class="no-sort" style="width: 100px;">@langapp('action')</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </section>
@@ -132,6 +141,7 @@ $(function() {
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('KeywordsController.data') !!}',
                 data: {

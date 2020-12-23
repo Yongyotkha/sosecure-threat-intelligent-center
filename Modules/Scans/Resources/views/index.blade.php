@@ -25,30 +25,39 @@
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table-scans-template">
-                        <thead>
-                            <tr>
-                                <th class="no-sort">
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>Site Name</th>
-                                <th>Domain</th>
-                                <th>Started</th>
-                                <th>Finished</th>
-                                <th>Elements</th>
-                                <th>Progress</th>
-                                {{-- <th>Status</th> --}}
-                                <th class="no-sort" width="10%">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Scans
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-scans-template">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>Site Name</th>
+                                    <th>Domain</th>
+                                    <th>Started</th>
+                                    <th>Finished</th>
+                                    <th>Elements</th>
+                                    <th>Progress</th>
+                                    {{-- <th>Status</th> --}}
+                                    <th class="no-sort" width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </section>
@@ -226,6 +235,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 contentType: "application/json",
                 dataType: 'JSON',

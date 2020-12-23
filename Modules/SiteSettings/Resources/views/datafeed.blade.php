@@ -80,26 +80,35 @@
 
                     
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table  class="table table-striped" id="table_data_feed">
-                                <thead>
-                                    <tr>
-                                        <th class="no-sort w-10">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        <th>Source</th>
-                                        <th>Keyword Ref</th>
-                                        <th>Content</th>
-                                        <th>Data Feed</th>
-                                        <th>url</th>
-                                        <th class="no-sort">@langapp('action')</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Data Feed (Social)
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table  class="table table-striped" id="table_data_feed">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort w-10">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="data_feed_id"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            <th>Source</th>
+                                            <th>Keyword Ref</th>
+                                            <th>Content</th>
+                                            <th>Data Feed</th>
+                                            <th>url</th>
+                                            <th class="no-sort">@langapp('action')</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </section>
@@ -221,6 +230,7 @@ function table_social_data(){
         processing: true,
         serverSide: true,
         destroy: true,
+        "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
         ajax: {
             url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
             data: {
@@ -253,11 +263,12 @@ function table_social_data(){
             },
             {
                 data: 'data_feed',
-                name: 'data_feed'
+                name: 'data_feed',
+                className: 'no-wrap'
             },
             {
                 data: 'url',
-                name: 'url'
+                name: 'url',
             },
             {
                 data: 'action',

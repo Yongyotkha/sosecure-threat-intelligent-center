@@ -75,7 +75,14 @@
 
 
                     <section class="panel panel-default">
-
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Users
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
 
                         <form id="frm-user" method="POST">
 
@@ -114,7 +121,7 @@
 
 
                         </form>
-
+                        </div>
 
 
 
@@ -147,6 +154,7 @@ $(function() {
     var table = $('#users-table').DataTable({
         processing: true,
         serverSide: true,
+        "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
         ajax: {
             url: '{!! route('users.data') !!}',
             data: {
