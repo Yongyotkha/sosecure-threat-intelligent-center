@@ -2206,3 +2206,53 @@ ul.topics-news-list li a:hover{
 .padding-3{
     padding: 0 1rem;
 }
+
+.img-icon-card{
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+    position: relative;
+}
+
+.img-icon-card img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.card-dash{
+    box-shadow: 0 2px 3px rgba(0,0,0,.5);
+    display: flex;
+    min-height: 290px;
+    padding: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.m-b-1{
+    margin-bottom: 1rem;
+}
+.card-text-dashboard{
+    text-align: center;
+}
+.name-dash-text{
+    font-size: 22px;
+    color: #333333 !important;
+}
+.number-card{
+    font-size: 44px;
+    font-weight: 700;
+    display: inline-block;
+}
+.number-card.info{
+    color: rgb(44, 178, 196) !important;
+}
+.number-card.green{
+    color: rgb(44, 196, 112) !important;
+}
+.number-card.grey{
+    color: rgb(70, 112, 167) !important;
+}
