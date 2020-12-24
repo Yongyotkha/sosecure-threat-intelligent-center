@@ -223,336 +223,90 @@ class IndicatorsController extends Controller
 
     public function load_relatedPulse(Request $request)
     {
-        $perpage = 25;
-
-        if (isset($_POST['page'])) {
-            $page = $_POST['page'];
-        } else {
-            $page = 1;
-        }
-
+      
+        $draw = $_POST['draw'];
+        $start = (int)$_POST['start'];
+        $rowperpage = (int)$_POST['length'];
+        $order = 'modified';
+        $dir = -1;
+        
         $reqId = (int)($request->id);
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
         $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+
+
+        $query = [
+            'indicator_id' => $reqId,
+            
+        ];
+
+
         $options = [
             'sort' => [
-                '$b.modified' => -1
+                // $order => $dir
             ],
-            'allowDiskUse' => TRUE
+            'skip' => $start,
+            'limit' => $rowperpage,
         ];
-        
-        // $pipeline_count = [
-        //     [
-        //         '$project' => [
-        //             '_id' => '$_id',
-        //             'a' => '$$ROOT'
-        //         ]
-        //     ]
-        //     ,
-        //     [
-        //         '$lookup' => [
-        //             'localField' => 'a.pulse_id',
-        //             'from' => 'fx_otx_events',
-        //             'foreignField' => 'pulse_id',
-        //             'as' => 'b'
-        //         ]
-        //     ]
-        //     ,
-        //     [
-        //         '$unwind' => [
-        //             'path' => '$b',
-        //             'preserveNullAndEmptyArrays' => TRUE
-        //         ]
-        //     ]
-        //     ,
-        //     [
-        //         '$match' => [
-        //             'a.indicator_id'  => $reqId,
-        //             'a.status'  => 1,
-        //         ]
-        //     ]
-        // ];
-        // $cursor_count = $col_fx_otx_events_indicator_ref->aggregate($pipeline_count, $options);
-        // $countAll = count($cursor_count->toArray());
-        // // $_search['type'] = ['$in'=>$request->type];
-        // $page = $page<1?1:$page;
-        // $start = ($page - 1) * $perpage;
-        // if($start>$countAll&&$countAll>0){
-        //     $page = $page-1;
-        //     $start = ($page - 1) * $perpage;
-        // }
 
-        $pipeline = [
-            [
-                '$project' => [
-                    '_id' => '$_id',
-                    'a' => '$$ROOT'
-                ]
-            ]
-            ,
-            [
-                '$match' => [
-                    'a.indicator_id'  => $reqId,
-                    'a.status'  => 1,
-                ]
-            ]
-            ,
-            [
-                '$lookup' => [
-                    'localField' => 'a.pulse_id',
-                    'from' => 'fx_otx_events',
-                    'foreignField' => 'pulse_id',
-                    'as' => 'b'
-                ]
-            ]
-            ,
-            [
-                '$unwind' => [
-                    'path' => '$b',
-                    'preserveNullAndEmptyArrays' => TRUE
-                ]
-            ]
-            ,
-            [
-                '$sort' => [
-                    'b.modified'  => -1,
-                ]
-            ]
-            // ,
-            // [
-            //     '$skip' => $start
-            // ],
-            // [
-            //     '$limit' => $perpage
-            // ]
-        ];
-        $cursor = $col_fx_otx_events_indicator_ref->aggregate($pipeline, $options);
-        
+        if($request->count_page==-1){
+            $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+            $count_filter = $cursor_count;
+            // dd($cursor_count);
+        }else{
+            $cursor_count = $request->count_page;
+            $count_filter = $cursor_count;
+        }
+        $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
         $document_all = $cursor->toArray();
-        // $total_record = $countAll;
-        // $total_page = ceil($total_record / $perpage);
-        // $second_last = $total_page - 1;
-        // $offset = ($page-1) * $perpage;
-        // $previous_page = $page - 1;
-        // $next_page = $page + 1;
-        // $adjacents = "2";
-
-        // $pagination = '<nav>
-        //             <ul class="pagination">';
-
-        // if($page > 1) {
-        //     $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">First Page</a></li>';
-        // }
-
-        // $pagination .= '<li onclick="pagination_goto('.$previous_page.')" data-page="'.@$previous_page.'"';
-        //     if($page <= 1) {
-        //         $pagination .= 'class="disabled"';
-        //     }
-        // $pagination .= '>';
-
-        // $pagination .= '<a ';
-        //     if($page > 1) {
-        //         $pagination .= 'href="#"';
-        //     }
-
-        //     $pagination .= '>Previous</a></li>';
-
-        //     if ($total_page <= 10){   
-        //         for ($counter = 1; $counter <= $total_page; $counter++){
-        //             if ($counter == $page) {
-        //                 $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //             }else{
-        //                 $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //             }
-        //         }
-        //     } elseif ($total_page > 10){
-        //         if($page <= 4) { 
-        //             for ($counter = 1; $counter < 8; $counter++){ 
-        //                 if ($counter == $page) {
-        //                     $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                 }else{
-        //                     $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                 }
-        //             }
-        //            $pagination .= '<li><a>...</a></li>';
-        //            $pagination .= '<li onclick="pagination_goto('.$second_last.')" data_page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
-        //            $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
-        //         } elseif ($page > 4 && $page < $total_page - 4) { 
-        //             $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
-        //             $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
-        //             $pagination .= "<li><a>...</a></li>";
-        //             for (
-        //                  $counter = $page - $adjacents;
-        //                  $counter <= $page + $adjacents;
-        //                  $counter++
-        //             ) { 
-        //                     if ($counter == $page) {
-        //                         $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                     }else{
-        //                         $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                     }                  
-        //             }   
-        //                    $pagination .= "<li><a>...</a></li>";
-        //                    $pagination .= '<li onclick="pagination_goto('.$second_last.')" data-page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
-        //                    $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
-        //         } else {
-        //             $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
-        //             $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
-        //             $pagination .= '<li><a>...</a></li>';
-        //             for (
-        //                  $counter = $total_page - 6;
-        //                  $counter <= $total_page;
-        //                  $counter++
-        //             ) {
-        //                     if ($counter == $page) {
-        //                     $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                     }else{
-        //                         $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                     }                   
-        //             }
-        //         }
-        //     }
-
-        //     $pagination .= '<li onclick="pagination_goto('.$next_page.')" data-page="'.@$next_page.'"';
-
-        //     if($page >= $total_page){
-        //         $pagination .= 'class="disabled"';
-        //     } 
-        //     $pagination .= ' >';
-
-        //     $pagination .= '<a ';
-        //     if($page < $total_page) {
-        //         $pagination .= 'href="#"';
-        //     }
-        //     $pagination .= '>Next</a></li>';
-
-        //     if($page < $total_page){
-        //         $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
-        //     } 
-        //     $pagination .= '</ul></nav>';
-
-        // if(!empty($document)){
-        //     //dd($document[0]["b"]["pulse_id"]);
-            
-        // }else{
-
-            
-        // }
-        $html = '';
-        $head_table = '';
-        $head_table .= '<table class="table table-striped" id="table-related-event">
-                            <thead>
-                                <tr>
-                                    <!--<th>
-                                        <label>
-                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>-->
-                                    <th>No</th>
-                                    <th>Event Name</th>
-                                    <th>Group</th>
-                                    <th>Tags</th>
-                                    <th>Attr</th>
-                                    <th>Published</th>
-                                    <th>Last Status</th>
-                                    <th style="width: 100px;">DateTime</th>
-                                    <th>View</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                        <tbody>';
-        // $head_table = '<tbody>';
-        $html .= $head_table;
-        function check_publish($val) {
-            if($val==1) {
-                $result = '<i class="fas fa-check"></i>';
-            } else {
-                $result = '';
-            }
-            return $result;
-        }
-        function check_last_status($val) {
-            if($val== true) {
-                $result = 'Modified';
-            } else {
-                $result = 'Created';
-            }
-            return $result;
-        }
-        function change_date_utc_to_thai($val) {
-            // if($val== true) {
-            //     $result = 'Modified';
-            // } else {
-            //     $result = 'Created';
-            // }
-    
-    
-            $tz = new \DateTimeZone('Asia/Bangkok');
-            // $start = '2020-01-01 00:00:00';
-            // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
-    
-            // print_r($dateStart->toDateTime()->format(DATE_RSS));
-            $date_start = $val->toDateTime();
-    
-            $date_start->setTimezone($tz);
-    
-            $start = $date_start->format(DATE_ATOM);
-            $return_date = date("Y-m-d",strtotime($start));
-    
-            // echo $start;
-    
-    
-            return $return_date;
-        }
-        // $i = $start;
-        $i = 0;
        
-        foreach ($document_all as $document) {
-            
-            $i++;
-            $html .= '
-                            <tr>
-                                <!--<td>
-                                    <label>
-                                        <input value="'.$document['b']['_id'].'" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </td>-->
-                                <td>'.$i.'</td>
-                                <td>'.$document['b']['name'].'</td>
-                                <td>'.$document['b']['groups'].'</td>
-                                <td>'.$document['b']['tags'].'</td>
-                                <td>
-                                    <a href="#"></a>
-                                </td>
-                                <td>'.check_publish($document['b']['public']).'</td>
-                                <td>'.check_last_status($document['b']['is_modified']).'</td>
-                                <td>'.change_date_utc_to_thai($document['b']['modified']).'</td>
-                                <td>'.$document['b']['count_view'].'</td>
-                                <td>
-                                    <a href="'.route('indicators.events_detail_select',['id' => $document['b']['pulse_id']]).
-                                    '?id='.$request->id.'&type='.$request->type.'&indicator='.$request->indicator.'" 
-                                    class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                            </tr>
-                        ';
-            // dd($document['_id']);
+
+
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $options = array(
+            'typeMap' => array(
+            'root' => 'array',
+            'document' => 'array',
+            ),
+        );
+
+        $data = array();
+        $order_number = $start;
+           
+        if($document_all){
+            foreach ($document_all as  $value) {
+                $query = [
+                    'pulse_id' => $value->pulse_id
+                    
+                ];
+                 $cursor_2 = $col_fx_otx_events->findOne($query,$options);
+               
+                //  dd($value);
+                $order_number++;
+                $nestedData['No'] = $order_number;
+                $nestedData['name'] = $cursor_2["name"];
+                $nestedData['groups'] = explode_val($cursor_2["groups"],'groups');
+                $nestedData['tags'] = explode_val($cursor_2["tags"],'tags');
+                $nestedData['public'] = ($cursor_2["public"]);
+                $nestedData['is_modified'] = ($cursor_2["is_modified"]);
+                $nestedData['modified'] = change_date_utc_to_thai($cursor_2['modified']);
+                $nestedData['count_view'] = $cursor_2["count_view"];
+                $nestedData['pulse_id'] = $cursor_2["pulse_id"];
+                $data[] = $nestedData;
+            }
         }
 
-    
-        $html .= '</tbody>
-            </table>';
-
-        if ($request->ajax()) {
-            $data = [
-                "html" => $html,
-                // "pagination" => $pagination,
-            ];
-            return response()->json($data);
-        }
+        $keysort = array_column($data, $order);
+        array_multisort($keysort, SORT_DESC, $data);
+        
+        $dataOut["draw"] = $draw;
+        $dataOut["recordsTotal"] = $cursor_count;
+        $dataOut["recordsFiltered"] = $count_filter;
+        $dataOut["data"] = $data;
+        $dataOut["cursor"] = $cursor;
+        return response()->json($dataOut);
 
     }
 
@@ -835,9 +589,14 @@ class IndicatorsController extends Controller
     public function LoadMoreOTX(Request $request)
     { //"someField" => array('$ne' => null),   
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+       
         // $DB_MONGO_KEY = "mongodb://10.104.0.7:27017";
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+        
+        $cursor = $col_fx_transaction_otx_indicators_data->find();
+        $documentAll = $cursor->toArray();
+        // dd($documentAll);
 
         $date_start = $request->startDate;
         $date_end = $request->endDate;
@@ -1007,6 +766,7 @@ class IndicatorsController extends Controller
         //dd($cursor->count());
         //dateATOM
         $documentAll = $cursor->toArray();
+        
         //    else {
 
         //         if ($request->target == 'Recently Modified') {
@@ -1119,7 +879,7 @@ class IndicatorsController extends Controller
 
 
 
-
+        
 
         $perpage = 25;
 
@@ -1488,7 +1248,7 @@ class IndicatorsController extends Controller
 
         public function load_attributes_tb(Request $request)
     {
-    //    dd( $_POST['order']);
+        // dd( $_POST['order']);
         $draw = $_POST['draw'];
         $row = (int)$_POST['start'];
         $rowperpage = (int)$_POST['length'];
@@ -1516,15 +1276,16 @@ class IndicatorsController extends Controller
 
        if($request->count_page==-1){
         $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+        $count_filter = $cursor_count;
         // dd($cursor_count);
        }else{
         $cursor_count = $request->count_page;
+        
        }
        
 
      
-        $cursor = $col_fx_otx_events_indicator_ref->find($query,$options); 
-        $count_filter = $col_fx_otx_events_indicator_ref->count($query);       
+        $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
         $document_all = $cursor->toArray();
        
         $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
@@ -1550,190 +1311,19 @@ class IndicatorsController extends Controller
                 "TYPE"=>@$cursor_2['type'],
                 "Attribute Name"=>@$cursor_2['indicator_name'],
                 "ROLE"=>@$value['role'],
-                "Date"=>(isset($cursor_2['created'])?change_date_utc_to_thai($cursor_2['created']):""),
-                "Action"=>''
+                "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
+                "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
+                          '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
                 
              );
    
         }
-
+        $keysort = array_column($data, "Date");
+        array_multisort($keysort, SORT_DESC, $data);
         
         $total_record = $cursor_count;
         $total_count_filter = $count_filter;
-        // $total_page = ceil($total_record / $perpage);
-        // $second_last = $total_page - 1; // total pages minus 1
-
-        // $offset = ($page-1) * $perpage;
-        // $previous_page = $page - 1;
-        // $next_page = $page + 1;
-        // $adjacents = "2";
-        
-        // $pagination = '<nav>
-        //                 <ul class="pagination">';
-
-        //     if($page > 1) {
-        //         $pagination .= '<li onclick="pagination_goto(1,'.$cursor_count.')" data-page="1"><a href="#">First Page</a></li>';
-        //     }
-
-        //     $pagination .= '<li onclick="pagination_goto('.$previous_page.','.$cursor_count.')" data-page="'.@$previous_page.'"';
-        //         if($page <= 1) {
-        //             $pagination .= 'class="disabled"';
-        //         }
-        //     $pagination .= '>';
-
-        //     $pagination .= '<a ';
-        //         if($page > 1) {
-        //             $pagination .= 'href="#"';
-        //         }
-
-        //         $pagination .= '>Previous</a></li>';
-
-        //         if ($total_page <= 10){   
-        //             for ($counter = 1; $counter <= $total_page; $counter++){
-        //                 if ($counter == $page) {
-        //                     $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                 }else{
-        //                     $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                 }
-        //             }
-        //         } elseif ($total_page > 10){
-        //             if($page <= 4) { 
-        //                 for ($counter = 1; $counter < 8; $counter++){ 
-        //                     if ($counter == $page) {
-        //                         $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                     }else{
-        //                         $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                     }
-        //                 }
-        //                $pagination .= '<li><a>...</a></li>';
-        //                $pagination .= '<li onclick="pagination_goto('.$second_last.','.$cursor_count.')" data_page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
-        //                $pagination .= '<li onclick="pagination_goto('.$total_page.','.$cursor_count.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
-        //             } elseif ($page > 4 && $page < $total_page - 4) { 
-        //                 $pagination .= '<li onclick="pagination_goto(1,'.$cursor_count.')" data-page="1"><a href="#">1</a></li>';
-        //                 $pagination .= '<li onclick="pagination_goto(2,'.$cursor_count.')" data-page="2"><a href="#">2</a></li>';
-        //                 $pagination .= "<li><a>...</a></li>";
-        //                 for (
-        //                      $counter = $page - $adjacents;
-        //                      $counter <= $page + $adjacents;
-        //                      $counter++
-        //                 ) { 
-        //                         if ($counter == $page) {
-        //                             $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                         }else{
-        //                             $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                         }                  
-        //                 }   
-        //                        $pagination .= "<li><a>...</a></li>";
-        //                        $pagination .= '<li onclick="pagination_goto('.$second_last.')" data-page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
-        //                        $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
-        //             } else {
-        //                 $pagination .= '<li onclick="pagination_goto(1,'.$cursor_count.')" data-page="1"><a href="#">1</a></li>';
-        //                 $pagination .= '<li onclick="pagination_goto(2,'.$cursor_count.')" data-page="2"><a href="#">2</a></li>';
-        //                 $pagination .= '<li><a>...</a></li>';
-        //                 for (
-        //                      $counter = $total_page - 6;
-        //                      $counter <= $total_page;
-        //                      $counter++
-        //                 ) {
-        //                         if ($counter == $page) {
-        //                         $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-        //                         }else{
-        //                             $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-        //                         }                   
-        //                 }
-        //             }
-        //         }
-
-        //         $pagination .= '<li onclick="pagination_goto('.$next_page.','.$cursor_count.')" data-page="'.@$next_page.'"';
-
-        //         if($page >= $total_page){
-        //             $pagination .= 'class="disabled"';
-        //         } 
-        //         $pagination .= ' >';
-
-        //         $pagination .= '<a ';
-        //         if($page < $total_page) {
-        //             $pagination .= 'href="#"';
-        //         }
-        //         $pagination .= '>Next</a></li>';
-
-        //         if($page < $total_page){
-        //             $pagination .= '<li onclick="pagination_goto('.$total_page.','.$cursor_count.')" data-page="'.$total_page.'"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
-        //         } 
-        //         $pagination .= '</ul></nav>';
-
-
-
-
-
-           
-        // $start_first_in_page = $start+1;
-        // $end_last_in_page = $start+$perpage;
-
-        // $showing_amount_text = '<div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">Showing '.$start_first_in_page.' to '.$end_last_in_page.' of '.$total_record.' entries</div>';
-
-
-
-        // $html = '';
-        // $head_table = '';
-        // $head_table .= '<table class="table table-striped" id="table-attributes-template">
-        //                     <thead>
-        //                         <tr>
-        //                             <!--<th>
-        //                                 <label>
-        //                                     <input name="select_all" value="1" id="select-all" type="checkbox" />
-        //                                     <span class="label-text"></span>
-        //                                 </label>
-        //                             </th>-->
-        //                             <th style="width: 100px;">TYPE</th>
-        //                             <th style="width: 120px;">Attribute Name</th>
-        //                             <th style="width: 120px;">ROLE</th>
-        //                             <th style="width: 100px;">Date</th>
-        //                             <th style="width: 120px;">Action</th>
-        //                         </tr>
-        //                     </thead>
-        //                 <tbody>';
-
-        // $html .= $head_table;
-
-
-       
-        // foreach ($join_fx_otx_indicator_detail as $document) {
-            
-           
-        //     // $html .= '
-        //     //                 <tr>
-        //     //                 <!--<td><label>
-        //     //                             <input value="'.@$document['a']['_id'].'" type="checkbox" />
-        //     //                             <span class="label-text"></span>
-        //     //                         </label></td>-->
-        //     //                     <td style="width: 500px;">'.@$document['b']['type'].'</td>
-        //     //                     <td style="width: 500px;">'.@$document['b']['indicator_name'].'</td>
-        //     //                     <td style="width: 500px;">'.@$document['a']['role'].'</td>
-        //     //                     <td>'.(isset($document['b']['created'])?change_date_utc_to_thai($document['b']['created']):"").'</td>
-        //     //                     <td>
-        //     //                         <a href="'.route('indicators.detail_indicator').
-        //     //                         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
-        //     //                         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-        //     //                     </td>
-        //     //                 </tr>
-        //     //             ';
-
-        //                 $data[] = array( 
-        //                     "TYPE"=>@$document['b']['type'],
-        //                     "Attribute Name"=>@$document['b']['indicator_name'],
-        //                     "ROLE"=>@$document['a']['role'],
-        //                     "Date"=>(isset($document['b']['created'])?change_date_utc_to_thai($document['b']['created']):""),
-        //                     "Action"=>''
-        //                  );
-
-        //                 // dd($document['a']['_id']);
-            
-        // }
-
-        // $html .= '</tbody>
-        //     </table>';
-
+     
 
         $dataOut["draw"] = $_POST['draw'];
         $dataOut["recordsTotal"] = $cursor_count;
@@ -1762,17 +1352,10 @@ class IndicatorsController extends Controller
     public function load_pulse_tb(Request $request)
     {
 
-        
-        $perpage = 25;
-
-        if (isset($request->page)) {
-            $page = $request->page;
-        } else {
-            $page = 1;
-        }
-
-        $start = ($page - 1) * $perpage;
-
+        $draw = $_POST['draw'];
+        $row = (int)$_POST['start'];
+        $rowperpage = (int)$_POST['length'];
+        $start =  $row;
         $reqId = $request->pulse_id;
         
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
@@ -1787,25 +1370,26 @@ class IndicatorsController extends Controller
 
         $options = [
             'skip' => $start,//10
-            'limit' => $perpage//5
+            'limit' => $rowperpage//5
         ];
 
-       if($request->count_page==-1){
-        $cursor_count = $fx_otx_events_event_ref->count($query); 
-        // dd($cursor_count);
-       }else{
-        $cursor_count = $request->count_page;
-       }
-       
-
-       
+        if($request->count_page==-1){
+            $cursor_count = $fx_otx_events_event_ref->count($query); 
+            $count_filter = $cursor_count;
+        }else{
+            $cursor_count = $request->count_page;
+            $count_filter = $cursor_count;
+        }
+           
+    
+           
         $cursor = $fx_otx_events_event_ref->find($query,$options);       
         $document_all = $cursor->toArray();
-        
-        // set_time_limit(500); 
-     
-        // $count_doc = count($document_all);
-        
+            
+            // set_time_limit(500); 
+         
+            // $count_doc = count($document_all);
+            
         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $options = array(
             'typeMap' => array(
@@ -1813,212 +1397,209 @@ class IndicatorsController extends Controller
                 'document' => 'array',
             ),
         );
+        $data = array();
+        $order_number = $start;
+
         if($document_all){
             foreach ($document_all as  $value) {
                 $query = [
-                    'pulse_id' => $value->pulse_id
-                    
+                    'pulse_id' => $value->pulse_id     
                 ];
-                $cursor_2 = $col_fx_otx_events->findOne($query,$options);
-               
-                $join_fx_fx_otx_events[]=  array("a"=>$value,"b"=>$cursor_2);
-                  
-             }
+                $document = $col_fx_otx_events->findOne($query,$options);
+                   
+                $order_number++;
+                $nestedData['No'] = $order_number;
+                $nestedData['name'] = $document["name"];
+                $nestedData['groups'] = explode_val($document["groups"],'groups');
+                $nestedData['tags'] = explode_val($document["tags"],'tags');
+                $nestedData['attr'] = '';
+                $nestedData['public'] = ($document["public"]);
+                $nestedData['is_modified'] = ($document["is_modified"]);
+                $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                $nestedData['count_view'] = $document["count_view"];
+                $nestedData['pulse_id'] = $document["pulse_id"];
+
+                $data[] = $nestedData;
+                      
+            }
         }
         
-        $total_record = $cursor_count;
-        $total_page = ceil($total_record / $perpage);
-        $second_last = $total_page - 1; // total pages minus 1
+        $dataOut["draw"] = $draw;
+        $dataOut["recordsTotal"] = $cursor_count;
+        $dataOut["recordsFiltered"] = $count_filter;
+        $dataOut["data"] = $data;
+        $dataOut["cursor"] = $cursor;
+        return response()->json($dataOut);
 
-        $offset = ($page-1) * $perpage;
-        $previous_page = $page - 1;
-        $next_page = $page + 1;
-        $adjacents = "2";
+
+    }
+
+
+   
+
+    public function datatableEvent(Request $request) {
+
+        // $row = (int)$_POST['start'];
+        // $rowperpage = (int)$_POST['length'];
         
-        $pagination = '<nav>
-                        <ul class="pagination">';
-
-            if($page > 1) {
-                $pagination .= '<li onclick="pagination_goto(1,'.$cursor_count.')" data-page="1"><a href="#">First Page</a></li>';
-            }
-
-            $pagination .= '<li onclick="pagination_goto('.$previous_page.','.$cursor_count.')" data-page="'.@$previous_page.'"';
-                if($page <= 1) {
-                    $pagination .= 'class="disabled"';
-                }
-            $pagination .= '>';
-
-            $pagination .= '<a ';
-                if($page > 1) {
-                    $pagination .= 'href="#"';
-                }
-
-                $pagination .= '>Previous</a></li>';
-
-                if ($total_page <= 10){   
-                    for ($counter = 1; $counter <= $total_page; $counter++){
-                        if ($counter == $page) {
-                            $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-                        }else{
-                            $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-                        }
-                    }
-                } elseif ($total_page > 10){
-                    if($page <= 4) { 
-                        for ($counter = 1; $counter < 8; $counter++){ 
-                            if ($counter == $page) {
-                                $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-                            }else{
-                                $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-                            }
-                        }
-                       $pagination .= '<li><a>...</a></li>';
-                       $pagination .= '<li onclick="pagination_goto('.$second_last.','.$cursor_count.')" data_page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
-                       $pagination .= '<li onclick="pagination_goto('.$total_page.','.$cursor_count.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
-                    } elseif ($page > 4 && $page < $total_page - 4) { 
-                        $pagination .= '<li onclick="pagination_goto(1,'.$cursor_count.')" data-page="1"><a href="#">1</a></li>';
-                        $pagination .= '<li onclick="pagination_goto(2,'.$cursor_count.')" data-page="2"><a href="#">2</a></li>';
-                        $pagination .= "<li><a>...</a></li>";
-                        for (
-                             $counter = $page - $adjacents;
-                             $counter <= $page + $adjacents;
-                             $counter++
-                        ) { 
-                                if ($counter == $page) {
-                                    $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-                                }else{
-                                    $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-                                }                  
-                        }   
-                               $pagination .= "<li><a>...</a></li>";
-                               $pagination .= '<li onclick="pagination_goto('.$second_last.')" data-page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
-                               $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
-                    } else {
-                        $pagination .= '<li onclick="pagination_goto(1,'.$cursor_count.')" data-page="1"><a href="#">1</a></li>';
-                        $pagination .= '<li onclick="pagination_goto(2,'.$cursor_count.')" data-page="2"><a href="#">2</a></li>';
-                        $pagination .= '<li><a>...</a></li>';
-                        for (
-                             $counter = $total_page - 6;
-                             $counter <= $total_page;
-                             $counter++
-                        ) {
-                                if ($counter == $page) {
-                                $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
-                                }else{
-                                    $pagination .= '<li onclick="pagination_goto('.$counter.','.$cursor_count.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
-                                }                   
-                        }
-                    }
-                }
-
-                $pagination .= '<li onclick="pagination_goto('.$next_page.','.$cursor_count.')" data-page="'.@$next_page.'"';
-
-                if($page >= $total_page){
-                    $pagination .= 'class="disabled"';
-                } 
-                $pagination .= ' >';
-
-                $pagination .= '<a ';
-                if($page < $total_page) {
-                    $pagination .= 'href="#"';
-                }
-                $pagination .= '>Next</a></li>';
-
-                if($page < $total_page){
-                    $pagination .= '<li onclick="pagination_goto('.$total_page.','.$cursor_count.')" data-page="'.$total_page.'"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
-                } 
-                $pagination .= '</ul></nav>';
-
-
-
-
-
-           
-        $start_first_in_page = $start+1;
-        $end_last_in_page = $start+$perpage;
+        $columns = array(
+            0 => 'No', // not sort 
+            1 => 'name',
+            2 => 'groups',
+            3 => 'tags',
+            4 => 'attr',// not sort 
+            5 => 'public',
+            6 => 'is_modified',
+            7 => 'modified',
+            8 => 'count_view',
+            9 => 'pulse_id',
+        );  
+        $draw = $_POST['draw'];
+        $row = (int)$_POST['start'];
+        $rowperpage = (int)$_POST['length'];
+        
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir')=='asc'?1:-1;
 
        
 
 
-
-        $html = '';
-        $head_table = '';
-        $head_table .= '<table class="table table-striped" id="table-attributes-template">
-                            <thead>
-                                <tr>
-                                    <!--<th>
-                                        <label>
-                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>-->
-                                    <th style="width: 100px;">TYPE</th>
-                                    <th style="width: 120px;">Attribute Name</th>
-                                    <th style="width: 120px;">ROLE</th>
-                                    <th style="width: 100px;">Date</th>
-                                    <th style="width: 120px;">Action</th>
-                                </tr>
-                            </thead>
-                        <tbody>';
-
-        $html .= $head_table;
+        $start =  $row;
 
 
-        if($document_all){
-
-            $showing_amount_text = '<div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
-            Showing '.$start_first_in_page.' to '.$end_last_in_page.' of '.$total_record.' entries</div>';
+        $reqId = $request->pulse_id;
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        
+        
+        $options = [
+            'projection' => [
+                '_id' => 0,
                 
-        foreach ($join_fx_fx_otx_events as $document) {
-            
-           
+                'name' => 1,
+                'groups' => 1,
+                'tags' => 1,
+                'public' => 1,
+                'is_modified' => 1,
+                'modified' => 1,
+                'count_view' => 1,
+                'pulse_id' => 1,
+                
+            ],
+            'sort' => [
+                $order => $dir
+            ],
+            'skip' => $start,
+            'limit' => $rowperpage,
+        ];
 
-            $html .= '
-                            <tr>
-                            <!--<td><label>
-                                        <input value="'.@$document['a']['_id'].'" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label></td>-->
-                                <td style="width: 500px;">'.@$document['b']['type'].'</td>
-                                <td style="width: 500px;">'.@$document['b']['name'].'</td>
-                                <td style="width: 500px;">'.@$document['a']['role'].'</td>
-                                <td>'.(isset($document['b']['created'])?change_date_utc_to_thai($document['b']['created']):"").'</td>
-                                <td>
-                                    <a href="'.route('indicators.events_detail_select',['id' => $document['b']['pulse_id']]).'" 
-                                    class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                            </tr>
-                        ';
-
-           
-            
-           }
-
+        $query = array( 
+            'status' => 1,
+            'deleted_at' => null,
+        );
+        
+        if($request->count_page==-1){
+            $cursor_count = $col_fx_otx_events->count($query);
+            $count_filter = $cursor_count;
         }else{
-            
-            $showing_amount_text ='';
-            $html .= '';
-            
-
-                        // dd($document['a']['_id']);
-            
+            $cursor_count = $request->count_page;
+            $count_filter = $cursor_count;
         }
 
-        $html .= '</tbody>
-            </table>';
+    //    if(empty($request->input('search.value'))) //internal Search
+    //    {
+    //         $query = [];
+    //         $cursor = $col_fx_otx_events->find($query,$options);
+    //    }
+    //    else {
+    //         $search = $request->input('search.value'); 
+    //         $query = [
+    //             '$or' => [
+    //                 [
+    //                     'name' => ['$regex'=>$search ,'$options'=>'i']
+    //                 ],
+    //                 [
+    //                     'groups' => ['$regex'=>$search ,'$options'=>'i']
+    //                 ],
+    //                 [
+    //                     'tags' => ['$regex'=>$search ,'$options'=>'i']
+    //                 ],
+    //                 [
+    //                     'public' => ['$regex'=>$search ,'$options'=>'i']
+    //                 ],
+    //                 [
+    //                     'is_modified' => ['$regex'=>$search ,'$options'=>'i']
+    //                 ]
+    //             ]
+    //         ];
 
+        
+        if($request->keyword||$request->isDateSearch||$request->start_date||$request->end_date)
+       {
+            if ($request->keywords) {
+                $query['name'] = ['$regex'=>$request->keywords, '$options' => 'i'];
+                // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
+            } 
 
+            $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
+
+            if($isDateSearch){
+                if ($request->startDate&&$request->endDate) {
+                    $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate)*1000), '$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
+                    // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                }else if($request->startDate){
+                    $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate)*1000)];
+                    // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
+                }else if($request->endDate){
+                    $query['modified'] = ['$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
+                    // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                }
+            }
+            $cursor = $col_fx_otx_events->find($query,$options);
+            $count_filter = $col_fx_otx_events->count($query);
+       } else {
+            $cursor = $col_fx_otx_events->find($query,$options);
+       }
+
+       
+       
+    $cursor = $cursor->toArray();
+
+    $data = array();
+    $order_number = $start;
+    if(!empty($cursor))
+       {
+           foreach ($cursor as $document)
+           {
+    
             
+                $order_number++;
+                $nestedData['No'] = $order_number;
+                $nestedData['name'] = $document["name"];
+                $nestedData['groups'] = explode_val($document["groups"],'groups');
+                $nestedData['tags'] = explode_val($document["tags"],'tags');
+                $nestedData['attr'] = '';
+                $nestedData['public'] = ($document["public"]);
+                $nestedData['is_modified'] = ($document["is_modified"]);
+                $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                $nestedData['count_view'] = $document["count_view"];
+                $nestedData['pulse_id'] = $document["pulse_id"];
+               
+                // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
+                // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                
+               
+               $data[] = $nestedData;
 
-        if ($request->ajax()) {
-            $data = [
-                 "html" => $html,
-                "pagination" => $pagination,
-                "showing_amount_text" => $showing_amount_text,
-            ];
-            return response()->json($data);
-        }
-
+           }
+       }
+    $dataOut["draw"] = $draw;
+    $dataOut["recordsTotal"] = $cursor_count;
+    $dataOut["recordsFiltered"] = $count_filter;
+    $dataOut["data"] = $data;
+    $dataOut["cursor"] = $cursor;
+    return response()->json($dataOut);
 
     }
 

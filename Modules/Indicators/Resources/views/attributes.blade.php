@@ -169,7 +169,6 @@
 
         if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
 
-            page++;
             if(page_stop){
                 
                 if(ck == 1) {
@@ -365,7 +364,9 @@
                 
             },
         }).done(function(data){
-
+            if(page == 1) {
+                $("#list_otx").html('');   
+            }
             {{--loading('stop_load');--}}
             if(data.html.length == 0){
                 $('.ajax-loading').hide();
