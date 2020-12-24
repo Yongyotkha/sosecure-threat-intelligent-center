@@ -2248,14 +2248,22 @@ ul.topics-news-list li a:hover{
     text-align: center;
 }
 
+
+.strech-card-dash{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 88vh;
+}
 .card-dash{
-    box-shadow: 0 3px 10px rgba(0,0,0,.2);
-    min-height: 290px;
+    background-color: #eee;
+    /* border-radius: 25px; */
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    min-height: 220px;
     padding: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-radius: 5px;
     /* display: flex;
     flex-direction: row;
     justify-content: center;
@@ -2303,6 +2311,26 @@ ul.topics-news-list li a:hover{
 }
 .number-card.warning {
     color: rgb(255, 204, 0) !important;
+}
+
+.divider-dark{
+    width: 100%;
+    height: 2px;
+    background: #e0e0e0;
+    margin-bottom: 1rem;
+}
+
+.highcharts-background {
+    fill: transparent !important;
+}
+
+.box-chart-color{
+    background-color: #eee;
+    /* border-radius: 25px; */
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.header-chart-p{
+    padding: .5rem 1rem;
 }
 
 @media screen and (max-width:1198px){
