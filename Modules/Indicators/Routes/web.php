@@ -31,8 +31,9 @@ Route::group(
         Route::get('/load/general', 'IndicatorsController@load_general')->name('indicators.load_general');
         Route::post('/load/pulses', 'IndicatorsController@load_relatedPulse')->name('indicators.load_pulses');
         Route::get('/load/pulses_tb', 'IndicatorsController@load_relatedPulse_tb')->name('indicators.load_pulses_tb');
-        Route::post('events_table', 'IndicatorsController@tableEvents')->name('indicators.events_table')->middleware('can:menu_items');
+        Route::post('events_table', 'IndicatorsController@datatableEvent')->name('indicators.events_table')->middleware('can:menu_items');
         Route::post('events_attributes_table', 'IndicatorsController@load_attributes_tb')->name('indicators.events_attributes_table')->middleware('can:menu_items');
-        Route::get('events_pulse_table', 'IndicatorsController@load_pulse_tb')->name('indicators.events_pulse_table')->middleware('can:menu_items');
+        Route::post('events_pulse_table', 'IndicatorsController@load_pulse_tb')->name('indicators.events_pulse_table')->middleware('can:menu_items');
+        Route::post('events_table_search', 'IndicatorsController@datatableEvent_search')->name('indicators.events_table_search')->middleware('can:menu_items');
     }
 );
