@@ -2334,3 +2334,24 @@ ul.topics-news-list li a:hover{
         margin-top: 0;
     }
 }
+
+button.buttons-copy{
+    background: #3869d4 !important;
+    color: #fff !important;
+}
+button.buttons-excel{
+    background: #379e38 !important;
+    color: #fff !important;
+}
+button.buttons-csv{
+    background: #ffb12b !important;
+    color: #fff !important;
+}
+button.buttons-pdf{
+    background: #fb4444 !important;
+    color: #fff !important;
+}
+button.buttons-print{
+    background: #63b8ff !important;
+    color: #fff !important;
+}
