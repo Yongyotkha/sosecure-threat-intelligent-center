@@ -21,7 +21,7 @@
                      </button>
                 </header>
                 <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                    <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
                                 <div class="col-lg-12">
