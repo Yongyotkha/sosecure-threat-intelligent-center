@@ -28,9 +28,9 @@
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
-                    <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+                    {{-- <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
-                    </a>
+                    </a> --}}
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
@@ -38,9 +38,9 @@
                         @icon('solid/plus') @langapp('create')
                     </a> -->
                     <a href="{{route('user.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-toggle="ajaxModal">@icon('solid/plus') @langapp('create')</a>
-                    <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color')  }}  pull-right m-xs">
+                    {{-- <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color')  }}  pull-right m-xs">
                         <span>@icon('solid/user') @langapp('role')</span>
-                    </button>
+                    </button> --}}
                 </header>
 
                 <section class="scrollable wrapper">
