@@ -4,6 +4,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $Site_keywords->name }}</h4>
         </div>
+        
         {!! Form::open(['route' => ['keyword.update', 'id' => $Site_keywords->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
 
         <input type="hidden" name="id" value="{{  $Site_keywords->id  }}">
