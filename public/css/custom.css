@@ -2231,8 +2231,8 @@ ul.topics-news-list li a:hover{
     overflow: hidden;
     position: relative;
     float: left;
-    margin-right: 1rem;
-    margin-top: 2rem;
+    /* margin-right: 1rem;
+    margin-top: 2rem; */
 }
 
 .img-icon-card img{
