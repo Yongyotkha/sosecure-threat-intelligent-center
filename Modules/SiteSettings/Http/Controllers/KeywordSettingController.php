@@ -92,12 +92,14 @@ class KeywordSettingController extends Controller
      */
     public function update(KeywordsRequest $request, $id = null)
     {
+        
         // dd($request);
         // exit();
         // $domain = $this->domain->findOrFail($id);
         $Site_keywords = Site_keywords::findOrFail($id);
         // $domain->update($request->all());
         $Site_keywords->name = $request->name;
+        $Site_keywords->type = $request->type;
         $Site_keywords->status = $request->status ? 1 : 0;
         $Site_keywords->save();
 
@@ -129,7 +131,7 @@ class KeywordSettingController extends Controller
 
     public function save(KeywordsRequest $request)//DomainRequest
     {
-        // dd($request);
+        
         // $this->authorize('create', Domain::class);
         // $Domain = $this->Domain->create($request->all());
         $SiteSettings = SiteSettings::where('code',$request->code)->where("active",1)->where("deleted_at",null)->first();
@@ -146,7 +148,7 @@ class KeywordSettingController extends Controller
         $segments = request()->segments();
         $last_segments  = end($segments);
         // $segment3 =  request()->segment(3);
-        // dd($segment3);
+        //  dd($segment3);
         $code = $request->code;
 
         $SiteSettings = SiteSettings::where('code',$code)->first();
@@ -155,6 +157,7 @@ class KeywordSettingController extends Controller
         $Site_keywords->code = generator_uuid();
         $Site_keywords->site_id = $SiteSettings->id;
         $Site_keywords->name = $request->name;
+        $Site_keywords->type = $request->type;
         $Site_keywords->status = $request->status ? 1 : 0;
         $Site_keywords->created_by = @Auth::user()->id;
         $Site_keywords->save();
