@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Auth;
 use DataTables;
+use App\Roles;
 use Modules\Users\Entities\User;
 use Modules\SiteSettings\Http\Requests\UserRequest;
 
@@ -108,7 +109,22 @@ class UsersSettingsController extends Controller
 
         $SiteSettings = SiteSettings::where('code',$code)->first();
 
+        $User_check_limit = User::where('site_id',$SiteSettings->id)->get()->count();
+
+        $user_allow = $SiteSettings->user_allow;
+        $user_limit_amount = $SiteSettings->user_limit_amount;
+
+        if($SiteSettings) {
+
+        }
+
+        // return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+
         // $User = $this->domain;
+
+        $password = $request->password;
+        // dd($password);
+        // exit();
         $User = new User;
         $User->code = generator_uuid();
         $User->username = $request->email;
@@ -166,6 +182,36 @@ class UsersSettingsController extends Controller
 
     public function update(UserRequest $request, $id = null)
     {
+
+        $password = $request->password;
+        $password_re = $request->password_re;
+        $role_id = $request->role_id;
+        $site_role_id = null;
+        if($role_id == 1) {
+            $role = 'admin';
+            // $site_role_id = 99;
+        } else if($role_id == 2) {
+            $role = 'client';
+            // $site_role_id = $role_id;
+        } else if($role_id == 3) {
+            $role = 'client';
+            // $site_role_id = $role_id;
+        }
+        // dd($password);
+        // exit();
+        $pass = '';
+        if($password) {
+            if($password_re) {
+                if($password == $password_re) {
+                    $pass = $password;
+                } else {
+                    return response()->json(['message' => 'Please make sure your passwords match', 'errors' => ['missing' => ["Please make sure your passwords match"]]], 500);
+                }
+
+            }
+
+        }
+
         // dd($request);
         // exit();
         // $user = $this->user->findOrFail($id);
@@ -174,12 +220,37 @@ class UsersSettingsController extends Controller
         // dd($user);
         // exit();
         // $user->update($request->all());
-        $user->name = trim($request->name);
-        $user->username = trim($request->username);
+
+
+        if($pass) {
+            $userColumns = ['username', 'password', 'name', 'active'];
+        } else {
+            $userColumns = ['username', 'name', 'active'];
+        }
+
+        // $userColumns = ['username', 'password', 'name', 'active'];
+        $user->update($request->only($userColumns));
+        // $user->code = generator_uuid();
+        // $user->save();
+
+
+        // $user->name = trim($request->name);
+        // $user->username = trim($request->username);
+        if($pass) {
+            // $user->password = Hash::make($request->password);
+            // $user->password = bcrypt($request->password);
+        }
         // $user->open_scan = $request->open_scan;
         // $user->scan_interval = $request->scan_interval;
         $user->active = $request->active ? 1 : 0;
+        $user->site_role_id = $role_id;
         $user->save();
+
+        // $user->profile->update($request->all());
+        if($role) {
+            $user->syncRoles($role);
+        }
+        
 
         $site_code = $this->siteSettings->find_code($user->site_id);
 
@@ -433,6 +504,7 @@ class UsersSettingsController extends Controller
 
     public function edit(Request $request, $id)
     {
+        
         $data['user'] = User::where('code', $id)->first();
         // dd($id);
         return view('sitesettings::modal.update_user')->with($data);

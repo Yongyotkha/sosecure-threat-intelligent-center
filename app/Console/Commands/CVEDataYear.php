@@ -2,7 +2,7 @@
 // ##################################### SETTING SQL ########################################
 // #update fern 10/7/2019 14:40
 
-// echo "START1";
+
 
 // date_default_timezone_set("Asia/Bangkok");
 // $serversql = "db-mysql-sgp1-sosecure-do-user-5073486-0.a.db.ondigitalocean.com";
@@ -91,13 +91,15 @@
 //             if (isset($vendor['children'])) {
 //                 foreach ($vendor['children'] as $children) {
 //                     foreach ($children['cpe_match'] as $cpe_match) {
-//                         array_push($array_cpe_match, $cpe_match);
+//                         //if($cpe_match['vulnerable']==true)
+//                             array_push($array_cpe_match, $cpe_match);
                         
 //                     }
 //                 }
 //             } else {
 //                 foreach ($vendor['cpe_match'] as $cpe_match) {
-//                     array_push($array_cpe_match, $cpe_match);
+//                     //if($cpe_match['vulnerable']==true)
+//                         array_push($array_cpe_match, $cpe_match);
 //                 }
 //             }
 //         }
@@ -105,11 +107,13 @@
 //         foreach ($array_cpe_match as $vendorkey => $vendor) {
 //             $vendor_text = @$vendor['cpe23Uri'];
 //             $vender_split = explode(":", $vendor_text);
-//             $vendor_name = @$vender_split[3]; //microsoft
-//             $product_name = @$vender_split[4];
+//             $vendor_name = @$vender_split[4]; //microsoft
+//             $product_name = @$vender_split[3];
 //             $product_version = @$vender_split[5];
 //             $product_edition = @$vender_split[6];
-
+//              if ($product_edition == "*") {
+//                  $product_edition = "";
+//              }
 //             print PHP_EOL . 'vendor_name :' . $vendor_name;
 //             print PHP_EOL . 'product_name :' . $product_name;
 //             print PHP_EOL . 'product_version :' . $product_version;

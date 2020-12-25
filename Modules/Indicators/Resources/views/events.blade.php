@@ -6,10 +6,11 @@
             <div class="bc-head">Events</div>
 
             {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span>@langapp('Search_Advance')</span>
+            <span>@langapp('Search_Advance')</span>
             </button> --}}
 
-            <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <a id="advance-search" href="#area_search"
+                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
             </a>
             {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
@@ -37,7 +38,8 @@
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="event_name" id="event_name" placeholder="Search">
+                                <input type="text" class="form-control" name="event_name" id="event_name"
+                                    placeholder="Search">
                             </div>
                         </div>
                         <!--<div class="col-md-4">
@@ -93,17 +95,11 @@
                         <table class="table table-striped" id="table_events">
                             <thead>
                                 <tr>
-                                    <th>
-                                        <label>
-                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
+
                                     <th>No</th>
                                     <th>Event Name</th>
                                     <th>Group</th>
                                     <th>Tags</th>
-                                    <th>Attr</th>
                                     <th>Published</th>
                                     <th>Last Status</th>
                                     <th style="width: 200px;">DateTime</th>
@@ -145,13 +141,14 @@
                                         152
                                     </td>
                                     <td>
-                                        <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs btn-info"><i
-                                    class="far fa-eye"></i> View</a>
+                                        <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
+                                btn-info"><i class="far fa-eye"></i> View</a>
                                 </td>
                                 </tr> --}}
                             </tbody>
                         </table>
-                        <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;"></div>
+                        <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+                        </div>
                         <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
                     </div>
                 </div>
@@ -181,10 +178,11 @@
 
     var start_date = '';
     var end_date = '';
-    var f_search=false;
+    var f_search= 1;
     var event_name = '';
-
-
+    var count_page = -1;
+    var isDateSearch = 0;
+    var datatable = [];
 
   $(function() {
   
@@ -213,23 +211,24 @@
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
         }, cb);
+        $('#event_date').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = 1;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+              
+            }
+        });
 
         cb(start, end);
 
         $("#btn_search_data").click(function() {
             {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-            let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-            let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-            console.log(startDate);
-            console.log(endDate);
+           
+
 
             start_date = startDate;
             end_date = endDate;
-
             event_name = $("#event_name").val();
-            
-            f_search = true;
-            pagination_goto(1);
+            search_table(1);
         });
 
 
@@ -239,8 +238,8 @@
             start = moment();
             end = moment();
             cb(start, end);
+            load_table(1);
 
-            f_search = false;
 
         });
 
@@ -254,67 +253,227 @@
 
 
     function load_table(page=1){
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        $('#table_events').DataTable({
+            searching: false,
+            ordering: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('indicators.events_table')!!}',
+                dataSrc: function ( json ) {
+                    count_page = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    
+                    d.count_page = count_page;
+                }
             },
-            url: '{!! route('indicators.events_table')!!}',
-            type: "post",
-            data:({
-                page : page
-            }),
-            beforeSend: function(){
-                loading('load');
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
             },
-        }).done(function(data){
-	    loading('stop_load');
-            
-            {{--$('#count_news').text(data.count);--}}
-            $("#table_events").html(data.html);
-            $('#table_events').DataTable({
-                "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
-            });
-            $("#pagination_custom").html(data.pagination);
-            $("#showing_amount_text").html(data.showing_amount_text);
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-	    loading('stop_load');
-            console.log("No response from server");
+
+            columns: [
+
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'count_view',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+
+            ],
+            columnDefs: [
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times"></i>';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
         });
+
     }
 
-    function pagination_goto(page=null) {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    
+    function search_table(page=1){
+        let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        $('#table_events').DataTable({
+            searching: false,
+            ordering: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('indicators.events_table')!!}',
+                dataSrc: function ( json ) {
+                   
+                    count_page = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    d.count_page = count_page;
+                    d.startDate = startDate;
+                    d.endDate = endDate;
+                    d.f_search = f_search;
+                    d.keywords = event_name;
+                    d.isDateSearch = isDateSearch;
+                }
             },
-            url: '{!! route('indicators.events_table')!!}',
-            type: "post",
-            data:({
-                page : page,
-                start_date : start_date,
-                end_date : end_date,
-                f_search : f_search,
-                keyword : event_name
-            }),
-            beforeSend: function(){
-                {{--loading('load');--}}
-                f_loading(null, '#table_events');
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
             },
-        }).done(function(data){
-	    {{--loading('stop_load');--}}
-        f_loading_stop(null, '#table_events');
-            
-            {{--$('#count_news').text(data.count);--}}
-            $("#table_events").html(data.html);
-            $("#pagination_custom").html(data.pagination);
-            $("#showing_amount_text").html(data.showing_amount_text);
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-	    {{--loading('stop_load');--}}
-        f_loading_stop(null, '#table_events');
-            console.log("No response from server");
+
+            columns: [
+
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'count_view',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+
+            ],
+            columnDefs: [
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times"></i>';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
+
         });
 
     }
+
+   
 
 
     

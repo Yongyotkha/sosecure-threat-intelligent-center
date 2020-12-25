@@ -119,21 +119,20 @@
                                         <table class="table table-striped" id="table-related-event">
                                             <thead>
                                                 <tr>
-                                                    {{-- <th>
-                                                        <label>
-                                                            <input name="select_all" value="1" id="select-all"
-                                                                type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </th> --}}
-                                                    <th>TYPE</th>
-                                                    <th>Attribute Name</th>
-                                                    <th>ROLE</th>
-                                                    <th>Date</th>
+
+                                                    <th>No</th>
+                                                    <th>Event Name</th>
+                                                    <th>Group</th>
+                                                    <th>Tags</th>
+                                                    <th>Published</th>
+                                                    <th>Last Status</th>
+                                                    <th style="width: 200px;">DateTime</th>
+                                                    <th>View</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -175,8 +174,8 @@
 
     var pulse_id={!! json_encode($pulse_id) !!};
     var total_page = 0;
-    var a = -1;
-    console.log (a);
+    var count_page = -1;
+
     const chart = new frappe.Chart("#chart-show-bar", { 
         title: "",
         data:{
@@ -225,7 +224,12 @@
 
     $(function() {
         load_table_attributes();
-        {{--load_table_pulse(1,-1);--}}
+
+    });
+    
+    $(function() {
+    
+        load_table_pulse();
     });
 
     function load_table_attributes(){
@@ -245,13 +249,11 @@
                 type: "POST",
                 data:function(d){
                     d.pulse_id = pulse_id;
-                    d.count_page = a;                
+                    d.count_page = count_page;                
                 },
             },
             initComplete : function( settings, json){
-                
-               a = JSON.stringify(json.recordsTotal);
-               console.log(a);
+                a = json.recordsTotal;
                 $('[data-toggle="tooltip"]').tooltip();
             },
             columns: [
@@ -272,108 +274,133 @@
                     data: 'Action',
                 },
 
+            ],
+            columnDefs: [
+ 
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="'+row.Action+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
             ]
         });
     }
 
     
 
-    function pagination_goto(page=null,count_page=-1) {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  
+
+    function load_table_pulse(){
+
+        $('#table-related-event').DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('indicators.events_pulse_table')!!}',
+                dataSrc: function ( json ) {
+                    count_page = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    d.pulse_id = pulse_id;
+                    d.count_page = count_page;
+                }
             },
-            url: '{!! route('indicators.events_attributes_table')!!}',
-            type: "get",
-            data:({
-                pulse_id:pulse_id,
-                page : page,
-                count_page : count_page
-
-            }),
-            beforeSend: function(){
-                {{--loading('load');--}}
-                f_loading(null, '#table-attributes-template');
-
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
             },
-        }).done(function(data){
-	        {{--loading('stop_load');--}}
-            f_loading_stop(null, '#table-attributes-template');
-            
-            {{--$('#count_news').text(data.count);--}}
-            $("#table-attributes-template").html(data.html);
-            $("#pagination_custom").html(data.pagination);
-            $("#showing_amount_text").html(data.showing_amount_text);
 
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-	        {{--loading('stop_load');--}}
-            f_loading_stop(null, '#table-attributes-template');
+            columns: [
 
-            console.log("No response from server");
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'count_view',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+
+            ],
+            columnDefs: [
+
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times"></i>';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
         });
-
-    }
-
-      function load_table_pulse(page=1,count_page=-1){
-
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: '{!! route('indicators.events_pulse_table')!!}',
-            type: "get",
-            data:({
-                pulse_id:pulse_id,
-                page : page,
-                count_page : count_page
-                
-            }),
-            beforeSend: function(){
-
-            },
-        }).done(function(data){
-        
-            $("#table-related-event").html(data.html);
-            $("#pagination_custom_pulse").html(data.pagination);
-            $("#showing_amount_text_pulse").html(data.showing_amount_text);
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-
-            console.log("No response from server");
-        });
-    }
-
-    function pagination_goto_pulse(page=null,count_page=-1) {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: '{!! route('indicators.events_pulse_table')!!}',
-            type: "get",
-            data:({
-                pulse_id:pulse_id,
-                page : page,
-                count_page : count_page
-
-            }),
-            beforeSend: function(){
-                {{--loading('load');--}}
-                loading('load');
-            },
-        }).done(function(data){
-	    {{--loading('stop_load');--}}
-   
-        loading('stop_load');
-            {{--$('#count_news').text(data.count);--}}
-            $("#table-related-event").html(data.html);
-            $("#pagination_custom_pulse").html(data.pagination);
-            $("#showing_amount_text_pulse").html(data.showing_amount_text);
-
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-	    {{--loading('stop_load');--}}
-        loading('stop_load');
-            console.log("No response from server");
-        });
-
+    
     }
 
    
