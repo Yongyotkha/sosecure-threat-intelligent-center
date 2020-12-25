@@ -2174,7 +2174,7 @@ ul.topics-news-list li a:hover{
 }
 
 .text-blue{
-    color: #63b8ff !important;
+    color: #fff !important;
     margin-left: 10px;
 }
 
@@ -2231,8 +2231,8 @@ ul.topics-news-list li a:hover{
     overflow: hidden;
     position: relative;
     float: left;
-    margin-right: 1rem;
-    margin-top: 2rem;
+    /* margin-right: 1rem;
+    margin-top: 2rem; */
 }
 
 .img-icon-card img{
@@ -2246,6 +2246,10 @@ ul.topics-news-list li a:hover{
 
 .left-card{
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 
@@ -2256,10 +2260,10 @@ ul.topics-news-list li a:hover{
     min-height: 88vh;
 }
 .card-dash{
-    background-color: #eee;
+    background-color: #f3f3f3;
     /* border-radius: 25px; */
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    min-height: 220px;
+    min-height: 235px;
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -2271,13 +2275,13 @@ ul.topics-news-list li a:hover{
     border-bottom: 2px solid #e6e3e3; */
 }
 .card-dash.bg-dark{
-    background: #263042;
+    background: #2b9eff40;
 }
 .card-dash.bg-info{
-    background: #556080;
+    background: #dce7ff;
 }
 .card-dash.bg-secondary{
-    background: #0077b6;
+    background: #ffcc0033;
 }
 
 .bg-muted-custom{
@@ -2325,12 +2329,13 @@ ul.topics-news-list li a:hover{
 }
 
 .box-chart-color{
-    background-color: #eee;
+    background-color: #f3f3f3;
     /* border-radius: 25px; */
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
 }
 .header-chart-p{
     padding: .5rem 1rem;
+    background: #2630425c;
 }
 
 @media screen and (max-width:1198px){
@@ -2382,4 +2387,20 @@ button.buttons-pdf{
 button.buttons-print{
     background: #63b8ff !important;
     color: #fff !important;
+}
+
+
+@media screen and (min-width:768px){
+    .padding-small-5px{
+        padding-left: 5px !important;
+        padding-right:5px !important;
+    }
+    .nopadding {
+        padding: 0 !important;
+        margin: 0 !important;
+     }
+}
+
+.mb-small-5px{
+    margin-bottom: 5px !important;
 }
