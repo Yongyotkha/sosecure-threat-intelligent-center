@@ -47,9 +47,18 @@
                 <label class="col-lg-4 control-label">Role <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
                     <select name="role_id" id="role" class="select2-option form-control">
-                        <option value="1">Admin</option>
+                        {{-- <option value="1">Admin</option>
                         <option value="2">User</option>
-                        <option value="3">Customer</option>
+                        <option value="3">Customer</option> --}}
+                        @if($Roles)
+                            @foreach($Roles as $roles_val)
+                                <option value="{{$roles_val['id']}}"
+                                @if(@$roles_select == $roles_val['id'])
+                                selected
+                                @endif
+                                >{{$roles_val['name']}}</option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
             </div>

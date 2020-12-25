@@ -13,6 +13,7 @@ class TransactionRssData extends Model
         return $this->belongsTo(RSSData::class, 'rss_id', 'id');
     }
     public function get_rss_news(){
-        return $this->hasOne(RSSNews::class, 'id', 'transaction_rss_id');
+        // return $this->hasOne(RSSNews::class, 'id', 'transaction_rss_id')->where('transaction_rss_id','!=',null);
+        return $this->belongsTo(RSSNews::class, 'id', 'transaction_rss_id')->where('transaction_rss_id','!=',null)->get_cate;
     }
 }

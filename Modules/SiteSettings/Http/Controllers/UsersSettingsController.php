@@ -92,8 +92,11 @@ class UsersSettingsController extends Controller
 
     public function create(Request $request)
     {
-        $code = $request->code;
-        return view('sitesettings::modal.create_user',compact('code'));
+        $Roles = Roles::get();
+        $data['Roles'] = $Roles;
+        $data['code'] = $request->code;
+
+        return view('sitesettings::modal.create_user')->with($data);
     }
 
     public function save(UserRequest $request)//UserRequest
@@ -118,6 +121,29 @@ class UsersSettingsController extends Controller
 
         }
 
+        $email = $request->email;
+        if($email) {
+            $User_check_email = User::where('email',$email)->where('deleted_at',null)->get()->count();
+            if($User_check_email > 0) {
+                return response()->json(['message' => 'this email address already exist', 'errors' => ['missing' => ["this email address already exist "]]], 500);
+            }
+        }
+        
+
+
+
+        $role_id = $request->role_id;
+        $site_role_id = null;
+        if($role_id == 1) {
+            $role = 'admin';
+            // $site_role_id = 99;
+        } else {
+            $role = 'client';
+            // $site_role_id = $role_id;
+        } 
+
+
+
         // return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
 
         // $User = $this->domain;
@@ -136,6 +162,10 @@ class UsersSettingsController extends Controller
         $User->site_id = $SiteSettings->id;
         $User->site_add_user_token = generator_uuid();
         $User->save();
+
+        if($role) {
+            $user->syncRoles($role);
+        }
 
 
             $this->summary = [
@@ -277,10 +307,27 @@ class UsersSettingsController extends Controller
         $user = User::where('code',$user_code)->first();
         // dd($user);
         // exit();
-        $user->password = Hash::make(Str::uuid());
+
+
+        // if($pass) {
+        //     $userColumns = ['username', 'password', 'name', 'active'];
+        // } else {
+        //     $userColumns = ['username', 'name', 'active'];
+        // }
+
+        // $userColumns = ['username', 'password', 'name', 'active'];
+        $user->update(array(
+            // 'name' =>  $request->name,
+            // 'email' => $request->email,
+            'password' => $request->pass
+            ));
+
+
+        // $user->password = Hash::make(Str::uuid());
         $user->password_time_expire = Carbon::now()->addMinutes(10);
         $user->active = 1;
         $user->save();
+        $user->syncRoles('admin');
 
         $user_find = User::where('code',$user->code)->first();
 
@@ -294,7 +341,7 @@ class UsersSettingsController extends Controller
                 'id'       => $user->id,
                 'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('userssettings.index',['id' => $site_code->code]),
-                'pass' => Str::uuid(),
+                'pass' => $request->pass,
                 'time_pass_expire' => $user_find->password_time_expire,
             ],
             true,
@@ -434,7 +481,20 @@ class UsersSettingsController extends Controller
             ->editColumn(
                 'role',
                 function ($user) {
-                    return $user->user;
+                    $site_role_id = $user->site_role_id;
+                    if($site_role_id) {
+                        if($site_role_id == '99') {
+                            $site_role_id_val = 1;
+                        } else {
+                            $site_role_id_val = $site_role_id;
+                        }
+                    }
+
+                    $Roles = Roles::where('id', $site_role_id_val)->first();
+                    $role_name = $Roles->name;
+
+                    
+                    return $role_name;
                 }
             )
             ->editColumn(
@@ -504,7 +564,21 @@ class UsersSettingsController extends Controller
 
     public function edit(Request $request, $id)
     {
+        $User = User::where('code', $id)->first();
+        $site_role_id = $User->site_role_id;
+        $site_role_id_val = '';
+        if($site_role_id) {
+            if($site_role_id == '99') {
+                $site_role_id_val = 1;
+            } else {
+                $site_role_id_val = $site_role_id;
+            }
+        }
         
+        $Roles = Roles::get();
+        $data['Roles'] = $Roles;
+        $data['roles_select'] = $site_role_id_val;
+        // dd($site_role_id_val);
         $data['user'] = User::where('code', $id)->first();
         // dd($id);
         return view('sitesettings::modal.update_user')->with($data);

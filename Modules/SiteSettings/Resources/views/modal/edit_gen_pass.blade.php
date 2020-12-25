@@ -81,9 +81,13 @@
         }
 
         function fn_gen_pass(user_code) {
+        
+            var uuid = '{{ \Illuminate\Support\Str::uuid() }}';
+        
             axios.post('{{route('user.process_gen_pass')}}', {
                 test: '',
                 user_code: user_code,
+                pass: uuid,
             }).then(function (response) {
                 $("#btn_gen_pass").prop("disabled",false);
                 toastr.success(response.data.message, '@langapp('response_status')');
