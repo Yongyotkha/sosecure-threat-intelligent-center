@@ -15,6 +15,17 @@
                     <input type="text" name="name" class="form-control" value="<?=@$Site_keywords->name?>">
                 </div>
             </div>
+
+           
+            <div class="form-group row">
+                <label class="col-lg-4 control-label">Type <span class="text-danger">*</span> </label>
+                <div class="col-lg-8">
+                    <select name="type" id="type" class="select2-option form-control select-site" style="min-width: 300px;">
+                        <option  value="social" {{ $Site_keywords->type=='social'  ? 'selected="selected"' : "" }}>Social</option>
+                        <option  value="darkweb" {{$Site_keywords->type=='darkweb'  ? 'selected="selected"' : "" }}>Dark Web</option>
+                    </select>
+                </div>
+            </div>
  
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Status </label>

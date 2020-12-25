@@ -28,7 +28,7 @@
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a>
-                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
+                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <a href="{{route('keyword.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
@@ -51,7 +51,7 @@
                                         <tr>
                                             <th class="no-sort w-10">
                                                 <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
@@ -133,7 +133,79 @@
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
 <script>
-$(function() {
+    $(function() {
+
+        $('#table_cve_assets').on('click', '.select-chk', function () {
+                if ($(this).is(':checked')) {
+
+                    $('#btn-change-status').prop("disabled", false);
+                } else {
+                    
+                    if ($('.select-chk').filter(':checked').length < 1){
+
+                        $('#btn-change-status').attr('disabled',true);
+                    }
+                }
+            });
+
+           
+
+            $('#table_cve_assets').on('click', '.keyword_id', function () {
+                if ($(this).is(':checked')) {
+                
+                    
+                    $('#btn-change-status').prop("disabled", false);
+                } else {
+                    if ($('.keyword_id').filter(':checked').length < 1){
+
+                        $('#btn-change-status').attr('disabled',true);
+                    }
+                }
+        });
+
+        var keyword_id = [];
+     
+        $("#btn-change-status").click(function() {
+            $('.keyword_id:checked').each(function () {
+                keyword_id.push(this.value);
+            });
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type:"POST",
+                        url:"{{ route('KeywordsController.delete_checked') }}",
+                        data:{id: keyword_id},
+                        beforeSend: function(){
+                            loading('load');
+                        },
+                        success:function(response) {
+                            loading('stop_load');
+                            toastr.success(response.message, '@langapp('response_status')');
+                            window.location.href = response.redirect;
+                        },
+                        error: function (error){
+                            loading('stop_load');
+                            var errors = error.response.data.errors;
+                            var errorsHtml = '';
+                            $.each(errors, function (key, value) {
+                                errorsHtml += '<li>' + value[0] + '</li>';
+                            });
+                            toastr.error(errorsHtml, '@langapp('response_status') ');
+                        }
+      
+                    });
+
+                }
+            })
+        });
 
 
         var table = $('#table_cve_assets').DataTable({
@@ -181,7 +253,7 @@ $(function() {
                 
             ]
         });
-});
+    });
 
     function change_keyword_active(code) {
         let checkState = $("#keyword_active_" + code).is(":checked") ? 1 : 0;

@@ -133,7 +133,7 @@ class KeywordsController extends Controller
             ->editColumn(
                 'chk',
                 function ($model) {
-                    return '<label><input type="checkbox" name="checked" value="' . $model->id . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" class="keyword_id" name="keyword_id" value="' . $model->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(
@@ -219,6 +219,32 @@ class KeywordsController extends Controller
             Response::HTTP_OK
         );
     }
+
+    
+    public function delete_checked(Request $request)
+    {
+
+        //  dd($request->id);
+
+        foreach($request->id as $keyword_id){
+
+            $Site_keywords  = Site_keywords::where('id', $keyword_id)->first();
+            $data = Site_keywords::where("id",$keyword_id);
+            $data->delete();
+
+        }
+
+        $SiteSettings = SiteSettings::where('id',$Site_keywords->site_id)->first();
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('keyword.index',['id' => @$SiteSettings->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }  
 
 
 }
