@@ -2174,7 +2174,7 @@ ul.topics-news-list li a:hover{
 }
 
 .text-blue{
-    color: #63b8ff !important;
+    color: #2b9eff !important;
     margin-left: 10px;
 }
 
@@ -2246,6 +2246,10 @@ ul.topics-news-list li a:hover{
 
 .left-card{
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 
@@ -2271,13 +2275,13 @@ ul.topics-news-list li a:hover{
     border-bottom: 2px solid #e6e3e3; */
 }
 .card-dash.bg-dark{
-    background: #263042;
+    background: #2b9eff40;
 }
 .card-dash.bg-info{
-    background: #556080;
+    background: #dce7ff;
 }
 .card-dash.bg-secondary{
-    background: #0077b6;
+    background: #ffcc0033;
 }
 
 .bg-muted-custom{
@@ -2331,6 +2335,7 @@ ul.topics-news-list li a:hover{
 }
 .header-chart-p{
     padding: .5rem 1rem;
+    background: #dce7ff;
 }
 
 @media screen and (max-width:1198px){
