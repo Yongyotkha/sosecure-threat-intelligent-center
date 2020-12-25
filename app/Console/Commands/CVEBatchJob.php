@@ -15,15 +15,25 @@
 
 //     //GET URL FORM DATABASE
 
-//     $urldata = "SELECT * FROM fx_logs_setting WHERE type = 'CVE'";
+//     $urldata = "SELECT * FROM fx_logs_setting WHERE UPPER(type) = 'CVE' ";
 
-//     $result = mysqli_query($conn, $urldata);
+//     $result_final = mysqli_query($conn, $urldata);
 
 //     //echo "Download url form : $linkurl";
 // }
 
-// while ($row = $result->fetch_assoc()) {
+
+
+
+
+
+// try {
+ 
+
+// while ($row = $result_final->fetch_assoc()) {
 //     # code...
+
+
 
 // // $updatedata = "UPDATE data_batchjob SET datetime='" . date("Y-m-d H:i:s ") . "' where id =1";//
 //     // $update_data_query = mysqli_query($conn, $updatedata);//
@@ -112,17 +122,19 @@
 //     $sql = "SELECT * FROM fx_cve_assets WHERE active = 1 AND site_id = " . $site_id_fx_cve_assets . " ";
 //     $result = $conn->query($sql);
 //     $data_utable_list = [];
+
 //     if ($result->num_rows > 0) {
-//         while ($row = $result->fetch_assoc()) {
+//         while ($row2 = $result->fetch_assoc()) {
+            
 //             $data_utable = array();
-//             $data_utable['vendor'] = $row['vendor'];
-//             $data_utable['title'] = $row['title'];
+//             $data_utable['vendor'] = $row2['vendor'];
+//             $data_utable['title'] = $row2['title'];
 //             array_push($data_utable_list, $data_utable);
 //         }
 //     } else {
 //         echo "0 results";
 //     }
-
+ 
 //     foreach ($json_o["CVE_Items"] as $json_data) {
         
 //         if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
@@ -139,12 +151,15 @@
 
 //                             }
 //                         }
-//                     } else {
+//                     } 
+
+//                     if (isset($vendor['cpe_match']))  {
 //                         foreach ($vendor['cpe_match'] as $cpe_match) {
 //                             //if($cpe_match['vulnerable']==true)
 //                             array_push($array_cpe_match, $cpe_match);
 //                         }
 //                     }
+
 //                     if (!empty($array_cpe_match)) {
 //                         foreach ($array_cpe_match as $keycpe_match => $valuecpe_match) {
 //                             if ($valuecpe_match['vulnerable'] == true) {
@@ -152,6 +167,7 @@
 //                                 //print PHP_EOL.$cpe23Uri[3].PHP_EOL;
                                 
 //                                 $data_count = search_revisions($data_utable_list, $cpe23Uri[3], 'vendor', $cpe23Uri[4], 'title');
+ 
                                 
 //                                 if (count($data_count) > 0) {
 //                                     print PHP_EOL . '=================================================================';
@@ -165,20 +181,21 @@
 //                                         $edition = "";
 //                                     }
 //                                     echo PHP_EOL . 'check...';
+                                    
 //                                     $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $product_name . "' and vendor='" . $vendor_name . "' and version='" . $versionvalue . "' and edition='" . $edition . "'";
 
 //                                     $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
 //                                     $num = mysqli_num_rows($result1);
 //                                     //echo 'end check';
 //                                     //$num  = 0;
-                                   
+                                    
 //                                     if ($num == 0) {
-//                                         $created_atz = date("Y-m-d H:i:s ");
-//                                         $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
+//                                         $created_atz = date("Y-m-d H:i:s");
+//                                         $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
 
 //                                         try {
 
-//                                             $sql = "INSERT INTO data_cveven(namecve,title,vendor,version,edition,created_at)
+//                                             $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,created_at)
 //                         VALUES ('" . $CVE_Code . "','" . $product_name . "','" . $vendor_name . "','" . $versionvalue . "','" . $edition . "','" . $created_at . "')";
 //                                             $result = mysqli_query($conn, $sql);
 
@@ -189,15 +206,23 @@
 //                                         }
 
 //                                     }
-
+                                    
 //                                     //================
 
 //                                     $description_data = "";
-//                                     foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
-//                                         $description_data = $description_data . $descriptionvalue['value'];
+//                                     if(isset($json_data['cve']['description']['description_data'])){
+//                                         foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
+//                                             $description_data = $description_data . $descriptionvalue['value'];
+//                                         }
 //                                     }
+//                                     // else{
+//                                     //     foreach ($json_data['cve']['description'] as $descriptionkey => $descriptionvalue) {
+//                                     //         $description_data = $description_data . $descriptionvalue['value'];
+//                                     //     }
+//                                     // }
+                                    
 //                                     $description_data = htmlspecialchars($description_data, ENT_QUOTES);
-
+                                    
 //                                     $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
 //                                     $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
 
@@ -220,6 +245,7 @@
 //                                     $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
 //                                     $num = mysqli_num_rows($result1);
 //                                     //$num = 0;
+                                    
 //                                     if ($num > 0) {
 
 //                                         $add_name = $CVE_Code;
@@ -284,7 +310,7 @@
 
 //                                     }
 //                                     //==========================
-
+                                    
 //                                     //==========
 
 //                                 }
@@ -303,6 +329,169 @@
 //         //break;
 //     }
 // // extract file //
+
+   
+//     $sql = "SELECT * FROM fx_cve_assets";
+//     $result2 = mysqli_query($conn, $sql) or die(mysqli_error());
+    
+//     //Save Mapping
+//     echo "Maping===================";
+//     /*
+//     $urldata2 = "SELECT * FROM fx_logs_setting WHERE id LIKE 1 ";
+
+//     $resulturldata2 = mysqli_query($conn, $urldata2);
+//     $rowresulturldata2 = $resulturldata2->fetch_assoc();
+
+//     $urldata3 = "SELECT mode FROM fx_logs_setting WHERE id LIKE 3 ";
+
+//     $resulturldata3 = mysqli_query($conn, $urldata3);
+//     $rowresulturldata3 = $resulturldata3->fetch_assoc();
+//     */
+
+//     while ($row3 = $result2->fetch_array(MYSQLI_ASSOC)) {
+        
+//         //  echo '<br>'.$row['vendor'].'<br>---------------------------------------/r/n';
+
+//         $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version='" . $row3['version'] . "'";
+
+//         //print PHP_EOL . $sql2;
+//         $result3 = mysqli_query($conn, $sql2) or die(mysqli_error());
+//         $namecveList = array();
+//         array_push($namecveList, 'C0000');
+//         array_push($namecveList, 'C0001');
+//         while ($row4 = $result3->fetch_array(MYSQLI_ASSOC)) {
+//             if (!array_key_exists($row4['namecve'], $namecveList)) {
+//                 array_push($namecveList, $row4['namecve']);
+//             }
+            
+//         }
+
+        
+
+//         $created_atz = date("Y-m-d H:i:s ");
+//         $modified = date("Y-m-d", strtotime($created_atz));
+
+//         $modified_start = date('Y-m-d', strtotime(' -1 day'));
+//         $sql3 =   "SELECT * FROM fx_data_datacve WHERE modified between '".$modified_start."' AND '".$modified."' and namecve IN ('".implode("','", $namecveList)."') ";
+        
+//         //$modified ='2019-08-08';
+//         // $sql3  = 'SELECT *
+//         //FROM `data_datacve`
+//         //WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+
+//         // $sql3  = 'SELECT *
+//         // FROM `data_datacve`
+//         // WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+
+//         // $sql3 = 'SELECT *
+//         //FROM `data_datacve`
+//         //WHERE modified > "2020-01-01" and  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+
+//         $result4 = mysqli_query($conn, $sql3) or die(mysqli_error());
+        
+//         while ($row4 = $result4->fetch_array(MYSQLI_ASSOC) ) {
+            
+//             $created_atz = date("Y-m-d H:i:s ");
+//             $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
+
+
+//             $sql_samename = "SELECT namecve FROM fx_data_datacve_mapping WHERE namecve = '" . $row4['namecve'] . "' AND cveven_id = '" . $row3['id'] . "'";
+//             $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
+//             $num = mysqli_num_rows($result1);
+            
+//             if ($num == 0) {
+//                 $insertdata = "INSERT INTO fx_data_datacve_mapping (namecve, published, modified, description, cvss_score, severity, updated_at, created_at,cveven_id)
+//         VALUES  ('" . $row4['namecve'] . "',
+//         '" . $row4['published'] . "',
+//         '" . $row4['modified'] . "',
+//         '" . $row4['description'] . "',
+//         '" . $row4['cvss_score'] . "',
+//         '" . $row4['severity'] . "',
+//         '" . $row4['updated_at'] . "','" . $created_at . "','" . $row3['id'] . "')";
+
+//                 $result = mysqli_query($conn, $insertdata);
+//             }
+
+            
+
+
+
+//             if (1 == 2) {
+//                 //send log
+//                 // usleep(1.5*1000000);
+//                 $mode = $row["protocal_format"];
+//                 if ($mode == 1) {
+
+//                     $LogString = "CEF:0|SOSecure|CVE|1.0|101|Vulnerability Detection|1| dst=" . $row3['IP'] . " dhost=" . $row3['Hostname'] . " dvchost=" . $row3['Site'] . ' cs1Label=NameCVE cs1=' . $row4['namecve'] . ' cs2Label=Vendor ' . "cs2=" . $row3['vendor'] . " " . 'cs3Label=OS ' . "cs3=" . $row3['title'] . " " . 'cs4Label=OSVersion ' . "cs4=" . $row3['version'] . " " . 'cs5Label=Edition ' . "cs5=" . $row3['edition'] . " " . 'cs6Label=Severity ' . "cs6=" . $row4['cvss_score'] . "-" . $row4['severity'];
+
+//                 } else {
+
+//                     $LogString = date("Y/M/d H:i:s") . " " . $row3['vendor'] . " CVE_ID=" . $row4['namecve'] . ",DESCRIPTION=" . $row4['description'] . ",CVSS=" . $row4['cvss_score'] . ",DEVICE=" . $row3['IP'] . ",VENDOR=" . $row3['vendor'] . ",SITE=" . $row3['Site'] . "";
+
+//                 }
+
+//                 if ($row['protocol'] == "udp") {
+//                     //  system("echo '".$LogString."' | nc -w0 -u ".$rowresulturldata2['ip']." ".$rowresulturldata2['port']);
+//                     //  echo  "echo '".$LogString."' | nc -w0 -u ".$rowresulturldata2['ip']." ".$rowresulturldata2['port']."<br>";
+
+//                     $server_ip = $row['ip'];
+//                     $server_port = $row['port'];
+//                     $beat_period = 1;
+//                     $message = $LogString;
+//                     if ($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
+//                         socket_sendto($socket, $message, strlen($message), 0, $server_ip, $server_port);
+
+//     //echo '\n'.$LogString.'\n';
+
+//                     } else {
+//                     }
+
+//                 } else {
+
+//                     $server_ip = $row['ip'];
+//                     $server_port = $row['port'];
+//                     $beat_period = 1;
+//                     $message = $LogString;
+
+//                     ini_set('display_errors', true);
+//                     error_reporting(E_ALL); // <- for debugging purposes only
+
+//                     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+//                     if (!$socket) {
+//                         $errno = socket_last_error();
+//                         $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
+//                         trigger_error($error, E_USER_ERROR);
+//                     }
+
+//                     if (!socket_connect($socket, $server_ip, $server_port)) {
+//                         $errno = socket_last_error($socket);
+//                         $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
+//                         trigger_error($error, E_USER_ERROR);
+//                     }
+
+//                     $buff = $message;
+//                     $length = strlen($buff);
+//                     $sent = socket_write($socket, $buff, $length);
+//                     if (false === $sent) {
+//                         $errno = socket_last_error($socket);
+//                         $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
+//                         trigger_error($error, E_USER_ERROR);
+//                     } else if ($length !== $sent) {
+//                         $msg = sprintf('only %d of %d bytes sent', $length, $sent);
+//                         trigger_error($msg, E_USER_NOTICE);
+//                     }
+
+//                 }
+
+//             }
+
+//         }
+//     }
+
+// }
+
+// } catch (Exception $th) {
+//     echo json_encode($th->getMessage());
 // }
 
 // function search_revisions($dataArray, $search_value, $key_to_search, $other_matching_value = null, $other_matching_key = null)
@@ -377,149 +566,5 @@
 
 // }
 
-// echo "222";
-// return 0;
-// //Save Mapping
-// echo "Maping===================";
-// $sql = "SELECT * FROM data_utable";
-// $result2 = mysqli_query($conn, $sql) or die(mysqli_error());
 
-// $urldata2 = "SELECT * FROM data_setting WHERE id LIKE 1 ";
-
-// $resulturldata2 = mysqli_query($conn, $urldata2);
-// $rowresulturldata2 = $resulturldata2->fetch_assoc();
-
-// $urldata3 = "SELECT mode FROM data_setting WHERE id LIKE 3 ";
-
-// $resulturldata3 = mysqli_query($conn, $urldata3);
-// $rowresulturldata3 = $resulturldata3->fetch_assoc();
-
-// while ($row = $result2->fetch_array(MYSQLI_ASSOC)) {
-
-//     //  echo '<br>'.$row['vendor'].'<br>---------------------------------------/r/n';
-
-//     $sql2 = "SELECT distinct * FROM data_cveven where vendor = '" . $row['vendor'] . "' and title='" . $row['title'] . "' and version='" . $row['version'] . "'";
-//     echo $sql2;
-//     print PHP_EOL . $sql2;
-//     $result3 = mysqli_query($conn, $sql2) or die(mysqli_error());
-//     $namecveList = array();
-//     array_push($namecveList, 'C0000');
-//     array_push($namecveList, 'C0001');
-//     while ($row2 = $result3->fetch_array(MYSQLI_ASSOC)) {
-//         if (!array_key_exists($row2['namecve'], $namecveList)) {
-//             array_push($namecveList, $row2['namecve']);
-//         }
-//     }
-//     $created_atz = date("Y-m-d H:i:s ");
-//     $modified = date("Y-m-d", strtotime($created_atz));
-
-//     $modified_start = date('Y-m-d', strtotime(' -1 day'));
-//     $sql3 = 'SELECT *
-//   FROM data_datacve
-//   WHERE modified BETWEEN  "' . $modified_start . '" and "' . $modified_start . '"  and  namecve IN (' . "'" . implode("','", $namecveList) . "'" . ')';
-
-//     //$modified ='2019-08-08';
-//     // $sql3  = 'SELECT *
-//     //FROM `data_datacve`
-//     //WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
-
-//     // $sql3  = 'SELECT *
-//     // FROM `data_datacve`
-//     // WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
-
-//     // $sql3 = 'SELECT *
-//     //FROM `data_datacve`
-//     //WHERE modified > "2020-01-01" and  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
-
-//     $result4 = mysqli_query($conn, $sql3) or die(mysqli_error());
-//     while ($row4 = $result4->fetch_array(MYSQLI_ASSOC)) {
-//         $created_atz = date("Y-m-d H:i:s ");
-//         $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-//         echo "3333333333333333333333";
-
-//         $sql_samename = "SELECT namecve FROM data_datacve_mapping WHERE namecve = '" . $row4['namecve'] . "'";
-//         $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-//         $num = mysqli_num_rows($result1);
-//         if ($num == 0) {
-//             $insertdata = "INSERT INTO data_datacve_mapping (namecve, published, modified, description, cvss_score, severity, updated_at, created_at,cveven_id)
-//     VALUES  ('" . $row4['namecve'] . "',
-//     '" . $row4['published'] . "',
-//     '" . $row4['modified'] . "',
-//     '" . $row4['description'] . "',
-//     '" . $row4['cvss_score'] . "',
-//     '" . $row4['severity'] . "',
-//     '" . $row4['updated_at'] . "','" . $created_at . "','" . $row['id'] . "')";
-//             echo $insertdata;
-//             $result = mysqli_query($conn, $insertdata);
-//         }
-//         if (1 == 2) {
-//             //send log
-//             // usleep(1.5*1000000);
-//             $mode = $rowresulturldata3["mode"];
-//             if ($mode == 1) {
-
-//                 $LogString = "CEF:0|SOSecure|CVE|1.0|101|Vulnerability Detection|1| dst=" . $row['IP'] . " dhost=" . $row['Hostname'] . " dvchost=" . $row['Site'] . ' cs1Label=NameCVE cs1=' . $row4['namecve'] . ' cs2Label=Vendor ' . "cs2=" . $row['vendor'] . " " . 'cs3Label=OS ' . "cs3=" . $row['title'] . " " . 'cs4Label=OSVersion ' . "cs4=" . $row['version'] . " " . 'cs5Label=Edition ' . "cs5=" . $row['edition'] . " " . 'cs6Label=Severity ' . "cs6=" . $row4['cvss_score'] . "-" . $row4['severity'];
-
-//             } else {
-
-//                 $LogString = date("Y/M/d H:i:s") . " " . $row['vendor'] . " CVE_ID=" . $row4['namecve'] . ",DESCRIPTION=" . $row4['description'] . ",CVSS=" . $row4['cvss_score'] . ",DEVICE=" . $row['IP'] . ",VENDOR=" . $row['vendor'] . ",SITE=" . $row['Site'] . "";
-
-//             }
-
-//             if ($rowresulturldata2['protocol'] == "udp") {
-//                 //  system("echo '".$LogString."' | nc -w0 -u ".$rowresulturldata2['ip']." ".$rowresulturldata2['port']);
-//                 //  echo  "echo '".$LogString."' | nc -w0 -u ".$rowresulturldata2['ip']." ".$rowresulturldata2['port']."<br>";
-
-//                 $server_ip = $rowresulturldata2['ip'];
-//                 $server_port = $rowresulturldata2['port'];
-//                 $beat_period = 1;
-//                 $message = $LogString;
-//                 if ($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
-//                     socket_sendto($socket, $message, strlen($message), 0, $server_ip, $server_port);
-
-// //echo '\n'.$LogString.'\n';
-
-//                 } else {
-//                 }
-
-//             } else {
-
-//                 $server_ip = $rowresulturldata2['ip'];
-//                 $server_port = $rowresulturldata2['port'];
-//                 $beat_period = 1;
-//                 $message = $LogString;
-
-//                 ini_set('display_errors', true);
-//                 error_reporting(E_ALL); // <- for debugging purposes only
-
-//                 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-//                 if (!$socket) {
-//                     $errno = socket_last_error();
-//                     $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
-//                     trigger_error($error, E_USER_ERROR);
-//                 }
-
-//                 if (!socket_connect($socket, $server_ip, $server_port)) {
-//                     $errno = socket_last_error($socket);
-//                     $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
-//                     trigger_error($error, E_USER_ERROR);
-//                 }
-
-//                 $buff = $message;
-//                 $length = strlen($buff);
-//                 $sent = socket_write($socket, $buff, $length);
-//                 if (false === $sent) {
-//                     $errno = socket_last_error($socket);
-//                     $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
-//                     trigger_error($error, E_USER_ERROR);
-//                 } else if ($length !== $sent) {
-//                     $msg = sprintf('only %d of %d bytes sent', $length, $sent);
-//                     trigger_error($msg, E_USER_NOTICE);
-//                 }
-
-//             }
-
-//         }
-
-//     }
-// }
+?>
