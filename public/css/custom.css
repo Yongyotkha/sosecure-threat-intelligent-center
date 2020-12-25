@@ -2174,7 +2174,7 @@ ul.topics-news-list li a:hover{
 }
 
 .text-blue{
-    color: #2b9eff !important;
+    color: #fff !important;
     margin-left: 10px;
 }
 
@@ -2335,7 +2335,7 @@ ul.topics-news-list li a:hover{
 }
 .header-chart-p{
     padding: .5rem 1rem;
-    background: #dce7ff;
+    background: #2630425c;
 }
 
 @media screen and (max-width:1198px){
