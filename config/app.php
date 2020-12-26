@@ -115,6 +115,7 @@ return [
     'DB_MONGO_STOREDATA'    => env('DB_MONGO_STOREDATA'),
     'DARKOWL_PUBLIC_KEY'    => env('DARKOWL_PUBLIC_KEY'),
     'DARKOWL_PRIVATE_KEY'   => env('DARKOWL_PRIVATE_KEY'),
+    'base_url' => '127.0.0.2',
 
     /*
     |--------------------------------------------------------------------------
