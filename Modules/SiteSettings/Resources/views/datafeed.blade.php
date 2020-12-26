@@ -39,7 +39,12 @@
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                         <div class="col-sm-9 col-xs-12">
                                             <select id="source_select" class="form-control">
-                                                <option value="1" selected>All</option>
+                                                <option value="">All</option>
+                                                @if($DataLeakSocial)
+                                                    @foreach($DataLeakSocial as $DataLeakSocial_val)
+                                                        <option value="{{$DataLeakSocial_val->id}}">{{$DataLeakSocial_val->source}}</option>
+                                                    @endforeach
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -52,6 +57,10 @@
                                 </div>
                                 <div class="col-lg-4 text-center">
                                     <div style="margin-top: 8px;">
+                                        <label class="mr-3">
+                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <span class="label-text" style="font-size: 16px;">All</span>
+                                        </label>
                                         <label class="mr-3">
                                             <input type="checkbox" name="" id="" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">Panding</span>
@@ -163,6 +172,14 @@
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div class="modal-body">
+                    <span class="modal-title">Are you sure you want to aprove this item?</span>
+                    <br>
+                  
+                    <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label>
+
+                </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
@@ -170,7 +187,7 @@
                     </button>
                     <button type="submit" class="btn btn-info btn-rounded" onclick="confirm_approve()">
                         <i class="fas fa-paper-plane"></i>
-                        Save
+                        Yes, approve
                     </button>
                 </div>
             </div>
@@ -187,6 +204,13 @@
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div class="modal-body">
+                    <span class="modal-title">Are you sure you want to cancel this item?</span>
+                    <br>
+                  
+                    {{-- <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label> --}}
+
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
@@ -194,7 +218,7 @@
                     </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="confirm_cancle()">
                         <i class="fas fa-paper-plane"></i>
-                        Save
+                        Yes, cancel
                     </button>
                 </div>
             </div>
