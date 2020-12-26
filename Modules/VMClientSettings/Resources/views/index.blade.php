@@ -56,14 +56,15 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
         <!-- Modal Gen Key -->
-        <div class="modal in fixed-left fixed-left" id="create_key_modal" data-easein="flipInX" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal in fixed-left" id="create_key_modal" data-easein="flipInX" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-aside" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <span class="modal-title" id="exampleModalLabel">Create Key</span>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
+                    <div class="modal-header bg-blue">
+                        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title text-white">
+                            <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                            Create Key
+                        </h4>
                     </div>
                     <form action="">
                     <div class="modal-body">
@@ -113,6 +114,7 @@
 
 @push('pagescript')
 @include('stacks.js.datatables')
+@include('stacks.js.fullscreen')
 
 <script>
 $(function() {

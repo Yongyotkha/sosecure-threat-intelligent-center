@@ -143,10 +143,12 @@
 <div class="modal in fixed-left" id="upload_image_logo_modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-aside" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ปรับขนาดโลโก้</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                </button>
+            <div class="modal-header bg-blue">
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                    ปรับขนาดโลโก้
+                </h4>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -181,6 +183,7 @@
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
+@include('stacks.js.fullscreen')
 <script>
 
     $(document).ready(function(){

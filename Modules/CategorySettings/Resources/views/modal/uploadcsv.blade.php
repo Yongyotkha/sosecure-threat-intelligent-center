@@ -1,6 +1,6 @@
-<div class="modal-dialog">
+<div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header bg-info">
+        <div class="modal-header bg-blue">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">@icon('solid/file-alt') @langapp('import')</h4>
         </div>

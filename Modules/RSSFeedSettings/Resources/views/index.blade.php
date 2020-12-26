@@ -117,11 +117,12 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">RSS Feed</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        RSS Feed
+                    </h4>
                 </div>
                 {!! Form::open(['route' => ['rssfeedsettings.save'], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => false]) !!}
                 {{-- <form action=""> --}}
@@ -254,6 +255,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.hidesettings');
+@include('stacks.js.fullscreen');
 
 <script>
     $(document).ready(function () {

@@ -2407,12 +2407,34 @@ a.author-by{
     width: 100% !important;
 }
 
+.modal-content {
+    border-radius: 0px !important;
+}
+.modal-dialog {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
 
+.modal-header.bg-blue{
+    background: #1d5073;
+}
 @media (min-width: 576px){
+    .modal.in .modal-dialog.size-sm {
+        width: 40rem;
+    }
     .modal.in .modal-dialog.size-50 {
         width: 50% !important;
     }
     .modal.in  .modal-dialog {
         width: 60rem;
     }
+}
+
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-shadow: 0 1px 0 #fff;
+    opacity: 1;
 }
