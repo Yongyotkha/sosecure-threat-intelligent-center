@@ -87,6 +87,7 @@ Route::group(
 
         
         Route::get('/socialdatas/{id}', 'DataLeakController@socialdatas')->name('socialdatas.index')->middleware('can:menu_items');
+        Route::get('/darkweb_datas/{id}', 'DataLeakController@darkweb_datas')->name('darkweb_datas.index')->middleware('can:menu_items');
         Route::post('/socialdatas/datatables', 'DataLeakController@socialdatas_datatables')->name('socialdatas.socialdatas_datatables')->middleware('can:menu_items');
         Route::post('/socialdatas/change_status', 'DataLeakController@change_status')->name('socialdatas.change_status');
         Route::get('/socialdatas/delete_socialdatas/{code}', 'DataLeakController@delete_socialdatas')->name('socialdatas.delete');

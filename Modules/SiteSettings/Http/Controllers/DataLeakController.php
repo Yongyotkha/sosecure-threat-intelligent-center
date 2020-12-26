@@ -73,6 +73,14 @@ class DataLeakController extends Controller
        return view('sitesettings::social-datas')->with($data);
     }
 
+    public function darkweb_datas($id)
+    {
+       $get_data = $this->siteSettings->get_data($id);
+       $data['siteSettings'] = $get_data;
+       $data['page'] = 'Dark Web Datas';
+       return view('sitesettings::darkweb-datas')->with($data);
+    }
+
     public function socialdatas_all_site()
     {
     //    $get_data = $this->siteSettings->get_data($id);
