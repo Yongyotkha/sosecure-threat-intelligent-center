@@ -21,6 +21,8 @@ class VlogsNoSysFormatRequest extends FormRequest
      *
      * @return array
      */
+
+
     public function rules()
     {
         // return [
@@ -37,10 +39,12 @@ class VlogsNoSysFormatRequest extends FormRequest
         // ];
 
         return [
-            'vlogs_ip' => 'required|sometimes',
-            'vlogs_link' => 'required|sometimes',
-            'vlogs_protocal' => 'required|sometimes',
-            'vlogs_port' => 'required|sometimes',
+            'syslog' => 'required|sometimes',
+            'ip_address' => 'required|sometimes',
+            'protocal' => 'required|sometimes',
+            'port' => 'required|sometimes',
         ];
     }
+
+    
 }

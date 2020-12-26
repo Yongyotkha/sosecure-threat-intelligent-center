@@ -213,14 +213,21 @@ class OTXMDFeedPulse extends Command
                         ['upsert' => true]
                     );
                     if(isset($value["id"])){
-                        $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit)["success"];
+                        echo "Indi : ".$value["id"];
+                        $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
+                        $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
+                        //$checkSuccessDummy = true;
                         if(!$checkSuccessDummy){
                             $checkSuccess = false;
                         }
+                        echo "  Pulse : ".$value["id"];
                         $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
+                        //$checkSuccessDummy = true;
                         if(!$checkSuccessDummy){
                             $checkSuccess = false;
                         }
+                        $this->info("--END--");
+
                     }
                     
                 } catch (Exception $e) {
@@ -233,10 +240,10 @@ class OTXMDFeedPulse extends Command
         return $dataOut;
     }
 
-    public function saveIndicator_ref($pulseID,$urlLimit)
+    public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
     {
         $allRow = (object) array();
-        $dayMoreThan = 30;
+        $dayMoreThan = 2;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         try {
             $otxSuccessCheck = true;
@@ -296,6 +303,7 @@ class OTXMDFeedPulse extends Command
                                 ['indicator_id' => (isset($value["id"]) ? $value["id"] : ""),
                                     'pulse_id' => (isset($pulseID) ? $pulseID : "")],
                                 ['$set' => [
+                                    'pulse_modified' => $dateModified,
                                     'role' => (isset($value["role"]) ? $value["role"] : ""),
                                     'created' => (isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null),
                                     'expiration' => (isset($value["expiration"]) ? new UTCDateTime(strtotime($value["expiration"])*1000) : null),
@@ -351,7 +359,7 @@ class OTXMDFeedPulse extends Command
     public function savePulse_related($pulseID,$urlLimit)
     {
         $allRow = (object) array();
-        $dayMoreThan = 30;
+        $dayMoreThan = 2;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         try {
             $otxSuccessCheck = true;
@@ -437,6 +445,7 @@ class OTXMDFeedPulse extends Command
                                 [   'main_pulse_id' => (isset($pulseID) ? $pulseID : ""),
                                     'pulse_id' => (isset($value["id"]) ? $value["id"] : "")],
                                 ['$set' => [
+                                    'sub_pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
                                     'updated_at' => $date_now,
                                     'updated_by' => "system",
                                 ],
