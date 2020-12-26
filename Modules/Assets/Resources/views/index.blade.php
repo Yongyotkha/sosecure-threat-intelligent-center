@@ -229,9 +229,9 @@
 
 
         <!-- Modal Scans -->
-        <div class="modal modal-slide" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        <div class="modal in fixed-left" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered size-half-50" role="document">
+        <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">Asset To Use</span>

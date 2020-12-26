@@ -151,9 +151,9 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     
      <!-- Modal RSS -->
-    <div class="modal modal-slide size-50" id="create-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal in fixed-left size-50" id="create-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-     <div class="modal-dialog modal-dialog-centered" role="document">
+     <div class="modal-dialog modal-dialog-aside" role="document">
          <div class="modal-content">
              <div class="modal-header">
                  <span class="modal-title" id="exampleModalLabel">News</span>

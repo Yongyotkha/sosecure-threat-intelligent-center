@@ -96,7 +96,7 @@ Date.now = Date.now || function() { return +new Date; };
         e.preventDefault();
         var $this = $(this)
           , $remote = $this.data('remote') || $this.attr('href')
-          , $modal = $('<div class="modal in" id="ajaxModal" data-easein="flipInX" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-body"></div></div>');
+          , $modal = $('<div class="modal in fixed-left" id="ajaxModal" data-easein="flipInX" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-body"></div></div>');
         $('body').append($modal);
         $modal.modal({ easein: 'flipInX'});
         $modal.load($remote);
