@@ -599,6 +599,7 @@ class OTXMDFeedIndicator extends Command
                         ['indicator_id' => (isset($indicatorID) ? $indicatorID : ""),
                             'pulse_id' => (isset($value["id"]) ? $value["id"] : "")],
                         ['$set' => [
+                            'pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
                             'updated_at' => $date_now ,
                             'updated_by' => "system",
                         ],

@@ -36,7 +36,7 @@ class VlogsSysFormatRequest extends FormRequest
         //     'logo' => 'sometimes|mimes:jpeg,jpg,png|max:1000',
         // ];
         return [
-            'vlogs_protocal_format' => 'required|sometimes',
+            'protocal_format' => 'required|sometimes',
             // 'active' => 'required'.$this->id,
         ];
     }

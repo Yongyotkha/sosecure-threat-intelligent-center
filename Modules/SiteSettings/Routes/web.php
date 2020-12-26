@@ -81,11 +81,19 @@ Route::group(
         Route::put('/vulnerability_logs/upsert/{id}', 'VulnerabilityController@upsert_VulnerabilityLogs')->name('vulsetting.upsert')->middleware('can:menu_items');
         Route::put('/vulnerability_logs/upsertSysFormat/{id}', 'VulnerabilityController@upsert_VulnerabilitySysFormat')->name('vulsetting.upsertSys')->middleware('can:menu_items');
 
+        Route::get('/indicators_logs/{id}', 'IndicatorsSettingController@index')->name('indisetting.indi_logs')->middleware('can:menu_items');
+        Route::put('/indicators_logs/upsert/{id}', 'IndicatorsSettingController@upsert_IndicatorsLogs')->name('indisetting.upsert')->middleware('can:menu_items');
+        Route::put('/indicators_logs/upsertSysFormat/{id}', 'IndicatorsSettingController@upsert_IndicatorsSysFormat')->name('indisetting.upsertSys')->middleware('can:menu_items');
+
+
+
         Route::get('/vulnerability_assets/{id}', 'VulnerabilityController@vulassets')->name('vulsetting.vul_assets')->middleware('can:menu_items');
         Route::get('/vulnerability_assets/cve_assets/data', 'VulnerabilityController@tableData')->name('cve_assets.data')->middleware('can:menu_items');
+        Route::get('/vulnerability_assets/create/{code}', 'VulnerabilityController@create')->name('vul_assets.create')->middleware('can:menu_items');
+        
+
         Route::get('/keywordsetting/{id}', 'DataLeakController@keyword')->name('keyword.index')->middleware('can:menu_items');
 
-        
         Route::get('/socialdatas/{id}', 'DataLeakController@socialdatas')->name('socialdatas.index')->middleware('can:menu_items');
         Route::post('/socialdatas/datatables', 'DataLeakController@socialdatas_datatables')->name('socialdatas.socialdatas_datatables')->middleware('can:menu_items');
         Route::post('/socialdatas/change_status', 'DataLeakController@change_status')->name('socialdatas.change_status');
@@ -99,3 +107,5 @@ Route::post('/datafeedsocial/datatables', 'DataLeakController@datafeedsocial_dat
 Route::post('/datafeedsocial/approve/dataFeed', 'DataLeakController@approve_data_feed')->name('socialdatas.approve_data_feed');
 Route::post('/datafeedsocial/cancle/dataFeed', 'DataLeakController@cancle_data_feed')->name('socialdatas.cancle_data_feed');
 Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_details')->name('vulsetting.detail')->middleware('can:menu_items');
+
+Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor');

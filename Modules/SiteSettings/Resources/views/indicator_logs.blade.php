@@ -27,7 +27,7 @@
                     @icon('solid/arrow-left')
                     </a> --}}
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                    <div class="bc-head">@langapp('settings') > Vulnerability Logs</div>
+                    <div class="bc-head">@langapp('settings') > Indicators Logs</div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                         title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col-lg-12"></div>
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['vulsetting.upsert', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['indisetting.upsert', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
                                 <section class="panel panel-default">
                                     <header class="panel-heading accordion">
@@ -101,7 +101,7 @@
 
 
                             {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
-                                {!! Form::open(['route' => ['vulsetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                                {!! Form::open(['route' => ['indisetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                                 <section class="panel panel-default">
                                     <header class="panel-heading accordion">
                                         Log Format
@@ -118,7 +118,7 @@
                                              <div class="form-group">
                                                  <label for="">Data Format <span class="text-danger">*</span></label>
                                                  <textarea name="" id="text_protocal_format" cols="30" rows="5" class="form-control" readonly>
-                                                    {{@$LogsSetting->protocal_format=="2"?'SYS FORMAT':'CEF:0|SOSecure|CVE|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$CVE_ID cs1=$CVE_ID_value cs2Label=$CVE_Vendor cs2=$CVE_Vendor_value cs3Label=$CVE_Description cs3=$CVE_Description_value requestUrl=$CVE_URL'}}
+                                                    {{@$LogsSetting->protocal_format=="2"?'SYS FORMAT':'CEF:0|SOSecure|INDICATOR|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$INDICATOR_ID cs1=$INDICATOR_ID_value cs2Label=$INDICATOR_Vendor cs2=$INDICATOR_Vendor_value cs3Label=$INDICATOR_Description cs3=$INDICATOR_Description_value requestUrl=$INDICATOR_URL'}}
                                                  </textarea>
                                               </div>
                                         </div>  
@@ -130,10 +130,8 @@
 
                                             <button type="submit" class="btn btn-info submit btn-rounded" id="btn-submitB" value="2"><i
                                                 class="fas fa-paper-plane"></i>
-                                                Save
-                                            </button>
-
-                                            
+                                            Save
+                                        </button>
                                         </div>
                                     </div>
                                 </section>
@@ -265,7 +263,7 @@ $(document).ready(function() {
     
     $('#vlogs_protocal_format').change(function() {
         if($(this).val() == 1){
-            $("#text_protocal_format").html('CEF:0|SOSecure|CVE|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$CVE_ID cs1=$CVE_ID_value cs2Label=$CVE_Vendor cs2=$CVE_Vendor_value cs3Label=$CVE_Description cs3=$CVE_Description_value requestUrl=$CVE_URL'); 
+            $("#text_protocal_format").html('CEF:0|SOSecure|INDICATOR|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$INDICATOR_ID cs1=$INDICATOR_ID_value cs2Label=$INDICATOR_Vendor cs2=$INDICATOR_Vendor_value cs3Label=$INDICATOR_Description cs3=$INDICATOR_Description_value requestUrl=$INDICATOR_URL'); 
         }else{
             $("#text_protocal_format").html('SYS FORMAT'); 
         }
