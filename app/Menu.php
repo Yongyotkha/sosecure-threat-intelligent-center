@@ -11,6 +11,6 @@ class Menu extends Model
     protected $table = 'menu';
 
     public function get_menu_sub(){
-            return $this->hasMany(Menu_sub::class, 'menu_id', 'id');
+            return $this->hasMany(Menu_sub::class, 'menu_id', 'id')->where('deleted_at',null)->where('active',1)->orderBy('order','asc');
     }
 }

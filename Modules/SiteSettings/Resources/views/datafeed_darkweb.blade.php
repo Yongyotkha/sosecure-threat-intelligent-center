@@ -1,51 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <section class="hbox stretch">  
-        <aside id="hide-settings" class="aside aside-md b-r">
-            <section class="vbox">
-                <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
-                        data-target="#setting-nav">@icon('solid/bars')
-                    </a>
-                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3">@langapp('settings')  </p>
-                </header>
-                <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
-                    <section id="setting-nav" class="hidden-xs">
-                        <ul class="nav nav-pills nav-stacked no-radius">
-                            <li class="{{ $page === 'Data Feed(Social)' ? 'active' : '' }}">
-                                <a href="{{route('datafeed.index')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    @langapp('data_feed_Social')
-                                </a>
-                            </li>
-                            <li class="{{ $page === 'Data Feed(darkweb)' ? 'active' : '' }}">
-                                <a href="{{route('datafeed.darkweb_index')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    @langapp('data_feed_darkweb')
-                                </a>
-                            </li>
-                            <li class="{{ $page === 'Social Datas' ? 'active' : '' }}">
-                                <a href="{{route('socialdatas.index_all_site')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    @langapp('social_data')
-                                </a>
-                            </li>
-                            <li class="{{ $page === 'Dark Web Datas' ? 'active' : '' }}">
-                                <a href="{{route('darkweb.index_all_site')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    @langapp('darkweb_data')
-                                </a>
-                            </li>
-                        </ul>
-                    </section>
-                </div>
-                </section>
-            </section>
-        </aside>
-
+    <section class="hbox stretch">      
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
@@ -107,7 +63,7 @@
                                         </label>
                                         <label class="mr-3">
                                             <input type="checkbox" name="" id="" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Pending</span>
+                                            <span class="label-text" style="font-size: 16px;">Panding</span>
                                         </label>
                                         <label class="mr-3">
                                             <input type="checkbox" name="" id="" value="TRUE">
