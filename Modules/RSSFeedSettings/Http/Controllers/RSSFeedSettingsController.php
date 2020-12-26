@@ -72,200 +72,195 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function tableRssData(Request $request){
-        if(($request -> keywords || $request -> startDate || $request -> status !== "null" || $request -> source) && $request -> search_val == true){
-            $model = TransactionRssData::where('status', 1);
+
+        
+        if(($request -> keywords || $request -> isDateSearch || $request -> status) && $request -> search_val == true){
+            $model = TransactionRssData::with('get_rss_news');
+
             if($request -> keywords){
                 $model -> where('title', 'LIKE' ,'%'.$request -> keywords.'%');
             }
-            if($request -> startDate){
+            if($request -> isDateSearch){
                 $date_start = $request->startDate;
                 $date_end = $request->endDate;
 
                 $date_start_explode = explode(" ",$date_start);
                 $date_start_date = @$date_start_explode[0];
-                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
                 // dd($date_start_time);
                 $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
                 // dd($date_start_date_format);
-                $date_start_time_time = date("H:i", strtotime($date_start_time));
-                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // $date_start_time_time = date("H:i", strtotime($date_start_time));
+                // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
                 // dd($date_start);
 
                 $date_end_explode = explode(" ",$date_end);
                 $date_end_date = @$date_end_explode[0];
-                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
                 // dd($date_end_time);
                 $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                $date_end_time_time = date("H:i", strtotime($date_end_time));
-                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // $date_end_time_time = date("H:i", strtotime($date_end_time));
+                // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
                 // dd($date_end_time_time);
 
                 // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                $model -> whereBetween('transcation_date',array($date_start_datetime_format,$date_end_datetime_format));
+                $model -> whereBetween('transcation_date',array($date_start_date_format,$date_end_date_format));
             }
             if($request -> status){
-                if($request -> status == '2' || $request -> status == '3'){
-                    if($request -> status == '2'){
-                        $RSSNews = RSSNews::where('transaction_rss_id','!=' ,null)->get();
-                        foreach($RSSNews as $data){
-                            $model -> where('id', $data -> transaction_rss_id);
-                        }
-                    }else if($request -> status == '3'){
-                        $RSSNews = RSSNews::where('transaction_rss_id','!=' ,null)->get();
-                        foreach($RSSNews as $data){
-                            $model -> where('id', '!=' ,$data -> transaction_rss_id);
-                        }
+            
+                    if($request -> status == '1'){
+
+                        $model = $model->whereHas('get_rss_news', function ($query) {
+                            $query->where('transaction_rss_id', '!=', null);
+                        });
+
+
+
+                        
+                    }else if($request -> status == '2'){
+     
+                        $model = $model->whereDoesntHave('get_rss_news', function ($query) {
+                            $query->where('transaction_rss_id', '!=', null);
+                        });
+
+                        
                     }
                     
-                }  
             }
-            if($request -> source){
-                $model -> where('link', 'LIKE' ,'%'.$request -> source.'%');
-            }
+            
             $model -> get();
         }else{
             $model = TransactionRssData::with('get_rss_news')->get();
         }
 
-        return DataTables::of($model)
-            ->editColumn('chk', function (TransactionRssData $model) {
-                    return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
-            })
-            ->addColumn('title', function (TransactionRssData $model) {
+        return DataTables::of($model)->toJson();
+            // ->editColumn('chk', function (TransactionRssData $model) {
+            //         return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
+            // })
+            // ->addColumn('title', function (TransactionRssData $model) {
 
                 
-                if(@$model ->get_rss_news-> title_th){
-                    return '<div class="text-elip" data-rel="tooltip" title="'.@$model ->get_rss_news-> title_th.'">'.@$model ->get_rss_news -> title_th.'</div>';
-                }else if(@$model ->get_rss_news-> title_en){
-                    return '<div class="text-elip" data-rel="tooltip" title="'.@$model ->get_rss_news-> title_en.'">'.@$model ->get_rss_news -> title_en.'</div>';
-                }else if($model -> title){
-                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> title.'">'.$model -> title.'</div>';
-                }else{
-                    return '-';
-                }
-            })
-            ->addColumn('link', function (TransactionRssData $model) {
-                $html = '';
-                // $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
-                $word_leng = utf8_strlen($model->link);
+            //     if(@$model ->get_rss_news-> title_th){
+            //         return '<div class="text-elip" data-rel="tooltip" title="'.@$model ->get_rss_news-> title_th.'">'.@$model ->get_rss_news -> title_th.'</div>';
+            //     }else if(@$model ->get_rss_news-> title_en){
+            //         return '<div class="text-elip" data-rel="tooltip" title="'.@$model ->get_rss_news-> title_en.'">'.@$model ->get_rss_news -> title_en.'</div>';
+            //     }else if($model -> title){
+            //         return '<div class="text-elip" data-rel="tooltip" title="'.$model -> title.'">'.$model -> title.'</div>';
+            //     }else{
+            //         return '-';
+            //     }
+            // })
+            // ->addColumn('link', function (TransactionRssData $model) {
+            //     $html = '';
+            //     // $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
+            //     $word_leng = utf8_strlen($model->link);
 
-                // if(!empty($RSSNews)){
-                //     // if($word_leng > 30) {
-                //     //     $html .= iconv_substr($model->link, 0, 30, "UTF-8");
-                //     //     $html .= '...'; 
-                //     // } else {
-                //     //     $html .= $model->link; 
-                //     // }
-                //     $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
-                // }else{
-                //     // if($word_leng > 30) {
-                //     //     $html .= iconv_substr($model->link, 0, 30, "UTF-8");
-                //     //     $html .= '...'; 
-                //     // } else {
-                //     //     $html .= $model->link; 
-                //     // }
-                //     $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
-                //     // $html .= iconv_substr($model->link, 0, 30, "UTF-8"); 
-                //     // $html .= $word_leng; 
+            //     // if(!empty($RSSNews)){
+            //     //     // if($word_leng > 30) {
+            //     //     //     $html .= iconv_substr($model->link, 0, 30, "UTF-8");
+            //     //     //     $html .= '...'; 
+            //     //     // } else {
+            //     //     //     $html .= $model->link; 
+            //     //     // }
+            //     //     $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
+            //     // }else{
+            //     //     // if($word_leng > 30) {
+            //     //     //     $html .= iconv_substr($model->link, 0, 30, "UTF-8");
+            //     //     //     $html .= '...'; 
+            //     //     // } else {
+            //     //     //     $html .= $model->link; 
+            //     //     // }
+            //     //     $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
+            //     //     // $html .= iconv_substr($model->link, 0, 30, "UTF-8"); 
+            //     //     // $html .= $word_leng; 
                  
 
-                if(!empty($model->get_rss_news)){
-                    if($word_leng > 30) {
-                        $html .= iconv_substr($model->link, 0, 30, "UTF-8");
-                        $html .= '...'; 
-                    } else {
-                        $html .= $model->link; 
-                    }
-                    $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
-                }else{
-                    if($word_leng > 30) {
-                        $html .= iconv_substr($model->link, 0, 30, "UTF-8");
-                        $html .= '...'; 
-                    } else {
-                        $html .= $model->link; 
-                    }
-                    $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
-                    // $html .= iconv_substr($model->link, 0, 30, "UTF-8"); 
-                    // $html .= $word_leng; 
-                }
+            //     if(!empty($model->get_rss_news)){
+            //         if($word_leng > 30) {
+            //             $html .= iconv_substr($model->link, 0, 30, "UTF-8");
+            //             $html .= '...'; 
+            //         } else {
+            //             $html .= $model->link; 
+            //         }
+            //         $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
+            //     }else{
+            //         if($word_leng > 30) {
+            //             $html .= iconv_substr($model->link, 0, 30, "UTF-8");
+            //             $html .= '...'; 
+            //         } else {
+            //             $html .= $model->link; 
+            //         }
+            //         $html .= '<a href="'.$model -> link .'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i> Open</a>';
+            //         // $html .= iconv_substr($model->link, 0, 30, "UTF-8"); 
+            //         // $html .= $word_leng; 
+            //     }
 
 
                
-                return $html;
-            })
-            ->addColumn('status', function (TransactionRssData $model) {
-                // $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
-                $html = '';
-                // if(!empty($RSSNews) && $RSSNews -> save_draft == 1){
-                //     $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
-                // }else if(!empty($RSSNews) && $RSSNews -> save_draft == 0){
-                //     $html .= '<span class="badge badge-success">Used</span>';
-                // }else{
-                //     $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
-                // }  
-
-
-                if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 1){
-                    $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
-                }else if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 0){
-                    $html .= '<span class="badge badge-success">Used</span>';
-                }else{
-                    $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
-                }  
-                return $html;
-            })
-            ->addColumn('action', function (TransactionRssData $model) {
-                $html = '';
-                $html_cr_news = '';
-                // $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
-                // if(!empty($RSSNews) && $RSSNews -> save_draft == 1){
-                //     $html_cr_news .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                //                             <!--<svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>-->
-                //                             <i class='fas fa-share-square'></i>
-                //                         </a>";
-                // }else if(!empty($RSSNews) && $RSSNews -> save_draft == 0){
-                //     $html_cr_news .= "";
-                // }else{
-                //     $html_cr_news .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                //                         <!--<svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>-->
-                //                         <i class='fas fa-share-square'></i>
-                //                     </a>";
-                // }
-
-                // $html .= $html_cr_news."
-                // <a href='". route('rssfeedsettings.rss_data_delete', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                // <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
-                // </a></div>";
+            //     return $html;
+            // })
+            // ->addColumn('status', function (TransactionRssData $model) {
+            //     $html = '';
 
 
 
-                // $RSSNews = RSSNews::where('transaction_rss_id', $model -> id)->first();
-                if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 1){
-                    $html_cr_news .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                                            <!--<svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>-->
-                                            <i class='fas fa-share-square'></i>
-                                        </a>";
-                }else if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 0){
-                    $html_cr_news .= "";
-                }else{
-                    $html_cr_news .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                                        <!--<svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>-->
-                                        <i class='fas fa-share-square'></i>
-                                    </a>";
-                }
+            //     if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 1){
+            //         $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+            //     }else if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 0){
+            //         $html .= '<span class="badge badge-success">Used</span>';
+            //     }else{
+            //         $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+            //     }  
+            //     return $html;
+            // })
+            // ->addColumn('action', function (TransactionRssData $model) {
+            //     $html = '';
+            //     $html_cr_news = '';
 
-                $html .= $html_cr_news."
-                <a href='". route('rssfeedsettings.rss_data_delete', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
-                </a></div>";
-                return $html;
-                // <a href='". route('rssfeedsettings.edit', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                // <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
-                // </a>
-            })
-            ->rawColumns(['chk','title','link','status','action'])
-            ->toJson();
+            //     if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 1){
+            //         $html_cr_news .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+            //                                 <!--<svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>-->
+            //                                 <i class='fas fa-share-square'></i>
+            //                             </a>";
+            //     }else if(!empty($model->get_rss_news) && $model->get_rss_news -> save_draft == 0){
+            //         $html_cr_news .= "";
+            //     }else{
+            //         $html_cr_news .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+            //                             <!--<svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>-->
+            //                             <i class='fas fa-share-square'></i>
+            //                         </a>";
+            //     }
+
+             
+            //     return $html;
+
+            // })
+            // ->rawColumns(['chk','title','link','status','action'])
+             
     }
+
+    public function deleteChecked(Request $request){
+
+        foreach($request->id as $rss_id){
+
+     
+            $data = TransactionRssData::where("id",$rss_id);
+            $data->delete();
+
+        }
+
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('rssfeedsettings.rss_data'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }  
+
+
 
     public function tableNews(Request $request){
         // if($request -> keywords || $request -> public_date || $request -> status !== "null" || $request -> source){
@@ -517,7 +512,7 @@ class RSSFeedSettingsController extends Controller
         $data['rss'] = TransactionRssData::where('code', $code)->first();
         $data['RSSNews'] = '';
         if($data['rss']) {
-            $data['RSSNews'] = RSSNews::where("transaction_rss_id",$data['rss']->id)->first();
+            // $data['RSSNews'] = RSSNews::where("transaction_rss_id",$data['rss']->id)->first();
         }
         
         $data['category'] = CategorySettings::where('active',1)->get();
