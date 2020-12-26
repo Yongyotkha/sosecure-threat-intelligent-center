@@ -1,7 +1,26 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <section class="hbox stretch">      
+    <section class="hbox stretch">  
+        <aside id="hide-settings" class="aside aside-md b-r">
+            <section class="vbox">
+                <header class="dk header b-b">
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
+                        data-target="#setting-nav">@icon('solid/bars')
+                    </a>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
+                    <p class="h3">@langapp('settings')  </p>
+                </header>
+                <section class="scrollable">
+                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
+                    <section id="setting-nav" class="hidden-xs">
+                        @include('partial.menu_data_dark')
+                    </section>
+                </div>
+                </section>
+            </section>
+        </aside>
+
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
@@ -39,7 +58,12 @@
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                         <div class="col-sm-9 col-xs-12">
                                             <select id="source_select" class="form-control">
-                                                <option value="1" selected>All</option>
+                                                <option value="">All</option>
+                                                @if($DataLeakSocial)
+                                                    @foreach($DataLeakSocial as $DataLeakSocial_val)
+                                                        <option value="{{$DataLeakSocial_val->id}}">{{$DataLeakSocial_val->source}}</option>
+                                                    @endforeach
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -54,7 +78,11 @@
                                     <div style="margin-top: 8px;">
                                         <label class="mr-3">
                                             <input type="checkbox" name="" id="" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Panding</span>
+                                            <span class="label-text" style="font-size: 16px;">All</span>
+                                        </label>
+                                        <label class="mr-3">
+                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <span class="label-text" style="font-size: 16px;">Pending</span>
                                         </label>
                                         <label class="mr-3">
                                             <input type="checkbox" name="" id="" value="TRUE">
@@ -118,8 +146,8 @@
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     <!-- Modal create_assets_vulnerability -->
-    <div class="modal modal-slide" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">Confirm Information</span>
@@ -154,8 +182,8 @@
         </div>
     </div>
 
-    <div class="modal modal-slide" id="confirm-change-status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal in fixed-left" id="confirm-change-status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">Confirm Information</span>
@@ -163,6 +191,14 @@
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div class="modal-body">
+                    <span class="modal-title">Are you sure you want to aprove this item?</span>
+                    <br>
+                  
+                    <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label>
+
+                </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
@@ -170,7 +206,7 @@
                     </button>
                     <button type="submit" class="btn btn-info btn-rounded" onclick="confirm_approve()">
                         <i class="fas fa-paper-plane"></i>
-                        Save
+                        Yes, approve
                     </button>
                 </div>
             </div>
@@ -178,14 +214,21 @@
     </div>
 
     
-    <div class="modal modal-slide" id="confirm-change-status-cancle" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal in fixed-left" id="confirm-change-status-cancle" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">Confirm Information</span>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
+                </div>
+                <div class="modal-body">
+                    <span class="modal-title">Are you sure you want to cancel this item?</span>
+                    <br>
+                  
+                    {{-- <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label> --}}
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
@@ -194,7 +237,7 @@
                     </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="confirm_cancle()">
                         <i class="fas fa-paper-plane"></i>
-                        Save
+                        Yes, cancel
                     </button>
                 </div>
             </div>

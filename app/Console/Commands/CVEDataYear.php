@@ -91,14 +91,15 @@
 //             if (isset($vendor['children'])) {
 //                 foreach ($vendor['children'] as $children) {
 //                     foreach ($children['cpe_match'] as $cpe_match) {
-//                         //if($cpe_match['vulnerable']==true)
+//                         if($cpe_match['vulnerable']==true)
 //                             array_push($array_cpe_match, $cpe_match);
                         
 //                     }
 //                 }
-//             } else {
+//             } 
+//             if (isset($vendor['cpe_match'])) {
 //                 foreach ($vendor['cpe_match'] as $cpe_match) {
-//                     //if($cpe_match['vulnerable']==true)
+//                     if($cpe_match['vulnerable']==true)
 //                         array_push($array_cpe_match, $cpe_match);
 //                 }
 //             }

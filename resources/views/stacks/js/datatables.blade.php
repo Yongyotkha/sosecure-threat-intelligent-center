@@ -9,6 +9,9 @@
         $.fn.dataTable.moment('{{ $sort }} HH:mm');
 
         $.extend( true, $.fn.dataTable.defaults, {
+        buttons: [
+            'csv'
+        ],
         "processing": true,
         "deferRender": true,
         "autoWidth": false,

@@ -65,9 +65,9 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
     <!-- Modal Scans -->
-    <div class="modal modal-slide" id="scans_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal in fixed-left" id="scans_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">RSS Feed</span>

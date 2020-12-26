@@ -53,8 +53,9 @@
                             <span class="input-group-btn icon-search">
                                 <i class="fas fa-search"></i>
                             </span>
-                            <input type="text" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword">
-                            
+                            <div class="autocomplete">
+                                <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword">
+                            </div>
                         </div>
                     </div>
                 </form>

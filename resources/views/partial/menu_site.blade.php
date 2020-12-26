@@ -53,6 +53,12 @@
                     Social Datas
                 </a>
             </li>
+
+            <li style="padding-left:2rem">
+                <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
+                    Dark web Data
+                </a>
+            </li>
         </ul>
     </li>
     {{-- <li {{ $page === 'News' ? 'active' : '' }}>

@@ -51,7 +51,17 @@ class DataLeakController extends Controller
 
     public function datafeed()
     {
+       $DataLeakSocial = DataLeakSocial::where('deleted_at',null)->where('status',1)->get();
+       $data['DataLeakSocial'] = $DataLeakSocial;
        $data['page'] = 'Data Feed(Social)';
+       return view('sitesettings::datafeed')->with($data);
+    }
+
+    public function datafeed_darkweb()
+    {
+       $DataLeakSocial = DataLeakSocial::where('deleted_at',null)->where('status',1)->get();
+       $data['DataLeakSocial'] = $DataLeakSocial;
+       $data['page'] = 'Data Feed(darkweb)';
        return view('sitesettings::datafeed')->with($data);
     }
 
@@ -61,6 +71,30 @@ class DataLeakController extends Controller
        $data['siteSettings'] = $get_data;
        $data['page'] = 'Social Datas';
        return view('sitesettings::social-datas')->with($data);
+    }
+
+    public function darkweb_datas($id)
+    {
+       $get_data = $this->siteSettings->get_data($id);
+       $data['siteSettings'] = $get_data;
+       $data['page'] = 'Dark Web Datas';
+       return view('sitesettings::darkweb-datas')->with($data);
+    }
+
+    public function socialdatas_all_site()
+    {
+    //    $get_data = $this->siteSettings->get_data($id);
+    //    $data['siteSettings'] = $get_data;
+       $data['page'] = 'Social Datas';
+       return view('sitesettings::social-datas_all_site')->with($data);
+    }
+
+    public function darkweb_datas_all_site()
+    {
+    //    $get_data = $this->siteSettings->get_data($id);
+    //    $data['siteSettings'] = $get_data;
+       $data['page'] = 'Dark Web Datas';
+       return view('sitesettings::darkweb-datas_all_site')->with($data);
     }
 
     /**
@@ -275,7 +309,7 @@ class DataLeakController extends Controller
                 $html = '';
                 if($model -> approve == 0){
                     $html .= '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed('.$model -> id.')">
-                        Approved
+                        Approve
                     </button>';
                 }else{
                     $html .= '<button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status-cancle" onclick="cancle_dataFeed('.$model -> id.')">

@@ -112,101 +112,114 @@ class UsersSettingsController extends Controller
 
         $SiteSettings = SiteSettings::where('code',$code)->first();
 
-        $User_check_limit = User::where('site_id',$SiteSettings->id)->get()->count();
+        $User_check_limit = User::where('site_id',$SiteSettings->id)->where('site_role_id','!=',99)->where('deleted_at',null)->get()->count();
 
         $user_allow = $SiteSettings->user_allow;
         $user_limit_amount = $SiteSettings->user_limit_amount;
 
         if($SiteSettings) {
 
-        }
+            if($user_allow == 'Y') {//allow
+                if($User_check_limit >= $user_limit_amount) {//limit
+                    return response()->json(['message' => 'Failure, user exceeded limit!', 'errors' => ['missing' => ["Failure, user exceeded limit! "]]], 500);
+                } else {//limit pass
 
-        $email = $request->email;
-        if($email) {
-            $User_check_email = User::where('email',$email)->where('deleted_at',null)->get()->count();
-            if($User_check_email > 0) {
-                return response()->json(['message' => 'this email address already exist', 'errors' => ['missing' => ["this email address already exist "]]], 500);
+                    $email = $request->email;
+                    if($email) {
+                        $User_check_email = User::where('email',$email)->where('deleted_at',null)->get()->count();
+                        if($User_check_email > 0) {
+                            return response()->json(['message' => 'this email address already exist', 'errors' => ['missing' => ["this email address already exist "]]], 500);
+                        }
+                    }
+
+
+                    $role_id = $request->role_id;
+                    $site_role_id = null;
+                    if($role_id == 1) {
+                        $role = 'admin';
+                        // $site_role_id = 99;
+                    } else {
+                        $role = 'client';
+                        // $site_role_id = $role_id;
+                    } 
+            
+            
+            
+                    // return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+            
+                    // $User = $this->domain;
+            
+                    $password = $request->password;
+                    // dd($password);
+                    // exit();
+                    $User = new User;
+                    $User->code = generator_uuid();
+                    $User->username = $request->email;
+                    $User->email = $request->email;
+                    $User->name = $request->name;
+                    $User->site_role_id = $request->role_id;
+                    // $User->created_by = @Auth::user()->id;
+                    $User->active = $request->active ? 1 : 0;
+                    $User->site_id = $SiteSettings->id;
+                    $User->site_add_user_token = generator_uuid();
+                    $User->save();
+            
+                    if($role) {
+                        $User->syncRoles($role);
+                    }
+            
+            
+                        $this->summary = [
+                            'site_add_user_token'   => $User->site_add_user_token,
+                            'User'   => $User,
+                            // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
+                            // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
+                            // 'hours_worked'       => $this->workedToday(),
+                            // 'deals_won'          => Deal::whereDate('won_time', today()->toDateTimeString())->count(),
+                            // 'leads_converted'    => Lead::whereDate('converted_at', today()->toDateTimeString())->count(),
+                            // 'expenses_total'     => formatCurrency(get_option('default_currency'), $this->expensesToday()),
+                            // 'closed_tickets'     => Ticket::whereDate('closed_at', today()->toDateTimeString())->count(),
+                            // 'completed_tasks'    => Task::completed()->whereDate('updated_at', today()->toDateTimeString())->count(),
+                        ];
+                        // \Mail::to(User::role('admin')->get())->send(new DailyDigestMail($this->summary));
+                        \Mail::to($User->email)->send(new SiteCreateUserMail($this->summary));
+                        // Mail::to($MAIL_TO_sent)->cc($MAIL_RECEIVE_ORDER_TO_ORG_cc_arr)->send(new Send_data_mailto_org_ins($OrderProductCar,$NO_ID,$LISNO,$vw_sys_product_cars,$OrderProductCarInsure,$sys_file,'sent_mailto_org_controller'));
+                    
+                    // Xrun::dispatch()->onQueue('low')->delay(now()->addMinutes(10));
+            
+                    // foreach($request->category AS $cate) {
+                    //     $SiteCategory = new SiteCategory;
+                    //     $SiteCategory->site_id = $User->id;
+                    //     $SiteCategory->category_id = $cate;
+                    //     $SiteCategory->save();
+                    // }
+            
+                    // if ($request->hasFile('logo')) {
+                    //     $this->uploadLogo($request, $User);
+                    // }
+            
+               
+                    return ajaxResponse(
+                        [
+                            'id'       => $User->id,
+                            'message'  => langapp('saved_successfully'),
+                            'redirect' =>route('userssettings.index', ['id' => $SiteSettings->code]),
+                        ],
+                        true,
+                        Response::HTTP_CREATED
+                    );
+
+
+                }
+
+            } else {//not allow
+                return response()->json(['message' => 'Failed, adding users is not allowed.!', 'errors' => ['missing' => ["Failed, adding users is not allowed.! "]]], 500);
             }
-        }
-        
 
-
-
-        $role_id = $request->role_id;
-        $site_role_id = null;
-        if($role_id == 1) {
-            $role = 'admin';
-            // $site_role_id = 99;
-        } else {
-            $role = 'client';
-            // $site_role_id = $role_id;
-        } 
-
-
-
-        // return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
-
-        // $User = $this->domain;
-
-        $password = $request->password;
-        // dd($password);
-        // exit();
-        $User = new User;
-        $User->code = generator_uuid();
-        $User->username = $request->email;
-        $User->email = $request->email;
-        $User->name = $request->name;
-        $User->site_role_id = $request->role_id;
-        // $User->created_by = @Auth::user()->id;
-        $User->active = $request->active ? 1 : 0;
-        $User->site_id = $SiteSettings->id;
-        $User->site_add_user_token = generator_uuid();
-        $User->save();
-
-        if($role) {
-            $user->syncRoles($role);
         }
 
-
-            $this->summary = [
-                'site_add_user_token'   => $User->site_add_user_token,
-                'User'   => $User,
-                // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
-                // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
-                // 'hours_worked'       => $this->workedToday(),
-                // 'deals_won'          => Deal::whereDate('won_time', today()->toDateTimeString())->count(),
-                // 'leads_converted'    => Lead::whereDate('converted_at', today()->toDateTimeString())->count(),
-                // 'expenses_total'     => formatCurrency(get_option('default_currency'), $this->expensesToday()),
-                // 'closed_tickets'     => Ticket::whereDate('closed_at', today()->toDateTimeString())->count(),
-                // 'completed_tasks'    => Task::completed()->whereDate('updated_at', today()->toDateTimeString())->count(),
-            ];
-            // \Mail::to(User::role('admin')->get())->send(new DailyDigestMail($this->summary));
-            \Mail::to($User->email)->send(new SiteCreateUserMail($this->summary));
-            // Mail::to($MAIL_TO_sent)->cc($MAIL_RECEIVE_ORDER_TO_ORG_cc_arr)->send(new Send_data_mailto_org_ins($OrderProductCar,$NO_ID,$LISNO,$vw_sys_product_cars,$OrderProductCarInsure,$sys_file,'sent_mailto_org_controller'));
-        
-        // Xrun::dispatch()->onQueue('low')->delay(now()->addMinutes(10));
-
-        // foreach($request->category AS $cate) {
-        //     $SiteCategory = new SiteCategory;
-        //     $SiteCategory->site_id = $User->id;
-        //     $SiteCategory->category_id = $cate;
-        //     $SiteCategory->save();
-        // }
-
-        // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $User);
-        // }
-
-   
-        return ajaxResponse(
-            [
-                'id'       => $User->id,
-                'message'  => langapp('saved_successfully'),
-                'redirect' =>route('userssettings.index', ['id' => $SiteSettings->code]),
-            ],
-            true,
-            Response::HTTP_CREATED
-        );
+ 
+    
     }
 
 

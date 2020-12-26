@@ -56,8 +56,8 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
         <!-- Modal Gen Key -->
-        <div class="modal modal-slide" id="create_key_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal in fixed-left fixed-left" id="create_key_modal" data-easein="flipInX" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-aside" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <span class="modal-title" id="exampleModalLabel">Create Key</span>
