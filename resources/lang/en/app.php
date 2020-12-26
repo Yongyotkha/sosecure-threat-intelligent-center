@@ -921,7 +921,7 @@ return [
     'indicators'                                 => 'Indicators',
     'news'                                       => 'News',
     'alert'                                      => 'Alert',
-    'vulnerabilitys'                             => 'Vulnerabilitys',
+    'vulnerabilitys'                             => 'Vulnerabilities',
     'vulnerability'                              => 'Vulnerability',
     'compromised'                                => 'Compromised',
     'data_leak'                                  => 'Data Leak',
