@@ -106,52 +106,82 @@ class DomainSettingsController extends Controller
         $last_segments  = end($segments);
         // $segment3 =  request()->segment(3);
         // dd($segment3);
-        $code = $request->code;
 
-        $SiteSettings = SiteSettings::where('code',$code)->first();
+        $domain_check_limit = Domain::where('site_id',$SiteSettings->id)->where('status',1)->where('deleted_at',null)->get()->count();
 
-        $Domain = $this->domain;
-        $Domain->code = generator_uuid();
-        $Domain->name = $request->name;
-        $Domain->domain = $request->domain;
-        // $Domain->created_by = @Auth::user()->id;
-        $Domain->status = $request->status ? 1 : 0;
-        $Domain->site_id = $SiteSettings->id;
-        $Domain->save();
+        $domain_allow = $SiteSettings->domain_allow;
+        $domain_limit_amount = $SiteSettings->domain_limit;
 
-        // foreach($request->category AS $cate) {
-        //     $SiteCategory = new SiteCategory;
-        //     $SiteCategory->site_id = $Domain->id;
-        //     $SiteCategory->category_id = $cate;
-        //     $SiteCategory->save();
-        // }
+        if($SiteSettings) {
 
-        // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $Domain);
-        // }
+            if($domain_allow == 'Y') {//allow
+                if($domain_check_limit >= $domain_limit_amount) {//limit
+                    return response()->json(['message' => 'Failure, domain exceeded limit!', 'errors' => ['missing' => ["Failure, domain exceeded limit! "]]], 500);
+                } else {//limit pass
 
-        if($request->formsubmit == 'formSavingAndRun'){
-            $TransactionTimeStampScans = $this->TransactionTimeStampScans;
-            $TransactionTimeStampScans->code = generator_uuid(); 
-            $TransactionTimeStampScans->created_by = @Auth::user()->id;
-            $TransactionTimeStampScans->site_id = $SiteSettings->id;
-            $TransactionTimeStampScans->domain_id = $Domain->id;
-            $TransactionTimeStampScans->status = 1;
-            $TransactionTimeStampScans->progress = 0;
-            $TransactionTimeStampScans->save();
+                    $domain = $request->domain;
+                    if($domain) {
+                        $Domain_check_domain = Domain::where('domain',$domain)->where('deleted_at',null)->get()->count();
+                        if($Domain_check_domain > 0) {
+                            return response()->json(['message' => 'this domain already exist', 'errors' => ['missing' => ["this domain already exist "]]], 500);
+                        }
+                    }
+
+
+
+                    $code = $request->code;
+
+                    $SiteSettings = SiteSettings::where('code',$code)->first();
+            
+                    $Domain = $this->domain;
+                    $Domain->code = generator_uuid();
+                    $Domain->name = $request->name;
+                    $Domain->domain = $request->domain;
+                    // $Domain->created_by = @Auth::user()->id;
+                    $Domain->status = $request->status ? 1 : 0;
+                    $Domain->site_id = $SiteSettings->id;
+                    $Domain->save();
+            
+                    // foreach($request->category AS $cate) {
+                    //     $SiteCategory = new SiteCategory;
+                    //     $SiteCategory->site_id = $Domain->id;
+                    //     $SiteCategory->category_id = $cate;
+                    //     $SiteCategory->save();
+                    // }
+            
+                    // if ($request->hasFile('logo')) {
+                    //     $this->uploadLogo($request, $Domain);
+                    // }
+            
+                    if($request->formsubmit == 'formSavingAndRun'){
+                        $TransactionTimeStampScans = $this->TransactionTimeStampScans;
+                        $TransactionTimeStampScans->code = generator_uuid(); 
+                        $TransactionTimeStampScans->created_by = @Auth::user()->id;
+                        $TransactionTimeStampScans->site_id = $SiteSettings->id;
+                        $TransactionTimeStampScans->domain_id = $Domain->id;
+                        $TransactionTimeStampScans->status = 1;
+                        $TransactionTimeStampScans->progress = 0;
+                        $TransactionTimeStampScans->save();
+                    }
+            
+                    return ajaxResponse(
+                        [
+                            'id'       => $Domain->id,
+                            'message'  => langapp('saved_successfully'),
+                            'redirect' =>route('domain.index', ['id' => $SiteSettings->code]),
+                        ],
+                        true,
+                        Response::HTTP_CREATED
+                    );
+
+                }
+
+            } else {//not allow
+                return response()->json(['message' => 'Failed, adding domain is not allowed.!', 'errors' => ['missing' => ["Failed, adding domain is not allowed.! "]]], 500);
+            }
+    
         }
-
-        return ajaxResponse(
-            [
-                'id'       => $Domain->id,
-                'message'  => langapp('saved_successfully'),
-                'redirect' =>route('domain.index', ['id' => $SiteSettings->code]),
-            ],
-            true,
-            Response::HTTP_CREATED
-        );
     }
-
 
     /**
      * Show the specified resource.
