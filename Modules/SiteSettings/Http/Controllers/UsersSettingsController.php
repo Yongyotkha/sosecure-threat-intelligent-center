@@ -164,7 +164,7 @@ class UsersSettingsController extends Controller
         $User->save();
 
         if($role) {
-            $user->syncRoles($role);
+            $User->syncRoles($role);
         }
 
 

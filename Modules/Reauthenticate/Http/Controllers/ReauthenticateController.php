@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Auth;
+use App\Roles;
 use Modules\Users\Entities\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -102,14 +103,30 @@ class ReauthenticateController extends Controller
         // $user = $this->user->findOrFail($id);
         // $user = $this->user->where('code',$id)->first();
         $user = User::where('code',$id)->first();
+
+
+        $role = Roles::where('id',$user->site_role_id)->first();
         // dd($user);
         // exit();
         // $user->update($request->all());
         // $user->name = trim($request->name);
-        $user->password = Hash::make($request->password);
+
+        $user->update(array(
+            // 'name' =>  $request->name,
+            // 'email' => $request->email,
+            'password' => $request->password
+        ));
+
+
+        // $user->password = Hash::make($request->password);
         $user->verify = 1;
+        $user->email_verified_at = Carbon::now();
         $user->last_change_pass = Carbon::now();
         $user->save();
+
+        if($role) {
+            $user->syncRoles($role->name);
+        }
 
         // $site_code = $this->siteSettings->find_code($user->site_id);
 
