@@ -77,9 +77,11 @@ Route::group(
         Route::put('/user-setting/user/update/{id}', 'UsersSettingsController@update')->name('user.update')->middleware('can:sitesettings_update');
         Route::delete('/user-setting/user/delete_process/{id}', 'UsersSettingsController@delete_process')->name('user.delete_process')->middleware('can:categorysettings_delete');
    
-        Route::get('/vulnerability_logs/{id}', 'VulnerabilityController@index')->name('vulsetting.vul_logs')->middleware('can:menu_items');
         Route::put('/vulnerability_logs/upsert/{id}', 'VulnerabilityController@upsert_VulnerabilityLogs')->name('vulsetting.upsert')->middleware('can:menu_items');
         Route::put('/vulnerability_logs/upsertSysFormat/{id}', 'VulnerabilityController@upsert_VulnerabilitySysFormat')->name('vulsetting.upsertSys')->middleware('can:menu_items');
+        Route::get('/vulnerability_logs/{id}', 'VulnerabilityController@index')->name('vulsetting.vul_logs')->middleware('can:menu_items');
+        Route::post('/vulnerability_logs/vendor/change_status', 'VulnerabilityController@change_status')->name('vulsetting.change_status')->middleware(['can:menu_items']);
+
 
         Route::get('/indicators_logs/{id}', 'IndicatorsSettingController@index')->name('indisetting.indi_logs')->middleware('can:menu_items');
         Route::put('/indicators_logs/upsert/{id}', 'IndicatorsSettingController@upsert_IndicatorsLogs')->name('indisetting.upsert')->middleware('can:menu_items');
@@ -90,7 +92,7 @@ Route::group(
         Route::get('/vulnerability_assets/{id}', 'VulnerabilityController@vulassets')->name('vulsetting.vul_assets')->middleware('can:menu_items');
         Route::get('/vulnerability_assets/cve_assets/data', 'VulnerabilityController@tableData')->name('cve_assets.data')->middleware('can:menu_items');
         Route::get('/vulnerability_assets/create/{code}', 'VulnerabilityController@create')->name('vul_assets.create')->middleware('can:menu_items');
-        
+        Route::post('/vulnerability_assets/save/{code}', 'VulnerabilityController@saveCveAsset')->name('vul_assets.save')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
 
         Route::get('/keywordsetting/{id}', 'DataLeakController@keyword')->name('keyword.index')->middleware('can:menu_items');
 
@@ -113,4 +115,4 @@ Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_de
 
 Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware('can:menu_items');
 Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware('can:menu_items');
-Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor');
+Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor')->middleware('can:menu_items');
