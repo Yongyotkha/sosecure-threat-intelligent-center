@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Modules\SiteSettings\Entities\SiteSettings;
+
 use Illuminate\Database\Eloquent\Model;
 
 class DataLeakSocialRef extends Model

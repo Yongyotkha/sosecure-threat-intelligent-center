@@ -248,7 +248,9 @@ class DataLeakController extends Controller
 
     public function socialdatas_all_site_tb(Request $request){
 
-        $model = DataLeakFeed::get_data_leak_feed();
+        $model = DataLeakFeed::where('deleted_at',null)->where('status',1)->with('get_social_ref');
+
+
         $model->get();
         dd($model);
         return DataTables::of($model)->toJson();
