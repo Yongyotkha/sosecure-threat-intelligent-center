@@ -113,9 +113,6 @@ Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_de
 
 Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware('can:menu_items');
 Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware('can:menu_items');
-<<<<<<< HEAD
 
 Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb');
-=======
 Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor');
->>>>>>> af3331424674378cbdcf7110ea47f692846da550
