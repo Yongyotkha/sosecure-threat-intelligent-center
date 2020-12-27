@@ -36,7 +36,7 @@
             Assets
         </a>
     </li>
-    <li class="{{ $page === 'Keyword Setting' ? 'active' : '' || $page === 'Social Datas' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Keyword Setting' ? 'active' : (($page === 'Social Datas') ? 'active' : '') }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Data Leak

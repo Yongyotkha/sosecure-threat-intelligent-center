@@ -14,6 +14,7 @@ use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\Facades\DataTables;
 
+
 class DataLeakController extends Controller
 {
         /**
@@ -85,8 +86,11 @@ class DataLeakController extends Controller
     {
     //    $get_data = $this->siteSettings->get_data($id);
     //    $data['siteSettings'] = $get_data;
-       $data['page'] = 'Social Datas';
-       return view('sitesettings::social-datas_all_site')->with($data);
+        $data['site'] = SiteSettings::where("active", '=', 1)->get();
+        $data['source'] = DataLeakSocial::where("status", '=', 1)->get();
+
+        $data['page'] = 'Social Datas';
+        return view('sitesettings::social-datas_all_site')->with($data);
     }
 
     public function darkweb_datas_all_site()
@@ -252,7 +256,6 @@ class DataLeakController extends Controller
 
 
         $model->get();
-        dd($model);
         return DataTables::of($model)->toJson();
 
 
