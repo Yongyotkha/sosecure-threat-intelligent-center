@@ -194,6 +194,8 @@
 <script>
 
 
+
+
     $('#area-advance-search').hide();
     $('#advance-search').click(function(){
         $('#area-advance-search').toggle();
@@ -409,33 +411,15 @@
                     width: '55px',
                     render: function (data, type, full, meta) {
                         if(full.get_rss_news!=null){
-                            if(full.get_rss_news.save_draft == 1){
-
-                            
-                                return ' <a href="{{config("base_url")}}rss_data/news/create/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>
-                                &nbsp <a href="{{config("base_url")}}delete-rss_data/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
-                                
-                                
-                                
-                                
-                                {{--'<a href="{{route('rssfeedsettings.rss_data_create_news')}}'+'/'+full.code+'" data-toggle="ajaxModal" class="btn btn-{{get_option("theme_color")}}"><i class="fas fa-share-square"></i></a>';--}}
-
-                            }else if(full.get_rss_news.save_draft == 0){
+                
                                 return '<a href="{{config("base_url")}}delete-rss_data/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
 
-                            }else{
-                                ' <a href="{{config("base_url")}}rss_data/news/create/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>
-                                &nbsp <a href="{{config("base_url")}}delete-rss_data/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
-                                
-                                
-                                
-                                {{--'<a href="{{route('rssfeedsettings.rss_data_create_news')}}'+'/'+full.code+'" data-toggle="ajaxModal" class="btn btn-{{get_option("theme_color")}}"><i class="fas fa-share-square"></i></a>';--}}
-
-                            }
                         }else {
-                            return' <a href="{{config("base_url")}}rss_data/news/create/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>
-                            &nbsp <a href="{{config("base_url")}}delete-rss_data/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
-                                delete-rss_data/{id}
+                            let html = '';
+                            html += `<a href="${base_url}/rssfeedsettings/rss_data/news/create/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>`;
+                            html += `&nbsp <a href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                       
+                            return html;
                         }
                     },
                 },
