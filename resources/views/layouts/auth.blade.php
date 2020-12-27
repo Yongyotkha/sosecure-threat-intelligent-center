@@ -39,6 +39,8 @@
     <link rel="stylesheet" href="{{ getAsset('storage/css/style.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('css/sofia.css') }}" type="text/css"/>
 
+    <link rel="stylesheet" href="{{ getAsset('css/custom.css') }}" type="text/css"/>
+
     @if (config('system.enable_tawk'))
         @include('partial.tawk')
     @endif

@@ -2447,3 +2447,34 @@ a.author-by{
     text-shadow: 0 1px 0 #fff;
     opacity: 1;
 }
+
+.nav-header-login {
+    background: #fff;
+    margin: 0 !important;
+}
+.panel-login{
+    margin: 0 !important;
+}
+.center-middle{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.logo-sosecure{
+    height: 70px;
+    object-fit: contain;
+    width: 100%;
+    max-height: 157px;
+    vertical-align: middle;
+    display: block;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: 10px;
+}

@@ -1,25 +1,27 @@
 @extends('layouts.auth')
 @section('content')
-<section id="content" class="wrapper-md content">
-    <div id="login-darken"></div>
+<section id="content" class="center-middle" style="background-image:url('{{asset('images/bg-login.png')}}') ">
+    {{-- <div id="login-darken"></div> --}}
     <div id="login-form" class="container aside-xxl animated fadeInUp">
-        <span class="navbar-brand block">
+        <span class="nav-header-login navbar-brand block">
             @php $display = get_option('logo_or_icon'); @endphp
             @if ($display == 'logo' || $display == 'logo_title')
             <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo')) }}"
-            class="img-responsive {{ ($display == 'logo' ? '' : 'thumb-sm m-r-sm') }}">
+            class="img-responsive logo-sosecure {{ ($display == 'logo' ? '' : 'thumb-sm m-r-sm') }}">
             @elseif ($display == 'icon' || $display == 'icon_title')
             <i class="{{ get_option('site_icon') }}"></i>
             @endif
             @if ($display == 'logo_title' || $display == 'icon_title')
             @if (get_option('website_name') == '')
+            <br>
             {{ get_option('company_name') }}
             @else
+            <br>
             {{ get_option('website_name') }}
             @endif
             @endif
         </span>
-        <section class="panel panel-default bg-white m-t-sm b-r-xs">
+        <section class="panel panel-default bg-white panel-login">
             <header class="panel-heading text-center login-heading">{{ get_option('login_title') }}</header>
             {{-- @if (settingEnabled('enable_languages'))
             <div class="panel-body text-right clearfix">
@@ -77,21 +79,26 @@
             @endif
             @endif
             
-            <div class="form-group">
-                
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> @langapp('remember_me')
-                    </label>
+            <div class="form-group row">
+                <div class="col-xs-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> @langapp('remember_me')
+                        </label>
+                    </div>
                 </div>
+                <div class="col-xs-6">
+                    <a class="btn btn-link pull-right" href="{{ route('password.request') }}">
+                        @langapp('forgot_password')
+                    </a>
+                </div>
+         
                 
             </div>
             <div class="form-group">
-                {!! renderButton(langapp('sign_in')) !!}
-                
-                <a class="btn btn-link pull-right m-t-xs" href="{{ route('password.request') }}">
-                    @langapp('forgot_password')
-                </a>
+                {{-- {!! renderButton(langapp('sign_in')) !!} --}}
+                <button type="submit" class="btn btn-info btn-block formSaving submit"><i class="fas fa-paper-plane"></i> Sign in</button>
+             
                 
             </div>
             @if (settingEnabled('social_login'))
