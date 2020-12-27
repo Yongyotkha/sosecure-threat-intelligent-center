@@ -246,6 +246,22 @@ class DataLeakController extends Controller
         ->make(true);
     }
 
+    public function socialdatas_all_site_tb(Request $request){
+
+        $model = DataLeakFeed::get_data_leak_feed();
+        $model->get();
+        dd($model);
+        return DataTables::of($model)->toJson();
+
+
+         // $model = DataLeakSocialRef::where('deleted_at', null)->orderBy('id', 'desc');
+        // $model->whereHas('get_data_leak_feed', function ($query){
+        //     $query->where('site_id', );
+
+        
+       
+    }
+
     public function datafeedsocial_datatables(Request $request){
         if($request -> search){
             $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '');

@@ -105,3 +105,5 @@ Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_de
 
 Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware('can:menu_items');
 Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware('can:menu_items');
+
+Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb');

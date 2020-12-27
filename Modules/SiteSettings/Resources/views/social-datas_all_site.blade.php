@@ -13,7 +13,7 @@
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
                     <section id="setting-nav" class="hidden-xs">
-                        @include('partial.menu_site')
+                        @include('partial.menu_data_dark')
                     </section>
                 </div>
                 </section>
@@ -92,13 +92,13 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th width="10%">Source</th>
-                                        <th width="15%">Keyword Ref</th>
+                                        <th>Source</th>
+                                        <th>Keyword Ref</th>
                                         <th>Content</th>
-                                        <th width="10%">Data Feed</th>
-                                        <th width="3%">View</th>
-                                        <th width="5%">Status</th>
-                                        <th class="no-sort" width="5%">@langapp('action')</th>
+                                        <th>Data Feed</th>
+                                        <th>View</th>
+                                        <th>Status</th>
+                                        <th>@langapp('action')</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -146,7 +146,7 @@
         </aside>
     </section>
 
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    {{-- <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     <!-- Modal create_assets_vulnerability -->
     <div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
@@ -181,7 +181,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
 
 </section>
 
@@ -207,60 +207,32 @@ $(function() {
 });
 
 function table_social_data(){
-    let search = $('#search').val();
+
     $('#table_social_datas').DataTable({
-        processing: true,
-        serverSide: true,
-        destroy: true,
-        ajax: {
-            url: '{!! route('socialdatas.socialdatas_datatables') !!}',
-            data: {
-                "site_code":'{{ Request::segment(3) }}',
-                "search" : search,
+            pageLength: 50,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                type: "POST",
+                url: '{!! route('socialdatas.socialdatas_all_site_tb') !!}',
+               
+                },
+         
+            initComplete : function( settings, json){
+                $('[data-toggle="tooltip"]').tooltip();
+
+                console.log(json);
+               
+                
             },
-            type: "POST",
-        },
-        order: [
-            [0, "desc"]
-        ],
-        columns: [
-            {
-                data: 'chk',
-                orderable: false,
-                searchable: false,
-                sortable: false,
-                className: 'w-10'
-            },  
-            {
-                data: 'source',
-                name: 'source'
+            createdRow: function ( row, data, index ) {
+                $(row).attr('id', 'tr' + data.id);
             },
-            {
-                data: 'keyword',
-                name: 'keyword'
-            },
-            {
-                data: 'content',
-                name: 'content'
-            },
-            {
-                data: 'data_feed',
-                name: 'data_feed'
-            },
-            {
-                data: 'view_count',
-                name: 'view_count'
-            },
-            {
-                data: 'status',
-                name: 'status'
-            },
-            {
-                data: 'action',
-                name: 'action'
-            },
-        ]
-    });
+
+            columnDefs: []
+       
+        });
 }
 
 $(function() { 
@@ -288,7 +260,7 @@ $(function() {
     cb(start, end);
 });
 
-function change_status(code) {
+{{--function change_status(code) {
     let checkState = $("#status_" + code).is(":checked") ? 1 : 0;
     axios.post('{{route('socialdatas.change_status')}}', {
         status: checkState,
@@ -304,7 +276,7 @@ function change_status(code) {
         });
         toastr.error(errorsHtml, '@langapp('response_status')');
     });
-}
+}--}}
 
 </script>
 @endpush
