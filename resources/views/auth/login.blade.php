@@ -3,26 +3,26 @@
 <section id="content" class="center-middle" style="background-image:url('{{asset('images/bg-login.png')}}') ">
     {{-- <div id="login-darken"></div> --}}
     <div id="login-form" class="container aside-xxl animated fadeInUp">
-        <span class="nav-header-login navbar-brand block">
+        <div class="box-login-shadow  bd-round-b-lr block bd-round-t-lr">
+        <span class="nav-header-login navbar-brand">
+            <img src="{{asset('images/logo_threat/logo_site.png')}}" class="logo-sosecure">
             @php $display = get_option('logo_or_icon'); @endphp
-            @if ($display == 'logo' || $display == 'logo_title')
+            {{-- @if ($display == 'logo' || $display == 'logo_title')
             <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo')) }}"
-            class="img-responsive logo-sosecure {{ ($display == 'logo' ? '' : 'thumb-sm m-r-sm') }}">
+            class="img-responsive logo-sosecure mt-2 {{ ($display == 'logo' ? '' : 'thumb-sm m-r-sm') }}"><br>
             @elseif ($display == 'icon' || $display == 'icon_title')
             <i class="{{ get_option('site_icon') }}"></i>
             @endif
             @if ($display == 'logo_title' || $display == 'icon_title')
             @if (get_option('website_name') == '')
-            <br>
             {{ get_option('company_name') }}
             @else
-            <br>
             {{ get_option('website_name') }}
             @endif
-            @endif
+            @endif --}}
         </span>
-        <section class="panel panel-default bg-white panel-login">
-            <header class="panel-heading text-center login-heading">{{ get_option('login_title') }}</header>
+        <section class="panel-default bg-white panel-login">
+            {{-- <header class="panel-heading text-center login-heading">Welcome To {{ get_option('login_title') }}</header> --}}
             {{-- @if (settingEnabled('enable_languages'))
             <div class="panel-body text-right clearfix">
                 <div class="btn-group dropdown">
@@ -48,82 +48,70 @@
             </div>
             @endif --}}
             
-            {!! Form::open(['route' => 'login', 'class' => 'panel-body wrapper-lg']) !!}
-            <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                <label for="email">@langapp('email')</label>
-                
-                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-                @if ($errors->has('email'))
-                <span class="help-block">
-                    <strong>{{ $errors->first('email') }}</strong>
+            {!! Form::open(['route' => 'login', 'class' => '']) !!}
+            <div class="login-body">
+                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                    <label for="email">@langapp('email')</label>
+                    <input id="email" type="email" class="input-login  form-control" name="email" value="{{ old('email') }}" required autofocus>
+                    @if ($errors->has('email'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('email') }}</strong>
+                    </span>
+                    @endif
+                    
+                </div>
+                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                    <label for="password">@langapp('password')</label>
+                    <input id="password" type="password" class="input-login  form-control" name="password" required>
+                    @if ($errors->has('password'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('password') }}</strong>
+                    </span>
+                    @endif
+                    
+                </div>
+                @if(settingEnabled('use_recaptcha'))
+                {!! NoCaptcha::display() !!}
+                @if ($errors->has('g-recaptcha-response'))
+                <span class="help-block text-danger">
+                    <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
                 </span>
                 @endif
-                
-            </div>
-            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                <label for="password">@langapp('password')</label>
-                <input id="password" type="password" class="form-control" name="password" required>
-                @if ($errors->has('password'))
-                <span class="help-block">
-                    <strong>{{ $errors->first('password') }}</strong>
-                </span>
                 @endif
                 
-            </div>
-            @if(settingEnabled('use_recaptcha'))
-            {!! NoCaptcha::display() !!}
-            @if ($errors->has('g-recaptcha-response'))
-            <span class="help-block text-danger">
-                <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
-            </span>
-            @endif
-            @endif
-            
-            <div class="form-group row">
-                <div class="col-xs-6">
+                <div class="form-group">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> @langapp('remember_me')
                         </label>
-                    </div>
+                    </div>           
                 </div>
-                <div class="col-xs-6">
-                    <a class="btn btn-link pull-right" href="{{ route('password.request') }}">
-                        @langapp('forgot_password')
-                    </a>
-                </div>
-         
-                
-            </div>
-            <div class="form-group">
-                {{-- {!! renderButton(langapp('sign_in')) !!} --}}
-                <button type="submit" class="btn btn-info btn-block formSaving submit"><i class="fas fa-paper-plane"></i> Sign in</button>
-             
-                
-            </div>
-            @if (settingEnabled('social_login'))
-                <div class="line line-dashed"></div>
-                <p id="social-buttons">
+
+                @if (settingEnabled('social_login'))
+                    <div class="line line-dashed"></div>
+                    <p id="social-buttons">
                         <a href="{{url('/redirect/twitter')}}" class="btn btn-sm btn-icon btn-{{ get_option('theme_color') }} m-xs" data-rel="tooltip" title="Login using Twitter">@icon('brands/twitter')</a>
                         <a href="{{url('/redirect/facebook')}}" class="btn btn-sm btn-icon btn-{{ get_option('theme_color') }} m-xs" data-rel="tooltip" title="Login using Facebook">@icon('brands/facebook')</a>
                         <a href="{{url('/redirect/google')}}" class="btn btn-sm btn-icon btn-{{ get_option('theme_color') }} m-xs" data-rel="tooltip" title="Login using Google">@icon('brands/google')</a>
                         <a href="{{url('/redirect/github')}}" class="btn btn-sm btn-icon btn-{{ get_option('theme_color') }} m-xs" data-rel="tooltip" title="Login using Github">@icon('brands/github')</a>
                         <a href="{{url('/redirect/linkedin')}}" class="btn btn-sm btn-icon btn-{{ get_option('theme_color') }} m-xs" data-rel="tooltip" title="Login using LinkedIn">@icon('brands/linkedin')</a>
                         <a href="{{url('/redirect/gitlab')}}" class="btn btn-sm btn-icon btn-{{ get_option('theme_color') }} m-xs" data-rel="tooltip" title="Login using Gitlab">@icon('brands/gitlab')</a>
-                      </p>
-            @endif
-            
-            <div class="line line-dashed"></div>
+                    </p>
+                @endif
+                <div class="line line-dashed"></div>
 
-            {{-- @if (settingEnabled('allow_client_registration'))
-            <p class="text-muted text-center">
-                <small>@langapp('do_not_have_an_account') </small>
-            </p>
-            <a href="{{ url('/register') }}"
-            class="btn btn-{{ get_option('theme_color') }} btn-block">@langapp('get_your_account') </a>
-            @endif --}}
-            
-            
+                {{-- @if (settingEnabled('allow_client_registration'))
+                <p class="text-muted text-center">
+                    <small>@langapp('do_not_have_an_account') </small>
+                </p>
+                <a href="{{ url('/register') }}"
+                class="btn btn-{{ get_option('theme_color') }} btn-block">@langapp('get_your_account') </a>
+                @endif --}}
+            </div>
+                <div>
+                    {{-- {!! renderButton(langapp('sign_in')) !!} --}}
+                    <button type="submit" class="btn-login-cus bd-round-b-lr btn btn-info btn-block formSaving submit">Login</button>        
+                </div>
             {!! Form::close() !!}
             
             {{-- Footer --}}
@@ -132,6 +120,10 @@
             @endif
             {{-- /Footer --}}
         </section>
+    </div>    
+        <a class="btn btn-link d-block text-center mt-2" href="{{ route('password.request') }}">
+            @langapp('forgot_password')
+        </a>
     </div>
 </section>
 @endsection
