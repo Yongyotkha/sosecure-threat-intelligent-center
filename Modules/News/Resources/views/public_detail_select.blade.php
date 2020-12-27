@@ -5,7 +5,10 @@
     <section class="vbox">
         <div class="section-jumborton">
             {{-- <div class="thumnail-img" style="background-image:url('https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')"></div> --}}
-            <div class="thumnail-img" style="background-image:url('{{@$RSSNews->logo}}')"></div>
+            @if(@$RSSNews->logo)
+                <div class="thumnail-img" style="background-image:url('{{@$RSSNews->logo}}')"></div>
+            @endif
+            
             <div class="jumborton-description">
                 <div class="container-description">
                     <div class="headding-secondary-text" id="detial_new">
@@ -86,18 +89,35 @@
                         <p>“Whenever providing intellectual property access to another organization or individual, it is important to log not only who has access, but when and what data they are accessing. Even better, as in this case with Intel, ensuring that you know where the documents have been shared by potentially marking the document itself, can be very valuable when hunting potential misuse as appears to have occurred here."</p> --}}
                     </div>
                 </div>
-                <div class="col-md-4">
+                      <div class="col-md-4">
+                    @if(@$RSSNews_last10)
                     <ul class="news_related">
                         <li>
                             <h2>Related to This Story</h2>
                         </li>
-                        <li><a href="">Lorem ipsum dolor, sit amet consectetur Lorem ipsum dolor, sit amet consectetur </a></li>
+                        @if(@$RSSNews_last10)
+                        @if($lang == 'th')
+                        @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                        <li><a
+                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_th}}</a>
+                        </li>
+                        @endforeach
+                        @else
+                        @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                        <li><a
+                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_en}}</a>
+                        </li>
+                        @endforeach
+                        @endif
+                        @endif
+                        {{-- <li><a href="">Lorem ipsum dolor, sit amet consectetur Lorem ipsum dolor, sit amet consectetur </a></li>
                         <li><a href="">adipisicing elit. Autem quis cum veniam Autem quis cum veniam</a> </li>
                         <li><a href="">laudantium expedita hic illum optio expedita hic illum</a></li>
                         <li><a href="">laudantium expedita hic illum optio expedita hic illum</a></li>
                         <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li>
-                        <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li>
+                        <li><a href="">eius alias. Eum id odit pariatur, reprehenderit  odit pariatur, reprehenderit</a></li> --}}
                     </ul>
+                    @endif
                 </div>
             </div>
         </div>
@@ -135,6 +155,25 @@
         leftpos = (screen.availWidth - width) / 2;
         toppos = (screen.availHeight - height) / 2;
         window.open(theURL, "viewdetails","width=" + width + ",height=" + height + ",left=" + leftpos + ",top=" + toppos);
+    }
+
+    function printDiv() { 
+        var divContents = document.getElementById("content_news").innerHTML; 
+        var divTopic = document.getElementById("topic_news").innerHTML; 
+        var divDetail = document.getElementById("detial_new").innerHTML; 
+        var a = window.open('', '', 'height=500, width=1000'); 
+        a.document.write('<html>'); 
+        a.document.write('<body > <h1>'); 
+        a.document.write(divTopic);
+        a.document.write('</h1> ');
+        a.document.write(divDetail);
+        a.document.write('<p>'); 
+        a.document.write(divContents); 
+        a.document.write('</p>'); 
+        a.document.write('</body></html>'); 
+        a.document.close(); 
+        a.print();
+
     }
 </script>
 @endpush

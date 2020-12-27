@@ -436,7 +436,24 @@ class RSSFeedSettingsController extends Controller
                 return $html;
             })
             ->addColumn('link', function (RSSNews $model) {
-                return '<a href="#">TH</a> | <a href="#">EN</a>';
+                $html = '';
+                $html_th = '';
+                $html_en = '';
+                $html_line = '';
+                if($model->title_th) {
+                    $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
+                    
+                }
+                if($model->title_en) {
+                    $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
+                    $html_line = ' | ';
+                }
+                
+                
+
+                $html .= $html_th . $html_line . $html_en;
+
+                return $html;
             })
             ->addColumn('status', function (RSSNews $model) {
                 if($model->status == '1') {
