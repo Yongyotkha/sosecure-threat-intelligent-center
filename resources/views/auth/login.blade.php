@@ -5,7 +5,7 @@
     <div id="login-form" class="container aside-xxl animated fadeInUp">
         <div class="box-login-shadow  bd-round-b-lr block bd-round-t-lr">
         <span class="nav-header-login navbar-brand">
-            <img src="{{asset('images/logo_threat/logo_site.png')}}" class="logo-sosecure">
+            <img src="{{asset('images/logo_threat/logo_site.png')}}" class="logo-sosecure mt-2">
             @php $display = get_option('logo_or_icon'); @endphp
             {{-- @if ($display == 'logo' || $display == 'logo_title')
             <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo')) }}"
