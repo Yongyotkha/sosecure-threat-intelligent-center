@@ -10,4 +10,8 @@ class DataLeakSocialRef extends Model
     public function get_data_leak_feed(){
         return $this->belongsTo(DataLeakFeed::class, 'data_leak_feed_id', 'id');
     }
+
+    public function get_site(){
+        return $this->belongsTo(SiteSettings::class, 'site_id', 'id');
+    }
 }
