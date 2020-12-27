@@ -214,11 +214,12 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Asset To Use</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Asset To Use
+                    </h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -237,7 +238,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -255,11 +256,12 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Asset To Use</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Asset To Use
+                    </h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -281,7 +283,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -295,4 +297,11 @@
     </div>
 
 </section>
+
+@push('pagestyle')
+@endpush
+
+@push('pagescript')
+@include('stacks.js.fullscreen')
+@endpush
 @endsection

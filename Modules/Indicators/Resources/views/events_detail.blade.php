@@ -175,7 +175,7 @@
     var pulse_id={!! json_encode($pulse_id) !!};
     var total_page = 0;
     var count_page = -1;
-
+    var count_page2 = -1;
     const chart = new frappe.Chart("#chart-show-bar", { 
         title: "",
         data:{
@@ -253,7 +253,7 @@
                 },
             },
             initComplete : function( settings, json){
-                a = json.recordsTotal;
+                count_page = json.recordsTotal;
                 $('[data-toggle="tooltip"]').tooltip();
             },
             columns: [
@@ -310,12 +310,12 @@
                 type: "POST",
                 url: '{!! route('indicators.events_pulse_table')!!}',
                 dataSrc: function ( json ) {
-                    count_page = json.recordsTotal;
+                    count_page2 = json.recordsTotal;
                     return json.data;
                 },
                 data:function(d){
                     d.pulse_id = pulse_id;
-                    d.count_page = count_page;
+                    d.count_page = count_page2;
                 }
             },
             initComplete : function( settings, json){

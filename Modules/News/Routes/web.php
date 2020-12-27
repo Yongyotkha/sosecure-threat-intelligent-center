@@ -27,4 +27,5 @@ Route::group(
 	}
 );
 
-Route::get('/public/news/detail', 'NewsController@public_detail')->name('news.public_detail');
+Route::get('/public/news/detail/{code}/{lang}', 'NewsController@public_detail_select')->name('news.public_detail_select');
+// Route::get('/public/news/detail', 'NewsController@public_detail')->name('news.public_detail');

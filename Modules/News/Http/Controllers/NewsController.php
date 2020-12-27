@@ -429,6 +429,109 @@ class NewsController extends Controller
        return view('news::public_detail')->with($data);
     }
 
+    public function public_detail_select($code , $lang)
+    {
+
+
+        $RSSNews_prev = '';
+        $RSSNews_next = '';
+        $RSSNews_last10 = '';
+        $lang = 'th';
+        $RSSNews = RSSNews::where("code",$code)->first();
+
+        $cate_id_all = [];
+        if($RSSNews->get_cate) {
+            foreach($RSSNews->get_cate as $cate) {
+                $cate->get_cate_name->id;
+                $cate_id_all[] = intval($cate->get_cate_name->id);
+                // dd($cate->get_cate_name->id);
+            }
+        }
+        // dd($cate_id_all);
+
+
+        if($cate_id_all) {
+            $NewsCategory = RSSNewsCategory::whereIn('news_category_id', $cate_id_all)->where('status',1)->get();
+            // dd($NewsCategory);
+            
+            
+            $rss_news_id_array = [];
+            if($NewsCategory) {
+                foreach($NewsCategory as $NewsCategory_val) {
+                    if($NewsCategory_val->rss_news_id == $RSSNews->id) {
+
+                    } else {
+                        $rss_news_id_array[] = intval($NewsCategory_val->rss_news_id);
+                    }
+                    // dd($topic->topic->id);
+                }
+            }
+            // dd($rss_news_id_array);
+            if($rss_news_id_array) {
+                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
+                // dd($RSSNews_last10);
+            }
+
+
+            $rss_news_id_all_array = [];
+            if($NewsCategory) {
+                foreach($NewsCategory as $NewsCategory_val) {
+                    
+                        $rss_news_id_all_array[] = intval($NewsCategory_val->rss_news_id);
+                    
+                    // dd($topic->topic->id);
+                }
+            }
+            // dd($rss_news_id_all_array);
+            if($rss_news_id_all_array) {
+                $RSSNews_prev = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','<',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                $RSSNews_next = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','>',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                // dd($RSSNews_last10);
+            }
+            
+        }
+
+        // dd($RSSNews_prev);
+        // dd($RSSNews_next);
+        if($lang == 'th') {
+            $RSSNews_name = $RSSNews->title_th;
+            $RSSNews_detail = $RSSNews->detail_th;
+        } else {
+            $RSSNews_name = $RSSNews->title_en;
+            $RSSNews_detail = $RSSNews->detail_en;
+        }
+
+
+        $data['RSSNews_prev'] = $RSSNews_prev;
+        $data['RSSNews_next'] = $RSSNews_next;
+        $data['RSSNews_last10'] = $RSSNews_last10;
+        $data['RSSNews_name'] = $RSSNews_name;
+        $data['RSSNews_detail'] = $RSSNews_detail;
+        $data['lang'] = $lang;
+        $data['RSSNews'] = $RSSNews;
+        $data['page'] = langapp('news_detail');
+        // $RSSNews;
+        $ReadNews_data = ReadNews::where('user_id',@Auth::user()->id)->where('news_id',$RSSNews->id)->where('status',1)->first();
+        if($ReadNews_data) {
+
+        } else {
+            $ReadNews = new ReadNews;
+            $ReadNews->code = generator_uuid();
+            $ReadNews->site_id = null;
+            $ReadNews->user_id = @Auth::user()->id;
+            $ReadNews->news_id = $RSSNews->id;
+            $ReadNews->save();
+        }
+
+
+        $RSSNews->view = $RSSNews->view+1;
+        $RSSNews->save();
+
+
+    //    $data['page'] = langapp('news_detail');
+       return view('news::public_detail_select')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response

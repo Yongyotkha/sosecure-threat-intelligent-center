@@ -1270,17 +1270,19 @@ class IndicatorsController extends Controller
         ];
 
         $options = [
-            'skip' => $start,//10
-            'limit' => $rowperpage//5
+            'skip' => $start,
+            'limit' => $rowperpage,
+            'sort' => [
+                'created' => -1,
+            ]
         ];
-
-       if($request->count_page==-1){
-        $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
-        $count_filter = $cursor_count;
-        // dd($cursor_count);
-       }else{
-        $cursor_count = $request->count_page;
         
+       if($request->count_page==-1){
+            $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+            $count_filter = $cursor_count;
+       }else{
+            $cursor_count = $request->count_page;
+            $count_filter = $cursor_count;
        }
        
 
@@ -1318,8 +1320,6 @@ class IndicatorsController extends Controller
              );
    
         }
-        $keysort = array_column($data, "Date");
-        array_multisort($keysort, SORT_DESC, $data);
         
         $total_record = $cursor_count;
         $total_count_filter = $count_filter;

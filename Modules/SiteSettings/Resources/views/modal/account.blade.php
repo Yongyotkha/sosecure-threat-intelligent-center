@@ -1,4 +1,4 @@
-<div class="modal-dialog">
+<div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         @if($type == 'hosting')
             <div class="modal-header">

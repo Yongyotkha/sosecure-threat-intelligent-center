@@ -17,7 +17,7 @@ class LogsSetting extends Model {
     protected $dates   = ['created_at', 'updated_at'];
 
 
-    public function get_data($site_id){
-        return $this->select('*')->where('site_id', $site_id)->first();
+    public function get_data($site_id,$type){
+        return $this->select('*')->where('site_id', $site_id)->where('type', $type)->first();
     }
 }

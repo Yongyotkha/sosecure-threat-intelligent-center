@@ -87,14 +87,14 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Vulnerability Logs' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Indicators Logs' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Indicators
         </a>
         <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
-                <a href="{{route('vulsetting.vul_logs', ['id' => $siteSettings->code])}}">
+                <a href="{{route('indisetting.indi_logs', ['id' => $siteSettings->code])}}">
                     Logs
                 </a>
             </li>
