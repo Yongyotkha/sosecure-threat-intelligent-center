@@ -11,7 +11,7 @@ class cve_assets extends Model {
     protected $table = "cve_assets";
     public $timestamps = true;
     protected $fillable = [
-        'id','code','vendor', 'title', 'version', 'edition', 'Hostname', 'Site', 'IP', 'created_by', 'updated_by', 'site_id'
+        'id','code','vendor', 'title', 'version', 'edition', 'Hostname', 'Site', 'IP', 'created_by', 'updated_by', 'site_id' , 'active'
     ];
     protected $dates   = ['created_at', 'updated_at'];
 
