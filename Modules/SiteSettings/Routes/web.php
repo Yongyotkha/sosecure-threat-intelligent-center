@@ -95,6 +95,8 @@ Route::group(
         Route::post('/vulnerability_assets/save/{code}', 'VulnerabilityController@saveCveAsset')->name('vul_assets.save')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
 
         Route::get('/keywordsetting/{id}', 'DataLeakController@keyword')->name('keyword.index')->middleware('can:menu_items');
+       
+        Route::get('/assets/{id}', 'AssetsSiteController@assets')->name('assetssite.index')->middleware('can:menu_items');
 
         Route::get('/socialdatas/{id}', 'DataLeakController@socialdatas')->name('socialdatas.index')->middleware('can:menu_items');
         Route::get('/darkweb_datas/{id}', 'DataLeakController@darkweb_datas')->name('darkweb_datas.index')->middleware('can:menu_items');

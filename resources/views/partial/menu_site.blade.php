@@ -31,7 +31,7 @@
     </li>
 
     <li class="{{ $page === 'Assets' ? 'active' : '' }}">
-        <a href="#">
+        <a href="{{route('assetssite.index', ['id' => $siteSettings->code])}}">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Assets
         </a>
