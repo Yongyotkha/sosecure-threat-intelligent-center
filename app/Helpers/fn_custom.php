@@ -90,15 +90,15 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
     $html = '';
     if($badg == 'badg') {
         if(strtolower($status_id) == strtolower("CRITICAL")) {
-            $html = '<span class="badge badge-secondary" style="background-color: #b30000;">'.$num_val.' CRITICAL</span>';
+            $html = '<span class="badge badge-secondary" style="background-color: #265c94;">'.$num_val.' CRITICAL</span>';
         } else if(strtolower($status_id) == strtolower("HIGH")) {
-            $html = '<span class="badge badge-Warning" style="background-color: #d9534f;">'.$num_val.' HIGH</span>';
+            $html = '<span class="badge badge-Warning" style="background-color: #6df3f7;">'.$num_val.' HIGH</span>';
         } else if(strtolower($status_id) == strtolower("MEDIUM")) {
-            $html = '<span class="badge badge-Warning" style="background-color: #ec971f;">'.$num_val.' MEDIUM</span>';
+            $html = '<span class="badge badge-Warning" style="background-color: #34b4ef;">'.$num_val.' MEDIUM</span>';
         } else if(strtolower($status_id) == strtolower("LOW")) {
-            $html = '<span class="badge badge-Success" style="background-color: #bfff00;">'.$num_val.' LOW</span>';
+            $html = '<span class="badge badge-Success" style="background-color: #a1dcff;">'.$num_val.' LOW</span>';
         } else if(strtolower($status_id) == strtolower("NONE")) {
-            $html = '<span class="badge badge-Success" style="background-color: #40ff00;">'.$num_val.' NONE</span>';
+            $html = '<span class="badge badge-Success" style="background-color: #d3d3d3;">'.$num_val.' NONE</span>';
         }
     } else {
         if(strtolower($status_id) == strtolower("CRITICAL")) {
