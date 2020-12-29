@@ -2110,16 +2110,16 @@ ul.topics-news-list li a:hover{
     background: #263042b0;
 }
 .dot.critical{
-    background-color: #ff0000 !important;
+    background-color: #265c94 !important;
 }
 .dot.high{
-    background-color: #ff6600 !important;
+    background-color: #6df3f7 !important;
 }
 .dot.medium{
-    background-color: #ffcc00 !important;
+    background-color: #34b4ef !important;
 }
 .dot.low{
-    background-color: #ffffcc !important;
+    background-color: #a1dcff  !important;
 }
 .dot.none{
     background-color: #d3d3d3 !important;
@@ -2166,7 +2166,7 @@ ul.topics-news-list li a:hover{
     background-color: #f3f3f3;
     /* border-radius: 25px; */
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    min-height: 235px;
+    min-height: 237px;
     padding: 2rem;
     display: flex;
     flex-direction: column;

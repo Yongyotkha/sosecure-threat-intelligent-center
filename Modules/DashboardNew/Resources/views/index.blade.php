@@ -1,314 +1,579 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .tooltip-inner {
+        max-width: 500px;
+        /* If max-width does not work, try using width instead */
+        width: 500px;
+    }
+
+    .w-200 {
+        width: 200px !important;
+    }
+</style>
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a> --}}
             <div class="bc-head">@langapp('dashboard')</div>
+
+            <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span>@langapp('Search_Advance')</span>
+            </a>
+
+            <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;"
+                    onchange="changeSite(value)">
+                    
+                </select>
+            </div>
         </header>
 
-        <section class="scrollable wrapper bg-grey pd-0">
-            <div class="container-fluid pd-0">
-                <div class="row">
-                    <div class="col-md-12">
-                        <header class="header-text-badge"><i class="fas fa-network-wired"></i>&nbsp; Asset</header>
-                        <div class="main-dash">
-                            <div class="main-dash-box">
-                                Core Variables
-                                <ul class="item-list-dash">
-                                    <li>
-                                        <div class="item-dash bg-blue">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                </ul>
+        <section class="scrollable wrapper">
+            <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                <div class="container-fluid" style="padding: 2rem;">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group m-b-md">
+                                <label for="" class="">Keyword</label>
+                                <input type="text" class="form-control" name="keywords" id="keywords"
+                                    placeholder="Search">
                             </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="" class="">Assets</label>
 
-                            <div class="main-dash-box">
-                                Reset Styles
-                                <ul class="item-list-dash">
-                                    <li>
-                                        <div class="item-dash bg-gray">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-gray">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-gray">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-gray">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                            <select name="assets" id="assets" class="select2-option form-control">
+                              
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
 
-                            <div class="main-dash-box">
-                                Core
-                                <ul class="item-list-dash">
-                                    <li>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-yellow">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                </ul>
+                        <div class="col-md-4">
+                            <label for="" class="d-block">Date</label>
+                            <div id="reportrange"
+                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-top: 5px;margin-bottom:0;">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down"></i>
                             </div>
+                        </div>
 
-                            <div class="main-dash-box">
-                                Components
-                                <ul class="item-list-dash">
-                                    <li>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-red">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                </ul>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="" class="">CVSS Severity</label>
+                                <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
+                                    <option value="CRITICAL">CRITICAL</option>
+                                    <option value="HIGH">HIGH</option>
+                                    <option value="MEDIUM">MEDIUM</option>
+                                    <option value="LOW">LOW</option>
+                                    <option value="NONE">NONE</option>
+                                </select>
                             </div>
-
-                            <div class="main-dash-box">
-                                Ultilities
-                                <ul class="item-list-dash">
-                                    <li>
-                                        <div class="item-dash bg-purple">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-purple">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-purple">
-                                            216.58.193.220
-                                        </div>
-                                        <div class="item-dash bg-purple">
-                                            216.58.193.220
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="m-0" style="margin-top: 28px !important">
+                                <input type="checkbox" name="acceptRules" class="inline checkbox" id="is_fix"
+                                    value="false">
+                                <span class="label-text" style="font-weight: bold;font-size:16px;">IS Fixed</span>
+                            </label>
+                            <div id="checkbox-value"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-right mt-2">
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive"
+                                onclick="search()">
+                                <i class="fas fa-search"></i>
+                                Search
+                            </button>
+                            <button class="btn btn-default" id="clear_data" type="reset">
+                                <i class=" fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="container-fluid">                 
+            </section>
+
+
+            <div id="load_chart">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-lg-12 col-md-12" id="count_cve"></div>
+                    <div class="col-md-12">
                         <section class="panel panel-default">
-                        <div class="card-list">
-                            <header class="header-text-badge"><i class="fas fa-project-diagram"></i>&nbsp; Top Asset</header>
-                            <table class="table table-striped">
-                                <tr>
-                                    <th width="50%">Asset name</th>
-                                    <th width="50%">Data</th>
-                                </tr>
-                                <tr>
-                                    <td>Lorem ipsum dolor sit amet.</td>
-                                    <td>Lorem ipsum dolor sit amet </td>
-                                </tr>
-                                <tr>
-                                    <td>Lorem ipsum dolor sit amet.</td>
-                                    <td>Lorem ipsum dolor sit amet </td>
-                                </tr>
-                                <tr>
-                                    <td>Lorem ipsum dolor sit amet.</td>
-                                    <td>Lorem ipsum dolor sit amet </td>
-                                </tr>
-                                <tr>
-                                    <td>Lorem ipsum dolor sit amet.</td>
-                                    <td>Lorem ipsum dolor sit amet </td>
-                                </tr>
-                            </table>
-                        </div>
+                            <header class="panel-heading font-bold panel-header-blue">
+                                <div class="row d-flex-center">
+                                    <div class="col-xs-6">
+                                        <i class="fas fa-chart-pie"></i> Summary Dashboard
+                                    </div>
+                                    <div class="col-xs-6 text-right">
+                                        Current Date : <i class="fas fa-calendar"></i> 2020-01-01
+                                        {{-- <button id="togglecollapsechart" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#chart-container','#togglecollapsechart')">
+                                            <i class="fas fa-minus-square"></i>Collapse
+                                        </button> --}}
+                                    </div>
+                                </div>
+                            </header>
+
+                            <div class="panel-body" id="chart-container">
+                                <div class="row">
+                                    <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px">
+                                        <div class="row">
+                                            <div class="col-md-12 mb-small-5px">
+                                                <div class="card-dash">
+                                                    <div class="left-card">
+                                                        <div class="img-icon-card">
+                                                            <img src="{{asset('images/compromise.png')}}" alt="">
+                                                        </div>
+                                                        <h3 class="name-dash-text text-dark">Compromise</h3>
+                                                        <span class="number-card info">73</span>
+                                                    </div>
+                                                   
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 mb-small-5px">
+                                                <div class="card-dash">
+                                                    <div class="left-card">
+                                                        <div class="img-icon-card">
+                                                            <img src="{{asset('images/hacker.png')}}" alt="">
+                                                        </div>
+                                                        <h3 class="name-dash-text text-dark">Phishing</h3>
+                                                        <span class="number-card green">13</span>
+                                                    </div>
+                                             
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 mb-small-5px">
+                                                <div class="card-dash">
+                                                    <div class="left-card">
+                                                        <div class="img-icon-card">
+                                                            <img src="{{asset('images/settings.png')}}" alt="">
+                                                        </div>
+                                                        <h3 class="name-dash-text text-dark">Vulnerability</h3>
+                                                        <span class="number-card grey">35</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 mb-small-5px">
+                                                <div class="card-dash">
+                                                    <div class="left-card">
+                                                        <div class="img-icon-card">
+                                                            <img src="{{asset('images/data_lead.png')}}" alt="">
+                                                        </div>
+                                                        <h3 class="name-dash-text text-dark">Data Lead</h3>
+                                                        <span class="number-card warning">73</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-9 col-lg-9 col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="box-chart-color">
+                                                    <div class="d-flex align-items-center header-chart-p">
+                                                        <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                                        <h1 class="text-blue">Vulnerability Severity</h1>
+                                                    </div>
+                                                    <div class="divider-dark"></div>
+                                                    <div id="chart-show-hl"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="box-chart-color">
+                                                    <div class="d-flex align-items-center header-chart-p">
+                                                        <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
+                                                        <h1 class="text-blue">Severity </h1>
+                                                    </div>
+                                                    <div class="divider-dark"></div>
+                                                    <div id="chart-show-pie"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="box-chart-color">
+                                                    <div class="d-flex align-items-center header-chart-p">
+                                                        <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
+                                                        
+                                                        <h1 class="text-blue">Indicators</h1>
+                                                    </div>
+                                                    <div class="divider-dark"></div>
+                                                    <div id="chart-show-line"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="box-chart-color">
+                                                    <div class="d-flex align-items-center header-chart-p">
+                                                        <img src="{{asset('images/table.png')}}" alt="" height="30px">
+                                                        <h1 class="text-blue">Assets</h1>
+                                                    </div>
+                                                    <div class="divider-dark"></div>
+                                                    <div class="table-responsive" style="max-height:400px;min-height: 400px;overflow: auto;">
+                                                        <table class="table table-striped" id="table-assets">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Assets</th>
+                                                                    <th>Referent</th>
+                                                                    <th>View</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span>Sosecure.co.th</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span>172.67.71.227</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </section>
                     </div>
-                    <div class="col-md-9">
-                        <div class="row m-b-md">
-                            <div class="col-md-3">
-                                <div class="dash-card">
-                                    <div class="dash-name">
-                                        Compromise System
-                                    </div>
-                                    <div class="dash-count color-purple">
-                                        0
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="dash-card">
-                                    <div class="dash-name">
-                                        Compromise Account
-                                    </div>
-                                    <div class="dash-count color-red">
-                                        1
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="dash-card">
-                                    <div class="dash-name">
-                                        CVE Detect
-                                    </div>
-                                    <div class="dash-count color-yellow">
-                                        60
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="dash-card">
-                                    <div class="dash-name">
-                                        Malware Infected
-                                    </div>
-                                    <div class="dash-count color-blue">
-                                        28
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="dash-card">
-                                    <div class="dash-name">
-                                        Dark Lark (Dark Web)
-                                    </div>
-                                    <div class="dash-count color-green">
-                                        19
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="dash-card">
-                                    <div class="dash-name">
-                                        Data Lark (Social)
-                                    </div>
-                                    <div class="dash-count color-light-purple">
-                                        0
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
+
         </section>
+
+
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
-
-
 @push('pagestyle')
-    @include('stacks.css.datatables')
+@include('stacks.css.datatables')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+@include('stacks.css.highchart')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
 @include('stacks.js.datatables')
+@include('stacks.js.datepicker')
+@include('stacks.js.daterangpicker')
+@include('stacks.js.chart')
+@include('stacks.js.form')
+@include('stacks.js.highchart')
 
 <script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip(); 
+    });
+
+    function collpase_chart(id,text){
+        $(id).slideToggle();
+        if($(text).text() == 'Expanded'){
+            $(text).html('<i class="fas fa-minus-square"></i>Collapse');
+        }else{
+            $(text).html('<i class="fas fa-plus-square"></i>Expanded');
+        }
+    }
+
+    $('#area-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#area-advance-search').toggle();
+    });
 
 </script>
+
+<script type="text/javascript">
+ $(function() {
+    
+        var start = moment().startOf('hour');
+        var end = moment().startOf('hour').add(32, 'hour');
+
+        function cb(start, end) {
+            $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            startDate = start;
+            endDate = end;
+        }
+
+        $('#reportrange').daterangepicker({
+            timePicker: true,
+            startDate: start,
+            endDate: end,
+            locale: {
+                format: 'M/DD hh:mm A'
+            },
+            ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+        $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = 1;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+            }
+        });
+
+        cb(start, end);
+    });
+
+
+    const chartstack = new Highcharts.chart('chart-show-hl', {
+        chart: {
+            height: 400, 
+            type: 'bar'
+        },
+        title: {
+            text: null
+        },
+        xAxis: {
+            categories: ['Host name 1', 'Host name 2', 'Host name 3', 'Host name 4', 'Host name 5']
+        },
+        yAxis: {
+            min: 0,
+            title: {
+            text: null
+            }
+        },
+        legend: {
+            reversed: true
+        },
+        plotOptions: {
+            series: {
+            stacking: 'normal',
+            dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            name: 'Critical',
+            data: [5, 3, 4, null, 2],
+            color: '#265c94',
+        }, {
+            name: 'High',
+            data: [2, 2, null, 2, 1],
+            color: '#6df3f7'
+        }, {
+            name: 'Medium',
+            data: [3, null, 4, 2, 5],
+            color: '#34b4ef'
+        }, {
+            name: 'Low',
+            data: [null, 4, 4, 2, 5],
+            color: '#a1dcff '
+        }, {
+            name: 'infomation',
+            data: [3, 4, 4, 2, null],
+            color: '#d3d3d3'
+        },
+        ]
+        });
+
+
+        const chart_pie = new Highcharts.chart('chart-show-pie', {
+            chart: {
+                height: 400, 
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: ''
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    color: ['#265c94', '#6df3f7', '#34b4ef', '#a1dcff ', '#d3d3d3'],
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    },
+                }
+            },
+            series: [{
+                colorByPoint: false,
+                data: [
+                {  name: 'Critical',   y: 12, color: '#265c94'  },
+                {  name: 'High',  y: 14 , color: '#6df3f7'}, 
+                {  name: 'Medium', y: 12, color: '#34b4ef'  }, 
+                {  name: 'Low',   y: 33, color: '#a1dcff '  },
+                {  name: 'Information',   y: 44, color: '#d3d3d3'  },
+                ],  
+            }]
+        });
+
+
+        const chart_line = new Highcharts.chart('chart-show-line', {
+            chart: {
+                height: 400, 
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'line'
+            },
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                title: {
+                text: 'Number (Months)'
+                }
+            },
+            plotOptions: {
+                line: {
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+                }
+            },
+            series: [
+            {
+                name: 'Number of Months',
+                data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
+                color: '#3984e7'
+            }, 
+            ]
+        });
+
+
+</script>
+
 @endpush
 @endsection
