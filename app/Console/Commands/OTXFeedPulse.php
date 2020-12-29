@@ -64,7 +64,8 @@ class OTXFeedPulse extends Command
         //$this->testfun();
         // $this->queryModel();
         // $this->queryMD();
-        $this->queryMD2();
+        //$this->queryMD2();
+        $this->queryMD3();
     }
 
     public function queryModel(){
@@ -116,6 +117,55 @@ class OTXFeedPulse extends Command
         echo json_encode($documentAll);
     }
 
+
+    public function queryMD3(){
+        $teststring = 'Forums\nSearch Forums\nRecent Posts\nMembers\nNotable Members\nRegistered Members\nCurrent 
+        Visitors\nRecent Activity\nHome\nForums\nSearch Forums\nFeatured Threads Archive\nПрикрепленные темы\nRe
+        cent Posts\nMembers\nNotable Members\nRegistered Members\nCurrent Visitors\nRecent Activity\nNew Profile 
+        Posts\nRecent Posts\nMenu\nLog in\nАНОНИМНЫЕ ВЫДЕЛЕННЫЕ СЕРВЕРА И VPS ПОД ЛЮБЫЕ ЗАДАЧИ И ЦЕЛИ\nРаскрутка сайт
+        а: *Вывод в ТОП-10 Я и G, поднятие ИКС , 3000+ отзывов*\nWhatsApp Рассылка до 1.2р/сбщ. До 300к в день. ТЕСТ Бесп
+        л!\nSearch titles only\nPosted by Member:\nSeparate names with a comma.\nNewer Than:\nSearch this thread only\nSea
+        rch this forum only\nDisplay results as threads\nMore...\nUseful Searches\nRecent Posts\nANTICHAT - Security online co
+        mmunity\n>\nБезопасность и Уязвимости\n>\nБеспроводные технологии/Wi-Fi/Wardriving\n>\nБрут роутера с помощью thc-hydra
+         (мануал для новичков)\nDiscussion in Беспроводные технологии/Wi-Fi/Wardriving started by Kevin Shindel, 27 Jan 2016.\nPa
+         ge 8 of 9\n< Prev\n1\n←\n4\n5\n6\n7\n8\n→\n9\nNext >\nbinarymaster\nElder - Старейшина\nJoined:\n11 Dec 2010\nMessages:\n4,
+         587\nLikes Received:\n9,734\nReputations:\n120\nShnaidt said:\n↑\nВот здесь надо смотреть?\nClick to expand...\nДа.\nShnai
+         dt said:\n↑\nА где его посмотреть?\nClick to expand...\nТам же, только во вкладке "Preview". Либо в этой же вкладке, но ни
+         же.\nВообще советую использовать сторонний прозрачный прокси типа Charles для перехвата запросов, поскольку в хроме список 
+         всех запросов очищается после перехода на другую страницу.\n\xa0\n#141\nbinarymaster,\n17 Jan 2020\nShnaidt\nNew Member\nJo
+         ined:\n13 Jan 2020\nMessages:\n40\nLikes Received:\n0\nReputations:\n0\nbinarymaster said:\n↑\nДа.\nТам же, только во вкладке
+          "Preview". Либо в этой же вкладке, но ниже.\nВообще советую использовать сторонний прозрачный прокси типа Charles для перехва
+          та запросов, поскольку в хроме список всех запросов очищается после перехода на другую страницу.\nClick to expand...\nLive HT
+          TP Headers - подойдет?\n\xa0\n#142\nShnaidt,\n17 Jan 2020\nbinarymaster\nElder - Старейшина\nJoined:\n11 Dec 2010\nMessages:\
+          n4,587\nLikes Received:\n9,734\nReputations:\n120\nShnaidt said:\n↑\nLive HTTP Headers - подойдет?\nClick to expand...\nДумаю 
+          да. Только POST запрос смотрите, а не css файл.\n\xa0\n#143\nbinarymaster,\n17 Jan 2020\nms13 likes this.\nShnaidt\nNew Membe
+          r\nJoined:\n13 Jan 2020\nMessages:\n40\nLikes Received:\n0\nReputations:\n0\nbinarymaster said:\n↑\nТолько POST запрос смотри
+          те, а не css файл\nClick to expand...\nВот что в POST, но что из этого использовать так и не понятно.\nCode:\nRequest URL: h
+          ttp://192.168.0.1/\nRequest Method: POST\nStatus Code: 302 Moved Temporarily\nRemote Address: 192.168.0.1:80\nReferrer Policy
+          : no-referrer-when-downgrade\nAccept-Ranges: bytes\nCache-Control: no-cache,no-store\nConnection: close\nContent-Length: 7083
+          1\nContent-Type: text/html; charset=utf-8\nLocation: /\nServer: ZTE web server 1.0 ZTE corp 2015.\nSet-Cookie: SID=591958f228
+          7dd45014d2cfd44048f3883d4a91ce9424fab65d53077f664e0702; PATH=/; HttpOnly\nSet-Cookie: SID=591958f2287dd45014d2cfd44048f388
+          3d4a91ce9424fab65d53077f664e0702; PATH=/; HttpOnly\nX-Content-Type-Options: nosniff\nX-Frame-Options: SAMEORIGIN\nX-XSS-Pro
+          tection: 1; mode=block\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,appl
+          ication/signed-exchange;v=b3;q=0.9\nAccept-Encoding: gzip, deflate\nAccept-Language: ru,en;q=0.9\nCache-Control: max-age=
+          0\nConnection: keep-alive\nContent-Length: 101\nContent-Type: application/x-www-form-urlencoded\nCookie: SID=591958f2287dd4
+          5014d2cfd44048f3883d4a91ce9424fab65d53077f664e0702; _TESTCOOKIESUPPORT=1\nHost: 192.168.0.1\nOrigin: http://192.168.0.1\nRe
+          ferer: http://192.168.0.1/\nUpgrade-Insecure-Requests: 1\nUser-Agent: Mozilla/5.0 (Linux; Android 
+          6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 M
+          obile Safari/537.36\nUsername: admin\nPassword: 05d23db3872087f5580b2d07da2f478e9b0a6ff7ef425
+          81c9d6d2d26fb3f8469\naction: login\n\xa0\n#144\nShnaidt,\n17 Jan 2020\nShnaidt\nNew Member\nJoined
+          :\n13 Jan 2020\nMessages:\n40\nLikes Received:\n0\nReputations:\n0\nxxxsert said:\n↑\nЭто заголовки, ну
+          жен зам запрос.\nClick to expand...\nЗдесь есть?\n\xa0\nAttached Files:\nФайл.txt\nFile size:\n124.9 KB\nV
+          iews:\n204\n#145\nShnaidt,\n17 Jan 2020\nxxxsert\nWell-Known Member\nJoined:\n15 Sep 2019\nMessages:\n166\n
+          Likes Received:\n322\nReputations:\n1\nShnaidt said:\n↑\nЗдесь есть?\nClick to expand...\nПараметры POST-запроса:
+          \n';
+          $site_domain = '192.168.0.1';
+          $implodeValue = preg_split("/\\r\\n|\\r|\\n/", $teststring);
+          $keyIndex = array_keys(array_filter($implodeValue, function($var) use ($site_domain){
+            return stripos($var, $site_domain) !== false;
+        }));
+        echo json_encode($keyIndex);
+    }
 
     public function queryMD(){
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");

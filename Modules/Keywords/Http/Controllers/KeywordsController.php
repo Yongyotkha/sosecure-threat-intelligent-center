@@ -143,6 +143,12 @@ class KeywordsController extends Controller
                 }
             )
             ->editColumn(
+                'type',
+                function ($model) {
+                    return $model->type;
+                }
+            )
+            ->editColumn(
                 'last_update',
                 function ($model) {
                     if($model->updated_at) {

@@ -174,9 +174,11 @@ class MDFeedDarkWeb extends Command
                     $site_Data["site_name"] = $Site_payload["name"];
                     $site_Data["site_domain"] = $Site_payload["get_domains_default"][0]["domain"];
                     $site_Data["site_domain_name"] = $Site_payload["get_domains_default"][0]["name"];
+                    $site_Data["site_domain_ip"] = $Site_payload["get_domains_default"][0]["IP"];
                     $getIDStamp = $this->createStamp($site_Data);
                     $saveCheck = $_clientHttp["success"];
-                    echo $_clientHttp["total"] . "All_DATA";
+                    echo $_clientHttp["total"] . " : IS All_DATA";
+                    $this->info(json_encode($site_Data));
                     if($_clientHttp["total"]>0){
                         if ($_clientHttp["total"] <= 20) {
                             //echo json_encode($_clientHttp["alldata"]);
@@ -314,8 +316,12 @@ class MDFeedDarkWeb extends Command
         if (count($all_data["results"]) > 0) {
             foreach ($all_data["results"] as $value) {
                 $implodeValue = preg_split("/\\r\\n|\\r|\\n/", $value["body"]);
-                $site_domain = $site_Data["site_domain"];
                 
+                if($site_Data["site_type_search"] == "ip"){
+                    $site_domain = $site_Data["site_domain_ip"];
+                }else{
+                    $site_domain = $site_Data["site_domain"];
+                }
                 $keyIndex = array_keys(array_filter($implodeValue, function($var) use ($site_domain){
                     return stripos($var, $site_domain) !== false;
                 }));
@@ -327,7 +333,8 @@ class MDFeedDarkWeb extends Command
                     }
                 }
 
-                
+                $site_domain = $site_Data["site_domain"];
+
                 if(!empty($value["emails"])){
                     $keyIndex_2 = array_keys(array_filter($value["emails"], function($var) use ($site_domain){
                         return stripos($var, $site_domain) !== false;
@@ -341,11 +348,13 @@ class MDFeedDarkWeb extends Command
                 }
 
 
+
                     $findUnique = $col_fx_transaction_darkweb_data->findOne(
                         [
                             'darkweb_id' => @$value["id"],
                             'transaction_site_id' => @$site_Data["site_id"],
-                            'transaction_site_type_search' => @$site_Data["site_type_search"]
+                            'transaction_site_type_search' => @$site_Data["site_type_search"],
+                            'transaction_site_domain' => @$site_Data["site_domain"]
                         ], 
                         [
                             'projection' => [
@@ -373,6 +382,7 @@ class MDFeedDarkWeb extends Command
                             'transaction_site_name' => @$site_Data["site_name"],
                             'transaction_site_domain' => @$site_Data["site_domain"],
                             'transaction_site_domain_name' => @$site_Data["site_domain_name"],
+                            'transaction_site_domain_ip' => @$site_Data["site_domain_ip"],
                             'updated_at' => $date_now,
                             'updated_by' => "system",
                             'transcation_id' => $get_InsertedId,
@@ -430,7 +440,7 @@ class MDFeedDarkWeb extends Command
         $_dataOut["result"] = "";
         $_dataOut["success"] = false;
         while ($_otxReconnect && $_reconnect < $limit) {
-            sleep(1);
+            sleep(3);
             try {
                 $_bodyData = $_clientHttp->request(
                     'GET',

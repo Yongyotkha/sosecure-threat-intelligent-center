@@ -56,6 +56,7 @@
                                                 </label>
                                             </th>
                                             <th>@langapp('keyword')</th>
+                                            <th>@langapp('type')</th>
                                             <th style="width: 150px;">Last @langapp('update')</th>
                                             <th style="width: 100px;">@langapp('status')</th>
                                             <th class="no-sort" style="width: 100px;">@langapp('action')</th>
@@ -235,6 +236,10 @@
                 {
                     data: 'name',
                     name: 'name'
+                },
+                {
+                    data: 'type',
+                    name: 'type'
                 },
                 {
                     data: 'last_update',
