@@ -171,7 +171,7 @@
 
     {{--$('#table-attributes-template').DataTable();
     $('#table-related-event').DataTable();--}}
-
+    count_view_event();
     var pulse_id={!! json_encode($pulse_id) !!};
     var total_page = 0;
     var count_page = -1;
@@ -193,7 +193,7 @@
   $(function() {
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');
-
+        
         function cb(start, end) {
             $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
             startDate = start;
@@ -403,7 +403,25 @@
     
     }
 
-   
+    function count_view_event(){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/count_view_event",
+            type: "get",
+            data: ({
+                pulse_id:{!! json_encode($pulse_id) !!},
+            }),
+            datatype: "html",
+            beforeSend: function(){
+            },
+        }).done(function(data){
+            console.log("sss");
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
 
 
     

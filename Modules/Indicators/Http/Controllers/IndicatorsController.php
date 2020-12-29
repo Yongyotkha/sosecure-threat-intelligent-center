@@ -1611,4 +1611,33 @@ class IndicatorsController extends Controller
 
     }
 
+    public function count_view(Request $request) {
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $options = array(
+            'typeMap' => array(
+                'root' => 'array',
+                'document' => 'array',
+            ),
+        );
+        $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id),$options);
+        if($document){
+            $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                ['_id' => $document['_id']],
+                ['$set' => [
+                    'count_view' => $document['count_view']+1
+                    ]
+                ]
+            );
+        }
+        
+        if ($request->ajax()) {
+            $data = [
+                "count" => $document['count_view']+1,
+            ];
+            return response()->json($data);
+        }
+    }
+
 }
