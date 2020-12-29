@@ -13,23 +13,16 @@
 </style>
 <section id="content" class="bg">
     <section class="vbox">
-        {{-- <header class="header panel-heading bg-white b-b b-light">
-            <div class="bc-head">@langapp('dashboard')</div>
+        <header class="header panel-heading bg-white b-b b-light">
+            <div class="bc-head">Summary Dashboard</div>
 
-            <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span>@langapp('Search_Advance')</span>
-            </a>
-
-            <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;"
-                    onchange="changeSite(value)">
-                    
-                </select>
+            <div class="pull-right" style="margin-top: 15px">
+                Current Date : <i class="fas fa-calendar"></i> 2020-01-01
             </div>
-        </header> --}}
+        </header>
 
         <section class="scrollable wrapper" style="padding:0;">
-            <section class="panel panel-default" id="area-advance-search" style="display: none;">
+            {{-- <section class="panel panel-default" id="area-advance-search" style="display: none;">
                 <div class="container-fluid" style="padding: 2rem;">
                     <div class="row">
                         <div class="col-md-8">
@@ -93,7 +86,7 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> --}}
 
 
             <div id="load_chart">
@@ -101,19 +94,16 @@
                     <div class="col-lg-12 col-md-12" id="count_cve"></div>
                     <div class="col-md-12">
                         <section class="">
-                            <header class="panel-heading font-bold panel-header-blue">
+                            {{-- <header class="panel-heading font-bold panel-header-blue">
                                 <div class="row d-flex-center">
                                     <div class="col-xs-6">
                                         <i class="fas fa-chart-pie"></i> Summary Dashboard
                                     </div>
                                     <div class="col-xs-6 text-right">
                                         Current Date : <i class="fas fa-calendar"></i> 2020-01-01
-                                        {{-- <button id="togglecollapsechart" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#chart-container','#togglecollapsechart')">
-                                            <i class="fas fa-minus-square"></i>Collapse
-                                        </button> --}}
                                     </div>
                                 </div>
-                            </header>
+                            </header> --}}
 
                             <div class="panel-body" id="chart-container">
                                 <div class="row">
