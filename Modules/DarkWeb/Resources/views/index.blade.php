@@ -5,7 +5,7 @@
 
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            <div class="bc-head">@langapp('data_leak') > @langapp('dark_web')</div>    
+            <div class="bc-head"> @langapp('dark_web')</div>    
 
             <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
