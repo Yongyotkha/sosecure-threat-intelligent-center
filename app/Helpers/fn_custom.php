@@ -98,7 +98,7 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
         } else if(strtolower($status_id) == strtolower("LOW")) {
             $html = '<span class="badge badge-Success" style="background-color: #88ce4f;">'.$num_val.' LOW</span>';
         } else if(strtolower($status_id) == strtolower("NONE")) {
-            $html = '<span class="badge badge-Success" style="background-color: #d3d3d3;">'.$num_val.' NONE</span>';
+            $html = '<span class="badge badge-Success" style="background-color: #d3d3d3;">'.$num_val.' INFORMATION</span>';
         }
     } else {
         if(strtolower($status_id) == strtolower("CRITICAL")) {
