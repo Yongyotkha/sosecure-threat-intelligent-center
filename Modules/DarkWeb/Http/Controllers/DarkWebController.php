@@ -2,6 +2,7 @@
 
 namespace Modules\DarkWeb\Http\Controllers;
 
+use Modules\SiteSettings\Entities\SiteSettings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -32,6 +33,9 @@ class DarkWebController extends Controller
      */
     public function index()
     {
+
+        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('dark_web');
         return view('darkweb::index')->with($data);
     }
