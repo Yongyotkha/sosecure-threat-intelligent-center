@@ -93,11 +93,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="table_social_data();">
+                                    <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive" onclick="table_social_data();">
                                         <i class="fas fa-search"></i>
                                         Search
                                     </button>
-                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                    <button type="button" id="btn_data_leak_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
                                     </button>
@@ -278,13 +278,55 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
 <script>
+    var search_val = 0;
+    var start_date = '';
+    var end_date = '';
 
 $(function() {
     table_social_data();
 });
 
+
+$(function() { 
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+    function cb(start, end) {
+        $('#datafeed_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
+    $('#datafeed_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    cb(start, end);
+});
+
+
+
+$("#btn_data_leak_search").click(function() {
+    search_val = 1;
+    table_social_data();
+});
+
+$("#btn_data_leak_reset").click(function() {
+    search_val = 0;
+    table_social_data();
+});
+
 function table_social_data(){
     let search = $('#search').val();
+    let source_select = $('#source_select').val();
     $('#table_data_feed').DataTable({
         processing: true,
         serverSide: true,
@@ -293,7 +335,11 @@ function table_social_data(){
         ajax: {
             url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
             data: {
+                "search_val" : search_val,
                 "search" : search,
+                "source_select" : source_select,
+                "start_date" : start_date,
+                "end_date" : end_date,
             },
             type: "POST",
         },
@@ -349,30 +395,7 @@ $('#table_data_feed').on('click', '.data_feed_id', function () {
     }
 });
 
-$(function() { 
-    var start = moment().startOf('hour');
-    var end = moment().startOf('hour').add(32, 'hour');
-    function cb(start, end) {
-        $('#datafeed_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-    $('#datafeed_date').daterangepicker({
-        timePicker: true,
-        startDate: start,
-        endDate: end,
-        locale: {
-            format: 'M/DD hh:mm A'
-        },
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, cb);
-    cb(start, end);
-});
+
 
 function approve_dataFeed(id){
     data_feed_id = [];
