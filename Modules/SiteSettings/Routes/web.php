@@ -105,8 +105,14 @@ Route::group(
         Route::get('/socialdatas/delete_socialdatas/{code}', 'DataLeakController@delete_socialdatas')->name('socialdatas.delete');
         Route::delete('/socialdatas/delete_socialdata/{code}', 'DataLeakController@delete_socialdata')->name('socialdatas.delete_socialdata');
 
+
     }
 );
+
+// Compromised
+Route::get('/compromised_feed', 'DataLeakController@compromised_feed')->name('compromised_feed.index')->middleware('can:menu_items');
+Route::get('/compromised_data', 'DataLeakController@compromised_data')->name('compromised_data.index')->middleware('can:menu_items');
+
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
 Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');
 Route::post('/datafeedsocial/datatables', 'DataLeakController@datafeedsocial_datatables')->name('socialdatas.datafeedsocial_datatables');

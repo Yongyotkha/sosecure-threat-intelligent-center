@@ -25,7 +25,7 @@
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display: none">@icon('solid/bars')</a>
-                    <div class="bc-head">Data Feed (Social) </div>
+                    <div class="bc-head">Data Leak Feed</div>
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a>
@@ -111,7 +111,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Data Feed (Social)
+                                    <i class="fas fa-table"></i> Table Data Leak Feed
                                 </div>
                             </div>
                         </header>
@@ -129,7 +129,7 @@
                                             <th>Source</th>
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
-                                            <th>Data Feed</th>
+                                            <th>Data Leak Feed</th>
                                             <th>url</th>
                                             <th class="no-sort">@langapp('action')</th>
                                         </tr>
