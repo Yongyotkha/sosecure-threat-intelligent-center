@@ -1,3 +1,9 @@
+@php
+use App\Menu;
+$menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+// dd($menu);
+@endphp
+
 {{-- <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav"> --}}
 <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav">
     <section class="vbox">
@@ -99,11 +105,11 @@
                     <ul class="nav">
 
                         @php
-                            $menu = [];
+                            // $menu = [];
                             $menu_html = '';
-                        if(isset($_SESSION["menu"])){
+                        // if(isset($_SESSION["menu"])){
                             // unset($_SESSION["lastname"]);
-                            $menu = $_SESSION["menu"];
+                            // $menu = $_SESSION["menu"];
 
 
                             if($menu) {
@@ -217,7 +223,7 @@
                                 echo $menu_html;
                             }
 
-                        }
+                        // }
 
                         @endphp
 

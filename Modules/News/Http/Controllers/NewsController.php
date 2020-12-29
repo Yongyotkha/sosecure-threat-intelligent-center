@@ -436,7 +436,7 @@ class NewsController extends Controller
         $RSSNews_prev = '';
         $RSSNews_next = '';
         $RSSNews_last10 = '';
-        $lang = 'th';
+        // $lang = 'th';
         $RSSNews = RSSNews::where("code",$code)->first();
 
         $cate_id_all = [];

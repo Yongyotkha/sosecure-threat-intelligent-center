@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="headding-primary-text">
-                        {{@$RSSNews->title_th}}
+                        {!!@$RSSNews_name!!}
                     </div>
                     <div class="shared-news">
                         <div class="pos-rlt">
@@ -63,7 +63,7 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="show-content-news" id="content_news">
-                        {!!@$RSSNews->detail_th!!}
+                        {!!@$RSSNews_detail!!}
                         {{-- <p>Intel is currently looking into how 20GB of sensitive internal data came to find its way online.</p>
 
                         <p>The range of documents — some marked “confidential,” “under NDA” or “restricted secret”— were uploaded to file hosting service MEGA by Swiss Android developer Till Kottmann.</p>
@@ -98,14 +98,28 @@
                         @if(@$RSSNews_last10)
                         @if($lang == 'th')
                         @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                            @php
+                                if($RSSNews_last10_val->title_th) {
+                                    $name_val_th = $RSSNews_last10_val->title_th;
+                                } else {
+                                    $name_val_th = $RSSNews_last10_val->title_en;
+                                }
+                            @endphp
                         <li><a
-                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_th}}</a>
+                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$name_val_th}}</a>
                         </li>
                         @endforeach
                         @else
                         @foreach($RSSNews_last10 as $RSSNews_last10_val)
+                            @php
+                                if($RSSNews_last10_val->title_en) {
+                                    $name_val_en = $RSSNews_last10_val->title_en;
+                                } else {
+                                    $name_val_en = $RSSNews_last10_val->title_th;
+                                }
+                            @endphp
                         <li><a
-                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$RSSNews_last10_val->title_en}}</a>
+                                href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$name_val_en}}</a>
                         </li>
                         @endforeach
                         @endif
