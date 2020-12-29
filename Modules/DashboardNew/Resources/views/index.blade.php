@@ -441,8 +441,10 @@
             series: {
             stacking: 'normal',
             dataLabels: {
-                enabled: true
-            }
+                enabled: true,
+                color:'#333',
+            },
+            
             }
         },
         series: [{

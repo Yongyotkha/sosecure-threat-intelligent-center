@@ -54,15 +54,7 @@ class DataLeakController extends Controller
     {
        $DataLeakSocial = DataLeakSocial::where('deleted_at',null)->where('status',1)->get();
        $data['DataLeakSocial'] = $DataLeakSocial;
-       $data['page'] = 'Data Feed(Social)';
-       return view('sitesettings::datafeed')->with($data);
-    }
-
-    public function datafeed_darkweb()
-    {
-       $DataLeakSocial = DataLeakSocial::where('deleted_at',null)->where('status',1)->get();
-       $data['DataLeakSocial'] = $DataLeakSocial;
-       $data['page'] = 'Data Feed(darkweb)';
+       $data['page'] = 'Data Leak Feed';
        return view('sitesettings::datafeed')->with($data);
     }
 
@@ -70,16 +62,38 @@ class DataLeakController extends Controller
     {
        $get_data = $this->siteSettings->get_data($id);
        $data['siteSettings'] = $get_data;
-       $data['page'] = 'Social Datas';
+       $data['page'] = 'Data Leak Datas';
        return view('sitesettings::social-datas')->with($data);
     }
 
+    public function datafeed_darkweb()
+    {
+       $DataLeakSocial = DataLeakSocial::where('deleted_at',null)->where('status',1)->get();
+       $data['DataLeakSocial'] = $DataLeakSocial;
+       $data['page'] = 'Compromised Feed';
+       return view('sitesettings::datafeed')->with($data);
+    }
+    
     public function darkweb_datas($id)
     {
        $get_data = $this->siteSettings->get_data($id);
        $data['siteSettings'] = $get_data;
-       $data['page'] = 'Dark Web Datas';
+       $data['page'] = 'Compromised Feed';
        return view('sitesettings::darkweb-datas')->with($data);
+    }
+
+    // Compromised Feed
+    public function compromised_feed()
+    {
+        $data['page'] = 'Compromised Feed';
+        return view('sitesettings::compromised_feed')->with($data);
+    }
+     // Compromised Data
+
+    public function compromised_data()
+    {
+        $data['page'] = 'Compromised Data';
+        return view('sitesettings::compromised_data')->with($data);
     }
 
     public function socialdatas_all_site()
@@ -89,7 +103,7 @@ class DataLeakController extends Controller
         $data['site'] = SiteSettings::where("active", '=', 1)->get();
         $data['source'] = DataLeakSocial::where("status", '=', 1)->get();
 
-        $data['page'] = 'Social Datas';
+        $data['page'] = 'DataLeakDatas';
         return view('sitesettings::social-datas_all_site')->with($data);
     }
 

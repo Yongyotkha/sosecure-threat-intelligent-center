@@ -5,7 +5,7 @@
 
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            <div class="bc-head">@langapp('data_leak') > @langapp('social')</div>   
+            <div class="bc-head">@langapp('data_leak')</div>   
             
             <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
@@ -43,7 +43,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Social</label>
+                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Data Leak</label>
                                 <div class="col-sm-9 col-xs-12">
                                     <select id="social" class="select2-option form-control">
                                         <option value="" >All</option>
