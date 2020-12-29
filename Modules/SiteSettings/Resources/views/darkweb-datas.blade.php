@@ -161,6 +161,12 @@
                 <form action="">
                 <div class="modal-body">
                     <div class="form-group row">
+                        <label for="" class="col-md-3">Content</label>
+                        <div class="col-md-9">
+                            <textarea name="" class="form-control" id="" cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
                             <select name="" id="" class="form-control">

@@ -140,6 +140,12 @@
                 <form action="">
                 <div class="modal-body">
                     <div class="form-group row">
+                        <label for="" class="col-md-3">Content</label>
+                        <div class="col-md-9">
+                            <textarea name="" class="form-control" id="" cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
                             <select id="status_action" class="form-control select2">
@@ -175,10 +181,31 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <span class="modal-title">Are you sure you want to aprove this item?</span>
-                    <br>
-                  
-                    <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Content</label>
+                        <div class="col-md-9">
+                            <textarea name="" class="form-control" id="" cols="30" rows="10">
+                            </textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Status</label>
+                        <div class="col-md-9">
+                            <select id="status_action" class="form-control select2">
+                                <option value="1">Approved</option>
+                                <option value="2">Cancle</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Send Mail</label>
+                        <div class="col-md-9">
+                            <input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span>
+                        </div>
+                    </div>
+
+                    <label></label>
 
                 </div>
                 

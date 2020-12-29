@@ -188,11 +188,21 @@
                     <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Confirm Information</h4>
                 </div>
                 <div class="modal-body">
-                    <span class="modal-title">Are you sure you want to aprove this item?</span>
-                    <br>
-                  
-                    <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label>
-
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Status</label>
+                        <div class="col-md-9">
+                            <select id="status_action" class="form-control select2">
+                                <option value="1">Approved</option>
+                                <option value="2">Cancle</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Sent mail</label>
+                        <div class="col-md-9">
+                            <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="modal-footer">
@@ -218,6 +228,17 @@
                     <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Confirm Information</h4>
                 </div>
                 <div class="modal-body">
+
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Status</label>
+                        <div class="col-md-9">
+                            <select id="status_action" class="form-control select2">
+                                <option value="1">Approved</option>
+                                <option value="2">Cancle</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <span class="modal-title">Are you sure you want to cancel this item?</span>
                     <br>
                   

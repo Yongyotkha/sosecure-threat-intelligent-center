@@ -13,7 +13,7 @@
 </style>
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header panel-heading bg-white b-b b-light">
+        {{-- <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('dashboard')</div>
 
             <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -26,9 +26,9 @@
                     
                 </select>
             </div>
-        </header>
+        </header> --}}
 
-        <section class="scrollable wrapper">
+        <section class="scrollable wrapper" style="padding:0;">
             <section class="panel panel-default" id="area-advance-search" style="display: none;">
                 <div class="container-fluid" style="padding: 2rem;">
                     <div class="row">
@@ -100,7 +100,7 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12" id="count_cve"></div>
                     <div class="col-md-12">
-                        <section class="panel panel-default">
+                        <section class="">
                             <header class="panel-heading font-bold panel-header-blue">
                                 <div class="row d-flex-center">
                                     <div class="col-xs-6">
@@ -123,9 +123,9 @@
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
-                                                            <img src="{{asset('images/compromise.png')}}" alt="">
+                                                            <img src="{{asset('images/database.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Compromise</h3>
+                                                        <h3 class="name-dash-text text-dark">Asset</h3>
                                                         <span class="number-card info">73</span>
                                                     </div>
                                                    
@@ -135,10 +135,10 @@
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
-                                                            <img src="{{asset('images/hacker.png')}}" alt="">
+                                                            <img src="{{asset('images/antivirus.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Phishing</h3>
-                                                        <span class="number-card green">13</span>
+                                                        <h3 class="name-dash-text text-dark">Vulnerability</h3>
+                                                        <span class="number-card green">1,300</span>
                                                     </div>
                                              
                                                 </div>
@@ -147,22 +147,12 @@
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
-                                                            <img src="{{asset('images/settings.png')}}" alt="">
+                                                            <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Vulnerability</h3>
-                                                        <span class="number-card grey">35</span>
+                                                        <h3 class="name-dash-text text-dark">Compromise</h3>
+                                                        <span class="number-card warning">3,500</span>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 mb-small-5px">
-                                                <div class="card-dash">
-                                                    <div class="left-card">
-                                                        <div class="img-icon-card">
-                                                            <img src="{{asset('images/data_lead.png')}}" alt="">
-                                                        </div>
-                                                        <h3 class="name-dash-text text-dark">Data Lead</h3>
-                                                        <span class="number-card warning">73</span>
-                                                    </div>
+                                          
                                                 </div>
                                             </div>
                                         </div>
@@ -209,7 +199,7 @@
                                                         <h1 class="text-blue">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive" style="max-height:400px;min-height: 400px;overflow: auto;">
+                                                    <div class="table-responsive" style="max-height:280px;min-height: 280px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -439,7 +429,7 @@
 
     const chartstack = new Highcharts.chart('chart-show-hl', {
         chart: {
-            height: 400, 
+            height: 280, 
             type: 'bar'
         },
         title: {
@@ -468,19 +458,19 @@
         series: [{
             name: 'Critical',
             data: [5, 3, 4, null, 2],
-            color: '#265c94',
+            color: '#e64732',
         }, {
             name: 'High',
             data: [2, 2, null, 2, 1],
-            color: '#6df3f7'
+            color: '#fcc838'
         }, {
             name: 'Medium',
             data: [3, null, 4, 2, 5],
-            color: '#34b4ef'
+            color: '#ffe46d'
         }, {
             name: 'Low',
             data: [null, 4, 4, 2, 5],
-            color: '#a1dcff '
+            color: '#88ce4f '
         }, {
             name: 'infomation',
             data: [3, 4, 4, 2, null],
@@ -492,7 +482,7 @@
 
         const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
-                height: 400, 
+                height: 280, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
@@ -513,7 +503,7 @@
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
-                    color: ['#265c94', '#6df3f7', '#34b4ef', '#a1dcff ', '#d3d3d3'],
+                    color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f ', '#d3d3d3'],
                     dataLabels: {
                         enabled: true,
                         format: '<b>{point.name}</b>: {point.percentage:.1f} %'
@@ -523,11 +513,11 @@
             series: [{
                 colorByPoint: false,
                 data: [
-                {  name: 'Critical',   y: 12, color: '#265c94'  },
-                {  name: 'High',  y: 14 , color: '#6df3f7'}, 
-                {  name: 'Medium', y: 12, color: '#34b4ef'  }, 
-                {  name: 'Low',   y: 33, color: '#a1dcff '  },
-                {  name: 'Information',   y: 44, color: '#d3d3d3'  },
+                {  name: 'Critical',   y: 12, color: '#e64732'  },
+                {  name: 'High',  y: 14 , color: '#fcc838'}, 
+                {  name: 'Medium', y: 12, color: '#ffe46d'  }, 
+                {  name: 'Low',   y: 33, color: '#88ce4f '  },
+                {  name: 'Information',   y: 0, color: '#d3d3d3'  },
                 ],  
             }]
         });
@@ -535,7 +525,7 @@
 
         const chart_line = new Highcharts.chart('chart-show-line', {
             chart: {
-                height: 400, 
+                height: 280, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
