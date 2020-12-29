@@ -149,7 +149,7 @@
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Compromise</h3>
+                                                        <h3 class="name-dash-text text-dark">Compromised</h3>
                                                         <span class="number-card warning">3,500</span>
                                                     </div>
                                           
