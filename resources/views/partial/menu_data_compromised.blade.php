@@ -5,7 +5,7 @@
             @langapp('data_feed_Social')
         </a>
     </li> --}}
-    <li class="{{ $page === 'Data Feed(darkweb)' ? 'active' : '' }}">
+    <li class="{{ $page === 'Compromised Feed' ? 'active' : '' }}">
         <a href="{{route('datafeed.darkweb_index')}}">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             @langapp('data_feed_darkweb')

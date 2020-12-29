@@ -11,7 +11,7 @@
             @langapp('data_feed_darkweb')
         </a>
     </li> --}}
-    <li class="{{ $page === 'Social Datas' ? 'active' : '' }}">
+    <li class="{{ $page === 'DataLeakDatas' ? 'active' : '' }}">
         <a href="{{route('socialdatas.index_all_site')}}">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             @langapp('social_data')
