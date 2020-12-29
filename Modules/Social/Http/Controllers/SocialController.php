@@ -147,11 +147,11 @@ class SocialController extends Controller
         // date("H:i", strtotime("04:25 PM"))
         $html = '';
 
-        $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->count();
+        $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->count();
 
         if(($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) && $request -> f_search == 1){
 
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1);//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social');//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
             if($request -> title){
                 $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
             }
@@ -206,7 +206,7 @@ class SocialController extends Controller
             $Data_leak_feed_all = $news->count();
             $news = $news->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
         }
 
         // dd($news);
