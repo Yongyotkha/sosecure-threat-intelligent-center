@@ -111,7 +111,8 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                             // unset($_SESSION["lastname"]);
                             // $menu = $_SESSION["menu"];
 
-
+                            $check_menu_active_arr = '';
+                            $check_menu_active_sub_arr = '';
                             if($menu) {
                                 foreach($menu as $menu_val) {
                                     $active = '';
@@ -130,14 +131,41 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                     if($menu_val->check_menu_active) {// check active
                                         if($menu_val->type_check_menu_active == 'langapp') {
                                             $check_menu_active = langapp($menu_val->check_menu_active);
+                                            if($check_menu_active) {
+                                                $check_menu_active_arr = explode(",",$check_menu_active);
+                                                // if(count($check_menu_active_arr) > 0) {
+                                                //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                //         $check_menu_active_arr_val
+                                                //     }
+                                                // }
+                                            }
+
                                         } else if ($menu_val->type_check_menu_active == '') {
-                                            $check_menu_active = $menu_val->check_menu_active;
+                                            if($menu_val->check_menu_active) {
+                                                $check_menu_active_arr = explode(",",$menu_val->check_menu_active);
+                                            //     if(count($check_menu_active_arr) > 0) {
+                                            //         foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                            //             $check_menu_active_arr_val
+                                            //         }
+                                            //     }
+                                            }
+                                            // $check_menu_active = $menu_val->check_menu_active;
                                         }
                                     }
 
-                                    if($page == $check_menu_active) {
-                                        $active = 'active';
+                                    // dd($check_menu_active_arr);
+
+                                    if($check_menu_active_arr) {
+                                        foreach($check_menu_active_arr as $check_menu_active_val) {
+                                            // dd($check_menu_active_val);
+                                            if($page == $check_menu_active_val) {
+                                                // dd($check_menu_active_val);
+                                                $active = 'active';
+                                            }
+                                        }
                                     }
+
+                                    
 
                                     if($menu_val->langapp) {//ชื่อเมนู
                                         $name_val = langapp($menu_val->langapp);
@@ -168,14 +196,41 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                             if($menu_sub_val->check_menu_active) {// check active
                                                 if($menu_sub_val->type_check_menu_active == 'langapp') {
                                                     $check_menu_active_sub = langapp($menu_sub_val->check_menu_active);
+                                                    if($check_menu_active_sub) {
+                                                        $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
+                                                        // if(count($check_menu_active_arr) > 0) {
+                                                        //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                        //         $check_menu_active_arr_val
+                                                        //     }
+                                                        // }
+                                                    }
+
                                                 } else if ($menu_sub_val->type_check_menu_active == '') {
                                                     $check_menu_active_sub = $menu_sub_val->check_menu_active;
+                                                    if($check_menu_active_sub) {
+                                                        $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
+                                                        // if(count($check_menu_active_arr) > 0) {
+                                                        //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                        //         $check_menu_active_arr_val
+                                                        //     }
+                                                        // }
+                                                    }
+
                                                 }
                                             }
 
-                                            if($page == $check_menu_active_sub) {
-                                                $active_sub = 'active';
+                                            if($check_menu_active_sub_arr) {
+                                                foreach($check_menu_active_sub_arr as $check_menu_active_sub_val) {
+                                                    // dd($check_menu_active_sub_val);
+                                                    if($page == $check_menu_active_sub_val) {
+                                                        // dd($check_menu_active_sub_val);
+                                                        $active_sub = 'active';
+                                                    }
+                                                }
                                             }
+
+
+
 
                                             if($menu_sub_val->langapp) {//ชื่อเมนู
                                                 $name_val_sub = langapp($menu_sub_val->langapp);
@@ -186,7 +241,7 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
 
                                             $menu_sub_html .= '<li class="'. $active_sub .'">
                                                                     <a href="'. $url_sub .'">
-                                                                        <i class="'.@$menu_sub_val->icon.'"><b class="bg-info"></b></i>
+                                                                        <i class="'.$menu_sub_val->icon.'"><b class="bg-info"></b></i>
                                                                         <span>'.$name_val_sub.'</span>
                                                                     </a>
                                                                 </li>';
@@ -194,7 +249,7 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
 
                                     }
                                         if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
-                                            $is_have_sub = '<a href="'. $url .'" class="'. $active_sub .'">
+                                            $is_have_sub = '<a href="'. $url .'" class="'. @$active_sub .'">
                                                                 <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
                                                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                                                 <i class="fas fa-angle-up text-active"></i></span>
