@@ -8,7 +8,8 @@
     <li class="{{ $page === 'Compromised Feed' ? 'active' : '' }}">
         <a href="{{route('datafeed.darkweb_index')}}">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            @langapp('data_feed_darkweb')
+            Compromise Feed
+            {{-- @langapp('data_feed_darkweb') --}}
         </a>
     </li>
     {{-- <li class="{{ $page === 'Social Datas' ? 'active' : '' }}">
@@ -20,7 +21,8 @@
     <li class="{{ $page === 'Dark Web Datas' ? 'active' : '' }}">
         <a href="{{route('darkweb.index_all_site')}}">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            @langapp('darkweb_data')
+            Compromise Data
+            {{-- @langapp('darkweb_data') --}}
         </a>
     </li>
 </ul>

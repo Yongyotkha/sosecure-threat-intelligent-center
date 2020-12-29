@@ -14,7 +14,8 @@
     <li class="{{ $page === 'DataLeakDatas' ? 'active' : '' }}">
         <a href="{{route('socialdatas.index_all_site')}}">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            @langapp('social_data')
+            Data Leak Data
+            {{-- @langapp('social_data') --}}
         </a>
     </li>
     {{-- <li class="{{ $page === 'Dark Web Datas' ? 'active' : '' }}">

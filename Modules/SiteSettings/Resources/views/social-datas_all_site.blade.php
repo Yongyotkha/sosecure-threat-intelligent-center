@@ -306,9 +306,16 @@
                         targets: 1,
                         width: '10px',
                         render: function (data, type, full, meta) {
+                            let val = full.get_social_ref;
+                            if(val) {
+                                val = full.get_social_ref.get_site;
+                                if(val) {
+                                    val = full.get_social_ref.get_site.name;
+                                }
+                            }
                 
         
-                            return full.get_social_ref.get_site.name;
+                            return val+' '+full.id;
 
                         },
                     },
