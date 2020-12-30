@@ -323,10 +323,10 @@
         $('.tab_cliick').click(function (event) {        
             let activeTab = $(this).attr('href').split('-')[1];
             if(activeTab=='bookmarks'){
-                alert('bookmark__');
+             
                 active_tab = 'bookmarks';
             }else if(activeTab=='leak'){
-                alert('leak__');
+               
                 active_tab = 'leak';
             }
         });
