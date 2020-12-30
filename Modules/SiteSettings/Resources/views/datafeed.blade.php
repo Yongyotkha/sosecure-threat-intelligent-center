@@ -77,15 +77,15 @@
                                 <div class="col-lg-4 text-center">
                                     <div style="margin-top: 8px;">
                                         <label class="mr-3">
-                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <input type="checkbox" name="check_all" id="check_all" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">All</span>
                                         </label>
                                         <label class="mr-3">
-                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">Pending</span>
                                         </label>
                                         <label class="mr-3">
-                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <input type="checkbox" name="check_approved" id="check_approved" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">Approved</span>
                                         </label>
                                     </div>
@@ -93,7 +93,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive" onclick="table_social_data();">
+                                    <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive" <!--onclick="table_social_data();-->">
                                         <i class="fas fa-search"></i>
                                         Search
                                     </button>
@@ -281,6 +281,9 @@
     var search_val = 0;
     var start_date = '';
     var end_date = '';
+    var check_all = false;
+    var check_pending = false;
+    var check_approved = false;
 
 $(function() {
     table_social_data();
@@ -310,19 +313,48 @@ $(function() {
         }
     }, cb);
     cb(start, end);
+
+    $("#btn_data_leak_reset").click(function() {
+        search_val = 0;
+        $("#search").val('');
+        $("#source_select").val('').trigger('change');
+        $("#check_all").prop("checked",false);
+        $("#check_pending").prop("checked",false);
+        $("#check_approved").prop("checked",false);
+
+        cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
+
+        table_social_data();
+    });
+
 });
 
 
 
 $("#btn_data_leak_search").click(function() {
     search_val = 1;
+    if ($('#check_all').is(":checked")) {
+        check_all = true;
+    } else {
+        check_all = false;
+    }
+    if ($('#check_pending').is(":checked")) {
+        check_pending = true;
+    } else {
+        check_pending = false;
+    }
+    if ($('#check_approved').is(":checked")) {
+        check_approved = true;
+    } else {
+        check_approved = false;
+    }
+    start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+    end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+
     table_social_data();
 });
 
-$("#btn_data_leak_reset").click(function() {
-    search_val = 0;
-    table_social_data();
-});
+
 
 function table_social_data(){
     let search = $('#search').val();
@@ -340,6 +372,9 @@ function table_social_data(){
                 "source_select" : source_select,
                 "start_date" : start_date,
                 "end_date" : end_date,
+                "check_all" : check_all,
+                "check_pending" : check_pending,
+                "check_approved" : check_approved,
             },
             type: "POST",
         },

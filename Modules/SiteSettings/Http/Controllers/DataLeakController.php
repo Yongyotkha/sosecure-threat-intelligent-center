@@ -282,15 +282,59 @@ class DataLeakController extends Controller
     }
 
     public function datafeedsocial_datatables(Request $request){
-        if($request -> search){
-            $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '');
+        if($request -> search_val == 1) {
+            $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '')->where('feed_type','social');
+
             if($request -> search){
                 $model = $model->where('keyword', 'LIKE', '%'.$request -> search.'%');
             }
+       
+            if($request -> source_select) {
+                $model = $model->where('sourceid', $request -> source_select);
+            }
+            if($request -> check_all == 'true') {
+
+            } else {
+                if($request -> check_pending == 'true') {
+                    $model = $model->where('approve', '0');
+                }
+                if($request -> check_approved == 'true') {
+                    $model = $model->where('approve', '1');
+                }
+            }
+
+            if($request -> start_date) {
+                $date_start = $request->start_date;
+                $date_end = $request->end_date;
+
+                $date_start_explode = explode(" ",$date_start);
+                $date_start_date = @$date_start_explode[0];
+                // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                // $date_start_time_time = date("H:i", strtotime($date_start_time));
+                // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start);
+
+                $date_end_explode = explode(" ",$date_end);
+                $date_end_date = @$date_end_explode[0];
+                // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                // $date_end_time_time = date("H:i", strtotime($date_end_time));
+                // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // dd($date_end_time_time);
+
+                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                $model = $model -> whereBetween('feedtimepost',array($date_start_date_format,$date_end_date_format));
+            }
+            
             $model = $model->get();
-        }else{
-            $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '')->get();
+        } else {
+            $model = DataLeakFeedTemp::where('keyword', '!=' , null)->where('keyword', '!=' , '')->where('feed_type','social')->get();
         }
+
         
         return DataTables::of($model)
         ->editColumn(
