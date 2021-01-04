@@ -193,7 +193,7 @@ class SiteSettingsController extends Controller
         $data['categories'] = $categories;
         $data['siteSettings'] = $get_data;
         $data['tags'] = $Tags;
-        $data['page'] = $this->getPage();
+        $data['page'] = "SiteSettings";
         return view('sitesettings::edit_site')->with($data);
     }
 

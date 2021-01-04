@@ -231,10 +231,10 @@
                 Close
             </button> --}}
             {!! closeModalButton() !!}
-            <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
+            {{-- <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
                 <i class="fas fa-play"></i>
                 Run Scan And Save Now
-            </button>
+            </button> --}}
             {{-- <button type="submit" class="btn btn-info btn-rounded">
                 <i class="fas fa-paper-plane"></i>
                 Save

@@ -8,10 +8,7 @@
             @icon('solid/arrow-left')
                 </a> --}}
                 <div class="bc-head">@langapp('settings') > Keywords</div>
-                <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
-                    data-rel="tooltip" title="@langapp('export') CSV">
-                    @icon('solid/download') CSV
-                </a>
+
 
                 @can('users_delete')
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">

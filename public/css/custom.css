@@ -1833,6 +1833,13 @@ ul.topics-news-list li a:hover{
     text-overflow: ellipsis; 
     width: 100%;
 }
+.text-elipse-setting{
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 163px;
+}
 
 .content-news-image a img{
     position: absolute;
@@ -2469,6 +2476,7 @@ a.author-by{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center top;
+    overflow: hidden;
 }
 .login-body{
     padding: 3rem;

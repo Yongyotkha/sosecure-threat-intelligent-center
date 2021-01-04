@@ -10,7 +10,12 @@
 
         $.extend( true, $.fn.dataTable.defaults, {
         buttons: [
-            'csv'
+            {
+                extend:    'csvHtml5',
+                text:      '<i class="fas fa-download"></i> CSV',
+                titleAttr: 'CSV'
+            },
+          
         ],
         "processing": true,
         "deferRender": true,

@@ -11,7 +11,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3">@langapp('settings')  </p>
+                        <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -45,6 +45,9 @@
                                         <div class="">
                                             <input id="file-input" type="file" class="form-control" name="logo" value="">
                                         </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div id="preview-image-logo"></div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -184,6 +187,7 @@
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
 @include('stacks.js.fullscreen')
+@include('stacks.js.cropple')
 <script>
 
     $(document).ready(function(){
@@ -191,70 +195,68 @@
         tags: true
         });
     });
+    
+    var cropper_logo;
+    var imgs_logo = null;
+    window.addEventListener('DOMContentLoaded', function () {
+        var image = document.getElementById('crop-img-logo');
+        var input_logo = $('#file-input');
+        var cropBoxData;
+        var canvasData;
+        var $modal = $('#upload_image_logo_modal');
+        var result = document.getElementById('result');
 
-    // Crop Logo
-    // var cropper_logo;
-    // var imgs_logo = null;
-    // window.addEventListener('DOMContentLoaded', function () {
-    //     var image = document.getElementById('crop-img-logo');
-    //     var input_logo = $('#file-input');
-    //     var cropBoxData;
-    //     var canvasData;
-    //     var $modal = $('#upload_image_logo_modal');
-    //     var result = document.getElementById('result');
+            input_logo.change(function(event) {
+                var files = event.target.files;
+                var done = function(url){
+                    image.src = url;
+                    $modal.modal('show');
+                };
 
-    //         input_logo.change(function(event) {
-    //             var files = event.target.files;
-    //             var done = function(url){
-    //                 image.src = url;
-    //                 $modal.modal('show');
-    //             };
+                if (files && files.length > 0)
+                {
+                    reader = new FileReader();
+                    reader.onload = function(event)
+                    {
+                        done(reader.result);
+                    };
+                    reader.readAsDataURL(files[0]);
+                }
+            });
 
-    //             if (files && files.length > 0)
-    //             {
-    //                 reader = new FileReader();
-    //                 reader.onload = function(event)
-    //                 {
-    //                     done(reader.result);
-    //                 };
-    //                 reader.readAsDataURL(files[0]);
-    //             }
-    //         });
+            $modal.on('shown.bs.modal', function () {
+                cropper_logo = new Cropper(image, {
+                    dragMode: 'move',
+                    aspectRatio: 16 / 9,
+                    restore: false,
+                    guides: false,
+                    center: false,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                    preview:'.preview_logo',
+                    ready: function () {
+                        cropper_logo.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+                    },
+                });
+            }).on('hidden.bs.modal', function () {
+                cropBoxData = cropper_logo.getCropBoxData();
+                canvasData = cropper_logo.getCanvasData();
+                cropper_logo.destroy();
+            });
+        });
 
-    //         $modal.on('shown.bs.modal', function () {
-    //             cropper_logo = new Cropper(image, {
-    //                 dragMode: 'move',
-    //                 aspectRatio: 16 / 9,
-    //                 restore: false,
-    //                 guides: false,
-    //                 center: false,
-    //                 highlight: false,
-    //                 cropBoxMovable: true,
-    //                 cropBoxResizable: true,
-    //                 toggleDragModeOnDblclick: false,
-    //                 preview:'.preview_logo',
-    //                 ready: function () {
-    //                     //Should set crop box data first here
-    //                     cropper_logo.setCropBoxData(cropBoxData).setCanvasData(canvasData);
-    //                 },
-    //             });
-    //         }).on('hidden.bs.modal', function () {
-    //             cropBoxData = cropper_logo.getCropBoxData();
-    //             canvasData = cropper_logo.getCanvasData();
-    //             cropper_logo.destroy();
-    //         });
-    //     });
-
-    //     // $('.upload-image-logo').on('click', function (ev) {
-    //     //     canvas = cropper_logo.getCroppedCanvas({
-    //     //         width: 200,
-    //     //         height: 150,
-    //     //     }).toDataURL();
-    //     //     imgs_logo = canvas;
-    //     //     html = '<img src="' + imgs_logo + '" />';
-    //     //     $("#preview_cer_img").html(html);
-    //     //     $("#preview-image_logo").html("");
-    //     // });
+        $('.upload-image-logo').on('click', function (ev) {
+            canvas = cropper_logo.getCroppedCanvas({
+                width: 200,
+                height: 150,
+            }).toDataURL();
+            imgs_logo = canvas;
+            html = '<img src="' + imgs_logo + '" />';
+            $("#preview_cer_img").html(html);
+            $("#preview-image_logo").html("");
+        });
      </script>
 @endpush
 

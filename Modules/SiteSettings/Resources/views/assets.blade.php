@@ -15,7 +15,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3">@langapp('settings')  </p>
+                        <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
