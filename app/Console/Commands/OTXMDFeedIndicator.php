@@ -67,6 +67,7 @@ class OTXMDFeedIndicator extends Command
                         'updated_at' => $date_now,
                         'updated_by' => "system",
                         'deleted_at' => null,
+                        'source' => "otx.alienvault",
                     ]);
                 }
                 $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C12h&page=1&limit=100', $urlLimit);
@@ -85,7 +86,7 @@ class OTXMDFeedIndicator extends Command
                             try {
                                 $collectionData = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
                                 $updateResult = $collectionData->updateOne(
-                                    ['indicator_id' => $value["id"]],
+                                    ['indicator_id' => $value["id"].""],
                                     ['$set' => [
                                         'indicator' => $value["indicator"],
                                         'type' => $value["type"],
@@ -103,6 +104,7 @@ class OTXMDFeedIndicator extends Command
                                             'created_by' => "system",
                                             'deleted_at' => null,
                                             'transaction_date' => date("Y-m-d"),
+                                            'source' => "otx.alienvault",
                                         ],
                                     ],
                                     ['upsert' => true]
@@ -166,6 +168,7 @@ class OTXMDFeedIndicator extends Command
         $_otxReconnect = true;
         $_dataOut["result"] = "";
         $_dataOut["success"] = false;
+        $_sleeptime = rand(0,2000); 
         while ($_otxReconnect && $_reconnect < $limit) {
             try {
                 $_bodyData = $_clientHttp->request(
@@ -177,7 +180,7 @@ class OTXMDFeedIndicator extends Command
                             'Content-type' => 'application/json',
                             'X-OTX-API-KEY' => $_OTX_KEY,
                         ],
-                        'delay' => 200, //millisec == 1sec
+                        'delay' => $_sleeptime, //millisec == 1sec
                         'timeout' => 59, //sec == 100sec
                     ]
                 )->getBody();
@@ -197,12 +200,12 @@ class OTXMDFeedIndicator extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $dayMoreThan = 29;
+        $dayMoreThan = 5;
         $checkSuccess = true;
 
         try {
             $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-            $document = $collectionBasic->findOne(['indicator_id' => $indicatorID], [
+            $document = $collectionBasic->findOne(['indicator_id' => $indicatorID.""], [
                 'projection' => [
                     "updated_at" => 1,
                     "transcation_id" => 1
@@ -472,7 +475,7 @@ class OTXMDFeedIndicator extends Command
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
             $updateResult = $collectionBasic->updateOne(
-                ['indicator_id' => $indicatorID],
+                ['indicator_id' => $indicatorID.""],
                 ['$set' => [
                     'indicator_name' => $indicatorName,
                     'type' => $type,
@@ -486,6 +489,7 @@ class OTXMDFeedIndicator extends Command
                         'created_by' => "system",
                         'deleted_at' => null,
                         'transaction_date' => date("Y-m-d"),
+                        'source' => "otx.alienvault",
                     ],
                 ],
                 ['upsert' => true]
@@ -507,7 +511,7 @@ class OTXMDFeedIndicator extends Command
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
             $updateResult = $collectionBasic->updateOne(
-                ['indicator_id' => $indicatorID],
+                ['indicator_id' => $indicatorID.""],
                 ['$set' => [
                     'indicator_name' => $indicatorName,
                     'type' => $type,
@@ -522,6 +526,7 @@ class OTXMDFeedIndicator extends Command
                         'created_by' => "system",
                         'deleted_at' => null,
                         'transaction_date' => date("Y-m-d"),
+                        'source' => "otx.alienvault",
                     ],
                 ],
                 ['upsert' => true]
@@ -590,13 +595,14 @@ class OTXMDFeedIndicator extends Command
                                 'deleted_at' => null,
                                 'transaction_date' => date("Y-m-d"),
                                 'count_view' => 0,
+                                'source' => "otx.alienvault",
                             ],
                         ],
                         ['upsert' => true]
                     );
 
                     $update_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->updateOne(
-                        ['indicator_id' => (isset($indicatorID) ? $indicatorID : ""),
+                        ['indicator_id' => (isset($indicatorID) ? $indicatorID."" : ""),
                             'pulse_id' => (isset($value["id"]) ? $value["id"] : "")],
                         ['$set' => [
                             'pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
@@ -613,6 +619,7 @@ class OTXMDFeedIndicator extends Command
                                 'created_by' => "system",
                                 'deleted_at' => null,
                                 'transaction_date' => date("Y-m-d"),
+                                'source' => "otx.alienvault",
                             ],
                         ],
                         ['upsert' => true]
