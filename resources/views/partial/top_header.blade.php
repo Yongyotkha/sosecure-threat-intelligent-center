@@ -5,7 +5,7 @@
                 @icon('solid/bars')
             </a>
             <a href="{{  url('/')  }}" class="navbar-brand">
-                {{-- <img src="{{asset('images/logo_threat/logo_site.png')}}" class="m-r-sm" onerror="setDefaultPic(this)"> --}}
+                <img src="{{asset('images/logo_threat/logo.png')}}" class="m-r-sm" onerror="setDefaultPic(this)">
                 {{-- @php $display = get_option('logo_or_icon'); @endphp
                 @if ($display == 'logo' || $display == 'logo_title')
                 <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="m-r-sm" onerror="setDefaultPic(this)">
@@ -19,7 +19,7 @@
                 {{ get_option('website_name') }}
                 @endif
                 @endif --}}
-                <span class="md-text-logo"> SOSECURE <br> <span class="sm-text-logo"> Threat inSight </span> </span>
+                {{-- <span class="md-text-logo"> SOSECURE <br> <span class="sm-text-logo"> Threat inSight </span> </span> --}}
             </a>
             <a class="btn btn-link visible-xs" data-toggle="dropdown" data-target=".nav-user">
                 @icon('solid/cog')

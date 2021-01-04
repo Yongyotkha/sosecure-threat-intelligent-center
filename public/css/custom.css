@@ -2530,7 +2530,7 @@ input.input-login:focus {
 }
 
 .md-text-logo{
-    display: block;
+    display: inline-block;
     font-size: 22px;
     font-weight: 700;
     color: #fff;
@@ -2553,11 +2553,18 @@ input.input-login:focus {
 .bold-700{
     font-weight: 700;
 }
-/* .navbar-brand img {
-    max-height: 35px !important;
+
+.highcharts-a11y-proxy-button{
+    margin-bottom: .5rem !important;
+}
+.navbar-brand img {
+    max-height: 43px !important;
+    vertical-align: middle;
+    display: inline-block;
+    /* margin-top: -22px !important; */
 }
 
-header.header.navbar.bg-dark{
+/* header.header.navbar.bg-dark{
     background: #848484 !important;
 }
 .bg-dark .nav>li>a {

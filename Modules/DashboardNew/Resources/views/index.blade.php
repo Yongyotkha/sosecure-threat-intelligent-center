@@ -3,7 +3,6 @@
 <style>
     .tooltip-inner {
         max-width: 500px;
-        /* If max-width does not work, try using width instead */
         width: 500px;
     }
 
@@ -142,7 +141,6 @@
                                                         <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
                                                         <span class="number-card warning">3,500</span>
                                                     </div>
-                                          
                                                 </div>
                                             </div>
                                         </div>
