@@ -2547,6 +2547,9 @@ input.input-login:focus {
 .text-upper{
     text-transform: uppercase !important;
 }
+.bold-500{
+    font-weight: 500;
+}
 .bold-700{
     font-weight: 700;
 }

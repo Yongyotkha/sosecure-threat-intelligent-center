@@ -115,7 +115,7 @@
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/database.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark text-upper bold-700">Asset</h3>
+                                                        <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
                                                         <span class="number-card info">73</span>
                                                     </div>
                                                    
@@ -127,7 +127,7 @@
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/antivirus.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark text-upper bold-700">Vulnerability</h3>
+                                                        <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
                                                         <span class="number-card green">1,300</span>
                                                     </div>
                                              
@@ -139,7 +139,7 @@
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark text-upper bold-700">Compromised</h3>
+                                                        <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
                                                         <span class="number-card warning">3,500</span>
                                                     </div>
                                           
@@ -153,7 +153,7 @@
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue">Vulnerability Severity</h1>
+                                                        <h1 class="text-blue bold-500">Vulnerability Severity</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div id="chart-show-hl"></div>
@@ -163,7 +163,7 @@
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue">Severity </h1>
+                                                        <h1 class="text-blue bold-500">Severity </h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div id="chart-show-pie"></div>
@@ -176,7 +176,7 @@
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
                                                         
-                                                        <h1 class="text-blue">Indicators</h1>
+                                                        <h1 class="text-blue bold-500">Indicators</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div id="chart-show-line"></div>
@@ -186,7 +186,7 @@
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/table.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue">Assets</h1>
+                                                        <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div class="table-responsive" style="max-height:280px;min-height: 280px;overflow: auto;">
