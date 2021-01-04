@@ -439,15 +439,16 @@ class MDFeedDarkWeb extends Command
         $_otxReconnect = true;
         $_dataOut["result"] = "";
         $_dataOut["success"] = false;
+        $_sleeptime = rand(0,2000); 
         while ($_otxReconnect && $_reconnect < $limit) {
-            sleep(3);
+            sleep(2);
             try {
                 $_bodyData = $_clientHttp->request(
                     'GET',
                     $url,
                     [
                         'headers' => $header,
-                        'delay' => 1000, //millisec == 1sec
+                        'delay' => $_sleeptime, //millisec == 1sec
                         'timeout' => 59, //sec == 100sec
                     ]
                 )->getBody();
