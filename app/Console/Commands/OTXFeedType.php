@@ -57,7 +57,10 @@ class OTXFeedType extends Command
                     'Accept'       => 'application/json',
                     'Content-type' => 'application/json',
                     'X-OTX-API-KEY' => $OTX_KEY,
-                ]]
+                ],
+                'delay' => 200, //millisec == 1sec
+                'timeout' => 59, //sec == 100sec
+            ]
         )->getBody();
         $otxFeedType = json_decode($bodyData,true);
 

@@ -164,7 +164,7 @@ class IndicatorsController extends Controller
     {   
         $reqType = $request->type;
         $reqIndicator = $request->indicator;
-        $reqId = $request->id;
+        $reqId = (string)$request->id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
@@ -177,7 +177,7 @@ class IndicatorsController extends Controller
             ),
         );
 
-        $document = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => (int)$reqId),$options);
+        $document = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $reqId),$options);
         if(!empty($document)){
 
 
@@ -230,7 +230,7 @@ class IndicatorsController extends Controller
         $order = 'modified';
         $dir = -1;
         
-        $reqId = (int)($request->id);
+        $reqId = (string)$request->id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
@@ -312,7 +312,7 @@ class IndicatorsController extends Controller
 
     public function load_relatedPulse_tb(Request $request)
     {
-        $reqId = (int)($request->id);
+        $reqId = $request->id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
@@ -1447,12 +1447,11 @@ class IndicatorsController extends Controller
             1 => 'name',
             2 => 'groups',
             3 => 'tags',
-            4 => 'attr',// not sort 
-            5 => 'public',
-            6 => 'is_modified',
-            7 => 'modified',
-            8 => 'count_view',
-            9 => 'pulse_id',
+            4 => 'public',
+            5 => 'is_modified',
+            6 => 'modified',
+            7 => 'count_view',
+            8 => 'pulse_id',
         );  
         $draw = $_POST['draw'];
         $row = (int)$_POST['start'];
