@@ -2557,7 +2557,21 @@ input.input-login:focus {
 .highcharts-a11y-proxy-button{
     margin-bottom: .5rem !important;
 }
+/* ของ Loguin */
+.nav-header-login.navbar-brand img {
+    max-height: 160px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin-top: 5px;
+}
 
+.nav-header-login.navbar-brand {
+    float: left;
+    padding: 0 15px;
+    font-size: 18px;
+    line-height: 20px;
+    height: auto !important;
+}
 .navbar-brand img {
     max-height: 60px !important;
     vertical-align: middle;
@@ -2579,6 +2593,11 @@ input.input-login:focus {
     }
 }
 
+@media screen and (max-width:1024px){
+    .name-dash-text{
+        font-size: 15px !important;
+    }
+}
 .form-custom{
     margin-bottom: 0;
     height: 45px;
