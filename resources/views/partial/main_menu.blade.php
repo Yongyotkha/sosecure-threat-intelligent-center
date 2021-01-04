@@ -575,7 +575,7 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
         </section>
         <footer class="footer lt hidden-xs b-t b-dark website-by" id="changeLanguages">
             <span>
-                Powered By <a href="">Sosecure</a> v1.0.1
+                Powered By <a href="">SOSECURE</a> v1.0.1
                 {{-- {{ getCurrentVersion()['version']  }} --}}
             </span>
             {{-- <a class="pull-right btn btn-sm btn-dark btn-icon" data-toggle="class:nav-xs" href="#nav">

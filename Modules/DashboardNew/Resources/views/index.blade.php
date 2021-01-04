@@ -107,39 +107,39 @@
 
                             <div class="panel-body" id="chart-container">
                                 <div class="row">
-                                    <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px">
+                                    <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px mb-2">
                                         <div class="row">
-                                            <div class="col-md-12 mb-small-5px">
+                                            <div class="col-lg-12 col-md-4 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/database.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Asset</h3>
+                                                        <h3 class="name-dash-text text-dark text-upper bold-700">Asset</h3>
                                                         <span class="number-card info">73</span>
                                                     </div>
                                                    
                                                 </div>
                                             </div>
-                                            <div class="col-md-12 mb-small-5px">
+                                            <div class="col-lg-12 col-md-4 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/antivirus.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Vulnerability</h3>
+                                                        <h3 class="name-dash-text text-dark text-upper bold-700">Vulnerability</h3>
                                                         <span class="number-card green">1,300</span>
                                                     </div>
                                              
                                                 </div>
                                             </div>
-                                            <div class="col-md-12 mb-small-5px">
+                                            <div class="col-lg-12 col-md-4 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark">Compromised</h3>
+                                                        <h3 class="name-dash-text text-dark text-upper bold-700">Compromised</h3>
                                                         <span class="number-card warning">3,500</span>
                                                     </div>
                                           

@@ -2529,8 +2529,28 @@ input.input-login:focus {
     }
 }
 
+.md-text-logo{
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    line-height: .8;
+    margin-top: 8px;
+}
+.sm-text-logo{
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+}
 
-.navbar-brand img {
+.text-upper{
+    text-transform: uppercase !important;
+}
+.bold-700{
+    font-weight: 700;
+}
+/* .navbar-brand img {
     max-height: 35px !important;
 }
 
@@ -2539,4 +2559,4 @@ header.header.navbar.bg-dark{
 }
 .bg-dark .nav>li>a {
     color: #ffffff !important;
-}
+} */
