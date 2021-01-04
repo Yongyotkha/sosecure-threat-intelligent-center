@@ -65,7 +65,7 @@
             @endadmin
         </ul>
 
-        <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
+        <ul class="nav navbar-nav navbar-right hidden-xs nav-user" style="margin-top: 1rem;">
 
             @if(count(runningTimers()) > 0)
             <li class="">
