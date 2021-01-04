@@ -306,7 +306,7 @@ function table_social_data(){
         destroy: true,
         "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
         ajax: {
-            url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
+            url: '{!! route('datafeed.darkweb_datatables') !!}',
             data: {
                 "search" : search,
             },

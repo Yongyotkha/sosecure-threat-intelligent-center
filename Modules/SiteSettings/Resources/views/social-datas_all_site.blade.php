@@ -252,7 +252,7 @@
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         
         console.log(site);
-        {{--table_social_data();--}}
+        table_social_data();
     }
 
     function table_social_data(){
@@ -315,7 +315,8 @@
                             }
                 
         
-                            return val+' '+full.id;
+                            {{--return val+' '+full.id;--}}
+                            return val;
 
                         },
                     },
