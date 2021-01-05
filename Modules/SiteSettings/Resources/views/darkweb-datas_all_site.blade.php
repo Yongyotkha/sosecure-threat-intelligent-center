@@ -251,9 +251,12 @@
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         
-        console.log(site);
         table_social_data();
     }
+
+
+
+
 
     function table_social_data(){
 
@@ -466,18 +469,20 @@
     cb(start, end);
 
             $("#social_reset").click(function() {
-                
-
                 search_val = false;
-                $("#keyword").val('');
+                $('#keyword').val('');
+                $('#site').val('').trigger('change');
+                $('#source').val('').trigger('change');
+                startDate =  null;
+                endDate =  null;
+
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
-                $("#site").val('').trigger("change");
-                $("#source").val('').trigger("change");
-                {{--table_social_data();--}}
-            
-
+                cb(start, end);
+                
+                table_social_data();
             });
+
     });
 
     {{--function change_status(code) {
