@@ -11,10 +11,10 @@
                 <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                     @langapp('delete')</span>
             </button>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                 title="@langapp('export') CSV">
                 @icon('solid/download') CSV
-            </a>
+            </a> --}}
             <a href="#"
                 class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
                 data-toggle="modal" data-target="#m_updatecode">
@@ -27,37 +27,45 @@
 
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-
-                <form id="frm-updatecode" method="POST">
-                    <div class="table-responsive">
-                        @php
-                            // dd(lastMonth());
-                        @endphp
-                        <table class="table table-striped" id="table-updatecode-template">
-                            <thead>
-                                <tr>
-                                    <th class="no-sort">
-                                        <label>
-                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
-                                    <th class="">Name</th>
-                                    <th class="">Version</th>
-                                    <th>Mode</th>
-                                    <th>Deploy Status</th>
-                                    <th>Download</th>
-                                    <th>Status</th>
-                                    <th>Update</th>
-                                    <th class="no-sort" width="10%">Action</th> 
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Update Code
+                        </div>
                     </div>
-                </form>
+                </header>
+                <div class="panel-body">
+                    <form id="frm-updatecode" method="POST">
+                        <div class="table-responsive">
+                            @php
+                                // dd(lastMonth());
+                            @endphp
+                            <table class="table table-striped" id="table-updatecode-template">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th class="">Name</th>
+                                        <th class="">Version</th>
+                                        <th>Mode</th>
+                                        <th>Deploy Status</th>
+                                        <th>Download</th>
+                                        <th>Status</th>
+                                        <th>Update</th>
+                                        <th class="no-sort" width="10%">Action</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
             </section>
         </section>
     </section>

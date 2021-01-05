@@ -106,66 +106,74 @@
                         </div>
                     </section>
 
-                    
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table  class="table table-striped" id="table_social_datas">
-                                <thead>
-                                    <tr>
-                                        <th class="no-sort w-10">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        <th>Site</th>
-                                        <th>Source</th>
-                                        <th>Keyword Ref</th>
-                                        <th>Content</th>
-                                        <th>Data Feed</th>
-                                        <th>View</th>
-                                        <th>Status</th>
-                                        <th>@langapp('action')</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- <tr>
-                                        <td>
-                                            <label>
-                                                <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            Pantip
-                                        </td>
-                                        <td>
-                                            Fibre
-                                        </td>
-                                        <td>
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                        </td>
-                                        <td class="no-wrap">
-                                            2020-12-2020 12:12
-                                        </td>
-                                        <td>
-                                            1
-                                        </td>
-                                        <td>
-                                            <label class="switch">
-                                                <input type="hidden" value="FALSE" name="">
-                                                <input type="checkbox" name="status" checked value="TRUE">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                        <td class="no-wrap text-center">
-                                            <button class="btn btn-danger btn-xs">
-                                                @icon('solid/trash-alt')
-                                            </button>
-                                        </td>
-                                    </tr> --}}
-                                </tbody>
-                            </table>
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Compromise Data
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table  class="table table-striped" id="table_social_datas">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort w-10">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            <th>Site</th>
+                                            <th>Source</th>
+                                            <th>Keyword Ref</th>
+                                            <th>Content</th>
+                                            <th>Data Feed</th>
+                                            <th>View</th>
+                                            <th>Status</th>
+                                            <th>@langapp('action')</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{-- <tr>
+                                            <td>
+                                                <label>
+                                                    <input name="select_all" value="1" type="checkbox" class="select-chk"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                Pantip
+                                            </td>
+                                            <td>
+                                                Fibre
+                                            </td>
+                                            <td>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
+                                            </td>
+                                            <td class="no-wrap">
+                                                2020-12-2020 12:12
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                <label class="switch">
+                                                    <input type="hidden" value="FALSE" name="">
+                                                    <input type="checkbox" name="status" checked value="TRUE">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                            <td class="no-wrap text-center">
+                                                <button class="btn btn-danger btn-xs">
+                                                    @icon('solid/trash-alt')
+                                                </button>
+                                            </td>
+                                        </tr> --}}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </section>
