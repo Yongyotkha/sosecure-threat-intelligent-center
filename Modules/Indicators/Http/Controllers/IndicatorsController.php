@@ -1602,13 +1602,7 @@ class IndicatorsController extends Controller
 
     }
 
-    public function link_group($id) {
 
-    }
-
-    public function link_tags($id) {
-
-    }
 
     public function count_view(Request $request) {
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
@@ -1637,6 +1631,20 @@ class IndicatorsController extends Controller
             ];
             return response()->json($data);
         }
+    }
+
+    public function link_group($id) {
+
+        $data['id'] = $id;
+        $data['page'] = langapp('indicators');
+        return view('indicators::link_group')->with($data);
+    }
+
+    public function link_tags($id) {
+
+        $data['id'] = $id;
+        $data['page'] = langapp('indicators');
+        return view('indicators::link_tag')->with($data);
     }
 
 }
