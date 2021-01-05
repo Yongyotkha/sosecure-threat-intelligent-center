@@ -188,9 +188,9 @@ function explode_val($val,$type=null) {
         if($val_arr) {
             foreach($val_arr as $tag) {
                 if($type == 'tags') {
-                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                    $result .=  '<a href="'.route('indicators.link_tags', ['id' => $tag]).'">'.$tag.'</a> ,';
                 } else if ($type == 'groups') {
-                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                    $result .=  '<a href="'.route('indicators.link_group', ['id' => $tag]).'">'.$tag.'</a> ,';
                 } else {
                     $result .=  '<a href="#">'.$tag.'</a> ,';
                 }
