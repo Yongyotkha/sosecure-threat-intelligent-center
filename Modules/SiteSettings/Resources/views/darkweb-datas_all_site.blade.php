@@ -317,11 +317,11 @@
                         targets: 1,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                            let val = full.get_social_ref;
+                            let val = full;
                             if(val) {
-                                val = full.get_social_ref.get_site;
+                                val = full.get_site;
                                 if(val) {
-                                    val = full.get_social_ref.get_site.name;
+                                    val = full.get_site.name;
                                 }
                             }
                 
@@ -335,9 +335,15 @@
                         targets: 2,
                         width: '60px',
                         render: function (data, type, full, meta) {
-                
+                            let val = full.get_data_leak_feed_one;
+                            if(val) {
+                                val = full.get_data_leak_feed_one;
+                                if(val) {
+                                    val = full.get_data_leak_feed_one.source_name;
+                                }
+                            }
         
-                            return full.source_name;
+                            return val;
 
                         },
                     
@@ -359,8 +365,14 @@
                         targets: 4,
                         width: '10px',
                         render: function (data, type, full, meta) {
+                            let val = '';
+                            val = full.get_data_leak_feed_one;
+                            if(val) {
+                                    val = full.get_data_leak_feed_one.feedcontent;
+                                
+                            }
         
-                            return '<div class="text-elip" data-rel="tooltip" title="'+full.feedcontent+'">'+full.feedcontent+'</div>';
+                            return '<div class="text-elip" data-rel="tooltip" title="'+val+'">'+val+'</div>';
 
                         },
                     },
@@ -368,10 +380,13 @@
                         targets: 5,
                         width: '80px',
                         render: function (data, type, full, meta) {
-                
-        
-                            return full.feedtimepost;
-
+                            let val = '';
+                            val = full.get_data_leak_feed_one;
+                            if(val) {
+                                    val = full.get_data_leak_feed_one.feedtimepost;
+                                
+                            }
+                            return val;
                         },
                     },
                     {
