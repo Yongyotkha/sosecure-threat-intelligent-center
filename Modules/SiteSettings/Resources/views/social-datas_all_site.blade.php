@@ -313,10 +313,6 @@
                             
                 
         
-<<<<<<< HEAD
-=======
-                            {{--return val+' '+full.id;--}}
->>>>>>> e62d9bbbe2930d298f14660bf250b08a6ab0330a
                             return val;
 
                         },
