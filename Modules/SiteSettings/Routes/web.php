@@ -132,6 +132,7 @@ Route::post('/darkweb/delete_darkwebdata_process/{code}', 'DataLeakController@de
 Route::post('/socialdatas/delete_dataleakdata/{code}', 'DataLeakController@delete_dataleakdata')->name('socialdatas.delete_dataleakdata');
 Route::post('/socialdatas/change_status_dataleakdata', 'DataLeakController@change_status_dataleakdata')->name('socialdatas.change_status_dataleakdata');
 Route::post('/socialdatas/change_delete_dataleakdata', 'DataLeakController@change_delete_dataleakdata')->name('socialdatas.change_delete_dataleakdata');
+Route::post('/darkweb/delete_select_process', 'DataLeakController@delete_darkweb_select_process')->name('darkweb.delete_select_process');
 
 Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb');
 Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor')->middleware('can:menu_items');

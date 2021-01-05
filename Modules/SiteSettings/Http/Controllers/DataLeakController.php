@@ -424,7 +424,7 @@ class DataLeakController extends Controller
         // dd($request->id);
 
         foreach($request->id as $social_id){
-        $data = DataLeakSocialRef::where('id', $social_id)->delete();;
+        $data = DataLeakSocialRef::where('id', $social_id)->delete();
 
 
         // $data = CVEMapping::where("id", $request->id)->first();
@@ -441,6 +441,22 @@ class DataLeakController extends Controller
             [
                 'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('socialdatas.index_all_site'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function delete_darkweb_select_process(Request $request)
+    {
+        // dd($request->id);
+        foreach($request->id as $val_id){
+            $data = DataLeakSocialRef::where('id', $val_id)->delete();
+        }
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('darkweb.index_all_site'),
             ],
             true,
             Response::HTTP_OK

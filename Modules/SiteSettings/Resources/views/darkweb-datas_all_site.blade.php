@@ -27,8 +27,8 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span>@langapp('Search_Advance')</span>
@@ -121,7 +121,7 @@
                                         <tr>
                                             <th class="no-sort w-10">
                                                 <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
@@ -245,7 +245,35 @@
     var startDate = null;
     var endDate = null;
     var isDateSearch = null;
-    var social_id = [];
+    var val_id = [];
+
+    $('#table_social_datas').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table_social_datas').on('click', '.val_id', function () {
+        if ($(this).is(':checked')) {
+
+            
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            if ($('.val_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+
 
     $(function() {
         table_social_data();
@@ -310,7 +338,7 @@
                         sortable: false,
                         width: '1px',
                         render: function (data, type, full, meta) {
-                            return '<label><input type="checkbox" name="social_id" class="social_id"  value="' + full.id + '"><span class="label-text"></span></label>';
+                            return '<label><input type="checkbox" name="val_id" class="val_id"  value="' + full.id + '"><span class="label-text"></span></label>';
                         },
                     },
                     {
@@ -506,6 +534,53 @@
             });
 
     });
+
+    $("#btn_del_select").click(function() {
+        $('.val_id:checked').each(function () {
+            val_id.push(this.value);
+            
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('darkweb.delete_select_process') }}",
+                    data:{id: val_id},
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
+
+
 
     {{--function change_status(code) {
         let checkState = $("#status_" + code).is(":checked") ? 1 : 0;
