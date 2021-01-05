@@ -2585,6 +2585,7 @@ input.input-login:focus {
     vertical-align: middle;
     display: inline-block;
     margin-top: 5px;
+    margin-left: 3rem;
 }
 
 .navbar-brand {
@@ -2595,15 +2596,59 @@ input.input-login:focus {
     height: 72px !important;
 }
 
-@media (min-width: 768px){
-    .vbox>header.header.navbar.navbar-fixed-top-xs.nav-z+section {
-        top: 72px;
+.vbox>header.header.navbar.navbar-fixed-top-xs.nav-z+section {
+    top: 72px !important;
+}
+
+@media (max-width: 767px){
+    .navbar-fixed-top-xs+* {
+        padding-top: 72px !important;
+    }
+    .navbar+section .nav-off-screen {
+        top: 72px !important;
+    }
+    .navbar+section .nav-off-screen+* {
+        top: 72px !important;
+    }
+    .navbar-header>.btn {
+        position: absolute;
+        font-size: 1.3em;
+        padding: 9px 16px;
+        line-height: 30px;
+        left: 0;
+        top: 50% !important;
+        transform: translateY(-50%);
     }
 }
 
 @media screen and (max-width:1024px){
     .name-dash-text{
         font-size: 15px !important;
+    }
+    .bc-head {
+        font-size: 16px;
+        color: #333;
+        margin-top: 13px;
+        display: inline-block;
+        font-weight: 700;
+        white-space: nowrap;
+        max-width: 500px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media screen and (max-width:768px){
+    .bc-head {
+        font-size: 16px;
+        color: #333;
+        margin-top: 13px;
+        display: inline-block;
+        font-weight: 700;
+        white-space: nowrap;
+        max-width: 320px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 .form-custom{
@@ -2621,3 +2666,4 @@ input.input-login:focus {
 .bg-dark .nav>li>a {
     color: #ffffff !important;
 } */
+
