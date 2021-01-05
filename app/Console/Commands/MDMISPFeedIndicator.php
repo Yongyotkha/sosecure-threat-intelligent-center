@@ -87,7 +87,7 @@ class MDMISPFeedIndicator extends Command
             foreach ($json_o["response"] as $key => $valueEvent) {
                 $this->$saveEvent($valueEvent["Event"]);
                 $this->$saveRelatedEvent($valueEvent["Event"]);
-                $this->$saveRelatedIndicator($valueEvent["Event"]);
+                $this->$saveRelatedIndicator($valueEvent["Event"]["Attribute"]);
             }
         }
     } 
