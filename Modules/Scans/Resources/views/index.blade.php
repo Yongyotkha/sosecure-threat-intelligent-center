@@ -7,12 +7,12 @@
             @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">Scans</div>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                 title="@langapp('export') CSV">
                 @icon('solid/download') CSV
-            </a>
+            </a> --}}
             <a href="#" class="btn btn-sm btn-default pull-right">
-                <i class="fa fa-sync-alt"></i>
+                <i class="fa fa-sync-alt"></i> Refresh
             </a>
             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                 <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
