@@ -24,7 +24,7 @@ use MongoDB\BSON\UTCDateTime;
 
 
 define("PAGINATE_NUM", 10);
-define("DB_MONGO_01", 'mongodb://10.104.0.7:27017');
+define("DB_MONGO_01", 'mongodb://10.104.0.10:27017');
 
 
 function gen_uuid() {
