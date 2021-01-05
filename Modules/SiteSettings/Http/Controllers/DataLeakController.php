@@ -345,6 +345,13 @@ class DataLeakController extends Controller
         return view('sitesettings::modal.delete_dataleakdata')->with($data);
     }
 
+    public function delete_darkwebdata_modal($code){
+
+        $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
+        $data["DataLeakSocialRef"] = $DataLeakSocialRef;
+        return view('sitesettings::modal.delete_darkwebdata')->with($data);
+    }
+
     public function delete_dataleakdata($code){
         dd($code);
         $model = DataLeakSocialRef::where('code', $code);
@@ -358,6 +365,22 @@ class DataLeakController extends Controller
         //     true,
         //     Response::HTTP_OK
         // );
+    }
+
+
+    public function delete_darkwebdata_process($code){
+        // dd($code);
+         DataLeakSocialRef::where('code', $code)->delete();
+        
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('darkweb.index_all_site'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
     

@@ -421,10 +421,9 @@
                         width: '10px',
                         render: function (data, type, full, meta) {
                 
-        
-                            return '<a href="" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
+
+                            return `<a href="${base_url}/darkweb_data/delete_darkwebdata_modal/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                             
-                            {{--href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}"--}}
                         },
                     },
 
