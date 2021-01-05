@@ -429,51 +429,10 @@ class DataLeakController extends Controller
 
 
 
-            // $model = $model->orwhere(function ($q) use ($orwhere,$request) {
-            //     $q->where($orwhere);
-            //     if($request -> source) {
-            //         $q->where('sourceid', $request -> source);
-            //     }
-            //     if($request -> keywords) {
-            //         $q->whereHas('get_social_ref', function($qq) use ($request) {
-            //             $qq->where('keyword', 'LIKE', '%'.$request -> keywords.'%');
-            //         });
-            //     }
-            //     if($request -> site) {
-            //         $q->whereHas('get_social_ref', function($qq) use ($request) {
-            //             $qq->where('site_id', $request -> site);
-            //         });
-            //     }
-
-            //     if($request -> startDate) {
-            //         $date_start = $request->startDate;
-            //         $date_end = $request->endDate;
-    
-            //         $date_start_explode = explode(" ",$date_start);
-            //         $date_start_date = @$date_start_explode[0];
-            //         // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-            //         // dd($date_start_time);
-            //         $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-            //         // dd($date_start_date_format);
-            //         // $date_start_time_time = date("H:i", strtotime($date_start_time));
-            //         // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-            //         // dd($date_start);
-    
-            //         $date_end_explode = explode(" ",$date_end);
-            //         $date_end_date = @$date_end_explode[0];
-            //         // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-            //         // dd($date_end_time);
-            //         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-            //         // $date_end_time_time = date("H:i", strtotime($date_end_time));
-            //         // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-            //         // dd($date_end_time_time);
-    
-            //         // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-            //         $q -> whereBetween('feedtimepost',array($date_start_date_format,$date_end_date_format));
-            //     }
-
-
-            // });
+            $model->whereHas('get_data_leak_feed_one', function($q) use ($where1,$orwhere) {
+                $q->where($where1);
+                $q->orwhere($orwhere);
+            });
            
             $model->orderBy('id', 'desc');
         } else {
