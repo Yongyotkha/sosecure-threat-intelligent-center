@@ -28,7 +28,7 @@
                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
+                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
                         @icon('solid/plus') @langapp('create')
                     </a>
                 </header>
@@ -138,6 +138,83 @@
     </section>
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+    <div class="modal fade fixed-left" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="exampleModalLabel">Add</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
+                        <div class="col-lg-9">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="" value="">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-info">Enter</button>  
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label">Image</label>
+                        <div class="col-lg-9">
+                                <input type="file" class="form-control" name="" value="">
+                            <div class="preview-img-wdfm"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label">Options</label>
+                        <div class="col-sm-9">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="" value="">
+                                    <span class="label-text">
+                                        Label
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="" value="">
+                                    <span class="label-text">
+                                        Label
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="" value="">
+                                    <span class="label-text">
+                                        Label
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-info btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 </section>
 
