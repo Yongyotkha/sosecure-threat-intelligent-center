@@ -230,7 +230,7 @@
 @include('stacks.js.advanced_search')
 <script>
 
-    var search_val = false;
+    var search_val = 0;
     var keywords = null;
     var site = null;
     var source = null;
@@ -244,15 +244,14 @@
     });
 
     function search(){
-        search_val = true;
+        search_val = 1;
         keywords = $('#keyword').val();
         site = $('#site option:selected').val();
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        
         console.log(site);
-        {{--table_social_data();--}}
+        table_social_data();
     }
 
     function table_social_data(){
@@ -306,16 +305,15 @@
                         targets: 1,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                            let val = full.get_social_ref;
-                            if(val) {
-                                val = full.get_social_ref.get_site;
+
+                                val = full.get_site;
                                 if(val) {
-                                    val = full.get_social_ref.get_site.name;
+                                    val = full.get_site.name;
                                 }
-                            }
+                            
                 
         
-                            return val+' '+full.id;
+                            return val;
 
                         },
                     },
@@ -324,8 +322,10 @@
                         width: '60px',
                         render: function (data, type, full, meta) {
                 
-        
-                            return full.source_name;
+                            if(full.get_data_leak_feed_one){
+                                return full.get_data_leak_feed_one.source_name;
+                            }
+                            return '';
 
                         },
                     
@@ -347,9 +347,12 @@
                         targets: 4,
                         width: '10px',
                         render: function (data, type, full, meta) {
-        
-                            return '<div class="text-elip" data-rel="tooltip" title="'+full.feedcontent+'">'+full.feedcontent+'</div>';
-
+                            console.log(full);
+                            if(full.get_data_leak_feed_one){
+                                return '<div class="text-elip" data-rel="tooltip" title="'+full.get_data_leak_feed_one.feedcontent+'">'+full.get_data_leak_feed_one.feedcontent+'</div>';
+                            }else{
+                                return '';
+                            }
                         },
                     },
                     {
@@ -357,8 +360,11 @@
                         width: '80px',
                         render: function (data, type, full, meta) {
                 
-        
-                            return full.feedtimepost;
+                            if(full.get_data_leak_feed_one){
+                            return full.get_data_leak_feed_one.feedtimepost;
+                            }else{
+                                return '';
+                            }
 
                         },
                     },
@@ -367,8 +373,11 @@
                         width: '10px',
                         render: function (data, type, full, meta) {
                 
-        
-                            return full.view;
+                            if(full.get_data_leak_feed_one){
+                            return full.get_data_leak_feed_one.view;
+                            }else{
+                                return '';
+                            }
 
                         },
                     },
@@ -393,9 +402,12 @@
                         targets: 8,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
+      
+                            return `<a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                      
+                            
         
-                            return '<a href="" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
+                            
                             
                             {{--href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}"--}}
                         },
@@ -468,13 +480,13 @@
             $("#social_reset").click(function() {
                 
 
-                search_val = false;
+                search_val = 0;
                 $("#keyword").val('');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 $("#site").val('').trigger("change");
                 $("#source").val('').trigger("change");
-                {{--table_social_data();--}}
+                table_social_data();
             
 
             });

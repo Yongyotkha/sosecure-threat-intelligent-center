@@ -266,10 +266,65 @@ class DataLeakController extends Controller
 
     public function socialdatas_all_site_tb(Request $request){
 
-        $model = DataLeakFeed::where('deleted_at',null)->where('status',1)->with('get_social_ref');
+        $model = DataLeakSocialRef::where('deleted_at',null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
+
+        if($request -> search_val==1){
+           
+            if($request ->keywords){
+                $model->where('keyword', 'LIKE', '%' . $request->keywords . '%')
+                ->orWhere('feedcontent', 'LIKE', '%' . $request->keywords . '%');               
+            }
+
+            if($request ->site){
+
+                // $model = $model ->where('site_id', $request ->site);
+                $site=$request ->site;
+                    $model -> whereHas('get_social_ref', function($query) use ($site){
+                    $query -> where('site_id', $site);
+                });               
+            }
+
+            if($request ->source){
+
+                $model-> where('sourceid', $request ->source);
+                   
+            }
+
+            if($request ->isDateSearch==1){
+                $date_start = $request->startDate;
+                $date_end = $request->endDate;
+        
+                $date_start_explode = explode(" ", $date_start);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
+        
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+        
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+        
+        
+                $date_end_explode = explode(" ", $date_end);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+                $model->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
+
+            }
+
+            $model->get();
+        }else{
+
+            $model->get();
+        }
+
+        
 
 
-        $model->get();
+        
         return DataTables::of($model)->toJson();
 
 
@@ -280,6 +335,29 @@ class DataLeakController extends Controller
         
        
     }
+
+    public function delete_dataleakdata_modal($code){
+
+        $data["code"] = $code;
+        return view('sitesettings::modal.delete_dataleakdata')->with($data);
+    }
+
+    public function delete_dataleakdata($code){
+        dd($code);
+        $model = DataLeakSocialRef::where('code', $code);
+        $model->softDeletes();
+
+        // return ajaxResponse(
+        //     [
+        //         'message'  => langapp('changes_saved_successful'),
+        //         'redirect' => route('socialdatas.index',['id' => $site_code->code]),
+        //     ],
+        //     true,
+        //     Response::HTTP_OK
+        // );
+    }
+
+    
 
     public function datafeedsocial_datatables(Request $request){
         if($request -> search_val == 1) {
