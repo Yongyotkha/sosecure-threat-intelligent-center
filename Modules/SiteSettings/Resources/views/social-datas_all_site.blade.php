@@ -26,8 +26,9 @@
                     <div class="bc-head">Data Leak Datas </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
-                    </a> --}}
-                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
+                        --}}
+                    </a>
+                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -114,7 +115,7 @@
                                     <tr>
                                         <th class="no-sort w-10">
                                             <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
@@ -239,6 +240,32 @@
     var isDateSearch = null;
     var social_id = [];
 
+    $('#table_social_datas').on('click', '.select-chk', function () {
+    if ($(this).is(':checked')) {
+
+        $('#btn-change-status').prop("disabled", false);
+    } else {
+        
+        if ($('.select-chk').filter(':checked').length < 1){
+
+            $('#btn-change-status').attr('disabled',true);
+        }
+    }
+    });
+
+    $('#table_social_datas').on('click', '.social_id', function () {
+        if ($(this).is(':checked')) {
+
+            
+            $('#btn-change-status').prop("disabled", false);
+        } else {
+            if ($('.social_id').filter(':checked').length < 1){
+                
+                $('#btn-change-status').attr('disabled',true);
+            }
+        }
+    });
+
     $(function() {
         table_social_data();
     });
@@ -250,7 +277,7 @@
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        console.log(site);
+
         table_social_data();
     }
 
@@ -347,7 +374,7 @@
                         targets: 4,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                            console.log(full);
+                          
                             if(full.get_data_leak_feed_one){
                                 return '<div class="text-elip" data-rel="tooltip" title="'+full.get_data_leak_feed_one.feedcontent+'">'+full.get_data_leak_feed_one.feedcontent+'</div>';
                             }else{
@@ -418,15 +445,12 @@
             });
     }
 
-    function social_active(id) {
+    function social_active(id) {    
 
-
-        console.log(id);
-        
-        {{--let checkState = $("#cve_active_" + id).is(":checked") ? 1 : 0;
-        axios.post('{{route('monitoringvulnerabilitys.change_status')}}', {
-            active: checkState,
-            id: id,
+        let checkState = $("#social_active_" + id).is(":checked") ? 1 : 0;
+        axios.post('{{route('socialdatas.change_status_dataleakdata')}}', {
+            status: checkState,
+            code: id,
         }).then(function (response) {
             console.log(response.data.redirect);
             toastr.success(response.data.message, '@langapp('response_status')');
@@ -438,7 +462,7 @@
                 errorsHtml += "<li>" + value[0] + "</li>";
             });
             toastr.error(errorsHtml, '@langapp('response_status')');
-        });--}}
+        });
     }
 
     $(function() {
@@ -492,23 +516,52 @@
             });
     });
 
-    {{--function change_status(code) {
-        let checkState = $("#status_" + code).is(":checked") ? 1 : 0;
-        axios.post('{{route('socialdatas.change_status')}}', {
-            status: checkState,
-            code: code,
-        }).then(function (response) {
-            toastr.success(response.data.message, '@langapp('response_status')');
-            window.location.href = response.data.redirect;
-        }).catch(function (error) {
-            var errors = error.response.data.errors;
-            var errorsHtml = "";
-            $.each(errors, function (key, value) {
-                errorsHtml += "<li>" + value[0] + "</li>";
-            });
-            toastr.error(errorsHtml, '@langapp('response_status')');
+    $("#btn-change-status").click(function() {
+        $('.social_id:checked').each(function () {
+            social_id.push(this.value);
+            
         });
-    }--}}
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes, Is Fixed!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+        type:"POST",
+        url:"{{ route('socialdatas.change_delete_dataleakdata') }}",
+        data:{id: social_id},
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            toastr.success(response.message, '@langapp('response_status')');
+            window.location.href = response.redirect;
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+      
+    });
+
+            }
+        })
+    });
+
+   
 
 </script>
 @endpush
