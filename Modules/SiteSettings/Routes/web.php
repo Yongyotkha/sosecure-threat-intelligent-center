@@ -109,6 +109,9 @@ Route::group(
     }
 );
 
+Route::get('/WebDefacement-website/{id}', 'WebDefacementController@webdefacement_website')->name('webdefacement_website.index')->middleware('can:menu_items');
+Route::get('/WebDefacement-server/{id}', 'WebDefacementController@webdefacement_server')->name('webdefacement_server.index')->middleware('can:menu_items');
+
 // Compromised
 Route::get('/compromised_feed', 'DataLeakController@compromised_feed')->name('compromised_feed.index')->middleware('can:menu_items');
 Route::get('/compromised_data', 'DataLeakController@compromised_data')->name('compromised_data.index')->middleware('can:menu_items');

@@ -107,20 +107,20 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Compromised' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Webdefacement' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Web Defacement
         </a>
        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
-                <a href="#">
+                <a href="{{route('webdefacement_website.index', ['id' => $siteSettings->code])}}">
                     Website
                 </a>
             </li>
 
             <li style="padding-left:2rem">
-                <a href="#">
+                <a href="{{route('webdefacement_website.index', ['id' => $siteSettings->code])}}">
                     Server
                 </a>
             </li>
