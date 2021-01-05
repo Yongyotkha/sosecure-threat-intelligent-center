@@ -2587,7 +2587,6 @@ input.input-login:focus {
     vertical-align: middle;
     display: inline-block;
     margin-top: 5px;
-    margin-left: 3rem;
 }
 
 .navbar-brand {
@@ -2603,11 +2602,20 @@ input.input-login:focus {
 }
 
 @media (max-width: 767px){
+
+    .nav-header-login.navbar-brand img{
+        margin-left: 0rem !important;
+    }
+
+    .navbar-brand img {
+        margin-left: 3rem !important;
+    }
     .navbar-fixed-top-xs+* {
         padding-top: 72px !important;
     }
     .navbar+section .nav-off-screen {
         top: 72px !important;
+        z-index: 2;
     }
     .navbar+section .nav-off-screen+* {
         top: 72px !important;

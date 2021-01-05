@@ -1,109 +1,21 @@
 @extends('layouts.app')
 @section('content')
-<style>
-    .tooltip-inner {
-        max-width: 500px;
-        width: 500px;
-    }
-
-    .w-200 {
-        width: 200px !important;
-    }
-</style>
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header panel-heading bg-white b-b b-light">
+        <header class="header bg-white b-b b-light">
             <div class="bc-head">Summary Dashboard</div>
 
             <div class="pull-right" style="margin-top: 15px">
-                Current Date : <i class="fas fa-calendar"></i> 2020-01-01
+                Current Date : <i class="fas fa-calendar"></i> <span id="current-date"></span>
             </div>
         </header>
 
-        <section class="scrollable wrapper" style="padding:0;">
-            {{-- <section class="panel panel-default" id="area-advance-search" style="display: none;">
-                <div class="container-fluid" style="padding: 2rem;">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group m-b-md">
-                                <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="keywords" id="keywords"
-                                    placeholder="Search">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="" class="">Assets</label>
-
-                            <select name="assets" id="assets" class="select2-option form-control">
-                              
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-
-                        <div class="col-md-4">
-                            <label for="" class="d-block">Date</label>
-                            <div id="reportrange"
-                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-top: 5px;margin-bottom:0;">
-                                <i class="fa fa-calendar"></i>&nbsp;
-                                <span></span> <i class="fa fa-caret-down"></i>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="" class="">CVSS Severity</label>
-                                <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                                    <option value="CRITICAL">CRITICAL</option>
-                                    <option value="HIGH">HIGH</option>
-                                    <option value="MEDIUM">MEDIUM</option>
-                                    <option value="LOW">LOW</option>
-                                    <option value="NONE">NONE</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="m-0" style="margin-top: 28px !important">
-                                <input type="checkbox" name="acceptRules" class="inline checkbox" id="is_fix"
-                                    value="false">
-                                <span class="label-text" style="font-weight: bold;font-size:16px;">IS Fixed</span>
-                            </label>
-                            <div id="checkbox-value"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive"
-                                onclick="search()">
-                                <i class="fas fa-search"></i>
-                                Search
-                            </button>
-                            <button class="btn btn-default" id="clear_data" type="reset">
-                                <i class=" fas fa-broom"></i>
-                                <span> Clear </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section> --}}
-
-
+        <section class="scrollable wrapper">
             <div id="load_chart">
                 <div class="row">
                     <div class="col-lg-12 col-md-12" id="count_cve"></div>
                     <div class="col-md-12">
                         <section class="">
-                            {{-- <header class="panel-heading font-bold panel-header-blue">
-                                <div class="row d-flex-center">
-                                    <div class="col-xs-6">
-                                        <i class="fas fa-chart-pie"></i> Summary Dashboard
-                                    </div>
-                                    <div class="col-xs-6 text-right">
-                                        Current Date : <i class="fas fa-calendar"></i> 2020-01-01
-                                    </div>
-                                </div>
-                            </header> --}}
-
                             <div class="panel-body" id="chart-container">
                                 <div class="row">
                                     <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px mb-2">
@@ -331,10 +243,7 @@
                     </div>
                 </div>
             </div>
-
         </section>
-
-
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
@@ -356,6 +265,15 @@
 @include('stacks.js.highchart')
 
 <script>
+
+    var today_date = new Date();
+    var dd = String(today_date.getDate()).padStart(2, '0');
+    var mm = String(today_date.getMonth() + 1).padStart(2, '0');
+    var yyyy = today_date.getFullYear();
+    today_date = mm + '-' + dd + '-' + yyyy;
+    document.getElementById('current-date').innerHTML = today_date;
+    
+
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip(); 
     });
