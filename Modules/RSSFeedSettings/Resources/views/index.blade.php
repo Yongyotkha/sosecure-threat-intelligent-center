@@ -47,11 +47,11 @@
                     @icon('solid/arrow-left')
                     </a> --}}
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                    <div class="bc-head">@langapp('settings') > @langapp('rss_feed_settings')</div>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
+                    <div class="bc-head">@langapp('rss_feed_settings')</div>
+                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                         title="@langapp('export') CSV">
                         @icon('solid/download') CSV
-                    </a>
+                    </a> --}}
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                             @langapp('delete')</span>
@@ -76,33 +76,42 @@
 
                 <section class="scrollable wrapper">
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="table-rss-setting-template">
-                                <thead>
-                                    <tr>
-                                        <th class="hide"></th>
-                                        <th class="no-sort">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        <th>@langapp('name')</th>
-                                        <th>URL</th>
-                                        {{-- <th>@langapp('keyword')</th>
-                                        <th>Interval (Day)</th>
-                                        <th>Start Date Feed</th>
-                                        <th>Last Date Feed</th>
-                                        <th>Data Feed</th>
-                                        <th>Data Error</th> --}}
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-        
-                                </tbody>
-                            </table>
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table RSS Feed Settings
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="table-rss-setting-template">
+                                    <thead>
+                                        <tr>
+                                            <th class="hide"></th>
+                                            <th class="no-sort">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            <th>@langapp('name')</th>
+                                            <th>URL</th>
+                                            {{-- <th>@langapp('keyword')</th>
+                                            <th>Interval (Day)</th>
+                                            <th>Start Date Feed</th>
+                                            <th>Last Date Feed</th>
+                                            <th>Data Feed</th>
+                                            <th>Data Error</th> --}}
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+            
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </section>

@@ -43,16 +43,20 @@
     
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                    <div class="bc-head">@langapp('rss_feed_settings') | www.xxx.xxx/xxx.xxx.rss</div>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+                    <div class="bc-head">News</div>
+                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
-                    </a>
+                    </a> --}}
                     {{-- <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
                     </button> --}}
                     <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span>@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
+
+                    <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span>@langapp('Search_Advance')</span>
+                    </a>
         
                     <a href="{{route('rssfeedsettings.rss_news_create_news')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle='ajaxModal'>
                         @icon('solid/plus') @langapp('create') News
@@ -63,10 +67,9 @@
             {{-- Search --}}
             {{-- Tab Content --}}
             <section class="scrollable wrapper bg-grey">
-                <section class="panel panel-default">
+                <section class="panel panel-default" id="area-advance-search" style="display: none;">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
-                            
                             <div class="col-lg-3">
                                 <label for="">Title</label>
                                 <input type="text" class="form-control" name="keywords" id="keywords">
@@ -104,8 +107,6 @@
                                     {{-- <option value="1" selected>All</option> --}}
                                 </select>
                             </div>
-                           
-                            
                         </div>
                         <div class="row">
                             <div class="col-lg-12 text-right">
@@ -124,32 +125,41 @@
                 
                 <section class="scrollable">              
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table  class="table table-striped" id="table-rss-news-template">
-                                <thead>
-                                    <tr>
-                                        <th class="no-sort">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        {{-- <th>Site Name</th> --}}
-                                        <th width="20px">Source name</th>
-                                        <th width="20%">Title</th>
-                                        <th>Category</th>
-                                        <th width="20px">Data Satatus</th>
-                                        <th width="30px">Public Date</th>
-                                        <th>View Count</th>
-                                        <th width="40px">Link</th>
-                                        <th>Status</th>
-                                        <th width="5%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-        
-                                </tbody>
-                            </table>   
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table News
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table  class="table table-striped" id="table-rss-news-template">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            {{-- <th>Site Name</th> --}}
+                                            <th width="20px">Source name</th>
+                                            <th width="20%">Title</th>
+                                            <th>Category</th>
+                                            <th width="20px">Data Satatus</th>
+                                            <th width="30px">Public Date</th>
+                                            <th>View Count</th>
+                                            <th width="40px">Link</th>
+                                            <th>Status</th>
+                                            <th width="5%">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+            
+                                    </tbody>
+                                </table>   
+                            </div>
                         </div>
                     </section>
                 </section>
@@ -183,6 +193,11 @@
 @include('stacks.js.daterangpicker')
 
 <script>
+
+    $('#area-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#area-advance-search').toggle();
+    });
 
     var search_val = false;
     var keywords = null;

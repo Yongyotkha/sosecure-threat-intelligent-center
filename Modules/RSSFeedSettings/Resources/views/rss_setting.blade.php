@@ -7,9 +7,9 @@
                 @icon('solid/arrow-left')
             </a>
             <div class="bc-head">@langapp('rss_feed_settings') | www.xxx.xxx/xxx.xxx.rss</div>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                 @icon('solid/download') CSV
-            </a>
+            </a> --}}
             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                 <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
             </button>
