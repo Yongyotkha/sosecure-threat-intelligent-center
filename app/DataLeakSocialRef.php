@@ -11,6 +11,8 @@ class DataLeakSocialRef extends Model
 {
     use SoftDeletes;
     protected $table = 'data_leak_socail_ref';
+    protected $dates = ['deleted_at'];
+
     public function get_data_leak_feed(){
         return $this->belongsTo(DataLeakFeed::class, 'data_leak_feed_id', 'id');
     }
