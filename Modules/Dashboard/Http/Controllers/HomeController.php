@@ -35,7 +35,7 @@ class HomeController extends Controller
             session()->pull('show_tour');
         }
 
-        return view('dashboard::index')->with($data);
+        return view('dashboard::welcome')->with($data);
     }
     // Get dashboard to display
     protected function getDashboard($dashboard)

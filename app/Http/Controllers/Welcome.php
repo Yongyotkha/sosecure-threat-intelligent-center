@@ -11,7 +11,7 @@ class Welcome extends Controller
 {
     public function index()
     {
-        return redirect('dashboard');
+        return redirect('dashboardnew');
     }
 
     // public function test()
