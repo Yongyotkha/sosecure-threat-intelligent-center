@@ -8,7 +8,6 @@
             <section class="vbox">
 
                 <header class="header panel-heading bg-white b-b b-light">
-
                     @admin
                         {{-- <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                            @icon('solid/download') CSV
@@ -16,9 +15,9 @@
                         @endadmin
 
                         @can('users_delete')
-                        <button type="submit" id="button" class="btn btn-sm btn-danger pull-right" value="bulk-delete">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
-                        </button>
+                            <button type="submit" id="button" class="btn btn-sm btn-danger pull-right" value="bulk-delete" data-rel="tooltip" title="Are you sure?" data-placement="bottom">
+                                @icon('solid/trash-alt') @langapp('delete')
+                            </button>
                         @endcan
 
                         @can('users_create')
@@ -33,7 +32,7 @@
                         </a>
                         @endif
 
-                <div class="btn-group">
+                    <div class="btn-group">
 						<button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown"> @langapp('filter') 
 							<span class="caret"></span>
 						</button>
