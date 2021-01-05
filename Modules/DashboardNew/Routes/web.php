@@ -11,8 +11,7 @@
 |
 */
 Route::group(
-    ['middleware' => 'web', 'prefix' => 'dashboardnew'],
-    function () {
+    ['middleware' => ['web', 'installed'], 'prefix' => 'dashboardnew'], function () {
         Route::get('/', 'DashboardNewController@index')->name('dashboardnew.index')->middleware('can:menu_items');
     }
 );

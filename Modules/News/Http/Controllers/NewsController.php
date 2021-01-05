@@ -803,7 +803,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <img src="'.$data -> logo.'" alt="">
+                        <img src="'.$data -> logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';
@@ -868,7 +868,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <img src="'.$data -> news -> logo.'" alt="">
+                        <img src="'.$data -> news -> logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';
@@ -919,7 +919,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <img src="'.$data -> news -> logo.'" alt="">
+                        <img src="'.$data -> news -> logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';

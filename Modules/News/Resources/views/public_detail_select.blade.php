@@ -5,9 +5,9 @@
     <section class="vbox">
         <div class="section-jumborton">
             {{-- <div class="thumnail-img" style="background-image:url('https://images.unsplash.com/photo-1597086657068-7e10f874e8c2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=986&q=80')"></div> --}}
-            @if(@$RSSNews->logo)
+            {{-- @if(@$RSSNews->logo)
                 <div class="thumnail-img" style="background-image:url('{{@$RSSNews->logo}}')"></div>
-            @endif
+            @endif --}}
             
             <div class="jumborton-description">
                 <div class="container-description">
