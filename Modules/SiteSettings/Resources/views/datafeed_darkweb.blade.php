@@ -9,7 +9,7 @@
                         data-target="#setting-nav">@icon('solid/bars')
                     </a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3">@langapp('settings')  </p>
+                    <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -306,7 +306,7 @@ function table_social_data(){
         destroy: true,
         "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
         ajax: {
-            url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
+            url: '{!! route('datafeed.darkweb_datatables') !!}',
             data: {
                 "search" : search,
             },

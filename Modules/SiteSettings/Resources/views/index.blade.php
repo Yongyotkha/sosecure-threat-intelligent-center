@@ -8,10 +8,7 @@
             @icon('solid/arrow-left')
                 </a> --}}
                 <div class="bc-head">@langapp('settings') > Site</div>
-                <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
-                    data-rel="tooltip" title="@langapp('export') CSV">
-                    @icon('solid/download') CSV
-                </a>
+
 
                 {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }}
                 pull-right" data-toggle="modal" data-target="#create_key_modal">

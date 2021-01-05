@@ -66,6 +66,7 @@ class OTXMDFeedPulse extends Command
                         'updated_at' => $date_now ,
                         'updated_by' => "system",
                         'deleted_at' => null,
+                        'source' => "otx.alienvault",
                     ]);
                 }//modified:%3C1d
                 $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified&q=modified:%3C12h', $urlLimit);
@@ -127,6 +128,7 @@ class OTXMDFeedPulse extends Command
         $_otxReconnect = true;
         $_dataOut["result"] = "";
         $_dataOut["success"] = false;
+        $_sleeptime = rand(0,2000); 
         while ($_otxReconnect && $_reconnect < $limit) {
             try {
                 $_bodyData = $_clientHttp->request(
@@ -138,7 +140,7 @@ class OTXMDFeedPulse extends Command
                             'Content-type' => 'application/json',
                             'X-OTX-API-KEY' => $_OTX_KEY,
                         ],
-                        'delay' => 200, //millisec == 1sec
+                        'delay' => $_sleeptime, //millisec == 1sec
                         'timeout' => 59, //sec == 100sec
                     ]
                 )->getBody();
@@ -208,6 +210,7 @@ class OTXMDFeedPulse extends Command
                                 'deleted_at' => null,
                                 'transaction_date' => date("Y-m-d"),
                                 'count_view' => 0,
+                                'source' => "otx.alienvault",
                             ],
                         ],
                         ['upsert' => true]
@@ -279,7 +282,7 @@ class OTXMDFeedPulse extends Command
                         }
                         try {
                             $updateResult = $collectionBasic->updateOne(
-                                ['indicator_id' => $value["id"]],
+                                ['indicator_id' => $value["id"].""],
                                 ['$set' => [
                                     'indicator_name' => $value["indicator"],
                                     'type' => $value["type"],
@@ -294,13 +297,14 @@ class OTXMDFeedPulse extends Command
                                         'created_by' => "system",
                                         'deleted_at' => null,
                                         'transaction_date' => date("Y-m-d"),
+                                        'source' => "otx.alienvault",
                                     ],
                                 ],
                                 ['upsert' => true]
                             );
 
                             $update_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->updateOne(
-                                ['indicator_id' => (isset($value["id"]) ? $value["id"] : ""),
+                                ['indicator_id' => (isset($value["id"]) ? $value["id"]."" : ""),
                                     'pulse_id' => (isset($pulseID) ? $pulseID : "")],
                                 ['$set' => [
                                     'pulse_modified' => $dateModified,
@@ -308,8 +312,7 @@ class OTXMDFeedPulse extends Command
                                     'created' => (isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null),
                                     'expiration' => (isset($value["expiration"]) ? new UTCDateTime(strtotime($value["expiration"])*1000) : null),
                                     'is_active' => (isset($value["is_active"]) ? $value["is_active"] : ""),
-                                    'updated_at' => $date_now,
-                                    'updated_by' => "system",
+                                    
                                 ],
                                     '$setOnInsert' => [
                                         'status' => 1,
@@ -317,6 +320,9 @@ class OTXMDFeedPulse extends Command
                                         'created_by' => "system",
                                         'deleted_at' => null,
                                         'transaction_date' => date("Y-m-d"),
+                                        'updated_at' => $date_now,
+                                        'updated_by' => "system",
+                                        'source' => "otx.alienvault",
                                     ],
                                 ],
                                 ['upsert' => true]
@@ -436,6 +442,7 @@ class OTXMDFeedPulse extends Command
                                         'deleted_at' => null,
                                         'transaction_date' => date("Y-m-d"),
                                         'count_view' => 0,
+                                        'source' => "otx.alienvault",
                                     ],
                                 ],
                                 ['upsert' => true]
@@ -455,6 +462,7 @@ class OTXMDFeedPulse extends Command
                                         'created_by' => "system",
                                         'deleted_at' => null,
                                         'transaction_date' => date("Y-m-d"),
+                                        'source' => "otx.alienvault",
                                     ],
                                 ],
                                 ['upsert' => true]

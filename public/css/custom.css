@@ -1833,6 +1833,13 @@ ul.topics-news-list li a:hover{
     text-overflow: ellipsis; 
     width: 100%;
 }
+.text-elipse-setting{
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 163px;
+}
 
 .content-news-image a img{
     position: absolute;
@@ -2469,6 +2476,7 @@ a.author-by{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center top;
+    overflow: hidden;
 }
 .login-body{
     padding: 3rem;
@@ -2529,14 +2537,87 @@ input.input-login:focus {
     }
 }
 
-
-.navbar-brand img {
-    max-height: 35px !important;
+.md-text-logo{
+    display: inline-block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    line-height: .8;
+    margin-top: 8px;
+}
+.sm-text-logo{
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
 }
 
-header.header.navbar.bg-dark{
+.text-upper{
+    text-transform: uppercase !important;
+}
+.bold-500{
+    font-weight: 500;
+}
+.bold-700{
+    font-weight: 700;
+}
+
+.highcharts-a11y-proxy-button{
+    margin-bottom: .5rem !important;
+}
+/* ของ Loguin */
+.nav-header-login.navbar-brand img {
+    max-height: 160px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.nav-header-login.navbar-brand {
+    float: left;
+    padding: 0 15px;
+    font-size: 18px;
+    line-height: 20px;
+    height: auto !important;
+}
+.navbar-brand img {
+    max-height: 60px !important;
+    vertical-align: middle;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.navbar-brand {
+    float: left;
+    padding: 0 15px;
+    font-size: 18px;
+    line-height: 20px;
+    height: 72px !important;
+}
+
+@media (min-width: 768px){
+    .vbox>header.header.navbar.navbar-fixed-top-xs.nav-z+section {
+        top: 72px;
+    }
+}
+
+@media screen and (max-width:1024px){
+    .name-dash-text{
+        font-size: 15px !important;
+    }
+}
+.form-custom{
+    margin-bottom: 0;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    margin-top: 1.2rem;
+}
+
+
+/* header.header.navbar.bg-dark{
     background: #848484 !important;
 }
 .bg-dark .nav>li>a {
     color: #ffffff !important;
-}
+} */

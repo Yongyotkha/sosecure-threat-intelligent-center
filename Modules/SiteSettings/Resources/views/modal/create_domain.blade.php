@@ -13,12 +13,25 @@
                     <input type="text" name="name" class="form-control">
                 </div>
             </div>
+
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Domain <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
                     <input type="text" name="domain" class="form-control">
+
+                    <!-- Example Domain -->
+                    <div class="mt-2">
+                        <table class="table table-bordered table-striped">
+                            <tr ><td>Example : Test.co.th</td></tr>
+                            <tr ><td>Example : Test.co.th</td></tr>
+                            <tr ><td>Example : Test.co.th</td></tr>
+                            <tr ><td>Example : Test.co.th</td></tr>
+                        </table>
+                    </div>
                 </div>
             </div>
+
+
             <div class="form-group row" style="display: none;">
                 <label class="col-lg-4 control-label">Open Scan </label>
                 <div class="col-lg-8">
@@ -231,10 +244,10 @@
                 Close
             </button> --}}
             {!! closeModalButton() !!}
-            <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
+            {{-- <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
                 <i class="fas fa-play"></i>
                 Run Scan And Save Now
-            </button>
+            </button> --}}
             {{-- <button type="submit" class="btn btn-info btn-rounded">
                 <i class="fas fa-paper-plane"></i>
                 Save
