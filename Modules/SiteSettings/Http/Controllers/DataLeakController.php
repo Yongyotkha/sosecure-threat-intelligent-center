@@ -700,10 +700,11 @@ class DataLeakController extends Controller
             if($request -> check_all == 'true') {
 
             } else {
-                if($request -> check_pending == 'true') {
+                if($request -> check_pending == 'true' && $request -> check_approved == 'true') {
+
+                } else if ($request -> check_pending == 'true'){
                     $model = $model->where('approve', '0');
-                }
-                if($request -> check_approved == 'true') {
+                } else if($request -> check_approved == 'true') {
                     $model = $model->where('approve', '1');
                 }
             }
@@ -745,7 +746,7 @@ class DataLeakController extends Controller
         ->editColumn(
             'chk',
             function (DataLeakFeedTemp $model) {
-                return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id val_id" value="' . $model->id . '"><span class="label-text"></span></label>';
             }
         )
         ->editColumn(
