@@ -23,7 +23,7 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
                         <div class="col-xs-6">
-                            <i class="fas fa-chart-pie"></i> Web Defacement
+                            <i class="fas fa-globe-europe"></i> Web Defacement
                         </div>
                         <div class="col-xs-6 text-right">
                             <button id="togglecollapsechart" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#details_webdefacement','#togglecollapsechart')">
