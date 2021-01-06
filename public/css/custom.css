@@ -2624,12 +2624,11 @@ input.input-login:focus {
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.14);
     background: #fff;
     border-radius: 6px;
-    height: 100%;
+    height: auto;
 }
 .wdfm-header{
     margin: -20px 15px 0;
-    height: 60%;
-    padding: 0;
+    padding-top: 56.25%;
     z-index: 3;
     position: relative;
     overflow: hidden;
@@ -2645,15 +2644,20 @@ input.input-login:focus {
     border-radius: 6px;
     display: flex;
     align-items: center;
+    background: #fff;
 }
 .wdfm-img{
-    flex: 1 1 auto;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 .wdfm-img a{
     display: inline-block;
 }
 .mdfm-text-muted{
     color: #9e9d9d;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .wdfm-img img{
     width: 100%;
@@ -2672,13 +2676,16 @@ input.input-login:focus {
     transform: translate3d(0,-50px,0);
 }
 .wdfm-btn{
-    top: -25px;
+    top: -35px;
     left: 17px;
     width: calc(100% - 30px);
     right: 17px;
     z-index: 1;
     position: absolute;
     text-align: center;
+}
+.wdfm-btn h4{
+    margin-left: 0 !important;
 }
 
 .wdfm-btn-a{
@@ -2711,25 +2718,46 @@ input.input-login:focus {
 .wdfm-footer{
     margin: 0 15px 10px;
     height: auto;
-    padding: 10px 0 0 0!important;
+    padding: 15px 0 10px 0!important;
     border-top: 1px solid #eeeeee;
-    padding-top: 10px;
     font-weight: 300;
     line-height: 1.5em;
     display: flex;
     box-sizing: border-box;
     align-items: center;
-}
-.wdfm-ft-left{
-
+    justify-content: space-between;
 }
 .wdfm-text-ft{
     margin: 0 !important;
+    color: #333;
 }
 .wdfm-ft-right{
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
+@media (min-width:0) and (max-width:1220px){
+    .wdfm-inner {
+        padding: 0 8px !important;
+        max-width: 100%;
+        flex-basis: 100%;
+        display: flex;
+    }
+    .mdfm-text-muted {
+        color: #9e9d9d;
+        font-size: 16px;
+    }
+}
+@media (min-width:1220px) and (max-width:1470px){
+    .wdfm-inner {
+        padding: 0 8px !important;
+        max-width: 50%;
+        flex-basis: 50%;
+        display: flex;
+    }
+}
 
 @media (max-width: 767px){
 

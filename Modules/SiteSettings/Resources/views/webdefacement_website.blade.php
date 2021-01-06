@@ -43,50 +43,20 @@
                         </header>
                         <div class="panel-body">
                             <div class="wdfm-container">
-                                <div class="wdfm-inner">
+                                <div class="item-wdfm wdfm-inner">
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="" class="wdfm-btn-a">
-                                                    <span>
-                                                        <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
-                                                    </span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="wdfm-body">
-                                            <div class="wdfm-btn">
-                                                {{-- <a class="btn btn-icon btn-default btn-sm">
-                                                    <i class="fas fa-eye"></i>
-                                                </a> --}}
-                                            </div>
-                                            <h4>Targeted Brand: paypal</h4>
-                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
-                                        </div>
-                                        <div class="wdfm-footer">
-                                            <div class="wdfm-ft-left">
-                                                <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
-                                            </div>
-                                            <div class="wdfm-ft-right">
-                                                Icon
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="wdfm-inner">
-                                    <div class="wdfm-card">
-                                        <div class="wdfm-header">
-                                            <div class="wdfm-img">
-                                                <a href="">
+                                                <a href="#">
                                                     <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
                                                 </a>
                                             </div>
                                         </div>
                                         <div class="wdfm-body">
                                             <div class="wdfm-btn">
-                                                {{-- <a class="btn btn-icon btn-default btn-sm">
+                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                                     <i class="fas fa-eye"></i>
-                                                </a> --}}
+                                                </a>
                                             </div>
                                             <h4>Targeted Brand: paypal</h4>
                                             <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
@@ -96,25 +66,26 @@
                                                 <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
                                             </div>
                                             <div class="wdfm-ft-right">
-                                                Icon
+                                                <div><i class="fas fa-map-marker text-muted"></i></div>
+                                                <div class="text-muted">GB</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="wdfm-inner">
+                                <div class="item-wdfm wdfm-inner">
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="">
+                                                <a href="#">
                                                     <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
                                                 </a>
                                             </div>
                                         </div>
                                         <div class="wdfm-body">
                                             <div class="wdfm-btn">
-                                                {{-- <a class="btn btn-icon btn-default btn-sm">
+                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                                     <i class="fas fa-eye"></i>
-                                                </a> --}}
+                                                </a>
                                             </div>
                                             <h4>Targeted Brand: paypal</h4>
                                             <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
@@ -124,7 +95,37 @@
                                                 <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
                                             </div>
                                             <div class="wdfm-ft-right">
-                                                Icon
+                                                <div><i class="fas fa-map-marker text-muted"></i></div>
+                                                <div class="text-muted">GB</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item-wdfm wdfm-inner">
+                                    <div class="wdfm-card">
+                                        <div class="wdfm-header">
+                                            <div class="wdfm-img">
+                                                <a href="#">
+                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="wdfm-body">
+                                            <div class="wdfm-btn">
+                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                            <h4>Targeted Brand: paypal</h4>
+                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
+                                        </div>
+                                        <div class="wdfm-footer">
+                                            <div class="wdfm-ft-left">
+                                                <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
+                                            </div>
+                                            <div class="wdfm-ft-right">
+                                                <div><i class="fas fa-map-marker text-muted"></i></div>
+                                                <div class="text-muted">GB</div>
                                             </div>
                                         </div>
                                     </div>
@@ -165,8 +166,8 @@
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">Image</label>
                         <div class="col-lg-9">
-                                <input type="file" class="form-control" name="" value="">
-                            <div class="preview-img-wdfm"></div>
+                            <input type="file" id="image-onchange" class="form-control">
+                            <img src="" id="preview-img-wdfm">
                         </div>
                     </div>
 
@@ -226,13 +227,15 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
+@include('partial.ajaxify')
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
 
 <script>
-    $('.wdfm-inner').hover(function(){
+    $('.wdfm-card').hover(function(){
         $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
-    })
+    });
 </script>
+
 @endpush
 @endsection
