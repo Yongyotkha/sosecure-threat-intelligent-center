@@ -119,7 +119,13 @@
         </ul>
     </li>
     
-    <li class="{{ $page === 'Webdefacement' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Webdefacement' ? 'active' : '' }}">
+        <a href="{{route('webdefacement_website.index', ['id' => $siteSettings->code])}}">
+            Web Defacement
+        </a>
+    </li>
+
+    {{-- <li class="{{ $page === 'Webdefacement' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Web Defacement
@@ -137,7 +143,7 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> --}}
 
 
 

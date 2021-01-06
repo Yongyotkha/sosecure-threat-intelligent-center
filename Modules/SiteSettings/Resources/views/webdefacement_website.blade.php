@@ -61,13 +61,18 @@
                                             <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
                                         </div>
                                         <div class="wdfm-footer">
-                                            <div class="wdfm-ft-left">
-                                                <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
+                                            <div class="wdfm-ft-left flex">
+                                                <div>Site : ออมสิน</div>
+                                                <div class="status-flex">Status : &nbsp; <span class="dot high"></span> High</div>
                                             </div>
-                                            <div class="wdfm-ft-right">
-                                                <div><i class="fas fa-map-marker text-muted"></i></div>
-                                                <div class="text-muted">GB</div>
+                                            <div class="wdfm-ft-right flex">
+                                                <div>Last Online: 10 second ago</div>
+                                                <div>Last Check: 10 second ago</div>
                                             </div>
+                                        </div>
+                                        <div class="wdfm-footer-action">
+                                            <a href="" class="btn btn-info">@icon('solid/pen-alt') Edit</a>
+                                            <a href="" class="btn btn-danger">@icon('solid/trash-alt') Delete</a>
                                         </div>
                                     </div>
                                 </div>
@@ -90,13 +95,18 @@
                                             <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
                                         </div>
                                         <div class="wdfm-footer">
-                                            <div class="wdfm-ft-left">
-                                                <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
+                                            <div class="wdfm-ft-left flex">
+                                                <div>Site : ออมสิน</div>
+                                                <div class="status-flex">Status : &nbsp; <span class="dot critical"></span> Critical</div>
                                             </div>
-                                            <div class="wdfm-ft-right">
-                                                <div><i class="fas fa-map-marker text-muted"></i></div>
-                                                <div class="text-muted">GB</div>
+                                            <div class="wdfm-ft-right flex">
+                                                <div>Last Online: 10 second ago</div>
+                                                <div>Last Check: 10 second ago</div>
                                             </div>
+                                        </div>
+                                        <div class="wdfm-footer-action">
+                                            <a href="" class="btn btn-info">@icon('solid/pen-alt') Edit</a>
+                                            <a href="" class="btn btn-danger">@icon('solid/trash-alt') Delete</a>
                                         </div>
                                     </div>
                                 </div>
@@ -119,13 +129,18 @@
                                             <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
                                         </div>
                                         <div class="wdfm-footer">
-                                            <div class="wdfm-ft-left">
-                                                <h4 class="wdfm-text-ft">Sun Dec 06 2020 22:21:15 GMT+0700 (Indochina Time)</h4>
+                                            <div class="wdfm-ft-left flex">
+                                                <div>Site : ออมสิน</div>
+                                                <div class="status-flex">Status : &nbsp; <span class="dot low"></span> Normal</div>
                                             </div>
-                                            <div class="wdfm-ft-right">
-                                                <div><i class="fas fa-map-marker text-muted"></i></div>
-                                                <div class="text-muted">GB</div>
+                                            <div class="wdfm-ft-right flex">
+                                                <div>Last Online: 10 second ago</div>
+                                                <div>Last Check: 10 second ago</div>
                                             </div>
+                                        </div>
+                                        <div class="wdfm-footer-action">
+                                            <a href="" class="btn btn-info">@icon('solid/pen-alt') Edit</a>
+                                            <a href="" class="btn btn-danger">@icon('solid/trash-alt') Delete</a>
                                         </div>
                                     </div>
                                 </div>
@@ -142,11 +157,11 @@
     <div class="modal fade fixed-left" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Add</span>
+                <div class="modal-header bg-blue">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true" class="text-white">&times;</span>
                     </button>
+                    <h4 class="modal-title text-white" id="exampleModalLabel">Add Website</h4>
                 </div>
                 <form action="">
                 <div class="modal-body">
@@ -156,17 +171,24 @@
                             <div class="input-group">
                                 <input type="text" class="form-control" name="" value="">
                                 <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-info">Enter</button>  
+                                    <button type="submit" class="btn btn-info">Check</button>  
                                 </span>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-lg-3 control-label">Image</label>
+                        <label class="col-lg-3 control-label">&nbsp;</label>
                         <div class="col-lg-9">
-                            <input type="file" accept="image/*" id="imgInp" name="logo-img" class="form-control">
-                            {{-- <img src="#" id="preview-img-wdfm"> --}}
+                            <div class="review-image-capture">
+                                <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" >
+                            </div>
+                            <div class="edit-capture text-center">
+                                {{-- {{route('webdefacement_website.edit_image')}} --}}
+                                <a href="#" target="_blank">
+                                    Edit Image
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -175,27 +197,47 @@
                         <div class="col-sm-9">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="" value="">
+                                    <input type="checkbox" name="options" value="">
                                     <span class="label-text">
-                                        Label
+                                        Hash
                                     </span>
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="" value="">
+                                    <input type="checkbox" name="options" value="">
                                     <span class="label-text">
-                                        Label
+                                        Filesize
                                     </span>
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="" value="">
+                                    <input type="checkbox" name="options" value="">
                                     <span class="label-text">
-                                        Label
+                                        Element
                                     </span>
                                 </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="options" value="">
+                                    <span class="label-text">
+                                        Element
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="options" value="blacklist">
+                                    <span class="label-text">
+                                        Blacklist Keyword
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="example-blacklist" style="display: none">
+                                <textarea name="" id="" cols="10" rows="5" class="form-control"></textarea>
+                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
                             </div>
                         </div>
                     </div>
@@ -233,9 +275,22 @@
  
 
 <script>
-    $(document).ready(function(){
+
+        $('#example-blacklist').hide();
+        $('input[type="checkbox"]').on('change',function(){
+            if($('input[value="blacklist"]').prop('checked')){
+                $('#example-blacklist').show();
+            }else{
+                $('#example-blacklist').hide();
+            }
+        });
+
+        $(document).ready(function(){
         $('.wdfm-card').hover(function(){
-            $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
+            $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+        }); 
+        $('.wdfm-card').mouseleave(function(){
+            $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
         }); 
     });
 </script>

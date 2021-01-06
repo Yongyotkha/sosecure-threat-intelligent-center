@@ -20,7 +20,7 @@
                                 <div class="row">
                                     <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px mb-2">
                                         <div class="row">
-                                            <div class="col-lg-12 col-md-4 mb-small-5px">
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
@@ -32,7 +32,7 @@
                                                    
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12 col-md-4 mb-small-5px">
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
@@ -44,7 +44,7 @@
                                              
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12 col-md-4 mb-small-5px">
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
@@ -52,6 +52,17 @@
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
                                                         <span class="number-card warning">{{@$count_compromised}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
+                                                <div class="card-dash">
+                                                    <div class="left-card">
+                                                        <div class="img-icon-card">
+                                                            <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                        </div>
+                                                        <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
+                                                        <span class="number-card dark">2,500</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -99,7 +110,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive" style="max-height:280px;min-height: 280px;overflow: auto;">
+                                                    <div class="table-responsive" style="max-height:280px;min-height: 400px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -301,7 +312,7 @@
        
     const chartstack = new Highcharts.chart('chart-show-hl', {
         chart: {
-            height: 280, 
+            height: 400, 
             type: 'bar'
         },
         title: {
@@ -356,7 +367,7 @@
 
        {{-- const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
-                height: 280, 
+                height: 400, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
@@ -399,7 +410,7 @@
 
         const chart_line = new Highcharts.chart('chart-show-line', {
             chart: {
-                height: 280, 
+                height: 400, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
