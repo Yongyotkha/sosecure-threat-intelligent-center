@@ -33,9 +33,9 @@
                     </div>
                 </header>
                 <div class="panel-body" id="details_webdefacement">
-                    <table class="table table-striped table-bordered table-hover">
+                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
                         <tr>
-                            <th>Name Page</th>
+                            <th width="250px">Name Page</th>
                             <td>Targeted Brand : Paypay</td>
                         </tr>
                         <tr>
@@ -48,7 +48,10 @@
                         </tr>
                         <tr>
                             <th>User Agent</th>
-                            <td>Mozila / 5.0 (x11.) Lorem ipsum dolor sit amet. <a href="#" class=""></a></td>
+                            <td>
+                                Mozila / 5.0 (x11.) Lorem ipsum dolor sit amet. 
+                                <a href="#" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
+                            </td>
                         </tr>
                         <tr>
                             <th>Site</th>
@@ -70,19 +73,123 @@
                             <th>Status</th>
                             <td> <span class="dot low"></span> &nbsp; Normal</td>
                         </tr>
-                        <tr>
-                            <th>Hash</th>
-                            <td>xxxxxxxxxxxxxxxxxxxxxx</td>
-                        </tr>
-                        <tr>
-                            <th>File Size</th>
-                            <td>10k</td>
-                        </tr>
-                        <tr>
-                            <th>Element</th>
-                            <td>100 tag</td>
-                        </tr>
                     </table>
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th width="250px"></th>
+                                <th>Ordinal</th>
+                                <th>Current</th>
+                            </tr>
+                        </thead>
+                        <tbody>                  
+                            <tr>
+                                <th>Hash</th>
+                                <td>xxxxxxxxxxxxxxxxxxxxxx</td>
+                                <td>xxxxxxxxxxxxxxxxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <th>File Size</th>
+                                <td>10k</td>
+                                <td>10k</td>
+                            </tr>
+                            <tr>
+                                <th>Element</th>
+                                <td>100 tag</td>
+                                <td>100 tag</td>
+                            </tr>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <td>Last Update 2020-01-01 11:11</td>
+                                <td>Last Update 2020-01-01 11:11</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <td colspan="2">
+                                    <button class="btn btn-info">Update Ordinal</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row d-flex-center">
+                        <div class="col-xs-6">
+                            <i class="fas fa-globe-europe"></i> Defacement Screen
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <button id="togglecollapse" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#Defacement','#togglecollapse')">
+                                <i class="fas fa-minus-square"></i>Collapse
+                            </button>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" id="Defacement">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="wdfm-container">
+                                <div class="item-wdfm wdfm-inner half-two">
+                                    <div class="wdfm-card">
+                                        <div class="wdfm-header">
+                                            <div class="wdfm-img">
+                                                <a href="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" data-lightbox="name-img-1">
+                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="wdfm-body">
+                                            <div class="wdfm-btn">
+                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                            <h4>Targeted Brand: paypal</h4>
+                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
+                                        </div>
+                                        <div class="wdfm-footer">
+                                            <div class="wdfm-ft-left flex rw">
+                                                <div>Ordinal</div>
+                                                <div>Last Update 2020-01-01 11:11</div>
+                                                <div><button class="btn btn-info">Update</button></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item-wdfm wdfm-inner half-two">
+                                    <div class="wdfm-card">
+                                        <div class="wdfm-header">
+                                            <div class="wdfm-img">
+                                                <a href="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" data-lightbox="name-img-2">
+                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="wdfm-body">
+                                            <div class="wdfm-btn">
+                                                <a href="{{route('webdefacement.detail')}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                            <h4>Targeted Brand: paypal</h4>
+                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
+                                        </div>
+                                        <div class="wdfm-footer">
+                                            <div class="wdfm-ft-left flex rw">
+                                                <div>Current</div>
+                                                <div>Last Update 2020-01-01 11:11</div>
+                                                <div class="status-flex">Status : &nbsp; <span class="dot low"></span> normal</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -94,6 +201,7 @@
 @push('pagestyle')
     @include('stacks.css.datatables')
     @include('stacks.css.form')
+    @include('stacks.css.lightbox')
 
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
@@ -105,6 +213,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
+@include('stacks.js.lightbox')
 
 <script>
     function collpase_chart(id,text){
@@ -115,6 +224,12 @@
             $(text).html('<i class="fas fa-plus-square"></i>Expanded');
         }
     }
+
+    $(document).ready(function(){
+        $('.wdfm-card').hover(function(){
+            $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
+        }); 
+    });
 </script>
 @endpush
 @endsection
