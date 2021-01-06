@@ -2108,6 +2108,24 @@ ul.topics-news-list li a:hover{
     padding: .5rem 1rem;
     background: #f3f3f3;
 }
+
+.btn-chart.white {
+    color: #000;
+    border: 1px solid #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: .5rem 1rem;
+    background: #fff;
+}
+.btn-chart.white:hover {
+    color: #fff;
+    border: 1px solid rgba(75, 81, 94, 0.69);
+    cursor: pointer;
+    border-radius: 5px;
+    padding: .5rem 1rem;
+    background: rgba(75, 81, 94, 0.69)
+}
+
 .btn-chart:hover{
     color: #000;
     border: 1px solid rgba(75, 81, 94, 0.69);
@@ -2730,6 +2748,32 @@ input.input-login:focus {
 .wdfm-text-ft{
     margin: 0 !important;
     color: #333;
+}
+.wdfm-ft-right.flex,
+.wdfm-ft-left.flex{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.status-flex{
+    display: flex;
+    align-items: center;
+}
+
+.status-success{
+    display: inline-block;
+    padding: .7rem;
+    border-radius: 50%;
+    background: #88ce4f;
+    margin: 0 1rem;
+}
+.status-failed{
+    display: inline-block;
+    padding: .7rem;
+    margin: 0 1rem;
+    border-radius: 50%;
+    background: #e64732;
 }
 .wdfm-ft-right{
     display: flex;

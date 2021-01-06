@@ -36,6 +36,12 @@ class WebDefacementController extends Controller
         return view('webdefacement::index')->with($data);
     }
 
+    public function detail()
+    {
+        $data['page'] = langapp('webdefacement');
+        return view('webdefacement::detail')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
