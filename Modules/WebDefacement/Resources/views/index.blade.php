@@ -210,9 +210,12 @@
 @include('stacks.js.daterangpicker')
 
 <script>
-    $(document).ready(function(){
+        $(document).ready(function(){
         $('.wdfm-card').hover(function(){
-            $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
+            $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+        }); 
+        $('.wdfm-card').mouseleave(function(){
+            $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
         }); 
     });
 </script>

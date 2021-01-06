@@ -20,38 +20,49 @@
                                 <div class="row">
                                     <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px mb-2">
                                         <div class="row">
-                                            <div class="col-lg-12 col-md-4 mb-small-5px">
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/database.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
-                                                        <span class="number-card info">73</span>
+                                                        <span class="number-card info">{{@$count_CVEAssets}}</span>
                                                     </div>
                                                    
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12 col-md-4 mb-small-5px">
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/antivirus.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
-                                                        <span class="number-card green">1,300</span>
+                                                        <span class="number-card green">{{@$count_CVEMapping}}</span>
                                                     </div>
                                              
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12 col-md-4 mb-small-5px">
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
-                                                        <span class="number-card warning">3,500</span>
+                                                        <span class="number-card warning">{{@$count_compromised}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-6 mb-small-5px">
+                                                <div class="card-dash">
+                                                    <div class="left-card">
+                                                        <div class="img-icon-card">
+                                                            <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                        </div>
+                                                        <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
+                                                        <span class="number-card dark">2,500</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -99,7 +110,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive" style="max-height:280px;min-height: 280px;overflow: auto;">
+                                                    <div class="table-responsive" style="max-height:280px;min-height: 400px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -109,127 +120,21 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                                @if ($get_CVEAssets)
+                                                                @foreach ($get_CVEAssets as $get_CVEAssets)
                                                                 <tr>
                                                                     <td>
-                                                                        <span>Sosecure.co.th</span>
+                                                                        <span>{{@$get_CVEAssets->vendor}}</span>
                                                                     </td>
                                                                     <td>
-                                                                        <span>172.67.71.227</span>
+                                                                        <span>{{@$get_CVEAssets->IP}}</span>
                                                                     </td>
                                                                     <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                                                        <a href="{{@$get_CVEAssets->site_id}}" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
                                                                     </td>
                                                                 </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>Sosecure.co.th</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>172.67.71.227</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
+                                                                @endforeach
+                                                                @endif
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -332,10 +237,82 @@
         cb(start, end);
     });
 
+    $(function () {
+        load_chart();
+    });
 
+    function load_chart(){
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('dashboardnew.load_chart') !!}',
+            type: "POST",
+            data: ({
+            }),
+            beforeSend: function(){
+                {{--loading('load');--}}
+                f_loading(null, '#chart-show-pie');
+
+            },
+        }).done(function(data){
+
+            f_loading_stop(null, '#chart-show-pie');
+
+            const chart_pie = new Highcharts.chart('chart-show-pie', {
+                chart: {
+                    height: 280, 
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f', '#d3d3d3'],
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        },
+                    }
+                },
+                series: [{
+                    colorByPoint: false,
+                    data: [
+                    {  name: 'Critical', y: data.count_critical, color: '#e64732'}, 
+                    {  name: 'High',  y: data.count_high , color: '#fcc838'}, 
+                    {  name: 'Medium', y: data.count_medium, color: '#ffe46d'  }, 
+                    {  name: 'Low',   y: data.count_low, color: '#88ce4f'  },
+                    {  name: 'Information',   y: data.count_none, color: '#d3d3d3'  },
+                    ]
+                }],
+            });
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+                f_loading_stop(null, '#chart-show-pie');
+                console.log("No response from server");
+            });
+        
+    }
+  
+
+       
     const chartstack = new Highcharts.chart('chart-show-hl', {
         chart: {
-            height: 280, 
+            height: 400, 
             type: 'bar'
         },
         title: {
@@ -388,9 +365,9 @@
         });
 
 
-        const chart_pie = new Highcharts.chart('chart-show-pie', {
+       {{-- const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
-                height: 280, 
+                height: 400, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
@@ -428,12 +405,12 @@
                 {  name: 'Information',   y: 0, color: '#d3d3d3'  },
                 ],  
             }]
-        });
+        });--}}
 
 
         const chart_line = new Highcharts.chart('chart-show-line', {
             chart: {
-                height: 280, 
+                height: 400, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,

@@ -5,6 +5,9 @@ namespace Modules\DashboardNew\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
+use App\DataLeakFeed;
 
 class DashboardNewController extends Controller
 {
@@ -42,6 +45,19 @@ class DashboardNewController extends Controller
         
         // dd($menu[4]->get_menu_sub);
         $data['page'] = langapp('dashboard');
+        $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
+        $data['count_CVEMapping'] = CVEMapping::count();
+        $data['count_compromised'] = DataLeakFeed::where("status", '=', 1)
+                                    ->where("deleted_at", '=', null)
+                                    ->where("feel_type", '!=', 'social')
+                                    ->count();
+        $data['count_dataLeak'] = DataLeakFeed::where("status", '=', 1)
+                                    ->where("deleted_at", '=', null)
+                                    ->where("feel_type", '!=', 'social')
+                                    ->count();
+        $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->get();                            
+
+
         return view('dashboardnew::index')->with($data);
     }
 
@@ -103,5 +119,28 @@ class DashboardNewController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function load_chart(Request $request)
+    {
+        $model = new CVEMapping;
+        $model->get();
+    
+        $high = $model->where('severity', '=', 'HIGH')->count();
+        $medium = $model->where('severity', '=', 'MEDIUM')->count();
+        $critical = $model->where('severity', '=', 'CRITICAL')->count();
+        $low = $model->where('severity', '=', 'LOW')->count();
+        $none = $model->where('severity', '=', 'NONE')->count();
+
+        if ($request->ajax()) {
+            $data = [
+                "count_high" => $high,
+                "count_medium" => $medium,
+                "count_critical" => $critical,
+                "count_low" => $low,
+                "count_none" => $none,
+            ];
+            return response()->json($data);
+        }
     }
 }

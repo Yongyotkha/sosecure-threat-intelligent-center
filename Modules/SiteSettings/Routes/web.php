@@ -110,6 +110,7 @@ Route::group(
 );
 
 Route::get('/WebDefacement-website/{id}', 'WebDefacementController@webdefacement_website')->name('webdefacement_website.index')->middleware('can:menu_items');
+Route::get('/edit-image', 'WebDefacementController@edit_image')->name('webdefacement_website.edit_image')->middleware('can:menu_items');
 Route::get('/WebDefacement-server/{id}', 'WebDefacementController@webdefacement_server')->name('webdefacement_server.index')->middleware('can:menu_items');
 
 // Compromised

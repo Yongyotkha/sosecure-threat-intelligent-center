@@ -49,6 +49,12 @@ class WebDefacementController extends Controller
        return view('sitesettings::webdefacement_server')->with($data);
     }
 
+    public function edit_image()
+    {
+       $data['page'] = 'Webdefacement';
+       return view('sitesettings::edit_image')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
