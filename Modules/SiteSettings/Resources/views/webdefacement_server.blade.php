@@ -10,11 +10,12 @@
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
-                <div class="slim-scroll">
+                <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_site')
                     </section>
                 </div>
+                </section>
             </section>
         </aside>
         <aside>
@@ -34,7 +35,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i>  Table Compromised Data
+                                    <i class="fas fa-table"></i>  WebdeFacement Server
                                 </div>
                             </div>
                         </header>

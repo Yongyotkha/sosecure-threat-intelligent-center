@@ -120,7 +120,7 @@
             </li>
 
             <li style="padding-left:2rem">
-                <a href="{{route('webdefacement_website.index', ['id' => $siteSettings->code])}}">
+                <a href="{{route('webdefacement_server.index', ['id' => $siteSettings->code])}}">
                     Server
                 </a>
             </li>
