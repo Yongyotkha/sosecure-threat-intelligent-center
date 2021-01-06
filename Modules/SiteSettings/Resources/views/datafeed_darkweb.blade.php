@@ -29,8 +29,8 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="buttom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
                         Change Status
@@ -77,15 +77,15 @@
                                 <div class="col-lg-4 text-center">
                                     <div style="margin-top: 8px;">
                                         <label class="mr-3">
-                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <input type="checkbox" name="check_all" id="check_all" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">All</span>
                                         </label>
                                         <label class="mr-3">
-                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">Panding</span>
                                         </label>
                                         <label class="mr-3">
-                                            <input type="checkbox" name="" id="" value="TRUE">
+                                            <input type="checkbox" name="check_approved" id="check_approved" value="TRUE">
                                             <span class="label-text" style="font-size: 16px;">Approved</span>
                                         </label>
                                     </div>
@@ -93,11 +93,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="table_social_data();">
+                                    <button type="button" id="btn_darkweb_feed_search" class="btn btn-info btn-responsive">
                                         <i class="fas fa-search"></i>
                                         Search
                                     </button>
-                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                    <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
                                     </button>
@@ -117,12 +117,12 @@
                         </header>
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <table  class="table table-striped" id="table_data_feed">
+                                <table  class="table table-striped" id="table_darkweb_feed">
                                     <thead>
                                         <tr>
                                             <th class="no-sort w-10">
                                                 <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="data_feed_id"/>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="data_feed_id select-chk"/>
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
@@ -294,13 +294,111 @@
 @include('stacks.js.fullscreen')
 <script>
 
+    var search_val = 0;
+    var keywords = null;
+    var site = null;
+    var source = null;
+    var start_date = null;
+    var end_date = null;
+    var isDateSearch = null;
+    var check_all = false;
+    var check_pending = false;
+    var check_approved = false;
+
+    var val_id = [];
+
+    $('#table_darkweb_feed').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            if ($('.select-chk').filter(':checked').length < 1){
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table_darkweb_feed').on('click', '.val_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            if ($('.val_id').filter(':checked').length < 1){
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+
 $(function() {
     table_social_data();
 });
 
+$(function() { 
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+    function cb(start, end) {
+        $('#datafeed_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
+    $('#datafeed_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    cb(start, end);
+
+    $("#btn_darkweb_feed_reset").click(function() {
+        search_val = 0;
+        $("#search").val('');
+        $("#source_select").val('').trigger('change');
+        $("#check_all").prop("checked",false);
+        $("#check_pending").prop("checked",false);
+        $("#check_approved").prop("checked",false);
+
+        cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
+
+        table_social_data();
+    });
+
+});
+
+$("#btn_darkweb_feed_search").click(function() {
+    search_val = 1;
+    if ($('#check_all').is(":checked")) {
+        check_all = true;
+    } else {
+        check_all = false;
+    }
+    if ($('#check_pending').is(":checked")) {
+        check_pending = true;
+    } else {
+        check_pending = false;
+    }
+    if ($('#check_approved').is(":checked")) {
+        check_approved = true;
+    } else {
+        check_approved = false;
+    }
+    start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+    end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+
+    table_social_data();
+});
+
+
 function table_social_data(){
     let search = $('#search').val();
-    $('#table_data_feed').DataTable({
+    let source_select = $('#source_select').val();
+    $('#table_darkweb_feed').DataTable({
         processing: true,
         serverSide: true,
         destroy: true,
@@ -308,7 +406,14 @@ function table_social_data(){
         ajax: {
             url: '{!! route('datafeed.darkweb_datatables') !!}',
             data: {
+                "search_val" : search_val,
                 "search" : search,
+                "source_select" : source_select,
+                "start_date" : start_date,
+                "end_date" : end_date,
+                "check_all" : check_all,
+                "check_pending" : check_pending,
+                "check_approved" : check_approved,
             },
             type: "POST",
         },
@@ -354,7 +459,7 @@ function table_social_data(){
 
 $('#source_select').select2();
 var data_feed_id = [];
-$('#table_data_feed').on('click', '.data_feed_id', function () {
+$('#table_darkweb_feed').on('click', '.data_feed_id', function () {
     if ($(this).is(':checked')) {
         $('#btn-change-status').prop("disabled", false);
     } else {
@@ -364,30 +469,7 @@ $('#table_data_feed').on('click', '.data_feed_id', function () {
     }
 });
 
-$(function() { 
-    var start = moment().startOf('hour');
-    var end = moment().startOf('hour').add(32, 'hour');
-    function cb(start, end) {
-        $('#datafeed_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-    $('#datafeed_date').daterangepicker({
-        timePicker: true,
-        startDate: start,
-        endDate: end,
-        locale: {
-            format: 'M/DD hh:mm A'
-        },
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, cb);
-    cb(start, end);
-});
+
 
 function approve_dataFeed(id){
     data_feed_id = [];
@@ -463,6 +545,53 @@ function change_status(){
         confirm_cancle();
     }
 }
+
+
+    $("#btn_del_select").click(function() {
+        $('.val_id:checked').each(function () {
+            val_id.push(this.value);
+            
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('darkweb.delete_select_process') }}",
+                    data:{id: val_id},
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
+
 
 </script>
 @endpush
