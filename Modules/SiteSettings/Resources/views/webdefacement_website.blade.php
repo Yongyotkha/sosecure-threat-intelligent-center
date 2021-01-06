@@ -165,8 +165,8 @@
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">Image</label>
                         <div class="col-lg-9">
-                            <input type="file" id="image-onchange" class="form-control">
-                            <img src="" id="preview-img-wdfm">
+                            <input type="file" accept="image/*" id="imgInp" name="logo-img" class="form-control">
+                            {{-- <img src="#" id="preview-img-wdfm"> --}}
                         </div>
                     </div>
 
@@ -230,9 +230,13 @@
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
 
+ 
+
 <script>
-    $('.wdfm-card').hover(function(){
-        $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
+    $(document).ready(function(){
+        $('.wdfm-card').hover(function(){
+            $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
+        }); 
     });
 </script>
 
