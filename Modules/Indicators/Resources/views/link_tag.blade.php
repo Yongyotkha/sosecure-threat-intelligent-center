@@ -31,16 +31,16 @@
                 </div>
                 <div id="hide-advance-search" class="container-fluid" style="padding: 2rem; display: none;">
                     <div class="row">
-                        {{-- <div class="col-md-8">
+                        <div class="col-md-8">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="event_name" id="event_name"
+                                <input type="text" class="form-control" name="keyword" id="keyword"
                                     placeholder="Search">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label for="" class="">Date</label>
-                            <div id="event_date" class="text-center"
+                            <div id="tags_date" class="text-center"
                                 style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                 <i class="fa fa-calendar"></i>&nbsp;
                                 <span></span> <i class="fa fa-caret-down"></i>
@@ -55,7 +55,7 @@
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
                             </button> 
-                        </div>--}}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -70,7 +70,7 @@
                 </header>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table_events">
+                        <table class="table table-striped" id="table_tag">
                             <thead>
                                 <tr>
 
@@ -116,9 +116,300 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.advanced_search')
 <script>
+
+    var start_date = '';
+    var end_date = '';
+    var keyword = '';
+    var count_page = -1;
+    var isDateSearch = 0;
+    var datatable = [];
+  
+
     $('.select2-option').select2();
 
- 
+    $(function() {
+  
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+
+    function cb(start, end) {
+        $('#tags_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        startDate = start;
+        endDate = end;
+    }
+
+    $('#tags_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    $('#tags_date').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+            
+        }
+    });
+
+    cb(start, end);
+
+    $("#btn_search_data").click(function() {
+
+        start_date = startDate;
+        end_date = endDate;
+        keyword = $("#keyword").val();
+        search_table(1);
+    });
+
+
+    $("#btn_reset").click(function() {
+        $("#keyword").val('');
+
+        start = moment();
+        end = moment();
+        cb(start, end);
+        load_table(1);
+
+
+    });
+
+
+    });
+
+    $(function() {
+        load_table(1);
+    });
+
+
+    function load_table(page=1){
+        $('#table_tag').DataTable({
+            searching: false,
+            ordering: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('indicators.table_tags')!!}',
+                dataSrc: function ( json ) {
+                    count_page = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    d.tags = {!! json_encode($id) !!};
+                    d.count_page = count_page;
+                }
+            },
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+
+            columns: [
+
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'count_view',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+
+            ],
+            columnDefs: [
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times"></i>';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
+        });
+
+    }
+
+    function search_table(page=1){
+        let startDate=  $("#tags_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        let endDate=  $("#tags_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        $('#table_tag').DataTable({
+            searching: false,
+            ordering: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('indicators.table_tags')!!}',
+                dataSrc: function ( json ) {
+                   
+                    count_page = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    d.count_page = count_page;
+                    d.startDate = startDate;
+                    d.endDate = endDate;
+                    d.keywords = keyword;
+                    d.isDateSearch = isDateSearch;
+                    d.tags = {!! json_encode($id) !!};
+                }
+            },
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+
+            columns: [
+
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'count_view',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+
+            ],
+            columnDefs: [
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times"></i>';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
+
+        });
+
+    }
 
     
 

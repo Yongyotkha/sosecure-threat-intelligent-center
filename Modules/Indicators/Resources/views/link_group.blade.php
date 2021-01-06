@@ -3,11 +3,7 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            <div class="bc-head">Events</div>
-
-            {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-            <span>@langapp('Search_Advance')</span>
-            </button> --}}
+            <div class="bc-head">Group : {{@$id}}</div>
 
             <a id="advance-search" href="#area_search"
                 class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -17,11 +13,11 @@
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
-                    @if($SiteSettings)
+                    {{-- @if($SiteSettings)
                     @foreach($SiteSettings as $SiteSettings_val)
                     <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                     @endforeach
-                    @endif
+                    @endif --}}
                 </select>
             </div>
 
@@ -38,31 +34,13 @@
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="event_name" id="event_name"
+                                <input type="text" class="form-control" name="keyword" id="keyword"
                                     placeholder="Search">
                             </div>
                         </div>
-                        <!--<div class="col-md-4">
-                            <div class="form-group">
-                                <label for="" class="">Group</label>
-                                {{-- <select name="group[]" id="type" class="select2-option form-control"
-                                    multiple="multiple">
-
-                                </select> --}}
-                                <input type="text" class="form-control" name="group" id="group" placeholder="Search">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="" class="">Tag</label>
-                                {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
-                                    <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
-                                </select>
-                            </div>
-                        </div>-->
                         <div class="col-md-4">
                             <label for="" class="">Date</label>
-                            <div id="event_date" class="text-center"
+                            <div id="groups_date" class="text-center"
                                 style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                 <i class="fa fa-calendar"></i>&nbsp;
                                 <span></span> <i class="fa fa-caret-down"></i>
@@ -76,7 +54,7 @@
                             <button class="btn btn-default" id="btn_reset">
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
-                            </button>
+                            </button> 
                         </div>
                     </div>
                 </div>
@@ -86,13 +64,13 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-xs-12">
-                            <i class="fas fa-table"></i> Table Event
+                            <i class="fas fa-table"></i> Table Group
                         </div>
                     </div>
                 </header>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table_events">
+                        <table class="table table-striped" id="table_group">
                             <thead>
                                 <tr>
 
@@ -102,49 +80,13 @@
                                     <th>Tags</th>
                                     <th>Published</th>
                                     <th>Last Status</th>
-                                    <th style="width: 200px;">DateTime</th>
+                                    <th>DateTime</th>
                                     <th>View</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- <tr>
-                                    <td>
-                                        <label>
-                                            <input value="" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </td>
-                                    <td>1</td>
-                                    <td>Suspicious proxy agent</td>
-                                    <td>
-                                        <a href="">MIST FEED</a>
-                                        <a href="">Phishing,UW</a>
-                                    </td>
-                                    <td>
-                                        <a href="">Scan,Agent,</a>
-                                        <a href="">Proxy,Spider</a>
-                                    </td>
-                                    <td>
-                                        <a href="">5421</a>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-check"></i>
-                                    </td>
-                                    <td>
-                                        Modified
-                                    </td>
-                                    <td>
-                                        2020-12-07 11:11
-                                    </td>
-                                    <td>
-                                        152
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
-                                btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                                </tr> --}}
+
                             </tbody>
                         </table>
                         <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
@@ -174,74 +116,72 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.advanced_search')
 <script>
-    $('.select2-option').select2();
 
     var start_date = '';
     var end_date = '';
-    var f_search= 1;
-    var event_name = '';
+    var keyword = '';
     var count_page = -1;
     var isDateSearch = 0;
     var datatable = [];
-
-  $(function() {
   
-        var start = moment().startOf('hour');
-        var end = moment().startOf('hour').add(32, 'hour');
 
-        function cb(start, end) {
-            $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            startDate = start;
-            endDate = end;
+    $('.select2-option').select2();
+
+    $(function() {
+  
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+
+    function cb(start, end) {
+        $('#groups_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        startDate = start;
+        endDate = end;
+    }
+
+    $('#groups_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         }
+    }, cb);
+    $('#groups_date').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+            
+        }
+    });
 
-        $('#event_date').daterangepicker({
-            timePicker: true,
-            startDate: start,
-            endDate: end,
-            locale: {
-                format: 'M/DD hh:mm A'
-            },
-            ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        }, cb);
-        $('#event_date').on('apply.daterangepicker', function(ev, picker) {
-            isDateSearch = 1;
-            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
-              
-            }
-        });
+    cb(start, end);
 
+    $("#btn_search_data").click(function() {
+
+        start_date = startDate;
+        end_date = endDate;
+        keyword = $("#keyword").val();
+        search_table(1);
+    });
+
+
+    $("#btn_reset").click(function() {
+        $("#keyword").val('');
+
+        start = moment();
+        end = moment();
         cb(start, end);
-
-        $("#btn_search_data").click(function() {
-            {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-           
+        load_table(1);
 
 
-            start_date = startDate;
-            end_date = endDate;
-            event_name = $("#event_name").val();
-            search_table(1);
-        });
-
-
-        $("#btn_reset").click(function() {
-            $("#event_name").val('');
-      
-            start = moment();
-            end = moment();
-            cb(start, end);
-            load_table(1);
-
-
-        });
+    });
 
 
     });
@@ -251,9 +191,8 @@
     });
 
 
-
     function load_table(page=1){
-        $('#table_events').DataTable({
+        $('#table_group').DataTable({
             searching: false,
             ordering: true,
             pageLength: 25,
@@ -264,13 +203,13 @@
             dom: 'Blfrtip',
             ajax: {
                 type: "POST",
-                url: '{!! route('indicators.events_table')!!}',
+                url: '{!! route('indicators.table_groups')!!}',
                 dataSrc: function ( json ) {
                     count_page = json.recordsTotal;
                     return json.data;
                 },
                 data:function(d){
-                    
+                    d.groups = {!! json_encode($id) !!};
                     d.count_page = count_page;
                 }
             },
@@ -358,11 +297,10 @@
 
     }
 
-    
     function search_table(page=1){
-        let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-        let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        $('#table_events').DataTable({
+        let startDate=  $("#groups_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        let endDate=  $("#groups_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        $('#table_group').DataTable({
             searching: false,
             ordering: true,
             pageLength: 25,
@@ -373,7 +311,7 @@
             dom: 'Blfrtip',
             ajax: {
                 type: "POST",
-                url: '{!! route('indicators.events_table')!!}',
+                url: '{!! route('indicators.table_groups')!!}',
                 dataSrc: function ( json ) {
                    
                     count_page = json.recordsTotal;
@@ -383,9 +321,9 @@
                     d.count_page = count_page;
                     d.startDate = startDate;
                     d.endDate = endDate;
-                    d.f_search = f_search;
-                    d.keywords = event_name;
+                    d.keywords = keyword;
                     d.isDateSearch = isDateSearch;
+                    d.groups = {!! json_encode($id) !!};
                 }
             },
             initComplete : function( settings, json){
@@ -472,11 +410,6 @@
         });
 
     }
-
-   
-
-
-    
 
     
 
