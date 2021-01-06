@@ -898,6 +898,9 @@ class DataLeakController extends Controller
                     $html .= '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed('.$model -> id.')">
                         Approve
                     </button>';
+
+                    // $html .= '<a href="'.route('').'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>';
+
                 }else{
                     $html .= '<button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status-cancle" onclick="cancle_dataFeed('.$model -> id.')">
                         Cancel
@@ -973,6 +976,10 @@ class DataLeakController extends Controller
     }
 
     public function approve_data_feed(Request $request){
+
+        // dd($request->sent_mail);
+        $sent_mail = $request->sent_mail;
+
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request -> id)->get();
         foreach($DataLeakFeedTemps as $DataLeakFeedTemp){
             $check_DataLeakFeed = DataLeakFeed::where('temp_id', $DataLeakFeedTemp -> id)->first();

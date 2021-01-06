@@ -203,7 +203,7 @@
                     <div class="form-group row">
                         <label for="" class="col-md-3">Content</label>
                         <div class="col-md-9">
-                            <textarea name="" class="form-control" id="" cols="30" rows="10">
+                            <textarea name="detail_content" class="form-control" id="detail_content" cols="30" rows="10">
                             </textarea>
                         </div>
                     </div>
@@ -220,7 +220,10 @@
                     <div class="form-group row">
                         <label for="" class="col-md-3">Send Mail</label>
                         <div class="col-md-9">
-                            <input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span>
+                            <label>
+                                <input type="checkbox" name="sent_mail" id="sent_mail" class="" value="true">
+                                <span class="label-text">Sent mail to customers</span>
+                            </label>
                         </div>
                     </div>
 
@@ -235,7 +238,8 @@
                     </button>
                     <button type="submit" class="btn btn-info btn-rounded" onclick="confirm_approve()">
                         <i class="fas fa-paper-plane"></i>
-                        Yes, approve
+                        Save
+                        {{-- Yes, approve --}}
                     </button>
                 </div>
             </div>
@@ -267,7 +271,8 @@
                     </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="confirm_cancle()">
                         <i class="fas fa-paper-plane"></i>
-                        Yes, cancel
+                        Save
+                        {{-- Yes, cancel --}}
                     </button>
                 </div>
             </div>
@@ -277,6 +282,7 @@
 </section>
 
 @push('pagestyle')
+    {{-- @include('stacks.css.summernote') --}}
     @include('stacks.css.datatables')
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
@@ -292,7 +298,16 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
+{{-- @include('scripts.summernote') --}}
 <script>
+
+        {{--$('form').each(function () {
+            if ($(this).data('validator'))
+                $(this).data('validator').settings.ignore = ".note-editor *";
+        });
+
+        $('#detail_content').summernote('destroy');--}}
+
 
     var search_val = 0;
     var keywords = null;
@@ -485,17 +500,25 @@ function confirm_approve(){
     $('.data_feed_id:checked').each(function () {
         data_feed_id.push(this.value);
     });
+
+    let sent_mail = 0;
+    if ($("#sent_mail").is(':checked')) {
+        sent_mail = 1;
+    }
     $.ajax({
         type:"POST",
         url:"{{ route('socialdatas.approve_data_feed') }}",
-        data:{id: data_feed_id},
+        data:({
+            id: data_feed_id,
+            sent_mail: sent_mail
+        }),
         beforeSend: function(){
             loading('load');
         },
         success:function(response) {
             loading('stop_load');
             toastr.success(response.message, '@langapp('response_status')');
-            window.location.href = response.redirect;
+            {{--window.location.href = response.redirect;--}}
         },
         error: function (error){
             loading('stop_load');
