@@ -13,5 +13,7 @@
 Route::group(
     ['middleware' => ['web', 'installed'], 'prefix' => 'dashboardnew'], function () {
         Route::get('/', 'DashboardNewController@index')->name('dashboardnew.index')->middleware('can:menu_items');
+        Route::post('load_chart', 'DashboardNewController@load_chart')->name('dashboardnew.load_chart')->middleware('can:menu_items');
+
     }
 );
