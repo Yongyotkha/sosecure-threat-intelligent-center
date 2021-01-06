@@ -1,55 +1,47 @@
 <ul class="nav nav-pills nav-stacked no-radius">
     <li class="{{ $page === 'SiteSettings' ? 'active' : '' }}">
         <a href="{{route('sitesettings.edit', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Site
         </a>
     </li>
     <li class="{{ $page === 'SystemSettings' ? 'active' : '' }}">
         <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             System
         </a>
     </li>
     
     <li class="{{ $page === 'DataSetting' ? 'active' : '' }}">
         <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Permission & Config
         </a>
     </li>
 
     <li class="{{ $page === 'Users' ? 'active' : '' }}">
         <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Users
         </a>
     </li>
 
     <li class="{{ $page === 'Domain' ? 'active' : '' }}">
         <a href="{{route('domain.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Domain
         </a>
     </li>
 
     <li class="{{ $page === 'Keyword Setting' ? 'active' : '' }}">
         <a href="{{route('keyword.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Keywords
         </a>
     </li>
 
     <li class="{{ $page === 'Assets' ? 'active' : '' }}">
         <a href="{{route('assetssite.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Assets
         </a>
     </li>
 
     {{-- <li {{ $page === 'News' ? 'active' : '' }}>
         <a href="#">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             News
         </a>
     </li> --}}
@@ -107,6 +99,26 @@
         </ul>
     </li>
 
+    <li class="{{ $page === 'Social Datas' ? 'active' : '' }} main-link">
+        <a href="#">
+            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+            Data Leak
+        </a>
+       <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+            <li style="padding-left:2rem">
+                <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
+                    Data Leak Feed
+                </a>
+            </li>
+
+            <li style="padding-left:2rem">
+                <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
+                    Data Leak Data
+                </a>
+            </li>
+        </ul>
+    </li>
+    
     <li class="{{ $page === 'Webdefacement' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
@@ -127,25 +139,7 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Social Datas' ? 'active' : '' }} main-link">
-        <a href="#">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            Data Leak
-        </a>
-       <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
-            <li style="padding-left:2rem">
-                <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
-                    Data Leak Feed
-                </a>
-            </li>
 
-            <li style="padding-left:2rem">
-                <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
-                    Data Leak Data
-                </a>
-            </li>
-        </ul>
-    </li>
 
 
 </ul>
