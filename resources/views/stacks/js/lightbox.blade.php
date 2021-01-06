@@ -1,0 +1,1 @@
+<script src="{{ getAsset('plugins/lightbox/js/lightbox.js') }}"></script>

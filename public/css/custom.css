@@ -2633,6 +2633,12 @@ input.input-login:focus {
     flex-basis: 33.33333%;
     display: flex;
 }
+.wdfm-inner.half-two{
+    padding: 0 15px !important;
+    max-width: 50%;
+    flex-basis: 50%;
+    display: flex;
+}
 .wdfm-card{
     width: 100%;
     color: rgba(0, 0, 0, 0.87);
@@ -2749,11 +2755,48 @@ input.input-login:focus {
     margin: 0 !important;
     color: #333;
 }
+
+
 .wdfm-ft-right.flex,
 .wdfm-ft-left.flex{
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.wdfm-ft-left.flex.rw{
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    width: 100%;
+    align-items: center;
+}
+.wdfm-ft-left.flex.rw div:nth-child(1){
+    flex: 1;
+    text-align: left;
+}
+.wdfm-ft-left.flex.rw div:nth-child(2){
+    flex: 1;
+    text-align: center;
+}
+.wdfm-ft-left.flex.rw div:nth-child(3){
+    flex: 1;
+    text-align: right;
+}
+
+.wdfm-ft-right{
+    font-size: 11px !important;
+    color: #a5a5a5;
+}
+
+.wdfm-ft-left.flex.rw .status-flex{
+    justify-content: flex-end;
+}
+
+.wdfm-footer-action{
+    border-top: 1px solid #eeeeee;
+    text-align: center;
+    padding: 1rem;
+    background: #eee;
 }
 
 .status-flex{
@@ -2783,12 +2826,13 @@ input.input-login:focus {
 }
 
 @media (min-width:0) and (max-width:1220px){
-    .wdfm-inner {
+    .wdfm-inner,.wdfm-inner.half-two {
         padding: 0 8px !important;
         max-width: 100%;
         flex-basis: 100%;
         display: flex;
     }
+    
     .mdfm-text-muted {
         color: #9e9d9d;
         font-size: 16px;
