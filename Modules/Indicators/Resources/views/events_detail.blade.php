@@ -45,8 +45,8 @@
             <section class="panel panel-default">
                 <div class="panel-heading">
                     <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
-                    |
-                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
+                    {{-- |
+                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a> --}}
                 </div>
                 <div class="container-fluid" style="padding: 2rem">
                     <div class="row">

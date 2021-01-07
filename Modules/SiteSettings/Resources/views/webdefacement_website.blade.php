@@ -210,18 +210,18 @@
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
-                            <div class="input-group">
                                 <input type="text" class="form-control" name="url_web" id="url_web" value="">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-info" id="btn_check_web">Check</button>  
-                                </span>
-                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
-                        <div class="col-lg-3">
-                            <input type="text" class="form-control" name="port_web" id="port_web" value="80">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="port_web" id="port_web" value="80">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-info" id="btn_check_web">Check</button>  
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -261,20 +261,22 @@
                                 </label>
                             </div>
                             <div id="example-blacklist" style="display: none">
-                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control"></textarea>
+                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control" placeholder="Ex: hacking,hacked,decript"></textarea>
                                 <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" name="delay_screen_shot" id="delay_screen_shot" value="true">
                                     <span class="label-text">
-                                        Delay Screenshot
+                                        Check image
+                                        {{-- Delay Screenshot --}}
                                     </span>
                                 </label>
                             </div>
-                            <div id="example-blacklist" style="display: none">
-                                <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
-                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
+                            <div id="delay_screen_shot_val_div" style="display: none">
+                                Delay Screenshot <input type="text" value="2000"> milliseconds
+                                {{-- <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
+                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span> --}}
                             </div>
                         </div>
                     </div>
@@ -338,6 +340,15 @@
                 $('#example-blacklist').show();
             }else{
                 $('#example-blacklist').hide();
+            }
+        });
+
+        $('#delay_screen_shot_val_div').hide();
+        $('input[type="checkbox"]').on('change',function(){
+            if($('#delay_screen_shot').prop('checked')){
+                $('#delay_screen_shot_val_div').show();
+            }else{
+                $('#delay_screen_shot_val_div').hide();
             }
         });
 
