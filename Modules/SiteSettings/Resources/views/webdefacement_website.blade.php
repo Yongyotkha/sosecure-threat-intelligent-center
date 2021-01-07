@@ -184,8 +184,7 @@
                                 <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" >
                             </div>
                             <div class="edit-capture text-center">
-                                {{-- {{route('webdefacement_website.edit_image')}} --}}
-                                <a href="#" target="_blank">
+                                <a href="{{route('webdefacement_website.edit_image')}}" target="_blank">
                                     Edit Image
                                 </a>
                             </div>
