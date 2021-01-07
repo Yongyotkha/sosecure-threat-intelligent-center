@@ -263,39 +263,27 @@
 }
 
     $("#critical").click(function() {
-        
-      
         search ('critical');
- 
     });
-    $("#high").click(function() {
-        
+
+    $("#high").click(function() { 
         search ('high');
     });
+
     $("#medium").click(function() {
-
-
         search ('medium');
-
     });
+
     $("#normal").click(function() {
-
-    
         search ('normal');
-
     });
+
     $("#none").click(function() {
-
-     
         search ('none');
-
     });
 
     $("#all").click(function() {
-
-     
-    search (null);
-
+        search (null);
     });
   
 </script>
