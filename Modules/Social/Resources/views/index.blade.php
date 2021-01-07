@@ -148,7 +148,7 @@
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
-                    <li class="active"><a href="#tab_related_news" data-toggle="tab">Leak (<span id="count_news"></span>)</a></li>
+                    <li class="active"><a href="#tab_related_news" data-toggle="tab">Data (<span id="count_news"></span>)</a></li>
                     <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
                     <li class="pull-right">
                         {{-- <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
