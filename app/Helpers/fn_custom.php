@@ -116,6 +116,36 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
     return $html;
 }
 
+function get_webdefacment_status($status_id,$color='') {
+    $html = '';
+    if($color == 'color') {
+        if(strtolower($status_id) == strtolower("critical")) {
+            $html = '<span class="dot critical"></span> Critical';
+        } else if(strtolower($status_id) == strtolower("high")) {
+            $html = '<span class="dot high"></span> High';
+        } else if(strtolower($status_id) == strtolower("meduim")) {
+            $html = '<span class="dot meduim"></span> Meduim';
+        } else if(strtolower($status_id) == strtolower("normal")) {
+            $html = '<span class="dot normal"></span> Normal';
+        } else if(strtolower($status_id) == strtolower("none")) {
+            $html = '<span class="dot none"></span> None';
+        }
+    } else {
+        if(strtolower($status_id) == strtolower("critical")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("high")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("meduim")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("normal")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("none")) {
+            $html = $status_id;
+        }
+    }
+    return $html;
+}
+
 
 function generator_uuid(){
     return Str::uuid()->toString();

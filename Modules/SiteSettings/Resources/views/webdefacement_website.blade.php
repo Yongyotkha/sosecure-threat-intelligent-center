@@ -38,8 +38,8 @@
                             </div>
                         </header>
                         <div class="panel-body">
-                            <div class="wdfm-container">
-                                <div class="item-wdfm wdfm-inner">
+                            <div class="wdfm-container" id='data_card'>
+                                {{-- <div class="item-wdfm wdfm-inner">
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
@@ -179,7 +179,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </section>
@@ -309,6 +309,8 @@
  
 
 <script>
+
+    var site_id = '';
     
         $('#example-blacklist').hide();
         $('input[type="checkbox"]').on('change',function(){
@@ -327,6 +329,51 @@
                 $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
             }); 
         });
+
+
+    $(function () {
+        load_card();
+    });
+    
+
+    
+    function load_card(){
+        site_id = '{{$siteSettings->id}}';
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('webdefacement.load_card_by_site') !!}',
+            type: "post",
+            data: ({
+                site_id:site_id
+            }),
+            datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+
+                $('.ajax-loading').hide();
+                $("#data_card").html(data.html);  
+
+                $('.wdfm-card').hover(function(){
+                    $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+                }); 
+                $('.wdfm-card').mouseleave(function(){
+                    $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
+                }); 
+
+          
+             
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.ajax-loading').hide();
+            console.log("No response from server");
+        });
+    }
+
+
+
 </script>
 
 @endpush
