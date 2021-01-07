@@ -196,7 +196,6 @@ class OTXFeedPulse extends Command
         $document = "5555";
         $options = [];
         $document = $collectionBasic->findOne(['indicator_id' => 1679044], [
-           
             'projection' => [
                 "updated_at" => 1,
             ]]);

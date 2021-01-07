@@ -38,7 +38,6 @@ class OTXMDFeedType extends Command
      */
     public function handle()
     {
-        
         try {
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
             $OTX_KEY = env("OTX_KEY", "");
