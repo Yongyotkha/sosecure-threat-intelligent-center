@@ -53,20 +53,18 @@ class DashboardNewController extends Controller
                                     ->count();
         $data['count_dataLeak'] = DataLeakFeed::where("status", '=', 1)
                                     ->where("deleted_at", '=', null)
-                                    ->where("feel_type", '!=', 'social')
+                                    ->where("feel_type", '=', 'social')
                                     ->count();
         $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->get();                            
 
 
         return view('dashboardnew::index')->with($data);
     }
-
     public function detail_asset()
     {
         $data['page'] = langapp('dashboard');
         return view('dashboardnew::view_detail_asset')->with($data);
     }
-
     /**
      * Show the form for creating a new resource.
      * @return Response
@@ -137,6 +135,11 @@ class DashboardNewController extends Controller
         $critical = $model->where('severity', '=', 'CRITICAL')->count();
         $low = $model->where('severity', '=', 'LOW')->count();
         $none = $model->where('severity', '=', 'NONE')->count();
+
+        // $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        // $clientMD = new MongoClient($DB_MONGO_KEY);
+        // $html = '';
+        // $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
 
         if ($request->ajax()) {
             $data = [

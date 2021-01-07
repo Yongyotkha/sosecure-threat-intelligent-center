@@ -12,6 +12,14 @@
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
+                    @if ($SiteSettings)
+
+                    @foreach ($SiteSettings as $SiteSettings)
+                    <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}}
+                    </option>
+                    @endforeach
+
+                    @endif
                 </select>
             </div>
         </header>
@@ -94,38 +102,9 @@
                         </div>
                     </div>
 
-                    <div class="wdfm-container">
-                        <div class="item-wdfm wdfm-inner">
-                            <div class="wdfm-card">
-                                <div class="wdfm-header">
-                                    <div class="wdfm-img">
-                                        <a href="{{route('webdefacement.detail')}}">
-                                            <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="wdfm-body">
-                                    <div class="wdfm-btn">
-                                        <a href="{{route('webdefacement.detail')}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </div>
-                                    <h4>Targeted Brand: paypal</h4>
-                                    <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
-                                </div>
-                                <div class="wdfm-footer">
-                                    <div class="wdfm-ft-left flex">
-                                        <div>Site : ออมสิน</div>
-                                        <div class="status-flex mr-2">Status : &nbsp;  <span class="dot low"></span> Normal</div>
-                                    </div>
-                                    <div class="wdfm-ft-right flex">
-                                        <div>Last online: 10 second ago</div>
-                                        <div>Last Check: 10 second ago</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item-wdfm wdfm-inner">
+                    <div class="wdfm-container" id='data_card'>
+                        
+                        {{-- <div class="item-wdfm wdfm-inner">
                             <div class="wdfm-card">
                                 <div class="wdfm-header">
                                     <div class="wdfm-img">
@@ -184,7 +163,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </section>
@@ -218,6 +197,49 @@
             $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
         }); 
     });
+
+
+    $(function () {
+        load_card();
+    });
+    
+
+    
+    function load_card(){
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('webdefacement.load_card') !!}',
+            type: "get",
+            data: ({
+
+            }),
+            datatype: "html",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+
+                $('.ajax-loading').hide();
+                $("#data_card").html(data.html);  
+
+                $('.wdfm-card').hover(function(){
+                    $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+                }); 
+                $('.wdfm-card').mouseleave(function(){
+                    $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
+                }); 
+
+          
+             
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.ajax-loading').hide();
+            console.log("No response from server");
+        });
+    }
+  
 </script>
 @endpush
 @endsection

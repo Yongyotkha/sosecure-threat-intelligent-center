@@ -62,7 +62,7 @@
                                                             <img src="{{asset('images/dataleak.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
-                                                        <a class="number-card dark">2,500</a>
+                                                        <a class="number-card dark">{{@$count_dataLeak}}</a>
                                                     </div>
                                                 </div>
                                             </div>
