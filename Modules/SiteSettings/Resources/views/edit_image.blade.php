@@ -85,6 +85,27 @@
             left: 50%;
             transform: translate(-50%,-50%);
         }
+        .xicon{
+            background: #ff8181;
+            color: #fff;
+            padding: 1rem;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, .2);
+            text-decoration: none;
+        }
+        .xicon:hover{
+            background: #f75a5a;
+            color: #fff;
+        }
+        
     </style>
 </head>
 
@@ -102,6 +123,7 @@
                     <div class="icon-drag">
                         <div class="draggable" style="position:relative">
                             <span class="icon-tool"><i class="fa fa-crop"></i></span>
+                            <span class="rm"></span>
                         </div>
                  
                     </div>
@@ -143,10 +165,20 @@
                     $item.addClass("drag-edit");
                     $item.resizable();
                     $item.appendTo('.dropBox');
+
+                    $item.addClass('remove');
+                    var el = `<span><a href='Javascript:void(0)' class="xicon delete" title="Remove">X</a></span>`;
+                    $(el).insertAfter($($item.find('.rm')));
+                    $item.appendTo('.dropBox');
+                    $('.delete').on('click', function () {
+                        $(this).parent().parent('span').remove();
+                    });
+                    $('.delete').on('click', function () {
+                        $(this).parent().parent('div').remove();
+                    });
                 }
             }
         });
-
 
 
         $(".draggable").draggable({

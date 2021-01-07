@@ -319,7 +319,7 @@
 
             const chart_pie = new Highcharts.chart('chart-show-pie', {
                 chart: {
-                    height: 280, 
+                    height: 400, 
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
                     plotShadow: false,
@@ -383,6 +383,9 @@
             title: {
             text: null
             }
+        },
+        scrollbar: {
+            enabled: true
         },
         legend: {
             reversed: true
