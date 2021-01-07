@@ -199,21 +199,21 @@
                     </button>
                     <h4 class="modal-title text-white" id="exampleModalLabel">Add Website</h4>
                 </div>
-                <form action="">
+                <form action="" class="">
                 <div class="modal-body">
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Name <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
-                            <input type="text" class="form-control" name="" value="">
+                            <input type="text" class="form-control" name="name_web" id="name_web" value="">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
                             <div class="input-group">
-                                <input type="text" class="form-control" name="" value="">
+                                <input type="text" class="form-control" name="url_web" id="url_web" value="">
                                 <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-info">Check</button>  
+                                    <button type="button" class="btn btn-info" id="btn_check_web">Check</button>  
                                 </span>
                             </div>
                         </div>
@@ -238,7 +238,7 @@
                         <div class="col-sm-9">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="options" value="">
+                                    <input type="checkbox" name="hash" id="hash" value="true">
                                     <span class="label-text">
                                         Hash
                                     </span>
@@ -246,7 +246,7 @@
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="options" value="">
+                                    <input type="checkbox" name="file_size" id="file_size" value="true">
                                     <span class="label-text">
                                         Filesize
                                     </span>
@@ -254,7 +254,7 @@
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="options" value="">
+                                    <input type="checkbox" name="element" id="element" value="true">
                                     <span class="label-text">
                                         Element
                                     </span>
@@ -262,14 +262,14 @@
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="options" value="blacklist">
+                                    <input type="checkbox" name="blacklist" id="blacklist" value="true">
                                     <span class="label-text">
                                         Blacklist Keyword
                                     </span>
                                 </label>
                             </div>
                             <div id="example-blacklist" style="display: none">
-                                <textarea name="" id="" cols="10" rows="5" class="form-control"></textarea>
+                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control"></textarea>
                                 <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
                             </div>
                         </div>
