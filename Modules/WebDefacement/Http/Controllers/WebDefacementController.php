@@ -40,7 +40,7 @@ class WebDefacementController extends Controller
         return view('webdefacement::index')->with($data);
     }
 
-    public function detail()
+    public function detail($code)
     {
         $data['page'] = langapp('webdefacement');
         return view('webdefacement::detail')->with($data);
@@ -173,7 +173,7 @@ class WebDefacementController extends Controller
                     </div>
                     <div class="wdfm-body">
                         <div class="wdfm-btn">
-                            <a href="webdefacement/detail" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                            <a href="webdefacement/detail/'.$key->code.'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>

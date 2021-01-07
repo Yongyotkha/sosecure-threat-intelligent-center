@@ -78,7 +78,8 @@
                                 <i class="fas fa-search"></i>
                                 Search
                             </button>
-                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" 
+                            style="white-space: nowrap"  onclick="clear_search()">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
@@ -241,6 +242,25 @@
         load_card(search_);
 
     }
+
+    function clear_search () {
+
+    search_ = 0;
+    datatype = null;
+    site = null;
+    keywords = null;
+    level = null;
+
+    $('#keywords').val('');
+    $('#datatype').val('').trigger('change');
+    $('#site').val('').trigger('change');
+    site = $('#site').val();
+
+
+
+    load_card(search_);
+
+}
 
     $("#critical").click(function() {
         
