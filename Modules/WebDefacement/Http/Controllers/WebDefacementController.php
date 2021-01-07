@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
+use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\SiteSettings\Entities\SiteSettings;
 
 class WebDefacementController extends Controller
@@ -42,7 +43,21 @@ class WebDefacementController extends Controller
 
     public function detail($code)
     {
+
+        // dd($code);
         $data['page'] = langapp('webdefacement');
+        $data['code'] = @$code;
+        $data['webdefacement'] = WebdefacmentSetting::where("code",$code)->first();
+        $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original[0];
+        $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check[0];
+        $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log[0];
+
+        //   dd( $data['webdefacment_data_check']);
+        
+
+
+
+        
         return view('webdefacement::detail')->with($data);
     }
 
@@ -166,14 +181,14 @@ class WebDefacementController extends Controller
                 <div class="wdfm-card">
                     <div class="wdfm-header">
                         <div class="wdfm-img">
-                            <a href="webdefacement/detail">
-                                <div class="wdfm-logo" style="background-image:url('.$key->image_last.')"></div>
+                            <a href="'.route('webdefacement.detail',['code'=>$key->code]).'">
+                                <img src="'.asset($key->image_last).'" alt="">
                             </a>
                         </div>
                     </div>
                     <div class="wdfm-body">
                         <div class="wdfm-btn">
-                            <a href="webdefacement/detail/'.$key->code.'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                            <a href="'.route('webdefacement.detail',['code'=>$key->code]).'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
@@ -186,8 +201,8 @@ class WebDefacementController extends Controller
                             <div class="status-flex mr-2">Status : &nbsp; '.get_webdefacment_status($key->status_val,'color').'</div>
                         </div>
                         <div class="wdfm-ft-right flex">
-                            <div>Last online: 10 second ago</div>
-                            <div>Last Check: 10 second ago</div>
+                            <div>Last online: '.$key->last_online.'</div>
+                            <div>Last Check: '.$key->last_check.'</div>
                         </div>
                     </div>
                 </div>

@@ -1,18 +1,19 @@
 <?php
 
 namespace Modules\WebDefacement\Entities;
+use Modules\WebDefacement\Entities\WebdefacmentSetting;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\SiteSettings\Entities\SiteSettings;
+
 
 class WebdefacmentDataOriginal extends Model
 {
     protected $table = 'webdefacment_data_original';
     protected $fillable = [];
 
-    // public function get_site()
+    // public function get_webdefacment_setting()
     // {
-    //     return $this->hasOne(SiteSettings::class, 'id', 'site_id');
+    //         return $this->belongsTo(WebdefacmentSetting::class, 'webdefacment_setting_id', 'id');
     // }
 
 
