@@ -193,6 +193,43 @@
                 </div>
             </section>
 
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row d-flex-center">
+                        <div class="col-xs-6">
+                            <i class="fas fa-globe-europe"></i> Log
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <button id="togglelog" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
+                                <i class="fas fa-minus-square"></i>Collapse
+                            </button>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" id="wdfm-log">
+                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th>Description</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Datetime</th>
+                            
+                        </tr>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td >
+                                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                                Totam ullam natus nobis expedita, neque iusto magnam saepe maiores consectetur?
+                                Id enim facere, nihil aut velit reprehenderit libero odio est ipsa.
+                            </td>
+                            <td class="text-center">-</td>
+                            <td class="no-wrap">2020-01-01 11:11</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+
           </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

@@ -29,10 +29,10 @@
                 <a href="{{  route('clients.import')  }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="@langapp('import_clients') " data-placement="bottom" data-toggle="ajaxModal">
                     @icon('solid/cloud-upload-alt') @langapp('import')
                 </a>
-                <a href="{{  route('clients.export')  }}"
+                {{-- <a href="{{  route('clients.export')  }}"
                     class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive" title="CSV" data-placement="bottom">
                     @icon('solid/cloud-download-alt') CSV
-                </a>
+                </a> --}}
                 </ul>
             </div>
             

@@ -2739,6 +2739,7 @@ input.input-login:focus {
     align-items: inherit;
     justify-content: inherit;
 }
+
 .wdfm-footer{
     margin: 0 15px 10px;
     height: auto;
@@ -2751,11 +2752,19 @@ input.input-login:focus {
     align-items: center;
     justify-content: space-between;
 }
+
+.wdfm-footer.start-top{
+    align-items: flex-start !important;
+}
 .wdfm-text-ft{
     margin: 0 !important;
     color: #333;
 }
 
+.flex-end{
+    display: flex;
+    justify-content: flex-end;
+}
 
 .wdfm-ft-right.flex,
 .wdfm-ft-left.flex{
@@ -2794,9 +2803,14 @@ input.input-login:focus {
 
 .wdfm-footer-action{
     border-top: 1px solid #eeeeee;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
     padding: 1rem;
+    align-items: center;
     background: #eee;
+}
+.wdfm-footer-action div{
+    flex: 1;
 }
 
 .status-flex{
