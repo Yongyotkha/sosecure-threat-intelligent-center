@@ -21,7 +21,7 @@ class MDMISPXMLrun extends Command
      *
      * @var string
      */
-    protected $description = 'DarkWeb Feed';
+    protected $description = 'Attr Feed';
 
     /**
      * Create a new command instance.
@@ -90,11 +90,8 @@ class MDMISPXMLrun extends Command
                 while (($file = readdir($dh)) !== false) {
 
                     try {
-
                         $dir_xmlfile = $dir_folder . $file;
-
                         echo $dir_xmlfile;
-
                         if ($file != "." && $file != "..") {
                             $content = file_get_contents($dir_xmlfile);
                             $xmlIndex = strpos($content, "<?xml");

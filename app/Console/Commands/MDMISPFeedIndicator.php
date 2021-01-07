@@ -22,7 +22,7 @@ class MDMISPFeedIndicator extends Command
      *
      * @var string
      */
-    protected $description = 'DarkWeb Feed';
+    protected $description = 'Attr Feed';
 
     /**
      * Create a new command instance.
@@ -80,8 +80,8 @@ class MDMISPFeedIndicator extends Command
         //$this->saveJson($json_o,$stamp_event_id,$stamp_indicator_id);
         if(!empty($json_o["response"])){
             $loop = 0;
-            $start = 100-1;
-            $stop = 200;
+            $start = 200-1;
+            $stop = 300;
             array_splice($json_o["response"], $stop);
             array_splice($json_o["response"], 0, $start);
             $this->info("Length :". count($json_o["response"]));
