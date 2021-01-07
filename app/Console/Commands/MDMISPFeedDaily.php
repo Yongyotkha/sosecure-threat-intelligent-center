@@ -22,7 +22,7 @@ class MDMISPFeedDaily extends Command
      *
      * @var string
      */
-    protected $description = 'DarkWeb Feed';
+    protected $description = 'Attr Feed';
 
     /**
      * Create a new command instance.
