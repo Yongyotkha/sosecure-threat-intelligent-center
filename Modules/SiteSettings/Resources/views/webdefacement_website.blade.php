@@ -38,8 +38,8 @@
                             </div>
                         </header>
                         <div class="panel-body">
-                            <div class="wdfm-container">
-                                <div class="item-wdfm wdfm-inner">
+                            <div class="wdfm-container" id='data_card'>
+                                {{-- <div class="item-wdfm wdfm-inner">
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
@@ -179,7 +179,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </section>
@@ -210,25 +210,17 @@
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
-                            <div class="input-group">
                                 <input type="text" class="form-control" name="url_web" id="url_web" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="port_web" id="port_web" value="80">
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-info" id="btn_check_web">Check</button>  
                                 </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">&nbsp;</label>
-                        <div class="col-lg-9">
-                            <div class="review-image-capture">
-                                <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" >
-                            </div>
-                            <div class="edit-capture text-center">
-                                <a href="{{route('webdefacement_website.edit_image')}}" target="_blank">
-                                    Edit Image
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -269,11 +261,41 @@
                                 </label>
                             </div>
                             <div id="example-blacklist" style="display: none">
-                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control"></textarea>
+                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control" placeholder="Ex: hacking,hacked,decript"></textarea>
                                 <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="delay_screen_shot" id="delay_screen_shot" value="true">
+                                    <span class="label-text">
+                                        Check image
+                                        {{-- Delay Screenshot --}}
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="delay_screen_shot_val_div" style="display: none">
+                                Delay Screenshot <input type="text" value="2000"> milliseconds
+                                {{-- <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
+                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span> --}}
                             </div>
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label">&nbsp;</label>
+                        <div class="col-lg-9">
+                            <div class="review-image-capture">
+                                <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" >
+                            </div>
+                            <div class="edit-capture text-center">
+                                <a href="{{route('webdefacement_website.edit_image')}}" target="_blank">
+                                    Edit Image
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                 </div>
                 <div class="modal-footer">
@@ -309,13 +331,24 @@
  
 
 <script>
+
+    var site_id = '';
     
         $('#example-blacklist').hide();
         $('input[type="checkbox"]').on('change',function(){
-            if($('input[value="blacklist"]').prop('checked')){
+            if($('#blacklist').prop('checked')){
                 $('#example-blacklist').show();
             }else{
                 $('#example-blacklist').hide();
+            }
+        });
+
+        $('#delay_screen_shot_val_div').hide();
+        $('input[type="checkbox"]').on('change',function(){
+            if($('#delay_screen_shot').prop('checked')){
+                $('#delay_screen_shot_val_div').show();
+            }else{
+                $('#delay_screen_shot_val_div').hide();
             }
         });
 
@@ -327,6 +360,57 @@
                 $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
             }); 
         });
+
+
+    $(function () {
+        load_card();
+    });
+    
+
+    
+    function load_card(){
+        site_id = '{{$siteSettings->id}}';
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('webdefacement.load_card_by_site') !!}',
+            type: "post",
+            data: ({
+                site_id:site_id
+            }),
+            datatype: "html",
+            beforeSend: function(){
+                {{--$('.ajax-loading').show();--}}
+                {{--loading('load');--}}
+                f_loading(null, '#data_card');
+            },
+        }).done(function(data){
+
+            {{--$('.ajax-loading').hide();--}}
+            {{--loading('stop_load');--}}
+            f_loading_stop(null, '#data_card');
+                $("#data_card").html(data.html);  
+
+                $('.wdfm-card').hover(function(){
+                    $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+                }); 
+                $('.wdfm-card').mouseleave(function(){
+                    $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
+                }); 
+
+          
+             
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            {{--$('.ajax-loading').hide();--}}
+            {{--loading('stop_load');--}}
+            f_loading_stop(null, '#data_card');
+            console.log("No response from server");
+        });
+    }
+
+
+
 </script>
 
 @endpush

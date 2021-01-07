@@ -28,11 +28,11 @@
         </header>
         <section class="scrollable wrapper">
             <section id="area_search" class="panel panel-default">
-                <div class="panel-heading">
+                {{-- <div class="panel-heading">
                     <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
                     |
                     <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
-                </div>
+                </div> --}}
                 <div id="hide-advance-search" class="container-fluid" style="padding: 2rem; display: none;">
                     <div class="row">
                         <div class="col-md-8">

@@ -116,6 +116,36 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
     return $html;
 }
 
+function get_webdefacment_status($status_id,$color='') {
+    $html = '';
+    if($color == 'color') {
+        if(strtolower($status_id) == strtolower("critical")) {
+            $html = '<span class="dot critical"></span> Critical';
+        } else if(strtolower($status_id) == strtolower("high")) {
+            $html = '<span class="dot high"></span> High';
+        } else if(strtolower($status_id) == strtolower("meduim")) {
+            $html = '<span class="dot meduim"></span> Meduim';
+        } else if(strtolower($status_id) == strtolower("normal")) {
+            $html = '<span class="dot low"></span> Normal';
+        } else if(strtolower($status_id) == strtolower("none")) {
+            $html = '<span class="dot none"></span> None';
+        }
+    } else {
+        if(strtolower($status_id) == strtolower("critical")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("high")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("meduim")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("normal")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("none")) {
+            $html = $status_id;
+        }
+    }
+    return $html;
+}
+
 
 function generator_uuid(){
     return Str::uuid()->toString();
@@ -386,4 +416,35 @@ function get_menu_html() {
         </nav>';
 
     echo $html_all;
+}
+
+
+function formatSizeUnits($bytes)
+    {
+        if ($bytes >= 1073741824)
+        {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        }
+        elseif ($bytes >= 1048576)
+        {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        }
+        elseif ($bytes >= 1024)
+        {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        }
+        elseif ($bytes > 1)
+        {
+            $bytes = $bytes . ' bytes';
+        }
+        elseif ($bytes == 1)
+        {
+            $bytes = $bytes . ' byte';
+        }
+        else
+        {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
 }

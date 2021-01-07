@@ -10,7 +10,7 @@
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            @langapp('webdefacement') > Targeted Brand:Paypal
+            @langapp('webdefacement') > {{@$webdefacement->name}}
         </div>
 
         &nbsp;
@@ -36,71 +36,71 @@
                     <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
                         <tr>
                             <th width="250px">Name Page</th>
-                            <td>Targeted Brand : Paypay</td>
+                            <td>{{@$webdefacement->name}}</td>
                         </tr>
                         <tr>
                             <th>URL</th>
-                            <td>https//www.xxxx.com/xxxx.html</td>
+                            <td>{{@$webdefacement->url}}</td>
                         </tr>
                         <tr>
                             <th>Domain</th>
-                            <td>html//www.xxxxx.com</td>
+                            <td>{{@$webdefacement->domain}}</td>
                         </tr>
                         <tr>
                             <th>User Agent</th>
                             <td>
-                                Mozila / 5.0 (x11.) Lorem ipsum dolor sit amet. 
+                                {{@$webdefacement->user_agent}}
                                 <a href="#" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
                             </td>
                         </tr>
                         <tr>
                             <th>Site</th>
-                            <td>ออมสิน</td>
+                            <td>{{@$webdefacement->get_site->name}}</td>
                         </tr>
                         <tr>
                             <th>Create Date</th>
-                            <td>2021-01-01 11:11</td>
+                            <td>{{@$webdefacement->created_at}}</td>
                         </tr>
                         <tr>
                             <th>Last Online</th>
-                            <td>10 second ago</td>
+                            <td>{{@$webdefacement->last_online}}</td>
                         </tr>
                         <tr>
                             <th>Last Check</th>
-                            <td>10 second ago</td>
+                            <td>{{@$webdefacement->last_check}}</td>
                         </tr>
                         <tr>
                             <th>Status</th>
-                            <td> <span class="dot low"></span> &nbsp; Normal</td>
+                            <td> {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}</td>
                         </tr>
                     </table>
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th width="250px"></th>
-                                <th>Ordinal</th>
+                                <th>Original</th>
                                 <th>Current</th>
                             </tr>
                         </thead>
                         <tbody>                  
                             <tr>
                                 <th>Hash</th>
-                                <td>xxxxxxxxxxxxxxxxxxxxxx</td>
-                                <td>xxxxxxxxxxxxxxxxxxxxxx</td>
+                                <td>{{@$webdefacment_data_original->hash}}</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <th>File Size</th>
-                                <td>10k</td>
+                                <td>{{@$webdefacment_data_original->filesize}} KB</td>
                                 <td>10k</td>
                             </tr>
                             <tr>
                                 <th>Element</th>
-                                <td>100 tag</td>
+                                <td>{{@$webdefacment_data_original->element}} tag</td>
                                 <td>100 tag</td>
                             </tr>
                             <tr>
                                 <th>&nbsp;</th>
-                                <td>Last Update 2020-01-01 11:11</td>
+                                <td>{{@$webdefacment_data_original->last_update}}</td>
                                 <td>Last Update 2020-01-01 11:11</td>
                             </tr>
                         </tbody>
@@ -108,7 +108,7 @@
                             <tr>
                                 <th>&nbsp;</th>
                                 <td colspan="2">
-                                    <button class="btn btn-info">Update Ordinal</button>
+                                    <button class="btn btn-info">Update Original</button>
                                 </td>
                             </tr>
                         </tfoot>
@@ -137,8 +137,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" data-lightbox="name-img-1">
-                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
+                                                <a href="">
+                                                    <img src="{{asset(@$webdefacment_data_original->image)}}" alt="">
                                                 </a>
                                             </div>
                                         </div>
@@ -148,13 +148,13 @@
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             </div>
-                                            <h4>Targeted Brand: paypal</h4>
-                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
+                                            <h4>{{@$webdefacement->name}}</h4>
+                                            <p class="mdfm-text-muted">{{@$webdefacement->url}}</p>
                                         </div>
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
-                                                <div>Ordinal</div>
-                                                <div>Last Update 2020-01-01 11:11</div>
+                                                <div>Original</div>
+                                                <div>Last Update {{@$webdefacment_data_original->last_update}}</div>
                                                 <div><button class="btn btn-info">Update</button></div>
                                             </div>
                                         </div>
@@ -171,7 +171,7 @@
                                         </div>
                                         <div class="wdfm-body">
                                             <div class="wdfm-btn">
-                                                <a href="{{route('webdefacement.detail')}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                                <a href="{{route('webdefacement.detail',['code'=>$code])}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             </div>
@@ -181,7 +181,7 @@
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
                                                 <div>Current</div>
-                                                <div>Last Update 2020-01-01 11:11</div>
+                                                <div>Last Update </div>
                                                 <div class="status-flex">Status : &nbsp; <span class="dot low"></span> normal</div>
                                             </div>
                                         </div>
