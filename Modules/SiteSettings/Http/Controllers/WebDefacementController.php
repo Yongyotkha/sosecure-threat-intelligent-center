@@ -61,7 +61,7 @@ class WebDefacementController extends Controller
                             </div>
                             <div class="wdfm-body">
                                 <div class="wdfm-btn">
-                                    <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                    <a href="'.route('webdefacement.detail',['code' => $key->code]).'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </div>
