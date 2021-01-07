@@ -2711,6 +2711,7 @@ input.input-login:focus {
     position: relative;
     text-align: center;
     background: #fff;
+    height: 110px;
 }
 
 .wdfm-header-upper{
