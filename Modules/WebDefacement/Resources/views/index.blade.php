@@ -6,7 +6,7 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head"> @langapp('webdefacement')</div>    
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <button id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
              </button>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
@@ -26,33 +26,55 @@
 
         <section class="scrollable wrapper">
             {{-- Search --}}
-            <section class="panel panel-default"  id="hide-advance-search" style="display: none">
+            <section class="panel panel-default"   id="area-advance-search" style="display: none">
                 <div class="container-fluid" style="padding: 2rem;">
                     <div class="row m-b-md">
                         <div class="col-lg-12">
                             <div class="row d-flex align-items-center">
                                 <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
                                 <div class="col-sm-11 col-xs-12">
-                                    <input type="text" id="Keywords" class="form-control">
+                                    <input type="text" id="keywords" class="form-control">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
+                        {{-- <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
+                                    <div class="col-sm-9 col-xs-12">
+                                        <select id="status" class="select2-option form-control"  multiple="multiple">
+                                            <option value="critical">Critical</option>
+                                            <option value="high">High</option>
+                                            <option value="meduim">Meduim</option>
+                                            <option value="normal">Normal</option>
+                                            <option value="none">None</option>
+                                        </select>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> --}}
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for=""  class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                 <div class="col-sm-9 col-xs-12">
-                                    <select id="social" class="select2-option form-control">
-                                        <option value="" >All</option>
-                                    </select>
+                                <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
+                                    <option value="critical">Critical</option>
+                                    <option value="high">High</option>
+                                    <option value="meduim">Meduim</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="none">None</option>
+                                </select>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="row">
                         <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive">
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="search()">
                                 <i class="fas fa-search"></i>
                                 Search
                             </button>
@@ -77,6 +99,10 @@
                     <div class="row">
                         <div class="col-12 text-right mb-2">
                             <div class="padding-3">
+                                <a href="#" id="all" class="btn-chart white d-il-flex mr-3">
+                                    <span class=""></span>
+                                    All
+                                </a>
                                 <a href="#" id="critical" class="btn-chart white d-il-flex mr-3">
                                     <span class="dot critical"></span>
                                     Critical
@@ -89,7 +115,7 @@
                                     <span class="dot medium"></span>
                                     Meduim
                                 </a>
-                                <a href="#" id="low" class="btn-chart white d-il-flex mr-3">
+                                <a href="#" id="normal" class="btn-chart white d-il-flex mr-3">
                                     <span class="dot low"></span>
                                     Normal
                                 </a>
@@ -104,66 +130,7 @@
 
                     <div class="wdfm-container" id='data_card'>
                         
-                        {{-- <div class="item-wdfm wdfm-inner">
-                            <div class="wdfm-card">
-                                <div class="wdfm-header">
-                                    <div class="wdfm-img">
-                                        <a href="{{route('webdefacement.detail')}}">
-                                            <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="wdfm-body">
-                                    <div class="wdfm-btn">
-                                        <a href="{{route('webdefacement.detail')}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </div>
-                                    <h4>Targeted Brand: paypal</h4>
-                                    <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
-                                </div>
-                                <div class="wdfm-footer">
-                                    <div class="wdfm-ft-left flex">
-                                        <div>Site : ออมสิน</div>
-                                        <div class="status-flex">Status : &nbsp; <span class="dot high"></span> High</div>
-                                    </div>
-                                    <div class="wdfm-ft-right flex">
-                                        <div>Last online: 10 second ago</div>
-                                        <div>Last Check: 10 second ago</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item-wdfm wdfm-inner">
-                            <div class="wdfm-card">
-                                <div class="wdfm-header">
-                                    <div class="wdfm-img">
-                                        <a href="{{route('webdefacement.detail')}}">
-                                            <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="wdfm-body">
-                                    <div class="wdfm-btn">
-                                        <a href="{{route('webdefacement.detail')}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </div>
-                                    <h4>Targeted Brand: paypal</h4>
-                                    <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
-                                </div>
-                                <div class="wdfm-footer">
-                                    <div class="wdfm-ft-left flex">
-                                        <div>Site : ออมสิน</div>
-                                        <div class="status-flex">Status : &nbsp; <span class="dot critical"></span> Critical</div>
-                                    </div>
-                                    <div class="wdfm-ft-right flex">
-                                        <div>Last online: 10 second ago</div>
-                                        <div>Last Check: 10 second ago</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
+                
                     </div>
                 </div>
             </section>
@@ -189,13 +156,29 @@
 @include('stacks.js.daterangpicker')
 
 <script>
-        $(document).ready(function(){
+
+    var keywords = null;
+    var site = null;
+    var datatype = null;
+    var level = null;
+    var search_ = 0;
+  
+
+
+
+
+    $(document).ready(function(){
         $('.wdfm-card').hover(function(){
             $(this).find('.wdfm-header').addClass('wdfm-header-upper');
         }); 
         $('.wdfm-card').mouseleave(function(){
             $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
         }); 
+    });
+
+    $('#area-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#area-advance-search').toggle();
     });
 
 
@@ -205,16 +188,22 @@
     
 
     
-    function load_card(){
+    function load_card(search_){
 
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             url: '{!! route('webdefacement.load_card') !!}',
-            type: "get",
+            type: "post",
             data: ({
 
+                search_: search_,
+                keywords: keywords,
+                datatype: datatype,
+                site: site,
+                level: level,
+                              
             }),
             datatype: "html",
             beforeSend: function(){
@@ -239,6 +228,55 @@
             console.log("No response from server");
         });
     }
+
+    function search (level_=null) {
+
+        search_ = 1;
+        keywords = $('#keywords').val();
+        datatype = $('#datatype').val(); 
+        site = $('#site').val();
+        level = level_;
+       
+        
+        load_card(search_);
+
+    }
+
+    $("#critical").click(function() {
+        
+      
+        search ('critical');
+ 
+    });
+    $("#high").click(function() {
+        
+        search ('high');
+    });
+    $("#medium").click(function() {
+
+
+        search ('medium');
+
+    });
+    $("#normal").click(function() {
+
+    
+        search ('normal');
+
+    });
+    $("#none").click(function() {
+
+     
+        search ('none');
+
+    });
+
+    $("#all").click(function() {
+
+     
+    search (null);
+
+    });
   
 </script>
 @endpush
