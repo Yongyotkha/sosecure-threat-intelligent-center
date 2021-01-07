@@ -2710,6 +2710,7 @@ input.input-login:focus {
     padding: 15px 20px;
     position: relative;
     text-align: center;
+    background: #fff;
 }
 
 .wdfm-header-upper{
@@ -2763,6 +2764,7 @@ input.input-login:focus {
     border-top: 1px solid #eeeeee;
     font-weight: 300;
     line-height: 1.5em;
+    background: #fff;
     display: flex;
     box-sizing: border-box;
     align-items: center;

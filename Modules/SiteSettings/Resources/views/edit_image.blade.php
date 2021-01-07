@@ -12,14 +12,10 @@
 
     <style>
         body{
-            overflow-x: hidden;
             box-sizing: border-box;
         }
         #preview-img-wdfm {
-            width: 100%;
-            height: 100%;
             border: 1px solid #eee;
-            padding: 1rem;
             box-sizing: border-box
         }
 
@@ -84,6 +80,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%,-50%);
+            cursor: pointer;
         }
         .xicon{
             background: #ff8181;
@@ -130,9 +127,8 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="dropBox" style="height: 100%;position:relative">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a"
-                    id="preview-img-wdfm">
+                <div class="dropBox" style="height: 100%;position:relative;display:inline-block">
+                    <img src="{{asset('images/image_original.png')}}" id="preview-img-wdfm">
                 </div>
             </div>
      
