@@ -108,70 +108,90 @@ class WebDefacementController extends Controller
 
     public function load_card(Request $request)
     {
-        $html = ''; 
-        $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null)->get();
+        $html = '';
+     
+
+        $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null);
+
+        if ($request->search_ == 1) {
+    
+            if ($request->site != "") {
+                $modal = $modal->where('site_id', '=', $request->site);
+                
+            }
+
+            if ($request->keywords) {
+                $modal = $modal->where('name', 'LIKE', '%' . $request->keywords . '%')
+                ->orWhere('url', 'LIKE', '%' . $request->keywords . '%');
+            }
+
+            if ($request->datatype) {
+                // dd($request->datatype);
+                
+                $modal = $modal->whereIn('status_val', $request->datatype);
+                // dd($modal);
+            }
+            
+            
+        }
+
+        if($request->level){
+            if($request->level =='critical'){
+                $modal = $modal->where('status_val', 'critical');
+            }
+            else if($request->level =='high'){
+                $modal = $modal->where('status_val', 'high');
+            }
+            else if($request->level =='medium'){
+                $modal = $modal->where('status_val', 'medium');
+            }
+            else if($request->level =='normal'){
+                $modal = $modal->where('status_val', 'normal');
+            }
+            else if($request->level =='none'){
+                $modal = $modal->where('status_val', 'none');
+            }
+            // else{
+            //     $modal = $modal;
+            // }
+        
+    }
+            
+        $modal = $modal->get();
+
+
         foreach ($modal as $key) {
-            $html .= '<div class="item-wdfm wdfm-inner">
-            <div class="wdfm-card">
-                <div class="wdfm-header">
-                    <div class="wdfm-img">
-                        <a href="webdefacement/detail">
-                            <img src="'.$key->image_last.'" alt="">
-                        </a>
+            $html .= 
+            '<div class="item-wdfm wdfm-inner">
+                <div class="wdfm-card">
+                    <div class="wdfm-header">
+                        <div class="wdfm-img">
+                            <a href="webdefacement/detail">
+                                <img src="'.$key->image_last.'" alt="">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="wdfm-body">
+                        <div class="wdfm-btn">
+                            <a href="webdefacement/detail" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                        <h4>'.$key->name.'</h4>
+                        <p class="mdfm-text-muted">'.$key->url.'</p>
+                    </div>
+                    <div class="wdfm-footer">
+                        <div class="wdfm-ft-left flex">
+                            <div>Site : '.$key->get_site->name.'</div>
+                            <div class="status-flex mr-2">Status : &nbsp; '.get_webdefacment_status($key->status_val,'color').'</div>
+                        </div>
+                        <div class="wdfm-ft-right flex">
+                            <div>Last online: 10 second ago</div>
+                            <div>Last Check: 10 second ago</div>
+                        </div>
                     </div>
                 </div>
-                <div class="wdfm-body">
-                    <div class="wdfm-btn">
-                        <a href="webdefacement/detail" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
-                    <h4>'.$key->name.'</h4>
-                    <p class="mdfm-text-muted">'.$key->url.'</p>
-                </div>
-                <div class="wdfm-footer">
-                    <div class="wdfm-ft-left flex">
-                        <div>Site : '.$key->get_site->name.'</div>
-                        <div class="status-flex mr-2">Status : &nbsp;  <span class="dot low"></span> Normal</div>
-                    </div>
-                    <div class="wdfm-ft-right flex">
-                        <div>Last online: 10 second ago</div>
-                        <div>Last Check: 10 second ago</div>
-                    </div>
-                </div>
-            </div>
-        </div>';
-                     
-            // '<div class="item-wdfm wdfm-inner">
-            //     <div class="wdfm-card">
-            //         <div class="wdfm-header">
-            //             <div class="wdfm-img">
-            //                 <a href="{{route("webdefacement.detail")}}">
-            //                     <img src="'.$key->image.'" alt="">
-            //                 </a>
-            //             </div>
-            //         </div>
-            //         <div class="wdfm-body">
-            //             <div class="wdfm-btn">
-            //                 <a href="{{route("webdefacement.detail")}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-            //                     <i class="fas fa-eye"></i>
-            //                 </a>
-            //             </div>
-            //             <h4>Targeted Brand: </h4>
-            //             <p class="mdfm-text-muted">'.$key->url.'</p>
-            //         </div>
-            //         <div class="wdfm-footer">
-            //             <div class="wdfm-ft-left flex">
-            //                 <div>Site : '.$key->name.'</div>
-            //                 <div class="status-flex mr-2">Status : &nbsp;  <span class="dot low"></span> Normal</div>
-            //             </div>
-            //             <div class="wdfm-ft-right flex">
-            //                 <div>Last online: 10 second ago</div>
-            //                 <div>Last Check: 10 second ago</div>
-            //             </div>
-            //         </div>
-            //     </div>
-            // </div>';
+            </div>';                    
         }
 
         if ($request->ajax()) {
