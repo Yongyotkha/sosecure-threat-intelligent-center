@@ -6,13 +6,13 @@ include_once  __DIR__ . '/../screen-master-v2/autoload.php';
 
 
 class DownloadImage {
-    function download($serverUrl, $imageName){
+    function download($serverUrl, $imageName,$Delay){
         //$execCommand = PATH_PHANTOM_JS . '/bin/phantomjs '. PATH_PHANTOM_JS .'/bin/capturePage.js '. $serverUrl . ' '.PATH_CAPTURE_SCREEN_MASTER.$imageName;
        // exec($execCommand);
         
         $url =$serverUrl;
         $screen = new Screen\Capture();
-        $screen->setDelay(3000);
+        $screen->setDelay($Delay);
         $screen->setUrl($url);
         $screen->setOptions([
             'ignore-ssl-errors' => 'yes',
@@ -26,7 +26,7 @@ class DownloadImage {
         $screen->setUserAgentString("e.g.: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36");
         $screen->setBackgroundColor("#ffffff");
         $screen->setImageType("png");
-        $fileLocation = PATH_CAPTURE_SCREEN_MASTER.'/'.$imageName;
+        $fileLocation = $imageName;
         try
         {
         	 $screen->save($fileLocation);

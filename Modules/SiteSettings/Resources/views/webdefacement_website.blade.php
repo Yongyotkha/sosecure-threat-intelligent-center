@@ -218,18 +218,10 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="form-group row">
-                        <label class="col-lg-3 control-label">&nbsp;</label>
-                        <div class="col-lg-9">
-                            <div class="review-image-capture">
-                                <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" >
-                            </div>
-                            <div class="edit-capture text-center">
-                                <a href="{{route('webdefacement_website.edit_image')}}" target="_blank">
-                                    Edit Image
-                                </a>
-                            </div>
+                        <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" name="port_web" id="port_web" value="80">
                         </div>
                     </div>
 
@@ -272,8 +264,36 @@
                                 <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control"></textarea>
                                 <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
                             </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="delay_screen_shot" id="delay_screen_shot" value="true">
+                                    <span class="label-text">
+                                        Delay Screenshot
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="example-blacklist" style="display: none">
+                                <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
+                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label">&nbsp;</label>
+                        <div class="col-lg-9">
+                            <div class="review-image-capture">
+                                <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" >
+                            </div>
+                            <div class="edit-capture text-center">
+                                <a href="{{route('webdefacement_website.edit_image')}}" target="_blank">
+                                    Edit Image
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                 </div>
                 <div class="modal-footer">
@@ -314,7 +334,7 @@
     
         $('#example-blacklist').hide();
         $('input[type="checkbox"]').on('change',function(){
-            if($('input[value="blacklist"]').prop('checked')){
+            if($('#blacklist').prop('checked')){
                 $('#example-blacklist').show();
             }else{
                 $('#example-blacklist').hide();
@@ -350,11 +370,15 @@
             }),
             datatype: "html",
             beforeSend: function(){
-                $('.ajax-loading').show();
+                {{--$('.ajax-loading').show();--}}
+                {{--loading('load');--}}
+                f_loading(null, '#data_card');
             },
         }).done(function(data){
 
-                $('.ajax-loading').hide();
+            {{--$('.ajax-loading').hide();--}}
+            {{--loading('stop_load');--}}
+            f_loading_stop(null, '#data_card');
                 $("#data_card").html(data.html);  
 
                 $('.wdfm-card').hover(function(){
@@ -367,7 +391,9 @@
           
              
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('.ajax-loading').hide();
+            {{--$('.ajax-loading').hide();--}}
+            {{--loading('stop_load');--}}
+            f_loading_stop(null, '#data_card');
             console.log("No response from server");
         });
     }
