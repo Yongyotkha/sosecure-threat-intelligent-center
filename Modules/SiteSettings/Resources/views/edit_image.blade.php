@@ -7,7 +7,9 @@
     <title>Edit Image</title>
 
     <link rel="stylesheet" href="{{getAsset('css/bootstrap.css')}}">
+    <link rel="stylesheet" href="{{getAsset('plugins/font-awesome/css/font-awesome.min.css')}}">
     <link rel="stylesheet" href="{{getAsset('jquery-ui/jquery-ui.min.css')}}">
+
     <style>
         body{
             overflow-x: hidden;
@@ -30,8 +32,59 @@
             font-weight: 700px;
         }
       
-        .resizable { width: 50px; height: 50px; padding: 0.5em; background: #eee}
+        .resizable {   
+            width: 50px;
+            height: 50px;
+            max-height: 100%;
+            max-width: 100%; padding: 0.5em; background: #eee
+        }
 
+        .resize-auto {
+            width: 50px;
+            height: 50px;
+            max-height: 100%;
+            max-width: 100%;
+        }
+        .draggable {
+            background: rgb(241, 206, 8);
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            max-height: 100%;
+            max-width: 100%;
+        }
+        .drag-edit {
+            width: 50px;
+            height: 50px;
+            max-height: 100%;
+            max-width: 100%;
+            background: #f2f2f2;
+            display: inline-block;
+        }
+        .d-flex {
+            display: flex;
+        }
+        .align-items-center {
+            align-items: center;
+        }
+        .justify-content-center{
+            justify-content: center;
+        }
+        .mr-4{
+            margin-right: 2rem;
+        }
+        .mb-3{
+            margin-bottom: 1.5rem;
+        }
+        .icon-drag{
+            position: relative;
+        }
+        .icon-tool{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
     </style>
 </head>
 
@@ -42,16 +95,16 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-3">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="mr-4">
                         <h4>Tools</h4>
                     </div>
-                    <div class="col-md-9">
+                    <div class="icon-drag">
                         <div class="draggable" style="position:relative">
-                            <div class="ui-widget-content resizable"></div>
+                            <span class="icon-tool"><i class="fa fa-crop"></i></span>
                         </div>
+                 
                     </div>
-                    <hr>
                 </div>
             </div>
             <div class="col-md-12">
@@ -68,45 +121,39 @@
     <script src="{{getAsset('jquery-ui/jquery-ui.min.js')}}"></script>
     <script>
 
-        $('.resizable').resizable();
 
         $(".dropBox").droppable({
             accept: '.draggable',
             drop: function(event, ui) {
                 if (ui.draggable.hasClass("draggable")) {
-                var $item = $(ui.helper).clone();
-                ui.helper.remove();
-                leftPosition  = ui.offset.left - $(this).offset().left;
-                topPosition   = ui.offset.top - $(this).offset().top;
-                console.log("top: " + topPosition + ", left: " + leftPosition); 
+                    var $item = $(ui.helper).clone();
+                    ui.helper.remove();
+                    leftPosition  = ui.offset.left - $(this).offset().left;
+                    topPosition   = ui.offset.top - $(this).offset().top;
+                    console.log("top: " + topPosition + ", left: " + leftPosition); 
 
-                $item.draggable({
-                    helper: 'original',
-                    cursor: 'move',
-                    containment: '.dropBox',
-                    tolerance: 'fit',
-                });
-
-                $(this).append($item);
-                makeDraggable($item);
+                    $item.draggable({
+                        helper: 'original',
+                        cursor: 'move',
+                        containment: '.dropBox',
+                        tolerance: 'fit',
+                    });
+                    $item.find('.icon-tool').remove();
+                    $item.removeClass("draggable");
+                    $item.addClass("drag-edit");
+                    $item.resizable();
+                    $item.appendTo('.dropBox');
                 }
             }
         });
 
-        function makeDraggable($item) {
-            $item.draggable({
-                start: function() {},
-                stop: function(event, ui) {
-                    console.log(ui.position.top);
-                    console.log(ui.position.left);
-                }
-            });
-        }
+
 
         $(".draggable").draggable({
             containment: ".dropBox",
             appendTo: ".dropBox",
             helper: "clone",
+            handle: ".icon-tool",
             scroll: true,
             start: function() {},
             stop: function(event, ui) {
@@ -115,6 +162,16 @@
             }
         });
 
+        $(".drag-edit").draggable({
+            containment: ".dropBox",
+            appendTo: ".dropBox",
+            scroll: true,
+            start: function() {},
+            stop: function(event, ui) {
+                console.log(ui.position.top);
+                console.log(ui.position.left);
+            }
+        });
 
     </script>
 </body>
