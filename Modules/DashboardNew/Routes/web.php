@@ -17,3 +17,5 @@ Route::group(
 
     }
 );
+
+Route::get('/view_detail_asset', 'DashboardNewController@detail_asset')->name('detail_asset.index')->middleware('can:menu_items');

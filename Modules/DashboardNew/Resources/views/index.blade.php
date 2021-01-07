@@ -27,7 +27,7 @@
                                                             <img src="{{asset('images/database.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
-                                                        <span class="number-card info">{{@$count_CVEAssets}}</span>
+                                                        <a href="#" data-toggle="modal" data-target="#modal_asset" class="number-card info">{{@$count_CVEAssets}}</a>
                                                     </div>
                                                    
                                                 </div>
@@ -39,7 +39,7 @@
                                                             <img src="{{asset('images/antivirus.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
-                                                        <span class="number-card green">{{@$count_CVEMapping}}</span>
+                                                        <a class="number-card green">{{@$count_CVEMapping}}</a>
                                                     </div>
                                              
                                                 </div>
@@ -51,7 +51,7 @@
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
-                                                        <span class="number-card warning">{{@$count_compromised}}</span>
+                                                        <a class="number-card warning">{{@$count_compromised}}</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -62,7 +62,7 @@
                                                             <img src="{{asset('images/dataleak.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
-                                                        <span class="number-card dark">2,500</span>
+                                                        <a class="number-card dark">2,500</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -151,6 +151,61 @@
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+    <div class="modal fade fixed-left" id="modal_asset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-white" id="exampleModalLabel">Asset All</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="table-assets-modal" class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Vendor</th>
+                                    <th>Title</th>
+                                    <th>Version</th>
+                                    <th>Edition</th>
+                                    <th>Site</th>
+                                    <th>IP</th>
+                                    <th>Hosting</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Microsoft</td>
+                                    <td>Window server 2008</td>
+                                    <td>r2</td>
+                                    <td>-</td>
+                                    <td>Site-01</td>
+                                    <td>10.10.1.11</td>
+                                    <td>www.10.10.1.11</td>
+                                    <td>
+                                        <a href="{{route('detail_asset.index')}}" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                        <a href="#" class="btn btn-danger btn-xs"><i class="fas fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')
@@ -170,6 +225,8 @@
 @include('stacks.js.highchart')
 
 <script>
+
+    $('#table-assets-modal').DataTable();
 
     var today_date = new Date();
     var dd = String(today_date.getDate()).padStart(2, '0');

@@ -61,6 +61,12 @@ class DashboardNewController extends Controller
         return view('dashboardnew::index')->with($data);
     }
 
+    public function detail_asset()
+    {
+        $data['page'] = langapp('dashboard');
+        return view('dashboardnew::view_detail_asset')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
