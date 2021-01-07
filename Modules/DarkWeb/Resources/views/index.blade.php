@@ -86,10 +86,10 @@
                         <div class="card-dash">
                             <div class="left-card">
                                 <div class="img-icon-card">
-                                    <img src="{{asset('images/compromise.png')}}" alt="">
+                                    <img src="{{asset('images/eye.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text text-dark text-upper ">Public</h3>
-                                <span class="number-card info">5</span>
+                                <span class="number-card warning">135</span>
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                                     <img src="{{asset('images/compromise.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text text-dark text-upper">Dark Web</h3>
-                                <span class="number-card info">5</span>
+                                <span class="number-card info">105</span>
                             </div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                                     <img src="{{asset('images/webserver.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text text-dark text-upper ">Web Server</h3>
-                                <span class="number-card info">5</span>
+                                <span class="number-card green">500</span>
                             </div>
                         </div>
                     </div>
