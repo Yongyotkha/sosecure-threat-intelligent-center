@@ -1,23 +1,25 @@
 <?php
-//app_path() . "\\Console\\Commands\\temp\\youtube.png";
-define('PATH_CAPTURE_SCREEN_MASTER', __DIR__ . '/../screen-master/');
+
+define('PATH_CAPTURE_SCREEN_MASTER', app_path() . '/Console/Commands/temp/');
 define('PATH_PHANTOM_JS',  __DIR__ . '/../screen-master');
 include_once  __DIR__ . '/../screen-master-v2/autoload.php';
 
 
-class DownloadImage {
+class SaveImage {
     function download($serverUrl, $imageName){
         //$execCommand = PATH_PHANTOM_JS . '/bin/phantomjs '. PATH_PHANTOM_JS .'/bin/capturePage.js '. $serverUrl . ' '.PATH_CAPTURE_SCREEN_MASTER.$imageName;
        // exec($execCommand);
         
         $url =$serverUrl;
         $screen = new Screen\Capture();
-        $screen->setDelay(10000);
+
+        $screen->setTimeout(10000);
+        $screen->setDelay(3000);
         $screen->setUrl($url);
         $screen->setOptions([
             'ignore-ssl-errors' => 'yes',
             'ssl-protocol' => "any",
-            'web-security' => "true"
+            //'web-security' => "true"
         ]);
         $screen->setWidth(intval('1024'));
         $screen->setHeight('768');
