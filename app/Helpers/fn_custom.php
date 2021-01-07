@@ -126,7 +126,7 @@ function get_webdefacment_status($status_id,$color='') {
         } else if(strtolower($status_id) == strtolower("meduim")) {
             $html = '<span class="dot meduim"></span> Meduim';
         } else if(strtolower($status_id) == strtolower("normal")) {
-            $html = '<span class="dot normal"></span> Normal';
+            $html = '<span class="dot low"></span> Normal';
         } else if(strtolower($status_id) == strtolower("none")) {
             $html = '<span class="dot none"></span> None';
         }
