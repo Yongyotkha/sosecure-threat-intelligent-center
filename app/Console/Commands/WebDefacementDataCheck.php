@@ -50,6 +50,7 @@ class WebDefacementDataCheck extends Command
         $result_checkDomainOnline=  $this->checkDomainOnline($host,$port);
         if ($result_checkDomainOnline == 1) {
             $result["Result"] = 1;
+            $result["domain"] = $host;
 
             $result_checkDomainHeaders=   $this->checkDomainHeaders($url,1);
             $result_URL_404=   $this->URL_404($url);
