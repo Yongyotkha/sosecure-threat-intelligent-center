@@ -24,7 +24,7 @@
                     @endcan
 
                     @can('users_delete')
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete" disabled>
                             <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                                 @langapp('delete')</span>
                         </button>
@@ -51,7 +51,7 @@
                                     <tr>
                                         <th class="no-sort">
                                             <label>
-                                                <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
+                                                <input name="select_all" value="1"  id="select-all" type="checkbox" class="select-chk"/>
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
@@ -139,6 +139,32 @@
     @include('stacks.js.datatables')
 
     <script>
+
+        $('#table-category-template').on('click', '.select-chk', function () {
+            if ($(this).is(':checked')) {
+
+                $('#btn_del_select').prop("disabled", false);
+            } else {
+                
+                if ($('.select-chk').filter(':checked').length < 1){
+
+                    $('#btn_del_select').attr('disabled',true);
+                }
+            }
+        });
+
+        $('#table-category-template').on('click', '.categorySettings_id', function () {
+            if ($(this).is(':checked')) {
+
+                
+                $('#btn_del_select').prop("disabled", false);
+            } else {
+                if ($('.categorySettings_id').filter(':checked').length < 1){
+                    
+                    $('#btn_del_select').attr('disabled',true);
+                }
+            }
+        });
         $(function () {
 
 
@@ -195,25 +221,10 @@
                 ]
             });
 
-            let del_val = [];
-            $("#btn_del_select").click(function(){
-                del_val = [];
-                $("input[type='checkbox'][name='checked']").each(function(){
 
-                    if($(this).is(":checked")) {
-                        del_val.push($(this).val());
-                        /* alert(3);*/
-                    }
-                });
-                console.log(del_val);
 
-                if(del_val.length > 0) {
-                    del_cate_select(del_val);
-                } else {
-                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
-                }
 
-            });
+
 
 
 
@@ -252,6 +263,27 @@
         //                     toastr.error(errorsHtml, '@langapp('response_status') ');
         //                 });
         // }
+
+        {{--            let del_val = [];
+            $("#btn_del_select").click(function(){
+                del_val = [];
+                $("input[type='checkbox'][name='checked']").each(function(){
+
+                    if($(this).is(":checked")) {
+                        del_val.push($(this).val());
+                        /* alert(3);*/
+                    }
+                });
+                console.log(del_val);
+
+                if(del_val.length > 0) {
+                    del_cate_select(del_val);
+                } else {
+                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
+                }
+
+            });
+        --}}
 
 
         function change_category_active (category_id) {

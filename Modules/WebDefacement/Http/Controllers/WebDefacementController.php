@@ -48,11 +48,11 @@ class WebDefacementController extends Controller
         $data['page'] = langapp('webdefacement');
         $data['code'] = @$code;
         $data['webdefacement'] = WebdefacmentSetting::where("code",$code)->first();
-        $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original[0];
-        $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check[0];
-        $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log[0];
+        $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original_detail[0];
+        $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check_detail[0];
+        $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log_detail;
 
-        //   dd( $data['webdefacment_data_check']);
+        //    dd( $data['webdefacment_data_original']);
         
 
 
@@ -175,7 +175,7 @@ class WebDefacementController extends Controller
                 <div class="wdfm-card">
                     <div class="wdfm-header">
                         <div class="wdfm-img">
-                            <a href="'.route('webdefacement.detail',['code'=>@$key->code]).'">
+                            <a href="'.asset($key->image_last).'" data-lightbox="name-img-2">
                                 <img src="'.asset(@$key->image_last).'" alt="">
                             </a>
                         </div>
