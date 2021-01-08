@@ -202,12 +202,12 @@ class WebDefacementProccess extends Command
             if (count($WebdefacmentImageMark_check) > 0) {
               $dir_folder_image_original = base_path() . "/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
               $image_original = imagecreatefrompng($dir_folder_image_original);
-              $black_original = ImageColorAllocate($image_original, 0, 0, 0);
+              $black_original = ImageColorAllocate($image_original, 242, 242, 242);
 
 
               $dir_folder_image_compare = base_path() . "/public/images/webdefacment_mages/".$site_id."/".$url_id."/".$image_name.".png";
               $image_compare = imagecreatefrompng($dir_folder_image_compare);
-              $black_compare = ImageColorAllocate($image_compare, 0, 0, 0);
+              $black_compare = ImageColorAllocate($image_compare, 242, 242,242);
 
               foreach ($WebdefacmentImageMark_check as $WebdefacmentImageMark_checkkey => $WebdefacmentImageMark_checkvalue) {
                 ImageFilledRectangle($image_original, $WebdefacmentImageMark_checkvalue->left,$WebdefacmentImageMark_checkvalue->top,$WebdefacmentImageMark_checkvalue->width,$WebdefacmentImageMark_checkvalue->hight,$black_original);
@@ -352,6 +352,9 @@ class WebDefacementProccess extends Command
           
           $WebdefacmentSetting_update->image_last = $result['image_url'];
           $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
+          $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
+          $WebdefacmentSetting_update->status_val = $status;
+          $WebdefacmentSetting_update->image_original = $result['image_url'];
           $WebdefacmentSetting_update->save();
           print_r($result);
 
