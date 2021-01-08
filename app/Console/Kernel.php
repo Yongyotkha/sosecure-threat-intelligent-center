@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Uncomment for shared hosting
-        
+
         $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
         $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
         
@@ -73,6 +73,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('app:reset-demo')->cron('0 */3 * * *')->name('demo.reset')->withoutOverlapping(5);
         // $schedule->command('inspire')
         //          ->hourly();
+        $delay_WebDefacementProccess = rand(1,55);
+        $schedule->command('app:WebDefacementProccess', ['--delay'=> $delay_WebDefacementProccess])->everyMinute();
     }
 
     /**
