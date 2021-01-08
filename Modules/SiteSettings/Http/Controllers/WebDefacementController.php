@@ -2,6 +2,7 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use Artisan;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Illuminate\Http\Request;
@@ -107,6 +108,29 @@ class WebDefacementController extends Controller
             ];
             return response()->json($data);
         }
+       
+    }
+
+    public function get_check_site(Request $request)
+    {
+        $html = ''; 
+        $site_id = $request->site_id;
+        $url_web = $request->url_web;
+        $port_web = $request->port_web;
+        // dd($port_web);
+        $command = 'app:WebDefacementDataCheck';
+
+        $params = [
+                'url' => $url_web,
+                'port' => $port_web,
+                'site_id' => $site_id,
+        ];
+
+
+            Artisan::call($command, $params);
+            $result = Artisan::output();
+            // dd($result);
+        
        
     }
 

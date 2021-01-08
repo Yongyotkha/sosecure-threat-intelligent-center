@@ -225,7 +225,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
+                    <div class="form-group row" style="display: none;">
                         <label class="col-lg-3 control-label">Options</label>
                         <div class="col-sm-9">
                             <div class="checkbox">
@@ -407,6 +407,61 @@
             f_loading_stop(null, '#data_card');
             console.log("No response from server");
         });
+    }
+
+    $("#btn_check_web").click(function() {
+        get_check_site();
+    });
+
+
+    function get_check_site(){
+        let url_web = $("#url_web").val();
+        let port_web = $("#port_web").val();
+        if(url_web && port_web) {
+
+            site_id = '{{$siteSettings->id}}';
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '{!! route('webdefacement.get_check_site') !!}',
+                type: "post",
+                data: ({
+                    site_id:site_id,
+                    url_web:url_web,
+                    port_web:port_web
+                }),
+                beforeSend: function(){
+                    f_loading(null, '#url_web');
+                    f_loading(null, '#port_web');
+                },
+            }).done(function(data){
+                f_loading_stop(null, '#url_web');
+                f_loading_stop(null, '#port_web');
+                var obj = JSON.parse(data);
+                console.log(obj);
+                    {{--$("#data_card").html(data.html);  
+                    $('.wdfm-card').hover(function(){
+                        $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+                    }); 
+                    $('.wdfm-card').mouseleave(function(){
+                        $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
+                    }); --}}
+
+                    if(obj.Result == 1) {
+                        console.log(55);
+                    } else {
+                        console.log(44);
+                    }
+
+            
+                
+            }).fail(function(jqXHR, ajaxOptions, thrownError){
+                f_loading_stop(null, '#url_web');
+                f_loading_stop(null, '#port_web');
+                console.log("No response from server");
+            });
+        }
     }
 
 

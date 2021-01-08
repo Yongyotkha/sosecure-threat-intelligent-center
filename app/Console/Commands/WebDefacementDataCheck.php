@@ -68,7 +68,36 @@ class WebDefacementDataCheck extends Command
     }
 
 
-    print_r($result);
+    // print_r($result);
+    
+    // $result_json_e = 'test';
+    $result_json_e = json_encode($result);
+    // $result_json_e = 'test';
+    // var_dump($result_json_e);
+
+    // var_dump($result);
+    // print_r($result);
+
+
+  
+        // $data = [
+        //     "Result" => $result["Result"],
+        // ];
+        // echo $result["Result"];
+
+        // $test = '{
+        //     "employees":[
+        //       {"firstName":"John", "lastName":"Doe"},
+        //       {"firstName":"Anna", "lastName":"Smith"},
+        //       {"firstName":"Peter", "lastName":"Jones"}
+        //     ]
+        // }';
+
+        // $test = 55;
+
+
+        echo $result_json_e;
+    
 
 
 }

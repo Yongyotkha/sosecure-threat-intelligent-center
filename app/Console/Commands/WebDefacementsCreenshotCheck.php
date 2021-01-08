@@ -47,9 +47,14 @@ class WebDefacementsCreenshotCheck extends Command
 
       $delay = $this->argument('delay');
       $result = array();
+    //   $result=new stdClass();
       if ($this->is_url($url)) {
         if (1== 1) {
             $result["Result"] = 1;
+            $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
+            $result["messes "] = "";
+
+            // $result->Result = 1;
             $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
             $result["messes "] = "";
             $path_include = base_path().'\\public\\screenshot\\use\\DownloadImage.php';
@@ -70,8 +75,10 @@ class WebDefacementsCreenshotCheck extends Command
         $result["messes "] = "The url is not formatted.";
     }
 
-
-    print_r($result);
+    $result_json_e = json_encode($result);
+    $result_json_e = 'test';
+    var_dump($result);
+    // print_r($result);
 
 
 
