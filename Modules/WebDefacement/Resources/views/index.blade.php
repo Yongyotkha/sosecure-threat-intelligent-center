@@ -13,9 +13,9 @@
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
                     @if ($SiteSettings)
-
+                    
                     @foreach ($SiteSettings as $SiteSettings)
-                    <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}}
+                    <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}} 
                     </option>
                     @endforeach
 
@@ -138,6 +138,7 @@
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
     <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+    @include('stacks.css.lightbox')
 @endpush
 
 @push('pagescript')
@@ -145,6 +146,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
+@include('stacks.js.lightbox')
 
 <script>
 
