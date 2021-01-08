@@ -24,10 +24,9 @@
                     @endcan
 
                     @can('users_delete')
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete" disabled>
-                            <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
-                                @langapp('delete')</span>
-                        </button>
+                    <button type="submit" id="btn-change-status"  class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
                     @endcan
 
         </header>
@@ -140,15 +139,17 @@
 
     <script>
 
+        var categorySettings_id = [];
+
         $('#table-category-template').on('click', '.select-chk', function () {
             if ($(this).is(':checked')) {
 
-                $('#btn_del_select').prop("disabled", false);
+                $('#btn-change-status').prop("disabled", false);
             } else {
                 
                 if ($('.select-chk').filter(':checked').length < 1){
 
-                    $('#btn_del_select').attr('disabled',true);
+                    $('#btn-change-status').attr('disabled',true);
                 }
             }
         });
@@ -157,11 +158,11 @@
             if ($(this).is(':checked')) {
 
                 
-                $('#btn_del_select').prop("disabled", false);
+                $('#btn-change-status').prop("disabled", false);
             } else {
                 if ($('.categorySettings_id').filter(':checked').length < 1){
                     
-                    $('#btn_del_select').attr('disabled',true);
+                    $('#btn-change-status').attr('disabled',true);
                 }
             }
         });
@@ -247,43 +248,53 @@
         }
 
 
-        // function change_category_active(category_id,category_active) {
-        //             // var form = $("#frm-category").serialize();
-        //             axios.post('{{ route('categorysettings.bulk.delete') }}', category_id)
-        //                 .then(function (response) {
-        //                     toastr.warning(response.data.message, '@langapp('response_status')');
-        //                     window.location.href = response.data.redirect;
-        //                 })
-        //                 .catch(function (error) {
-        //                     var errors = error.response.data.errors;
-        //                     var errorsHtml = '';
-        //                     $.each(errors, function (key, value) {
-        //                         errorsHtml += '<li>' + value[0] + '</li>';
-        //                     });
-        //                     toastr.error(errorsHtml, '@langapp('response_status') ');
-        //                 });
-        // }
 
-        {{--            let del_val = [];
-            $("#btn_del_select").click(function(){
-                del_val = [];
-                $("input[type='checkbox'][name='checked']").each(function(){
+        $("#btn-change-status").click(function() {
 
-                    if($(this).is(":checked")) {
-                        del_val.push($(this).val());
-                        /* alert(3);*/
-                    }
-                });
-                console.log(del_val);
-
-                if(del_val.length > 0) {
-                    del_cate_select(del_val);
-                } else {
-                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
-                }
-
+            
+            $('.categorySettings_id:checked').each(function () {
+                categorySettings_id.push(this.value);
+                
             });
-        --}}
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                heightAuto: false,
+                confirmButtonText: 'Yes, Is Fixed!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+            type:"POST",
+            url:"{{ route('categorysettings.change_delete') }}",
+            data:{id: categorySettings_id},
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        
+        });
+
+            }
+        })
+    });
 
 
         function change_category_active (category_id) {

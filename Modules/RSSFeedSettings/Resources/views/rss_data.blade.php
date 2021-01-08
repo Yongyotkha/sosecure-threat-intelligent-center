@@ -480,6 +480,7 @@
             $("#keywords").val('');
             start = moment().subtract(1, 'month').startOf('month');
             end = moment();
+            cb(start, end);
             $("#status").val('').trigger("change");
             datatable();
            

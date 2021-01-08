@@ -156,7 +156,7 @@ class DarkWebController extends Controller
             if($request -> social) {
                 $news = $news -> where('feel_type', '=' ,$request -> social);
             }else{
-                $news = $news->whereIn('feel_type', ['darkweb', 'compromise']);
+                $news = $news->whereIn('feel_type', ['darkweb', 'compromise','webserver']);
             }
 
             if($request -> title){
@@ -200,8 +200,8 @@ class DarkWebController extends Controller
             $Data_leak_feed_all = $news->count();
             $news = $news->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }else{
-            $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->count();
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise'])->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+            $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->orWhere('feel_type', 'webserver')->count();
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver'])->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
         }
 
         // dd($news);
