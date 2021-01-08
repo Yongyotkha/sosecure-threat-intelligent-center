@@ -807,23 +807,20 @@ class IndicatorsController extends Controller
         // }
         // if(!empty($documentAll))
         foreach ($documentAll as $data) {
-
             //ถ้าเป็น NIDS เอา Title มาแทน indicatior
             if ($data->type == "CIDR"  || $data->type == "FileHash-IMPHASH"|| $data->type == "FileHash-PEHASH" || $data->type == "FilePath" || $data->type == "Mutex" || $data->type == "URI"|| $data->type == "JA3"|| $data->type == "osquery") {
                 $linkIndicator =  '<a>';
             } else {
                 $linkIndicator =  '<a href="' . route('indicators.detail_indicator') . '?id=' . $data->indicator_id . '&type=' . $data->type . '&indicator=' . $data->indicator . '">';
             }
-            $html .= ' <ul class="list-indicators">
+            $html .='<ul class="list-indicators text-elip">
                         <li>
                             ' . $linkIndicator . '
                                 <h1 class="primary-text">' . $data->indicator . '</h1>
-                                
-                                
-                               
                                 <span class="secondary-text">Type : ' . $data->type . '</span>
                             </a>
-                        </li></ul>';
+                        </li>
+                    </ul>';
         }
 
         if ($request->ajax()) {
