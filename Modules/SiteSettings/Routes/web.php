@@ -111,6 +111,7 @@ Route::group(
 
 Route::get('/WebDefacement-website/{id}', 'WebDefacementController@webdefacement_website')->name('webdefacement_website.index')->middleware('can:menu_items');
 Route::post('/WebDefacement-website/load_card_by_site', 'WebDefacementController@load_card_by_site')->name('webdefacement.load_card_by_site')->middleware('can:menu_items');
+Route::post('/WebDefacement-website/get_check_site', 'WebDefacementController@get_check_site')->name('webdefacement.get_check_site')->middleware('can:menu_items');
 Route::get('/edit-image', 'WebDefacementController@edit_image')->name('webdefacement_website.edit_image')->middleware('can:menu_items');
 Route::get('/WebDefacement-server/{id}', 'WebDefacementController@webdefacement_server')->name('webdefacement_server.index')->middleware('can:menu_items');
 
