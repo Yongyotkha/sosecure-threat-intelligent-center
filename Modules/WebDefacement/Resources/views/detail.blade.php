@@ -142,7 +142,7 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="">
+                                                <a href="{{asset(@$webdefacment_data_original->image)}}" data-lightbox="name-img-2">
                                                     <img src="{{asset(@$webdefacment_data_original->image)}}" alt="">
                                                 </a>
                                             </div>
@@ -159,7 +159,7 @@
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
                                                 <div>Original</div>
-                                                <div>Last Update {{@$webdefacment_data_original->last_update}}</div>
+                                                <div>Last Update : {{@$webdefacment_data_original->last_update}}</div>
                                                 <div><button class="btn btn-info">Update</button></div>
                                             </div>
                                         </div>
@@ -169,8 +169,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" data-lightbox="name-img-2">
-                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
+                                                <a href="{{asset(@$webdefacment_data_original->image_new)}}" data-lightbox="name-img-2">
+                                                    <img src="{{asset(@$webdefacment_data_original->image_new)}}" alt="">
                                                 </a>
                                             </div>
                                         </div>
@@ -186,8 +186,8 @@
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
                                                 <div>Current</div>
-                                                <div>Last Update {{@$webdefacment_data_check->last_update}}</div>
-                                                <div class="status-flex">Status : &nbsp; <span class="dot low"></span>{{@$webdefacment_data_check->status_code}}</div>
+                                                <div>Last Update : {{@$webdefacment_data_check->last_update}}</div>
+                                                <div class="status-flex">Status : &nbsp;{{@$webdefacment_data_check->status_code}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -220,16 +220,16 @@
                             <th class="text-center">Datetime</th>
                             
                         </tr>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td >
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                                Totam ullam natus nobis expedita, neque iusto magnam saepe maiores consectetur?
-                                Id enim facere, nihil aut velit reprehenderit libero odio est ipsa.
-                            </td>
-                            <td class="text-center">-</td>
-                            <td class="no-wrap">2020-01-01 11:11</td>
-                        </tr>
+                        @if ($webdefacment_data_log)            
+                            @foreach ($webdefacment_data_log as $webdefacment_data_log)
+                                <tr>
+                                    <td class="text-center">{!! @$loop->iteration !!}</td>
+                                    <td >{{@$webdefacment_data_log->message}}</td>
+                                    <td class="text-center">{{@$webdefacment_data_log->message}}</td>
+                                    <td class="no-wrap">{{@$webdefacment_data_log->updated_date}}</td>
+                                </tr>
+                            @endforeach
+                        @endif
                     </table>
                 </div>
             </section>

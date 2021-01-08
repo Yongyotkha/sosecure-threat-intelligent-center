@@ -24,14 +24,29 @@ class WebdefacmentSetting extends Model
         return $this->hasMany(WebdefacmentDataOriginal::class, 'webdefacment_setting_id', 'id');
     }
 
+    public function get_webdefacment_data_original_detail()
+    {
+        return $this->hasMany(WebdefacmentDataOriginal::class, 'webdefacment_setting_id', 'id')->orderBy('last_update','desc');
+    }
+
     public function get_webdefacment_data_check()
     {
         return $this->hasMany(WebdefacmentDataCheck::class, 'webdefacment_setting_id', 'id');
     }
 
+    public function get_webdefacment_data_check_detail()
+    {
+        return $this->hasMany(WebdefacmentDataCheck::class, 'webdefacment_setting_id', 'id')->orderBy('last_update','desc');
+    }
+
     public function get_webdefacment_data_log()
     {
         return $this->hasMany(WebdefacmentDataLog::class, 'webdefacment_setting_id', 'id');
+    }
+
+    public function get_webdefacment_data_log_detail()
+    {
+        return $this->hasMany(WebdefacmentDataLog::class, 'webdefacment_setting_id', 'id')->orderBy('updated_date','desc');
     }
 
     
