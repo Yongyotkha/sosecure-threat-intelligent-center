@@ -165,7 +165,7 @@ class WebDefacementUpdateOriginal extends Command
    $result["Result"] = 0;
    $result["messes "] = "No data found.";
 }
-return $result;
+ dump($result);
 }
 
 private function compareImage2($dirPath,$imgSourcePath, $imgComparePath)

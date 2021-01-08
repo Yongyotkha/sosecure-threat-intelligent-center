@@ -183,7 +183,7 @@ class WebDefacementUpdateOriginalAll extends Command
     $result2["Result"] = 1;
     $result2["messes "] = "";
 
-    return $result2;
+     dump($result2);
   }
 
   private function compareImage2($dirPath,$imgSourcePath, $imgComparePath)
