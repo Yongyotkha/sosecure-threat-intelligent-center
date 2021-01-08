@@ -107,7 +107,7 @@ class WebDefacementUpdateOriginal extends Command
           $Path_image = base_path()."/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
           $downloadImg->download($url,$Path_image,$delay);
           $result["image_path_original_full"] = $Path_image;
-          $result["image_path_original"] = "public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
+          $result["image_path_original"] = "/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
           $result["url_id"] = $url_id;
 
 
@@ -142,7 +142,7 @@ class WebDefacementUpdateOriginal extends Command
       $WebdefacmentDataOriginal_data->updated_at = date("Y-m-d H:i:s");
       $WebdefacmentDataOriginal_data->save();
 
-
+      $parse = \parse_url($url);
            $host = $parse['host']; // prints 'google.com'
 
            $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
@@ -168,7 +168,9 @@ class WebDefacementUpdateOriginal extends Command
  $result["Result"] = 0;
  $result["messes "] = "No data found.";
 }
-dump($result);
+$result_json_e = json_encode($result);
+echo $result_json_e;
+
 }
 
 private function compareImage2($dirPath,$imgSourcePath, $imgComparePath)
