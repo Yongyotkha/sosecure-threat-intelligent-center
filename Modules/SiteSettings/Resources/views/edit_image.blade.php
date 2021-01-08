@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Edit Image</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="stylesheet" href="{{getAsset('css/bootstrap.css')}}">
     <link rel="stylesheet" href="{{getAsset('plugins/font-awesome/css/font-awesome.min.css')}}">
@@ -102,11 +103,60 @@
             background: #f75a5a;
             color: #fff;
         }
-        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+        .overlay__wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .spinner {
+            position: absolute;
+            height:60px;
+            width:60px;
+            bottom: 0;
+            right: 0;
+            -webkit-animation: rotation .6s infinite linear;
+            -moz-animation: rotation .6s infinite linear;
+            -o-animation: rotation .6s infinite linear;
+            animation: rotation .6s infinite linear;
+            border-left:6px solid rgba(0,174,239,.15);
+            border-right:6px solid rgba(0,174,239,.15);
+            border-bottom:6px solid rgba(0,174,239,.15);
+            border-top:6px solid rgba(0,174,239,.8);
+            border-radius:100%;
+        }
+
+        @-webkit-keyframes rotation {
+            from {-webkit-transform: rotate(0deg);}
+            to {-webkit-transform: rotate(359deg);}
+        }
+        @-moz-keyframes rotation {
+            from {-moz-transform: rotate(0deg);}
+            to {-moz-transform: rotate(359deg);}
+        }
+        @-o-keyframes rotation {
+            from {-o-transform: rotate(0deg);}
+            to {-o-transform: rotate(359deg);}
+        }
+        @keyframes rotation {
+            from {transform: rotate(0deg);}
+            to {transform: rotate(359deg);}
+        }  
     </style>
 </head>
 
 <body>
+    <div class="overlay">
+        <div class="overlay__wrapper">
+            <div class="spinner" style="display: none"></div>
+        </div>
+    </div>
     <div class="header">
         Edit Image
     </div>
@@ -127,11 +177,11 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="dropBox" style="height: 100%;position:relative;display:inline-block">
+                <div class="dropBox" style="position:relative;display:inline-block">
                     <img src="{{asset($web_defacment_original->image)}}" id="preview-img-wdfm">
+                    <div class="droppable-preview"></div>
                 </div>
             </div>
-     
         </div>
     </div>
 
@@ -144,6 +194,108 @@
             }
         });
         let webdefacment_data_original_id = '{{ $web_defacment_original -> id }}';
+        $( document ).ready(function() {
+            get_image_data();
+        });
+        function loading_show(){
+            $('.spinner').show();
+        }
+        function loading_stop(){
+            $('.spinner').hide();
+        }
+        function get_image_data(){
+            $.ajax({
+                type: 'POST',
+                dataType: "json",
+                url: '{{ route("webdefacement_website.get_image_data") }}',
+                data: {
+                    webdefacment_data_original_id: webdefacment_data_original_id, 
+                },
+                beforeSend: function() {
+                    loading_show();
+                },
+                success: function(result){
+                    loading_stop();
+                    if(result.status_code == 200){
+                        let html = ``;
+                        for(let i in result.data){
+                            const data = result.data[i];
+                            html += `
+                            <div class="ui-draggable ui-draggable-handle drag-edit ui-resizable remove remove_${data.id}"
+                                style="position: absolute; left: ${data.left}px; top: ${data.top}px; width: ${data.width}px; height: ${data.hight}px;" data-id="${data.id}">
+                                <span class="rm"></span><span><a href="Javascript:void(0)" class="xicon delete" title="Remove" data-id="${data.id}">X</a></span>
+                            </div>
+                            `;
+                            $('.droppable-preview').html(html);
+                        }
+                        $(".drag-edit").resizable();
+                        $(".drag-edit").resizable({
+                            stop: function (event, ui) {
+                                var width = $(this).width();
+                                var height = $(this).height();
+                                $.ajax({
+                                    type: 'POST',
+                                    dataType: "json",
+                                    url: '{{ route("webdefacement_website.update_item_width_height") }}',
+                                    data: {
+                                        'web_defacment_image_mark_id':$(this).data('id'), 
+                                        'width':width, 
+                                        'height':height
+                                    },
+                                    beforeSend: function() {
+                                        loading_show();
+                                    },
+                                    success: function(result){
+                                        loading_stop();
+                                    }
+                                });
+                            }
+                        });
+                        $(".drag-edit").draggable({
+                            containment: ".dropBox",
+                            appendTo: ".dropBox",
+                            scroll: true,
+                            start: function() {},
+                            stop: function(event, ui) {
+                                $.ajax({
+                                    type: 'POST',
+                                    dataType: "json",
+                                    url: '{{ route("webdefacement_website.update_item_top_left") }}',
+                                    data: {
+                                        'web_defacment_image_mark_id':$(this).data('id'), 
+                                        'top':ui.position.top, 
+                                        'left':ui.position.left
+                                    },
+                                    beforeSend: function() {
+                                        loading_show();
+                                    },
+                                    success: function(result){
+                                        loading_stop();
+                                    }
+                                });
+                            }
+                        });
+                        $('.delete').on('click', function () {
+                            $.ajax({
+                                type: 'POST',
+                                dataType: "json",
+                                url: '{{ route("webdefacement_website.remove_item") }}',
+                                data: {
+                                    'web_defacment_image_mark_id':$(this).data('id'), 
+                                },
+                                beforeSend: function() {
+                                    loading_show();
+                                },
+                                success: function(result){
+                                    loading_stop();
+                                    $('.remove_' + result.data).remove();
+                                }
+                            });
+                        });
+                    }
+                }
+            }); 
+        }
         $(".dropBox").droppable({
             accept: '.draggable',
             drop: function(event, ui) {
@@ -155,26 +307,6 @@
                     topPosition   = ui.offset.top - $(this).offset().top;
                     let item_width = $(ui.draggable).width();
                     let item_height = $(ui.draggable).height();
-
-                    $.ajax({
-                        type: 'POST',
-                        dataType: "json",
-                        url: '{{ route("webdefacement_website.save_item") }}',
-                        data: {
-                            webdefacment_data_original_id: webdefacment_data_original_id, 
-                            top:topPosition, 
-                            left:leftPosition,
-                            width:item_width, 
-                            height:item_height
-                        },
-                        beforeSend: function() {
-                            
-                        },
-                        success: function(result){
-                            $item.attr('data-id', result.data)
-                        }
-                    }); 
-
 
                     $item.draggable({
                         helper: 'original',
@@ -188,18 +320,53 @@
                     $item.resizable();
                     $item.appendTo('.dropBox');
 
-                    $item.addClass('remove');
-                    var el = `<span><a href='Javascript:void(0)' class="xicon delete" title="Remove">X</a></span>`;
-                    $(el).insertAfter($($item.find('.rm')));
-                    $item.appendTo('.dropBox');
-                    makeDraggable($item);
+                    
+                    $.ajax({
+                        type: 'POST',
+                        dataType: "json",
+                        url: '{{ route("webdefacement_website.save_item") }}',
+                        data: {
+                            webdefacment_data_original_id: webdefacment_data_original_id, 
+                            top:topPosition, 
+                            left:leftPosition,
+                            width:item_width, 
+                            height:item_height
+                        },
+                        beforeSend: function() {
+                            loading_show();
+                        },
+                        success: function(result){
+                            loading_stop();
+                            $item.attr('data-id', result.data);
+                            $item.addClass('remove_' + result.data);
 
-                    $('.delete').on('click', function () {
-                        $(this).parent().parent('span').remove();
+                            $item.addClass('remove');
+                            var el = `<span><a href='Javascript:void(0)' class="xicon delete" title="Remove" data-id="${result.data}">X</a></span>`;
+                            $(el).insertAfter($($item.find('.rm')));
+                            $item.appendTo('.dropBox');
+
+                                                
+                            $('.delete').on('click', function () {
+                                $.ajax({
+                                    type: 'POST',
+                                    dataType: "json",
+                                    url: '{{ route("webdefacement_website.remove_item") }}',
+                                    data: {
+                                        'web_defacment_image_mark_id':$(this).data('id'), 
+                                    },
+                                    beforeSend: function() {
+                                        loading_show();
+                                    },
+                                    success: function(result){
+                                        loading_stop();
+                                        $('.remove_' + result.data).remove();
+                                    }
+                                });
+                            });
+                        }
                     });
-                    $('.delete').on('click', function () {
-                        $(this).parent().parent('div').remove();
-                    });
+                    
+                    makeDraggable($item);
                 }
             }
         });
@@ -212,8 +379,7 @@
             scroll: true,
             start: function() {},
             stop: function(event, ui) {
-                console.log('top :' + ui.position.top);
-                console.log('left :' + ui.position.left);
+                
             }
         });
 
@@ -222,16 +388,44 @@
                 stop: function (event, ui) {
                     var width = $(this).width();
                     var height = $(this).height();
-                    console.log('width :' + width);
-                    console.log('height :' + height);
+                    $.ajax({
+                        type: 'POST',
+                        dataType: "json",
+                        url: '{{ route("webdefacement_website.update_item_width_height") }}',
+                        data: {
+                            'web_defacment_image_mark_id':$(this).data('id'), 
+                            'width':width, 
+                            'height':height
+                        },
+                        beforeSend: function() {
+                            loading_show();
+                        },
+                        success: function(result){
+                            loading_stop();
+                        }
+                    });
                 }
             });
             $item.draggable({
                 accept: '.dropBox',
                 start: function() {},
                 stop: function(event, ui) {
-                    console.log('top :' + ui.position.top);
-                    console.log('left :' + ui.position.left);
+                    $.ajax({
+                        type: 'POST',
+                        dataType: "json",
+                        url: '{{ route("webdefacement_website.update_item_top_left") }}',
+                        data: {
+                            'web_defacment_image_mark_id':$(this).data('id'), 
+                            'top':ui.position.top, 
+                            'left':ui.position.left
+                        },
+                        beforeSend: function() {
+                            loading_show();
+                        },
+                        success: function(result){
+                            loading_stop();
+                        }
+                    });  
                 }
             });
         }

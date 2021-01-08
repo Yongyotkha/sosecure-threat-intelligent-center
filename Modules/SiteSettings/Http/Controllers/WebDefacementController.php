@@ -179,7 +179,70 @@ class WebDefacementController extends Controller
         $res = [
             'data' => $WebdefacmentImageMark -> id
         ];
-        return redirect()->json($res);
+        return response()->json($res);
+    }
+
+    public function update_item_top_left(Request $request){
+        $WebdefacmentImageMark = WebdefacmentImageMark::find($request->web_defacment_image_mark_id);
+        if($WebdefacmentImageMark){
+            $WebdefacmentImageMark -> top = $request -> top;
+            $WebdefacmentImageMark -> left = $request -> left;
+            $WebdefacmentImageMark -> save();
+            $response = array(
+                'error' => '', 
+                'status_code' => '200',
+                'data' => ''
+            );
+            return response()->json($response);
+        }else{
+            return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+        }
+    }
+
+    public function update_item_width_height(Request $request){
+        $WebdefacmentImageMark = WebdefacmentImageMark::find($request->web_defacment_image_mark_id);
+        if($WebdefacmentImageMark){
+            $WebdefacmentImageMark -> hight = $request -> height;
+            $WebdefacmentImageMark -> width = $request -> width;
+            $WebdefacmentImageMark -> save();
+            $response = array(
+                'error' => '', 
+                'status_code' => '200',
+                'data' => ''
+            );
+            return response()->json($response);
+        }else{
+            return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+        }
+    }
+
+    public function get_image_data(Request $request){
+        $WebdefacmentImageMark = WebdefacmentImageMark::where('webdefacment_data_original_id', $request->webdefacment_data_original_id)->get();
+        if($WebdefacmentImageMark){
+            $response = array(
+                'error' => '', 
+                'status_code' => '200',
+                'data' => $WebdefacmentImageMark
+            );
+            return response()->json($response);
+        }else{
+            return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+        }
+    }
+
+    public function remove_item(Request $request){
+        $WebdefacmentImageMark = WebdefacmentImageMark::find($request->web_defacment_image_mark_id);
+        if($WebdefacmentImageMark){
+            $WebdefacmentImageMark -> delete();
+            $response = array(
+                'error' => '', 
+                'status_code' => '200',
+                'data' => $request->web_defacment_image_mark_id
+            );
+            return response()->json($response);
+        }else{
+            return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+        }
     }
 
     /**
