@@ -351,8 +351,12 @@
                 $('#delay_screen_shot_val_div').hide();
             }
         });
-
+        
         $(document).ready(function(){
+            load_card();
+        {{--setInterval(function(){ 
+            load_card(); 
+        }, 1000);--}}
             $('.wdfm-card').hover(function(){
                 $(this).find('.wdfm-header').addClass('wdfm-header-upper');
             }); 
@@ -362,9 +366,7 @@
         });
 
 
-    $(function () {
-        load_card();
-    });
+    
     
 
     

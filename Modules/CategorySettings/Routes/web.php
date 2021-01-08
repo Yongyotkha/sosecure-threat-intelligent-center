@@ -24,5 +24,7 @@ Route::group(
         Route::put('edit_process-categorysettings/{id}', 'CategorySettingsController@update')->name('categorysettings.update')->middleware('can:categorysettings_update');
         Route::post('categorysettings/change_status', 'CategorySettingsController@change_status')->name('categorysettings.change_status')->middleware('can:categorysettings_update');
         Route::delete('categorysettings/delete/{id}', 'CategorySettingsController@delete_process')->name('categorysettings.delete_process')->middleware('can:categorysettings_delete');
+
+        Route::post('categorysettings/change_delete', 'CategorySettingsController@change_delete')->name('categorysettings.change_delete');
     }
 );

@@ -225,7 +225,7 @@
                                 <tr>
                                     <td class="text-center">{!! @$loop->iteration !!}</td>
                                     <td >{{@$webdefacment_data_log->message}}</td>
-                                    <td class="text-center">{{@$webdefacment_data_log->message}}</td>
+                                    <td class="text-center">{!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}</td>
                                     <td class="no-wrap">{{@$webdefacment_data_log->updated_date}}</td>
                                 </tr>
                             @endforeach

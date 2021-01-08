@@ -366,6 +366,24 @@ class CategorySettingsController extends Controller
     //     abort(404);
     // }
 
+    public function change_delete(Request $request)
+    {
+
+        foreach($request->id as $categorySettings_id){
+        $data = CategorySettings::where('id', $categorySettings_id)->delete();
+
+        }
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('categorysettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
 
 
 }

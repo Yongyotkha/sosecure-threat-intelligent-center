@@ -508,6 +508,7 @@
                 $("#keyword").val('');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
+                cb(start, end);
                 $("#site").val('').trigger("change");
                 $("#source").val('').trigger("change");
                 table_social_data();
