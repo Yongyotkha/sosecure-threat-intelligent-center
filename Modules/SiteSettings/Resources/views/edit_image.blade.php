@@ -128,7 +128,7 @@
             </div>
             <div class="col-md-12">
                 <div class="dropBox" style="height: 100%;position:relative;display:inline-block">
-                    <img src="{{asset('images/image_original.png')}}" id="preview-img-wdfm">
+                    <img src="{{asset($web_defacment_original->image)}}" id="preview-img-wdfm">
                 </div>
             </div>
      
@@ -176,6 +176,16 @@
             }
         });
 
+        function makeDraggable($item) {
+            $item.draggable({
+                start: function() {},
+                stop: function(event, ui) {
+                    console.log(ui.position.top);
+                    console.log(ui.position.left);
+                }
+            });
+        }
+
 
         $(".draggable").draggable({
             containment: ".dropBox",
@@ -194,7 +204,9 @@
             containment: ".dropBox",
             appendTo: ".dropBox",
             scroll: true,
-            start: function() {},
+            start: function() {
+
+            },
             stop: function(event, ui) {
                 console.log(ui.position.top);
                 console.log(ui.position.left);

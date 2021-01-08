@@ -11,10 +11,10 @@ class WebdefacmentDataOriginal extends Model
     protected $table = 'webdefacment_data_original';
     protected $fillable = [];
 
-    // public function get_webdefacment_setting()
-    // {
-    //         return $this->belongsTo(WebdefacmentSetting::class, 'webdefacment_setting_id', 'id');
-    // }
+    public function get_webdefacment_setting()
+    {
+        return $this->belongsTo(WebdefacmentSetting::class, 'webdefacment_setting_id', 'id');
+    }
 
 
 
