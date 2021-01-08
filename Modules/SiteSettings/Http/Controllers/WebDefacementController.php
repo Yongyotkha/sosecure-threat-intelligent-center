@@ -134,6 +134,81 @@ class WebDefacementController extends Controller
        
     }
 
+    public function get_check_image_screenshot(Request $request)
+    {
+        $html = ''; 
+        $site_id = $request->site_id;
+        $url_web = $request->url_web;
+        $port_web = $request->port_web;
+        $url_id = $request->url_id;
+        $delay_screenshot_val = $request->delay_screenshot_val;
+        // dd($port_web);
+        $command = 'app:WebDefacementsCreenshotCheck';
+
+        $params = [
+                'url' => $url_web,
+                'port' => $port_web,
+                'site_id' => $site_id,
+                'url_id' => $url_id,
+                'delay' => $delay_screenshot_val,
+        ];
+
+            Artisan::call($command, $params);
+            $result = Artisan::output();
+            // dd($result);
+    }
+
+
+    public function WebDefacement_create_data(Request $request) {
+        $name_web = $request->name_web;
+        $url_web = $request->url_web;
+        $port_web = $request->port_web;
+        $hash = $request->hash;
+        $file_size = $request->file_size;
+        $element = $request->element;
+        $blacklist = $request->blacklist;
+        $blacklist_text = $request->blacklist_text;
+        $delay_screen_shot = $request->delay_screen_shot;
+        $delay_screenshot_val = $request->delay_screenshot_val;
+        $site_id = $request->site_id;
+
+
+        // dd($file_size);
+
+        $WebdefacmentSetting = new WebdefacmentSetting;
+        $WebdefacmentSetting->code = generator_uuid();
+        $WebdefacmentSetting->name = $name_web;
+        $WebdefacmentSetting->url = $url_web;
+        $WebdefacmentSetting->port = $port_web;
+        $WebdefacmentSetting->hash = $hash;
+        $WebdefacmentSetting->filesize = $file_size;
+        $WebdefacmentSetting->element = $element;
+        $WebdefacmentSetting->DomainHeaders = '';
+        $WebdefacmentSetting->blacklist_keyword = $blacklist;
+        $WebdefacmentSetting->image_check = $delay_screen_shot;
+        $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+        $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+        $WebdefacmentSetting->site_id = $site_id;
+        $WebdefacmentSetting->active = 1;
+        $WebdefacmentSetting->domain = '';
+        $WebdefacmentSetting->user_agent = '';
+        $WebdefacmentSetting->webdeflacement_progress = 3;
+        $WebdefacmentSetting->image_last = '';
+        $WebdefacmentSetting->save();
+
+        $SiteSettings = SiteSettings::where('id',$site_id)->first();
+
+        return ajaxResponse(
+            [
+                'id'       => $WebdefacmentSetting->id,
+                'message'  => langapp('saved_successfully'),
+                'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
+            ],
+            true,
+            Response::HTTP_CREATED
+        );
+    }
+
 
 
     public function webdefacement_server($id)

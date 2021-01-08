@@ -52,11 +52,11 @@ class WebDefacementsCreenshotCheck extends Command
         if (1== 1) {
             $result["Result"] = 1;
             $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-            $result["messes "] = "";
+            $result["message"] = "";
 
             // $result->Result = 1;
             $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-            $result["messes "] = "";
+            $result["message"] = "";
             $path_include = base_path().'\\public\\screenshot\\use\\DownloadImage.php';
             include_once($path_include);
             $downloadImg = new \DownloadImage();
@@ -64,22 +64,22 @@ class WebDefacementsCreenshotCheck extends Command
             $downloadImg->download($url,$Path_image,$delay);
             $result["image_path_original_full"] = $Path_image;
             $result["image_path_original"] = "public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-            $result["url_id "] = $url_id;
+            $result["url_id"] = $url_id;
 
         }else{
             $result["Result"] = 0;
-            $result["messes "] = "The website is not online.";
+            $result["message"] = "The website is not online.";
         }
     }else{
         $result["Result"] = 0;
-        $result["messes "] = "The url is not formatted.";
+        $result["message"] = "The url is not formatted.";
     }
 
-    $result_json_e = json_encode($result);
-    $result_json_e = 'test';
-    var_dump($result);
-    // print_r($result);
 
+    // var_dump($result);
+
+    $result_json_e = json_encode($result);
+    echo $result_json_e;
 
 
 
