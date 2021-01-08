@@ -40,7 +40,12 @@
                         </tr>
                         <tr>
                             <th>URL</th>
-                            <td>{{@$webdefacement->url}}</td>
+                            <td>
+                                {{@$webdefacement->url}}
+                                <a href="{{@$webdefacement->url}}" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
+
+                            </td>
+                            
                         </tr>
                         <tr>
                             <th>Domain</th>
@@ -50,7 +55,7 @@
                             <th>User Agent</th>
                             <td>
                                 {{@$webdefacement->user_agent}}
-                                <a href="#" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
+                               
                             </td>
                         </tr>
                         <tr>
@@ -86,22 +91,22 @@
                             <tr>
                                 <th>Hash</th>
                                 <td>{{@$webdefacment_data_original->hash}}</td>
-                                <td></td>
+                                <td>{{@$webdefacment_data_check->hash_new}}</td>
                             </tr>
                             <tr>
                                 <th>File Size</th>
                                 <td>{{@$webdefacment_data_original->filesize}} KB</td>
-                                <td>10k</td>
+                                <td>{{@$webdefacment_data_check->filesize_new}}</td>
                             </tr>
                             <tr>
                                 <th>Element</th>
                                 <td>{{@$webdefacment_data_original->element}} tag</td>
-                                <td>100 tag</td>
+                                <td>{{@$webdefacment_data_check->element_new}}</td>
                             </tr>
                             <tr>
                                 <th>&nbsp;</th>
                                 <td>{{@$webdefacment_data_original->last_update}}</td>
-                                <td>Last Update 2020-01-01 11:11</td>
+                                <td>{{@$webdefacment_data_check->last_update}}</td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -143,11 +148,11 @@
                                             </div>
                                         </div>
                                         <div class="wdfm-body">
-                                            <div class="wdfm-btn">
+                                            {{-- <div class="wdfm-btn">
                                                 <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                            </div>
+                                            </div> --}}
                                             <h4>{{@$webdefacement->name}}</h4>
                                             <p class="mdfm-text-muted">{{@$webdefacement->url}}</p>
                                         </div>
@@ -170,19 +175,19 @@
                                             </div>
                                         </div>
                                         <div class="wdfm-body">
-                                            <div class="wdfm-btn">
+                                            {{-- <div class="wdfm-btn">
                                                 <a href="{{route('webdefacement.detail',['code'=>$code])}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                            </div>
-                                            <h4>Targeted Brand: paypal</h4>
-                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
+                                            </div> --}}
+                                            <h4>{{@$webdefacement->name}}</h4>
+                                            <p class="mdfm-text-muted">{{@$webdefacement->url}}</p>
                                         </div>
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
                                                 <div>Current</div>
-                                                <div>Last Update </div>
-                                                <div class="status-flex">Status : &nbsp; <span class="dot low"></span> normal</div>
+                                                <div>Last Update {{@$webdefacment_data_check->last_update}}</div>
+                                                <div class="status-flex">Status : &nbsp; <span class="dot low"></span>{{@$webdefacment_data_check->status_code}}</div>
                                             </div>
                                         </div>
                                     </div>
