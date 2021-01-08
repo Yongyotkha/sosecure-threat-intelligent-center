@@ -122,9 +122,9 @@ function get_webdefacment_status($status_id,$color='') {
         if(strtolower($status_id) == strtolower("critical")) {
             $html = '<span class="dot critical"></span> Critical';
         } else if(strtolower($status_id) == strtolower("high")) {
-            $html = '<span class="dot high"></span> High';
+            $html = '<span class="dot " style="background: #e64732 !important;"></span> High';
         } else if(strtolower($status_id) == strtolower("meduim")) {
-            $html = '<span class="dot meduim"></span> Meduim';
+            $html = '<span class="dot " style="background: #fcc838 !important;"></span> Meduim';
         } else if(strtolower($status_id) == strtolower("normal")) {
             $html = '<span class="dot low"></span> Normal';
         } else if(strtolower($status_id) == strtolower("none")) {
