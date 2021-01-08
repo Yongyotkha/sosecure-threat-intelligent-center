@@ -189,7 +189,7 @@ class WebDefacementProccess extends Command
 
             $image_name =  $site_id.'_'.$url_id.'_'.date("Y_m_d_His");
             $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/".$image_name.".png";
-            $path_include = base_path().'\\public\\screenshot\\use\\DownloadImage.php';
+            $path_include = base_path().'/public/screenshot/use/DownloadImage.php';
             include_once($path_include);
             $downloadImg = new \DownloadImage();
             $Path_image = base_path()."/public/images/webdefacment_mages/".$site_id."/".$url_id."/".$image_name.".png";
