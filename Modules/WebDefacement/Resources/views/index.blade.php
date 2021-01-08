@@ -61,9 +61,7 @@
                                 <label for=""  class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                 <div class="col-sm-9 col-xs-12">
                                 <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                                    <option value="critical">Critical</option>
                                     <option value="high">High</option>
-                                    <option value="meduim">Meduim</option>
                                     <option value="normal">Normal</option>
                                     <option value="none">None</option>
                                 </select>
@@ -104,17 +102,9 @@
                                     <span class=""></span>
                                     All
                                 </a>
-                                <a href="#" id="critical" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot critical"></span>
-                                    Critical
-                                </a>
                                 <a href="#" id="high" class="btn-chart white d-il-flex mr-3">
                                     <span class="dot high"></span>
                                     High
-                                </a>
-                                <a href="#" id="medium" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot medium"></span>
-                                    Meduim
                                 </a>
                                 <a href="#" id="normal" class="btn-chart white d-il-flex mr-3">
                                     <span class="dot low"></span>
@@ -208,11 +198,11 @@
             }),
             datatype: "html",
             beforeSend: function(){
-                $('.ajax-loading').show();
+                f_loading(null, '#data_card');
             },
         }).done(function(data){
 
-                $('.ajax-loading').hide();
+            f_loading_stop(null, '#data_card');
                 $("#data_card").html(data.html);  
 
                 $('.wdfm-card').hover(function(){
@@ -262,16 +252,9 @@
 
 }
 
-    $("#critical").click(function() {
-        search ('critical');
-    });
 
     $("#high").click(function() { 
         search ('high');
-    });
-
-    $("#medium").click(function() {
-        search ('medium');
     });
 
     $("#normal").click(function() {

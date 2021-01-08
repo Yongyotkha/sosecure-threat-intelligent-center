@@ -151,14 +151,8 @@ class WebDefacementController extends Controller
         }
 
         if($request->level){
-            if($request->level =='critical'){
-                $modal = $modal->where('status_val', 'critical');
-            }
-            else if($request->level =='high'){
+            if($request->level =='high'){
                 $modal = $modal->where('status_val', 'high');
-            }
-            else if($request->level =='medium'){
-                $modal = $modal->where('status_val', 'medium');
             }
             else if($request->level =='normal'){
                 $modal = $modal->where('status_val', 'normal');
@@ -181,28 +175,28 @@ class WebDefacementController extends Controller
                 <div class="wdfm-card">
                     <div class="wdfm-header">
                         <div class="wdfm-img">
-                            <a href="'.route('webdefacement.detail',['code'=>$key->code]).'">
-                                <img src="'.asset($key->image_last).'" alt="">
+                            <a href="'.route('webdefacement.detail',['code'=>@$key->code]).'">
+                                <img src="'.asset(@$key->image_last).'" alt="">
                             </a>
                         </div>
                     </div>
                     <div class="wdfm-body">
                         <div class="wdfm-btn">
-                            <a href="'.route('webdefacement.detail',['code'=>$key->code]).'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                            <a href="'.route('webdefacement.detail',['code'=>@$key->code]).'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
-                        <h4>'.$key->name.'</h4>
-                        <p class="mdfm-text-muted">'.$key->url.'</p>
+                        <h4>'.@$key->name.'</h4>
+                        <p class="mdfm-text-muted">'.@$key->url.'</p>
                     </div>
                     <div class="wdfm-footer">
                         <div class="wdfm-ft-left flex">
-                            <div>Site : '.$key->get_site->name.'</div>
-                            <div class="status-flex mr-2">Status : &nbsp; '.get_webdefacment_status($key->status_val,'color').'</div>
+                            <div>Site : '.@$key->get_site->name.'</div>
+                            <div class="status-flex mr-2">Status : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
                         </div>
                         <div class="wdfm-ft-right flex">
-                            <div>Last online: '.$key->last_online.'</div>
-                            <div>Last Check: '.$key->last_check.'</div>
+                            <div>Last online: '.@$key->last_online.'</div>
+                            <div>Last Check: '.@$key->last_check.'</div>
                         </div>
                     </div>
                 </div>
