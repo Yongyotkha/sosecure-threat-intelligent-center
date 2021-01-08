@@ -44,44 +44,44 @@ class WebDefacementUpdateOriginal extends Command
      */
     public function handle()
     {
-     $result = array();
-     $webdefacment_id= $this->argument('webdefacment_id');
-     $WebdefacmentSetting_data =    WebdefacmentSetting::find($webdefacment_id);
-     if ($WebdefacmentSetting_data) {
-      $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
-      if (!$WebdefacmentDataOriginal_data ) {
-         $WebdefacmentDataOriginal_save = new WebdefacmentDataOriginal;
-         $WebdefacmentDataOriginal_save->webdefacment_setting_id = $webdefacment_id;
-         $WebdefacmentDataOriginal_save->save();
-         $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
-     }
-     $url =$WebdefacmentSetting_data->url;
-     $Keyword_check = array();
+       $result = array();
+       $webdefacment_id= $this->argument('webdefacment_id');
+       $WebdefacmentSetting_data =    WebdefacmentSetting::find($webdefacment_id);
+       if ($WebdefacmentSetting_data) {
+          $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
+          if (!$WebdefacmentDataOriginal_data ) {
+           $WebdefacmentDataOriginal_save = new WebdefacmentDataOriginal;
+           $WebdefacmentDataOriginal_save->webdefacment_setting_id = $webdefacment_id;
+           $WebdefacmentDataOriginal_save->save();
+           $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
+       }
+       $url =$WebdefacmentSetting_data->url;
+       $Keyword_check = array();
 
 
 
 
-     if ($this->is_url($url)) {
-      $result["Result"] = 1;
-      $result["messes "] = "";
-      $result['hash_code'] = "";
-      $result["file_size"] = 0 ;
-      $result["all_element"] = 0 ;
-      $result['image_url'] ="";
-      $result["image_path_original"] ="";
-      $response   = $this->getHtml($url);
-      if ($response['content'] === FALSE){
-        $webContent = "";
-        $result["Result"] = 0;
-        $result["messes "] = "Html not found";
-    }else{
-        $webContent = $response['content'];
+       if ($this->is_url($url)) {
+          $result["Result"] = 1;
+          $result["messes "] = "";
+          $result['hash_code'] = "";
+          $result["file_size"] = 0 ;
+          $result["all_element"] = 0 ;
+          $result['image_url'] ="";
+          $result["image_path_original"] ="";
+          $response   = $this->getHtml($url);
+          if ($response['content'] === FALSE){
+            $webContent = "";
+            $result["Result"] = 0;
+            $result["messes "] = "Html not found";
+        }else{
+            $webContent = $response['content'];
 
-        if ($WebdefacmentSetting_data->hash == 1) {
-          $hashMD5 = hash($this->hashingAlgorithm, $webContent);
-          $result['hash_code'] = $hashMD5;
-      }
-      if ($WebdefacmentSetting_data->filesize == 1) {
+            if ($WebdefacmentSetting_data->hash == 1) {
+              $hashMD5 = hash($this->hashingAlgorithm, $webContent);
+              $result['hash_code'] = $hashMD5;
+          }
+          if ($WebdefacmentSetting_data->filesize == 1) {
                  $file_size = strlen($webContent);//filesize
                  $result["file_size"] = $file_size ;
 
@@ -93,79 +93,82 @@ class WebDefacementUpdateOriginal extends Command
             }
             if ($WebdefacmentSetting_data->image_check == 1) {
 
-               $url_id = $WebdefacmentDataOriginal_data->url_id;
-               $site_id = $WebdefacmentSetting_data->site_id;
-               $delay = $WebdefacmentSetting_data->delay_screen_shot_val;
-               if (!$url_id) {
-                  $url_id =rand(10,100);
-              }
-
-              $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-              $path_include = base_path().'\\public\\screenshot\\use\\DownloadImage.php';
-              include_once($path_include);
-              $downloadImg = new \DownloadImage();
-              $Path_image = base_path()."/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-              $downloadImg->download($url,$Path_image,$delay);
-              $result["image_path_original_full"] = $Path_image;
-              $result["image_path_original"] = "public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-              $result["url_id"] = $url_id;
-
-
-
-              $compareMachine = new compareImages($result["image_path_original_full"]);
-              $image1Hash = $compareMachine->getHasString(); 
-              $result["imageHash"] = $image1Hash;
-
-
-              $WebdefacmentDataOriginal_data->url_id = $result["url_id"];
-              $WebdefacmentDataOriginal_data->imageHash = $result["imageHash"];
-
+             $url_id = $WebdefacmentDataOriginal_data->url_id;
+             $site_id = $WebdefacmentSetting_data->site_id;
+             $delay = $WebdefacmentSetting_data->delay_screen_shot_val;
+             if (!$url_id) {
+              $url_id =rand(10,100);
           }
 
+          $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
+          $path_include = base_path().'\\public\\screenshot\\use\\DownloadImage.php';
+          include_once($path_include);
+          $downloadImg = new \DownloadImage();
+          $Path_image = base_path()."/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
+          $downloadImg->download($url,$Path_image,$delay);
+          $result["image_path_original_full"] = $Path_image;
+          $result["image_path_original"] = "public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
+          $result["url_id"] = $url_id;
 
-          $result_checkDomainHeaders=   $this->checkDomainHeaders($url,1);
-          $result_URL_404=   $this->URL_404($url);
-          $result["DomainHeaders"] = $result_checkDomainHeaders;
-          $result["Is_URL_404"] = $result_URL_404;
+
+
+          $compareMachine = new compareImages($result["image_path_original_full"]);
+          $image1Hash = $compareMachine->getHasString(); 
+          $result["imageHash"] = $image1Hash;
+
+
+          $WebdefacmentDataOriginal_data->url_id = $result["url_id"];
+          $WebdefacmentDataOriginal_data->imageHash = $result["imageHash"];
+
+      }
+
+
+      $result_checkDomainHeaders=   $this->checkDomainHeaders($url,1);
+      $result_URL_404=   $this->URL_404($url);
+      $result["DomainHeaders"] = $result_checkDomainHeaders;
+      $result["Is_URL_404"] = $result_URL_404;
        // $blackListFound = $this->trackKeyWords($webContent,$WebdefacmentSetting_data->blacklist_keyword_content,$Keyword_check);//keyword
 
        //$result['blacklist'] = $blackListFound;
 
 
 
-          $WebdefacmentDataOriginal_data->hash = $result['hash_code'];
-          $WebdefacmentDataOriginal_data->filesize = $result['file_size'];
-          $WebdefacmentDataOriginal_data->element = $result['all_element'];
-          $WebdefacmentDataOriginal_data->image = $result['image_url'];
-          $WebdefacmentDataOriginal_data->part_image = $result['image_path_original'];
-          $WebdefacmentDataOriginal_data->last_update = date("Y-m-d H:i:s");
-          $WebdefacmentDataOriginal_data->updated_at = date("Y-m-d H:i:s");
-          $WebdefacmentDataOriginal_data->save();
+      $WebdefacmentDataOriginal_data->hash = $result['hash_code'];
+      $WebdefacmentDataOriginal_data->filesize = $result['file_size'];
+      $WebdefacmentDataOriginal_data->element = $result['all_element'];
+      $WebdefacmentDataOriginal_data->image = $result['image_url'];
+      $WebdefacmentDataOriginal_data->part_image = $result['image_path_original'];
+      $WebdefacmentDataOriginal_data->last_update = date("Y-m-d H:i:s");
+      $WebdefacmentDataOriginal_data->updated_at = date("Y-m-d H:i:s");
+      $WebdefacmentDataOriginal_data->save();
 
 
-          $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
-          $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
-          $WebdefacmentSetting_data->save();
+           $host = $parse['host']; // prints 'google.com'
 
-      }
+           $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
+           $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
+           $WebdefacmentSetting_data->domain = $host;
+           $WebdefacmentSetting_data->save();
 
-
-
-
-
-
+       }
 
 
 
-  }else{
-   $result["Result"] = 0;
-   $result["messes "] = "The url is not formatted.";
-}
+
+
+
+
+
+
+   }else{
+     $result["Result"] = 0;
+     $result["messes "] = "The url is not formatted.";
+ }
 }else{
-   $result["Result"] = 0;
-   $result["messes "] = "No data found.";
+ $result["Result"] = 0;
+ $result["messes "] = "No data found.";
 }
- dump($result);
+dump($result);
 }
 
 private function compareImage2($dirPath,$imgSourcePath, $imgComparePath)

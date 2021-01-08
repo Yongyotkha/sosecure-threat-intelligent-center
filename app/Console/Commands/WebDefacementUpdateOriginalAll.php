@@ -146,32 +146,36 @@ class WebDefacementUpdateOriginalAll extends Command
             $WebdefacmentDataOriginal_data->save();
 
 
-            $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
-            $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
-            $WebdefacmentSetting_data->save();
+            $parse = parse_url($url);
+           $host = $parse['host']; // prints 'google.com'
 
-          }
+           $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
+           $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
+           $WebdefacmentSetting_data->domain = $host;
+           $WebdefacmentSetting_data->save();
 
-
-
-
-
-
+         }
 
 
 
-        }else{
+
+
+
+
+
+
+       }else{
         // $result["Result"] = 0;
         // $result["messes "] = "The url is not formatted.";
-        }
-      }else{
+       }
+     }else{
       // $result["Result"] = 0;
       // $result["messes "] = "No data found.";
-      }
+     }
 
 
 
-    }
+   }
 
 
 
@@ -179,180 +183,180 @@ class WebDefacementUpdateOriginalAll extends Command
 
 
 
-    $result2 = array();
-    $result2["Result"] = 1;
-    $result2["messes "] = "";
+   $result2 = array();
+   $result2["Result"] = 1;
+   $result2["messes "] = "";
 
-     dump($result2);
-  }
+   dump($result2);
+ }
 
-  private function compareImage2($dirPath,$imgSourcePath, $imgComparePath)
-  {
-    $compareImage = array();
+ private function compareImage2($dirPath,$imgSourcePath, $imgComparePath)
+ {
+  $compareImage = array();
         // $imgSourcePath = PATH_CAPTURE_SCREEN.'/'.$imgSourcePath;
         // $imgComparePath = PATH_CAPTURE_SCREEN.'/'.$imgComparePath;
 
-    $imgSourcePath = $dirPath.$imgSourcePath;
-    $imgComparePath = $dirPath.$imgComparePath;
+  $imgSourcePath = $dirPath.$imgSourcePath;
+  $imgComparePath = $dirPath.$imgComparePath;
 
         // $imgSourcePath = "D:\ทดสอบรูปภาพ\\2017-06-14-02-43-01408692.jpg";
         //$imgComparePath =  "D:\ทดสอบรูปภาพ\\2017-06-15-20-37-12458813.jpg";
 
-    $image1 = $imgSourcePath;
-    $compareMachine = new compareImages($image1);
-    $image1Hash = $compareMachine->getHasString(); 
-    $compareImage["image1Hash"] = $image1Hash;
+  $image1 = $imgSourcePath;
+  $compareMachine = new compareImages($image1);
+  $image1Hash = $compareMachine->getHasString(); 
+  $compareImage["image1Hash"] = $image1Hash;
 
 
-    $image2 =$imgComparePath;
-    $image2Hash = $compareMachine->hasStringImage($image2); 
-    $diff = $compareMachine->compareHash($image2Hash); 
-    $compareImage["image2Hash"] = $image2Hash;
-    $compareImage["diff"] = $diff;
-    return $compareImage;
+  $image2 =$imgComparePath;
+  $image2Hash = $compareMachine->hasStringImage($image2); 
+  $diff = $compareMachine->compareHash($image2Hash); 
+  $compareImage["image2Hash"] = $image2Hash;
+  $compareImage["diff"] = $diff;
+  return $compareImage;
+}
+function is_url($uri){
+  if(preg_match( '/^(http|https):\\/\\/[a-z0-9_]+([\\-\\.]{1}[a-z_0-9]+)*\\.[_a-z]{2,5}'.'((:[0-9]{1,5})?\\/.*)?$/i' ,$uri)){
+    return $uri;
   }
-  function is_url($uri){
-    if(preg_match( '/^(http|https):\\/\\/[a-z0-9_]+([\\-\\.]{1}[a-z_0-9]+)*\\.[_a-z]{2,5}'.'((:[0-9]{1,5})?\\/.*)?$/i' ,$uri)){
-      return $uri;
-    }
-    else{
-      return false;
-    }
+  else{
+    return false;
   }
-  private function getHtml($url) {
+}
+private function getHtml($url) {
 
         // you can add some code to extract/parse response number from first header. 
         // For example from "HTTP/1.1 200 OK" string.
 
-    $content =$this->get_dataa($url);
+  $content =$this->get_dataa($url);
 
-    return array(
-      'content' => $content
-    );
-  }
-  function get_dataa($url) {
-    $ch = curl_init();
-    $timeout = 5;
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
-    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-    $data = curl_exec($ch);
-    curl_close($ch);
-    return $data;
-  }
+  return array(
+    'content' => $content
+  );
+}
+function get_dataa($url) {
+  $ch = curl_init();
+  $timeout = 5;
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+  curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+  $data = curl_exec($ch);
+  curl_close($ch);
+  return $data;
+}
 
-  private function trackKeyWords($webContent, $blacklistKeywords,$Keyword_checks)
-  {
-    $keywordOK =array();
-    $keywords = explode(',', $blacklistKeywords);
-    foreach ($keywords as $keyword) {
-      $trackFound = $this->CheckKeyword($webContent,$keyword);
-      if (count($trackFound) > 0)
+private function trackKeyWords($webContent, $blacklistKeywords,$Keyword_checks)
+{
+  $keywordOK =array();
+  $keywords = explode(',', $blacklistKeywords);
+  foreach ($keywords as $keyword) {
+    $trackFound = $this->CheckKeyword($webContent,$keyword);
+    if (count($trackFound) > 0)
+    {
+      if (count($Keyword_checks) > 0)
       {
-        if (count($Keyword_checks) > 0)
-        {
-          $filtereds = array();
-          $rows = $Keyword_checks;
-          foreach($rows as $index => $columns) {
-            foreach($columns as $key => $value) {
-              if ($key == 'key' && $value == $keyword) {
-                $filtereds[] = $columns;
-              }
+        $filtereds = array();
+        $rows = $Keyword_checks;
+        foreach($rows as $index => $columns) {
+          foreach($columns as $key => $value) {
+            if ($key == 'key' && $value == $keyword) {
+              $filtereds[] = $columns;
             }
           }
+        }
 
-          foreach ($trackFound as $position)
-          {
+        foreach ($trackFound as $position)
+        {
                         //ถ้ามีให้หาตำแหน่ง
 
-            if (!in_array($position, array_column($filtereds, 'position')))
-            {
-                            //ไม่มีอยู่ใน ignore
-              array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
-            }
-          }
-
-        }else
-        {
-          foreach ($trackFound as $position)
+          if (!in_array($position, array_column($filtereds, 'position')))
           {
+                            //ไม่มีอยู่ใน ignore
             array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
-
           }
         }
-      }
-    }
 
-    return $keywordOK;
-  }
-
-  function CheckKeyword($html,$needle){
-    $lastPos = 0;
-    $positions = array();
-
-    while (($lastPos = strpos($html, $needle, $lastPos))!== false) {
-      $positions[] = $lastPos;
-      $lastPos = $lastPos + strlen($needle);
-    }
-    return $positions;
-  }
-  function checkDomainHeaders($url,$format=0)
-  {
-    $url=parse_url($url);
-    $end = "\r\n\r\n";
-    $fp = fsockopen($url['host'], (empty($url['port'])?80:$url['port']), $errno, $errstr, 30);
-    if ($fp)
-    {
-      $out  = "GET / HTTP/1.1\r\n";
-      $out .= "Host: ".$url['host']."\r\n";
-      $out .= "Connection: Close\r\n\r\n";
-      $var  = '';
-      fwrite($fp, $out);
-      while (!feof($fp))
+      }else
       {
-        $var.=fgets($fp, 1280);
-        if(strpos($var,$end))
-          break;
-      }
-      fclose($fp);
-
-      $var=preg_replace("/\r\n\r\n.*\$/",'',$var);
-      $var=explode("\r\n",$var);
-      if($format)
-      {
-        foreach($var as $i)
+        foreach ($trackFound as $position)
         {
-          if(preg_match('/^([a-zA-Z -]+): +(.*)$/',$i,$parts))
-            $v[$parts[1]]=$parts[2];
+          array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
+
         }
-        return $v;
       }
-      else
-        return $var;
-    }
-
-  }
-  function URL_404($url) {
-    $handle = curl_init($url);
-    curl_setopt($handle,  CURLOPT_RETURNTRANSFER, TRUE);
-
-    /* Get the HTML or whatever is linked in $url. */
-    $response = curl_exec($handle);
-
-    /* Check for 404 (file not found). */
-    $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-    curl_close($handle);
-
-    /* If the document has loaded successfully without any redirection or error */
-    if ($httpCode >= 200 && $httpCode < 300) {
-      return 0;
-    } else {
-      return 1;
     }
   }
+
+  return $keywordOK;
+}
+
+function CheckKeyword($html,$needle){
+  $lastPos = 0;
+  $positions = array();
+
+  while (($lastPos = strpos($html, $needle, $lastPos))!== false) {
+    $positions[] = $lastPos;
+    $lastPos = $lastPos + strlen($needle);
+  }
+  return $positions;
+}
+function checkDomainHeaders($url,$format=0)
+{
+  $url=parse_url($url);
+  $end = "\r\n\r\n";
+  $fp = fsockopen($url['host'], (empty($url['port'])?80:$url['port']), $errno, $errstr, 30);
+  if ($fp)
+  {
+    $out  = "GET / HTTP/1.1\r\n";
+    $out .= "Host: ".$url['host']."\r\n";
+    $out .= "Connection: Close\r\n\r\n";
+    $var  = '';
+    fwrite($fp, $out);
+    while (!feof($fp))
+    {
+      $var.=fgets($fp, 1280);
+      if(strpos($var,$end))
+        break;
+    }
+    fclose($fp);
+
+    $var=preg_replace("/\r\n\r\n.*\$/",'',$var);
+    $var=explode("\r\n",$var);
+    if($format)
+    {
+      foreach($var as $i)
+      {
+        if(preg_match('/^([a-zA-Z -]+): +(.*)$/',$i,$parts))
+          $v[$parts[1]]=$parts[2];
+      }
+      return $v;
+    }
+    else
+      return $var;
+  }
+
+}
+function URL_404($url) {
+  $handle = curl_init($url);
+  curl_setopt($handle,  CURLOPT_RETURNTRANSFER, TRUE);
+
+  /* Get the HTML or whatever is linked in $url. */
+  $response = curl_exec($handle);
+
+  /* Check for 404 (file not found). */
+  $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+  curl_close($handle);
+
+  /* If the document has loaded successfully without any redirection or error */
+  if ($httpCode >= 200 && $httpCode < 300) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
 }
