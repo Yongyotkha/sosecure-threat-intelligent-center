@@ -56,7 +56,7 @@ class WebDefacementDataCheck extends Command
             $result_URL_404=   $this->URL_404($url);
             $result["DomainHeaders"] = $result_checkDomainHeaders;
             $result["Is_URL_404"] = $result_URL_404;
-            $result["messes "] = "";
+            $result["message"] = "";
 
         }else{
             $result["Result"] = 0;
@@ -64,7 +64,7 @@ class WebDefacementDataCheck extends Command
         }
     }else{
         $result["Result"] = 0;
-        $result["messes "] = "The url is not formatted.";
+        $result["message"] = "The url is not formatted.";
     }
 
 
