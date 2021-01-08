@@ -138,17 +138,43 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="{{getAsset('jquery-ui/jquery-ui.min.js')}}"></script>
     <script>
-
-
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        let webdefacment_data_original_id = '{{ $web_defacment_original -> id }}';
         $(".dropBox").droppable({
             accept: '.draggable',
             drop: function(event, ui) {
                 if (ui.draggable.hasClass("draggable")) {
                     var $item = $(ui.helper).clone();
                     ui.helper.remove();
+
                     leftPosition  = ui.offset.left - $(this).offset().left;
                     topPosition   = ui.offset.top - $(this).offset().top;
-                    console.log("top: " + topPosition + ", left: " + leftPosition); 
+                    let item_width = $(ui.draggable).width();
+                    let item_height = $(ui.draggable).height();
+
+                    $.ajax({
+                        type: 'POST',
+                        dataType: "json",
+                        url: '{{ route("webdefacement_website.save_item") }}',
+                        data: {
+                            webdefacment_data_original_id: webdefacment_data_original_id, 
+                            top:topPosition, 
+                            left:leftPosition,
+                            width:item_width, 
+                            height:item_height
+                        },
+                        beforeSend: function() {
+                            
+                        },
+                        success: function(result){
+                            $item.attr('data-id', result.data)
+                        }
+                    }); 
+
 
                     $item.draggable({
                         helper: 'original',
@@ -166,6 +192,8 @@
                     var el = `<span><a href='Javascript:void(0)' class="xicon delete" title="Remove">X</a></span>`;
                     $(el).insertAfter($($item.find('.rm')));
                     $item.appendTo('.dropBox');
+                    makeDraggable($item);
+
                     $('.delete').on('click', function () {
                         $(this).parent().parent('span').remove();
                     });
@@ -176,17 +204,6 @@
             }
         });
 
-        function makeDraggable($item) {
-            $item.draggable({
-                start: function() {},
-                stop: function(event, ui) {
-                    console.log(ui.position.top);
-                    console.log(ui.position.left);
-                }
-            });
-        }
-
-
         $(".draggable").draggable({
             containment: ".dropBox",
             appendTo: ".dropBox",
@@ -195,23 +212,29 @@
             scroll: true,
             start: function() {},
             stop: function(event, ui) {
-                console.log(ui.position.top);
-                console.log(ui.position.left);
+                console.log('top :' + ui.position.top);
+                console.log('left :' + ui.position.left);
             }
         });
 
-        $(".drag-edit").draggable({
-            containment: ".dropBox",
-            appendTo: ".dropBox",
-            scroll: true,
-            start: function() {
-
-            },
-            stop: function(event, ui) {
-                console.log(ui.position.top);
-                console.log(ui.position.left);
-            }
-        });
+        function makeDraggable($item) {
+            $item.resizable({
+                stop: function (event, ui) {
+                    var width = $(this).width();
+                    var height = $(this).height();
+                    console.log('width :' + width);
+                    console.log('height :' + height);
+                }
+            });
+            $item.draggable({
+                accept: '.dropBox',
+                start: function() {},
+                stop: function(event, ui) {
+                    console.log('top :' + ui.position.top);
+                    console.log('left :' + ui.position.left);
+                }
+            });
+        }
 
     </script>
 </body>

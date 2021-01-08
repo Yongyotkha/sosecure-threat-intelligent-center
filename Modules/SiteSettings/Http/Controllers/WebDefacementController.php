@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\WebDefacement\Entities\WebdefacmentImageMark;
 
 class WebDefacementController extends Controller
 {
@@ -125,7 +126,7 @@ class WebDefacementController extends Controller
         $data['page'] = 'Webdefacement';
         $site_code = $this->siteSettings->find_id($site_id);
         if($site_code){
-            $WebdefacmentDataOriginal = WebdefacmentDataOriginal::select('webdefacment_setting_id', 'image')
+            $WebdefacmentDataOriginal = WebdefacmentDataOriginal::select('id', 'webdefacment_setting_id', 'image')
             ->where('webdefacment_setting_id', $id)
             ->whereHas('get_webdefacment_setting', function($query) use($site_code){
                 $query->where('site_id', $site_code -> id);
@@ -140,6 +141,21 @@ class WebDefacementController extends Controller
         }else{
             abort(404);
         }
+    }   
+
+    public function save_item(Request $request){
+        $WebdefacmentImageMark = new WebdefacmentImageMark();
+        $WebdefacmentImageMark -> webdefacment_data_original_id = $request -> webdefacment_data_original_id;
+        $WebdefacmentImageMark -> top = $request -> top;
+        $WebdefacmentImageMark -> left = $request -> left;
+        $WebdefacmentImageMark -> hight = $request -> height;
+        $WebdefacmentImageMark -> width = $request -> width;
+        $WebdefacmentImageMark -> save();
+
+        $res = [
+            'data' => $WebdefacmentImageMark -> id
+        ];
+        return redirect()->json($res);
     }
 
     /**
