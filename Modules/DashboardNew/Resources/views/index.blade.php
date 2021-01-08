@@ -8,6 +8,20 @@
             <div class="pull-right" style="margin-top: 15px">
                 Current Date : <i class="fas fa-calendar"></i> <span id="current-date"></span>
             </div>
+            <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;"
+                    onchange="changeSite(value)">
+                    <option value="0" selected>All Site</option>
+                    @if ($site_settings)
+
+                    @foreach ($site_settings as $site_settings)
+                    <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                    </option>
+                    @endforeach
+
+                    @endif
+                </select>
+            </div>
         </header>
 
         <section class="scrollable wrapper">
@@ -27,7 +41,7 @@
                                                             <img src="{{asset('images/database.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
-                                                        <a href="#" data-toggle="modal" data-target="#modal_asset" class="number-card info">{{@$count_CVEAssets}}</a>
+                                                        <a href="#" data-toggle="modal" data-target="#modal_asset" class="number-card info number_asset"></a>
                                                     </div>
                                                    
                                                 </div>
@@ -39,7 +53,7 @@
                                                             <img src="{{asset('images/antivirus.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
-                                                        <a class="number-card green">{{@$count_CVEMapping}}</a>
+                                                        <a class="number-card green number_vulnerability"></a>
                                                     </div>
                                              
                                                 </div>
@@ -51,7 +65,7 @@
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
-                                                        <a class="number-card warning">{{@$count_compromised}}</a>
+                                                        <a class="number-card warning number_compromised"></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -62,7 +76,7 @@
                                                             <img src="{{asset('images/dataleak.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
-                                                        <a class="number-card dark">{{@$count_dataLeak}}</a>
+                                                        <a class="number-card dark number_data_leak"></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -74,7 +88,7 @@
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue bold-500">Vulnerability Severity</h1>
+                                                        <h1 class="text-blue bold-500">Vulnerability Host</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div id="chart-show-hl"></div>
@@ -84,7 +98,7 @@
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue bold-500">Severity </h1>
+                                                        <h1 class="text-blue bold-500">Vulnerability Severity </h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div id="chart-show-pie"></div>
@@ -225,6 +239,103 @@
 @include('stacks.js.highchart')
 
 <script>
+    var site = 0;
+    function changeSite(value) {
+        site = value;
+        count_asset();
+        count_vulnerability();
+        count_compromised();
+        count_data_leak();
+        count_vulnerability_host();
+    }
+
+    $( document ).ready(function() {
+        count_asset();
+        count_vulnerability();
+        count_compromised();
+        count_data_leak();
+        count_vulnerability_host();
+    });
+
+    function count_asset(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.count_asset") }}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                f_loading(null, '.number_asset');
+            },
+            success: function(result){
+                f_loading_stop(null, '.number_asset');
+                if(result.status_code == 200){
+                    $('.number_asset').text(result.data);
+                }
+            }
+        });
+    }
+
+    function count_vulnerability(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.count_vulnerability") }}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                f_loading(null, '.number_vulnerability');
+            },
+            success: function(result){
+                f_loading_stop(null, '.number_vulnerability');
+                if(result.status_code == 200){
+                    $('.number_vulnerability').text(result.data);
+                }
+            }
+        });
+    }
+
+    function count_compromised(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.count_compromised") }}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                f_loading(null, '.number_compromised');
+            },
+            success: function(result){
+                f_loading_stop(null, '.number_compromised');
+                if(result.status_code == 200){
+                    $('.number_compromised').text(result.data);
+                }
+            }
+        });
+    }
+
+    function count_data_leak(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.count_data_leak") }}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                f_loading(null, '.number_data_leak');
+            },
+            success: function(result){
+                f_loading_stop(null, '.number_data_leak');
+                if(result.status_code == 200){
+                    $('.number_data_leak').text(result.data);
+                }
+            }
+        });
+    }
 
     $('#table-assets-modal').DataTable();
 
@@ -365,65 +476,102 @@
         
     }
   
-
-       
-    const chartstack = new Highcharts.chart('chart-show-hl', {
-        chart: {
-            height: 400, 
-            type: 'bar'
-        },
-        title: {
-            text: null
-        },
-        xAxis: {
-            categories: ['Host name 1', 'Host name 2', 'Host name 3', 'Host name 4', 'Host name 5']
-        },
-        yAxis: {
-            min: 0,
-            title: {
-            text: null
-            }
-        },
-        scrollbar: {
-            enabled: true
-        },
-        legend: {
-            reversed: true
-        },
-        plotOptions: {
-            series: {
-            stacking: 'normal',
-            dataLabels: {
-                enabled: true,
-                color:'#333',
+    function count_vulnerability_host(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.count_vulnerability_host") }}',
+            data: {
+                site : site, 
             },
-            
+            beforeSend: function() {
+                f_loading(null, '#chart-show-hl');
+            },
+            success: function(result){
+                f_loading_stop(null, '#chart-show-hl');
+                if(result.status_code == 200){
+                    var critical = [];
+                    var high = [];
+                    var medium = [];
+                    var low = [];
+                    var infomation = [];
+                    for(let i in result.data.data){
+                        const data = result.data.data[i];
+                        for(let b in result.data.host_name){
+                            const data_b = result.data.host_name[b];
+                            if(data.title == data_b.host_name){
+                                if(data.severity == 'HIGH'){
+                                    high.push(data.total);
+                                }
+                            }
+                        }  
+                    }
+                    var host_name = '';
+                    for(let i in result.data.host_name){
+                        const data = result.data.host_name[i];
+                        host_name += data + ',';
+                    }
+                    console.log(host_name);
+                    const chartstack = new Highcharts.chart('chart-show-hl', {
+                        chart: {
+                            height: 400, 
+                            type: 'bar'
+                        },
+                        title: {
+                            text: null
+                        },
+                        xAxis: {
+                            categories: [host_name]
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                            text: null
+                            }
+                        },
+                        scrollbar: {
+                            enabled: true
+                        },
+                        legend: {
+                            reversed: true
+                        },
+                        plotOptions: {
+                            series: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color:'#333',
+                            },
+                            
+                            }
+                        },
+                        series: [{
+                            name: 'Critical',
+                            data: critical,
+                            color: '#e64732',
+                        }, {
+                            name: 'High',
+                            data: high,
+                            color: '#fcc838'
+                        }, {
+                            name: 'Medium',
+                            data: medium,
+                            color: '#ffe46d'
+                        }, {
+                            name: 'Low',
+                            data: low,
+                            color: '#88ce4f '
+                        }, {
+                            name: 'infomation',
+                            data: infomation,
+                            color: '#d3d3d3'
+                        }]
+                    });
+                }
             }
-        },
-        series: [{
-            name: 'Critical',
-            data: [5, 3, 4, null, 2],
-            color: '#e64732',
-        }, {
-            name: 'High',
-            data: [2, 2, null, 2, 1],
-            color: '#fcc838'
-        }, {
-            name: 'Medium',
-            data: [3, null, 4, 2, 5],
-            color: '#ffe46d'
-        }, {
-            name: 'Low',
-            data: [null, 4, 4, 2, 5],
-            color: '#88ce4f '
-        }, {
-            name: 'infomation',
-            data: [3, 4, 4, 2, null],
-            color: '#d3d3d3'
-        },
-        ]
         });
-
+    }
+       
 
        {{-- const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
