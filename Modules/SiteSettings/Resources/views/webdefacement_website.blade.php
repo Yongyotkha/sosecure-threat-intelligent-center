@@ -24,7 +24,7 @@
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Webdefacement > Website </div>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
+                    <a href="#" id="btn_md_create" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
                         @icon('solid/plus') @langapp('create')
                     </a>
                 </header>
@@ -299,9 +299,9 @@
                                 <img src="" id="preview-img-wdfm" >
                             </div>
                             <div class="edit-capture text-center">
-                                <a href="{{route('webdefacement_website.edit_image')}}" target="_blank">
+                                {{-- <a href="{{route('webdefacement_website.edit_image',['site_id' => @$siteSettings->id])}}" target="_blank">
                                     Edit Image
-                                </a>
+                                </a> --}}
                             </div>
                         </div>
                     </div>
@@ -367,8 +367,12 @@
                 $('.review_image_screenshot').css("display","none");
             }
         });
-
+        
         $(document).ready(function(){
+            load_card();
+        {{--setInterval(function(){ 
+            load_card(); 
+        }, 1000);--}}
             $('.wdfm-card').hover(function(){
                 $(this).find('.wdfm-header').addClass('wdfm-header-upper');
             }); 
@@ -378,9 +382,7 @@
         });
 
 
-    $(function () {
-        load_card();
-    });
+    
     
 
     
