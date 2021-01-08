@@ -114,7 +114,10 @@ Route::post('/WebDefacement-website/load_card_by_site', 'WebDefacementController
 Route::get('/edit-image/{site_id}/{id}', 'WebDefacementController@edit_image')->name('webdefacement_website.edit_image')->middleware('can:menu_items');
 Route::get('/WebDefacement-server/{id}', 'WebDefacementController@webdefacement_server')->name('webdefacement_server.index')->middleware('can:menu_items');
 Route::post('/WebDefacement-save_item', 'WebDefacementController@save_item')->name('webdefacement_website.save_item')->middleware('can:menu_items');
-
+Route::post('/WebDefacement-get_image_data', 'WebDefacementController@get_image_data')->name('webdefacement_website.get_image_data')->middleware('can:menu_items');
+Route::post('/WebDefacement-remove_item', 'WebDefacementController@remove_item')->name('webdefacement_website.remove_item')->middleware('can:menu_items');
+Route::post('/WebDefacement-update_item_top_left', 'WebDefacementController@update_item_top_left')->name('webdefacement_website.update_item_top_left')->middleware('can:menu_items');
+Route::post('/WebDefacement-update_item_width_height', 'WebDefacementController@update_item_width_height')->name('webdefacement_website.update_item_width_height')->middleware('can:menu_items');
 // Compromised
 Route::get('/compromised_feed', 'DataLeakController@compromised_feed')->name('compromised_feed.index')->middleware('can:menu_items');
 Route::get('/compromised_data', 'DataLeakController@compromised_data')->name('compromised_data.index')->middleware('can:menu_items');
