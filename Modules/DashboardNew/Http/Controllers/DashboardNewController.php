@@ -8,6 +8,11 @@ use Illuminate\Routing\Controller;
 use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use App\DataLeakFeed;
+use App\DataLeakSocialRef;
+use Illuminate\Support\Facades\DB;
+use Modules\Scans\Entities\Assets;
+use Modules\SiteSettings\Entities\DataCveven;
+use Modules\SiteSettings\Entities\SiteSettings;
 
 class DashboardNewController extends Controller
 {
@@ -56,7 +61,7 @@ class DashboardNewController extends Controller
                                     ->where("feel_type", '=', 'social')
                                     ->count();
         $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->get();                            
-
+        $data['site_settings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
 
         return view('dashboardnew::index')->with($data);
     }
@@ -65,6 +70,109 @@ class DashboardNewController extends Controller
         $data['page'] = langapp('dashboard');
         return view('dashboardnew::view_detail_asset')->with($data);
     }
+
+    public function count_asset(Request $request){
+        if($request -> site == 0){
+            $assets = Assets::select('id')->where('status', 1)->count();
+        }else{
+            $assets = Assets::select('id')->where('site_id', $request -> site)->where('status', 1)->count();
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => $assets
+        );
+        return response()->json($response);
+    }
+
+    public function count_vulnerability(Request $request){
+        if($request -> site == 0){
+            $CVEMapping = CVEMapping::select('id')->count();
+        }else{
+            $CVEMapping = CVEMapping::select('id')->where('site_id', $request -> site)->count();
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => $CVEMapping
+        );
+        return response()->json($response);
+    }
+
+    public function count_compromised(Request $request){
+        if($request -> site == 0){
+            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromised'])->count();
+        }else{
+            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromised'])->count();
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => $DataLeakSocialRef
+        );
+        return response()->json($response);
+    }
+
+    public function count_data_leak(Request $request){
+        if($request -> site == 0){
+            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
+        }else{
+            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->where('feel_type', 'social')->count();
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => $DataLeakSocialRef
+        );
+        return response()->json($response);
+    }
+
+    public function count_vulnerability_host(Request $request){
+        if($request -> site == 0){
+            $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+        }else{
+            $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $request -> site)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+        }
+        
+        $vendor = [];
+        $title = [];
+        foreach($CVEAssets as $data){
+            $vendor[] = $data -> vendor;
+            $title[] = $data -> title;
+        }
+        $DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
+        $namecve = [];
+        $check_total_namecve = array();
+        $host_name = [];
+        foreach($DataCveven as $data){
+            $namecve[] = $data -> namecve;
+            $check_total_namecve[] = collect([
+                'total' => $data -> total,
+                'namecve' => $data -> namecve,
+                'title' => $data -> title
+            ]);
+        }
+        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity')->get();
+        foreach($CVEMapping as $data){
+            foreach($check_total_namecve as $item){
+                if($data -> namecve == $item['namecve']){
+                    $data['total'] = $item['total'];
+                    $data['title'] = $item['title'];
+                    $host_name[] = $item['title'];
+                }
+            }
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => [
+                'data' => $CVEMapping,
+                'host_name' => $host_name
+            ]
+        );
+        return response()->json($response);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
