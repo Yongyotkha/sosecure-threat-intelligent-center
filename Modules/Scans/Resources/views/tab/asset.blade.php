@@ -16,7 +16,6 @@
                         </select>
                     </div>
                 </div>
-    
             </div>
             <div class="row">
                 <div class="col-md-4">
@@ -37,11 +36,7 @@
                             <span> Clear </span>
                         </button>
                     </div>
-
                 </div>
-            </div>
-            <div class="row">
-               
             </div>
         </div>
 

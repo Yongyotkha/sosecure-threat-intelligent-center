@@ -3,14 +3,13 @@
 @section('content')
 
 
-    <section id="content" class="wrapper-md content">
+<section id="content" class="center-middle" style="background-image:url('{{asset('images/bg-login.png')}}') ">
 
-
-        <div id="login-darken"></div>
         <div id="login-form" class="container aside-xxl animated fadeInUp">
-
-            <span class="navbar-brand block">
-                @php $display = get_option('logo_or_icon'); @endphp
+        <div class="box-login-shadow  bd-round-b-lr block bd-round-t-lr">
+            <span class="nav-header-login navbar-brand block">
+                <img src="{{asset('images/logo_threat/logo_site.png')}}" class="logo-sosecure mt-2">
+                {{-- @php $display = get_option('logo_or_icon'); @endphp
                 @if ($display == 'logo' || $display == 'logo_title') 
                 <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo')) }}"
                      class="img-responsive {{ ($display == 'logo' ? '' : 'thumb-sm m-r-sm') }}">
@@ -24,7 +23,7 @@
                     @else 
                     {{ get_option('website_name') }}
                 @endif
-            @endif
+            @endif --}}
 
             </span>
 

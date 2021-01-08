@@ -1,4 +1,4 @@
-<div id="fullscreen-modal" class="modal-dialog">
+<div id="fullscreen-modal" class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -8,20 +8,19 @@
                  <div class="modal-body">
                      <div class="container-fluid">
                          <div class="row">
-                             <div class="col-md-3">
+                             <div class="col-md-4">
                                 <h5>Date : </h5>
                                 <h5>Update : {{ $rss -> transcation_datetime }}</h5>
                              </div>
-                             <div class="col-md-3">
+                             <div class="col-md-4">
                                  <h5 class="text-elip-line-1">Name : {{ $rss -> title }}</h5>
                              </div>
-                             <div class="col-md-3">
-                                <h5>URL : {{ $rss -> link }}
-                                    <div class="d-inline">
-                                        <a href="{{ $rss -> link }}" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>
-                                        <button type="button" class="btn btn-xs btn-info" onclick="copy_link('{{ $rss -> link }}');"><i class="fas fa-copy"></i> Copy</button>
-                                    </div>
-                                </h5>
+                             <div class="col-md-4" style="display: flex;align-items:center">
+                                <h5 class="text-elip-line-1">URL : {{ $rss -> link }}  </h5>
+                                <div style="display: flex;align-items:center">
+                                    <a href="{{ $rss -> link }}" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> Open</a>
+                                    <button type="button" class="btn btn-xs btn-info" onclick="copy_link('{{ $rss -> link }}');"><i class="fas fa-copy"></i> Copy</button>
+                                </div>
                              </div>
                              <div class="col-xs-12">
                                  <hr>
@@ -44,7 +43,7 @@
                                     @foreach ($category as $item)
                                         
                                         <option value="{{ $item -> id }}"
-                                            @if($RSSNews)
+                                            {{-- @if($RSSNews)
                                             @foreach(@$RSSNews->get_cate as $news_cate_val)
                                                 @if($item->id == $news_cate_val->news_category_id)
                                                     selected
@@ -52,7 +51,7 @@
                                                     
                                                 @endif
                                             @endforeach
-                                            @endif
+                                            @endif --}}
                                             >{{ $item -> name }}</option>
                                     @endforeach
 
@@ -63,7 +62,7 @@
                          <div class="form-group row">
                             <label for="" class="col-lg-12 control-label">Source <span class="text-danger">*</span></label>
                             <div class="col-lg-12">
-                                <input type="text" class="form-control" name="source" value="{{ $rss -> get_rss -> name }}" readonly>
+                                <input type="text" class="form-control" name="source" value="{{ @$rss -> get_rss -> name }}" readonly>
                             </div>
                         </div>
                          {{-- <div class="row d-none">
@@ -102,22 +101,22 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        @php
+                                                        {{-- @php
                                                             $title_default = '';
                                                             if(@$RSSNews->title_th) {
                                                                 $title_default = $RSSNews->title_th;
                                                             } else if ($rss->title) {
                                                                 $title_default = $rss->title;
                                                             }
-                                                        @endphp
-                                                        <input type="text" class="form-control" name="title_th" id="title_th" value="{{$title_default}}">
+                                                        @endphp --}}
+                                                        <input type="text" class="form-control" name="title_th" id="title_th">
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1">{!!@$RSSNews->detail_th!!}</textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1"></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -127,14 +126,14 @@
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Text (EN) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <input type="text" class="form-control" name="title_en" id="title_en" value="{{@$RSSNews->title_en}}">
+                                                        <input type="text" class="form-control" name="title_en" id="title_en" >
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label">Detail (EN) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1">{!!@$RSSNews->detail_en!!}</textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1"></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -159,15 +158,15 @@
                                 <label class="control-label">Public Date </label>
                                 <div class="input-group date">
                                     <input id="public_date" type="text" class="form-control datetimepicker-input"
-                                    @php
+                                    {{-- @php
                                         $date_public = '';
                                         if(@$RSSNews -> public_date) {
                                             $date_public = timePickerFormat($RSSNews -> public_date);
                                         } else if ($rss -> pubDate){
                                             $date_public = timePickerFormat($rss -> pubDate);
                                         }
-                                    @endphp
-                                    value="{{  @$date_public }}" name="public_date"
+                                    @endphp --}}
+                                    name="public_date"
                                     data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()">
                                     <div class="input-group-addon">
                                         @icon('solid/calendar-alt', 'text-muted')
@@ -178,16 +177,16 @@
                                 <label class="control-label">Status </label>
                                 <br>
                                 <label class="switch" style="margin-top: 7px">
-                                    @php
+                                    {{-- @php
                                     $checked_val = '';
                                         if(@$RSSNews -> status == 1) {
                                             $checked_val = 'checked';
                                         } else {
                                             
                                         }
-                                    @endphp
+                                    @endphp --}}
 
-                                    <input type="checkbox" name="status" {{@$checked_val}} value="TRUE">
+                                    <input type="checkbox" name="status" value="TRUE">
                                     <span></span>
                                 </label>
                              </div>
@@ -229,7 +228,7 @@ $('form').each(function () {
 });
 
 $('#detail_th').summernote('destroy');
-var markupStr = '{{@$RSSNews->detail_th}}';
+{{--var markupStr = '{{@$RSSNews->detail_th}}';--}}
 {{--$('#detail_th').summernote();--}}
 {{--$('#detail_th').summernote('code', markupStr);--}}
 

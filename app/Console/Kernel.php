@@ -24,10 +24,21 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Uncomment for shared hosting
-        
+
         $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
         $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
+        
+        $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
+        $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
 
+        // $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
+        // $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
+        // $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
+
+        // $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
+        // $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
+        // $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
+        // $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
         //$schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
         //$schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
         
@@ -62,6 +73,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('app:reset-demo')->cron('0 */3 * * *')->name('demo.reset')->withoutOverlapping(5);
         // $schedule->command('inspire')
         //          ->hourly();
+        $delay_WebDefacementProccess = rand(1,55);
+        $schedule->command('app:WebDefacementProccess', ['--delay'=> $delay_WebDefacementProccess])->everyMinute();
     }
 
     /**

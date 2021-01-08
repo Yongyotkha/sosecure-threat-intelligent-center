@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Auth;
 use DataTables;
+use App\Roles;
 use Modules\Users\Entities\User;
 use Modules\SiteSettings\Http\Requests\UserRequest;
 
@@ -91,8 +92,11 @@ class UsersSettingsController extends Controller
 
     public function create(Request $request)
     {
-        $code = $request->code;
-        return view('sitesettings::modal.create_user',compact('code'));
+        $Roles = Roles::get();
+        $data['Roles'] = $Roles;
+        $data['code'] = $request->code;
+
+        return view('sitesettings::modal.create_user')->with($data);
     }
 
     public function save(UserRequest $request)//UserRequest
@@ -108,64 +112,149 @@ class UsersSettingsController extends Controller
 
         $SiteSettings = SiteSettings::where('code',$code)->first();
 
-        // $User = $this->domain;
-        $User = new User;
-        $User->code = generator_uuid();
-        $User->username = $request->email;
-        $User->email = $request->email;
-        $User->name = $request->name;
-        $User->site_role_id = $request->role_id;
-        // $User->created_by = @Auth::user()->id;
-        $User->active = $request->active ? 1 : 0;
-        $User->site_id = $SiteSettings->id;
-        $User->site_add_user_token = generator_uuid();
-        $User->save();
+        $User_check_limit = User::where('site_id',$SiteSettings->id)->where('site_role_id','!=',99)->where('deleted_at',null)->get()->count();
+
+        $user_allow = $SiteSettings->user_allow;
+        $user_limit_amount = $SiteSettings->user_limit_amount;
+
+        if($SiteSettings) {
+
+            if($user_allow == 'Y') {//allow
+                if($User_check_limit >= $user_limit_amount) {//limit
+                    return response()->json(['message' => 'Failure, user exceeded limit!', 'errors' => ['missing' => ["Failure, user exceeded limit! "]]], 500);
+                } else {//limit pass
+
+                    $email = $request->email;
+                    if($email) {
+                        $User_check_email = User::where('email',$email)->where('deleted_at',null)->get()->count();
+                        if($User_check_email > 0) {
+                            return response()->json(['message' => 'this email address already exist', 'errors' => ['missing' => ["this email address already exist "]]], 500);
+                        }
+                    }
 
 
-            $this->summary = [
-                'site_add_user_token'   => $User->site_add_user_token,
-                'User'   => $User,
-                // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
-                // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
-                // 'hours_worked'       => $this->workedToday(),
-                // 'deals_won'          => Deal::whereDate('won_time', today()->toDateTimeString())->count(),
-                // 'leads_converted'    => Lead::whereDate('converted_at', today()->toDateTimeString())->count(),
-                // 'expenses_total'     => formatCurrency(get_option('default_currency'), $this->expensesToday()),
-                // 'closed_tickets'     => Ticket::whereDate('closed_at', today()->toDateTimeString())->count(),
-                // 'completed_tasks'    => Task::completed()->whereDate('updated_at', today()->toDateTimeString())->count(),
-            ];
-            // \Mail::to(User::role('admin')->get())->send(new DailyDigestMail($this->summary));
-            \Mail::to($User->email)->send(new SiteCreateUserMail($this->summary));
-            // Mail::to($MAIL_TO_sent)->cc($MAIL_RECEIVE_ORDER_TO_ORG_cc_arr)->send(new Send_data_mailto_org_ins($OrderProductCar,$NO_ID,$LISNO,$vw_sys_product_cars,$OrderProductCarInsure,$sys_file,'sent_mailto_org_controller'));
-        
-        // Xrun::dispatch()->onQueue('low')->delay(now()->addMinutes(10));
+                    $role_id = $request->role_id;
+                    $site_role_id = null;
+                    if($role_id == 1) {
+                        $role = 'admin';
+                        // $site_role_id = 99;
+                    } else {
+                        $role = 'client';
+                        // $site_role_id = $role_id;
+                    } 
+            
+            
+            
+                    // return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+            
+                    // $User = $this->domain;
+            
+                    $password = $request->password;
+                    // dd($password);
+                    // exit();
+                    $User = new User;
+                    $User->code = generator_uuid();
+                    $User->username = $request->email;
+                    $User->email = $request->email;
+                    $User->name = $request->name;
+                    $User->site_role_id = $request->role_id;
+                    // $User->created_by = @Auth::user()->id;
+                    $User->active = $request->active ? 1 : 0;
+                    $User->site_id = $SiteSettings->id;
+                    $User->site_add_user_token = generator_uuid();
+                    $User->save();
+            
+                    if($role) {
+                        $User->syncRoles($role);
+                    }
+            
+            
+                        $this->summary = [
+                            'site_add_user_token'   => $User->site_add_user_token,
+                            'User'   => $User,
+                            // 'invoiced_amount'    => formatCurrency(get_option('default_currency'), $this->invoicedToday()),
+                            // 'estimates_accepted' => formatCurrency(get_option('default_currency'), $this->estimatesToday()),
+                            // 'hours_worked'       => $this->workedToday(),
+                            // 'deals_won'          => Deal::whereDate('won_time', today()->toDateTimeString())->count(),
+                            // 'leads_converted'    => Lead::whereDate('converted_at', today()->toDateTimeString())->count(),
+                            // 'expenses_total'     => formatCurrency(get_option('default_currency'), $this->expensesToday()),
+                            // 'closed_tickets'     => Ticket::whereDate('closed_at', today()->toDateTimeString())->count(),
+                            // 'completed_tasks'    => Task::completed()->whereDate('updated_at', today()->toDateTimeString())->count(),
+                        ];
+                        // \Mail::to(User::role('admin')->get())->send(new DailyDigestMail($this->summary));
+                        \Mail::to($User->email)->send(new SiteCreateUserMail($this->summary));
+                        // Mail::to($MAIL_TO_sent)->cc($MAIL_RECEIVE_ORDER_TO_ORG_cc_arr)->send(new Send_data_mailto_org_ins($OrderProductCar,$NO_ID,$LISNO,$vw_sys_product_cars,$OrderProductCarInsure,$sys_file,'sent_mailto_org_controller'));
+                    
+                    // Xrun::dispatch()->onQueue('low')->delay(now()->addMinutes(10));
+            
+                    // foreach($request->category AS $cate) {
+                    //     $SiteCategory = new SiteCategory;
+                    //     $SiteCategory->site_id = $User->id;
+                    //     $SiteCategory->category_id = $cate;
+                    //     $SiteCategory->save();
+                    // }
+            
+                    // if ($request->hasFile('logo')) {
+                    //     $this->uploadLogo($request, $User);
+                    // }
+            
+               
+                    return ajaxResponse(
+                        [
+                            'id'       => $User->id,
+                            'message'  => langapp('saved_successfully'),
+                            'redirect' =>route('userssettings.index', ['id' => $SiteSettings->code]),
+                        ],
+                        true,
+                        Response::HTTP_CREATED
+                    );
 
-        // foreach($request->category AS $cate) {
-        //     $SiteCategory = new SiteCategory;
-        //     $SiteCategory->site_id = $User->id;
-        //     $SiteCategory->category_id = $cate;
-        //     $SiteCategory->save();
-        // }
 
-        // if ($request->hasFile('logo')) {
-        //     $this->uploadLogo($request, $User);
-        // }
+                }
 
-   
-        return ajaxResponse(
-            [
-                'id'       => $User->id,
-                'message'  => langapp('saved_successfully'),
-                'redirect' =>route('userssettings.index', ['id' => $SiteSettings->code]),
-            ],
-            true,
-            Response::HTTP_CREATED
-        );
+            } else {//not allow
+                return response()->json(['message' => 'Failed, adding users is not allowed.!', 'errors' => ['missing' => ["Failed, adding users is not allowed.! "]]], 500);
+            }
+
+        }
+
+ 
+    
     }
 
 
     public function update(UserRequest $request, $id = null)
     {
+
+        $password = $request->password;
+        $password_re = $request->password_re;
+        $role_id = $request->role_id;
+        $site_role_id = null;
+        if($role_id == 1) {
+            $role = 'admin';
+            // $site_role_id = 99;
+        } else if($role_id == 2) {
+            $role = 'client';
+            // $site_role_id = $role_id;
+        } else if($role_id == 3) {
+            $role = 'client';
+            // $site_role_id = $role_id;
+        }
+        // dd($password);
+        // exit();
+        $pass = '';
+        if($password) {
+            if($password_re) {
+                if($password == $password_re) {
+                    $pass = $password;
+                } else {
+                    return response()->json(['message' => 'Please make sure your passwords match', 'errors' => ['missing' => ["Please make sure your passwords match"]]], 500);
+                }
+
+            }
+
+        }
+
         // dd($request);
         // exit();
         // $user = $this->user->findOrFail($id);
@@ -174,12 +263,37 @@ class UsersSettingsController extends Controller
         // dd($user);
         // exit();
         // $user->update($request->all());
-        $user->name = trim($request->name);
-        $user->username = trim($request->username);
+
+
+        if($pass) {
+            $userColumns = ['username', 'password', 'name', 'active'];
+        } else {
+            $userColumns = ['username', 'name', 'active'];
+        }
+
+        // $userColumns = ['username', 'password', 'name', 'active'];
+        $user->update($request->only($userColumns));
+        // $user->code = generator_uuid();
+        // $user->save();
+
+
+        // $user->name = trim($request->name);
+        // $user->username = trim($request->username);
+        if($pass) {
+            // $user->password = Hash::make($request->password);
+            // $user->password = bcrypt($request->password);
+        }
         // $user->open_scan = $request->open_scan;
         // $user->scan_interval = $request->scan_interval;
         $user->active = $request->active ? 1 : 0;
+        $user->site_role_id = $role_id;
         $user->save();
+
+        // $user->profile->update($request->all());
+        if($role) {
+            $user->syncRoles($role);
+        }
+        
 
         $site_code = $this->siteSettings->find_code($user->site_id);
 
@@ -206,10 +320,27 @@ class UsersSettingsController extends Controller
         $user = User::where('code',$user_code)->first();
         // dd($user);
         // exit();
-        $user->password = Hash::make(Str::uuid());
+
+
+        // if($pass) {
+        //     $userColumns = ['username', 'password', 'name', 'active'];
+        // } else {
+        //     $userColumns = ['username', 'name', 'active'];
+        // }
+
+        // $userColumns = ['username', 'password', 'name', 'active'];
+        $user->update(array(
+            // 'name' =>  $request->name,
+            // 'email' => $request->email,
+            'password' => $request->pass
+            ));
+
+
+        // $user->password = Hash::make(Str::uuid());
         $user->password_time_expire = Carbon::now()->addMinutes(10);
         $user->active = 1;
         $user->save();
+        $user->syncRoles('admin');
 
         $user_find = User::where('code',$user->code)->first();
 
@@ -223,7 +354,7 @@ class UsersSettingsController extends Controller
                 'id'       => $user->id,
                 'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('userssettings.index',['id' => $site_code->code]),
-                'pass' => Str::uuid(),
+                'pass' => $request->pass,
                 'time_pass_expire' => $user_find->password_time_expire,
             ],
             true,
@@ -363,7 +494,20 @@ class UsersSettingsController extends Controller
             ->editColumn(
                 'role',
                 function ($user) {
-                    return $user->user;
+                    $site_role_id = $user->site_role_id;
+                    if($site_role_id) {
+                        if($site_role_id == '99') {
+                            $site_role_id_val = 1;
+                        } else {
+                            $site_role_id_val = $site_role_id;
+                        }
+                    }
+
+                    $Roles = Roles::where('id', $site_role_id_val)->first();
+                    $role_name = $Roles->name;
+
+                    
+                    return $role_name;
                 }
             )
             ->editColumn(
@@ -433,6 +577,21 @@ class UsersSettingsController extends Controller
 
     public function edit(Request $request, $id)
     {
+        $User = User::where('code', $id)->first();
+        $site_role_id = $User->site_role_id;
+        $site_role_id_val = '';
+        if($site_role_id) {
+            if($site_role_id == '99') {
+                $site_role_id_val = 1;
+            } else {
+                $site_role_id_val = $site_role_id;
+            }
+        }
+        
+        $Roles = Roles::get();
+        $data['Roles'] = $Roles;
+        $data['roles_select'] = $site_role_id_val;
+        // dd($site_role_id_val);
         $data['user'] = User::where('code', $id)->first();
         // dd($id);
         return view('sitesettings::modal.update_user')->with($data);

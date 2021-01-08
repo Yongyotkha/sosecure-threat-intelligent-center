@@ -11,10 +11,10 @@
                 <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                     @langapp('delete')</span>
             </button>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                 title="@langapp('export') CSV">
                 @icon('solid/download') CSV
-            </a>
+            </a> --}}
             <a href="#"
                 class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
                 data-toggle="modal" data-target="#m_updatecode">
@@ -27,52 +27,61 @@
 
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-
-                <form id="frm-updatecode" method="POST">
-                    <div class="table-responsive">
-                        @php
-                            // dd(lastMonth());
-                        @endphp
-                        <table class="table table-striped" id="table-updatecode-template">
-                            <thead>
-                                <tr>
-                                    <th class="no-sort">
-                                        <label>
-                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
-                                    <th class="">Name</th>
-                                    <th class="">Version</th>
-                                    <th>Mode</th>
-                                    <th>Deploy Status</th>
-                                    <th>Download</th>
-                                    <th>Status</th>
-                                    <th>Update</th>
-                                    <th class="no-sort" width="10%">Action</th> 
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Update Code
+                        </div>
                     </div>
-                </form>
+                </header>
+                <div class="panel-body">
+                    <form id="frm-updatecode" method="POST">
+                        <div class="table-responsive">
+                            @php
+                                // dd(lastMonth());
+                            @endphp
+                            <table class="table table-striped" id="table-updatecode-template">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th class="">Name</th>
+                                        <th class="">Version</th>
+                                        <th>Mode</th>
+                                        <th>Deploy Status</th>
+                                        <th>Download</th>
+                                        <th>Status</th>
+                                        <th>Update</th>
+                                        <th class="no-sort" width="10%">Action</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
             </section>
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
        <!-- Modal Update Code -->
-       <div class="modal modal-slide" id="m_updatecode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       <div class="modal in fixed-left" id="m_updatecode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Update Code</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Update Code
+                    </h4>
                 </div>
                 <form action="">
                     <div class="modal-body">
@@ -116,7 +125,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                             <i class="fas fa-times"></i>
                             Close
                         </button>
@@ -142,6 +151,7 @@
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
+@include('stacks.js.fullscreen')
 
 <script>
     $(function () {

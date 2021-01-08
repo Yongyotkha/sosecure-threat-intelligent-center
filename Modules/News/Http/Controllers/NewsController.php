@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
+use Modules\SiteSettings\Entities\SiteNewsRelatedTemp;
 use Modules\RSSFeedSettings\Entities\NewsTopics;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
@@ -53,6 +54,7 @@ class NewsController extends Controller
         $SiteSettings = SiteSettings::all();
         $RSSNews_all = RSSNews::all();
         $SiteNewsRelated = SiteNewsRelated::all();
+        $SiteCategory = SiteCategory::all();
 
         $news_array = array();
         // $new_array_sub = [];
@@ -68,54 +70,89 @@ class NewsController extends Controller
                         $new_array_sub['cate_id'] = $val2->news_category_id;
        
                     }
-                    array_push($news_array, $new_array_sub);
+                    $new_array_sub_cal = array_filter($new_array_sub);
+                    array_push($news_array, $new_array_sub_cal);
                 }
 
             }
         }
 
         $site_array = [];
-        if($SiteSettings) {
-            foreach($SiteSettings as $key => $val) {
+        // if($SiteSettings) {
+        //     foreach($SiteSettings as $key => $val) {
+                
+        //         // $val->get_cate[0]->get_cate_name->id;
+        //         // $site_array_sub = [];
+        //         if($val) {
+        //             $val_news_id = $val->id;
+        //             if($val->get_categorys) {
+        //                 foreach($val->get_categorys as $key2 => $val2) {
+        //                     if($val2) {
+        //                         $site_array_sub['site_id'] = $val_news_id;
+        //                         $site_array_sub['cate_id'] = $val2->category_id;
+        //                     }
+        //                 }
+        //                 $site_array_sub_cal = array_filter($site_array_sub);
+        //                 array_push($site_array, $site_array_sub_cal);
+        //             }
+        //         }
+        //     }
+        // }
+
+        if($SiteCategory) {
+            foreach($SiteCategory as $key => $val) {
                 
                 // $val->get_cate[0]->get_cate_name->id;
-                $site_array_sub = [];
+                // $site_array_sub = [];
                 if($val) {
-                    $val_news_id = $val->id;
-                    if($val->get_categorys) {
-                        foreach($val->get_categorys as $key2 => $val2) {
-                            if($val2) {
-                                $site_array_sub['site_id'] = $val_news_id;
-                                $site_array_sub['cate_id'] = $val2->category_id;
-                            }
-                        }
-                        array_push($site_array, $site_array_sub);
+                    $val_site_id = $val->site_id;
+                    if($val->site_id) {
+                        
+                                $site_array_sub['site_id'] = $val_site_id;
+                                $site_array_sub['cate_id'] = $val->category_id;
+                            
+                        $site_array_sub_cal = array_filter($site_array_sub);
+                        array_push($site_array, $site_array_sub_cal);
                     }
                 }
             }
         }
+        
 
+        //site_news_related จาก db
         $site_news_related = [];
         if($SiteNewsRelated) {
             foreach($SiteNewsRelated as $key => $val) {
-                $val_news_related_id = $val->site_id;
-                $val_news_id = $val->news_id;
-                // $val->get_cate[0]->get_cate_name->id;
-                $news_related_array_sub = [];
-                if($val->get_news) {
-                    foreach($val->get_news[0]->get_cate as $key2 => $val2) {
+                if($val) {
+                    $val_news_related_id = $val->site_id;
+                    $val_news_id = $val->news_id;
+                    // $val->get_cate[0]->get_cate_name->id;
+                    
+                    if($val->get_news) {
+                        $news_related_array_sub = [];
+                        foreach(@$val->get_news as $key2 => $val2) {
 
-                        $news_related_array_sub['site_id'] = $val_news_related_id;
-                        $news_related_array_sub['cate_id'] = $val2->news_category_id;
-                        $news_related_array_sub['news_id'] = $val_news_id;
-
+                            if($val2) {
+                                $news_related_array_sub['site_id'] = $val_news_related_id;
+                                // $news_related_array_sub['cate_id'] = @$val2->news_category_id;
+                                $news_related_array_sub['cate_id'] = @$val2->get_cate[0]->news_category_id;
+                                $news_related_array_sub['news_id'] = $val_news_id;
+                            }
+    
+                 
+    
+                        }
+                        $news_related_array_sub_cal = array_filter($news_related_array_sub);
+                        array_push($site_news_related, $news_related_array_sub_cal);
                     }
-                    array_push($site_news_related, $news_related_array_sub);
                 }
-
             }
         }
 
+
+
+
+        //site news
         $site_and_news_array_all = [];
         if($news_array) {
             foreach($news_array as $news_key => $news_val) {
@@ -138,24 +175,111 @@ class NewsController extends Controller
                   
     
                                 }
-                                array_push($site_and_news_array_all, $site_and_news_array);
+                                
                             }
                         }
+                        array_push($site_and_news_array_all, $site_and_news_array);
                     }
                 }  
             }
         }
 
+
+
+
+        // $site_news_related_insert_all = [];
+        // $site_news_related_insert = [];
+        // $site_news_related_insert_sub = [];
+        // if($site_news_related) {
+        //     foreach($site_news_related as $key => $val) {
+        //         if($val) {
+
+        //             if($site_and_news_array_all) {
+        //                 foreach($site_and_news_array_all as $key2 => $val2) {
+        //                     if(@$val['site_id'] == @$val2['site_id'] && @$val['cate_id'] == @$val2['cate_id'] && @$val['news_id'] == @$val2['news_id']) {
+                                
+
+        //                     } else {
+        //                         $site_news_related_insert_sub['site_id'] = @$val2['site_id'];
+        //                         $site_news_related_insert_sub['cate_id'] = @$val2['cate_id'];
+        //                         $site_news_related_insert_sub['news_id'] = @$val2['news_id'];
+
+        //                         // dd($site_news_related_insert_sub);
+
+        //                         $site_news_related_insert_sub_cal = array_filter($site_news_related_insert_sub);
+        //                         array_push($site_news_related_insert, $site_news_related_insert_sub_cal);
+        //                     }
+
+        //                 }
+        //             }
+
+
+        //         }
+        //     }
+
+        //     $site_news_related_insert_cal = array_filter($site_news_related_insert);
+        //     array_push($site_news_related_insert_all, $site_news_related_insert_cal);
+
+
+        // }
+
+        SiteNewsRelatedTemp::truncate();
+        if($site_and_news_array_all) {
+            // dd($site_and_news_array_all);
+            foreach($site_and_news_array_all as $key => $val) {
+                // dd($val);
+                if($val) {
+                    $SiteNewsRelatedTemp = new SiteNewsRelatedTemp;
+                    $SiteNewsRelatedTemp->site_id = @$val['site_id'];
+                    // $SiteNewsRelatedTemp->cate_id = $val['cate_id'];
+                    $SiteNewsRelatedTemp->news_id = @$val['news_id'];
+                    $SiteNewsRelatedTemp->save();
+                }
+            }
+        }
+
+        $SiteNewsRelatedTemp = SiteNewsRelatedTemp::all();
+        if($SiteNewsRelatedTemp) {
+            if($site_and_news_array_all) {
+                SiteNewsRelated::truncate();
+                foreach($site_and_news_array_all as $key => $val) {
+                    if($val) {
+                        $SiteNewsRelatedTemp = new SiteNewsRelated;
+                        $SiteNewsRelatedTemp->site_id = @$val['site_id'];
+                        // $SiteNewsRelatedTemp->cate_id = $val['cate_id'];
+                        $SiteNewsRelatedTemp->news_id = @$val['news_id'];
+                        $SiteNewsRelatedTemp->save();
+                    }
+                }
+            }
+        }
+
+
+
+
+
+        // $site_array = array_filter($site_array);
+        // $result=array_diff($site_news_related[0],$site_and_news_array_all[0]);
+
+        // $result=array_diff($news_related_array_sub_cal,$site_and_news_array);
+
+
+        
+
+
+
         // dd($news_array);
         // dd($site_array);
-        dd($site_and_news_array_all);
+        // dd($site_news_related);
+        // print_r($result);
+        // dd($site_news_related_insert_all);
         // dd(array_unique($site_and_news_array_all));
         // dd($SiteNewsRelated[0]->get_news[0]->get_cate);
         // dd($SiteNewsRelated[0]->get_news->get_cate);
 
 
         
-       return view('news::index')->with($data);
+    //    return view('news::index')->with($data);
     }
 
     public function index()
@@ -303,6 +427,109 @@ class NewsController extends Controller
     {
        $data['page'] = langapp('news_detail');
        return view('news::public_detail')->with($data);
+    }
+
+    public function public_detail_select($code , $lang)
+    {
+
+
+        $RSSNews_prev = '';
+        $RSSNews_next = '';
+        $RSSNews_last10 = '';
+        // $lang = 'th';
+        $RSSNews = RSSNews::where("code",$code)->first();
+
+        $cate_id_all = [];
+        if($RSSNews->get_cate) {
+            foreach($RSSNews->get_cate as $cate) {
+                $cate->get_cate_name->id;
+                $cate_id_all[] = intval($cate->get_cate_name->id);
+                // dd($cate->get_cate_name->id);
+            }
+        }
+        // dd($cate_id_all);
+
+
+        if($cate_id_all) {
+            $NewsCategory = RSSNewsCategory::whereIn('news_category_id', $cate_id_all)->where('status',1)->get();
+            // dd($NewsCategory);
+            
+            
+            $rss_news_id_array = [];
+            if($NewsCategory) {
+                foreach($NewsCategory as $NewsCategory_val) {
+                    if($NewsCategory_val->rss_news_id == $RSSNews->id) {
+
+                    } else {
+                        $rss_news_id_array[] = intval($NewsCategory_val->rss_news_id);
+                    }
+                    // dd($topic->topic->id);
+                }
+            }
+            // dd($rss_news_id_array);
+            if($rss_news_id_array) {
+                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
+                // dd($RSSNews_last10);
+            }
+
+
+            $rss_news_id_all_array = [];
+            if($NewsCategory) {
+                foreach($NewsCategory as $NewsCategory_val) {
+                    
+                        $rss_news_id_all_array[] = intval($NewsCategory_val->rss_news_id);
+                    
+                    // dd($topic->topic->id);
+                }
+            }
+            // dd($rss_news_id_all_array);
+            if($rss_news_id_all_array) {
+                $RSSNews_prev = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','<',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                $RSSNews_next = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','>',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                // dd($RSSNews_last10);
+            }
+            
+        }
+
+        // dd($RSSNews_prev);
+        // dd($RSSNews_next);
+        if($lang == 'th') {
+            $RSSNews_name = $RSSNews->title_th;
+            $RSSNews_detail = $RSSNews->detail_th;
+        } else {
+            $RSSNews_name = $RSSNews->title_en;
+            $RSSNews_detail = $RSSNews->detail_en;
+        }
+
+
+        $data['RSSNews_prev'] = $RSSNews_prev;
+        $data['RSSNews_next'] = $RSSNews_next;
+        $data['RSSNews_last10'] = $RSSNews_last10;
+        $data['RSSNews_name'] = $RSSNews_name;
+        $data['RSSNews_detail'] = $RSSNews_detail;
+        $data['lang'] = $lang;
+        $data['RSSNews'] = $RSSNews;
+        $data['page'] = langapp('news_detail');
+        // $RSSNews;
+        $ReadNews_data = ReadNews::where('user_id',@Auth::user()->id)->where('news_id',$RSSNews->id)->where('status',1)->first();
+        if($ReadNews_data) {
+
+        } else {
+            $ReadNews = new ReadNews;
+            $ReadNews->code = generator_uuid();
+            $ReadNews->site_id = null;
+            $ReadNews->user_id = @Auth::user()->id;
+            $ReadNews->news_id = $RSSNews->id;
+            $ReadNews->save();
+        }
+
+
+        $RSSNews->view = $RSSNews->view+1;
+        $RSSNews->save();
+
+
+    //    $data['page'] = langapp('news_detail');
+       return view('news::public_detail_select')->with($data);
     }
 
     /**
@@ -576,7 +803,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <img src="'.$data -> logo.'" alt="">
+                        <img src="'.$data -> logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';
@@ -641,7 +868,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <img src="'.$data -> news -> logo.'" alt="">
+                        <img src="'.$data -> news -> logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';
@@ -665,7 +892,7 @@ class NewsController extends Controller
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
         $html = '';
-        $Bookmark = Bookmark::orderBy('created_at','desc')->get();
+        $Bookmark = Bookmark::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();
         foreach($Bookmark as $data){
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
             if($check_read_news){
@@ -692,7 +919,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <img src="'.$data -> news -> logo.'" alt="">
+                        <img src="'.$data -> news -> logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';

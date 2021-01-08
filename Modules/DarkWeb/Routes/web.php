@@ -14,5 +14,8 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'darkweb'],
     function () {
         Route::get('/', 'DarkWebController@index')->name('darkweb.index')->middleware('can:menu_items');
+        Route::get('/jqueryLoadMoreNews', 'DarkWebController@jqueryLoadMoreNews')->name('darkweb.jqueryLoadMoreNews');
+        Route::get('/bookmark', 'DarkWebController@bookmark')->name('darkweb.bookmark');
+        Route::get('/jqueryLoadMoreNewsBookmark', 'DarkWebController@jqueryLoadMoreNewsBookmark')->name('darkweb.jqueryLoadMoreNewsBookmark');
     }
 );

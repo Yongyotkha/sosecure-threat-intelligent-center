@@ -7,9 +7,9 @@
                 @icon('solid/arrow-left')
             </a>
             <div class="bc-head">@langapp('rss_feed_settings') | www.xxx.xxx/xxx.xxx.rss</div>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                 @icon('solid/download') CSV
-            </a>
+            </a> --}}
             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                 <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
             </button>
@@ -151,16 +151,17 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     
      <!-- Modal RSS -->
-    <div class="modal modal-slide size-50" id="create-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal in fixed-left size-50" id="create-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-     <div class="modal-dialog modal-dialog-centered" role="document">
+     <div class="modal-dialog modal-dialog-aside" role="document">
          <div class="modal-content">
-             <div class="modal-header">
-                 <span class="modal-title" id="exampleModalLabel">News</span>
-                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <span aria-hidden="true">&times;</span>
-                 </button>
-             </div>
+            <div class="modal-header bg-blue">
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                    News
+                </h4>
+            </div>
              <form action="">
                  <div class="modal-body">
                      <div class="container-fluid">
@@ -375,7 +376,7 @@
                  </div>
 
                  <div class="modal-footer">
-                     <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                     <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                          <i class="fas fa-times"></i>
                          Close
                      </button>
@@ -402,6 +403,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.markdown')
+@include('stacks.js.fullscreen')
 
 <script>
 $(function() {

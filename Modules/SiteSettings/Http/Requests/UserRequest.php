@@ -36,7 +36,8 @@ class UserRequest extends FormRequest
         //     'logo' => 'sometimes|mimes:jpeg,jpg,png|max:1000',
         // ];
         return [
-            'email' => 'required|sometimes|unique:users,email,'.$this->id,
+            'email' => 'required',
+            // 'email' => 'required|sometimes|unique:users,email,'.$this->id,
             // 'active' => 'required'.$this->id,
         ];
     }

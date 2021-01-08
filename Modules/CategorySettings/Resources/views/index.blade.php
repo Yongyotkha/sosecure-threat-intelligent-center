@@ -8,10 +8,7 @@
             @icon('solid/arrow-left')
                 </a> --}}
                 <div class="bc-head">@langapp('settings') > Categorys</div>
-                <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
-                    data-rel="tooltip" title="@langapp('export') CSV">
-                    @icon('solid/download') CSV
-                </a>
+
 
                 {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }}
                 pull-right" data-toggle="modal" data-target="#create_key_modal">
@@ -27,7 +24,7 @@
                     @endcan
 
                     @can('users_delete')
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete" disabled>
                             <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                                 @langapp('delete')</span>
                         </button>
@@ -36,37 +33,45 @@
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-
-                <form id="frm-category" method="POST">
-                    <div class="table-responsive">
-                        @php
-                            // dd(lastMonth());
-                        @endphp
-                        <table class="table table-striped" id="table-category-template">
-                            <thead>
-                                <tr>
-                                    <th class="no-sort">
-                                        <label>
-                                            <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
-                                    <th class="">No.</th>
-                                    <th>@langapp('name')</th>
-                                    <th>@langapp('status')</th>
-                                    <th class="no-sort">Action</th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-
-
-
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Categorys
+                        </div>
                     </div>
-                </form>
+                </header>
+                <div class="panel-body">
+                    <form id="frm-category" method="POST">
+                        <div class="table-responsive">
+                            @php
+                                // dd(lastMonth());
+                            @endphp
+                            <table class="table table-striped" id="table-category-template">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort">
+                                            <label>
+                                                <input name="select_all" value="1"  id="select-all" type="checkbox" class="select-chk"/>
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th class="">No.</th>
+                                        <th>@langapp('name')</th>
+                                        <th>@langapp('status')</th>
+                                        <th class="no-sort">Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+
+
+
+                        </div>
+                    </form>
+                </div>
             </section>
         </section>
     </section>
@@ -74,7 +79,7 @@
 
     <!-- Modal Gen Category -->
     {{-- <div class="modal fade" id="create_key_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title" id="exampleModalLabel">Category</span>
@@ -134,6 +139,32 @@
     @include('stacks.js.datatables')
 
     <script>
+
+        $('#table-category-template').on('click', '.select-chk', function () {
+            if ($(this).is(':checked')) {
+
+                $('#btn_del_select').prop("disabled", false);
+            } else {
+                
+                if ($('.select-chk').filter(':checked').length < 1){
+
+                    $('#btn_del_select').attr('disabled',true);
+                }
+            }
+        });
+
+        $('#table-category-template').on('click', '.categorySettings_id', function () {
+            if ($(this).is(':checked')) {
+
+                
+                $('#btn_del_select').prop("disabled", false);
+            } else {
+                if ($('.categorySettings_id').filter(':checked').length < 1){
+                    
+                    $('#btn_del_select').attr('disabled',true);
+                }
+            }
+        });
         $(function () {
 
 
@@ -144,6 +175,7 @@
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
                 ajax: {
                     url: '{!! route('categorysettings.data') !!}',
                     data: ({
@@ -189,25 +221,10 @@
                 ]
             });
 
-            let del_val = [];
-            $("#btn_del_select").click(function(){
-                del_val = [];
-                $("input[type='checkbox'][name='checked']").each(function(){
 
-                    if($(this).is(":checked")) {
-                        del_val.push($(this).val());
-                        /* alert(3);*/
-                    }
-                });
-                console.log(del_val);
 
-                if(del_val.length > 0) {
-                    del_cate_select(del_val);
-                } else {
-                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
-                }
 
-            });
+
 
 
 
@@ -246,6 +263,27 @@
         //                     toastr.error(errorsHtml, '@langapp('response_status') ');
         //                 });
         // }
+
+        {{--            let del_val = [];
+            $("#btn_del_select").click(function(){
+                del_val = [];
+                $("input[type='checkbox'][name='checked']").each(function(){
+
+                    if($(this).is(":checked")) {
+                        del_val.push($(this).val());
+                        /* alert(3);*/
+                    }
+                });
+                console.log(del_val);
+
+                if(del_val.length > 0) {
+                    del_cate_select(del_val);
+                } else {
+                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
+                }
+
+            });
+        --}}
 
 
         function change_category_active (category_id) {

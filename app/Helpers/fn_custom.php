@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 use App\Entities\Hook;
 use App\Entities\Language;
 use App\Entities\Local;
@@ -15,7 +17,14 @@ use Modules\Users\Entities\User;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Stringy\Stringy as S;
 
+use MongoDB\BSON\Regex;
+use MongoDB\Client;
+use MongoDB\Client as MongoClient;
+use MongoDB\BSON\UTCDateTime;
+
+
 define("PAGINATE_NUM", 10);
+define("DB_MONGO_01", 'mongodb://10.104.0.10:27017');
 
 
 function gen_uuid() {
@@ -81,15 +90,15 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
     $html = '';
     if($badg == 'badg') {
         if(strtolower($status_id) == strtolower("CRITICAL")) {
-            $html = '<span class="badge badge-secondary" style="background-color: #b30000;">'.$num_val.' CRITICAL</span>';
+            $html = '<span class="badge badge-secondary" style="background-color: #e64732;">'.$num_val.' CRITICAL</span>';
         } else if(strtolower($status_id) == strtolower("HIGH")) {
-            $html = '<span class="badge badge-Warning" style="background-color: #d9534f;">'.$num_val.' HIGH</span>';
+            $html = '<span class="badge badge-Warning" style="background-color: #fcc838;">'.$num_val.' HIGH</span>';
         } else if(strtolower($status_id) == strtolower("MEDIUM")) {
-            $html = '<span class="badge badge-Warning" style="background-color: #ec971f;">'.$num_val.' MEDIUM</span>';
+            $html = '<span class="badge badge-Warning" style="background-color: #ffe46d;">'.$num_val.' MEDIUM</span>';
         } else if(strtolower($status_id) == strtolower("LOW")) {
-            $html = '<span class="badge badge-Success" style="background-color: #bfff00;">'.$num_val.' LOW</span>';
+            $html = '<span class="badge badge-Success" style="background-color: #88ce4f;">'.$num_val.' LOW</span>';
         } else if(strtolower($status_id) == strtolower("NONE")) {
-            $html = '<span class="badge badge-Success" style="background-color: #40ff00;">'.$num_val.' NONE</span>';
+            $html = '<span class="badge badge-Success" style="background-color: #d3d3d3;">'.$num_val.' INFORMATION</span>';
         }
     } else {
         if(strtolower($status_id) == strtolower("CRITICAL")) {
@@ -102,6 +111,36 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
             $html = 'LOW';
         } else if(strtolower($status_id) == strtolower("NONE")) {
             $html = 'NONE';
+        }
+    }
+    return $html;
+}
+
+function get_webdefacment_status($status_id,$color='') {
+    $html = '';
+    if($color == 'color') {
+        if(strtolower($status_id) == strtolower("critical")) {
+            $html = '<span class="dot critical"></span> Critical';
+        } else if(strtolower($status_id) == strtolower("high")) {
+            $html = '<span class="dot high"></span> High';
+        } else if(strtolower($status_id) == strtolower("meduim")) {
+            $html = '<span class="dot meduim"></span> Meduim';
+        } else if(strtolower($status_id) == strtolower("normal")) {
+            $html = '<span class="dot low"></span> Normal';
+        } else if(strtolower($status_id) == strtolower("none")) {
+            $html = '<span class="dot none"></span> None';
+        }
+    } else {
+        if(strtolower($status_id) == strtolower("critical")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("high")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("meduim")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("normal")) {
+            $html = $status_id;
+        } else if(strtolower($status_id) == strtolower("none")) {
+            $html = $status_id;
         }
     }
     return $html;
@@ -170,4 +209,242 @@ function utf8_strlen($str) {
          }
       }
       return $l;
+}
+
+function explode_val($val,$type=null) {
+    $result = '';
+    if($val) {
+        $val_arr = explode(",",$val);
+        if($val_arr) {
+            foreach($val_arr as $tag) {
+                if($type == 'tags') {
+                    $result .=  '<a href="'.route('indicators.link_tags', ['id' => $tag]).'">'.$tag.'</a> ,';
+                } else if ($type == 'groups') {
+                    $result .=  '<a href="'.route('indicators.link_group', ['id' => $tag]).'">'.$tag.'</a> ,';
+                } else {
+                    $result .=  '<a href="#">'.$tag.'</a> ,';
+                }
+                
+            }
+            $result = rtrim($result,',');
+        }
+    } else {
+        $result = '';
+    }
+    return $result;
+}
+
+
+function check_publish($val) {
+    if($val==1) {
+        $result = '<i class="fas fa-check"></i>';
+    } else {
+        $result = '';
+    }
+    return $result;
+}
+function check_last_status($val) {
+    if($val== true) {
+        $result = 'Modified';
+    } else {
+        $result = 'Created';
+    }
+    return $result;
+}
+
+
+function change_date_utc_to_thai($val) {
+    // if($val== true) {
+    //     $result = 'Modified';
+    // } else {
+    //     $result = 'Created';
+    // }
+
+
+    $tz = new \DateTimeZone('Asia/Bangkok');
+    // $start = '2020-01-01 00:00:00';
+    // $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($val)*1000);
+
+    // print_r($dateStart->toDateTime()->format(DATE_RSS));
+    $date_start = $val->toDateTime();
+
+    $date_start->setTimezone($tz);
+
+    $start = $date_start->format(DATE_ATOM);
+    $return_date = date("Y-m-d H:i",strtotime($start));
+
+    // echo $start;
+
+
+    return $return_date;
+}
+
+
+
+function get_menu_html() {
+    $html_all = '';
+
+    $html_all .= '
+    <nav class="nav-primary hidden-xs">
+    <ul class="nav">
+    ';
+
+            $menu = [];
+            $menu_html = '';
+        if(isset($_SESSION["menu"])){
+            // unset($_SESSION["lastname"]);
+            $menu = $_SESSION["menu"];
+
+
+            if($menu) {
+                foreach($menu as $menu_val) {
+                    $active = '';
+                    $url = '#';
+                    $check_menu_active = '';
+                    $name_val = '';
+                    
+                    if($menu_val->url) {// url
+                        if($menu_val->type_url == 'site_url') {
+                            $url = site_url($menu_val->url);
+                        } else if ($menu_val->type_url == 'route') {
+                            $url = route($menu_val->url);
+                        }
+                    }
+
+                    if($menu_val->check_menu_active) {// check active
+                        if($menu_val->type_check_menu_active == 'langapp') {
+                            $check_menu_active = langapp($menu_val->check_menu_active);
+                        } else if ($menu_val->type_check_menu_active == '') {
+                            $check_menu_active = $menu_val->check_menu_active;
+                        }
+                    }
+
+                    if(@$page == $check_menu_active) {
+                        $active = 'active';
+                    }
+
+                    if($menu_val->langapp) {//ชื่อเมนู
+                        $name_val = langapp($menu_val->langapp);
+                    }
+
+                    if(@$menu_val->get_menu_sub) {
+
+
+                        
+                        $menu_sub_html = '';
+                        foreach($menu_val->get_menu_sub as $menu_sub_val) {
+
+
+                            $active_sub = '';
+                            $url_sub = '#';
+                            $check_menu_active_sub = '';
+                            $name_val_sub = '';
+                            
+
+                            if($menu_sub_val->url) {// url
+                                if($menu_sub_val->type_url == 'site_url') {
+                                    $url_sub = site_url($menu_sub_val->url);
+                                } else if ($menu_sub_val->type_url == 'route') {
+                                    $url_sub = route($menu_sub_val->url);
+                                }
+                            }
+
+                            if($menu_sub_val->check_menu_active) {// check active
+                                if($menu_sub_val->type_check_menu_active == 'langapp') {
+                                    $check_menu_active_sub = langapp($menu_sub_val->check_menu_active);
+                                } else if ($menu_sub_val->type_check_menu_active == '') {
+                                    $check_menu_active_sub = $menu_sub_val->check_menu_active;
+                                }
+                            }
+
+                            if(@$page == $check_menu_active_sub) {
+                                $active_sub = 'active';
+                            }
+
+                            if($menu_sub_val->langapp) {//ชื่อเมนู
+                                $name_val_sub = langapp($menu_sub_val->langapp);
+                            }
+
+
+
+
+                            $menu_sub_html .= '<li class="'. $active_sub .'">
+                                                    <a href="'. $url_sub .'">
+                                                        <i class="'.@$menu_sub_val->icon.'"><b class="bg-info"></b></i>
+                                                        <span>'.$name_val_sub.'</span>
+                                                    </a>
+                                                </li>';
+                        }
+
+                    }
+                        if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
+                            $is_have_sub = '<a href="'. $url .'" class="'. $active_sub .'">
+                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                                <i class="fas fa-angle-up text-active"></i></span>
+                                                <span> '.$name_val.' </span>
+                                            </a>
+                                        <ul class="nav lt">'.$menu_sub_html.'</ul>
+                                        ';
+                        } else {
+                            $is_have_sub = '<a href="'. $url .'" class="'. $active .'">
+                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                    
+                                                <span> '.$name_val.' </span>
+                                            </a>';
+                        }
+                            
+
+                    
+           
+
+                    $menu_html .=    '<li class="'. $active .'">
+                                        '.$is_have_sub.'
+                                      </li>';
+
+                }
+
+                $html_all .= $menu_html;
+            }
+
+        }
+
+       
+
+    $html_all .= '
+            </ul>
+        </nav>';
+
+    echo $html_all;
+}
+
+
+function formatSizeUnits($bytes)
+    {
+        if ($bytes >= 1073741824)
+        {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        }
+        elseif ($bytes >= 1048576)
+        {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        }
+        elseif ($bytes >= 1024)
+        {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        }
+        elseif ($bytes > 1)
+        {
+            $bytes = $bytes . ' bytes';
+        }
+        elseif ($bytes == 1)
+        {
+            $bytes = $bytes . ' byte';
+        }
+        else
+        {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
 }

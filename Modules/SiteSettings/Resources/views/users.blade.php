@@ -11,7 +11,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3">@langapp('settings')  </p>
+                    <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
@@ -26,11 +26,9 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
-                    <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a>
+             
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
@@ -38,16 +36,16 @@
                         @icon('solid/plus') @langapp('create')
                     </a> -->
                     <a href="{{route('user.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-toggle="ajaxModal">@icon('solid/plus') @langapp('create')</a>
-                    <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color')  }}  pull-right m-xs">
+                    {{-- <button type="submit" id="button" class="btn btn-sm btn-{{ get_option('theme_color')  }}  pull-right m-xs">
                         <span>@icon('solid/user') @langapp('role')</span>
-                    </button>
+                    </button> --}}
                 </header>
 
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                            <header class="panel-heading">@icon('solid/user') Users</header>
+                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/user') Users</header>
                             <div class="panel-body">
                                 <div class="table-responsive">
                                     <table  class="table table-striped" id="table-users-template">
@@ -88,14 +86,15 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 
     <!-- Modal New User -->
-    <div class="modal modal-slide" id="create-new-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal in fixed-left" id="create-new-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">New User</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        New User
+                    </h4>
                 </div>
                 <form action="">
                 <div class="modal-body">
@@ -146,7 +145,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -161,14 +160,15 @@
     </div>
 
 
-    <div class="modal modal-slide" id="support-password" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal in fixed-left" id="support-password" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Support Password</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Support Password
+                    </h4>
                 </div>
                 <form action="">
                 <div class="modal-body">
@@ -205,7 +205,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -233,6 +233,7 @@
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
+@include('stacks.js.fullscreen')
 
 <script>
     $(document).ready(function () {
@@ -246,6 +247,7 @@
         var table = $('#table-users-template').DataTable({
             processing: true,
             serverSide: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('user.data') !!}',
                 data: {

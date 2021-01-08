@@ -3,9 +3,9 @@
     @slot('header')
         @component('mail::header', ['url' => site_url()])
         {{ get_option('company_name') }}
+        {{-- <img src="{{asset('images/logo_site.png')}}" style="widht:100px;height:auto;"> --}}
         @endcomponent
     @endslot
-
     {{-- Body --}}
     {{ $slot }}
 

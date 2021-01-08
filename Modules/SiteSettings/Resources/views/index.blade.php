@@ -8,10 +8,7 @@
             @icon('solid/arrow-left')
                 </a> --}}
                 <div class="bc-head">@langapp('settings') > Site</div>
-                <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
-                    data-rel="tooltip" title="@langapp('export') CSV">
-                    @icon('solid/download') CSV
-                </a>
+
 
                 {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }}
                 pull-right" data-toggle="modal" data-target="#create_key_modal">
@@ -36,38 +33,46 @@
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-
-                <form id="frm-site" method="POST">
-                    <div class="table-responsive">
-                        @php
-                            // dd(lastMonth());
-                        @endphp
-                        <table class="table table-striped" id="table-site-template">
-                            <thead>
-                                <tr>
-                                    <th class="no-sort">
-                                        <label>
-                                            <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
-                                    <th class="">No.</th>
-                                    <th>@langapp('logo')</th>
-                                    <th>@langapp('name')</th>
-                                    <th>Categorys</th>
-                                    <th>Assets Use</th>
-                                    <th>Start Date</th>
-                                    <th>Exprie Date</th>
-                                    <th>@langapp('status')</th>
-                                    <th class="no-sort" width="10%">Action</th> 
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Site
+                        </div>
                     </div>
-                </form>
+                </header>
+                <div class="panel-body">
+                    <form id="frm-site" method="POST">
+                        <div class="table-responsive">
+                            @php
+                                // dd(lastMonth());
+                            @endphp
+                            <table class="table table-striped" id="table-site-template">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort">
+                                            <label>
+                                                <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th class="">No.</th>
+                                        <th>@langapp('logo')</th>
+                                        <th>@langapp('name')</th>
+                                        <th>Categorys</th>
+                                        <th>Assets Use</th>
+                                        <th>Start Date</th>
+                                        <th>Exprie Date</th>
+                                        <th>@langapp('status')</th>
+                                        <th class="no-sort" width="10%">Action</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+    
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
             </section>
         </section>
     </section>
@@ -94,6 +99,7 @@
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
                 ajax: {
                     url: '{!! route('sitesettings.data') !!}',
                     data: ({

@@ -133,13 +133,19 @@ class KeywordsController extends Controller
             ->editColumn(
                 'chk',
                 function ($model) {
-                    return '<label><input type="checkbox" name="checked" value="' . $model->id . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" class="keyword_id" name="keyword_id" value="' . $model->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(
                 'name',
                 function ($model) {
                     return $model->name;
+                }
+            )
+            ->editColumn(
+                'type',
+                function ($model) {
+                    return $model->type;
                 }
             )
             ->editColumn(
@@ -202,22 +208,49 @@ class KeywordsController extends Controller
 
     public function delete_process($id = null)
     {
-
+        $Site_keywords = Site_keywords::where("id",$id)->first();
         $model = Site_keywords::where("id",$id);
         // dd($model);
         $model->delete();
 
-        $site_code = $this->siteSettings->find_code($model->$site_id);
+        // $site_code = $this->siteSettings->find_code($model->$site_id);
+        $SiteSettings = SiteSettings::where('id',$Site_keywords->site_id)->first();
 
         return ajaxResponse(
             [
                 'message'  => langapp('deleted_successfully'),
-                'redirect' => route('keyword.index',['id' => $site_code->code]),
+                'redirect' => route('keyword.index',['id' => @$SiteSettings->code]),
             ],
             true,
             Response::HTTP_OK
         );
     }
+
+    
+    public function delete_checked(Request $request)
+    {
+
+        //  dd($request->id);
+
+        foreach($request->id as $keyword_id){
+
+            $Site_keywords  = Site_keywords::where('id', $keyword_id)->first();
+            $data = Site_keywords::where("id",$keyword_id);
+            $data->delete();
+
+        }
+
+        $SiteSettings = SiteSettings::where('id',$Site_keywords->site_id)->first();
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('keyword.index',['id' => @$SiteSettings->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }  
 
 
 }

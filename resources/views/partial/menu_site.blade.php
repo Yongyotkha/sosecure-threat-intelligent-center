@@ -1,65 +1,63 @@
 <ul class="nav nav-pills nav-stacked no-radius">
     <li class="{{ $page === 'SiteSettings' ? 'active' : '' }}">
         <a href="{{route('sitesettings.edit', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            Site Settings
+            Site
         </a>
     </li>
     <li class="{{ $page === 'SystemSettings' ? 'active' : '' }}">
         <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            System Settings
+            System
         </a>
     </li>
+    
     <li class="{{ $page === 'DataSetting' ? 'active' : '' }}">
         <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            Permission & Config Settings
+            Permission & Config
         </a>
     </li>
+
     <li class="{{ $page === 'Users' ? 'active' : '' }}">
         <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Users
         </a>
     </li>
+
     <li class="{{ $page === 'Domain' ? 'active' : '' }}">
         <a href="{{route('domain.index', ['id' => $siteSettings->code])}}">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Domain
         </a>
     </li>
 
+    <li class="{{ $page === 'Keyword Setting' ? 'active' : '' }}">
+        <a href="{{route('keyword.index', ['id' => $siteSettings->code])}}">
+            Keywords
+        </a>
+    </li>
+
     <li class="{{ $page === 'Assets' ? 'active' : '' }}">
-        <a href="#">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+        <a href="{{route('assetssite.index', ['id' => $siteSettings->code])}}">
             Assets
         </a>
     </li>
-    <li class="{{ $page === 'Keyword Setting' ? 'active' : '' || $page === 'Social Datas' ? 'active' : '' }} main-link">
+
+    {{-- <li {{ $page === 'News' ? 'active' : '' }}>
+        <a href="#">
+            News
+        </a>
+    </li> --}}
+
+    <li class="{{ $page === 'Indicators Logs' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            Data Leak
+            Indicators
         </a>
-       <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
-                <a href="{{route('keyword.index', ['id' => $siteSettings->code])}}">
-                    Keyword Setting
-                </a>
-            </li>
-
-            <li style="padding-left:2rem">
-                <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
-                    Social Datas
+                <a href="{{route('indisetting.indi_logs', ['id' => $siteSettings->code])}}">
+                    Logs
                 </a>
             </li>
         </ul>
-    </li>
-    <li {{ $page === 'News' ? 'active' : '' }}>
-        <a href="#">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            News
-        </a>
     </li>
 
     <li class="{{ $page === 'Vulnerability Assets' ? 'active' : '' }} main-link">
@@ -73,15 +71,6 @@
                     Assets
                 </a>
             </li>
-        </ul>
-    </li>
-
-    <li class="{{ $page === 'Vulnerability Logs' ? 'active' : '' }} main-link">
-        <a href="#">
-            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-            Indicators
-        </a>
-        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
                 <a href="{{route('vulsetting.vul_logs', ['id' => $siteSettings->code])}}">
                     Logs
@@ -89,4 +78,74 @@
             </li>
         </ul>
     </li>
+
+    <li class="{{ $page === 'Compromised' ? 'active' : '' }} main-link">
+        <a href="#">
+            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+            Compromised
+        </a>
+       <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+            <li style="padding-left:2rem">
+                <a href="#">
+                    Compromised Feed
+                </a>
+            </li>
+
+            <li style="padding-left:2rem">
+                <a href="#">
+                    Compromised Data
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    <li class="{{ $page === 'Social Datas' ? 'active' : '' }} main-link">
+        <a href="#">
+            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+            Data Leak
+        </a>
+       <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+            <li style="padding-left:2rem">
+                <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
+                    Data Leak Feed
+                </a>
+            </li>
+
+            <li style="padding-left:2rem">
+                <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
+                    Data Leak Data
+                </a>
+            </li>
+        </ul>
+    </li>
+    
+    <li class="{{ $page === 'Webdefacement' ? 'active' : '' }}">
+        <a href="{{route('webdefacement_website.index', ['id' => $siteSettings->code])}}">
+            Web Defacement
+        </a>
+    </li>
+
+    {{-- <li class="{{ $page === 'Webdefacement' ? 'active' : '' }} main-link">
+        <a href="#">
+            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+            Web Defacement
+        </a>
+       <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+            <li style="padding-left:2rem">
+                <a href="{{route('webdefacement_website.index', ['id' => $siteSettings->code])}}">
+                    Website
+                </a>
+            </li>
+
+            <li style="padding-left:2rem">
+                <a href="{{route('webdefacement_server.index', ['id' => $siteSettings->code])}}">
+                    Server
+                </a>
+            </li>
+        </ul>
+    </li> --}}
+
+
+
+
 </ul>

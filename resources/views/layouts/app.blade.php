@@ -280,6 +280,7 @@
 
 <script src="{{ getAsset('js/app.js') }}"></script>
 
+<script src="{{ getAsset('jquery-ui/jquery-ui.js') }}" type="text/javascript"></script>
 <script src="{{ getAsset('js/theme.js') }}"></script>
 
 <script src="{{ getAsset('jquery-easy-loading/dist/jquery.loading.js') }}" type="text/javascript"></script>
@@ -301,7 +302,36 @@
         }
     }
 
-    
+    $(document).ready(function(){
+        var availableTags = [
+            "ActionScript",
+            "AppleScript",
+            "Asp",
+            "BASIC",
+            "C",
+            "C++",
+            "Clojure",
+            "COBOL",
+            "ColdFusion",
+            "Erlang",
+            "Fortran",
+            "Groovy",
+            "Haskell",
+            "Java",
+            "JavaScript",
+            "Lisp",
+            "Perl",
+            "PHP",
+            "Python",
+            "Ruby",
+            "Scala",
+            "Scheme"
+            ];
+            $( "#search_input" ).autocomplete({
+            source: availableTags
+        });
+    });
+
         function f_loading(type, control_id){
             if(type == 1){
                 $('body').loading({

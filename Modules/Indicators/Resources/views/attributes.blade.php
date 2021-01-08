@@ -27,11 +27,11 @@
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
-                    {{-- @if($SiteSettings)
+                    @if($SiteSettings)
                     @foreach($SiteSettings as $SiteSettings_val)
                     <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                     @endforeach
-                    @endif --}}
+                    @endif
                 </select>
             </div>
 
@@ -39,8 +39,8 @@
         <section id="scroll_otx" class="scrollable wrapper bg-white">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <a class="text-muted" href="{{ route('indicators.events') }}">Events</a> 
-                    | 
+                    <a class="text-muted" href="{{ route('indicators.events') }}">Events</a>
+                    |
                     <a href="{{ route('indicators.attributes') }}" class="text-primary">Attributes</a>
                 </div>
                 <div id="hide-search-advance" class="container-fluid" style="padding: 2rem">
@@ -48,21 +48,28 @@
                         <div class="col-md-12">
                             <div class="form-group m-b-md">
                                 <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search">
+                                <input type="text" class="form-control" name="keyword" id="keyword"
+                                    placeholder="Search">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="">Indicator Type</label>
-                                <select name="type[]" id="type" class="select2-option form-control" multiple="multiple">
+                                <select name="type[]" id="type" class="select2-option form-control" multiple="multiple"
+                                    onchange="changeSite(value)">
 
-                                    @if ($otx_type)
+                                    @if ($cursor)
 
-                                    @foreach ($otx_type as $otx_type)
+                                    {{-- @foreach ($otx_type as $otx_type)
                                     <option value="{{$otx_type->name}}">{{$otx_type->name}}</option>
+                                    @endforeach --}}
+                                    @foreach ($cursor as $document) {
+                                    <option value="{{$document->name}}">{{$document->name}}</option>
+                                    }
                                     @endforeach
-
                                     @endif
+
+
 
                                 </select>
                             </div>
@@ -118,7 +125,9 @@
 
                 <section id="scrollable_otx" class="show-indicators">
                     <div id="list_otx"></div>
-                    <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading</div>
+                    <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading&nbsp;<span
+                            class="content-spinner-loading-inline"></span>
+                    </div>
                 </section>
             </section>
         </section>
@@ -149,7 +158,9 @@
 
     var page = 1; 
     var page_stop = true;
+    var ck = 1;
 
+    var isDateSearch = false;
     load_more(page);
     $('#scroll_otx').scroll(function(event) {
             let scrolltop = $('#scroll_otx').scrollTop();
@@ -157,12 +168,22 @@
             let docu_height = $(document).height();
 
         if($('#scroll_otx').scrollTop() + $('#scroll_otx').height() >= $(document).height()) {
-            page++;
 
             if(page_stop){
-                {{--load_more(page);--}}
-                load_more_search(page,f_search);
+                
+                if(ck == 1) {
+                    page = page+1;
+                    load_more_search(page,f_search);
+                    
+                    ck++;
+                    
+                }
+
+                setTimeout(function(){ 
+                
+                }, 10000);
             }
+            
         }
     });
 
@@ -178,6 +199,8 @@
         $('#date').select2({
             placeholder: 'Role',
         });
+
+        
     });
 
 
@@ -190,7 +213,7 @@
             startDate = start;
             endDate = end;
         }
-
+        
         $('#indicator_date').daterangepicker({
             timePicker: true,
             startDate: start,
@@ -207,6 +230,14 @@
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
         }, cb);
+        $('#indicator_date').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = true;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+            }
+        });
+        
+        
 
         cb(start, end);
 
@@ -225,14 +256,18 @@
 
 
         });
+
         $("#search_data").click(function() {
-        keywords = $('#keyword').val();
-        type = $('#type').val();
-        f_search = 1;
-        page = 1;
-        $('#count_news').text(0);
-        page_stop = true;
-        load_more_search(page,f_search);
+           
+            keywords = $('#keyword').val();
+            type = $('#type').val();
+            f_search = 1;
+            page = 1;
+            {{--$('#count_news').text(0);--}}
+            page_stop = true;
+            load_more_search(page,f_search);
+        
+       
           
 
 
@@ -242,19 +277,15 @@
 
 
     function sort_by(event) {
-    target = event.target.innerHTML;
-    page = 1;
-    page_stop = true;
-    if(f_search == 0){
-
-        load_more(page);
-    }else{
-        load_more_search(page,f_search);
-
-        
+        target = event.target.innerHTML;
+        page = 1;
+        page_stop = true;
+        if(f_search == 0){
+            load_more(page);
+        }else{
+            load_more_search(page,f_search);
+        }
     }
-    
-}
 
     
 
@@ -279,20 +310,30 @@
             },
         }).done(function(data){
             {{--loading('stop_load');--}}
+
             if(data.html.length == 0){
-                
+                ck = 0;
                 page_stop = false;
                 $('.ajax-loading').hide();
+                f_loading_stop(1);
                 $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
+            }else{
+                ck = 1;
+                f_loading_stop(1);
+                $('#count_otx').text("We've found "+data.count+" indicators" );
+                $('.ajax-loading').hide();
+                $("#list_otx").append(data.html);  
+
             }
-            $('#count_otx').text("We've found "+data.count+" indicators" );
-            $('.ajax-loading').hide();
-            $("#list_otx").append(data.html);   
+             
         }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.ajax-loading').hide();
             console.log("No response from server");
         });
     }
+
+    
     function load_more_search(page,f_search){
         if(page == 1) {
             $("#list_otx").html('');   
@@ -313,34 +354,47 @@
                 keywords:keywords,
                 type:type,
                 f_search:f_search,
+                isDateSearch:isDateSearch,
                 target:target,
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
-                {{--loading('load');--}}
                 $('.ajax-loading').show();
+                {{--loading('load');--}}
+                
             },
         }).done(function(data){
+            if(page == 1) {
+                $("#list_otx").html('');   
+            }
             {{--loading('stop_load');--}}
             if(data.html.length == 0){
-                page_stop = false;
                 $('.ajax-loading').hide();
+                ck = 0;
+                page_stop = false;
                 $('#count_otx').text("We've found "+data.count+" indicators");
                 return;
             }
-
+            ck = 1;
             let count_n = $('#count_otx').text();
             let count_search = data.count;
             let count_n_all = parseInt(count_n) + parseInt(count_search);
             {{--$('#count_otx').text(data.count);--}}
             $('#count_otx').text("We've found "+data.count+" indicators");
             $('.ajax-loading').hide();
-            $('.ajax-loading').addClass('d-none');
+            {{--$('.ajax-loading').addClass('d-none');--}}
             $("#list_otx").append(data.html);   
         }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.ajax-loading').hide();
             console.log("No response from server : search");
         });
     }
+
+    function changeSite(value) {
+        console.log($('#type').val());
+   
+
+   }
 
    
 

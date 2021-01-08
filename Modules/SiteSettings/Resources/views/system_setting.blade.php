@@ -11,7 +11,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3">@langapp('settings')  </p>
+                        <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -27,7 +27,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting > {{$siteSettings->name}}</div>
                 </header>
                 <section class="scrollable wrapper">
@@ -35,7 +35,13 @@
                         <div class="col-lg-12">
                             {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT']) !!}
                             <section class="panel panel-default">
-                            <header class="panel-heading">@icon('solid/cogs') System Details  </header>
+                            <header class="panel-heading font-bold panel-header-blue">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        @icon('solid/cogs') System Settings
+                                    </div>
+                                </div>
+                            </header>
                             <input type="hidden" name="page_setting" value="system_settings">
                             <div class="panel-body">
                                 <div class="form-group row">

@@ -1,9 +1,9 @@
-<div class="modal-dialog">
+<div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         @if($type == 'hosting')
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">@langapp('hosting_account')  </h4>
+            <div class="modal-header bg-blue">
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">@langapp('hosting_account')  </h4>
             </div>
             <div class="modal-body">
                 <ul class="list-group no-radius">

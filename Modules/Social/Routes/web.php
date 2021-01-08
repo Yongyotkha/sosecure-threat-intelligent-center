@@ -17,5 +17,6 @@ Route::group(
         Route::get('/jqueryLoadMoreNewsBookmark', 'SocialController@jqueryLoadMoreNewsBookmark')->name('social.jqueryLoadMoreNewsBookmark');
         Route::get('/jqueryLoadMoreNews', 'SocialController@jqueryLoadMoreNews')->name('social.jqueryLoadMoreNews');
         Route::get('/bookmark', 'SocialController@bookmark')->name('social.bookmark');
+        Route::get('/add_read', 'SocialController@add_read')->name('social.add_read');
     }
 );

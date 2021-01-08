@@ -10,7 +10,7 @@
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                    <p class="h3">@langapp('settings')  </p>
+                    <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -26,9 +26,6 @@
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     <div class="bc-head">Site Setting > ธนาคารออมสิน</div>
-                    <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a>
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
@@ -82,14 +79,15 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 
     <!-- Modal Add Domain -->
-    <div class="modal modal-slide" id="add-domain" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal in fixed-left" id="add-domain" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Add Domain</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Domain
+                    </h4>
                 </div>
                 {{-- <form action=""> --}}
                 {!! Form::open(['route' => 'domain.api.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
@@ -344,6 +342,7 @@
 @include('stacks.js.fullscreen')
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
+@include('stacks.js.fullscreen')
 
 <script>
     $(document).ready(function () {

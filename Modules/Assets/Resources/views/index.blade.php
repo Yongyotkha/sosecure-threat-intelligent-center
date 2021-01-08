@@ -97,7 +97,7 @@
             </header>
 
             <section class="scrollable wrapper">
-                <div class="hide-fillter" style="margin-bottom: 1rem;background:#fff;padding:1rem;">
+                <div class="hide-fillter" style="margin-bottom: 1rem;display:none;background:#fff;padding:1rem;">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
@@ -134,77 +134,92 @@
                 </div>
 
                 <section class="panel panel-default">
-                    <table class="table table-striped table-bordered" id="table-assets-template">
-                        <thead>
-                            <tr>
-                                <th class="no-sort">
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>Site Name</th>
-                                <th>Asset</th>
-                                <th>Referent</th>
-                                <th style="width: 20px" class="text-center">Status</th>
-                                <th style="width: 20px" class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    ออมสิน
-                                </td>
-                                <td>
-                                    secureserver.net
-                                </td>
-                                <td>
-                                    <ul class="asset-list-tb">
-                                        <li>Ip-166-62-28-135.ip.secureserver.net</li>
-                                        <li>admin.sosecure.co.th</li>
-                                    </ul>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge badge-success">Active</span>
-                                </td>
-                                <td class="no-wrap">
-                                    <button type="submit" class="btn btn-sm btn-info m-xs">
-                                        <span>@icon('solid/edit')
-                                    </button>
-    
-                                    <button type="submit" class="btn btn-sm btn-danger m-xs">
-                                        <span>@icon('solid/trash-alt')
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    ออมสิน
-                                </td>
-                                <td>
-                                    secureserver.net
-                                </td>
-                                <td>
-                                    <ul class="asset-list-tb">
-                                        <li>Ip-166-62-28-135.ip.secureserver.net</li>
-                                        <li>admin.sosecure.co.th</li>
-                                    </ul>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge badge-danger">Inactive</span>
-                                </td>
-                                <td class="no-wrap">
-                                    <button type="submit" class="btn btn-sm btn-info m-xs">
-                                        <span>@icon('solid/edit')
-                                    </button>
-    
-                                    <button type="submit" class="btn btn-sm btn-danger m-xs">
-                                        <span>@icon('solid/trash-alt')
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Assets
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body">
+                        <table class="table table-striped table-bordered" id="table-assets-template">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>Site Name</th>
+                                    <th>Asset</th>
+                                    <th>Referent</th>
+                                    <th style="width: 20px" class="text-center">Status</th>
+                                    <th style="width: 20px" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        ออมสิน
+                                    </td>
+                                    <td>
+                                        secureserver.net
+                                    </td>
+                                    <td>
+                                        <ul class="asset-list-tb">
+                                            <li>Ip-166-62-28-135.ip.secureserver.net</li>
+                                            <li>admin.sosecure.co.th</li>
+                                        </ul>
+                                    </td>
+                                    <td class="text-center">
+                                        -
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-success">Active</span>
+                                    </td>
+                                    <td class="no-wrap">
+                                        <button type="submit" class="btn btn-sm btn-info m-xs">
+                                            <span>@icon('solid/edit')
+                                        </button>
+        
+                                        <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                            <span>@icon('solid/trash-alt')
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        ออมสิน
+                                    </td>
+                                    <td>
+                                        secureserver.net
+                                    </td>
+                                    <td>
+                                        <ul class="asset-list-tb">
+                                            <li>Ip-166-62-28-135.ip.secureserver.net</li>
+                                            <li>admin.sosecure.co.th</li>
+                                        </ul>
+                                    </td>
+                                    <td class="text-center">
+                                        -
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-danger">Inactive</span>
+                                    </td>
+                                    <td class="no-wrap">
+                                        <button type="submit" class="btn btn-sm btn-info m-xs">
+                                            <span>@icon('solid/edit')
+                                        </button>
+        
+                                        <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                            <span>@icon('solid/trash-alt')
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
             </section>
@@ -214,15 +229,16 @@
 
 
         <!-- Modal Scans -->
-        <div class="modal modal-slide" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        <div class="modal in fixed-left" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered size-half-50" role="document">
+        <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Asset To Use</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Asset To Use
+                    </h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -241,7 +257,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -264,6 +280,7 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
+@include('stacks.js.fullscreen')
 
 <script>
     $(document).ready(function () {

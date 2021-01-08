@@ -108,6 +108,15 @@ return [
 
     'cipher'          => 'AES-256-CBC',
 
+    'OTX_KEY'         => env('OTX_KEY'),
+    'OTX_KEY_store'   => env('OTX_KEY_store'),
+    'DB_MONGO_DEV'    => env('DB_MONGO_DEV'),
+    'DB_MONGO'        => env('DB_MONGO'),
+    'DB_MONGO_STOREDATA'    => env('DB_MONGO_STOREDATA'),
+    'DARKOWL_PUBLIC_KEY'    => env('DARKOWL_PUBLIC_KEY'),
+    'DARKOWL_PRIVATE_KEY'   => env('DARKOWL_PRIVATE_KEY'),
+    // 'base_url' => '127.0.0.2',
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

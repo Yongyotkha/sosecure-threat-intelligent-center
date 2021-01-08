@@ -11,7 +11,7 @@
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="modal" data-target="#setting-nav">@icon('solid/bars')</a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3">@langapp('settings')  </p>
+                    <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -27,7 +27,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
                 </header>
                 <section class="scrollable wrapper">
@@ -37,7 +37,7 @@
                             {!! Form::open(['route' => ['datasettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             <input type="hidden" name="page_setting" value="site_permission_settings">
                             <section class="panel panel-default">
-                            <header class="panel-heading">@icon('solid/cogs') Permission & Config Settings  </header>
+                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') Permission & Config Settings  </header>
                             <div class="panel-body">
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Permission Menu </label>

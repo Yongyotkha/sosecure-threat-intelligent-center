@@ -23,6 +23,7 @@ Route::group(
         
         Route::get('delete-rss_data/{id}', 'RSSFeedSettingsController@rss_data_delete')->name('rssfeedsettings.rss_data_delete')->middleware('can:menu_items');
         Route::get('delete-rss_news/{id}', 'RSSFeedSettingsController@rss_news_delete')->name('rssfeedsettings.rss_news_delete')->middleware('can:menu_items');
+        Route::post('delete_checked', 'RSSFeedSettingsController@deleteChecked')->name('RSSFeedSettingsController.delete_checked');
         Route::get('/rss_data/news/create/{code}', 'RSSFeedSettingsController@rss_data_create_news')->name('rssfeedsettings.rss_data_create_news');
         Route::get('/rss_news/news/edit/{code}', 'RSSFeedSettingsController@rss_news_edit_news')->name('rssfeedsettings.rss_news_edit_news');
         Route::get('/rss_news/news/create', 'RSSFeedSettingsController@rss_news_create_news')->name('rssfeedsettings.rss_news_create_news');

@@ -1,5 +1,11 @@
 @extends('layouts.app')
 
+<style>
+    .w100px {
+        width: 100px;
+    }
+</style>
+
 @section('content')
 
 <section id="content" class="bg">
@@ -11,7 +17,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3">@langapp('settings')  </p>
+                        <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -26,11 +32,9 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
-                    <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a>
+
                     <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
@@ -45,10 +49,15 @@
                     <div class="row">
                         <div class="col-lg-12">  
                             <section class="panel panel-default">
-
-                                <form id="frm-domain" method="POST"> 
-                                    <header class="panel-heading">@icon('solid/user') Domain</header>
-                                    <div class="panel-body">
+                                <header class="panel-heading font-bold panel-header-blue">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <i class="fas fa-table"></i> Table Domain
+                                        </div>
+                                    </div>
+                                </header>
+                                <div class="panel-body">
+                                    <form id="frm-domain" method="POST"> 
                                         <div class="table-responsive">
                                             <table  class="table table-striped" id="table-domain-template">
                                                 <thead>
@@ -76,12 +85,8 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                    </div>
-
-                                </form>
-                                {{-- <div class="panel-footer">
-                                
-                                </div> --}}
+                                    </form>
+                                </div>
                             </section>
                         </div>
                     </div>
@@ -133,6 +138,7 @@
         var table = $('#table-domain-template').DataTable({
             processing: true,
             serverSide: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('domainsettings.data') !!}',
                 data: {
@@ -158,12 +164,12 @@
                 {
                     data: 'created_at',
                     name: 'created_at',
-                    className: 'text-center'
+                    className: 'text-center w100px'
                 },
                 {
                     data: 'updated_at',
                     name: 'updated_at',
-                    className: 'text-center'
+                    className: 'text-center w100px'
                 },
                 {
                     data: 'elements',
@@ -173,7 +179,7 @@
                 {
                     data: 'progress',
                     name: 'progress',
-                    className: 'w-10'
+                    className: 'w100px'
                 },
                 {
                     data: 'action',

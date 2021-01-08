@@ -132,7 +132,7 @@ class CategorySettingsController extends Controller
     public function delete(CategorySettings $id)
     {
         $data['categorySettings'] = $id;
-        dd($id);
+        // dd($id);
         return view('categorysettings::modal.delete')->with($data);
     }
 
@@ -263,7 +263,7 @@ class CategorySettingsController extends Controller
             ->editColumn(
                 'chk',
                 function ($categorySettings) {
-                    return '<label><input type="checkbox" name="checked" value="' . $categorySettings->id . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" name="checked" class="categorySettings_id" value="' . $categorySettings->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(

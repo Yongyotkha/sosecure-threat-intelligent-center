@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\ApiController;
 use Modules\Users\Entities\User;
+use App\Menu;
+use App\Menu_sub;
+use App\Menu_permission_site;
+use App\Menu_sub_permission_site;
 use Auth;
 use Hautelook\Phpass\PasswordHash;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +27,9 @@ class AuthController extends ApiController
         }
         
         $value = $request -> data;
+        // dd($value);
         $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+        // dd($data);
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
@@ -37,7 +43,23 @@ class AuthController extends ApiController
                     $token = $this->jwt($user);
                     $user -> access_token = $token;
                     $user -> save();
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user]);
+
+
+                    $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+                    $menu_sub = Menu_sub::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+                    $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
+                    // $Menu_permission_site = Menu_permission_site::all();
+                    $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
+
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site]);
+                    // return response()->json(['message' => 'Successful', 
+                    //                             'error' => '', 
+                    //                             'status_code' => '200', 
+                    //                             'data' => $user,
+                    //                             'menu' => $menu,
+                    //                             'menu_sub' => $menu_sub,
+                    //                             'menu_permission_site' => $Menu_permission_site,
+                    //                             'menu_sub_permission_site' => $Menu_sub_permission_site]);
                 } else{
                     return response()->json(['error' => 'Username or password is incorrect', 'status_code' => '400']);
                 }

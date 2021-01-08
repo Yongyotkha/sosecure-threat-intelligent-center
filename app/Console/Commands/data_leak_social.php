@@ -76,46 +76,86 @@ class data_leak_social extends Command
         // $where = array(
         //     'feedtimestamp' => array('$gt' => $start, '$lt' => $end),
         // );
+
+        $time_stamp_search = new \MongoDB\BSON\UTCDateTime(Carbon::now('UTC')->subDays(1));
+
+        //echo json_encode($time_stamp_search);
+        
         $where = array(
-            'feedcontent' => new \MongoDB\BSON\Regex("PTTGC"),
-            // 'feedcontent' => new \MongoDB\BSON\Regex("PTT"),
+            'feedtimepost' => ['$gt' => $time_stamp_search],
+            //'feedcontent' => ['$regex'=>'PTT', '$options' => 'i'],
+            //'sourceid' => 1,
         );
-        $cursor = $collection->find($where, []);   //This is the main line
+        
+        
+        $cursor = $collection->find($where, ['sort' => ['feedtimepost' => -1]]);   //This is the main line
         $docs = $cursor->toArray();
+
+        $Site_keywords = Site_keywords::where('status', 1)->where('deleted_at', null)->where('type', 'social')->get();
         foreach($docs as $data){
             $source = DataLeakSocial::select('source', 'tag')->find($data -> sourceid);
             $site_id = '';
             $keyword = '';
-            $Site_keywords = Site_keywords::where('status', 1)->where('deleted_at', null)->get();
+            
             foreach($Site_keywords as $item){
-                $site_id .= $item -> site_id . ',';
-                if (strpos($data -> feedcontent, $item -> name) !== false) {
+                // if (strpos($data -> feedcontent, $item -> name) !== false) {
+                //     $keyword .= $item -> name . ',';
+                //     $site_id .= $item -> site_id . ',';
+                // }
+                $pattern = "/\b".$item -> name."\b/";
+                if (preg_match($pattern, $data -> feedcontent)) {
+                    $site_id .= $item -> site_id . ',';
                     $keyword .= $item -> name . ',';
+                    
+                    echo $data -> feedcontent;
+                    $this->info("LINE");
+                    echo $item -> name;
+                  
+                }else{
+
                 }
             }
             $site_id = rtrim($site_id, ",");
             $keyword = rtrim($keyword, ",");
-            if(!empty($site_id) && !empty($keyword)){
-                $DataLeakFeedTemp = new DataLeakFeedTemp();
-                $DataLeakFeedTemp -> data_id = $data -> _id;
-                $DataLeakFeedTemp -> sourceid = $data -> sourceid;
-                $DataLeakFeedTemp -> keyword = $keyword;
-                $DataLeakFeedTemp -> source_name = $source -> source;
-                $DataLeakFeedTemp -> tag = $source -> tag;
-                $DataLeakFeedTemp -> feedtimepost = Carbon::now();
-                $DataLeakFeedTemp -> feedcontent = $data -> feedcontent;
-                $DataLeakFeedTemp -> feedtimestamp = Carbon::now();
-                $DataLeakFeedTemp -> feedlink = $data -> feedlink;
-                $DataLeakFeedTemp -> feeduser = $data -> feeduser;
-                $DataLeakFeedTemp -> save();
-
-                $leak_socail_ref_temp = new leak_socail_ref_temp();
-                $leak_socail_ref_temp -> data_leak_feed_id = $DataLeakFeedTemp -> id;
-                $leak_socail_ref_temp -> site_id = $site_id;
-                $leak_socail_ref_temp -> keyword = $keyword;
-                $leak_socail_ref_temp -> status = 1;
-                $leak_socail_ref_temp -> save();
+           
+            try {
+                if(!empty($keyword)){
+                    $DataLeakFeedTemp = DataLeakFeedTemp::where('data_id', $data -> _id)->where('sourceid', $data -> sourceid)
+                        ->where('keyword', $keyword)->where('feedlink', $data -> feedlink)->first();
+                    if (!$DataLeakFeedTemp){
+                        $DataLeakFeedTemp = new DataLeakFeedTemp();
+                        $DataLeakFeedTemp -> data_id = $data -> _id;
+                        $DataLeakFeedTemp -> sourceid = $data -> sourceid;
+                        $DataLeakFeedTemp -> keyword = $keyword;
+                        $DataLeakFeedTemp -> source_name = $source -> source;
+                        $DataLeakFeedTemp -> tag = $source -> tag;
+                        $DataLeakFeedTemp -> feedtimepost = Carbon::now();
+                        $DataLeakFeedTemp -> feedcontent = $data -> feedcontent;
+                        $DataLeakFeedTemp -> feedtimestamp = Carbon::now();
+                        $DataLeakFeedTemp -> feedlink = $data -> feedlink;
+                        $DataLeakFeedTemp -> feeduser = $data -> feeduser;
+                        $DataLeakFeedTemp -> save();
+                    }
+                }
+                if(!empty($site_id) && !empty($keyword)){
+                    $find_leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp -> id)->where('site_id', $site_id)
+                    ->where('keyword', $keyword)->first();
+                    if (!$find_leak_socail_ref_temp){
+                        $leak_socail_ref_temp = new leak_socail_ref_temp();
+                        $leak_socail_ref_temp -> data_leak_feed_id = $DataLeakFeedTemp -> id;
+                        $leak_socail_ref_temp -> site_id = $site_id;
+                        $leak_socail_ref_temp -> keyword = $keyword;
+                        $leak_socail_ref_temp -> status = 1;
+                        $leak_socail_ref_temp -> save();
+                    }
+                    echo "SAVE";
+                }
             }
+            catch (\Exception $ex) {
+                echo "ERROR ERROR";
+                echo json_encode($ex->getMessage());
+            }
+
         } 
     }
 }

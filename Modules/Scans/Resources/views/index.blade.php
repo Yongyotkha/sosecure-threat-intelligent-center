@@ -7,12 +7,12 @@
             @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">Scans</div>
-            <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                 title="@langapp('export') CSV">
                 @icon('solid/download') CSV
-            </a>
+            </a> --}}
             <a href="#" class="btn btn-sm btn-default pull-right">
-                <i class="fa fa-sync-alt"></i>
+                <i class="fa fa-sync-alt"></i> Refresh
             </a>
             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                 <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
@@ -25,30 +25,39 @@
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table-scans-template">
-                        <thead>
-                            <tr>
-                                <th class="no-sort">
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>Site Name</th>
-                                <th>Domain</th>
-                                <th>Started</th>
-                                <th>Finished</th>
-                                <th>Elements</th>
-                                <th>Progress</th>
-                                {{-- <th>Status</th> --}}
-                                <th class="no-sort" width="10%">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Scans
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-scans-template">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>Site Name</th>
+                                    <th>Domain</th>
+                                    <th>Started</th>
+                                    <th>Finished</th>
+                                    <th>Elements</th>
+                                    <th>Progress</th>
+                                    {{-- <th>Status</th> --}}
+                                    <th class="no-sort" width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </section>
@@ -56,15 +65,16 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
     <!-- Modal Scans -->
-    <div class="modal modal-slide" id="scans_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal in fixed-left" id="scans_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">RSS Feed</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        RSS Feed
+                    </h4>
                 </div>
                 <form action="">
                     <div class="modal-body">
@@ -167,7 +177,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                             <i class="fas fa-times"></i>
                             Close
                         </button>
@@ -194,6 +204,7 @@
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
+@include('stacks.js.fullscreen')
 
 <script>
     $(document).ready(function () {
@@ -226,6 +237,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 contentType: "application/json",
                 dataType: 'JSON',

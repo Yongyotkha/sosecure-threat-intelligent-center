@@ -1,15 +1,32 @@
+@php
+// dd($otx_events[0]['name']);
+@endphp
+
+
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
+            @if ($indicator)
+            <a href="{{ route('indicators.detail_indicator').'?id='.$indicator_id.'&type='.$type.'&indicator='.$indicator }}"
+                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+            </a>
+            <div class="bc-head">{{@$indicator}} > {{@$otx_events[0]['name']}}</div>
+            @else
             <a href="{{ route('indicators.events') }}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
-            <div class="bc-head">Events > SSH-US...</div>
+            <div class="bc-head">Events > {{@$otx_events[0]['name']}}</div>
+            @endif
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+
+
+
+
+            <!--<button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span>@langapp('Search_Advance')</span>
             </button>
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
@@ -21,39 +38,44 @@
                     @endforeach
                     @endif --}}
                 </select>
-            </div>
+            </div>-->
 
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a> 
-                    | 
-                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
+                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
+                    {{-- |
+                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a> --}}
                 </div>
                 <div class="container-fluid" style="padding: 2rem">
                     <div class="row">
                         <div class="col-md-6">
-                            <h1>SSH - US Honeypot loCs 2020-12-04</h1>
-                            <p>Last Status : Modified | Public : <i class="fas fa-check"></i></p>
-                            <p>Created : 2020-12-12 11:12 | Modified : 2020-12-11:12</p>
-                            <p>Daily SSH brutefoce logs from a honeypot in the US on a/32</p>
-                            <p>Tags : <a href="">honeypot</a>,<a href="">ssh</a>,<a href="">cowrie</a></p>
-                            <p>Groups : <a href="">honeypot</a>,<a href="">ssh</a>,<a href="">cowrie</a></p>
+                            <h1>{{@$otx_events[0]['name']}}</h1>
+                            <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public :
+                                {!!check_publish(@$otx_events[0]['public'])!!}</p>
+                            <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified :
+                                {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
+                            <p>Tags : {!!explode_val(@$otx_events[0]['tags'],'tags')!!}</p>
+                            <p>Groups : {!!explode_val(@$otx_events[0]['groups'],'groups')!!}</p>
                         </div>
                         <div class="col-md-6">
-                            <h1 class="text-center">Type Attributes 5 (5210)</h1>
+                            <h1 class="text-center">Type Attributes {{@$indicator_type_counts}}
+                                ({{@$otx_events[0]['indicator_count']}})
+                            </h1>
                             <div id="chart-show-bar"></div>
                         </div>
                     </div>
-                </div>        
+                </div>
             </section>
 
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
-                    <li class="active"><a href="#tab_attributes" data-toggle="tab">Attributes (442)</a></li>
-                    <li id="tab-bookmark"><a href="#tab_related_event" data-toggle="tab">Related Event (905)</a></li>   
+                    <li id="tab-attributes" class="active"><a href="#tab_attributes" data-toggle="tab">Attributes
+                            ({{@$otx_events[0]['indicator_count']}})</a></li>
+                    <li id="tab-event"><a href="#tab_related_event" data-toggle="tab">Related Event
+                            ({{@$count_related_pulse}})</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_attributes">
@@ -64,44 +86,29 @@
                                         <table class="table table-striped" id="table-attributes-template">
                                             <thead>
                                                 <tr>
-                                                    <th>
+                                                    {{-- <th>
                                                         <label>
-                                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                            <input name="select_all" value="1" id="select-all"
+                                                                type="checkbox" />
                                                             <span class="label-text"></span>
                                                         </label>
-                                                    </th>
+                                                    </th> --}}
                                                     <th>TYPE</th>
                                                     <th>Attribute Name</th>
                                                     <th>ROLE</th>
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
-                                            </thead>   
+                                            </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <label>
-                                                            <input value="" type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </td>
-                                                    <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.</a></td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                                    </td>
-                                                </tr>    
-                                            </tbody> 
+                                            </tbody>
                                         </table>
                                     </div>
+                                    <div id="showing_amount_text" class="pull-left"
+                                        style="margin-top: 5px; margin-left: 15px;"></div>
+                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom">
+                                    </div>
                                 </div>
-                            </div>
                         </section>
                     </div>
                     <div class="tab-pane" id="tab_related_event">
@@ -112,114 +119,32 @@
                                         <table class="table table-striped" id="table-related-event">
                                             <thead>
                                                 <tr>
-                                                    <th>
-                                                        <label>
-                                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </th>
-                                                    <th>TYPE</th>
-                                                    <th>Attribute Name</th>
-                                                    <th>ROLE</th>
-                                                    <th>Date</th>
+
+                                                    <th>No</th>
+                                                    <th>Event Name</th>
+                                                    <th>Group</th>
+                                                    <th>Tags</th>
+                                                    <th>Published</th>
+                                                    <th>Last Status</th>
+                                                    <th style="width: 200px;">DateTime</th>
+                                                    <th>View</th>
                                                     <th>Action</th>
                                                 </tr>
-                                            </thead>   
+                                            </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <label>
-                                                            <input value="" type="checkbox" />
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </td>
-                                                    <td>FileHash-SHA256</td>
-                                                    <td><a href="">Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.</a></td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        -
-                                                    </td>
-                                                    <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                                    </td>
-                                                </tr>    
-                                            </tbody> 
+
+                                            </tbody>
                                         </table>
                                     </div>
+                                    <div id="showing_amount_text_pulse" class="pull-left"
+                                        style="margin-top: 5px; margin-left: 15px;"></div>
+                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom_pulse">
+                                    </div>
                                 </div>
-                            </div>
-                        </section>  
+                        </section>
                     </div>
                 </div>
             </div>
-
-            {{-- <section class="panel panel-default">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table-events-template">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </th>
-                                <th>No</th>
-                                <th>Event Name</th>
-                                <th>Group</th>
-                                <th>Tags</th>
-                                <th>Attr</th>
-                                <th>Published</th>
-                                <th>Last Status</th>
-                                <th>DateTime</th>
-                                <th>View</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>   
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <label>
-                                        <input value="" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </td>
-                                <td>1</td>
-                                <td>Suspicious proxy agent</td>
-                                <td>
-                                    <a href="">MIST FEED</a>
-                                    <a href="">Phishing,UW</a>
-                                </td>
-                                <td>
-                                    <a href="">Scan,Agent,</a>
-                                    <a href="">Proxy,Spider</a>
-                                </td>
-                                <td>
-                                    <a href="">5421</a>
-                                </td>
-                                <td>
-                                    <i class="fas fa-check"></i>
-                                </td>
-                                <td>
-                                    Modified
-                                </td>
-                                <td>
-                                    2020-12-07 11:11
-                                </td>
-                                <td>
-                                    152
-                                </td>
-                                <td>
-                                    <a href="" target="_blank" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                            </tr>    
-                        </tbody> 
-                    </table>
-                </div>
-            </section> --}}
-
         </section>
     </section>
 
@@ -244,26 +169,31 @@
 <script>
     $('.select2-option').select2();
 
-    $('#table-attributes-template').DataTable();
-    $('#table-related-event').DataTable();
-
-
+    {{--$('#table-attributes-template').DataTable();
+    $('#table-related-event').DataTable();--}}
+    count_view_event();
+    var pulse_id={!! json_encode($pulse_id) !!};
+    var total_page = 0;
+    var count_page = -1;
+    var count_page2 = -1;
     const chart = new frappe.Chart("#chart-show-bar", { 
         title: "",
         data:{
-            labels: ["IPv4", "URL" , "FileHash-SHA256",],
+            labels: {!! json_encode($countKey) !!},
             datasets: [
-                { values: [254, 2, 185] }
+                { values: {!! json_encode($countVal) !!}}
             ]
         },
         type: 'percentage',
         colors: ['#743ee2']
     });
 
+  
+
   $(function() {
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');
-
+        
         function cb(start, end) {
             $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
             startDate = start;
@@ -289,6 +219,214 @@
 
         cb(start, end);
     });
+
+  
+
+    $(function() {
+        load_table_attributes();
+
+    });
+    
+    $(function() {
+    
+        load_table_pulse();
+    });
+
+    function load_table_attributes(){
+
+      
+       
+        $('#table-attributes-template').DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            dom: 'Blfrtip',
+            ajax: {
+                url: '{!! route('indicators.events_attributes_table')!!}',
+                type: "POST",
+                data:function(d){
+                    d.pulse_id = pulse_id;
+                    d.count_page = count_page;                
+                },
+            },
+            initComplete : function( settings, json){
+                count_page = json.recordsTotal;
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+            columns: [
+
+                {
+                    data: 'TYPE',
+                },
+                {
+                    data: 'Attribute Name',
+                },
+                {
+                    data: 'ROLE',
+                },
+                {
+                    data: 'Date',
+                },
+                {
+                    data: 'Action',
+                },
+
+            ],
+            columnDefs: [
+ 
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="'+row.Action+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
+        });
+    }
+
+    
+
+  
+
+    function load_table_pulse(){
+
+        $('#table-related-event').DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('indicators.events_pulse_table')!!}',
+                dataSrc: function ( json ) {
+                    count_page2 = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    d.pulse_id = pulse_id;
+                    d.count_page = count_page2;
+                }
+            },
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+
+            columns: [
+
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'count_view',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+
+            ],
+            columnDefs: [
+
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times"></i>';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
+                    }
+                      
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        return inner;
+                    }
+                      
+                }
+
+            ]
+        });
+    
+    }
+
+    function count_view_event(){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/indicators/count_view_event",
+            type: "get",
+            data: ({
+                pulse_id:{!! json_encode($pulse_id) !!},
+            }),
+            datatype: "html",
+            beforeSend: function(){
+            },
+        }).done(function(data){
+            console.log("sss");
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+
+    
+
+            
 </script>
 
 @endpush

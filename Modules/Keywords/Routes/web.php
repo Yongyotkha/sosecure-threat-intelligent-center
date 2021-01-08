@@ -20,5 +20,6 @@ Route::group(
         Route::get('/dataleak/social/edit/{id}', 'KeywordsController@edit')->name('KeywordsController.edit')->middleware('can:menu_items');
         Route::get('/dataleak/social/delete/{id}', 'KeywordsController@delete')->name('KeywordsController.delete')->middleware('can:menu_items');
         Route::delete('/dataleak/social/delete_process/{id}', 'KeywordsController@delete_process')->name('KeywordsController.delete_process');
+        Route::post('/dataleak/social/delete_checked', 'KeywordsController@delete_checked')->name('KeywordsController.delete_checked');
     }
 );

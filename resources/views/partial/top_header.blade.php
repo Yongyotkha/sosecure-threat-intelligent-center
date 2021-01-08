@@ -5,7 +5,8 @@
                 @icon('solid/bars')
             </a>
             <a href="{{  url('/')  }}" class="navbar-brand">
-                @php $display = get_option('logo_or_icon'); @endphp
+                <img src="{{asset('images/logo_threat/logo.png')}}" class="m-r-sm" onerror="setDefaultPic(this)">
+                {{-- @php $display = get_option('logo_or_icon'); @endphp
                 @if ($display == 'logo' || $display == 'logo_title')
                 <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="m-r-sm" onerror="setDefaultPic(this)">
                 @elseif ($display == 'icon' || $display == 'icon_title')
@@ -17,7 +18,8 @@
                 @else
                 {{ get_option('website_name') }}
                 @endif
-                @endif
+                @endif --}}
+                {{-- <span class="md-text-logo"> SOSECURE <br> <span class="sm-text-logo"> Threat inSight </span> </span> --}}
             </a>
             <a class="btn btn-link visible-xs" data-toggle="dropdown" data-target=".nav-user">
                 @icon('solid/cog')
@@ -37,9 +39,9 @@
                     <a href="{{ route('calendar.appointments') }}" class="m-l" data-rel="tooltip" title="@langapp('appointments') " data-placement="bottom">
                         @icon('solid/calendar-check')
                     </a>  --}}
-                    <a class="btn btn-link" id="collapse-menu">
+                    {{-- <a class="btn btn-link" id="collapse-menu">
                         @icon('solid/bars')
-                    </a>
+                    </a> --}}
                 </div>
             </li>
         </ul>
@@ -53,8 +55,9 @@
                             <span class="input-group-btn icon-search">
                                 <i class="fas fa-search"></i>
                             </span>
-                            <input type="text" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword">
-                            
+                            <div class="autocomplete">
+                                <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword">
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -62,7 +65,7 @@
             @endadmin
         </ul>
 
-        <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
+        <ul class="nav navbar-nav navbar-right hidden-xs nav-user" style="margin-top: 1rem;">
 
             @if(count(runningTimers()) > 0)
             <li class="">
@@ -88,12 +91,12 @@
                 <ul class="dropdown-menu animated fadeInRight">
                     <li class="arrow top"></li>
                     <li><a href="{{ route('users.profile') }}">@langapp('settings')</a></li>
-                    <li><a href="{{ route('tell.friend') }}" data-toggle="ajaxModal">@langapp('tell_friend')  </a></li>
-                    <li><a href="{{ route('users.reminders') }}">@langapp('reminders')</a></li>
+                    {{-- <li><a href="{{ route('tell.friend') }}" data-toggle="ajaxModal">@langapp('tell_friend')  </a></li>
+                    <li><a href="{{ route('users.reminders') }}">@langapp('reminders')</a></li> --}}
                     <li><a href="{{ route('users.notifications') }}">@langapp('notifications') </a></li>
-                    <li><a href="{{ route('extras.user.templates') }}">@langapp('canned_responses')</a></li>
+                    {{-- <li><a href="{{ route('extras.user.templates') }}">@langapp('canned_responses')</a></li> --}}
                     @admin
-                    <li><a href="{{ route('support.ticket') }}" data-toggle="ajaxModal">Need Help?</a></li>
+                    {{-- <li><a href="{{ route('support.ticket') }}" data-toggle="ajaxModal">Need Help?</a></li> --}}
                     @endadmin
                     <li class="divider"></li>
                     @if(Auth::user()->isImpersonating())

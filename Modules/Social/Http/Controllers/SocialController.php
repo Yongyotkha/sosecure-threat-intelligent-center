@@ -147,11 +147,11 @@ class SocialController extends Controller
         // date("H:i", strtotime("04:25 PM"))
         $html = '';
 
-        $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->count();
+        $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->count();
 
         if(($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) && $request -> f_search == 1){
 
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1);//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social');//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
             if($request -> title){
                 $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
             }
@@ -206,7 +206,7 @@ class SocialController extends Controller
             $Data_leak_feed_all = $news->count();
             $news = $news->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
         }
 
         // dd($news);
@@ -231,11 +231,11 @@ class SocialController extends Controller
 
             
             $count_view = 0;
-            if($data -> get_social) {
-                foreach($data -> get_social as $view_val) {
-                    $count_view += $view_val->view;
-                }
-            }
+            // if($data -> get_social) {
+            //     foreach($data -> get_social as $view_val) {
+            //         $count_view += $view_val->view;
+            //     }
+            // }
 
             $check_read_news = Read_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
             $checkBookmark = Bookmarks_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
@@ -259,13 +259,13 @@ class SocialController extends Controller
                                     <a href="#">'.$data -> source_name.'</a>
                                 </span>
                                 <h3 style="font-size: 16px;">
-                                    <a href="'.$data -> feedlink.'" target="_blank">
+                                    <a href="'.$data -> feedlink.'" target="_blank" onclick="add_read('.$data -> id.')">
                                     '.$n_title.'
                                     </a>
                                 </h3>
                                 <div class="entry-meta">
                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
-                                    <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
+                                    <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
                                 </div>
                                 <!--<div class="description-text hidden-xs">
                                 <span><p>&nbsp;'.strip_tags($n_title).'</p></span>
@@ -365,7 +365,8 @@ class SocialController extends Controller
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
         $html = '';
-        $Bookmark = Bookmarks_social::orderBy('created_at','desc')->get();
+        $Bookmark = Bookmarks_social::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();//->paginate(PAGINATE_NUM);//->get()
+        // $Bookmark = Bookmarks_social::orderBy('created_at','desc')->get();
         foreach($Bookmark as $data){
             $count_view = 0;
             if($data -> data_leak_feed) {
@@ -391,23 +392,34 @@ class SocialController extends Controller
                         <span class="label-text checkbox-news-input"></span>
                     </label>
                 </div>-->
-                <div class="content-news-text">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> data_leak_feed -> code]).'">
-                        <span class="head-news-text">'.$data -> data_leak_feed -> feedcontent.'</span>
-                    </a>
-                    <div class="entry-meta">
-                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> data_leak_feed -> feedtimepost.'</span>
-                        <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
-                        <span><p></p>&nbsp;'.strip_tags($data -> data_leak_feed -> feedcontent).'</p></span>
+
+                <article class="def-rlt">
+                    <div class="entry">
+                        <span class="entry-category">
+                            <a href="#">'.@$data -> data_leak_feed -> source_name.'</a>
+                        </span>
+                        <h3 style="font-size: 16px;">
+                            <a href="'.@$data -> data_leak_feed -> feedlink.'" target="_blank">
+                            '.@$data -> data_leak_feed -> feedcontent.'
+                            </a>
+                        </h3>
+                        <div class="entry-meta">
+                            <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> data_leak_feed -> feedtimepost.'</span>
+                            <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
+                        </div>
+                        <!--<div class="description-text hidden-xs">
+                        <span><p>&nbsp;'.strip_tags(@$data -> data_leak_feed -> feedcontent).'</p></span>
+                        </div>-->
                     </div>
-                </div>
+                </article>
+
                 <!--<div class="content-news-image">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> data_leak_feed -> code]).'">
-                        <img src="'.$data -> data_leak_feed -> logo.'" alt="">
+                    <a href="'.route('news.news_detail_code',['code' => @$data -> data_leak_feed -> code]).'">
+                        <img src="'.@$data -> data_leak_feed -> logo.'" alt="">
                     </a>
                 </div>-->
                 <div class="action-bookmark">';
-                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$data -> data_leak_feed -> id.'" onclick="Bookmarks(this, '.$data -> data_leak_feed -> id.')"></i>';
+                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.@$data -> data_leak_feed -> id.'" onclick="Bookmarks(this, '.@$data -> data_leak_feed -> id.')"></i>';
                     $html .= '</div>
             </div>
             ';
@@ -433,5 +445,58 @@ class SocialController extends Controller
             $Bookmark -> save();
         }
         return response()->json(); 
+    }
+
+    public function add_read(Request $request) {
+        $addread = $request->addread;
+
+        try {
+            //  Block of code to try
+        
+
+            if($addread) {
+                $RSSNews = Data_leak_feed::where("id",$addread)->first();
+
+                $RSSNews->view = $RSSNews->view+1;
+                $RSSNews->save();
+
+                $Read_social_check = Read_social::where("id",$addread)->where('user_id',@Auth::user()->id)->first();
+                if($Read_social_check) {
+
+                } else {
+                    $Read_social = new Read_social;
+                    $Read_social->code = generator_uuid();
+                    $Read_social->site_id = @Auth::user()->site_id;
+                    $Read_social->user_id = @Auth::user()->id;
+                    $Read_social->data_leak_feed_id = $addread;
+                    $Read_social->status = 1;
+                    $Read_social->save();
+                }
+    
+            }
+
+
+            if ($request->ajax()) {
+                $data = [
+                    "message" => '',
+                    "success" => true
+                ];
+            }
+
+        }
+        catch(\Exception $e) {
+        //  Block of code to handle errors
+            $data = [
+                "message" => $e->getMessage(),
+                "success" => false
+            ];
+        }
+
+        if ($request->ajax()) {
+        
+            return response()->json($data); 
+        }
+
+        // dd($addread);
     }
 }

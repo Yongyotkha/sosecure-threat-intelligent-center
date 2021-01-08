@@ -1,3 +1,9 @@
+@php
+use App\Menu;
+$menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+// dd($menu);
+@endphp
+
 {{-- <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav"> --}}
 <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav">
     <section class="vbox">
@@ -39,6 +45,11 @@
         <section class="w-f scrollable">
             <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="5px">
                 
+
+                {{-- @php
+                    get_menu_html();
+                @endphp --}}
+
                 <nav class="nav-primary hidden-xs">
                     {{-- <ul class="nav">
 
@@ -92,6 +103,186 @@
                     </ul> --}}
 
                     <ul class="nav">
+
+                        @php
+                            // $menu = [];
+                            $menu_html = '';
+                        // if(isset($_SESSION["menu"])){
+                            // unset($_SESSION["lastname"]);
+                            // $menu = $_SESSION["menu"];
+
+                            $check_menu_active_arr = '';
+                            $check_menu_active_sub_arr = '';
+                            if($menu) {
+                                foreach($menu as $menu_val) {
+                                    $active = '';
+                                    $url = '#';
+                                    $check_menu_active = '';
+                                    $name_val = '';
+                                    
+                                    if($menu_val->url) {// url
+                                        if($menu_val->type_url == 'site_url') {
+                                            $url = site_url($menu_val->url);
+                                        } else if ($menu_val->type_url == 'route') {
+                                            $url = route($menu_val->url);
+                                        }
+                                    }
+
+                                    if($menu_val->check_menu_active) {// check active
+                                        if($menu_val->type_check_menu_active == 'langapp') {
+                                            $check_menu_active = langapp($menu_val->check_menu_active);
+                                            if($check_menu_active) {
+                                                $check_menu_active_arr = explode(",",$check_menu_active);
+                                                // if(count($check_menu_active_arr) > 0) {
+                                                //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                //         $check_menu_active_arr_val
+                                                //     }
+                                                // }
+                                            }
+
+                                        } else if ($menu_val->type_check_menu_active == '') {
+                                            if($menu_val->check_menu_active) {
+                                                $check_menu_active_arr = explode(",",$menu_val->check_menu_active);
+                                            //     if(count($check_menu_active_arr) > 0) {
+                                            //         foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                            //             $check_menu_active_arr_val
+                                            //         }
+                                            //     }
+                                            }
+                                            // $check_menu_active = $menu_val->check_menu_active;
+                                        }
+                                    }
+
+                                    // dd($check_menu_active_arr);
+
+                                    if($check_menu_active_arr) {
+                                        foreach($check_menu_active_arr as $check_menu_active_val) {
+                                            // dd($check_menu_active_val);
+                                            if($page == $check_menu_active_val) {
+                                                // dd($check_menu_active_val);
+                                                $active = 'active';
+                                            }
+                                        }
+                                    }
+
+                                    
+
+                                    if($menu_val->langapp) {//ชื่อเมนู
+                                        $name_val = langapp($menu_val->langapp);
+                                    }
+
+                                    if(@$menu_val->get_menu_sub) {
+
+
+                                        
+                                        $menu_sub_html = '';
+                                        foreach($menu_val->get_menu_sub as $menu_sub_val) {
+
+
+                                            $active_sub = '';
+                                            $url_sub = '#';
+                                            $check_menu_active_sub = '';
+                                            $name_val_sub = '';
+                                            
+
+                                            if($menu_sub_val->url) {// url
+                                                if($menu_sub_val->type_url == 'site_url') {
+                                                    $url_sub = site_url($menu_sub_val->url);
+                                                } else if ($menu_sub_val->type_url == 'route') {
+                                                    $url_sub = route($menu_sub_val->url);
+                                                }
+                                            }
+
+                                            if($menu_sub_val->check_menu_active) {// check active
+                                                if($menu_sub_val->type_check_menu_active == 'langapp') {
+                                                    $check_menu_active_sub = langapp($menu_sub_val->check_menu_active);
+                                                    if($check_menu_active_sub) {
+                                                        $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
+                                                        // if(count($check_menu_active_arr) > 0) {
+                                                        //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                        //         $check_menu_active_arr_val
+                                                        //     }
+                                                        // }
+                                                    }
+
+                                                } else if ($menu_sub_val->type_check_menu_active == '') {
+                                                    $check_menu_active_sub = $menu_sub_val->check_menu_active;
+                                                    if($check_menu_active_sub) {
+                                                        $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
+                                                        // if(count($check_menu_active_arr) > 0) {
+                                                        //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                        //         $check_menu_active_arr_val
+                                                        //     }
+                                                        // }
+                                                    }
+
+                                                }
+                                            }
+
+                                            if($check_menu_active_sub_arr) {
+                                                foreach($check_menu_active_sub_arr as $check_menu_active_sub_val) {
+                                                    // dd($check_menu_active_sub_val);
+                                                    if($page == $check_menu_active_sub_val) {
+                                                        // dd($check_menu_active_sub_val);
+                                                        $active_sub = 'active';
+                                                    }
+                                                }
+                                            }
+
+
+
+
+                                            if($menu_sub_val->langapp) {//ชื่อเมนู
+                                                $name_val_sub = langapp($menu_sub_val->langapp);
+                                            }
+
+
+
+
+                                            $menu_sub_html .= '<li class="'. $active_sub .'">
+                                                                    <a href="'. $url_sub .'">
+                                                                        <i class="'.$menu_sub_val->icon.'"><b class="bg-info"></b></i>
+                                                                        <span>'.$name_val_sub.'</span>
+                                                                    </a>
+                                                                </li>';
+                                        }
+
+                                    }
+                                        if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
+                                            $is_have_sub = '<a href="'. $url .'" class="'. @$active_sub .'">
+                                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                                <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                                                <i class="fas fa-angle-up text-active"></i></span>
+                                                                <span> '.$name_val.' </span>
+                                                            </a>
+                                                        <ul class="nav lt">'.$menu_sub_html.'</ul>
+                                                        ';
+                                        } else {
+                                            $is_have_sub = '<a href="'. $url .'" class="'. $active .'">
+                                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                                    
+                                                                <span> '.$name_val.' </span>
+                                                            </a>';
+                                        }
+                                            
+
+                                    
+                           
+
+                                    $menu_html .=    '<li class="'. $active .'">
+                                                        '.$is_have_sub.'
+                                                      </li>';
+
+                                }
+
+                                echo $menu_html;
+                            }
+
+                        // }
+
+                        @endphp
+
+                    <!-- Start
                         <li class="{{ $page === langapp('dashboard') ? 'active' : '' }}">
                             <a href="{{ site_url('/dashboardnew') }}">
                                 <i class="fas fa-home icon"><b class="bg-info"></b></i>
@@ -360,6 +551,7 @@
                                 </li>
                             </ul>
                         </li>
+                   End Menu -->
 
                     </ul>
                 </nav>
@@ -383,7 +575,7 @@
         </section>
         <footer class="footer lt hidden-xs b-t b-dark website-by" id="changeLanguages">
             <span>
-                Powered By <a href="">Sosecure</a> v1.0.1
+                Powered By <a href="">SOSECURE</a> v1.0.1
                 {{-- {{ getCurrentVersion()['version']  }} --}}
             </span>
             {{-- <a class="pull-right btn btn-sm btn-dark btn-icon" data-toggle="class:nav-xs" href="#nav">

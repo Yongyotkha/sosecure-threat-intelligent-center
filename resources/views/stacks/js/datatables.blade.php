@@ -9,6 +9,14 @@
         $.fn.dataTable.moment('{{ $sort }} HH:mm');
 
         $.extend( true, $.fn.dataTable.defaults, {
+        buttons: [
+            {
+                extend:    'csvHtml5',
+                text:      '<i class="fas fa-download"></i> CSV',
+                titleAttr: 'CSV'
+            },
+          
+        ],
         "processing": true,
         "deferRender": true,
         "autoWidth": false,

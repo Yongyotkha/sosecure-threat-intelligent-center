@@ -44,7 +44,7 @@ class DataSettingsController extends Controller
     public function datasetting($id)
     {
         $get_data = $this->siteSettings->get_data($id);
-        $Menu = Menu::all();
+        $Menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
         $data['site_user_limit_default'] = DB::table("config")->where("config_key","site_user_limit_default")->first();
         $data['site_domain_limit_default'] = DB::table("config")->where("config_key","site_domain_limit_default")->first();
         $data['site_asset_limit_default'] = DB::table("config")->where("config_key","site_asset_limit_default")->first();

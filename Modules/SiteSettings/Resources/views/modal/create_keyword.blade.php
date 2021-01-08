@@ -1,4 +1,4 @@
-<div class="modal-dialog">
+<div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -13,13 +13,16 @@
                     <input type="text" name="name" class="form-control">
                 </div>
             </div>
-            {{-- <div class="form-group row">
-                <label class="col-lg-4 control-label">Domain <span class="text-danger">*</span> </label>
-                <div class="col-lg-8">
-                    <input type="text" name="domain" class="form-control">
-                </div>
-            </div> --}}
 
+            <div class="form-group row">
+                <label class="col-lg-4 control-label">Type <span class="text-danger">*</span> </label>
+                <div class="col-lg-8">
+                    <select name="type" id="type" class="select2-option form-control select-site" style="min-width: 300px;">
+                        <option  value="social">Social</option>
+                        <option  value="darkweb">Dark Web</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Status </label>
