@@ -104,7 +104,7 @@ class WebDefacementUpdateOriginalAll extends Command
               }
 
               $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-              $path_include = base_path().'\\public\\screenshot\\use\\DownloadImage.php';
+              $path_include = base_path().'/public/screenshot/se/DownloadImage.php';
               include_once($path_include);
               $downloadImg = new \DownloadImage();
               $Path_image = base_path()."/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
