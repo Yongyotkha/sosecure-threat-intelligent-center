@@ -164,12 +164,12 @@ class WebDefacementController extends Controller
         $name_web = $request->name_web;
         $url_web = $request->url_web;
         $port_web = $request->port_web;
-        $hash = $request->hash;
-        $file_size = $request->file_size;
-        $element = $request->element;
-        $blacklist = $request->blacklist;
+        $hash = ($request->hash == 'true') ? 1 : 0;
+        $file_size = ($request->file_size == 'true') ? 1 : 0;
+        $element = ($request->element == 'true') ? 1 : 0;
+        $blacklist = ($request->blacklist == 'true') ? 1 : 0;
         $blacklist_text = $request->blacklist_text;
-        $delay_screen_shot = $request->delay_screen_shot;
+        $delay_screen_shot = ($request->delay_screen_shot == 'true') ? 1 : 0;
         $delay_screenshot_val = $request->delay_screenshot_val;
         $site_id = $request->site_id;
 
