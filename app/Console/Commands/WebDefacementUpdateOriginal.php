@@ -2,13 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Exception;
-use GuzzleHttp\Client;
-use Illuminate\Console\Command;
-use MongoDB\BSON\UTCDateTime;
 use App\Console\Commands\compareImages;
-use Modules\WebDefacement\Entities\WebdefacmentSetting;
+use Illuminate\Console\Command;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
+use Modules\WebDefacement\Entities\WebdefacmentSetting;
+
 class WebDefacementUpdateOriginal extends Command
 {
     /**
@@ -25,7 +23,7 @@ class WebDefacementUpdateOriginal extends Command
      * @var string
      */
     protected $description = 'WebDefacementUpdateOriginal {webdefacment_id}';
-    private $hashingAlgorithm  = 'md5';
+    private $hashingAlgorithm = 'md5';
     /**
      * Create a new command instance.
      *
@@ -36,7 +34,6 @@ class WebDefacementUpdateOriginal extends Command
       parent::__construct();
     }
 
-    
     /**
      * Execute the console command.
      *
@@ -131,7 +128,13 @@ class WebDefacementUpdateOriginal extends Command
 
        //$result['blacklist'] = $blackListFound;
 
+                    }
+                    if ($WebdefacmentSetting_data->element == 1) {
+                        $allElement = preg_match_all('/<([^\/!][a-z1-9]*)/i', $webContent, $matches);
+                        $result['all_element'] = (int) $allElement;
 
+                    }
+                    if ($WebdefacmentSetting_data->image_check == 1) {
 
             $WebdefacmentDataOriginal_data->hash = $result['hash_code'];
             $WebdefacmentDataOriginal_data->filesize = $result['file_size'];
@@ -154,13 +157,37 @@ class WebDefacementUpdateOriginal extends Command
 
          }
 
+                    }
 
+                    $result_checkDomainHeaders = $this->checkDomainHeaders($url, 1);
+                    $result_URL_404 = $this->URL_404($url);
+                    $result["DomainHeaders"] = $result_checkDomainHeaders;
+                    $result["Is_URL_404"] = $result_URL_404;
+                    // $blackListFound = $this->trackKeyWords($webContent,$WebdefacmentSetting_data->blacklist_keyword_content,$Keyword_check);//keyword
 
+                    //$result['blacklist'] = $blackListFound;
 
+                    $WebdefacmentDataOriginal_data->hash = $result['hash_code'];
+                    $WebdefacmentDataOriginal_data->filesize = $result['file_size'];
+                    $WebdefacmentDataOriginal_data->element = $result['all_element'];
+                    $WebdefacmentDataOriginal_data->image = $result['image_url'];
+                    $WebdefacmentDataOriginal_data->part_image = $result['image_path_original'];
+                    $WebdefacmentDataOriginal_data->last_update = date("Y-m-d H:i:s");
+                    $WebdefacmentDataOriginal_data->updated_at = date("Y-m-d H:i:s");
+                    $WebdefacmentDataOriginal_data->save();
 
+                    $parse = \parse_url($url);
+                    $host = $parse['host']; // prints 'google.com'
 
+                    $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
+                    $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
+                    $WebdefacmentSetting_data->domain = $host;
+                    $WebdefacmentSetting_data->save();
 
+                    $result["Result"] = 1;
+                    $result["message"] = "The url is not formatted.";
 
+                }
 
        }else{
          $result["Result"] = 0;
@@ -181,8 +208,8 @@ class WebDefacementUpdateOriginal extends Command
         // $imgSourcePath = PATH_CAPTURE_SCREEN.'/'.$imgSourcePath;
         // $imgComparePath = PATH_CAPTURE_SCREEN.'/'.$imgComparePath;
 
-    $imgSourcePath = $dirPath.$imgSourcePath;
-    $imgComparePath = $dirPath.$imgComparePath;
+        $imgSourcePath = $dirPath . $imgSourcePath;
+        $imgComparePath = $dirPath . $imgComparePath;
 
         // $imgSourcePath = "D:\ทดสอบรูปภาพ\\2017-06-14-02-43-01408692.jpg";
         //$imgComparePath =  "D:\ทดสอบรูปภาพ\\2017-06-15-20-37-12458813.jpg";
@@ -210,10 +237,10 @@ class WebDefacementUpdateOriginal extends Command
   }
   private function getHtml($url) {
 
-        // you can add some code to extract/parse response number from first header. 
+        // you can add some code to extract/parse response number from first header.
         // For example from "HTTP/1.1 200 OK" string.
 
-    $content =$this->get_dataa($url);
+        $content = $this->get_dataa($url);
 
     return array(
       'content' => $content
@@ -324,6 +351,10 @@ class WebDefacementUpdateOriginal extends Command
       else
         return $var;
     }
+    public function URL_404($url)
+    {
+        $handle = curl_init($url);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
   }
   function URL_404($url) {
