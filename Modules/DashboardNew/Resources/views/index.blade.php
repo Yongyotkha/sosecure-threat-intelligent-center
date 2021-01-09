@@ -403,13 +403,26 @@
                     let html = ``;
                     for(let i in result.data){
                         const data = result.data[i];
+                        let raw_data;
+                        let referent;
+                        if(data.raw_data){
+                            raw_data = data.raw_data;
+                        }else{
+                            raw_data = 'No data';
+                        }
+                        if(data.referent){
+                            referent = data.referent;
+                        }else{
+                            referent = 'No data';
+                        }
+
                         html += `
                         <tr>
                             <td>
-                                <span>${data.raw_data}</span>
+                                <span>${raw_data}</span>
                             </td>
                             <td>
-                                <span>${data.referent}</span>
+                                <span>${referent}</span>
                             </td>
                             <td>
                                 <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
