@@ -12,10 +12,9 @@ use Carbon\Carbon;
 use Modules\Social\Entities\Data_leak_social;
 use Modules\Social\Entities\Data_leak_feed;
 
-use Modules\Darkweb\Entities\Bookmarks_compromised;
+use Modules\DarkWeb\Entities\Bookmarks_compromised;
 use Modules\Social\Entities\Read_social;
 use Illuminate\Support\Facades\Auth;
-
 class DarkWebController extends Controller
 {
     /**

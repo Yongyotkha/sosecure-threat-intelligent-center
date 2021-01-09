@@ -11,6 +11,7 @@ use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentImageMark;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
+use Modules\WebDefacement\Entities\WebdefacmentDataLog;
 
 
 class WebDefacementProccess extends Command
@@ -344,22 +345,55 @@ class WebDefacementProccess extends Command
           }
           $WebdefacmentDataCheck_save->save();
           $WebdefacmentSetting_update =   WebdefacmentSetting::find($webdefacment_id);
-          if ($status == 'Normal') {
-            $WebdefacmentSetting_update->webdeflacement_progress = 1;
-          }else{
-            $WebdefacmentSetting_update->webdeflacement_progress = 3;
-          }
           
-          $WebdefacmentSetting_update->image_last = $result['image_url'];
-          $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
-          $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
-          $WebdefacmentSetting_update->status_val = $status;
-          $WebdefacmentSetting_update->image_original = $result['image_url'];
-          $WebdefacmentSetting_update->save();
-          print_r($result);
+          if ($status == 'Normal' || $status == 'Meduim') {
+            $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
+            if ($status == 'Meduim') {
+             $WebdefacmentDataLog_save = new WebdefacmentDataLog;
+             $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
+             $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
+             $WebdefacmentDataLog_save->message ='hash:'.$WebdefacmentDataCheck_save->hash_new.'(percent:$WebdefacmentDataCheck_save->hash_percent%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|filesize:'.$WebdefacmentDataCheck_save->filesize_new.'(percent:$WebdefacmentDataCheck_save->filesize_percent%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|element:'.$WebdefacmentDataCheck_save->element_new.'(percent:$WebdefacmentDataCheck_save->element_percent%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|image:'.$WebdefacmentDataCheck_save->image_new.'(percent:$WebdefacmentDataCheck_save->image_percent%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|blacklistKeywords:'.$
+             $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
+             $WebdefacmentDataLog_save->status_val  =  $status;
+             $WebdefacmentDataLog_save->save();
+           }
+         }else{
+          $WebdefacmentSetting_update->webdeflacement_progress = 3;
+          $WebdefacmentDataLog_save = new WebdefacmentDataLog;
+          $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
+          $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
+          $WebdefacmentDataLog_save->message ='hash:'.$WebdefacmentDataCheck_save->hash_new.'(percent:$WebdefacmentDataCheck_save->hash_percent%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|filesize:'.$WebdefacmentDataCheck_save->filesize_new.'(percent:$WebdefacmentDataCheck_save->filesize_percent%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|element:'.$WebdefacmentDataCheck_save->element_new.'(percent:$WebdefacmentDataCheck_save->element_percent%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|image:'.$WebdefacmentDataCheck_save->image_new.'(percent:$WebdefacmentDataCheck_save->image_percent%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|blacklistKeywords:'.$
+          $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
+          $WebdefacmentDataLog_save->status_val  =  $status;
+          $WebdefacmentDataLog_save->save();
 
         }
+        
+        $WebdefacmentSetting_update->image_last = $result['image_url'];
+        $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
+        $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
+        $WebdefacmentSetting_update->status_val = $status;
+        $WebdefacmentSetting_update->image_original = $result['image_url'];
+        $WebdefacmentSetting_update->blacklist_keyword_current = $WebdefacmentDataCheck_save->keyword;
+        $WebdefacmentSetting_update->save();
+
+
+
+
+
+        print_r($result);
+
+
+      }
 
 
 
@@ -369,15 +403,15 @@ class WebDefacementProccess extends Command
 
 
 
-      }else{
+    }else{
         // $result["Result"] = 0;
         // $result["messes "] = "The url is not formatted.";
-      }
-    }else{
+    }
+  }else{
       // $result["Result"] = 0;
       // $result["messes "] = "No data found.";
-    }
   }
+}
 
 
 
