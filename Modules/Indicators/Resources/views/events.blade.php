@@ -91,12 +91,12 @@
                             </div>
                             <div class="card-ev-body">
                                 <div class="ev-left">
-                                    <span>418</span>
+                                    <span>{{ @$attr_all->event_count }}</span>
                                     <span>All</span>
                                 </div>
                                 <div class="ev-right">
-                                    <span>141</span>
-                                    <span>New Event</span>
+                                    <span>{{ @$attr_current->event_count }}</span>
+                                    <span>Current</span>
                                 </div>
                             </div>
                         </div>
@@ -108,12 +108,12 @@
                             </div>
                             <div class="card-ev-body">
                                 <div class="ev-left">
-                                    <span>418</span>
+                                    <span>{{ @$attr_all->attribute_count }}</span>
                                     <span>All</span>
                                 </div>
                                 <div class="ev-right">
-                                    <span>141</span>
-                                    <span>New Attribute</span>
+                                    <span>{{ @$attr_current->attribute_count }}</span>
+                                    <span>Current</span>
                                 </div>
                             </div>
                         </div>
@@ -332,9 +332,14 @@ const chart = new Highcharts.chart('chart-pack', {
 
     $(function() {
         load_table(1);
+        console.log(load_graph());
     });
 
+    function load_graph() {
+        var graph = {!!json_encode(@$attr_type)!!};
+        return graph;
 
+    }
 
     function load_table(page=1){
         $('#table_events').DataTable({
