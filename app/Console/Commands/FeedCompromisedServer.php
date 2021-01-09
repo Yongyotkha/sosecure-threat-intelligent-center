@@ -101,8 +101,8 @@ class FeedCompromisedServer extends Command
         //     $return_value = $ssh->exec($cmd);
         // }
         // $line = $this->user_exec_mod($return_value)[0];
-        // $datail = $this->get_exec_subdetail($line,$ssh);
-        // echo json_encode($datail);
+        // $detail = $this->get_exec_subdetail($line,$ssh);
+        // echo json_encode($detail);
 
     }
 
@@ -122,34 +122,36 @@ class FeedCompromisedServer extends Command
                 $rand = rand(0,30000);
                 $rand = $rand+30000;
                 usleep($rand);
-                $datail = $this->get_exec_subdetail($line,$ssh);
+                $detail = $this->get_exec_subdetail($line,$ssh);
                 $CompromisedFileOriginal = new CompromisedFileOriginal;
-                $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $datail["file_path"])->where('site_id', $server->site_id)->first();
-                if($datail["file_name"]!=''){
+                $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
+                if($detail["file_name"]!=''){
                     if (!$CompromisedFileOriginal){
                         $CompromisedFileOriginal = new CompromisedFileOriginal;
                         $CompromisedFileOriginal->code = generator_uuid();
                         $CompromisedFileOriginal->compromised_server_id = $server->id;
-                        $CompromisedFileOriginal->file_name = $datail["file_name"];
-                        $CompromisedFileOriginal->file_extension = $datail["file_extenstion"];
-                        $CompromisedFileOriginal->file_path = $datail["file_path"];
-                        $CompromisedFileOriginal->file_size = $datail["file_size"];
-                        $CompromisedFileOriginal->file_modified = $datail["file_modified"];
-                        $CompromisedFileOriginal->file_hash = $datail["file_hash"];
+                        $CompromisedFileOriginal->file_name = $detail["file_name"];
+                        $CompromisedFileOriginal->file_extension = $detail["file_extenstion"];
+                        $CompromisedFileOriginal->file_path = $detail["file_path"];
+                        $CompromisedFileOriginal->file_size = $detail["file_size"];
+                        $CompromisedFileOriginal->file_modified = $detail["file_modified"];
+                        $CompromisedFileOriginal->file_hash = $detail["file_hash"];
                         $CompromisedFileOriginal->file_status = 1;
                         $CompromisedFileOriginal->active = 1;
                         $CompromisedFileOriginal->site_id = $server->site_id;
                         $CompromisedFileOriginal->save();
+                        $status_active = $this->checkAlgorithmAndSave($server,$detail);
                     }else{
-                        $status_active = $this->checkAlgorithmAndSave($server,$datail);
-                        if($CompromisedFileOriginal->file_modified==$datail["file_modified"]){
+                        
+                        if($CompromisedFileOriginal->file_modified==$detail["file_modified"]){
                             $CompromisedFileOriginal->file_status = 2;
                             $CompromisedFileOriginal->save();
                         }else{
-                            if($CompromisedFileOriginal->file_hash!=$datail["file_hash"]){
-                                $CompromisedFileOriginal->file_size = $datail["file_size"];
-                                $CompromisedFileOriginal->file_modified = $datail["file_modified"];
-                                $CompromisedFileOriginal->file_hash = $datail["file_hash"];
+                            if($CompromisedFileOriginal->file_hash!=$detail["file_hash"]){
+                                $status_active = $this->checkAlgorithmAndSave($server,$detail);
+                                $CompromisedFileOriginal->file_size = $detail["file_size"];
+                                $CompromisedFileOriginal->file_modified = $detail["file_modified"];
+                                $CompromisedFileOriginal->file_hash = $detail["file_hash"];
                                 $CompromisedFileOriginal->file_status = 3;
                                 
                                 $CompromisedFileOriginal->save();
@@ -196,7 +198,7 @@ class FeedCompromisedServer extends Command
         }
     }
 
-    private  function checkAlgorithmAndSave($server,$datail) {
+    private  function checkAlgorithmAndSave($server,$detail) {
         //implode (",", $blackListFoundString);//insert
         $blacklistKeywords = $server->blacklist_keyword;
         $blackListFoundString = array();
@@ -204,34 +206,34 @@ class FeedCompromisedServer extends Command
 
         if (!empty($blacklistKeywords)) {
             //$totalConfig += 1;
-            $blackListFound = $this->trackKeyWords($datail["file_content"], $blacklistKeywords,[]);
+            $blackListFound = $this->trackKeyWords($detail["file_content"], $blacklistKeywords,[]);
             if (count($blackListFound) > 0){
                 foreach($blackListFound as $value) {
                     array_push($blackListFoundString,$value["key"]."(Position:[".$value["value"]."])");
                 }
+                $this->saveBlacklistKeyword($server,$detail,'webserver','keyword',$blackListFoundString);
             }
-
-
         }
 
-        echo json_encode($blackListFoundString);
+        //echo json_encode($blackListFoundString);
         return 0;
     }
 
-    private  function saveBlacklistKeyword($server,$detail,$keyword,$blackListFoundString) {
+    private  function saveBlacklistKeyword($server,$detail,$feedtype,$keyword,$blackListFoundString) {
 
         $implode_blacklist = implode (",", $blackListFoundString);//insert
-        $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $detail["file_path"])->where('site_id',$server->site_id)->get(); 
+        $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $detail["file_path"])->where('site_id',$server->site_id)->first(); 
         $insertLeak = true;
         //1 path มีได้กี่ check
         if(!$CompromisedFileCheck){
-            $CompromisedFileCheck = new CompromisedFileOriginal;
+            $CompromisedFileCheck = new CompromisedFileCheck;
             $CompromisedFileCheck->code = generator_uuid();
             $CompromisedFileCheck->compromised_server_id = $server->id;
-            $CompromisedFileCheck->file_name = $datail["file_name"];
-            $CompromisedFileCheck->file_extension = $datail["file_extenstion"];
-            $CompromisedFileCheck->file_path = $datail["file_path"];
-            $CompromisedFileCheck->file_size = $datail["file_size"];
+            $CompromisedFileCheck->file_name = $detail["file_name"];
+            $CompromisedFileCheck->file_extension = $detail["file_extenstion"];
+            $CompromisedFileCheck->file_path = $detail["file_path"];
+            $CompromisedFileCheck->file_size = $detail["file_size"];
+            $CompromisedFileCheck->file_modified = $detail["file_modified"];
             $CompromisedFileCheck->defacement_type = $keyword;
             $CompromisedFileCheck->defacment_description = $implode_blacklist;
             $CompromisedFileCheck->file_status = 1;
@@ -246,32 +248,58 @@ class FeedCompromisedServer extends Command
                 $insertLeak = false;
             }else if($CompromisedFileCheck->file_status==1){
                 //status จะเป็น 2 เมือ่ไร
-                $CompromisedFileCheck->file_size = $datail["file_size"];
+                $CompromisedFileCheck->file_size = $detail["file_size"];
                 $CompromisedFileCheck->defacment_description = $implode_blacklist;
                 $CompromisedFileCheck->site_id = $server->site_id;
                 // $CompromisedFileCheck->file_status = 2;
                 $CompromisedFileCheck->save();
             }
 
-            if($insertLeak){
-                $DataLeakFeedCheck = DataLeakFeed::where('data_id', $CompromisedFileCheck->id)
-                ->where('temp_id', $server->id)
-                ->where('feel_type', $keyword)
-                ->where('feedcontent',$server->site_id)->get();
-                if(!$DataLeakFeedCheck){
-
-                }
-
-                $DataLeakSocialRefCheck = DataLeakSocialRef::where('data_leak_feed_id', $DataLeakFeedCheck->id)
-                ->where('site_id', $server->site_id)
-                ->where('temp_id', $server->id)->get();
-                if(!$DataLeakSocialRefCheck){
-
-                }
-            }
+            
 
         }
 
+        if($insertLeak){
+            $DataLeakFeedCheck = DataLeakFeed::where('data_id', $CompromisedFileCheck->id)
+            ->where('temp_id', $server->id)
+            ->where('feel_type', $keyword)
+            ->where('feedcontent',$server->site_id)->first();
+           
+            if(!$DataLeakFeedCheck){
+                $DataLeakFeedCheck = new DataLeakFeed;
+                $DataLeakFeedCheck->code = generator_uuid();
+                $DataLeakFeedCheck->data_id =$CompromisedFileCheck->id;
+                $DataLeakFeedCheck->temp_id =  $server->id;
+                $DataLeakFeedCheck->sourceid = 1000;
+                $DataLeakFeedCheck->keyword = $keyword;
+                $DataLeakFeedCheck->source_name = $detail["file_path"];
+                // $DataLeakFeedCheck->feedtimepost = $detail["file_modified"];
+                $DataLeakFeedCheck->feedtimepost = date("Y-m-d H:i:s");
+                $DataLeakFeedCheck->feedtimestamp = date("Y-m-d H:i:s");
+                $DataLeakFeedCheck->feedcontent = $implode_blacklist;
+                $DataLeakFeedCheck->status = 1;
+                $DataLeakFeedCheck->feel_type = $feedtype;
+                $DataLeakFeedCheck->view = 0;
+                $DataLeakFeedCheck->save();
+            }
+
+            $DataLeakSocialRefCheck = DataLeakSocialRef::where('data_leak_feed_id', $DataLeakFeedCheck->id)
+            ->where('site_id', $server->site_id)
+            ->where('temp_id', $server->id)->first();
+            if(!$DataLeakSocialRefCheck){
+                $DataLeakSocialRefCheck = new DataLeakSocialRef;
+                $DataLeakSocialRefCheck->code = generator_uuid();
+                $DataLeakSocialRefCheck->temp_id = $server->id;
+                $DataLeakSocialRefCheck->data_leak_feed_id =  $DataLeakFeedCheck->id;
+                $DataLeakSocialRefCheck->site_id = $server->site_id;
+                $DataLeakSocialRefCheck->keyword = $keyword ;
+                $DataLeakSocialRefCheck->status = 1;
+                $DataLeakSocialRefCheck->feel_type = $feedtype;
+                $DataLeakSocialRefCheck->view = 0;
+                $DataLeakSocialRefCheck->save();
+
+            }
+        }
         return 0;
     }
 
