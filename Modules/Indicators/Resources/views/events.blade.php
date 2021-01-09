@@ -220,63 +220,40 @@
 <script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
 <script>
 
-const chart = Highcharts.chart('chart-pack', {
+const chart = new Highcharts.chart('chart-pack', {
   chart: {
-    type: 'timeline',
+    type: 'bar',
     height: '125px'
-  },
-  accessibility: {
-    screenReaderSection: {
-      beforeChartFormat: '<h5>{chartTitle}</h5>' +
-        '<div>{typeDescription}</div>' +
-        '<div>{chartSubtitle}</div>' +
-        '<div>{chartLongdesc}</div>' +
-        '<div>{viewTableButton}</div>'
-    },
-    point: {
-      valueDescriptionFormat: '{index}. {point.label}. {point.description}.'
-    }
-  },
-  xAxis: {
-    visible: false
-  },
-  yAxis: {
-    visible: false
   },
   title: {
     text: null
   },
-  subtitle: {
-    text: null
+  xAxis: {
+    categories: ['test']
   },
-  colors: [
-    '#4185F3',
-    '#427CDD',
-    '#406AB2',
-    '#3E5A8E',
-    '#3B4A68',
-    '#363C46'
-  ],
+  yAxis: {
+    min: 0,
+    title: {
+      text: null
+    }
+  },
+  legend: {
+    reversed: true
+  },
+  plotOptions: {
+    series: {
+      stacking: 'normal'
+    }
+  },
   series: [{
-    data: [{
-      name: 'First dogs',
-      description: '22 July 1951 First dogs in space (Dezik and Tsygan) '
-    }, {
-      name: 'Sputnik 1',
-      description: '4 October 1957 First artificial satellite. First signals from space.'
-    }, {
-      name: 'First human spaceflight',
-      description: 'First human spaceflight (Yuri Gagarin), and the first human-crewed orbital flight'
-    }, {
-      name: 'First human on the Moon',
-      description: 'First human on the Moon, and first space launch from a celestial body other than the Earth. First sample return from the Moon'
-    }, {
-      name: 'China',
-      description: 'Salyut 1 was the first space station of any kind, launched into low Earth orbit by the Soviet Union on April 19, 1971.'
-    }, {
-      name: 'Other',
-      description: 'The mission included both joint and separate scientific experiments, and provided useful engineering experience for future joint US–Russian space flights, such as the Shuttle–Mir Program and the International Space Station.'
-    }]
+    name: 'Chaina',
+    data: [1]
+  }, {
+    name: 'United State',
+    data: [1]
+  }, {
+    name: 'Other',
+    data: [1]
   }]
 });
 
