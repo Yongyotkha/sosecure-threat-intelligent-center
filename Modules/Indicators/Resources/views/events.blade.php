@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="ev-right">
                                     <span>141</span>
-                                    <span>Current</span>
+                                    <span>New Event</span>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                                 </div>
                                 <div class="ev-right">
                                     <span>141</span>
-                                    <span>Current</span>
+                                    <span>New Attribute</span>
                                 </div>
                             </div>
                         </div>
