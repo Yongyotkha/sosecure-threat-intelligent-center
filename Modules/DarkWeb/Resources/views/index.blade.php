@@ -83,10 +83,10 @@
             <div class="container-fluid" style="margin-bottom:10px;">
                 <div class="row">
                     <div class="col-md-4 nopadding">
-                        <div class="card-dash bg-dark-blue none-shadow">
+                        <div class="card-dash none-bg none-shadow">
                             <div class="left-card">
                                 <div class="img-icon-card ice">
-                                    <img src="{{asset('images/iceberg1.png')}}" alt="">
+                                    <img src="{{asset('images/iceberg2.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text text-white text-upper ">Public</h3>
                                 <span class="number-card warning" id='compromise-count'>0</span>
@@ -94,10 +94,10 @@
                         </div>
                     </div>
                     <div class="col-md-4 nopadding">
-                        <div class="card-dash bg-dark-blue none-shadow">
+                        <div class="card-dash none-bg none-shadow">
                             <div class="left-card">
                                 <div class="img-icon-card ice">
-                                    <img src="{{asset('images/iceberg2.png')}}" alt="">
+                                    <img src="{{asset('images/iceberg1.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text text-white text-upper">Dark Web</h3>
                                 <span class="number-card info"  id='darkweb-count'>0</span>
@@ -105,7 +105,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 nopadding">
-                        <div class="card-dash bg-dark-blue none-shadow">
+                        <div class="card-dash none-bg none-shadow">
                             <div class="left-card">
                                 <div class="img-icon-card ice">
                                     <img src="{{asset('images/webserver.png')}}" alt="">

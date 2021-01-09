@@ -27,13 +27,13 @@
 
         </header>
         <section class="scrollable wrapper">
-            <section id="area_search" class="panel panel-default">
+            <section id="hide-advance-search" class="panel panel-default" style="display: none;">
                 {{-- <div class="panel-heading">
                     <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
                     |
                     <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
                 </div> --}}
-                <div id="hide-advance-search" class="container-fluid" style="padding: 2rem; display: none;">
+                <div class="container-fluid" style="padding: 2rem;">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
@@ -81,6 +81,20 @@
                     </div>
                 </div>
             </section>
+
+            <div class="container-fluid" style="margin-bottom:10px;">
+                <div class="row">
+                    <div class="col-md-3 nopadding">
+
+                    </div>
+                    <div class="col-md-3 nopadding">
+
+                    </div>
+                    <div class="col-md-6 nopadding">
+
+                    </div>
+                </div>
+            </div>
 
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
