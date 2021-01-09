@@ -8,6 +8,8 @@ use Illuminate\Routing\Controller;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Auth;
+use Artisan;
 
 class WebDefacementController extends Controller
 {
@@ -47,12 +49,18 @@ class WebDefacementController extends Controller
         // dd($code);
         $data['page'] = langapp('webdefacement');
         $data['code'] = @$code;
-        $data['webdefacement'] = WebdefacmentSetting::where("code",$code)->first();
+        $data['webdefacement'] = WebdefacmentSetting::where("code",$code)
+        ->where("hash",1)
+        ->where("filesize",1)
+        ->where("element",1)
+        ->where("blacklist_keyword",1)
+        ->where("image_check",1)
+        ->first();
         $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original_detail[0];
         $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check_detail[0];
         $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log_detail;
 
-        //    dd( $data['webdefacment_data_original']);
+            // dd( $data['webdefacement']->blacklist_keyword_content);
         
 
 
@@ -151,14 +159,14 @@ class WebDefacementController extends Controller
         }
 
         if($request->level){
-            if($request->level =='high'){
-                $modal = $modal->where('status_val', 'high');
+            if($request->level =='High'){
+                $modal = $modal->where('status_val', 'High');
             }
-            else if($request->level =='normal'){
-                $modal = $modal->where('status_val', 'normal');
+            else if($request->level =='Normal'){
+                $modal = $modal->where('status_val', 'Normal');
             }
-            else if($request->level =='none'){
-                $modal = $modal->where('status_val', 'none');
+            else if($request->level =='Medium'){
+                $modal = $modal->where('status_val', 'Medium');
             }
             // else{
             //     $modal = $modal;
@@ -211,4 +219,121 @@ class WebDefacementController extends Controller
         }
        
     }
+
+    public function change_status(Request $request)
+    {
+
+        $data = WebdefacmentSetting::where('id', $request->id)->first();
+        $data->webdeflacement_progress = 1;
+        $data->status_val = 'Normal';
+        
+        $data->save();
+
+        $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
+
+        $html='';
+        if ($webdefacement->status_val != 'Normal')   {
+            $html= '<a href="#" id="accept_risk"
+            class="btn btn- '.get_option('theme_color').' btn-sm btn-responsive">
+            Accept Risk
+            </a>';
+        }
+        
+        return ajaxResponse(
+            [
+                'html'  => $html,
+                'message'  => langapp('changes_saved_successful'),
+                // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }  
+
+    public function update_original(Request $request)
+    {
+
+        $webdefacment_id = $request->id;
+
+
+        // dd($port_web);
+        $command = 'app:WebDefacementUpdateOriginal';
+
+        $params = [
+                'webdefacment_id' => $webdefacment_id,
+        ];
+
+            Artisan::call($command, $params);
+            $result = Artisan::output();
+
+        
+        // return ajaxResponse(
+        //     [
+        //         'html'  => $html,
+        //         'message'  => langapp('changes_saved_successful'),
+        //         // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
+        //     ],
+        //     true,
+        //     Response::HTTP_OK
+        // );
+    }  
+
+    public function update_original_detail(Request $request)
+    {
+        $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
+        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->first();
+        $html_h = $webdefacement_original->hash;
+        $html_f = $webdefacement_original->filesize;
+        $html_e = $webdefacement_original->element;
+        $html_b = $webdefacement->blacklist_keyword_content;
+        $html_l = $webdefacement_original->last_update;
+
+
+        
+        return ajaxResponse(
+            [
+                'html_h'  => $html_h,
+                'html_f'  => $html_f,
+                'html_e'  => $html_e,
+                'html_b'  => $html_b,
+                'html_l'  => $html_l,
+                'message'  => langapp('changes_saved_successful'),
+                // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }  
+
+    public function update_image(Request $request)
+    {
+        $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
+
+        if($webdefacement->get_webdefacment_data_original_detail[0]->url_id){
+            $url_id = $webdefacement->get_webdefacment_data_original_detail[0]->url_id;
+        }else{
+            $url_id = 0;
+        }
+      
+        $html = ''; 
+        $site_id = $webdefacement->site_id;
+        $url_web = $webdefacement->url;
+        $port_web = $webdefacement->port;
+        // $url_id = $webdefacement->url_id;
+        $delay_screenshot_val = $webdefacement->delay_screen_shot_val;
+   
+        // dd($port_web);
+        $command = 'app:WebDefacementsCreenshotCheck';
+
+        $params = [
+                'url' => $url_web,
+                'port' => $port_web,
+                'site_id' => $site_id,
+                'url_id' => $url_id,
+                'delay' => $delay_screenshot_val,
+        ];
+
+            Artisan::call($command, $params);
+            $result = Artisan::output();
+    }  
 }

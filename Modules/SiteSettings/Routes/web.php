@@ -150,3 +150,7 @@ Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->na
 Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor')->middleware('can:menu_items');
 
 Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkweb_data_change_status')->name('DataLeakController.darkweb_data_change_status')->middleware('can:menu_items');
+
+
+// Route::post('/webdefacement/detail/update_original', 'WebDefacementController@update_original')->name('webdefacement.update_original')->middleware('can:menu_items');
+// Route::post('/webdefacement/detail/update_image', 'WebDefacementController@update_image')->name('webdefacement.update_image')->middleware('can:menu_items');

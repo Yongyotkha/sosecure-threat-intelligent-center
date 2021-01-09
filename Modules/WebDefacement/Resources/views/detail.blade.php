@@ -12,14 +12,20 @@
             </a>
             @langapp('webdefacement') > {{@$webdefacement->name}}
 
-            <div class="pull-right" style="display: flex;align-items:center;">
+            <div class="pull-right" style="display: flex;align-items:center;" id='load_status'>
                 <span>Status &nbsp;</span>
+                <span id="status_val_webdefacement">
                 {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
+                </span>
                 &nbsp;
-                <a href="#"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
-                    Accept Risk
-                </a>
+                <span id="check_status_val_webdefacement">
+                @if ($webdefacement->status_val != 'Normal')   
+                    <a href="#" id="accept_risk" onclick="accept_risk()"
+                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
+                        Accept Risk
+                    </a>
+                </span>    
+                @endif
             </div>
         </div>
 
@@ -53,14 +59,14 @@
                                 <th>URL</th>
                                 <td>
                                     {{@$webdefacement->url}}
-                                    <a href="{{@$webdefacement->url}}" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
+                                    <a href="{{@$webdefacement->url}}" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
     
                                 </td>
                                 
                             </tr>
                             <tr>
                                 <th>Domain</th>
-                                <td>{{@$webdefacement->domain}}</td>
+                                <td >{{@$webdefacement->domain}}</td>
                             </tr>
                             <tr>
                                 <th>User Agent</th>
@@ -87,11 +93,11 @@
                             </tr>
                             <tr>
                                 <th>Status</th>
-                                <td> {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}</td>
+                                <td id='defacement_status'>{!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}</td>
                             </tr>
                         </table>
                     </div>
-                    <div class="table-responsive">
+                    <div class="table-responsive" id='updateO'>
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -103,25 +109,27 @@
                             <tbody>                  
                                 <tr>
                                     <th>Hash</th>
-                                    <td>{{@$webdefacment_data_original->hash}}</td>
-                                    <td>{{@$webdefacment_data_check->hash_new}}</td>
+                                    <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
+                                    <td>{{@$webdefacment_data_check->hash_new}} ({{@$webdefacment_data_check->hash_percent}}%)</td>
                                 </tr>
                                 <tr>
                                     <th>File Size</th>
-                                    <td>{{@$webdefacment_data_original->filesize}} KB</td>
-                                    <td>{{@$webdefacment_data_check->filesize_new}}</td>
+                                    <td id='FileSize'>{{@formatSizeUnits($webdefacment_data_original->filesize)}}</td>
+                                    <td>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} ({{@$webdefacment_data_check->filesize_percent}}%)</td>
                                 </tr>
                                 <tr>
                                     <th>Element</th>
-                                    <td>{{@$webdefacment_data_original->element}} tag</td>
-                                    <td>{{@$webdefacment_data_check->element_new}}</td>
+                                    <td id='Element'>{{@$webdefacment_data_original->element}}</td>
+                                    <td>{{@$webdefacment_data_check->element_new}} ({{@$webdefacment_data_check->element_percent}}%)</td>
                                 </tr>
                                 <tr>
-                                    <th colspan="3">Blacklist Keyword</th>
+                                    <th>Blacklist Keyword</th>
+                                    <td id='BlacklistKeyword'>{{@$webdefacement->blacklist_keyword_content}}</td>
+                                    <td>{{@$webdefacement->blacklist_keyword_current}}</td>
                                 </tr>
                                 <tr>
-                                    <th>&nbsp;</th>
-                                    <td>{{@$webdefacment_data_original->last_update}}</td>
+                                    <th>Last Update</th>
+                                    <td id='LastUpdate'>{{@$webdefacment_data_original->last_update}}</td>
                                     <td>{{@$webdefacment_data_check->last_update}}</td>
                                 </tr>
                             </tbody>
@@ -129,10 +137,12 @@
                                 <tr>
                                     <th>&nbsp;</th>
                                     <td>
-                                        <button class="btn btn-info">Update Original</button>
+                                        <button class="btn btn-info" onclick="update_original()">Update Original</button>
                                     </td>
                                     <td>
-                                        <button class="btn btn-info">Accept Risk</button>
+                                        {{-- @if ($webdefacement->status_val != 'Normal')
+                                            <span id='check_status_val_current'><button class="btn btn-info"  onclick="accept_risk()">Accept Risk</button></span>
+                                        @endif --}}
                                     </td>
                                 </tr>
                             </tfoot>
@@ -161,9 +171,9 @@
                                 <div class="item-wdfm wdfm-inner half-two">
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
-                                            <div class="wdfm-img">
-                                                <a href="{{asset(@$webdefacment_data_original->image)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacment_data_original->image)}}" onerror="setDefaultPic(this)"/>
+                                            <div class="wdfm-img" id='updateImage_original'>
+                                                <a href="{{asset(@$webdefacement->image_original)}}" data-lightbox="name-img-2">
+                                                    <img src="{{asset(@$webdefacement->image_original)}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -180,7 +190,7 @@
                                             <div class="wdfm-ft-left flex rw">
                                                 <div>Original</div>
                                                 <div>Last Update : {{@$webdefacment_data_original->last_update}}</div>
-                                                <div><button class="btn btn-info">Update</button></div>
+                                                <div><button class="btn btn-info" onclick="update_image()">Update</button></div>
                                             </div>
                                         </div>
                                     </div>
@@ -189,8 +199,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="{{asset(@$webdefacment_data_original->image_new)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacment_data_original->image_new)}}" onerror="setDefaultPic(this)"/>
+                                                <a href="{{asset(@$webdefacement->image_last)}}" data-lightbox="name-img-2">
+                                                    <img src="{{asset(@$webdefacement->image_last)}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -244,9 +254,21 @@
                             @foreach ($webdefacment_data_log as $webdefacment_data_log)
                                 <tr>
                                     <td class="text-center">{!! @$loop->iteration !!}</td>
-                                    <td >{{@$webdefacment_data_log->message}}</td>
-                                    <td class="text-center">{!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}</td>
-                                    <td class="no-wrap">{{@$webdefacment_data_log->updated_date}}</td>
+                                    <td >
+                                        @if ($webdefacment_data_log->message) 
+                                        {!!@$webdefacment_data_log->message!!}
+                                        @else
+                                            -
+                                        @endif 
+                                    </td>
+                                    <td class="text-center">
+                                        @if ($webdefacment_data_log->status_val) 
+                                            {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
+                                        @else
+                                            -
+                                        @endif    
+                                    </td>
+                                    <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -292,6 +314,190 @@
             $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
         }); 
     });
+
+    function accept_risk() { 
+     
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('webdefacement.change_status') }}",
+                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    beforeSend: function(){
+                        $('#load_status').loading('start');
+                    },
+                    success:function(response) {
+                 
+                        
+
+                        $('#status_val_webdefacement').html('{!!@get_webdefacment_status('Normal','color')!!}');
+                        $('#defacement_status').html('{!!@get_webdefacment_status('Normal','color')!!}');
+                        $('#check_status_val_webdefacement').html(response.html);
+               
+                        $('#load_status').loading('stop');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        {{--window.location.href = response.redirect;--}}
+                    },
+                    error: function (error){
+                        $('#load_status').loading('stop');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+      
+                });
+
+            }   
+        })
+    };
+
+    function update_original() { 
+     
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('webdefacement.update_original') }}",
+                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    beforeSend: function(){
+                        $('#updateO').loading('start');
+                        
+                    },
+                    success:function(response) {
+                        $.ajax({
+                            type:"POST",
+                            url:"{{ route('webdefacement.update_original_detail') }}",
+                            data:{id: {!!json_encode($webdefacement->id)!!}},
+                            beforeSend: function(){
+                                
+                            },
+                            success:function(response) {
+                        
+                                $('#Hash').html(response.html_h);
+                                $('#FileSize').html(response.html_f);
+                                $('#Element').html(response.html_e);
+                                $('#BlacklistKeyword').html(response.html_b);
+                                $('#LastUpdate').html(response.html_l);
+                                $('#updateO').loading('stop');
+                                {{--window.location.href = response.redirect;--}}
+                            },
+                            error: function (error){
+                                $('#updateO').loading('stop');
+                                var errors = error.response.data.errors;
+                                var errorsHtml = '';
+                                $.each(errors, function (key, value) {
+                                    errorsHtml += '<li>' + value[0] + '</li>';
+                                });
+                                toastr.error(errorsHtml, '@langapp('response_status') ');
+                            }
+            
+                        });
+
+
+                    
+              
+                        let data = JSON.parse(response);
+        
+                        if(data.Result==1){
+                            toastr.success('Update Success', '@langapp('response_status')');
+                        } else {
+                            toastr.error(data.message, '@langapp('response_status')');
+                        }
+                        
+                        {{--window.location.href = response.redirect;--}}
+                    },
+                    error: function (error){
+                        $('#updateO').loading('stop');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+    
+                });
+
+            }   
+        })
+    };
+
+
+
+    function update_image() { 
+     
+     Swal.fire({
+         title: 'Are you sure?',
+         text: "You won't be able to revert this!",
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonColor: '#3085d6',
+         cancelButtonColor: '#d33',
+         heightAuto: false,
+         confirmButtonText: 'Yes'
+     }).then((result) => {
+         if (result.isConfirmed) {
+             $.ajax({
+                 type:"POST",
+                 url:"{{ route('webdefacement.update_image') }}",
+                 data:{id: {!!json_encode($webdefacement->id)!!}},
+                 beforeSend: function(){
+                    $('#Defacement').loading('start');
+                 },
+                 success:function(response) {
+
+                    let data = JSON.parse(response);
+
+                    $('#updateImage_original').html(`<a href="${base_url}/${data.image_url}" data-lightbox="name-img-2"><img src="${base_url}/${data.image_url}" onerror="setDefaultPic(this)"/>a>`);
+             
+                        $('#Defacement').loading('stop');
+
+                    
+                   
+             
+                    if(data.Result==1){
+                        toastr.success('Update Success', '@langapp('response_status')');
+                    } else {
+                        toastr.error(data.message, '@langapp('response_status')');
+                    }
+                     {{--window.location.href = response.redirect;--}}
+                 },
+                 error: function (error){
+                    ('#updateImage_original').loading('stop');
+                     var errors = error.response.data.errors;
+                     var errorsHtml = '';
+                     $.each(errors, function (key, value) {
+                         errorsHtml += '<li>' + value[0] + '</li>';
+                     });
+                     toastr.error(errorsHtml, '@langapp('response_status') ');
+                 }
+ 
+             });
+
+         }   
+     })
+ };
 </script>
 @endpush
 @endsection
