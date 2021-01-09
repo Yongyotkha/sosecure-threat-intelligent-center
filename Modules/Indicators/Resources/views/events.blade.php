@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="ev-right">
                                     <span>{{ @$attr_current->event_count }}</span>
-                                    <span>Current</span>
+                                    <span>New Event</span>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                                 </div>
                                 <div class="ev-right">
                                     <span>{{ @$attr_current->attribute_count }}</span>
-                                    <span>Current</span>
+                                    <span>New Attribute</span>
                                 </div>
                             </div>
                         </div>
