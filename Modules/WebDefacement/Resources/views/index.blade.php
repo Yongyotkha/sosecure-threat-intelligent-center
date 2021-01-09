@@ -61,9 +61,9 @@
                                 <label for=""  class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                 <div class="col-sm-9 col-xs-12">
                                 <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                                    <option value="high">High</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="none">None</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Normal">Normal</option>
                                 </select>
                                 </div>
                             </div>
@@ -103,16 +103,16 @@
                                     All
                                 </a>
                                 <a href="#" id="high" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot high"></span>
+                                    <span class="dot critical"></span>
                                     High
                                 </a>
-                                <a href="#" id="normal" class="btn-chart white d-il-flex mr-3">
+                                <a href="#" id="medium" class="btn-chart white d-il-flex mr-3">
+                                    <span class="dot high"></span>
+                                    Medium
+                                </a>
+                                <a href="#" id="normal" class="btn-chart white d-il-flex">
                                     <span class="dot low"></span>
                                     Normal
-                                </a>
-                                <a href="#" id="none" class="btn-chart white d-il-flex">
-                                    <span class="dot none"></span>
-                                    None
                                 </a>
                             </div>
                    
@@ -182,7 +182,7 @@
 
     
     function load_card(search_){
-
+        console.log(level);
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -256,15 +256,15 @@
 
 
     $("#high").click(function() { 
-        search ('high');
+        search ('High');
     });
 
     $("#normal").click(function() {
-        search ('normal');
+        search ('Normal');
     });
 
-    $("#none").click(function() {
-        search ('none');
+    $("#medium").click(function() {
+        search ('Medium');
     });
 
     $("#all").click(function() {

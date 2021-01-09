@@ -296,9 +296,9 @@
                         <div class="col-lg-9 review_image_screenshot" style="display: none;">
                             <div class="review-image-capture">
                                 {{-- <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" > --}}
-                                <img src="" id="preview-img-wdfm" >
+                                
                             </div>
-                            <div class="edit-capture text-center">
+                            <div id="link_edit_image_screenshot" class="edit-capture text-center">
                                 {{-- <a href="{{route('webdefacement_website.edit_image',['site_id' => @$siteSettings->id])}}" target="_blank">
                                     Edit Image
                                 </a> --}}
@@ -326,6 +326,7 @@
     </div>
 
     <input type="hidden" id="url_id">
+    <input type="hidden" id="webdefacment_setting_id">
 
 </section>
 
@@ -545,6 +546,9 @@
             }
 
             site_id = '{{$siteSettings->id}}';
+            let webdefacment_setting_id = $("#webdefacment_setting_id").val();
+
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -556,7 +560,8 @@
                     url_web:url_web,
                     port_web:port_web,
                     delay_screenshot_val:delay_screenshot_val,
-                    url_id:url_id
+                    url_id:url_id,
+                    webdefacment_setting_id:webdefacment_setting_id
                 }),
                 beforeSend: function(){
                     f_loading(null, '.review_image_screenshot');
@@ -574,9 +579,76 @@
                         }
                         
                         var image_screenshot = obj.image_url;
-                        var image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
-                        $(".review-image-capture").html(image_screenshot_html);
+                        var part_image = obj.image_path_original;
 
+                        var image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
+
+                        let webdefacment_setting_id = $("#webdefacment_setting_id").val();
+                        site_code = '{{$siteSettings->code}}';
+                        let link_edit_image_screenshot_html = `
+                                <a href="${base_url}/edit-image/${site_code}/${webdefacment_setting_id}" target="_blank">
+                                    Edit Image
+                                </a>`;
+
+
+                        {{--$(".review-image-capture").html(image_screenshot_html);
+                        $("#link_edit_image_screenshot").html(link_edit_image_screenshot_html);--}}
+
+
+               
+                            {{--start ajax --}}
+                                $.ajax({
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    url: '{!! route('webdefacement.get_update_image_screenshot') !!}',
+                                    type: "post",
+                                    data: ({
+                                        webdefacment_setting_id:webdefacment_setting_id,
+                                        image:image_screenshot,
+                                        part_image:part_image
+                                    }),
+                                    beforeSend: function(){
+                                        f_loading(null, '.review_image_screenshot');
+                                    },
+                                }).done(function(obj){
+                                    f_loading_stop(null, '.review_image_screenshot');
+                                    console.log(obj);
+
+                                        if(obj.status_code == 200) {
+                                            console.log(200);
+                           
+                                            image_screenshot = obj.data.image;
+                                            image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
+
+                                            webdefacment_setting_id = $("#webdefacment_setting_id").val();
+                                            site_code = '{{$siteSettings->code}}';
+                                            link_edit_image_screenshot_html = `
+                                                    <a href="${base_url}/edit-image/${site_code}/${webdefacment_setting_id}" target="_blank">
+                                                        Edit Image
+                                                    </a>`;
+
+
+                                            $(".review-image-capture").html(image_screenshot_html);
+                                            $("#link_edit_image_screenshot").html(link_edit_image_screenshot_html);
+
+
+                                            
+
+                                            
+                                        } else {
+                                            console.log(404);
+                                            let message_html = ``;
+                                            $("#area_check_message").html(message_html);
+                                        }
+
+
+                                }).fail(function(jqXHR, ajaxOptions, thrownError){
+                                    f_loading_stop(null, '#review_image_screenshot');
+                                    console.log("No response from server");
+                                });
+                            {{--end ajax --}}
+                        
                         
                     } else {
                         console.log(44);
@@ -602,6 +674,13 @@
             
             var data = new FormData(this);
             data.append('site_id', site_id);
+
+            let webdefacment_setting_id = $("#webdefacment_setting_id").val();
+            if(webdefacment_setting_id) {
+                data.append('webdefacment_setting_id', webdefacment_setting_id);
+            }
+            data.append('site_id', site_id);
+
             if(form_save == '.formSavingAndRun'){
                 data.append('formsubmit', 'formSavingAndRun');
             }else if(form_save == '.formPreview'){
@@ -630,6 +709,59 @@
                 }
             }); 
     });
+
+
+
+    $("#btn_md_create").click(function() {
+        get_create_open_md_site_url();
+    });
+
+    function get_create_open_md_site_url(){
+    
+            site_id = '{{$siteSettings->id}}';
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '{!! route('webdefacement.get_create_open_md_site_url') !!}',
+                type: "post",
+                data: ({
+                    site_id:site_id
+          
+                }),
+                beforeSend: function(){
+                    loading('load');
+                },
+            }).done(function(obj){
+                loading('stop_load');
+                console.log(obj);
+
+                    if(obj.status_code == 200) {
+                        console.log(200);
+
+                        if(obj.data) {
+                            let webdefacment_setting_id = obj.data.id;
+                            if(webdefacment_setting_id) {
+                                $("#webdefacment_setting_id").val(webdefacment_setting_id);
+                            }
+                        }
+
+                    } else {
+                        console.log(404);
+                        
+                    }
+
+
+            }).fail(function(jqXHR, ajaxOptions, thrownError){
+                loading('stop_load');
+                console.log("No response from server");
+            });
+        
+    }
+
+
+
+    
 
 
 

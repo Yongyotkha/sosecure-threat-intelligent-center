@@ -363,12 +363,12 @@
         }).done(function(data){
             if(data.html.length == 0){
                 page_stop = false;
-                $('#load_list_news_book_mark').hide();
                 $('#count_news_bookmark').text(0);
+                $('#load_list_news_book_mark').hide();
+               
                 return;
             }
             $('#count_news_bookmark').text(data.count);
-            
             $("#list_news_book_mark").html(data.html);
             $('#load_list_news_book_mark').hide();
         }).fail(function(jqXHR, ajaxOptions, thrownError){

@@ -2,6 +2,7 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use Auth;
 use Artisan;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
@@ -91,8 +92,8 @@ class WebDefacementController extends Controller
                                     <strong>Update Original</strong>
                                 </div>
                                 <div class="flex-end">
-                                    <a href="" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
-                                    <a href="" class="btn btn-danger btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg> Delete</a>
+                                    <a href="#" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
+                                    <a href="#" class="btn btn-danger btn-sm btn_del_webdefacment"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg> Delete</a>
                                 </div>
                             </div>
                         </div>
@@ -141,6 +142,9 @@ class WebDefacementController extends Controller
         $port_web = $request->port_web;
         $url_id = $request->url_id;
         $delay_screenshot_val = $request->delay_screenshot_val;
+        $webdefacment_setting_id = $request->webdefacment_setting_id;
+
+
         // dd($port_web);
         $command = 'app:WebDefacementsCreenshotCheck';
 
@@ -154,7 +158,59 @@ class WebDefacementController extends Controller
 
             Artisan::call($command, $params);
             $result = Artisan::output();
+
+            // $data_arr = json_decode($result);
             // dd($result);
+
+    }
+
+
+    public function get_update_image_screenshot(Request $request)
+    {
+        $html = ''; 
+        $webdefacment_setting_id = $request->webdefacment_setting_id;
+        $image = $request->image;
+        $part_image = $request->part_image;
+
+
+        // dd($port_web);
+
+
+
+            if($webdefacment_setting_id) {
+                $webdefacment_data_original = WebdefacmentDataOriginal::where('deleted_at',null)->where('webdefacment_setting_id',$webdefacment_setting_id)->orderBy('id','desc')->first();
+
+                if($webdefacment_data_original) {
+                    $webdefacment_data_original->webdefacment_setting_id = $webdefacment_setting_id;
+                    $webdefacment_data_original->image = $image;
+                    $webdefacment_data_original->part_image = $part_image;
+                    $webdefacment_data_original->save();
+        
+                } else {
+                    $webdefacment_data_original = new WebdefacmentDataOriginal;
+                    $webdefacment_data_original->webdefacment_setting_id = $webdefacment_setting_id;
+                    $webdefacment_data_original->image = $image;
+                    $webdefacment_data_original->part_image = $part_image;
+                    $webdefacment_data_original->save();
+                }
+            }
+
+
+            if($webdefacment_data_original) {
+
+                $response = array(
+                    'message' => '', 
+                    'status_code' => '200',
+                    'data' => $webdefacment_data_original
+                );
+    
+    
+                return response()->json($response);
+            }else{
+                return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+            }
+
+
     }
 
 
@@ -170,30 +226,58 @@ class WebDefacementController extends Controller
         $delay_screen_shot = ($request->delay_screen_shot == 'true') ? 1 : 0;
         $delay_screenshot_val = $request->delay_screenshot_val;
         $site_id = $request->site_id;
+        $webdefacment_setting_id = $request->webdefacment_setting_id;
 
 
         // dd($file_size);
+        if($webdefacment_setting_id) {
+            $WebdefacmentSetting = WebdefacmentSetting::where('id',$webdefacment_setting_id)->first();
+            $WebdefacmentSetting->name = $name_web;
+            $WebdefacmentSetting->url = $url_web;
+            $WebdefacmentSetting->port = $port_web;
+            $WebdefacmentSetting->hash = $hash;
+            $WebdefacmentSetting->filesize = $file_size;
+            $WebdefacmentSetting->element = $element;
+            $WebdefacmentSetting->DomainHeaders = '';
+            $WebdefacmentSetting->blacklist_keyword = $blacklist;
+            $WebdefacmentSetting->image_check = $delay_screen_shot;
+            $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+            $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+            $WebdefacmentSetting->site_id = $site_id;
+            $WebdefacmentSetting->active = 1;
+            $WebdefacmentSetting->domain = '';
+            $WebdefacmentSetting->user_agent = '';
+            $WebdefacmentSetting->webdeflacement_progress = 3;
+            $WebdefacmentSetting->image_last = '';
+            $WebdefacmentSetting->status_add = 1;
+            $WebdefacmentSetting->save();
 
-        $WebdefacmentSetting = new WebdefacmentSetting;
-        $WebdefacmentSetting->code = generator_uuid();
-        $WebdefacmentSetting->name = $name_web;
-        $WebdefacmentSetting->url = $url_web;
-        $WebdefacmentSetting->port = $port_web;
-        $WebdefacmentSetting->hash = $hash;
-        $WebdefacmentSetting->filesize = $file_size;
-        $WebdefacmentSetting->element = $element;
-        $WebdefacmentSetting->DomainHeaders = '';
-        $WebdefacmentSetting->blacklist_keyword = $blacklist;
-        $WebdefacmentSetting->image_check = $delay_screen_shot;
-        $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
-        $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
-        $WebdefacmentSetting->site_id = $site_id;
-        $WebdefacmentSetting->active = 1;
-        $WebdefacmentSetting->domain = '';
-        $WebdefacmentSetting->user_agent = '';
-        $WebdefacmentSetting->webdeflacement_progress = 3;
-        $WebdefacmentSetting->image_last = '';
-        $WebdefacmentSetting->save();
+        } else {
+            // $WebdefacmentSetting = new WebdefacmentSetting;
+            // $WebdefacmentSetting->code = generator_uuid();
+            // $WebdefacmentSetting->name = $name_web;
+            // $WebdefacmentSetting->url = $url_web;
+            // $WebdefacmentSetting->port = $port_web;
+            // $WebdefacmentSetting->hash = $hash;
+            // $WebdefacmentSetting->filesize = $file_size;
+            // $WebdefacmentSetting->element = $element;
+            // $WebdefacmentSetting->DomainHeaders = '';
+            // $WebdefacmentSetting->blacklist_keyword = $blacklist;
+            // $WebdefacmentSetting->image_check = $delay_screen_shot;
+            // $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+            // $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+            // $WebdefacmentSetting->site_id = $site_id;
+            // $WebdefacmentSetting->active = 1;
+            // $WebdefacmentSetting->domain = '';
+            // $WebdefacmentSetting->user_agent = '';
+            // $WebdefacmentSetting->webdeflacement_progress = 3;
+            // $WebdefacmentSetting->image_last = '';
+            // $WebdefacmentSetting->user_id = @Auth::user()->id;
+            // $WebdefacmentSetting->status_add = 1;
+            // $WebdefacmentSetting->save();
+        }
+
+    
 
         $SiteSettings = SiteSettings::where('id',$site_id)->first();
 
@@ -206,6 +290,55 @@ class WebDefacementController extends Controller
             true,
             Response::HTTP_CREATED
         );
+    }
+
+    public function get_create_open_md_site_url(Request $request) {
+
+        $site_id = $request->site_id;
+        $WebdefacmentSetting = WebdefacmentSetting::where('site_id',$site_id)->where('status_add',0)->where('user_id',@Auth::user()->id)->orderBy('id','desc')->first();
+
+        if($WebdefacmentSetting) {
+            
+
+        } else {
+            $WebdefacmentSetting = new WebdefacmentSetting;
+            $WebdefacmentSetting->code = generator_uuid();
+            $WebdefacmentSetting->site_id = $site_id;
+            $WebdefacmentSetting->user_id = @Auth::user()->id;
+            $WebdefacmentSetting->status_add = 0;
+            $WebdefacmentSetting->active = 0;
+            $WebdefacmentSetting->save();
+        }
+
+
+        $webdefacment_data_original = WebdefacmentDataOriginal::where('deleted_at',null)->where('webdefacment_setting_id',$WebdefacmentSetting->id)->orderBy('id','desc')->first();
+
+        if($webdefacment_data_original) {
+            
+
+        } else {
+            $webdefacment_data_original = new WebdefacmentDataOriginal;
+            $webdefacment_data_original->webdefacment_setting_id = $WebdefacmentSetting->id;
+            $webdefacment_data_original->save();
+        }
+
+
+
+        if($WebdefacmentSetting) {
+
+            $response = array(
+                'error' => '', 
+                'status_code' => '200',
+                'data' => $WebdefacmentSetting
+            );
+
+
+            return response()->json($response);
+        }else{
+            return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+        }
+
+        
     }
 
 

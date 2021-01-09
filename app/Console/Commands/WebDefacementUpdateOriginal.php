@@ -63,7 +63,7 @@ class WebDefacementUpdateOriginal extends Command
 
        if ($this->is_url($url)) {
           $result["Result"] = 1;
-          $result["messes "] = "";
+          $result["message"] = "";
           $result['hash_code'] = "";
           $result["file_size"] = 0 ;
           $result["all_element"] = 0 ;
@@ -73,7 +73,7 @@ class WebDefacementUpdateOriginal extends Command
           if ($response['content'] === FALSE){
             $webContent = "";
             $result["Result"] = 0;
-            $result["messes "] = "Html not found";
+            $result["message"] = "Html not found";
         }else{
             $webContent = $response['content'];
 
@@ -156,17 +156,18 @@ class WebDefacementUpdateOriginal extends Command
 
 
 
-
+       $result["Result"] = 1;
+       $result["message"] = "";
 
 
 
    }else{
      $result["Result"] = 0;
-     $result["messes "] = "The url is not formatted.";
+     $result["message"] = "The url is not formatted.";
  }
 }else{
  $result["Result"] = 0;
- $result["messes "] = "No data found.";
+ $result["message"] = "No data found.";
 }
 $result_json_e = json_encode($result);
 echo $result_json_e;
