@@ -4,10 +4,6 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light">
             <div class="bc-head">Summary Dashboard</div>
-
-            <div class="pull-right" style="margin-top: 15px">
-                Current Date : <i class="fas fa-calendar"></i> <span id="current-date"></span>
-            </div>
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;"
                     onchange="changeSite(value)">
