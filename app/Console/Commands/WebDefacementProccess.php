@@ -354,10 +354,10 @@ class WebDefacementProccess extends Command
              $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
              $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
              $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|blacklistKeywords:'.implode (",", $blackListFoundString);
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
+             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
              $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
              $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
              $WebdefacmentDataLog_save->status_val  =  $status;
@@ -369,10 +369,10 @@ class WebDefacementProccess extends Command
           $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
           $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
           $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'|blacklistKeywords:'.implode (",", $blackListFoundString);
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
+          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
           $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
           $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
           
