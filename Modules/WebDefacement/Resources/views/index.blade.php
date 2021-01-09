@@ -103,15 +103,15 @@
                                     All
                                 </a>
                                 <a href="#" id="high" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot high"></span>
+                                    <span class="dot critical"></span>
                                     High
                                 </a>
                                 <a href="#" id="medium" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot low"></span>
+                                    <span class="dot high"></span>
                                     Medium
                                 </a>
                                 <a href="#" id="normal" class="btn-chart white d-il-flex">
-                                    <span class="dot none"></span>
+                                    <span class="dot low"></span>
                                     Normal
                                 </a>
                             </div>
