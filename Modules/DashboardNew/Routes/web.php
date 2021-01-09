@@ -20,6 +20,7 @@ Route::group(
         Route::post('count_data_leak', 'DashboardNewController@count_data_leak')->name('dashboardnew.count_data_leak')->middleware('can:menu_items');
         Route::post('count_vulnerability_host', 'DashboardNewController@count_vulnerability_host')->name('dashboardnew.count_vulnerability_host')->middleware('can:menu_items');
         Route::post('chart_indicators', 'DashboardNewController@chart_indicators')->name('dashboardnew.chart_indicators')->middleware('can:menu_items');
+        Route::post('cve_assets', 'DashboardNewController@cve_assets')->name('dashboardnew.cve_assets')->middleware('can:menu_items');
     }
 );
 

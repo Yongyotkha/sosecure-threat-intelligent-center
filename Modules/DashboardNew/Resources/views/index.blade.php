@@ -124,7 +124,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive" style="max-height:280px;min-height: 400px;overflow: auto;">
+                                                    <div class="table-responsive cve_assets" style="max-height:280px;min-height: 400px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -133,23 +133,7 @@
                                                                     <th>View</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody>
-                                                                @if ($get_CVEAssets)
-                                                                @foreach ($get_CVEAssets as $get_CVEAssets)
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>{{@$get_CVEAssets->vendor}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{@$get_CVEAssets->IP}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="{{@$get_CVEAssets->site_id}}" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                @endforeach
-                                                                @endif
-                                                            </tbody>
+                                                            <tbody id="cve_assets"></tbody>
                                                         </table>
                                                     </div>
                                                 </div>
@@ -248,6 +232,7 @@
         count_data_leak();
         count_vulnerability_host();
         load_chart();
+        cve_assets();
     }
 
     $( document ).ready(function() {
@@ -258,6 +243,7 @@
         count_vulnerability_host();
         load_chart();
         chart_indicators();
+        cve_assets();
     });
 
     function count_asset(){
@@ -383,12 +369,55 @@
                         },
                         series: [
                         {
-                            name: 'Number of Months',
-                            data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
+                            name: 'Number of Event',
+                            data: result.data.events,
                             color: '#3984e7'
+                        }, 
+                        {
+                            name: 'Number of Attribute',
+                            data: result.data.attribute,
+                            color: '#e64732'
                         }, 
                         ]
                     });
+                }
+            }
+        });
+    }
+
+    function cve_assets(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.cve_assets") }}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                f_loading(null, '.cve_assets');
+            },
+            success: function(result){
+                f_loading_stop(null, '.cve_assets');
+                if(result.status_code == 200){
+                    $('#cve_assets').empty();
+                    let html = ``;
+                    for(let i in result.data){
+                        const data = result.data[i];
+                        html += `
+                        <tr>
+                            <td>
+                                <span>${data.raw_data}</span>
+                            </td>
+                            <td>
+                                <span>${data.referent}</span>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        `;
+                    }
+                    $('#cve_assets').html(html);
                 }
             }
         });
