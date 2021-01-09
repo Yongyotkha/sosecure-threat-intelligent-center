@@ -51,12 +51,10 @@ class WebDefacementsCreenshotCheck extends Command
       if ($this->is_url($url)) {
         if (1== 1) {
             $result["Result"] = 1;
-            $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-            $result["message"] = "";
 
             // $result->Result = 1;
             $result["image_url"] = "/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
-            $result["messes "] = "";
+            $result["message"] = "";
             $path_include = base_path().'/public/screenshot/use/DownloadImage.php';
             include_once($path_include);
             $downloadImg = new \DownloadImage();
