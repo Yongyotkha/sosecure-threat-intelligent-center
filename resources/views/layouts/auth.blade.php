@@ -27,9 +27,9 @@
     <title>{{ config('app.name', 'Workice CRM') }}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <meta name="author" content="{{ get_option('site_author') }}">
-    <meta name="keywords" content="{{ get_option('site_keywords') }}">
-    <meta name="description" content="{{ get_option('site_desc') }}">
+    <meta name="author" content="mtsc.co.th">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="{{ getAsset('css/theme.css') }}" type="text/css"/>

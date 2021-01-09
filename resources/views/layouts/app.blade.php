@@ -9,9 +9,11 @@
     </script>
 
     <meta charset="utf-8"/>
-    <meta name="author" content="{{ get_option('site_author') }}">
-    <meta name="keywords" content="{{ get_option('site_keywords') }}">
-    <meta name="description" content="{{ get_option('site_desc') }}">
+    <meta name="author" content="mtsc.co.th">
+    {{-- {{ get_option('site_keywords') }} --}}
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    {{-- {{ get_option('site_desc') }} --}}
     <meta property="og:url" content="@yield('url_share')">
     <meta property="og:image" content="@yield('image')">
     
