@@ -247,6 +247,7 @@
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
+        load_chart();
     }
 
     $( document ).ready(function() {
@@ -255,6 +256,8 @@
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
+        load_chart();
+        chart_indicators();
     });
 
     function count_asset(){
@@ -337,6 +340,60 @@
         });
     }
 
+    function chart_indicators(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.chart_indicators") }}',
+            beforeSend: function() {
+                f_loading(null, '#chart-show-line');
+            },
+            success: function(result){
+                f_loading_stop(null, '#chart-show-line');
+                if(result.status_code == 200){
+                    const chart_line = new Highcharts.chart('chart-show-line', {
+                        chart: {
+                            height: 400, 
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'line'
+                        },
+                        title: {
+                            text: ''
+                        },
+                        subtitle: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        },
+                        yAxis: {
+                            title: {
+                            text: 'Number (Months)'
+                            }
+                        },
+                        plotOptions: {
+                            line: {
+                            dataLabels: {
+                                enabled: true
+                            },
+                            enableMouseTracking: false
+                            }
+                        },
+                        series: [
+                        {
+                            name: 'Number of Months',
+                            data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
+                            color: '#3984e7'
+                        }, 
+                        ]
+                    });
+                }
+            }
+        });
+    }
+
     $('#table-assets-modal').DataTable();
 
     var today_date = new Date();
@@ -405,10 +462,6 @@
         cb(start, end);
     });
 
-    $(function () {
-        load_chart();
-    });
-
     function load_chart(){
 
         $.ajax({
@@ -417,8 +470,9 @@
             },
             url: '{!! route('dashboardnew.load_chart') !!}',
             type: "POST",
-            data: ({
-            }),
+            data: {
+                site : site, 
+            },
             beforeSend: function(){
                 {{--loading('load');--}}
                 f_loading(null, '#chart-show-pie');
@@ -475,15 +529,6 @@
             });
         
     }
-    var critical = [];
-    var high = [];
-    var medium = [];
-    var low = [];
-    var infomation = [];
-    var host_name = [];
-
-    var data_array = [];
-
     function count_vulnerability_host(){
         $.ajax({
             type: 'POST',
@@ -498,6 +543,13 @@
             success: function(result){
                 f_loading_stop(null, '#chart-show-hl');
                 if(result.status_code == 200){
+                    var critical = [];
+                    var high = [];
+                    var medium = [];
+                    var low = [];
+                    var infomation = [];
+                    var host_name = [];
+                    var data_array = [];
                     for(let b in result.data.host_name){
                         var data_object = {};
                         const data_b = result.data.host_name[b];
@@ -680,48 +732,6 @@
                 ],  
             }]
         });--}}
-
-
-        const chart_line = new Highcharts.chart('chart-show-line', {
-            chart: {
-                height: 400, 
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'line'
-            },
-            title: {
-                text: ''
-            },
-            subtitle: {
-                text: ''
-            },
-            xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            },
-            yAxis: {
-                title: {
-                text: 'Number (Months)'
-                }
-            },
-            plotOptions: {
-                line: {
-                dataLabels: {
-                    enabled: true
-                },
-                enableMouseTracking: false
-                }
-            },
-            series: [
-            {
-                name: 'Number of Months',
-                data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
-                color: '#3984e7'
-            }, 
-            ]
-        });
-
-
 </script>
 
 @endpush

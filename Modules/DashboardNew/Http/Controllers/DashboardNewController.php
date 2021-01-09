@@ -9,6 +9,7 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use App\DataLeakFeed;
 use App\DataLeakSocialRef;
+use App\IndicatorSummaryYear;
 use Illuminate\Support\Facades\DB;
 use Modules\Scans\Entities\Assets;
 use Modules\SiteSettings\Entities\DataCveven;
@@ -178,6 +179,16 @@ class DashboardNewController extends Controller
         return response()->json($response);
     }
 
+    public function chart_indicators(Request $request){
+        $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->get();
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => $IndicatorSummaryYear
+        );
+        return response()->json($response);
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response
@@ -241,13 +252,21 @@ class DashboardNewController extends Controller
     public function load_chart(Request $request)
     {
         $model = new CVEMapping;
-        $model->get();
-    
-        $high = $model->where('severity', '=', 'HIGH')->count();
-        $medium = $model->where('severity', '=', 'MEDIUM')->count();
-        $critical = $model->where('severity', '=', 'CRITICAL')->count();
-        $low = $model->where('severity', '=', 'LOW')->count();
-        $none = $model->where('severity', '=', 'NONE')->count();
+        if($request -> site == 0){
+            $model->get();
+            $high = $model->where('severity', '=', 'HIGH')->count();
+            $medium = $model->where('severity', '=', 'MEDIUM')->count();
+            $critical = $model->where('severity', '=', 'CRITICAL')->count();
+            $low = $model->where('severity', '=', 'LOW')->count();
+            $none = $model->where('severity', '=', 'NONE')->count();
+        }else{
+            $model->get();
+            $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->count();
+            $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->count();
+            $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->count();
+            $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->count();
+            $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->count();
+        }
 
         // $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         // $clientMD = new MongoClient($DB_MONGO_KEY);
