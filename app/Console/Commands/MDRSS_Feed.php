@@ -9,7 +9,7 @@ use Modules\RSSFeedSettings\Entities\TransactionRssData;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 
-class RSS_Feed extends Command
+class MDRSS_Feed extends Command
 {
     /**
      * The name and signature of the console command.
