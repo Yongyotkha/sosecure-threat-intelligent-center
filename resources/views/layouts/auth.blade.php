@@ -139,8 +139,8 @@
     <script src="js/ie/excanvas.js" cache="false">
     </script> <![endif]-->
 </head>
-<body>
-<div id="app">
+<body class="h100">
+<div id="app" class="h100vh">
 
 {{-- main content start --}}
 @yield('content')
