@@ -2492,8 +2492,7 @@ a.author-by{
     display: flex;
     align-items: center;
     justify-content:center;
-    height: 100vh;
-    min-height: -webkit-fill-available;
+    height: 100%;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center top;
@@ -2504,8 +2503,8 @@ a.author-by{
 }
 .h100vh{
     height: 100vh;
-    height: -webkit-fill-available;
 }
+
 .login-body{
     padding: 3rem;
     width: 100%;

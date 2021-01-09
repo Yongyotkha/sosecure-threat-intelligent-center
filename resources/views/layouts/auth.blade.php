@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="@langapp('lang_code') " class="bg-dark">
+<html lang="@langapp('lang_code') " class="bg-dark" style="height: 100%;">
 <head>
     <meta charset="utf-8"/>
     <?php $favicon = get_option('site_favicon');
@@ -139,8 +139,8 @@
     <script src="js/ie/excanvas.js" cache="false">
     </script> <![endif]-->
 </head>
-<body class="h100">
-<div id="app" class="h100vh">
+<body class="center-middle" style="background-image:url('{{asset('images/bg-login.png')}}')">
+<div id="app">
 
 {{-- main content start --}}
 @yield('content')

@@ -3,7 +3,7 @@
 @section('content')
 
 
-<section id="content" class="center-middle" style="background-image:url('{{asset('images/bg-login.png')}}') ">
+<section id="content">
 
         <div id="login-form" class="container aside-xxl animated fadeInUp">
         <div class="box-login-shadow  bd-round-b-lr block bd-round-t-lr">
