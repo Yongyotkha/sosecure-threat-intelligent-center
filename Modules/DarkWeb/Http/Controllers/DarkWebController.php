@@ -1,7 +1,7 @@
 <?php
 
 namespace Modules\DarkWeb\Http\Controllers;
-
+use DB;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -151,23 +151,28 @@ class DarkWebController extends Controller
         if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) ){
 
             $news = Data_leak_feed::where('deleted_at', null)->where('status', 1);//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
-            
+            $countGroupBy = Data_leak_feed::where('deleted_at', null)->where('status', 1);
             if($request -> social) {
                 $news = $news -> where('feel_type', '=' ,$request -> social);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> social);
             }else{
                 $news = $news->whereIn('feel_type', ['darkweb', 'compromise','webserver']);
+                $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver']);
             }
 
             if($request -> title){
                 $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+                $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
             }
 
             
 
             if($date_start) {
                 // $news = $news -> whereDate('created_at','>', $date_start_datetime_format);
-                if($request -> isDateSearch=="true")
-                $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                if($request -> isDateSearch=="true"){
+                    $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                    $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                }
             //     ->where(function($query) use ($date_start_datetime_format,$date_end_datetime_format){
             //         $query->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
             //               ->whereBetween('time',array($timfrom,$timto));
@@ -183,6 +188,10 @@ class DarkWebController extends Controller
                 $news = $news->whereHas('get_social', function ($query) use ($site_id) {
                             $query->where('site_id', '=', $site_id);
                         });
+
+                $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id) {
+                    $query->where('site_id', '=', $site_id);
+                });
             }
 
             // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
@@ -197,14 +206,18 @@ class DarkWebController extends Controller
             // dd($news);
             // dd($news->total);
             $Data_leak_feed_all = $news->count();
-            $news = $news->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
+            $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
+            $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }else{
             $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->orWhere('feel_type', 'webserver')->count();
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver'])->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver']);//->get()
+            $countGroupBy = Data_leak_feed::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver'])->groupBy('feel_type')->get();
+            $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }
 
         // dd($news);
         $content = [];
+
         foreach($news as $data){
     
             $n_title = @$data -> feedcontent;
@@ -238,6 +251,19 @@ class DarkWebController extends Controller
             }else{
                 $html .= '<div class="list-news">';
             }
+
+            $get_ref_name = '';
+            $get_ref_name .= 'Site: ';
+            if(!empty($data -> get_ref)){
+                foreach ($data -> get_ref as $get_ref) {
+
+                    if(isset($get_ref->get_site_name->name))
+                    $get_ref_name = $get_ref_name.$get_ref->get_site_name->name.", ";
+                }
+            }
+
+            $get_ref_name = rtrim($get_ref_name,", ");
+
             $html .= '
                 <!--<div class="checkbox-news-select">
                     <label class="mr-3">
@@ -258,8 +284,10 @@ class DarkWebController extends Controller
                                     </a>
                                 </h3>
                                 <div class="entry-meta">
+                                    <span class="entry-date"> <b>'.@$data -> feel_type.'</b></span>
                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
                                     <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
+                                    <span class="entry-date"> <b>'.$get_ref_name.'</b></span>
                                 </div>
                                 <!--<div class="description-text hidden-xs">
                                 <span><p>&nbsp;'.strip_tags($n_title).'</p></span>
@@ -284,10 +312,20 @@ class DarkWebController extends Controller
             ';
         }
         // dd($content);
+        $count_sub_type["webserver"] = 0;
+        $count_sub_type["darkweb"] = 0;
+        $count_sub_type["compromise"] = 0;
+        
+        foreach ($countGroupBy as $countGroup) {
+            $count_sub_type[$countGroup->feel_type] = $countGroup->total;
+        }
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
-                "count" => $Data_leak_feed_all
+                "count" => $Data_leak_feed_all,
+                "webserver" => $count_sub_type["webserver"],
+                "darkweb" => $count_sub_type["darkweb"],
+                "compromise" => $count_sub_type["compromise"],
             ];
             return response()->json($data); 
         }
