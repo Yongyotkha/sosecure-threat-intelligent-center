@@ -57,7 +57,7 @@ class WebDefacementController extends Controller
                             <div class="wdfm-header">
                                 <div class="wdfm-img">
                                     <a href="#">
-                                        <div class="wdfm-logo" style="background-image:url('.asset($key->image_last).')"></div>
+                                        <img src="'.asset($key->image_last).'" onerror="setDefaultPic(this)"/>
                                     </a>
                                 </div>
                             </div>

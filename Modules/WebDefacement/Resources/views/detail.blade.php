@@ -5,12 +5,22 @@
         {{-- Head --}}
         <header class="header bg-white b-b b-light head-d-flex-nowrap"
         style="white-space: nowrap;overflow-x: auto;">
-        <div class="bc-head m-none">
+        <div class="bc-head m-none" style="width:100%;">
             <a href="{{route('webdefacement.index')}}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                 @icon('solid/arrow-left')
             </a>
             @langapp('webdefacement') > {{@$webdefacement->name}}
+
+            <div class="pull-right" style="display: flex;align-items:center;">
+                <span>Status &nbsp;</span>
+                {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
+                &nbsp;
+                <a href="#"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
+                    Accept Risk
+                </a>
+            </div>
         </div>
 
         &nbsp;
@@ -33,91 +43,101 @@
                     </div>
                 </header>
                 <div class="panel-body" id="details_webdefacement">
-                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
-                        <tr>
-                            <th width="250px">Name Page</th>
-                            <td>{{@$webdefacement->name}}</td>
-                        </tr>
-                        <tr>
-                            <th>URL</th>
-                            <td>
-                                {{@$webdefacement->url}}
-                                <a href="{{@$webdefacement->url}}" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
-
-                            </td>
-                            
-                        </tr>
-                        <tr>
-                            <th>Domain</th>
-                            <td>{{@$webdefacement->domain}}</td>
-                        </tr>
-                        <tr>
-                            <th>User Agent</th>
-                            <td>
-                                {{@$webdefacement->user_agent}}
-                               
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Site</th>
-                            <td>{{@$webdefacement->get_site->name}}</td>
-                        </tr>
-                        <tr>
-                            <th>Create Date</th>
-                            <td>{{@$webdefacement->created_at}}</td>
-                        </tr>
-                        <tr>
-                            <th>Last Online</th>
-                            <td>{{@$webdefacement->last_online}}</td>
-                        </tr>
-                        <tr>
-                            <th>Last Check</th>
-                            <td>{{@$webdefacement->last_check}}</td>
-                        </tr>
-                        <tr>
-                            <th>Status</th>
-                            <td> {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}</td>
-                        </tr>
-                    </table>
-                    <table class="table table-striped table-bordered table-hover">
-                        <thead>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
                             <tr>
-                                <th width="250px"></th>
-                                <th>Original</th>
-                                <th>Current</th>
-                            </tr>
-                        </thead>
-                        <tbody>                  
-                            <tr>
-                                <th>Hash</th>
-                                <td>{{@$webdefacment_data_original->hash}}</td>
-                                <td>{{@$webdefacment_data_check->hash_new}}</td>
+                                <th width="250px">Name Page</th>
+                                <td>{{@$webdefacement->name}}</td>
                             </tr>
                             <tr>
-                                <th>File Size</th>
-                                <td>{{@$webdefacment_data_original->filesize}} KB</td>
-                                <td>{{@$webdefacment_data_check->filesize_new}}</td>
+                                <th>URL</th>
+                                <td>
+                                    {{@$webdefacement->url}}
+                                    <a href="{{@$webdefacement->url}}" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
+    
+                                </td>
+                                
                             </tr>
                             <tr>
-                                <th>Element</th>
-                                <td>{{@$webdefacment_data_original->element}} tag</td>
-                                <td>{{@$webdefacment_data_check->element_new}}</td>
+                                <th>Domain</th>
+                                <td>{{@$webdefacement->domain}}</td>
                             </tr>
                             <tr>
-                                <th>&nbsp;</th>
-                                <td>{{@$webdefacment_data_original->last_update}}</td>
-                                <td>{{@$webdefacment_data_check->last_update}}</td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>&nbsp;</th>
-                                <td colspan="2">
-                                    <button class="btn btn-info">Update Original</button>
+                                <th>User Agent</th>
+                                <td>
+                                    {{@$webdefacement->user_agent}}
+                                   
                                 </td>
                             </tr>
-                        </tfoot>
-                    </table>
+                            <tr>
+                                <th>Site</th>
+                                <td>{{@$webdefacement->get_site->name}}</td>
+                            </tr>
+                            <tr>
+                                <th>Create Date</th>
+                                <td>{{@$webdefacement->created_at}}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Online</th>
+                                <td>{{@$webdefacement->last_online}}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Check</th>
+                                <td>{{@$webdefacement->last_check}}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td> {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="250px"></th>
+                                    <th>Original</th>
+                                    <th>Current</th>
+                                </tr>
+                            </thead>
+                            <tbody>                  
+                                <tr>
+                                    <th>Hash</th>
+                                    <td>{{@$webdefacment_data_original->hash}}</td>
+                                    <td>{{@$webdefacment_data_check->hash_new}}</td>
+                                </tr>
+                                <tr>
+                                    <th>File Size</th>
+                                    <td>{{@$webdefacment_data_original->filesize}} KB</td>
+                                    <td>{{@$webdefacment_data_check->filesize_new}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Element</th>
+                                    <td>{{@$webdefacment_data_original->element}} tag</td>
+                                    <td>{{@$webdefacment_data_check->element_new}}</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="3">Blacklist Keyword</th>
+                                </tr>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <td>{{@$webdefacment_data_original->last_update}}</td>
+                                    <td>{{@$webdefacment_data_check->last_update}}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <td>
+                                        <button class="btn btn-info">Update Original</button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-info">Accept Risk</button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>       
+                    </div>
                 </div>
             </section>
 
@@ -143,7 +163,7 @@
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
                                                 <a href="{{asset(@$webdefacment_data_original->image)}}" data-lightbox="name-img-2">
-                                                    <div class="wdfm-logo" style="background-image:url({{asset(@$webdefacment_data_original->image)}})"></div>
+                                                    <img src="{{asset(@$webdefacment_data_original->image)}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -170,7 +190,7 @@
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
                                                 <a href="{{asset(@$webdefacment_data_original->image_new)}}" data-lightbox="name-img-2">
-                                                    <div class="wdfm-logo" style="background-image:url({{asset(@$webdefacment_data_original->image_new)}})"></div>
+                                                    <img src="{{asset(@$webdefacment_data_original->image_new)}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
