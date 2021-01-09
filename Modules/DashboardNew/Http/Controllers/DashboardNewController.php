@@ -152,7 +152,7 @@ class DashboardNewController extends Controller
                 'title' => $data -> title
             ]);
         }
-        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity')->get();
+        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
         foreach($CVEMapping as $data){
             foreach($check_total_namecve as $item){
                 if($data -> namecve == $item['namecve']){
@@ -162,12 +162,17 @@ class DashboardNewController extends Controller
                 }
             }
         }
+        $result = array();
+        foreach ($host_name as $element) {
+            $result[$element] = $element;
+        }
+        
         $response = array(
             'error' => '', 
             'status_code' => '200',
             'data' => [
                 'data' => $CVEMapping,
-                'host_name' => $host_name
+                'host_name' => $result
             ]
         );
         return response()->json($response);
