@@ -152,6 +152,9 @@ class WebDefacementUpdateOriginalAll extends Command
            $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
            $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
            $WebdefacmentSetting_data->domain = $host;
+
+           $WebdefacmentSetting_data->webdeflacement_progress = 1;
+           $WebdefacmentSetting_data->status_val = 'Normal';
            $WebdefacmentSetting_data->save();
 
          }
