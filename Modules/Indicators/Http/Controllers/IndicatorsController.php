@@ -14,6 +14,7 @@ use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
+use DB;
 class IndicatorsController extends Controller
 {
     /**
@@ -44,7 +45,7 @@ class IndicatorsController extends Controller
         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         $data["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
         $data["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
-        $data["attr_type"] = IndicatorSummaryYear::select('type_name AS description','type_name AS name')->where("type",'summary_attr_type')->get();
+        $data["attr_type"] = IndicatorSummaryYear::select('type_name AS name',DB::raw('CONCAT(attribute_count, " Attribute") as description'))->where("type",'summary_attr_type')->take(15)->orderBy('attribute_count','desc')->get();
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);

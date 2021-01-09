@@ -259,7 +259,8 @@ const chart = Highcharts.chart('chart-pack', {
   ],
   series: [
       {
-    data: [{
+    data: load_graph()
+    {{--[{
       name: 'First dogs',
       description: '22 July 1951 First dogs in space (Dezik and Tsygan) '
     }, {
@@ -277,7 +278,7 @@ const chart = Highcharts.chart('chart-pack', {
     }, {
       name: 'Other',
       description: 'The mission included both joint and separate scientific experiments, and provided useful engineering experience for future joint US–Russian space flights, such as the Shuttle–Mir Program and the International Space Station.'
-    }]
+    }]--}}
     }
   ]
 });
@@ -357,6 +358,7 @@ const chart = Highcharts.chart('chart-pack', {
 
     $(function() {
         load_table(1);
+        console.log(load_graph());
     });
 
     function load_graph() {
