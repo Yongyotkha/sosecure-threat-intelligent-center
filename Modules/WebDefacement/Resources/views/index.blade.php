@@ -56,8 +56,8 @@
                                 </div>
                             </div>
                         </div> --}}
-                        <div class="col-md-4">
-                            <div class="form-group">
+                        <div class="col-lg-4">
+                            <div class="form-group row">
                                 <label for=""  class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                 <div class="col-sm-9 col-xs-12">
                                 <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
