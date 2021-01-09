@@ -143,7 +143,7 @@
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
                                                 <a href="{{asset(@$webdefacment_data_original->image)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacment_data_original->image)}}" alt="">
+                                                    <div class="wdfm-logo" style="background-image:url({{asset(@$webdefacment_data_original->image)}})"></div>
                                                 </a>
                                             </div>
                                         </div>
@@ -170,7 +170,7 @@
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
                                                 <a href="{{asset(@$webdefacment_data_original->image_new)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacment_data_original->image_new)}}" alt="">
+                                                    <div class="wdfm-logo" style="background-image:url({{asset(@$webdefacment_data_original->image_new)}})"></div>
                                                 </a>
                                             </div>
                                         </div>

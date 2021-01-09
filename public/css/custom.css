@@ -2619,10 +2619,14 @@ input.input-login:focus {
     top: 72px !important;
 }
 
+.text-sm-date{
+    color: #848282;
+    font-size: 11px;
+}
 
 .wdfm-container{
     width: calc(100% + 30px);
-    margin:  5rem -15px;
+    /* margin:  5rem -15px; */
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
@@ -2692,6 +2696,7 @@ input.input-login:focus {
     height: 100%;
     background-size: cover;
     background-position: top center;
+    background-color: #333;
 }
 .mdfm-text-muted{
     color: #9e9d9d;

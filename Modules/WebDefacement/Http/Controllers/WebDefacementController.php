@@ -176,7 +176,7 @@ class WebDefacementController extends Controller
                     <div class="wdfm-header">
                         <div class="wdfm-img">
                             <a href="'.asset($key->image_last).'" data-lightbox="name-img-2">
-                                <img src="'.asset(@$key->image_last).'" alt="">
+                                <div class="wdfm-logo" style="background-image:url('.asset(@$key->image_last).')"></div>
                             </a>
                         </div>
                     </div>
