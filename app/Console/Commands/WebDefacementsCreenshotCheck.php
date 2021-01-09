@@ -63,7 +63,7 @@ class WebDefacementsCreenshotCheck extends Command
             $Path_image = base_path()."/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
             $downloadImg->download($url,$Path_image,$delay);
             $result["image_path_original_full"] = $Path_image;
-            $result["image_path_original"] = "public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
+            $result["image_path_original"] = "/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
             $result["url_id"] = $url_id;
 
         }else{

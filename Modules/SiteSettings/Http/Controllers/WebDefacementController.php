@@ -2,6 +2,7 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use Auth;
 use Artisan;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
@@ -141,6 +142,9 @@ class WebDefacementController extends Controller
         $port_web = $request->port_web;
         $url_id = $request->url_id;
         $delay_screenshot_val = $request->delay_screenshot_val;
+        $webdefacment_setting_id = $request->webdefacment_setting_id;
+
+
         // dd($port_web);
         $command = 'app:WebDefacementsCreenshotCheck';
 
@@ -154,7 +158,59 @@ class WebDefacementController extends Controller
 
             Artisan::call($command, $params);
             $result = Artisan::output();
+
+            // $data_arr = json_decode($result);
             // dd($result);
+
+    }
+
+
+    public function get_update_image_screenshot(Request $request)
+    {
+        $html = ''; 
+        $webdefacment_setting_id = $request->webdefacment_setting_id;
+        $image = $request->image;
+        $part_image = $request->part_image;
+
+
+        // dd($port_web);
+
+
+
+            if($webdefacment_setting_id) {
+                $webdefacment_data_original = WebdefacmentDataOriginal::where('deleted_at',null)->where('webdefacment_setting_id',$webdefacment_setting_id)->orderBy('id','desc')->first();
+
+                if($webdefacment_data_original) {
+                    $webdefacment_data_original->webdefacment_setting_id = $webdefacment_setting_id;
+                    $webdefacment_data_original->image = $image;
+                    $webdefacment_data_original->part_image = $part_image;
+                    $webdefacment_data_original->save();
+        
+                } else {
+                    $webdefacment_data_original = new WebdefacmentDataOriginal;
+                    $webdefacment_data_original->webdefacment_setting_id = $webdefacment_setting_id;
+                    $webdefacment_data_original->image = $image;
+                    $webdefacment_data_original->part_image = $part_image;
+                    $webdefacment_data_original->save();
+                }
+            }
+
+
+            if($webdefacment_data_original) {
+
+                $response = array(
+                    'message' => '', 
+                    'status_code' => '200',
+                    'data' => $webdefacment_data_original
+                );
+    
+    
+                return response()->json($response);
+            }else{
+                return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+            }
+
+
     }
 
 
@@ -170,30 +226,58 @@ class WebDefacementController extends Controller
         $delay_screen_shot = ($request->delay_screen_shot == 'true') ? 1 : 0;
         $delay_screenshot_val = $request->delay_screenshot_val;
         $site_id = $request->site_id;
+        $webdefacment_setting_id = $request->webdefacment_setting_id;
 
 
         // dd($file_size);
+        if($webdefacment_setting_id) {
+            $WebdefacmentSetting = WebdefacmentSetting::where('id',$webdefacment_setting_id)->first();
+            $WebdefacmentSetting->name = $name_web;
+            $WebdefacmentSetting->url = $url_web;
+            $WebdefacmentSetting->port = $port_web;
+            $WebdefacmentSetting->hash = $hash;
+            $WebdefacmentSetting->filesize = $file_size;
+            $WebdefacmentSetting->element = $element;
+            $WebdefacmentSetting->DomainHeaders = '';
+            $WebdefacmentSetting->blacklist_keyword = $blacklist;
+            $WebdefacmentSetting->image_check = $delay_screen_shot;
+            $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+            $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+            $WebdefacmentSetting->site_id = $site_id;
+            $WebdefacmentSetting->active = 1;
+            $WebdefacmentSetting->domain = '';
+            $WebdefacmentSetting->user_agent = '';
+            $WebdefacmentSetting->webdeflacement_progress = 3;
+            $WebdefacmentSetting->image_last = '';
+            $WebdefacmentSetting->status_add = 1;
+            $WebdefacmentSetting->save();
 
-        $WebdefacmentSetting = new WebdefacmentSetting;
-        $WebdefacmentSetting->code = generator_uuid();
-        $WebdefacmentSetting->name = $name_web;
-        $WebdefacmentSetting->url = $url_web;
-        $WebdefacmentSetting->port = $port_web;
-        $WebdefacmentSetting->hash = $hash;
-        $WebdefacmentSetting->filesize = $file_size;
-        $WebdefacmentSetting->element = $element;
-        $WebdefacmentSetting->DomainHeaders = '';
-        $WebdefacmentSetting->blacklist_keyword = $blacklist;
-        $WebdefacmentSetting->image_check = $delay_screen_shot;
-        $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
-        $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
-        $WebdefacmentSetting->site_id = $site_id;
-        $WebdefacmentSetting->active = 1;
-        $WebdefacmentSetting->domain = '';
-        $WebdefacmentSetting->user_agent = '';
-        $WebdefacmentSetting->webdeflacement_progress = 3;
-        $WebdefacmentSetting->image_last = '';
-        $WebdefacmentSetting->save();
+        } else {
+            // $WebdefacmentSetting = new WebdefacmentSetting;
+            // $WebdefacmentSetting->code = generator_uuid();
+            // $WebdefacmentSetting->name = $name_web;
+            // $WebdefacmentSetting->url = $url_web;
+            // $WebdefacmentSetting->port = $port_web;
+            // $WebdefacmentSetting->hash = $hash;
+            // $WebdefacmentSetting->filesize = $file_size;
+            // $WebdefacmentSetting->element = $element;
+            // $WebdefacmentSetting->DomainHeaders = '';
+            // $WebdefacmentSetting->blacklist_keyword = $blacklist;
+            // $WebdefacmentSetting->image_check = $delay_screen_shot;
+            // $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+            // $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+            // $WebdefacmentSetting->site_id = $site_id;
+            // $WebdefacmentSetting->active = 1;
+            // $WebdefacmentSetting->domain = '';
+            // $WebdefacmentSetting->user_agent = '';
+            // $WebdefacmentSetting->webdeflacement_progress = 3;
+            // $WebdefacmentSetting->image_last = '';
+            // $WebdefacmentSetting->user_id = @Auth::user()->id;
+            // $WebdefacmentSetting->status_add = 1;
+            // $WebdefacmentSetting->save();
+        }
+
+    
 
         $SiteSettings = SiteSettings::where('id',$site_id)->first();
 
@@ -206,6 +290,55 @@ class WebDefacementController extends Controller
             true,
             Response::HTTP_CREATED
         );
+    }
+
+    public function get_create_open_md_site_url(Request $request) {
+
+        $site_id = $request->site_id;
+        $WebdefacmentSetting = WebdefacmentSetting::where('site_id',$site_id)->where('status_add',0)->where('user_id',@Auth::user()->id)->orderBy('id','desc')->first();
+
+        if($WebdefacmentSetting) {
+            
+
+        } else {
+            $WebdefacmentSetting = new WebdefacmentSetting;
+            $WebdefacmentSetting->code = generator_uuid();
+            $WebdefacmentSetting->site_id = $site_id;
+            $WebdefacmentSetting->user_id = @Auth::user()->id;
+            $WebdefacmentSetting->status_add = 0;
+            $WebdefacmentSetting->active = 0;
+            $WebdefacmentSetting->save();
+        }
+
+
+        $webdefacment_data_original = WebdefacmentDataOriginal::where('deleted_at',null)->where('webdefacment_setting_id',$WebdefacmentSetting->id)->orderBy('id','desc')->first();
+
+        if($webdefacment_data_original) {
+            
+
+        } else {
+            $webdefacment_data_original = new WebdefacmentDataOriginal;
+            $webdefacment_data_original->webdefacment_setting_id = $WebdefacmentSetting->id;
+            $webdefacment_data_original->save();
+        }
+
+
+
+        if($WebdefacmentSetting) {
+
+            $response = array(
+                'error' => '', 
+                'status_code' => '200',
+                'data' => $WebdefacmentSetting
+            );
+
+
+            return response()->json($response);
+        }else{
+            return response()->json(['error' => 'Not Found', 'status_code' => '404']);
+        }
+
+        
     }
 
 
