@@ -10,6 +10,8 @@ use phpseclib\Net\SSH2;
 use App\Entities\CompromisedServer;
 use App\Entities\CompromisedFileOriginal;
 use App\Entities\CompromisedFileCheck;
+use App\DataLeakFeed;
+use App\DataLeakSocialRef;
 
 class FeedCompromisedServer extends Command
 {
@@ -219,7 +221,9 @@ class FeedCompromisedServer extends Command
     private  function saveBlacklistKeyword($server,$detail,$keyword,$blackListFoundString) {
 
         $implode_blacklist = implode (",", $blackListFoundString);//insert
-        $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $detail["file_path"])->get(); 
+        $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $detail["file_path"])->where('site_id',$server->site_id)->get(); 
+        $insertLeak = true;
+        //1 path มีได้กี่ check
         if(!$CompromisedFileCheck){
             $CompromisedFileCheck = new CompromisedFileOriginal;
             $CompromisedFileCheck->code = generator_uuid();
@@ -228,30 +232,43 @@ class FeedCompromisedServer extends Command
             $CompromisedFileCheck->file_extension = $datail["file_extenstion"];
             $CompromisedFileCheck->file_path = $datail["file_path"];
             $CompromisedFileCheck->file_size = $datail["file_size"];
-            $CompromisedFileCheck->defacement_type = $datail["file_modified"];
-            $CompromisedFileCheck->defacment_description = $datail["file_hash"];
+            $CompromisedFileCheck->defacement_type = $keyword;
+            $CompromisedFileCheck->defacment_description = $implode_blacklist;
             $CompromisedFileCheck->file_status = 1;
             $CompromisedFileCheck->active = 1;
             $CompromisedFileCheck->site_id = $server->site_id;
             $CompromisedFileCheck->save();
+    
+
         }else{
             if($CompromisedFileCheck->file_status==2){
                 //no update
+                $insertLeak = false;
             }else if($CompromisedFileCheck->file_status==1){
-                //update
+                //status จะเป็น 2 เมือ่ไร
+                $CompromisedFileCheck->file_size = $datail["file_size"];
+                $CompromisedFileCheck->defacment_description = $implode_blacklist;
+                $CompromisedFileCheck->site_id = $server->site_id;
+                // $CompromisedFileCheck->file_status = 2;
+                $CompromisedFileCheck->save();
             }
-            $CompromisedFileCheck->code = generator_uuid();
-            $CompromisedFileCheck->compromised_server_id = $server->id;
-            $CompromisedFileCheck->file_name = $datail["file_name"];
-            $CompromisedFileCheck->file_extension = $datail["file_extenstion"];
-            $CompromisedFileCheck->file_path = $datail["file_path"];
-            $CompromisedFileCheck->file_size = $datail["file_size"];
-            $CompromisedFileCheck->file_modified = $datail["file_modified"];
-            $CompromisedFileCheck->file_hash = $datail["file_hash"];
-            $CompromisedFileCheck->file_status = 1;
-            $CompromisedFileCheck->active = 1;
-            $CompromisedFileCheck->site_id = $server->site_id;
-            $CompromisedFileCheck->save();
+
+            if($insertLeak){
+                $DataLeakFeedCheck = DataLeakFeed::where('data_id', $CompromisedFileCheck->id)
+                ->where('temp_id', $server->id)
+                ->where('feel_type', $keyword)
+                ->where('feedcontent',$server->site_id)->get();
+                if(!$DataLeakFeedCheck){
+
+                }
+
+                $DataLeakSocialRefCheck = DataLeakSocialRef::where('data_leak_feed_id', $DataLeakFeedCheck->id)
+                ->where('site_id', $server->site_id)
+                ->where('temp_id', $server->id)->get();
+                if(!$DataLeakSocialRefCheck){
+
+                }
+            }
 
         }
 
