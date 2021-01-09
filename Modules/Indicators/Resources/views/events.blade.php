@@ -91,11 +91,11 @@
                             </div>
                             <div class="card-ev-body">
                                 <div class="ev-left">
-                                    <span>418</span>
+                                    <span>{{ @$attr_all->event_count }}</span>
                                     <span>All</span>
                                 </div>
                                 <div class="ev-right">
-                                    <span>141</span>
+                                    <span>{{ @$attr_current->event_count }}</span>
                                     <span>Current</span>
                                 </div>
                             </div>
@@ -108,11 +108,11 @@
                             </div>
                             <div class="card-ev-body">
                                 <div class="ev-left">
-                                    <span>418</span>
+                                    <span>{{ @$attr_all->attribute_count }}</span>
                                     <span>All</span>
                                 </div>
                                 <div class="ev-right">
-                                    <span>141</span>
+                                    <span>{{ @$attr_current->attribute_count }}</span>
                                     <span>Current</span>
                                 </div>
                             </div>
@@ -257,7 +257,8 @@ const chart = Highcharts.chart('chart-pack', {
     '#3B4A68',
     '#363C46'
   ],
-  series: [{
+  series: [
+      {
     data: [{
       name: 'First dogs',
       description: '22 July 1951 First dogs in space (Dezik and Tsygan) '
@@ -277,7 +278,8 @@ const chart = Highcharts.chart('chart-pack', {
       name: 'Other',
       description: 'The mission included both joint and separate scientific experiments, and provided useful engineering experience for future joint US–Russian space flights, such as the Shuttle–Mir Program and the International Space Station.'
     }]
-  }]
+    }
+  ]
 });
 
 
@@ -357,7 +359,11 @@ const chart = Highcharts.chart('chart-pack', {
         load_table(1);
     });
 
+    function load_graph() {
+        var graph = {!!json_encode(@$attr_type)!!};
+        return graph;
 
+    }
 
     function load_table(page=1){
         $('#table_events').DataTable({

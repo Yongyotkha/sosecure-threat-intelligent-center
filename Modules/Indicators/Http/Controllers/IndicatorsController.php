@@ -3,6 +3,7 @@
 namespace Modules\Indicators\Http\Controllers;
 
 use Modules\SiteSettings\Entities\SiteSettings;
+use App\IndicatorSummaryYear;
 use Yajra\DataTables\DataTables;
 use App\Entities\OtxIndicatiorData;
 use Illuminate\Http\Request;
@@ -41,7 +42,9 @@ class IndicatorsController extends Controller
     public function events()
     {
         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
-        
+        $data["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
+        $data["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
+        $data["attr_type"] = IndicatorSummaryYear::select('type_name AS description','type_name AS name')->where("type",'summary_attr_type')->get();
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);
