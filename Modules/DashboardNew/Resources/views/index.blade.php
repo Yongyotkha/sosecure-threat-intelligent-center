@@ -4,10 +4,6 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light">
             <div class="bc-head">Summary Dashboard</div>
-
-            <div class="pull-right" style="margin-top: 15px">
-                Current Date : <i class="fas fa-calendar"></i> <span id="current-date"></span>
-            </div>
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;"
                     onchange="changeSite(value)">
@@ -124,7 +120,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive" style="max-height:280px;min-height: 400px;overflow: auto;">
+                                                    <div class="table-responsive cve_assets" style="max-height:280px;min-height: 400px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -133,23 +129,7 @@
                                                                     <th>View</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody>
-                                                                @if ($get_CVEAssets)
-                                                                @foreach ($get_CVEAssets as $get_CVEAssets)
-                                                                <tr>
-                                                                    <td>
-                                                                        <span>{{@$get_CVEAssets->vendor}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{@$get_CVEAssets->IP}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="{{@$get_CVEAssets->site_id}}" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                @endforeach
-                                                                @endif
-                                                            </tbody>
+                                                            <tbody id="cve_assets"></tbody>
                                                         </table>
                                                     </div>
                                                 </div>
@@ -247,6 +227,8 @@
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
+        load_chart();
+        cve_assets();
     }
 
     $( document ).ready(function() {
@@ -255,6 +237,9 @@
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
+        load_chart();
+        chart_indicators();
+        cve_assets();
     });
 
     function count_asset(){
@@ -337,6 +322,116 @@
         });
     }
 
+    function chart_indicators(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.chart_indicators") }}',
+            beforeSend: function() {
+                f_loading(null, '#chart-show-line');
+            },
+            success: function(result){
+                f_loading_stop(null, '#chart-show-line');
+                if(result.status_code == 200){
+                    const chart_line = new Highcharts.chart('chart-show-line', {
+                        chart: {
+                            height: 400, 
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'line'
+                        },
+                        title: {
+                            text: ''
+                        },
+                        subtitle: {
+                            text: ''
+                        },
+                        xAxis: {
+                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        },
+                        yAxis: {
+                            title: {
+                            text: 'Number (Months)'
+                            }
+                        },
+                        plotOptions: {
+                            line: {
+                            dataLabels: {
+                                enabled: true
+                            },
+                            enableMouseTracking: false
+                            }
+                        },
+                        series: [
+                        {
+                            name: 'Number of Event',
+                            data: result.data.events,
+                            color: '#3984e7'
+                        }, 
+                        {
+                            name: 'Number of Attribute',
+                            data: result.data.attribute,
+                            color: '#e64732'
+                        }, 
+                        ]
+                    });
+                }
+            }
+        });
+    }
+
+    function cve_assets(){
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '{{ route("dashboardnew.cve_assets") }}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                f_loading(null, '.cve_assets');
+            },
+            success: function(result){
+                f_loading_stop(null, '.cve_assets');
+                if(result.status_code == 200){
+                    $('#cve_assets').empty();
+                    let html = ``;
+                    for(let i in result.data){
+                        const data = result.data[i];
+                        let raw_data;
+                        let referent;
+                        if(data.raw_data){
+                            raw_data = data.raw_data;
+                        }else{
+                            raw_data = 'No data';
+                        }
+                        if(data.referent){
+                            referent = data.referent;
+                        }else{
+                            referent = 'No data';
+                        }
+
+                        html += `
+                        <tr>
+                            <td>
+                                <span>${raw_data}</span>
+                            </td>
+                            <td>
+                                <span>${referent}</span>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        `;
+                    }
+                    $('#cve_assets').html(html);
+                }
+            }
+        });
+    }
+
     $('#table-assets-modal').DataTable();
 
     var today_date = new Date();
@@ -405,10 +500,6 @@
         cb(start, end);
     });
 
-    $(function () {
-        load_chart();
-    });
-
     function load_chart(){
 
         $.ajax({
@@ -417,8 +508,9 @@
             },
             url: '{!! route('dashboardnew.load_chart') !!}',
             type: "POST",
-            data: ({
-            }),
+            data: {
+                site : site, 
+            },
             beforeSend: function(){
                 {{--loading('load');--}}
                 f_loading(null, '#chart-show-pie');
@@ -475,7 +567,6 @@
             });
         
     }
-  
     function count_vulnerability_host(){
         $.ajax({
             type: 'POST',
@@ -495,23 +586,88 @@
                     var medium = [];
                     var low = [];
                     var infomation = [];
-                    for(let i in result.data.data){
-                        const data = result.data.data[i];
-                        for(let b in result.data.host_name){
-                            const data_b = result.data.host_name[b];
-                            if(data.title == data_b.host_name){
-                                if(data.severity == 'HIGH'){
-                                    high.push(data.total);
-                                }
+                    var host_name = [];
+                    var data_array = [];
+                    for(let b in result.data.host_name){
+                        var data_object = {};
+                        const data_b = result.data.host_name[b];
+                        let total_critical = 0;
+                        let total_high = 0;
+                        let total_medium = 0;
+                        let total_low = 0;
+                        let total_infomation = 0;
+                        data_object.host_name = data_b;
+                        for(let i in result.data.data){
+                            const data = result.data.data[i];
+                            if(data_b == data.title && data.severity == 'HIGH'){
+                                total_high += data.total;
+                                data_object.severity_high = data.severity;
+                            }else if(data_b == data.title && data.severity == 'CRITICAL'){
+                                total_critical += data.total;
+                                data_object.severity_critical = data.severity;
+                            }else if(data_b == data.title && data.severity == 'MEDIUM'){
+                                total_medium += data.total;
+                                data_object.severity_medium = data.severity;
+                            }else if(data_b == data.title && data.severity == 'LOW'){
+                                total_low += data.total;
+                                data_object.severity_low = data.severity;
+                            }else if(data_b == data.title && data.severity == 'INFOMATION'){
+                                total_infomation += data.total;
+                                data_object.severity_infomation = data.severity;
                             }
-                        }  
+                        }
+                        if(total_critical > 0){
+                            data_object.total_critical = total_critical;
+                        }
+                        if(total_high > 0){
+                            data_object.total_high = total_high;
+                        }
+                        if(total_medium > 0){
+                            data_object.total_medium = total_medium;
+                        }
+                        if(total_low > 0){
+                            data_object.total_low = total_low;
+                        }
+                        if(total_infomation > 0){
+                            data_object.total_infomation = total_infomation;
+                        }
+                        data_array.push(data_object);
                     }
-                    var host_name = '';
                     for(let i in result.data.host_name){
                         const data = result.data.host_name[i];
-                        host_name += data + ',';
+                        host_name.push(data);
                     }
-                    console.log(host_name);
+                    for(let i in data_array){
+                        const host_name_check = host_name[i];
+                        const data = data_array[i];
+                        if(host_name_check == data.host_name){
+                            if(data.severity_high){
+                                high.push(data.total_high);
+                            }else{
+                                high.push(null);
+                            }
+                            if(data.severity_critical){
+                                critical.push(data.total_critical);
+                            }else{
+                                critical.push(null);
+                            }
+                            if(data.severity_medium){
+                                medium.push(data.total_medium);
+                            }else{
+                                medium.push(null);
+                            }
+                            if(data.severity_low){
+                                low.push(data.total_low);
+                            }else{
+                                low.push(null);
+                            }
+                            if(data.severity_infomation){
+                                infomation.push(data.total_infomation);
+                            }else{
+                                infomation.push(null);
+                            } 
+                        }
+                    }
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
                             height: 400, 
@@ -521,7 +677,7 @@
                             text: null
                         },
                         xAxis: {
-                            categories: [host_name]
+                            categories: host_name
                         },
                         yAxis: {
                             min: 0,
@@ -614,48 +770,6 @@
                 ],  
             }]
         });--}}
-
-
-        const chart_line = new Highcharts.chart('chart-show-line', {
-            chart: {
-                height: 400, 
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'line'
-            },
-            title: {
-                text: ''
-            },
-            subtitle: {
-                text: ''
-            },
-            xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            },
-            yAxis: {
-                title: {
-                text: 'Number (Months)'
-                }
-            },
-            plotOptions: {
-                line: {
-                dataLabels: {
-                    enabled: true
-                },
-                enableMouseTracking: false
-                }
-            },
-            series: [
-            {
-                name: 'Number of Months',
-                data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
-                color: '#3984e7'
-            }, 
-            ]
-        });
-
-
 </script>
 
 @endpush

@@ -9,6 +9,7 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use App\DataLeakFeed;
 use App\DataLeakSocialRef;
+use App\IndicatorSummaryYear;
 use Illuminate\Support\Facades\DB;
 use Modules\Scans\Entities\Assets;
 use Modules\SiteSettings\Entities\DataCveven;
@@ -69,6 +70,20 @@ class DashboardNewController extends Controller
     {
         $data['page'] = langapp('dashboard');
         return view('dashboardnew::view_detail_asset')->with($data);
+    }
+
+    public function cve_assets(Request $request){
+        if($request -> site == 0){
+            $assets = Assets::where('status', 1)->get();
+        }else{
+            $assets = Assets::where('site_id', $request -> site)->where('status', 1)->get();
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => $assets
+        );
+        return response()->json($response);
     }
 
     public function count_asset(Request $request){
@@ -152,7 +167,7 @@ class DashboardNewController extends Controller
                 'title' => $data -> title
             ]);
         }
-        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity')->get();
+        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
         foreach($CVEMapping as $data){
             foreach($check_total_namecve as $item){
                 if($data -> namecve == $item['namecve']){
@@ -162,12 +177,71 @@ class DashboardNewController extends Controller
                 }
             }
         }
+        $result = array();
+        foreach ($host_name as $element) {
+            $result[$element] = $element;
+        }
+        
         $response = array(
             'error' => '', 
             'status_code' => '200',
             'data' => [
                 'data' => $CVEMapping,
-                'host_name' => $host_name
+                'host_name' => $result
+            ]
+        );
+        return response()->json($response);
+    }
+
+    public function chart_indicators(Request $request){
+        $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', now()->year)->get();
+        $events = [0,0,0,0,0,0,0,0,0,0,0,0];
+        $attribute = [0,0,0,0,0,0,0,0,0,0,0,0];
+        foreach($IndicatorSummaryYear as $data){
+            if($data -> month == 1){
+                $events[0] = $data -> event_count;
+                $attribute[0] = $data -> attribute_count;
+            }else if($data -> month == 2){
+                $events[1] = $data -> event_count;
+                $attribute[1] = $data -> attribute_count;
+            }else if($data -> month == 3){
+                $events[2] = $data -> event_count;
+                $attribute[2] = $data -> attribute_count;
+            }else if($data -> month == 4){
+                $events[3] = $data -> event_count;
+                $attribute[3] = $data -> attribute_count;
+            }else if($data -> month == 5){
+                $events[4] = $data -> event_count;
+                $attribute[4] = $data -> attribute_count;
+            }else if($data -> month == 6){
+                $events[5] = $data -> event_count;
+                $attribute[5] = $data -> attribute_count;
+            }else if($data -> month == 7){
+                $events[6] = $data -> event_count;
+                $attribute[6] = $data -> attribute_count;
+            }else if($data -> month == 8){
+                $events[7] = $data -> event_count;
+                $attribute[7] = $data -> attribute_count;
+            }else if($data -> month == 9){
+                $events[8] = $data -> event_count;
+                $attribute[8] = $data -> attribute_count;
+            }else if($data -> month == 10){
+                $events[9] = $data -> event_count;
+                $attribute[9] = $data -> attribute_count;
+            }else if($data -> month == 11){
+                $events[10] = $data -> event_count;
+                $attribute[10] = $data -> attribute_count;
+            }else if($data -> month == 12){
+                $events[11] = $data -> event_count;
+                $attribute[11] = $data -> attribute_count;
+            }
+        }
+        $response = array(
+            'error' => '', 
+            'status_code' => '200',
+            'data' => [
+                'events' => $events,
+                'attribute' => $attribute,
             ]
         );
         return response()->json($response);
@@ -236,13 +310,21 @@ class DashboardNewController extends Controller
     public function load_chart(Request $request)
     {
         $model = new CVEMapping;
-        $model->get();
-    
-        $high = $model->where('severity', '=', 'HIGH')->count();
-        $medium = $model->where('severity', '=', 'MEDIUM')->count();
-        $critical = $model->where('severity', '=', 'CRITICAL')->count();
-        $low = $model->where('severity', '=', 'LOW')->count();
-        $none = $model->where('severity', '=', 'NONE')->count();
+        if($request -> site == 0){
+            $model->get();
+            $high = $model->where('severity', '=', 'HIGH')->count();
+            $medium = $model->where('severity', '=', 'MEDIUM')->count();
+            $critical = $model->where('severity', '=', 'CRITICAL')->count();
+            $low = $model->where('severity', '=', 'LOW')->count();
+            $none = $model->where('severity', '=', 'NONE')->count();
+        }else{
+            $model->get();
+            $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->count();
+            $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->count();
+            $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->count();
+            $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->count();
+            $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->count();
+        }
 
         // $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         // $clientMD = new MongoClient($DB_MONGO_KEY);

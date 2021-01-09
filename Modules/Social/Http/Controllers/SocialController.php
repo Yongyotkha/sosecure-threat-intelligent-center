@@ -204,9 +204,9 @@ class SocialController extends Controller
             // dd($news);
             // dd($news->total);
             $Data_leak_feed_all = $news->count();
-            $news = $news->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
+            $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
         }
 
         // dd($news);
@@ -244,6 +244,19 @@ class SocialController extends Controller
             }else{
                 $html .= '<div class="list-news">';
             }
+
+            $get_ref_name = '';
+            $get_ref_name .= 'Site: ';
+            if(!empty($data -> get_ref)){
+                foreach ($data -> get_ref as $get_ref) {
+
+                    if(isset($get_ref->get_site_name->name))
+                    $get_ref_name = $get_ref_name.$get_ref->get_site_name->name.", ";
+                }
+            }
+
+            $get_ref_name = rtrim($get_ref_name,", ");
+
             $html .= '
                 <!--<div class="checkbox-news-select">
                     <label class="mr-3">
@@ -264,8 +277,10 @@ class SocialController extends Controller
                                     </a>
                                 </h3>
                                 <div class="entry-meta">
+                                    <span class="entry-view"><b>'.@$data -> feel_type.'</b></span>
                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
                                     <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
+                                    <span class="entry-view"><b>'.$get_ref_name.'</b></span>
                                 </div>
                                 <!--<div class="description-text hidden-xs">
                                 <span><p>&nbsp;'.strip_tags($n_title).'</p></span>

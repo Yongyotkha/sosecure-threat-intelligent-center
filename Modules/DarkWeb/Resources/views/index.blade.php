@@ -88,8 +88,8 @@
                                 <div class="img-icon-card ice">
                                     <img src="{{asset('images/iceberg2.png')}}" alt="">
                                 </div>
-                                <h3 class="name-dash-text text-dark text-upper ">Public</h3>
-                                <span class="number-card warning">135</span>
+                                <h3 class="name-dash-text text-white text-upper ">Public</h3>
+                                <span class="number-card warning" id='compromise-count'>0</span>
                             </div>
                         </div>
                     </div>
@@ -99,8 +99,8 @@
                                 <div class="img-icon-card ice">
                                     <img src="{{asset('images/iceberg1.png')}}" alt="">
                                 </div>
-                                <h3 class="name-dash-text text-dark text-upper">Dark Web</h3>
-                                <span class="number-card info">105</span>
+                                <h3 class="name-dash-text text-white text-upper">Dark Web</h3>
+                                <span class="number-card info"  id='darkweb-count'>0</span>
                             </div>
                         </div>
                     </div>
@@ -110,8 +110,8 @@
                                 <div class="img-icon-card ice">
                                     <img src="{{asset('images/webserver.png')}}" alt="">
                                 </div>
-                                <h3 class="name-dash-text text-dark text-upper ">Web Server</h3>
-                                <span class="number-card green">500</span>
+                                <h3 class="name-dash-text text-white text-upper ">Web Server</h3>
+                                <span class="number-card green"  id='webserver-count'>0</span>
                             </div>
                         </div>
                     </div>
@@ -315,6 +315,9 @@
                 return;
             } else {
                 ck = 1;
+                $('#darkweb-count').text(data.darkweb);
+                $('#compromise-count').text(data.compromise);
+                $('#webserver-count').text(data.webserver);
                 $('#count_news').text(data.count);
                 $("#list_news").append(data.html); 
                 $('.ajax-loading').hide();
