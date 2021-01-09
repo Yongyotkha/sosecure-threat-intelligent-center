@@ -50,6 +50,7 @@ class MDCountIndicator extends Command
         $options = [
             'allowDiskUse' => TRUE
         ];
+
         $pipeline = [
             [
                 '$group' => [
@@ -80,6 +81,7 @@ class MDCountIndicator extends Command
                 ]
             ]
         ];
+
         $pipeline2 = [
             [
                 '$group' => [
@@ -117,18 +119,20 @@ class MDCountIndicator extends Command
         
         foreach ( $countAttr as $value) {
             $IndicatorSummaryYear = IndicatorSummaryYear::where('year', $value["year"])
-            ->where('month',  $value["month"])->first();
+            ->where('month',  $value["month"])->where('type',  'summary_year')->first();
             if(!$IndicatorSummaryYear){
                 $IndicatorSummaryYear = new IndicatorSummaryYear;
                 $IndicatorSummaryYear->year = $value["year"];
                 $IndicatorSummaryYear->month = $value["month"];
                 $IndicatorSummaryYear->attribute_count =  $value["COUNT_Attr"];
                 $IndicatorSummaryYear->event_count =  0;
+                $IndicatorSummaryYear->type =  'summary_year';
                 $IndicatorSummaryYear->status = 1;
                 $IndicatorSummaryYear->save();
 
             }else{
                 $IndicatorSummaryYear->attribute_count =  $value["COUNT_Attr"];
+               
                 $IndicatorSummaryYear->save();
 
             }
@@ -136,23 +140,91 @@ class MDCountIndicator extends Command
 
         foreach ( $countEvents as $value) {
             $IndicatorSummaryYear = IndicatorSummaryYear::where('year', $value["year"])
-            ->where('month',  $value["month"])->first();
+            ->where('month',  $value["month"])->where('type',  'summary_year')->first();
             if(!$IndicatorSummaryYear){
                 $IndicatorSummaryYear = new IndicatorSummaryYear;
                 $IndicatorSummaryYear->year = $value["year"];
                 $IndicatorSummaryYear->month = $value["month"];
                 $IndicatorSummaryYear->attribute_count = 0;
                 $IndicatorSummaryYear->event_count =  $value["COUNT_Event"];
+                $IndicatorSummaryYear->type =  'summary_year';
                 $IndicatorSummaryYear->status = 1;
                 $IndicatorSummaryYear->save();
 
             }else{
                 $IndicatorSummaryYear->event_count =  $value["COUNT_Event"];
+                
                 $IndicatorSummaryYear->save();
 
             }
         }
-        print_r($countEvents);
+  
+
+        $pipeline3 = [
+            [
+                '$group' => [
+                    '_id' => [
+                        'type' => '$type'
+                    ],
+                    'COUNT(*)' => [
+                        '$sum' => 1
+                    ]
+                ]
+            ],
+            [
+                '$project' => [
+                    'COUNT_AttrType' => '$COUNT(*)',
+                    'type' => 'AttrType',
+                    'thisType' => '$_id.type',
+                    '_id' => 0
+                ]
+            ]
+        ];
+
+        $countTypeAttr = $col_fx_otx_indicator_detail->aggregate($pipeline3, $options);
+        $countTypeAttr = $countTypeAttr->toArray();
+        foreach ( $countTypeAttr as $value) {
+            $IndicatorSummaryYear = IndicatorSummaryYear::where('type_name', $value["thisType"])
+            ->where('type',  'summary_attr_type')->first();
+            if(!$IndicatorSummaryYear){
+                $IndicatorSummaryYear = new IndicatorSummaryYear;
+                $IndicatorSummaryYear->attribute_count = $value["COUNT_AttrType"];
+                $IndicatorSummaryYear->type =  'summary_attr_type';
+                $IndicatorSummaryYear->type_name = $value["thisType"];
+                $IndicatorSummaryYear->status = 1;
+                $IndicatorSummaryYear->save();
+            }else{
+                $IndicatorSummaryYear->attribute_count = $value["COUNT_AttrType"];
+                $IndicatorSummaryYear->save();
+
+            }
+        }
+
+        // $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+        $date_sub1 = 4;
+        $date_now_sub1 = new UTCDateTime( Carbon::now('UTC')->subDays($date_sub1));
+        $query = array(
+            'created_at' => ['$gt' =>  $date_now_sub1],
+        );
+
+        $query2 = array( 
+            'created_at' => ['$gt' =>  $date_now_sub1],
+        );
+        $Attr_count_current = (int)$col_fx_otx_indicator_detail->count($query);
+        $Event_count_current = (int)$col_fx_otx_events->count($query2);
+        $IndicatorSummaryYear = IndicatorSummaryYear::where('type',  'summary_current')->first();
+        if(!$IndicatorSummaryYear){
+            $IndicatorSummaryYear = new IndicatorSummaryYear;
+            $IndicatorSummaryYear->attribute_count = $Attr_count_current;
+            $IndicatorSummaryYear->event_count =  $Event_count_current;
+            $IndicatorSummaryYear->status = 1;
+            $IndicatorSummaryYear->save();
+        }else{
+            $IndicatorSummaryYear->attribute_count = $Attr_count_current;
+            $IndicatorSummaryYear->event_count =  $Event_count_current;
+            $IndicatorSummaryYear->save();
+
+        }
         $this->info('END------------------------------------------------------------END');
     }
 
