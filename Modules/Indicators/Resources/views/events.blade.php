@@ -85,10 +85,38 @@
             <div class="container-fluid" style="margin-bottom:10px;">
                 <div class="row">
                     <div class="col-md-3 nopadding">
-
+                        <div class="card-ev">
+                            <div class="header-ev">
+                                Events
+                            </div>
+                            <div class="card-ev-body">
+                                <div class="ev-left">
+                                    <span>418</span>
+                                    <span>All</span>
+                                </div>
+                                <div class="ev-right">
+                                    <span>141</span>
+                                    <span>Current</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3 nopadding">
-
+                        <div class="card-ev">
+                            <div class="header-ev">
+                                Attribute
+                            </div>
+                            <div class="card-ev-body">
+                                <div class="ev-left">
+                                    <span>418</span>
+                                    <span>All</span>
+                                </div>
+                                <div class="ev-right">
+                                    <span>141</span>
+                                    <span>Current</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 nopadding">
 

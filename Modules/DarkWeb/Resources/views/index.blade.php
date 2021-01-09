@@ -124,8 +124,6 @@
                     <li  id="tab-bookmark"><a href="#tab-bookmarks" class="tab_cliick" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
                 </ul>
                 <div class="tab-content">
-
-
                     <div class="tab-pane active" id="tab-leak">
                         <section class="panel panel-default border-n">
                             <div id="main-list" class="row m-b-md">

@@ -3008,3 +3008,48 @@ input.input-login:focus {
     height: 100%;
     object-fit: cover;
 }
+
+.card-ev{
+    background: #fff;
+    padding: 1rem;
+    border: 1px solid #eee;
+}
+
+.header-ev{
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.card-ev-body{
+    display: flex;
+    align-items: center;
+}
+.ev-left,
+.ev-right{
+    flex: 1;
+}
+.ev-left{
+    border-right: 1px solid #eee;
+}
+.ev-left > span:first-child{
+    font-size: 38px;
+    font-weight: 700;
+    height: 50px;
+}
+
+.ev-right > span:first-child{
+    font-size: 28px;
+    font-weight: 700;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ev-left > span,
+.ev-right > span
+{
+    text-align: center;
+    display: block;
+}
