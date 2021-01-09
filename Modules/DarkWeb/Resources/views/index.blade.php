@@ -80,43 +80,43 @@
             </section>
 
 
-            <section class="panel panel-default">
-                <div class="panel-body">
-                    <div class="col-md-4">
-                        <div class="card-dash">
+            <div class="container-fluid" style="margin-bottom:10px;">
+                <div class="row">
+                    <div class="col-md-4 nopadding">
+                        <div class="card-dash bg-dark-blue none-shadow">
                             <div class="left-card">
-                                <div class="img-icon-card">
-                                    <img src="{{asset('images/eye.png')}}" alt="">
+                                <div class="img-icon-card ice">
+                                    <img src="{{asset('images/iceberg1.png')}}" alt="">
                                 </div>
-                                <h3 class="name-dash-text text-dark text-upper ">Public</h3>
+                                <h3 class="name-dash-text text-white text-upper ">Public</h3>
                                 <span class="number-card warning">135</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card-dash">
+                    <div class="col-md-4 nopadding">
+                        <div class="card-dash bg-dark-blue none-shadow">
                             <div class="left-card">
-                                <div class="img-icon-card">
-                                    <img src="{{asset('images/compromise.png')}}" alt="">
+                                <div class="img-icon-card ice">
+                                    <img src="{{asset('images/iceberg2.png')}}" alt="">
                                 </div>
-                                <h3 class="name-dash-text text-dark text-upper">Dark Web</h3>
+                                <h3 class="name-dash-text text-white text-upper">Dark Web</h3>
                                 <span class="number-card info">105</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card-dash">
+                    <div class="col-md-4 nopadding">
+                        <div class="card-dash bg-dark-blue none-shadow">
                             <div class="left-card">
-                                <div class="img-icon-card">
+                                <div class="img-icon-card ice">
                                     <img src="{{asset('images/webserver.png')}}" alt="">
                                 </div>
-                                <h3 class="name-dash-text text-dark text-upper ">Web Server</h3>
+                                <h3 class="name-dash-text text-white text-upper ">Web Server</h3>
                                 <span class="number-card green">500</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">

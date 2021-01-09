@@ -2163,6 +2163,14 @@ ul.topics-news-list li a:hover{
     margin-top: 2rem; */
 }
 
+.img-icon-card.ice{
+    width: 110px;
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+    float: left;
+}
+
 .img-icon-card img{
     position: absolute;
     top: 0;
@@ -2202,6 +2210,20 @@ ul.topics-news-list li a:hover{
     align-items: center;
     border-bottom: 2px solid #e6e3e3; */
 }
+.card-dash.none-bg{
+    background-color: unset !important;
+}
+.card-dash.none-shadow{
+    box-shadow: unset !important;
+}
+
+.card-dash.bg-dark-light-blue{
+    background: #074170;
+}
+.card-dash.bg-dark-blue{
+    background: #222938;
+}
+
 .card-dash.bg-dark{
     background: #2b9eff40;
 }
