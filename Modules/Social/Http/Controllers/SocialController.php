@@ -394,6 +394,22 @@ class SocialController extends Controller
                 }
             }
 
+            $get_ref_name = '';
+            $get_ref_name .= 'Site: ';
+           
+            if(!empty($data -> data_leak_feed -> get_ref)){
+                foreach ($data -> data_leak_feed -> get_ref as $get_ref) {
+                   
+                    if(isset($get_ref->get_site_name->name)){
+                    $get_ref_name = $get_ref_name.$get_ref->get_site_name->name.", ";
+                    
+                    }
+                }
+            }
+
+            $get_ref_name = rtrim($get_ref_name,", ");
+
+
             $check_read_news = Read_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> data_leak_feed_id)->first();
             if($check_read_news){
                 $html .= '<div class="list-news" style="background-color:#ececec">';
@@ -419,8 +435,10 @@ class SocialController extends Controller
                             </a>
                         </h3>
                         <div class="entry-meta">
+                            <span class="entry-date"> <b>'.@$data -> data_leak_feed -> feel_type.'</b></span>
                             <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> data_leak_feed -> feedtimepost.'</span>
                             <span class="entry-view"> <i class="fas fa-eye"></i> '.$count_view.'</span>
+                            <span class="entry-date"> <b>'.$get_ref_name.'</b></span>
                         </div>
                         <!--<div class="description-text hidden-xs">
                         <span><p>&nbsp;'.strip_tags(@$data -> data_leak_feed -> feedcontent).'</p></span>
