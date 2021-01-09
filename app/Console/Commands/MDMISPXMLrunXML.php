@@ -87,8 +87,8 @@ class MDMISPXMLrunXML extends Command
         $dir_folder = app_path() . "\\Console\\Commands\\temp\\otx_export2\\";
         if (is_dir($dir_folder)) {
             if ($dh = opendir($dir_folder)) {
-                    $start = 400-1;
-                    $stop = 600+1;
+                    $start = 667-1;
+                    $stop = 700+1;
                     $loop = 0;
                     // rematch 0-300
                 while (($file = readdir($dh)) !== false) {

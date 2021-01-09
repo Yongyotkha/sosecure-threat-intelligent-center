@@ -1,7 +1,7 @@
 <?php
 
 namespace Modules\Social\Entities;
-
+use Modules\SiteSettings\Entities\SiteSettings;
 // use Modules\Social\Entities\SiteNewsRelated;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,6 +9,10 @@ class Data_leak_socail_ref extends Model
 {
     protected $table = 'data_leak_socail_ref';
     protected $fillable = [];
+
+    public function get_site_name(){
+        return $this->hasOne(SiteSettings::class, 'id', 'site_id');
+    }
 
     // public function get_cate(){
     //     return $this->hasMany(RSSNewsCategory::class, 'rss_news_id', 'id')->with("get_cate_name");
