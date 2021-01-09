@@ -119,7 +119,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 nopadding">
-
+                        <div id="chart-pack" style="background: #fff"></div>
                     </div>
                 </div>
             </div>
@@ -206,6 +206,7 @@
 @include('stacks.css.datatables')
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
+@include('stacks.css.highchart')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
@@ -213,9 +214,73 @@
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
+@include('stacks.js.highchart')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.advanced_search')
+<script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
 <script>
+
+const chart = Highcharts.chart('chart-pack', {
+  chart: {
+    type: 'timeline',
+    height: '125px'
+  },
+  accessibility: {
+    screenReaderSection: {
+      beforeChartFormat: '<h5>{chartTitle}</h5>' +
+        '<div>{typeDescription}</div>' +
+        '<div>{chartSubtitle}</div>' +
+        '<div>{chartLongdesc}</div>' +
+        '<div>{viewTableButton}</div>'
+    },
+    point: {
+      valueDescriptionFormat: '{index}. {point.label}. {point.description}.'
+    }
+  },
+  xAxis: {
+    visible: false
+  },
+  yAxis: {
+    visible: false
+  },
+  title: {
+    text: null
+  },
+  subtitle: {
+    text: null
+  },
+  colors: [
+    '#4185F3',
+    '#427CDD',
+    '#406AB2',
+    '#3E5A8E',
+    '#3B4A68',
+    '#363C46'
+  ],
+  series: [{
+    data: [{
+      name: 'First dogs',
+      description: '22 July 1951 First dogs in space (Dezik and Tsygan) '
+    }, {
+      name: 'Sputnik 1',
+      description: '4 October 1957 First artificial satellite. First signals from space.'
+    }, {
+      name: 'First human spaceflight',
+      description: 'First human spaceflight (Yuri Gagarin), and the first human-crewed orbital flight'
+    }, {
+      name: 'First human on the Moon',
+      description: 'First human on the Moon, and first space launch from a celestial body other than the Earth. First sample return from the Moon'
+    }, {
+      name: 'China',
+      description: 'Salyut 1 was the first space station of any kind, launched into low Earth orbit by the Soviet Union on April 19, 1971.'
+    }, {
+      name: 'Other',
+      description: 'The mission included both joint and separate scientific experiments, and provided useful engineering experience for future joint US–Russian space flights, such as the Shuttle–Mir Program and the International Space Station.'
+    }]
+  }]
+});
+
+
     $('.select2-option').select2();
 
     var start_date = '';

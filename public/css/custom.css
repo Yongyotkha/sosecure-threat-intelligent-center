@@ -3013,6 +3013,7 @@ input.input-login:focus {
     background: #fff;
     padding: 1rem;
     border: 1px solid #eee;
+    height: 125px;
 }
 
 .header-ev{
