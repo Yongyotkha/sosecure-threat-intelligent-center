@@ -448,3 +448,47 @@ function formatSizeUnits($bytes)
 
         return $bytes;
 }
+
+function encrypt_decrypt_version($action, $string, $ip, $mac) {
+    $output = false;
+    $encrypt_method = "AES-256-CBC";
+    $secret_key = 'secret-key-!@#$#@!@#$%^' . $ip . '?><!@#$' . $mac;
+    $secret_iv = 'secret-iv-!@#$#@!@#$%^' . $ip . '?><!@#$' . $mac;
+    // hash
+    $key = hash('sha256', $secret_key);
+
+    // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+    $iv = substr(hash('sha256', $secret_iv), 0, 16);
+    if ( $action == 'encrypt' ) {
+        $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+        $output = base64_encode($output);
+    } else if( $action == 'decrypt' ) {
+        $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+    }
+    return $output;
+}
+
+function get_ip(){
+    return '192.168.2.1';
+}
+
+function get_mac(){
+    return 'fe80::8c98:dba3:69f3:2ecb%6';
+}
+
+function setEnvironmentValue($envKey, $envValue)
+{
+    $envFile = app()->environmentFilePath();
+    $str = file_get_contents($envFile);
+
+    $str .= "\n"; // In case the searched variable is in the last line without \n
+    $keyPosition = strpos($str, "{$envKey}=");
+    $endOfLinePosition = strpos($str, PHP_EOL, $keyPosition);
+    $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
+    $str = str_replace($oldLine, "{$envKey}={$envValue}", $str);
+    $str = substr($str, 0, -1);
+
+    $fp = fopen($envFile, 'w');
+    fwrite($fp, $str);
+    fclose($fp);
+}
