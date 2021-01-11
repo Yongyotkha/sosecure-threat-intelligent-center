@@ -7,14 +7,14 @@ use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
 
-class MDMISPXMLrun extends Command
+class MDMISPXMLrunXMLL extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:MDMISPXMLrun';
+    protected $signature = 'app:MDMISPXMLrunXMLL';
 
     /**
      * The console command description.
@@ -84,103 +84,120 @@ class MDMISPXMLrun extends Command
     public function saveJson($stamp_event_id, $stamp_indicator_id, $json_o = null)
     {
 
-        $dir_folder = app_path() . "\\Console\\Commands\\temp\\otx_export\\";
+        $dir_folder = app_path() . "\\Console\\Commands\\temp\\otx_export2\\";
+        //$dir_folder = "127.0.0.1" . "\\Newfolder\\otx_export2\\";
         if (is_dir($dir_folder)) {
             if ($dh = opendir($dir_folder)) {
+                    // $start = 667-1;
+                    // $stop = 700+1;
+                    $start = 395-1;
+                    $stop = 600+1;
+                    $loop = 0;
+                    // rematch 0-300
                 while (($file = readdir($dh)) !== false) {
+                    if ($file != "." && $file != "..") {
+                        $pieces = explode("_", $file)[1];
+                        $pieces = (int)(explode(".", $pieces)[0]);
+                        $this->info($pieces);
+                    if($pieces>$start&&$pieces<$stop){
+                        try {
+                            $dir_xmlfile = $dir_folder . $file;
+                            echo $dir_xmlfile;
+                            
+                                $content = file_get_contents($dir_xmlfile);
+                                $xmlIndex = strpos($content, "<?xml");
+                                $content = substr($content, $xmlIndex);
+                                $xmlIndex = strrpos($content, ">") + 1;
+                                $content = substr($content, 0, $xmlIndex);
 
-                    try {
-                        $dir_xmlfile = $dir_folder . $file;
-                        echo $dir_xmlfile;
-                        if ($file != "." && $file != "..") {
-                            $content = file_get_contents($dir_xmlfile);
-                            $xmlIndex = strpos($content, "<?xml");
-                            $content = substr($content, $xmlIndex);
-                            $xmlIndex = strrpos($content, ">") + 1;
-                            $content = substr($content, 0, $xmlIndex);
+                                $t_xml = new \DOMDocument();
+                                //$t_xml->load($dir_folder);
+                                $t_xml->loadXML($content);
+                                unset($content);
+                                $responseEvents = $t_xml->getElementsByTagName('response');
 
-                            $t_xml = new \DOMDocument();
-                            //$t_xml->load($dir_folder);
-                            $t_xml->loadXML($content);
-                            unset($content);
-                            $responseEvents = $t_xml->getElementsByTagName('response');
+                                foreach ($responseEvents as $Events_) {
 
-                            foreach ($responseEvents as $Events_) {
+                                    $EventCheck = $Events_->getElementsByTagName('Event');
+                                    $item = array();
+                                    if ($EventCheck->length > 0) {
+                                        $Event = $EventCheck->item(0);
 
-                                $EventCheck = $Events_->getElementsByTagName('Event');
-                                $item = array();
-                                if ($EventCheck->length > 0) {
-                                    $Event = $EventCheck->item(0);
-
-                                    $tag = array();
-                                    foreach ($Event->getElementsByTagName('Tag') as $Tags) {
-                                        if($Tags->nodeValue){
-                                            $tag[] = array('name' => $Tags->getElementsByTagName('name')->item(0)->nodeValue);
+                                        $tag = array();
+                                        foreach ($Event->getElementsByTagName('Tag') as $Tags) {
+                                            if($Tags->nodeValue){
+                                                $tag[] = array('name' => $Tags->getElementsByTagName('name')->item(0)->nodeValue);
+                                            }
                                         }
-                                    }
 
-                                    $relatedevent = array();
-                                    foreach ($Event->getElementsByTagName('RelatedEvent') as $RelatedEvents) {
-                                        $RelatedEventsCheck = $RelatedEvents->getElementsByTagName('Event');
-                                        if ($RelatedEventsCheck->length > 0) {
-                                            $RelatedEvent = $RelatedEventsCheck->item(0);
-                                            $relatedevent[] = array('Event' => array(
-                                                'id' => $RelatedEvent->getElementsByTagName('id')->item(0)->nodeValue,
-                                                'published' => $RelatedEvent->getElementsByTagName('published')->item(0)->nodeValue,
-                                                'date' => $RelatedEvent->getElementsByTagName('date')->item(0)->nodeValue,
-                                                'timestamp' => $RelatedEvent->getElementsByTagName('timestamp')->item(0)->nodeValue,
-                                                'info' => $RelatedEvent->getElementsByTagName('info')->item(0)->nodeValue,
-                                            ),
-                                            );
+                                        $relatedevent = array();
+                                        foreach ($Event->getElementsByTagName('RelatedEvent') as $RelatedEvents) {
+                                            $RelatedEventsCheck = $RelatedEvents->getElementsByTagName('Event');
+                                            if ($RelatedEventsCheck->length > 0) {
+                                                $RelatedEvent = $RelatedEventsCheck->item(0);
+                                                $relatedevent[] = array('Event' => array(
+                                                    'id' => $RelatedEvent->getElementsByTagName('id')->item(0)->nodeValue,
+                                                    'published' => $RelatedEvent->getElementsByTagName('published')->item(0)->nodeValue,
+                                                    'date' => $RelatedEvent->getElementsByTagName('date')->item(0)->nodeValue,
+                                                    'timestamp' => $RelatedEvent->getElementsByTagName('timestamp')->item(0)->nodeValue,
+                                                    'info' => $RelatedEvent->getElementsByTagName('info')->item(0)->nodeValue,
+                                                ),
+                                                );
+                                            }
                                         }
-                                    }
 
-                                    $relatedattribute = array();
+                                        $relatedattribute = array();
 
-                                    foreach ($Event->getElementsByTagName('Attribute') as $RelatedAttributes) {
-                                        if($RelatedAttributes->nodeValue){
-                                            $relatedattribute[] = array(
-                                                'type' => $RelatedAttributes->getElementsByTagName('type')->item(0)->nodeValue,
-                                                'value' => $RelatedAttributes->getElementsByTagName('value')->item(0)->nodeValue,
-                                                'id' => $RelatedAttributes->getElementsByTagName('id')->item(0)->nodeValue,
-                                                'category' => $RelatedAttributes->getElementsByTagName('category')->item(0)->nodeValue,
-                                            );
+                                        foreach ($Event->getElementsByTagName('Attribute') as $RelatedAttributes) {
+                                            if($RelatedAttributes->nodeValue){
+                                                $relatedattribute[] = array(
+                                                    'type' => $RelatedAttributes->getElementsByTagName('type')->item(0)->nodeValue,
+                                                    'value' => $RelatedAttributes->getElementsByTagName('value')->item(0)->nodeValue,
+                                                    'id' => $RelatedAttributes->getElementsByTagName('id')->item(0)->nodeValue,
+                                                    'category' => $RelatedAttributes->getElementsByTagName('category')->item(0)->nodeValue,
+                                                );
+                                            }
                                         }
+                                        $item = array(
+                                            'id' => $Event->getElementsByTagName('id')->item(0)->nodeValue,
+                                            'info' => $Event->getElementsByTagName('info')->item(0)->nodeValue,
+                                            'publish_timestamp' => $Event->getElementsByTagName('publish_timestamp')->item(0)->nodeValue,
+                                            'date' => $Event->getElementsByTagName('date')->item(0)->nodeValue,
+                                            'published' => $Event->getElementsByTagName('published')->item(0)->nodeValue,
+                                            'timestamp' => $Event->getElementsByTagName('timestamp')->item(0)->nodeValue,
+                                            'Tag' => $tag,
+                                            'RelatedEvent' => $relatedevent,
+                                            'Attribute' => $relatedattribute,
+                                        );
+
                                     }
-                                    $item = array(
-                                        'id' => $Event->getElementsByTagName('id')->item(0)->nodeValue,
-                                        'info' => $Event->getElementsByTagName('info')->item(0)->nodeValue,
-                                        'publish_timestamp' => $Event->getElementsByTagName('publish_timestamp')->item(0)->nodeValue,
-                                        'date' => $Event->getElementsByTagName('date')->item(0)->nodeValue,
-                                        'published' => $Event->getElementsByTagName('published')->item(0)->nodeValue,
-                                        'timestamp' => $Event->getElementsByTagName('timestamp')->item(0)->nodeValue,
-                                        'Tag' => $tag,
-                                        'RelatedEvent' => $relatedevent,
-                                        'Attribute' => $relatedattribute,
-                                    );
 
                                 }
 
-                            }
-
-                            if (!empty($item)) {
-                                try {
-                                    $this->info(" id" . ": " . $item["id"]);
-                                    $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
-                                    $countEvent = $this->saveRelatedEvent($item, $stamp_event_id, $stamp_indicator_id);
-                                    $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent);
-                                } catch (Exception $e) {
-                                    echo json_encode($e->getMessage());
+                                if (!empty($item)) {
+                                    try {
+                                        $this->info(" id" . ": " . $item["id"]);
+                                        $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
+                                        $countEvent = $this->saveRelatedEvent($item, $stamp_event_id, $stamp_indicator_id);
+                                        $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent);
+                                    } catch (Exception $e) {
+                                        echo json_encode($e->getMessage());
+                                    }
                                 }
-                            }
 
+                            
+
+                        } catch (Exception $e) {
+                            echo json_encode($e->getMessage());
                         }
-
-                    } catch (Exception $e) {
-                        echo json_encode($e->getMessage());
                     }
 
+
                 }
+
+                }
+
+
                 $this->info("END");
                 closedir($dh);
             }
@@ -207,7 +224,7 @@ class MDMISPXMLrun extends Command
             $tags = rtrim($tags, ", ");
         }
         $update_fx_otx_events = $col_fx_otx_events->updateOne(
-            ['pulse_id' => "misp2_" . @$valueEvent["id"]],
+            ['pulse_id' => "misp_" . @$valueEvent["id"]],
             ['$set' => [
                 'name' => @$valueEvent["info"],
                 'description' => @$valueEvent["info"],
@@ -258,7 +275,7 @@ class MDMISPXMLrun extends Command
                 $data["all"]++;
 
                 $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                    ['pulse_id' => "misp2_" . @$value["Event"]["id"]],
+                    ['pulse_id' => "misp_" . @$value["Event"]["id"]],
                     ['$set' => [
                         'name' => @$value["Event"]["info"],
                         'description' => @$value["Event"]["info"],
@@ -294,8 +311,8 @@ class MDMISPXMLrun extends Command
 
                 $update_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->updateOne(
                     [
-                        'main_pulse_id' => "misp2_" . @$valueEvent["id"],
-                        'pulse_id' => "misp2_" . @$value["Event"]["id"]],
+                        'main_pulse_id' => "misp_" . @$valueEvent["id"],
+                        'pulse_id' => "misp_" . @$value["Event"]["id"]],
                     ['$set' => [
                         'sub_pulse_modified' => isset($value["Event"]["timestamp"]) ? new UTCDateTime($value["Event"]["timestamp"] * 1000) : null,
                         'updated_at' => $date_now,
@@ -353,11 +370,12 @@ class MDMISPXMLrun extends Command
                 if (true) {
                     $update_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->updateOne(
                         [
-                            'indicator_id' => "misp2_" . @$value["id"],
+                            'indicator_id' => "misp_" . @$value["id"],
                         ],
                         [
                             '$set' => [
                                 'indicator_name' => @$value["value"],
+                                'role' => @$value["category"],
                                 'type' => @$value["type"],
                                 'updated_by' => "system",
                                 'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
@@ -378,7 +396,7 @@ class MDMISPXMLrun extends Command
                     );
 
                     $update_fx_transaction_otx_indicators_data = $col_fx_transaction_otx_indicators_data->updateOne(
-                        ['indicator_id' => "misp2_" . @$value["id"]],
+                        ['indicator_id' => "misp_" . @$value["id"]],
                         [
                             '$set' => [
                                 'indicator' => @$value["value"],
@@ -431,8 +449,8 @@ class MDMISPXMLrun extends Command
 
                 $update_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->updateOne(
                     [
-                        'indicator_id' => "misp2_" . @$value["id"],
-                        'pulse_id' => "misp2_" . @$valueEvent["id"],
+                        'indicator_id' => "misp_" . @$value["id"],
+                        'pulse_id' => "misp_" . @$valueEvent["id"],
                     ],
                     [
                         '$set' => [
