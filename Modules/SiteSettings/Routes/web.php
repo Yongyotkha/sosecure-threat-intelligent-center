@@ -124,8 +124,16 @@ Route::post('/WebDefacement-remove_item', 'WebDefacementController@remove_item')
 Route::post('/WebDefacement-update_item_top_left', 'WebDefacementController@update_item_top_left')->name('webdefacement_website.update_item_top_left')->middleware('can:menu_items');
 Route::post('/WebDefacement-update_item_width_height', 'WebDefacementController@update_item_width_height')->name('webdefacement_website.update_item_width_height')->middleware('can:menu_items');
 // Compromised
-Route::get('/compromised_feed', 'DataLeakController@compromised_feed')->name('compromised_feed.index')->middleware('can:menu_items');
-Route::get('/compromised_data', 'DataLeakController@compromised_data')->name('compromised_data.index')->middleware('can:menu_items');
+Route::get('/compromised_feed/{code}', 'DataLeakController@compromised_feed')->name('compromised_feed.index')->middleware('can:menu_items');
+Route::get('/compromised_data/{code}', 'DataLeakController@compromised_data')->name('compromised_data.index')->middleware('can:menu_items');
+Route::post('/compromised_feed/compromised_feed_datatables', 'DataLeakController@compromised_feed_datatables')->name('compromised_feed.compromised_feed_datatables')->middleware('can:menu_items');
+Route::post('/compromised_feed/approve/dataFeed', 'DataLeakController@compromised_feed_approve_data_feed')->name('compromised_feed.approve_data_feed');
+Route::post('/compromised_feed/cancle/dataFeed', 'DataLeakController@compromised_feed_cancle_data_feed')->name('compromised_feed.cancle_data_feed');
+Route::post('/compromised_feed/compromised_feed_darkweb_all_site_tb', 'DataLeakController@compromised_feed_darkweb_all_site_tb')->name('compromised_feed.darkweb_all_site_tb');
+Route::post('compromised_feed/compromised_feed_change_status', 'DataLeakController@compromised_feed_change_status')->name('compromised_feed.change_status')->middleware('can:menu_items');
+Route::post('/compromised_feed/compromised_feed_delete_select', 'DataLeakController@compromised_feed_delete_select')->name('compromised_feed.delete_select_process');
+Route::get('/compromised_feed/delete_compromised_feed_modal/{code}', 'DataLeakController@delete_compromised_feed_modal')->name('darkweb.delete_compromised_feed_modal');
+Route::post('/compromised_feed/delete_compromised_feed_process/{code}', 'DataLeakController@delete_compromised_feed_process')->name('compromised_feed.delete_compromised_feed_process');
 
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
 Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');
