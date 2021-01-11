@@ -86,13 +86,13 @@
         </a>
        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
-                <a href="#">
+                <a href="{{route('compromised_feed.index', ['id' => $siteSettings->code])}}">
                     Compromised Feed
                 </a>
             </li>
 
             <li style="padding-left:2rem">
-                <a href="#">
+                <a href="{{route('compromised_data.index', ['id' => $siteSettings->code])}}">
                     Compromised Data
                 </a>
             </li>

@@ -503,6 +503,38 @@ $(document).ready(function(){
     });
 });
 
+function get_CVSS_Severity_status_js(num_val,status_id,badg='') {
+    
+    var html = '';
+    if(badg == 'badg') {
+
+        if(status_id == "CRITICAL") {
+            html = '<span class="badge badge-secondary" style="background-color: #e64732;">'+num_val+' CRITICAL</span>';
+        } else if(status_id == "HIGH") {
+            html = '<span class="badge badge-Warning" style="background-color: #fcc838;">'+num_val+' HIGH</span>';
+        } else if(status_id == "MEDIUM") {
+            html = '<span class="badge badge-Warning" style="background-color: #ffe46d;">'+num_val+' MEDIUM</span>';
+        } else if(status_id== "LOW") {
+            html = '<span class="badge badge-Success" style="background-color: #88ce4f;">'+num_val+' LOW</span>';
+        } else if(status_id == "NONE") {
+            html = '<span class="badge badge-Success" style="background-color: #d3d3d3;">'+num_val+' INFORMATION</span>';
+        }
+    } else {
+        if(status_id == "CRITICAL") {
+            html = 'CRITICAL';
+        } else if(status_id == "HIGH") {
+            html = 'HIGH';
+        } else if(status_id == "MEDIUM") {
+            html = 'MEDIUM';
+        } else if(status_id == "LOW") {
+            html = 'LOW';
+        } else if(status_id == "NONE") {
+            html = 'NONE';
+        }
+    }
+    return html;
+}
+
 </script>
 
 
