@@ -46,7 +46,7 @@ class MDMISPXMLrunXML extends Command
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_otx_event_stamp;
+        $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_event_stamp;
         $ins_fx_transaction_otx_event_stamp = $col_fx_transaction_otx_event_stamp->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date("Y-m-d"),
@@ -58,7 +58,7 @@ class MDMISPXMLrunXML extends Command
             'deleted_at' => null,
             'source' => "misp",
         ]);
-        $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_otx_indicator_stamp;
+        $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicator_stamp;
         $ins_fx_transaction_otx_indicator_stamp = $col_fx_transaction_otx_indicator_stamp->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date("Y-m-d"),
@@ -83,12 +83,14 @@ class MDMISPXMLrunXML extends Command
 
     public function saveJson($stamp_event_id, $stamp_indicator_id, $json_o = null)
     {
-
         $dir_folder = app_path() . "\\Console\\Commands\\temp\\otx_export2\\";
+        //$dir_folder = "127.0.0.1" . "\\Newfolder\\otx_export2\\";
         if (is_dir($dir_folder)) {
             if ($dh = opendir($dir_folder)) {
-                    $start = 667-1;
-                    $stop = 700+1;
+                    // $start = 667-1;
+                    // $stop = 700+1;
+                    $start = 1-1;
+                    $stop = 300+1;
                     $loop = 0;
                     // rematch 0-300
                 while (($file = readdir($dh)) !== false) {
@@ -206,7 +208,7 @@ class MDMISPXMLrunXML extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_test->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $tlpcolor = null;
         $tags = null;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
@@ -264,8 +266,8 @@ class MDMISPXMLrunXML extends Command
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $data["all"] = 0;
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_test->fx_otx_events;
-        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_test->fx_otx_events_event_ref;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
 
         if (!empty($valueEvent["RelatedEvent"])) {
             foreach ($valueEvent["RelatedEvent"] as $key => $value) {
@@ -336,10 +338,10 @@ class MDMISPXMLrunXML extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_test->fx_otx_indicator_detail;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_test->fx_otx_events_indicator_ref;
-        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_test->fx_transaction_otx_indicators_data;
-        $col_fx_otx_type = $clientMD->sosecure_threatintelligent_test->fx_otx_type;
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+        $col_fx_otx_type = $clientMD->sosecure_threatintelligent->fx_otx_type;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $data["all"] = 0;
         $data["byType"] = array();
