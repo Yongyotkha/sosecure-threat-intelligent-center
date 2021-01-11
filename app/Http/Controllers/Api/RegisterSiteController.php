@@ -62,7 +62,8 @@ class RegisterSiteController extends ApiController
                 $new_version = DeployCode::select('version', 'created_at')->where('status', 1)->where('access_type', 1)->orderBy('version', 'desc')->first();
                 $current_version = DeployCode::select('version', 'created_at')->where('version', $data_key_decrypt)->first();
                 $update_version = DeployCode::select('code','path')->where('status', 1)->where('access_type', 1)->where('version','>', $data_key_decrypt)->get();
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => ['new_version' => $new_version, 'current_version' => $current_version, 'update_version' => $update_version]]);
+                $indecator = asset('indicator/indicator.zip');
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => ['new_version' => $new_version, 'current_version' => $current_version, 'update_version' => $update_version, 'indecator' => $indecator]]);
             }
         }
     }
