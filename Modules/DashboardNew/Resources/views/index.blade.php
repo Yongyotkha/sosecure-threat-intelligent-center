@@ -81,28 +81,40 @@
                                     <div class="col-xl-9 col-lg-9 col-md-12">
                                         <div class="row">
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="loadhost backdrop-loader">
+                                                    <div class="loader4 centerloader"></div>
+                                                    <div class="loadding-text">Loading ...</div>
+                                                </div>
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
                                                         <h1 class="text-blue bold-500">Vulnerability Host</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-hl"></div>
+                                                    <div id="chart-show-hl" style="height: 400px"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="loadvulserverity backdrop-loader">
+                                                    <div class="loader4 centerloader"></div>
+                                                    <div class="loadding-text">Loading ...</div>
+                                                </div>
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
                                                         <h1 class="text-blue bold-500">Vulnerability Severity </h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-pie"></div>
+                                                    <div id="chart-show-pie" style="height: 400px"></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="loadindicator backdrop-loader">
+                                                    <div class="loader4 centerloader"></div>
+                                                    <div class="loadding-text">Loading ...</div>
+                                                </div>
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
@@ -110,10 +122,14 @@
                                                         <h1 class="text-blue bold-500">Indicators</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-line"></div>
+                                                    <div id="chart-show-line" style="height: 400px"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                <div class="loaddertb backdrop-loader">
+                                                    <div class="loader4 centerloader"></div>
+                                                    <div class="loadding-text">Loading ...</div>
+                                                </div>
                                                 <div class="box-chart-color">
                                                     <div class="d-flex align-items-center header-chart-p">
                                                         <img src="{{asset('images/table.png')}}" alt="" height="30px">
@@ -251,7 +267,7 @@
                 site : site, 
             },
             beforeSend: function() {
-                f_loading(null, '.number_asset');
+                $('.number_asset').text('0');
             },
             success: function(result){
                 f_loading_stop(null, '.number_asset');
@@ -271,7 +287,7 @@
                 site : site, 
             },
             beforeSend: function() {
-                f_loading(null, '.number_vulnerability');
+                $('.number_vulnerability').text('0');
             },
             success: function(result){
                 f_loading_stop(null, '.number_vulnerability');
@@ -291,10 +307,9 @@
                 site : site, 
             },
             beforeSend: function() {
-                f_loading(null, '.number_compromised');
+                $('.number_compromised').text('0');
             },
             success: function(result){
-                f_loading_stop(null, '.number_compromised');
                 if(result.status_code == 200){
                     $('.number_compromised').text(result.data);
                 }
@@ -311,10 +326,9 @@
                 site : site, 
             },
             beforeSend: function() {
-                f_loading(null, '.number_data_leak');
+                $('.number_data_leak').text('0');
             },
             success: function(result){
-                f_loading_stop(null, '.number_data_leak');
                 if(result.status_code == 200){
                     $('.number_data_leak').text(result.data);
                 }
@@ -328,10 +342,10 @@
             dataType: "json",
             url: '{{ route("dashboardnew.chart_indicators") }}',
             beforeSend: function() {
-                f_loading(null, '#chart-show-line');
+                $(".loadindicator").show();
             },
             success: function(result){
-                f_loading_stop(null, '#chart-show-line');
+                $(".loadindicator").hide();
                 if(result.status_code == 200){
                     const chart_line = new Highcharts.chart('chart-show-line', {
                         chart: {
@@ -390,10 +404,10 @@
                 site : site, 
             },
             beforeSend: function() {
-                f_loading(null, '.cve_assets');
+                $(".loaddertb").show();
             },
             success: function(result){
-                f_loading_stop(null, '.cve_assets');
+                $(".loaddertb").hide();
                 if(result.status_code == 200){
                     $('#cve_assets').empty();
                     let html = ``;
@@ -512,13 +526,11 @@
                 site : site, 
             },
             beforeSend: function(){
-                {{--loading('load');--}}
-                f_loading(null, '#chart-show-pie');
-
+                $(".loadvulserverity").show();
             },
         }).done(function(data){
 
-            f_loading_stop(null, '#chart-show-pie');
+            $(".loadvulserverity").hide();
 
             const chart_pie = new Highcharts.chart('chart-show-pie', {
                 chart: {
@@ -562,7 +574,7 @@
                 }],
             });
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-                f_loading_stop(null, '#chart-show-pie');
+                $(".loadvulserverity").hide();
                 console.log("No response from server");
             });
         
@@ -576,10 +588,10 @@
                 site : site, 
             },
             beforeSend: function() {
-                f_loading(null, '#chart-show-hl');
+                $(".loadhost").show();
             },
             success: function(result){
-                f_loading_stop(null, '#chart-show-hl');
+                $(".loadhost").hide();
                 if(result.status_code == 200){
                     var critical = [];
                     var high = [];
