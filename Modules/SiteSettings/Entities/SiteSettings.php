@@ -8,6 +8,8 @@ use Modules\SiteSettings\Entities\Tags_site;
 use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\Site_keywords;
 use Modules\SiteSettings\Entities\Domain;
+use Modules\Users\Entities\UserSite;
+
 class SiteSettings extends Model{
     protected $table = "site";
     public $timestamps = true;
@@ -58,5 +60,9 @@ class SiteSettings extends Model{
 
     public function get_site_config_email_alert(){
         return $this->hasMany(site_config_email_alert::class, 'site_id', 'id');
+    }
+
+    public function get_user_site(){
+        return $this->hasMany(UserSite::class, 'site_id', 'id');
     }
 }

@@ -136,11 +136,11 @@ class UsersSettingsController extends Controller
 
                     $role_id = $request->role_id;
                     $site_role_id = null;
-                    if($role_id == 1) {
-                        $role = 'admin';
+                    if($role_id == 1 || $role_id == 4) {
+                        $role = 'admin_site';
                         // $site_role_id = 99;
                     } else {
-                        $role = 'client';
+                        $role = 'client_site';
                         // $site_role_id = $role_id;
                     } 
             
