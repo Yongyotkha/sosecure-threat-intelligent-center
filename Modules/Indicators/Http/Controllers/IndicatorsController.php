@@ -45,7 +45,12 @@ class IndicatorsController extends Controller
         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         $data["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
         $data["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
-        $data["attr_type"] = IndicatorSummaryYear::select('type_name AS name',DB::raw('CONCAT(attribute_count, " Attribute") as description'))->where("type",'summary_attr_type')->take(15)->orderBy('attribute_count','desc')->get();
+        // DB::raw('CONCAT("[",attribute_count, "]") as data2')
+        $dataForloop = IndicatorSummaryYear::select('type_name AS name','attribute_count AS data')->where("type",'summary_attr_type')->orderBy('attribute_count','desc')->take(10)->get();
+        $data["attr_type"] = array();
+        foreach ($dataForloop as $document) {
+            array_push($data["attr_type"], array('name'=>$document->name,'data'=>[$document->data]));
+        }
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);

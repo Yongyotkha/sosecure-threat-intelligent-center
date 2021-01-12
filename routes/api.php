@@ -23,6 +23,11 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('test_get', 'Api\ExampleApiController@test_get');
 });
 
+Route::group(['prefix' => 'v1/client-transfer/'], function () {
+    Route::post('rss_news/', 'Api\ApiTransferClients@getTranfer_News');
+    Route::get('get_encode/{site_id}', 'Api\ApiTransferClients@get_encode');
+});
+
 Route::group(['middleware' => 'api','prefix' => 'v1'], function ($router) {//, 'middleware' => 'auth:api'
     $router->get('test_api', 'Auth\LoginController@test_api');
 });

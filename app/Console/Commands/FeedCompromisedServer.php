@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Exception;
+use Artisan;
 //lib
 use phpseclib\Net\SSH2;
 //model
@@ -48,10 +49,12 @@ class FeedCompromisedServer extends Command
      */
     public function handle()
     {
+        $this->info("--Start Process--");
         $CompromisedServer = CompromisedServer::where('active', '1')->whereNull('deleted_at')->get(); 
         if($CompromisedServer){
             foreach ($CompromisedServer as $server) {
                 try{
+                    $this->info("Process: "."ip - ".$server->ip." site - ".$server->site_id." serverID - ".$server->id);
                     $ip = $server->ip;
                     $port = $server->port;
                     $user = $server->user;
@@ -85,11 +88,14 @@ class FeedCompromisedServer extends Command
                         $this->FileSaveDetail($server,$ssh,$return_value);
                     }
                 } catch (Exception $e) {
-                    echo $e->getMessage();
+                    $this->info($e->getMessage());
                 }
             }
         }
-
+        $this->info("--Start ScanPython--");
+        $commandArtisan = 'app:FeedCompromisedScan';
+        Artisan::call($commandArtisan);
+        $this->info("--END Process--");
         // $ip = '10.104.0.7';
         // $port = '22';
         // $user = 'sosecure';
@@ -116,12 +122,10 @@ class FeedCompromisedServer extends Command
         $stop = 10+1;
 
         $checkPythonScan = true;
-        echo json_encode($server->file_extension." : ");
 
         foreach ($lines as $line) {
             $loop++;
             if($loop<$stop){
-                echo json_encode($loop);
                 $rand = rand(0,30000);
                 $rand = $rand+30000;
                 usleep($rand);
@@ -145,20 +149,22 @@ class FeedCompromisedServer extends Command
                         $CompromisedFileOriginal->save();
                         $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                     }else{
+                       
                         if($CompromisedFileOriginal->file_modified==$detail["file_modified"]){
                             $CompromisedFileOriginal->file_status = 2;
                             $CompromisedFileOriginal->save();
                         }else{
                             if($CompromisedFileOriginal->file_hash!=$detail["file_hash"]){
-                                // $status_active = $this->checkAlgorithmAndSave($server,$detail);
                                 $CompromisedFileOriginal->file_size = $detail["file_size"];
                                 $CompromisedFileOriginal->file_modified = $detail["file_modified"];
                                 $CompromisedFileOriginal->file_hash = $detail["file_hash"];
                                 $CompromisedFileOriginal->file_status = 3;
                                 $CompromisedFileOriginal->save();
+                                $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                             }else{
                                 $CompromisedFileOriginal->file_status = 2;
                                 $CompromisedFileOriginal->save();
+                               
                             }
                         }
                         $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
@@ -243,7 +249,7 @@ class FeedCompromisedServer extends Command
         return 0;
     }
 
-    private  function savePythonScan($server,$detail,$feedtype,$keyword,$blackListFoundString) {
+    private  function savePythonScan_backup($server,$detail,$feedtype,$keyword,$blackListFoundString) {
         $implode_blacklist = implode (",", $blackListFoundString);//insert
         $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $detail["file_path"])->where('site_id',$server->site_id)->first(); 
         $insertLeak = true;
@@ -431,10 +437,7 @@ class FeedCompromisedServer extends Command
             $cmd = "cat ".$output["file_path"];
             $output["file_content"] = @$ssh->exec($cmd);
             $output["file_hash"] = hash($this->hashingAlgorithm, $output["file_content"]);
-            $this->info($output["file_name"]);
-            if($output["file_name"]=='artisan'){
-                echo json_encode($line);
-            }
+            // $this->info($output["file_name"]);
         }
         return $output;
     }

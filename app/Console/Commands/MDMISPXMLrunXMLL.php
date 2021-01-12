@@ -90,7 +90,7 @@ class MDMISPXMLrunXMLL extends Command
             if ($dh = opendir($dir_folder)) {
                     // $start = 667-1;
                     // $stop = 700+1;
-                    $start = 395-1;
+                    $start = 492-1;
                     $stop = 600+1;
                     $loop = 0;
                     // rematch 0-300

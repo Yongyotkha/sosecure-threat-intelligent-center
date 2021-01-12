@@ -72,6 +72,21 @@ return [
             'prefix'         => '',
             'prefix_indexes' => true,
         ],
+        'dummyDatabase'  => [
+            'driver'         => 'mysql',
+            'host'           => env('DB_HOST', '127.0.0.1'),
+            'port'           => env('DB_PORT', '3306'),
+            'database'       => 'sosecure_threatintelligent_site_dev',
+            'username'       => env('DB_USERNAME', 'forge'),
+            'password'       => env('DB_PASSWORD', ''),
+            'unix_socket'    => env('DB_SOCKET', ''),
+            'charset'        => 'utf8mb4',
+            'collation'      => 'utf8mb4_unicode_ci',
+            'prefix'         => 'fx_',
+            'prefix_indexes' => true,
+            'strict'         => false,
+            'engine'         => null,
+        ],
     ],
     /*
     |--------------------------------------------------------------------------
