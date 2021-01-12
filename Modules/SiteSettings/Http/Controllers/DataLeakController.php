@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\Facades\DataTables;
+use App\Entities\CompromisedServer;
 
 class DataLeakController extends Controller
 {
@@ -1223,7 +1224,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'chk',
                 function (DataLeakFeedTemp $model) {
-                    return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id val_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id" value="' . $model->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(
@@ -1534,6 +1535,222 @@ class DataLeakController extends Controller
             true,
             Response::HTTP_OK
         );
+    }
+
+    public function compromised_web_server($code)
+    {
+        $get_data = $this->siteSettings->get_data($code);
+        $data['siteSettings'] = $get_data;
+        $siteID = siteSettings::where('code', $code)->first();
+
+        $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
+        $data['DataLeakSocial'] = $DataLeakSocial;
+        $data['siteID'] = $siteID->id;
+        $data['page'] = 'Web Server';
+        return view('sitesettings::compromised_web_server')->with($data);
+    }
+
+    public function table_web_server(Request $request)
+    {
+
+        $model = CompromisedServer::where('site_id',$request->site)->where('deleted_at', null)->with('get_site');
+        // if ($request->search_val == 1) {
+
+        //     if ($request->keywords) {
+        //         $keywords = $request->keywords;
+        //         $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+        //             $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+        //                 ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+        //         });
+        //     }
+
+        //     if ($request->site) {
+
+        //         $model->where('site_id', $request->site);
+
+        //     }
+
+        //     if ($request->source) {
+
+        //         $source = $request->source;
+        //         $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
+        //             $query->where('sourceid', 'LIKE', '%' . $source . '%');
+        //         });
+
+        //     }
+
+        //     if ($request->isDateSearch == 1) {
+        //         $date_start = $request->startDate;
+        //         $date_end = $request->endDate;
+
+        //         $date_start_explode = explode(" ", $date_start);
+        //         $date_start_date = @$date_start_explode[0];
+        //         $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
+
+        //         $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+
+        //         $date_start_time_time = date("H:i", strtotime($date_start_time));
+        //         $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+
+        //         $date_end_explode = explode(" ", $date_end);
+        //         $date_end_date = @$date_end_explode[0];
+        //         $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
+        //         // dd($date_end_time);
+        //         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        //         $date_end_time_time = date("H:i", strtotime($date_end_time));
+        //         $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+
+        //         $source = $request->source;
+        //         $model->whereHas('get_data_leak_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
+        //             $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
+        //         });
+
+        //     }
+
+    
+        // } 
+        $model->get();
+
+        return DataTables::of($model)->toJson();
+
+        // $model = DataLeakSocialRef::where('deleted_at', null)->orderBy('id', 'desc');
+        // $model->whereHas('get_data_leak_feed', function ($query){
+        //     $query->where('site_id', );
+
+    }
+
+    public function web_server_delete(Request $request)
+    {
+
+        // dd($request->id);
+        if($request->id_chang){
+            
+            foreach($request->id_chang as $id_chang ){
+
+                $data = CompromisedServer::where("id", $id_chang )->delete();
+
+            }
+        }else{
+
+            CompromisedServer::where("id", $request->id)->delete();
+
+        }
+
+        $code_site = SiteSettings::where("id", '=', $request->site)->first();
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('compromised_web_server.index', ['code' => $code_site->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
+    }
+
+    public function web_server_change_status(Request $request)
+    {
+        // dd($request->id);
+        if($request->id_chang){
+            foreach($request->id_chang as $id_chang ){
+                $data = CompromisedServer::where("id", $id_chang )->first();
+                if($data->active == 1){
+                    $data->active = 0;
+                }else{
+                    $data->active = 1;
+                }
+                $data->save();
+            }
+        }else{
+            $data = CompromisedServer::where("id", $request->id)->first();
+            if($data->active == 1){
+                $data->active = 0;
+            }else{
+                $data->active = 1;
+            }
+            $data->save();
+        }
+        
+
+           
+
+        $code_site = SiteSettings::where("id", '=', $request->site)->first();
+
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('compromised_web_server.index', ['code' => $code_site->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function web_server_create(Request $request)
+    {
+        $data = new CompromisedServer;
+        $data->code = generator_uuid();
+        $data->site_id = $request->site;
+        $data->ip = $request->ip;
+        $data->user = $request->user;
+        $data->password = $request->password;
+        $data->path = $request->root_path;
+        $data->os = $request->os;
+        $data->active = $request->check;
+        
+        $data->save();
+
+        $code_site = SiteSettings::where("id", '=', $request->site)->first();
+
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('compromised_web_server.index', ['code' => $code_site->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function web_server_edit_modal($code)
+    {
+
+        $data["CompromisedServer"] = CompromisedServer::where('code', $code)->first();
+    
+        return view('sitesettings::modal.update_compromised_web_server')->with($data);
+    }
+
+    public function web_server_edit(Request $request,$id)
+    {
+        // dd($request->site);
+        
+        $data = CompromisedServer::where('id', $id)->first();
+
+        
+        $data->ip = $request->ip;
+        $data->user = $request->user;
+        $data->password = $request->password;
+        $data->path = $request->root_path;
+        $data->os = $request->os;
+        $data->active = ($request->status)?1:0;
+        
+        $data->save();
+
+        $code_site = SiteSettings::where("id", '=', $request->site)->first();
+
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('compromised_web_server.index', ['code' => $code_site->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+        
     }
 
 }

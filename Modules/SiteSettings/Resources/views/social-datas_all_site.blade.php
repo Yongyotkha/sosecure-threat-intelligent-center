@@ -531,7 +531,7 @@
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             heightAuto: false,
-            confirmButtonText: 'Yes, Is Fixed!'
+            confirmButtonText: 'Yes'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({

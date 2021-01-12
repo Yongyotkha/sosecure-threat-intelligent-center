@@ -135,6 +135,13 @@ Route::post('compromised_feed/compromised_feed_change_status', 'DataLeakControll
 Route::post('/compromised_feed/compromised_feed_delete_select', 'DataLeakController@compromised_feed_delete_select')->name('compromised_feed.delete_select_process');
 Route::get('/compromised_feed/delete_compromised_feed_modal/{code}', 'DataLeakController@delete_compromised_feed_modal')->name('darkweb.delete_compromised_feed_modal');
 Route::post('/compromised_feed/delete_compromised_feed_process/{code}', 'DataLeakController@delete_compromised_feed_process')->name('compromised_feed.delete_compromised_feed_process');
+Route::get('/compromised_web_server/{code}', 'DataLeakController@compromised_web_server')->name('compromised_web_server.index')->middleware('can:menu_items');
+Route::post('/compromised_web_server/table_web_server', 'DataLeakController@table_web_server')->name('compromised_web_server.table_web_server')->middleware('can:menu_items');
+Route::post('/compromised_web_server/web_server_delete', 'DataLeakController@web_server_delete')->name('compromised_web_server.web_server_delete')->middleware('can:menu_items');
+Route::get('/compromised_web_server/web_server_edit_modal/{code}', 'DataLeakController@web_server_edit_modal')->name('compromised_web_server.web_server_edit_modal')->middleware('can:menu_items');
+Route::post('/compromised_web_server/web_server_edit/{id}', 'DataLeakController@web_server_edit')->name('compromised_web_server.web_server_edit')->middleware('can:menu_items');
+Route::post('/compromised_web_server/web_server_create', 'DataLeakController@web_server_create')->name('compromised_web_server.web_server_create')->middleware('can:menu_items');
+Route::post('/compromised_web_server/web_server_change_status', 'DataLeakController@web_server_change_status')->name('compromised_web_server.web_server_change_status')->middleware('can:menu_items');
 
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
 Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');
