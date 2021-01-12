@@ -146,7 +146,8 @@
                                             <th>Root Path</th>
                                             <th>status</th>
                                             <th>Last Update</th>
-                                            <th class="no-sort">@langapp('action')</th>
+                                            
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -171,7 +172,7 @@
                     <h4 class="modal-title text-white">
                         <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();"
                             datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                        Confirm Information
+                            Add Asset
                     </h4>
                 </div>
                 <div class="modal-body">
@@ -476,6 +477,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            order: [[ 8, "desc" ]],
             ajax: {
                 type: "POST",
                 url: '{!! route('compromised_web_server.table_web_server') !!}',
@@ -495,13 +497,97 @@
                 $(row).attr('id', 'tr' + data.id);
             },
 
+            columns: [
+                {
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    data: 'chk',
+                    className: 'w-10'
+                },
+
+                {
+
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    data: 'no.',
+                    name: 'no.',
+                    className: 'w-10 text-center'
+
+
+                },
+
+                {
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+        
+                    data: 'name',
+                    name: 'name',
+            
+                    
+                },
+                {
+                    data: 'ip',
+                    name: 'ip',
+         
+                },
+                {
+                    data: 'user',
+                    name: 'user',
+               
+
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+ 
+                    data: 'password',
+                    name: 'password',
+           
+                   
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    data: 'path',
+                    name: 'path',
+         
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+      
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+           
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at',
+       
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    data: 'action',
+                    name: 'action',
+                    className: 'w-10 text-center no-wrap'
+
+                },
+            ],
+
             columnDefs: [
 
                 {
                     targets: 0,
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
+
                     width: '1px',
                     render: function (data, type, full, meta) {
 
@@ -510,9 +596,7 @@
                 },
                 {
                     targets: 1,
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
+
                     width: '1px',
                     render: function (data, type, full, meta) {
 
@@ -575,9 +659,7 @@
                 },
                 {
                     targets: 7,
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
+  
                     width: '5px',
                     render: function (data, type, full, meta) {
 
@@ -612,10 +694,9 @@
                 },
                 {
                     targets: 9,
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
+
                     width: '70px',
+                    class:'nowrap',
                     render: function (data, type, full, meta) {
                         var html = '';
                         html =`<a href="${base_url}/compromised_web_server/web_server_edit_modal/${full.code}" class="btn btn-{{get_option("theme_color") }} btn-xs" data-toggle='ajaxModal'>
