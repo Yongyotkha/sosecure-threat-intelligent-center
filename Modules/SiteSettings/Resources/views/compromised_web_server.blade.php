@@ -41,12 +41,12 @@
                         data-toggle="modal" data-target="#change_status" disabled>
                         Change Status
                     </button>
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span>@langapp('Search_Advance')</span>
-                    </button>
+                    </button> --}}
                 </header>
                 <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="hide-advance-search" style="display: none;">
+                    {{-- <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
                                 <div class="col-lg-12">
@@ -115,7 +115,7 @@
                                 </div>
                             </div>
                         </div>
-                    </section>
+                    </section> --}}
 
 
                     <section class="panel panel-default">
@@ -574,12 +574,11 @@
                     },
                 },
                 {
-                    
                     targets: 7,
                     orderable: false,
                     searchable: false,
                     sortable: false,
-                    width: '10px',
+                    width: '5px',
                     render: function (data, type, full, meta) {
 
                             
@@ -597,8 +596,9 @@
                     },
                 },
                 {
-         
-                    width: '5px',
+                    targets: 8,
+                    
+                    width: '10px',
                     render: function (data, type, full, meta) {
                 
                         if(full.updated_at){
@@ -615,7 +615,7 @@
                     orderable: false,
                     searchable: false,
                     sortable: false,
-                    width: '55px',
+                    width: '70px',
                     render: function (data, type, full, meta) {
                         var html = '';
                         html =`<a href="${base_url}/compromised_web_server/web_server_edit_modal/${full.code}" class="btn btn-{{get_option("theme_color") }} btn-xs" data-toggle='ajaxModal'>
