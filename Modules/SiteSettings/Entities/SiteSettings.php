@@ -62,7 +62,8 @@ class SiteSettings extends Model{
         return $this->hasMany(site_config_email_alert::class, 'site_id', 'id');
     }
 
-    public function get_user_site(){
-        return $this->hasMany(UserSite::class, 'site_id', 'id');
+    public function get_user_site($id){
+        $user_site = UserSite::where('user_id',$id)->get();
+        return $user_site;
     }
 }

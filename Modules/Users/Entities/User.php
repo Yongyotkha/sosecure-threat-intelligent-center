@@ -518,8 +518,13 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return $this->belongsTo(SiteSettings::class, 'site_id', 'id');
     }
 
-    public function get_user_site(){
-        return $this->hasMany(UserSite::class, 'user_id', 'id');
+    // public function get_user_site(){
+    //     return $this->hasMany(UserSite::class, 'user_id', 'id');
+    // }
+
+    public function get_user_site($id){
+        $user_site = UserSite::select('site_id')->where('user_id',$id)->get();
+        return $user_site;
     }
 
     // public function getJWTIdentifier()

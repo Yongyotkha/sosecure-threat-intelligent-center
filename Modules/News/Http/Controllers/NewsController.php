@@ -16,6 +16,8 @@ use Modules\RSSFeedSettings\Entities\NewsTopics;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Modules\CategorySettings\Entities\CategorySettings;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -290,6 +292,8 @@ class NewsController extends Controller
         $RSSNews_all = RSSNews::all();
 
         if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(Auth::user()->hasRole('admin')) {//if admin
                 // dd(777);
                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
@@ -298,19 +302,17 @@ class NewsController extends Controller
                 // dd(888);
                 if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
                     if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null);
-                        $SiteSettings->whereHas('get_user_site', function($q) {
-                            $q->whereIn('site_id', @Auth::user()->get_user_site);
-                        })
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
                         ->get();
+             
 
                     } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null);
-                        $SiteSettings->whereHas('get_user_site', function($q) {
-                            $q->whereIn('site_id', @Auth::user()->get_user_site);
-                        })
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
                         ->get();
-
                     }
                 }
             }
