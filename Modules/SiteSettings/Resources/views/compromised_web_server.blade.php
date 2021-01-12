@@ -1,11 +1,7 @@
 @extends('layouts.app')
 @section('content')
 
-<style>
-    .aa{
-        width: 50px !important;
-    }
-</style>
+
 <section id="content" class="bg">
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r">
@@ -544,9 +540,6 @@
                 },
                 {
                     targets: 4,
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
                     width: '10px',
                     render: function (data, type, full, meta) {
 
@@ -561,7 +554,6 @@
                 {
                     targets: 5,
                     width: '10px',
-                    class:'aa',
                     render: function (data, type, full, meta) {
             
                         return full.password;
@@ -605,10 +597,7 @@
                     },
                 },
                 {
-                    targets: 8,
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
+         
                     width: '5px',
                     render: function (data, type, full, meta) {
                 
