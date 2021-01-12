@@ -91,11 +91,11 @@
                             </div>
                             <div class="card-ev-body">
                                 <div class="ev-left">
-                                    <span>{{ @$attr_all->event_count }}</span>
+                                    <span>{{ @number_format($attr_all->event_count) }}</span>
                                     <span>All</span>
                                 </div>
                                 <div class="ev-right">
-                                    <span>{{ @$attr_current->event_count }}</span>
+                                    <span>{{ @number_format($attr_current->event_count) }}</span>
                                     <span>New Event</span>
                                 </div>
                             </div>
@@ -108,11 +108,11 @@
                             </div>
                             <div class="card-ev-body">
                                 <div class="ev-left">
-                                    <span>{{ @$attr_all->attribute_count }}</span>
+                                    <span>{{ @number_format($attr_all->attribute_count) }}</span>
                                     <span>All</span>
                                 </div>
                                 <div class="ev-right">
-                                    <span>{{ @$attr_current->attribute_count }}</span>
+                                    <span>{{ @number_format($attr_current->attribute_count) }}</span>
                                     <span>New Attribute</span>
                                 </div>
                             </div>
@@ -229,7 +229,7 @@ const chart = new Highcharts.chart('chart-pack', {
     text: null
   },
   xAxis: {
-    categories: ['test']
+    categories: ['Attribute']
   },
   yAxis: {
     min: 0,
@@ -245,7 +245,8 @@ const chart = new Highcharts.chart('chart-pack', {
       stacking: 'normal'
     }
   },
-  series: [{
+  series: load_graph()
+  {{--[{
     name: 'Chaina',
     data: [1]
   }, {
@@ -254,7 +255,7 @@ const chart = new Highcharts.chart('chart-pack', {
   }, {
     name: 'Other',
     data: [1]
-  }]
+  }]--}}
 });
 
 
@@ -336,7 +337,9 @@ const chart = new Highcharts.chart('chart-pack', {
     });
 
     function load_graph() {
+        
         var graph = {!!json_encode(@$attr_type)!!};
+        console.log(graph);
         return graph;
 
     }
