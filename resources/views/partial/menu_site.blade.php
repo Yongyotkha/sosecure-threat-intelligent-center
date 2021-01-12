@@ -86,6 +86,11 @@
         </a>
        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
+                <a href="{{route('compromised_web_server.index', ['id' => $siteSettings->code])}}">
+                    Web Server
+                </a>
+            </li>
+            <li style="padding-left:2rem">
                 <a href="{{route('compromised_feed.index', ['id' => $siteSettings->code])}}">
                     Compromised Feed
                 </a>
