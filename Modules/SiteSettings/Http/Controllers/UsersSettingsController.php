@@ -136,11 +136,11 @@ class UsersSettingsController extends Controller
 
                     $role_id = $request->role_id;
                     $site_role_id = null;
-                    if($role_id == 1) {
+                    if($role_id == 1 || $role_id == 4) {
                         $role = 'admin';
                         // $site_role_id = 99;
                     } else {
-                        $role = 'client';
+                        $role = 'admin';//client_site
                         // $site_role_id = $role_id;
                     } 
             
@@ -166,8 +166,8 @@ class UsersSettingsController extends Controller
                     $User->save();
 
                     $UserSite = new UserSite;
-                    $UserSite->user_id = $user->id;
-                    $UserSite->site_id = $user->site_id;
+                    $UserSite->user_id = $User->id;
+                    $UserSite->site_id = $User->site_id;
                     $UserSite->created_by = @Auth::user()->id;
                     $UserSite->save();
             
