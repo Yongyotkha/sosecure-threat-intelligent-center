@@ -9,6 +9,7 @@ use Auth;
 use DataTables;
 use App\Roles;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 use Modules\SiteSettings\Http\Requests\UserRequest;
 
 use Mail;
@@ -163,6 +164,12 @@ class UsersSettingsController extends Controller
                     $User->site_id = $SiteSettings->id;
                     $User->site_add_user_token = generator_uuid();
                     $User->save();
+
+                    $UserSite = new UserSite;
+                    $UserSite->user_id = $user->id;
+                    $UserSite->site_id = $user->site_id;
+                    $UserSite->created_by = @Auth::user()->id;
+                    $UserSite->save();
             
                     if($role) {
                         $User->syncRoles($role);

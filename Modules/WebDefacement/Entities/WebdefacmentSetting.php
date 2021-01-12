@@ -7,10 +7,12 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataLog;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class WebdefacmentSetting extends Model
 {
+    use SoftDeletes;
     protected $table = 'webdefacment_setting';
     protected $fillable = [];
 

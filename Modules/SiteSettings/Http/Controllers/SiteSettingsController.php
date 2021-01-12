@@ -17,6 +17,7 @@ use Modules\SiteSettings\Entities\Tags;
 use Modules\SiteSettings\Entities\Tags_site;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 
 class SiteSettingsController extends Controller
 {
@@ -154,6 +155,12 @@ class SiteSettingsController extends Controller
         // $user->password_time_expire = Carbon::now()->addMinutes(10);
         $user->active = 1;
         $user->save();
+
+        $UserSite = new UserSite;
+        $UserSite->user_id = $user->id;
+        $UserSite->site_id = $user->site_id;
+        $UserSite->created_by = @Auth::user()->id;
+        $UserSite->save();
         //----end------gen user_support----------------//
 
         return ajaxResponse(
