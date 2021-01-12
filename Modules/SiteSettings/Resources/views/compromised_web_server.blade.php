@@ -122,7 +122,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Compromise Feed
+                                    <i class="fas fa-table"></i> Table Web Server
                                 </div>
                             </div>
                         </header>
