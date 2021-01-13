@@ -25,23 +25,36 @@ class RegisterSiteController extends ApiController
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
-            $data_key = json_decode($data, true);
-            // $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']['ip_key'],  $site['data']['mac_address_key']);
-            // if($data_key_decrypt === false){
-            //     return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400', 'data' => $data_key['key']]);
-            // }else{
-            //     $site_explode = explode('&', $data_key_decrypt);
-                $site = SiteSettings::where('code', $site['data']['code'])->first();
-                if($site->no_expiration_active === 0){
-                    $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain->domain]);
-                }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
-                    $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain->domain]);
-                }else{
-                    return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
-                }
-            // }
+            try {
+                $data_key = json_decode($data, true);
+                // $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                // if($data_key_decrypt === false){
+                //     return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400', 'data' => $data_key['key']]);
+                // }else{
+                //     $site_explode = explode('&', $data_key_decrypt);
+                    $site = SiteSettings::where('code', $site['data']['code'])->first();
+                    $logo = url('/').'/'.$site->logo;
+                    if($site->no_expiration_active === 0){
+                        $domain_name = 'ไม่ได้ระบุโดเมน';
+                        $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
+                        if($domain){
+                            $domain_name = $domain -> domain;
+                        }
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain_name, 'logo' => $logo]);
+                    }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
+                        $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain_name, 'logo' => $logo]);
+                    }else{
+                        return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
+                    }
+                // }
+            } catch (\Exception $e) {
+                $response = array(
+                    'status' => 0,
+                    'message' => $e -> getMessage(),
+                );
+                return response()->json($response);
+            }
         }
     }
 
