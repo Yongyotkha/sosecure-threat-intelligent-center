@@ -133,12 +133,18 @@ class DomainSettingsController extends Controller
 
                     $SiteSettings = SiteSettings::where('code',$code)->first();
             
+
+                    if($request->default){
+                        Domain::where('site_id',$SiteSettings->id)->update(['domain_default' => 0]);
+                    }
+
                     $Domain = $this->domain;
                     $Domain->code = generator_uuid();
                     $Domain->name = $request->name;
                     $Domain->domain = $request->domain;
                     // $Domain->created_by = @Auth::user()->id;
                     $Domain->status = $request->status ? 1 : 0;
+                    $Domain->domain_default = $request->default ? 1 : 0;
                     $Domain->site_id = $SiteSettings->id;
                     $Domain->save();
             
@@ -220,6 +226,10 @@ class DomainSettingsController extends Controller
         // $domain->open_scan = $request->open_scan;
         // $domain->scan_interval = $request->scan_interval;
         $domain->status = $request->status ? 1 : 0;
+        if($request->default){
+            Domain::where('site_id',$domain->site_id)->update(['domain_default' => 0]);
+        }
+        $domain->domain_default = $request->default ? 1 : 0;
         $domain->save();
 
         $site_code = $this->siteSettings->find_code($domain->site_id);

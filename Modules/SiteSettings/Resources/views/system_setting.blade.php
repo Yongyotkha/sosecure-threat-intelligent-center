@@ -11,7 +11,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3 text-elipse-setting">Name Domain</p>
+                        <p class="h3 text-elipse-setting">{{@$siteSettings->name}}</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
@@ -68,7 +68,7 @@
                                     <div class="col-lg-6">
                                         <div class="input-group date">
                                             <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                            value="{{  timePickerFormat($siteSettings -> start_active) }}" name="start_active"
+                                            value="{{  timePickerFormat( (empty($siteSettings -> start_active)?date('Y-m-d H:i:s'):$siteSettings -> start_active) ) }}" name="start_active"
                                             data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()" required>
                                             <div class="input-group-addon">
                                                 @icon('solid/calendar-alt', 'text-muted')
@@ -190,6 +190,71 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Mysql User<span  data-rel="tooltip" title="Copy Key ไปใส่ในระบบ Site System"><i class="far fa-question-circle"></i></span> <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="mysql_user" value="{{ $siteSettings -> mysql_user }}" readonly>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info" onclick="copy_text_id('mysql_user')">Copy</button>  
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Mysql Password<span  data-rel="tooltip" title="Copy Key ไปใส่ในระบบ Site System"><i class="far fa-question-circle"></i></span> <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control" id="read_mysql_password" value="{{ $siteSettings -> mysql_password }}" readonly>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info" onclick="copy_password_mysql()">Copy</button>  
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Mongo User<span  data-rel="tooltip" title="Copy Key ไปใส่ในระบบ Site System"><i class="far fa-question-circle"></i></span> <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="mongo_user" value="{{ $siteSettings -> mongo_user }}" readonly>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info" onclick="copy_text_id('mongo_user')">Copy</button>  
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Mongo Password<span  data-rel="tooltip" title="Copy Key ไปใส่ในระบบ Site System"><i class="far fa-question-circle"></i></span> <span class="text-danger">*</span> </label>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control" id="read_mongo_password" value="{{ $siteSettings -> mongo_password }}" readonly>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info" onclick="copy_password_mongo()">Copy</button>  
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                  {{-- <div class="form-group row">
                                      <div class="col-lg-3 control-label">API Key</div>
                                      <div class="col-lg-6">
@@ -205,8 +270,8 @@
                                  <div class="row">
                                      <div class="col-lg- text-center">
                                         <div class="line"></div>
-                                        <h4 class="py-3">Client System Status : <span class="text-success">Online (Last Update : 2020-08-29 11:11:23)</span>
-                                            &nbsp;<button type="submit" class="btn btn-xs btn-info"><i class="fa fa-sync-alt"></i></button>
+                                        <h4 class="py-3">Client System Status : <span class="text-success">Online (Last Update : {{$siteSettings->last_client_update==null?'ไม่มีข้อมูล':$siteSettings->last_client_update}})</span>
+                                            &nbsp;<button style="display: none;" class="btn btn-xs btn-info"><i class="fa fa-sync-alt"></i></button>
                                         </h4> 
                                        
                                      </div>
@@ -215,14 +280,14 @@
                                     <div class="col-lg-12" style="background: #f3f6f9;">
                                         <div class="m-xs">
                                             <span class="text-dark">Laravel Version</span>: <span class="text-muted">{{ $siteSettings -> laravel_version == null ? 'ไม่มีข้อมูล' : $siteSettings -> laravel_version }}</span>
-                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
-                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
-                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
+                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
+                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
+                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
                                             <span class="text-dark">Code Version</span>: <span class="text-muted">{{ empty($code_version) ? 'ไม่มีข้อมูล' : $code_version }}</span>
-                                            <a href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" id="updatesBtn" data-rel="tooltip" title="Check for updates now">@icon('solid/code-branch') @langapp('check_for_updates')</a>
+                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" id="updatesBtn" data-rel="tooltip" title="Check for updates now">@icon('solid/code-branch') @langapp('check_for_updates')</a>
                                             <span class="text-danger ml-2">Last Version {{ $last_version }}</span>
                                         </div>
                                         <div class="line"></div>
@@ -283,8 +348,8 @@
 
 <script>
 $(document).ready(function(){
-    $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
-
+    {{--$('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });--}}
+    $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
     $('#show_start_exp_date').hide();
     $('#show_end_exp_date').hide();
 
@@ -314,6 +379,34 @@ function copy_system_key(){
 
 function copy_public_key(){
     var copyText = document.getElementById("public_key");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function copy_password_mysql(){
+    var copyText = document.createElement("textarea");
+    document.body.appendChild(copyText);
+    copyText.value = '{{ $siteSettings -> mysql_password }}';
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function copy_password_mongo(){
+    var copyText = document.createElement("textarea");
+    document.body.appendChild(copyText);
+    copyText.value = '{{ $siteSettings -> mongo_password }}';
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function copy_text_id(keyId){
+    var copyText = document.getElementById(keyId);
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     document.execCommand("copy");

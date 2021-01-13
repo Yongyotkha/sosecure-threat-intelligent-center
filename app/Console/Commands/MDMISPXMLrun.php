@@ -130,7 +130,7 @@ class MDMISPXMLrun extends Command
                                                 'date' => $RelatedEvent->getElementsByTagName('date')->item(0)->nodeValue,
                                                 'timestamp' => $RelatedEvent->getElementsByTagName('timestamp')->item(0)->nodeValue,
                                                 'info' => $RelatedEvent->getElementsByTagName('info')->item(0)->nodeValue,
-                                            ),
+                                                ),
                                             );
                                         }
                                     }

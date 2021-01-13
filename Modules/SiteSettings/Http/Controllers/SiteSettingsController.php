@@ -120,6 +120,10 @@ class SiteSettingsController extends Controller
         $SiteSettings->end_active = $dt->addYear();
         // $SiteSettings->system_key = generator_uuid();
         $SiteSettings->public_key = str_random(135);
+        $SiteSettings->mysql_user = str_random(10);
+        $SiteSettings->mysql_password = str_random(15);
+        $SiteSettings->mongo_user = str_random(10);
+        $SiteSettings->mongo_password = str_random(15);
         $SiteSettings->save();
 
         if ($request->category) {

@@ -108,16 +108,89 @@
                                     </header>
                                     <div class="panel-body panel-accordion">
                                         <div style="padding: 2rem">
-                                             <div class="form-group">
+                                             {{-- <div class="form-group">
                                                 <label for="">Protocol <span class="text-danger">*</span></label>
                                                 <select name="protocal_format" id="vlogs_protocal_format" class="select-option form-control" value="C">
                                                     <option value="1" {{@$LogsSetting->protocal_format=="1"?"selected":""}}>CEF Format</option>
                                                     <option value="2" {{@$LogsSetting->protocal_format=="2"?"selected":""}}>Syslog Format</option>
                                                 </select>
-                                             </div>
+                                             </div> --}}
                                              <div class="form-group">
-                                                 <label for="">Data Format <span class="text-danger">*</span></label>
-                                                 <textarea name="" id="text_protocal_format" cols="30" rows="5" class="form-control" readonly>
+                                                <label for="">Data Format <span class="text-danger">*</span></label>
+                                             </div>
+
+                                             <div class="form-group row">
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_eventname" name="eventname" value="[[Event name]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_eventname')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_group" name="group" value="[[Group]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_group')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_tags" name="tags" value="[[Tags]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_tags')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_datetime" name="datetime" value="[[DateTime]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_datetime')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="form-group row">
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_attrcount" name="attrcount" value="[[Attribute Count]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_attrcount')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_attrname" name="attrname" value="[[Attribute Name]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_attrname')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_attrtype" name="attrtype" value="[[Attribute Type]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_attrtype')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_attrdatetime" name="attrdatetime" value="[[Attribute DateTime]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_attrdatetime')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="form-group">
+                                                 <textarea name="" id="text_protocal_format" cols="30" rows="5" class="form-control">
                                                     {{@$LogsSetting->protocal_format=="2"?'SYS FORMAT':'CEF:0|SOSecure|INDICATOR|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$INDICATOR_ID cs1=$INDICATOR_ID_value cs2Label=$INDICATOR_Vendor cs2=$INDICATOR_Vendor_value cs3Label=$INDICATOR_Description cs3=$INDICATOR_Description_value requestUrl=$INDICATOR_URL'}}
                                                  </textarea>
                                               </div>
@@ -226,6 +299,14 @@
 @endpush
 
 <script>
+
+function copy_btn(id){
+    var copyText = document.getElementById(id);
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
 
 $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
 

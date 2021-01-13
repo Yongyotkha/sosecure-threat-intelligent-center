@@ -48,6 +48,7 @@
                                         <option value="" >All</option>
                                         <option value="compromise" >Public</option>
                                         <option value="darkweb" >Darkweb</option>
+                                        <option value="webserver" >Webserver</option>
                                     </select>
                                 </div>
                             </div>
@@ -120,8 +121,8 @@
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
-                    <li class="active"><a href="#tab-leak" class="tab_cliick" data-toggle="tab">Data (<span id="count_news"></span>)</a></li>
-                    <li  id="tab-bookmark"><a href="#tab-bookmarks" class="tab_cliick" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
+                    <li class="active"><a href="#tab-leak" class="tab_cliick" data-toggle="tab">Data (<span id="count_news">0</span>)</a></li>
+                    <li  id="tab-bookmark"><a href="#tab-bookmarks" class="tab_cliick" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark">0</span>)</a></li>   
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab-leak">

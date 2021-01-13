@@ -15,6 +15,9 @@ use Modules\Social\Entities\Data_leak_feed;
 use Modules\DarkWeb\Entities\Bookmarks_compromised;
 use Modules\Social\Entities\Read_social;
 use Illuminate\Support\Facades\Auth;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
+
 class DarkWebController extends Controller
 {
     /**
@@ -42,7 +45,34 @@ class DarkWebController extends Controller
     public function index()
     {
 
-        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('dark_web');
         return view('darkweb::index')->with($data);
@@ -184,6 +214,45 @@ class DarkWebController extends Controller
 
             }
 
+
+
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+            
+                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                 
+    
+                        } else {//not support and admin
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+            
+                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                        }
+                    }
+                }
+            }
+
+
+
             if($site_id) {
                 $news = $news->whereHas('get_social', function ($query) use ($site_id) {
                             $query->where('site_id', '=', $site_id);
@@ -211,8 +280,47 @@ class DarkWebController extends Controller
         }else{
             $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->orWhere('feel_type', 'webserver')->count();
             $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver']);//->get()
-            $countGroupBy = Data_leak_feed::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver'])->groupBy('feel_type')->get();
+            $countGroupBy = Data_leak_feed::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver'])->groupBy('feel_type');
+           
+
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+            
+                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                 
+    
+                        } else {//not support and admin
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+            
+                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                        }
+                    }
+                }
+            }
+
             $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
+            $countGroupBy = $countGroupBy->get();
+
+
         }
 
         // dd($news);

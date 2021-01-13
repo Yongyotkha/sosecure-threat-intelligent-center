@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 
 class SocialController extends Controller
 {
@@ -40,7 +42,35 @@ class SocialController extends Controller
     public function index()
     {
 
-        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+
+        // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         $Data_leak_social = Data_leak_social::where("deleted_at",null)->where("status",1)->get();
         $data['Data_leak_social'] = $Data_leak_social;
         $data['SiteSettings'] = $SiteSettings;
@@ -152,14 +182,39 @@ class SocialController extends Controller
         if(($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) && $request -> f_search == 1){
 
             $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social');//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+            
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                 
+    
+                        } else {//not support and admin
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                        }
+                    }
+                }
+            }
+            
             if($request -> title){
                 $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
             }
 
  
-
-  
-
             if($social) {
                 // dd($social);
                 // $cate_id_m = CategorySettings::where('code',$cate)->first();
@@ -206,7 +261,38 @@ class SocialController extends Controller
             $Data_leak_feed_all = $news->count();
             $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social');//->get()
+
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                 
+    
+                        } else {//not support and admin
+                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
+                                $query->whereIn('site_id', $site_id_arr);
+                            });
+                        }
+                    }
+                }
+            }
+
+            $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);//->get()
+
+
         }
 
         // dd($news);

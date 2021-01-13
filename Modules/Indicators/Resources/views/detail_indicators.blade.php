@@ -27,7 +27,8 @@
                                 <a id="to_top" href="#general_details">General Detail</a>
                                 <div class="underline"></div>
                             </li>
-                            <li class="nav-link">
+                            
+                            <li class="nav-link" style="display: none;">
                                 <a href="#related_event" id="event_tag">Event</a>
                                 <div class="underline"></div>
                             </li>
@@ -93,7 +94,7 @@
                                                     <th>Published</th>
                                                     <th>Last Status</th>
                                                     <th style="width: 200px;">DateTime</th>
-                                                    <th>View</th>
+                                                    <th>Attribute</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -255,7 +256,7 @@
                     data: 'modified',
                 },
                 {
-                    data: 'count_view',
+                    data: 'attrCount',
 
                 },
                 {
@@ -267,6 +268,15 @@
 
             ],
             columnDefs: [
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                        return inner;
+                    }
+                      
+                },
                 {
                     targets: 4,
                     render: function (data, type, row) {

@@ -22,10 +22,7 @@
                     <!-- Example Domain -->
                     <div class="mt-2">
                         <table class="table table-bordered table-striped">
-                            <tr ><td>Example : Test.co.th</td></tr>
-                            <tr ><td>Example : Test.co.th</td></tr>
-                            <tr ><td>Example : Test.co.th</td></tr>
-                            <tr ><td>Example : Test.co.th</td></tr>
+                            <tr ><td>Example : example.com</td></tr>
                         </table>
                     </div>
                 </div>
@@ -223,6 +220,18 @@
                     </select>
                 </div>
             </div>
+            
+            <div class="form-group row">
+                <label class="col-lg-4 control-label">Default </label>
+                <div class="col-lg-8">
+                    <label class="switch">
+                        <input type="hidden" value="FALSE" name="">
+                        <input type="checkbox" name="default" value="TRUE">
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+            
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Status </label>
                 <div class="col-lg-8">
@@ -233,6 +242,7 @@
                     </label>
                 </div>
             </div>
+
         </div>
 
         {{-- @include('partial.privacy_consent') --}}

@@ -12,7 +12,7 @@ class Domain extends Model {
     protected $table = "domain";
     public $timestamps = true;
     protected $fillable = [
-        'id','code','name', 'domain', 'open_scan', 'scan_interval', 'status', 'site_id'
+        'id','code','name', 'domain', 'open_scan', 'scan_interval', 'status', 'site_id', 'domain_default'
     ];
     protected $dates   = ['deleted_at', 'created_at', 'updated_at'];
 

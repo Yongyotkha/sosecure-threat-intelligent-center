@@ -74,7 +74,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         $delay_WebDefacementProccess = rand(1,55);
-        $schedule->command('app:WebDefacementProccess', ['--delay'=> $delay_WebDefacementProccess])->everyMinute();
+        $schedule->command('app:WebDefacementProccess')->everyMinute();
     }
 
     /**

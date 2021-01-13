@@ -84,7 +84,8 @@ class MDMISPXMLrunXMLLL extends Command
     public function saveJson($stamp_event_id, $stamp_indicator_id, $json_o = null)
     {
 
-        $dir_folder = app_path() . "\\Console\\Commands\\temp\\otx_export2\\";
+        // $dir_folder = app_path(). "\\Console\\Commands\\temp\\otx_export2\\";
+        $dir_folder = "C:\\Users\\Non\\Desktop\\New folder (2)\\otx_export2\\";
         //$dir_folder = "127.0.0.1" . "\\Newfolder\\otx_export2\\";
         if (is_dir($dir_folder)) {
             if ($dh = opendir($dir_folder)) {

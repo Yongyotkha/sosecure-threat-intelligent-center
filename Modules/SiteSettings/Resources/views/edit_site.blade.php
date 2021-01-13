@@ -43,7 +43,7 @@
                                     <label class="col-lg-3 control-label">Logo </label>
                                     <div class="col-lg-6">
                                         <div class="">
-                                            <input id="file-input" type="file" class="form-control" name="logo" value="">
+                                            <input id="file-input-demo" type="file" class="form-control" name="logo">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -188,15 +188,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.fullscreen')
 @include('stacks.js.cropple')
-<script>
-
-    $(document).ready(function(){
-        $("#tags").select2({
-        tags: true
-        });
-    });
-    
-    var cropper_logo;
+{{-- var cropper_logo;
     var imgs_logo = null;
     window.addEventListener('DOMContentLoaded', function () {
         var image = document.getElementById('crop-img-logo');
@@ -256,7 +248,14 @@
             html = '<img src="' + imgs_logo + '" />';
             $("#preview_cer_img").html(html);
             $("#preview-image_logo").html("");
+        }); --}}
+<script>
+
+    $(document).ready(function(){
+        $("#tags").select2({
+        tags: true
         });
+    });
      </script>
 @endpush
 
