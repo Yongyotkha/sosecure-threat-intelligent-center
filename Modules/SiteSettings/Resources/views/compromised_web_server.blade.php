@@ -167,6 +167,7 @@
         aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
+                
                 <div class="modal-header bg-blue">
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title text-white">
@@ -176,11 +177,12 @@
                     </h4>
                 </div>
                 <div class="modal-body">
+                <form >
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="ip" class="form-control" required>
+                            <input type="text" id="ip" class="form-control" required="yes" >
                         </div>
                     </div>
                     <div class="form-group row">
@@ -225,9 +227,9 @@
                             </label>
                         </div>
                     </div>
+                
 
-
-
+             
 
                 </div>
 
@@ -236,12 +238,13 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" class="btn btn-info btn-rounded" onclick="add_asset_click()">
+                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" onclick="add_asset_click()">
                         <i class="fas fa-paper-plane"></i>
                         Save
                         {{-- Yes, approve --}}
                     </button>
                 </div>
+            </form>
             </div>
         </div>
     </div>
@@ -321,7 +324,7 @@
 
     
 
-    console.log({!!json_encode($siteID)!!});
+
 
     $('#table_web_server').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
@@ -416,38 +419,54 @@
         root_path = $('#root_path').val();
         os = $('#os').val();
 
-        $.ajax({
-            type:"POST",
-            url:"{{ route('compromised_web_server.web_server_create') }}",
-            data:{
-                check:Number(check),
-                os:os,
-                root_path:root_path,
-                password:password,
-                user:user,
-                ip:ip,
-                id_chang: web_server_id_chang,
-                site:{!!json_encode($siteID)!!},
-            },
-            beforeSend: function(){
-                loading('load');
-            },
-            success:function(response) {
-                loading('stop_load');
-                toastr.success(response.message, '@langapp('response_status')');
-                window.location.href = response.redirect;
-            },
-            error: function (error){
-                loading('stop_load');
-                var errors = error.response.data.errors;
-                var errorsHtml = '';
-                $.each(errors, function (key, value) {
-                    errorsHtml += '<li>' + value[0] + '</li>';
-                });
-                toastr.error(errorsHtml, '@langapp('response_status') ');
-            }
-        
-        });
+        if(ip==''||user==''||password==''||root_path==''){
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please fill your information completely.',
+            })
+        }
+
+
+
+        else{
+
+            $.ajax({
+                type:"POST",
+                url:"{{ route('compromised_web_server.web_server_create') }}",
+                data:{
+                    check:Number(check),
+                    os:os,
+                    root_path:root_path,
+                    password:password,
+                    user:user,
+                    ip:ip,
+                    id_chang: web_server_id_chang,
+                    site:{!!json_encode($siteID)!!},
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) {
+                    loading('stop_load');
+                    toastr.success(response.message, '@langapp('response_status')');
+                    window.location.href = response.redirect;
+                },
+                error: function (error){
+                    loading('stop_load');
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                }
+
+            });
+
+        }
+
+       
    }
 
    $("#add_asset").on('click', function() {
@@ -639,8 +658,10 @@
                     targets: 5,
                     width: '10px',
                     render: function (data, type, full, meta) {
-            
-                        return full.password;
+
+                        
+
+                        return '<span style="-webkit-text-security: disc;">'+full.password+'</span>';
 
                     },
                 },
