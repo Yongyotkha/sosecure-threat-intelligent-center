@@ -19,7 +19,7 @@
                 </span>
                 &nbsp;
                 <span id="check_status_val_webdefacement">
-                @if ($webdefacement->status_val != 'Normal')   
+                @if (@$webdefacement->status_val != 'Normal')   
                     <a href="#" id="accept_risk" onclick="accept_risk()"
                         class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
                         Accept Risk
@@ -106,27 +106,35 @@
                                     <th>Current</th>
                                 </tr>
                             </thead>
-                            <tbody>                  
+                            <tbody> 
+                                @if(@$webdefacement->hash == 1)
                                 <tr>
                                     <th>Hash</th>
                                     <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
                                     <td>{{@$webdefacment_data_check->hash_new}} ({{@$webdefacment_data_check->hash_percent}}%)</td>
                                 </tr>
+                                @endif
+                                @if(@$webdefacement->filesize == 1)
                                 <tr>
                                     <th>File Size</th>
                                     <td id='FileSize'>{{@formatSizeUnits($webdefacment_data_original->filesize)}}</td>
                                     <td>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} ({{@$webdefacment_data_check->filesize_percent}}%)</td>
                                 </tr>
+                                @endif
+                                @if(@$webdefacement->element == 1)
                                 <tr>
                                     <th>Element</th>
                                     <td id='Element'>{{@$webdefacment_data_original->element}}</td>
                                     <td>{{@$webdefacment_data_check->element_new}} ({{@$webdefacment_data_check->element_percent}}%)</td>
                                 </tr>
+                                @endif
+                                @if(@$webdefacement->blacklist_keyword_content == 1)
                                 <tr>
                                     <th>Blacklist Keyword</th>
                                     <td id='BlacklistKeyword'>{{@$webdefacement->blacklist_keyword_content}}</td>
                                     <td>{{@$webdefacement->blacklist_keyword_current}}</td>
                                 </tr>
+                                @endif
                                 <tr>
                                     <th>Last Update</th>
                                     <td id='LastUpdate'>{{@$webdefacment_data_original->last_update}}</td>
@@ -151,6 +159,7 @@
                 </div>
             </section>
 
+            @if(@$webdefacement->image_check == 1)
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
@@ -227,6 +236,7 @@
                     </div>
                 </div>
             </section>
+            @endif
 
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">

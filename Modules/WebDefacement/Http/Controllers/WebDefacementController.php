@@ -10,6 +10,8 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Auth;
 use Artisan;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 
 class WebDefacementController extends Controller
 {
@@ -38,7 +40,35 @@ class WebDefacementController extends Controller
     public function index()
     {
         $data['page'] = langapp('webdefacement');
-        $data['SiteSettings'] = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        // $data['SiteSettings'] = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        $data['SiteSettings'] = $SiteSettings;
 
         return view('webdefacement::index')->with($data);
     }
@@ -46,25 +76,59 @@ class WebDefacementController extends Controller
     public function detail($code)
     {
 
+        $WebdefacmentSetting = WebdefacmentSetting::where("code",$code)->where('deleted_at', null)->where('active', 1)->with('get_webdefacment_data_original_detail')->with('get_webdefacment_data_check_detail')->with('get_webdefacment_data_log_detail');
+        
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+        if(count($site_id_arr) > 0) {
+            $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id' , $site_id_arr);
+        }
+        $WebdefacmentSetting = $WebdefacmentSetting->first();
+        // dd($WebdefacmentSetting);
+
+
+
+
         // dd($code);
         $data['page'] = langapp('webdefacement');
         $data['code'] = @$code;
-        $data['webdefacement'] = WebdefacmentSetting::where("code",$code)
-        ->where("hash",1)
-        ->where("filesize",1)
-        ->where("element",1)
-        ->where("blacklist_keyword",1)
-        ->where("image_check",1)
-        ->first();
+        $data['webdefacement'] = $WebdefacmentSetting;
+        // WebdefacmentSetting::where("code",$code)->where('deleted_at', null)->where('active', 1)
+        // ->where("hash",1)
+        // ->where("filesize",1)
+        // ->where("element",1)
+        // ->where("blacklist_keyword",1)
+        // ->where("image_check",1)
+        // ->first();
         $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original_detail[0];
         $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check_detail[0];
         $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log_detail;
 
             // dd( $data['webdefacement']->blacklist_keyword_content);
-        
-
-
-
         
         return view('webdefacement::detail')->with($data);
     }
@@ -136,6 +200,27 @@ class WebDefacementController extends Controller
 
         $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null);
 
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+                        $modal = $modal->whereIn('site_id' , $site_id_arr);
+                    } else {//not support and admin
+                        $modal = $modal->whereIn('site_id', $site_id_arr);
+                    }
+                }
+            }
+        }
+
+
         if ($request->search_ == 1) {
     
             if ($request->site != "") {
@@ -171,8 +256,7 @@ class WebDefacementController extends Controller
             // else{
             //     $modal = $modal;
             // }
-        
-    }
+        }
             
         $modal = $modal->get();
 
