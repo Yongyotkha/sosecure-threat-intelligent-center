@@ -23,6 +23,16 @@
                         required>
                 </div>
             </div>
+
+            <div class="form-group row">
+                <label style="padding-top: 7px" class="col-lg-3 control-label">Port <span class="text-danger">*</span>
+                </label>
+                <div class="col-lg-8">
+                    <input type="text" id="port" name="port" class="form-control" value="{{@$CompromisedServer->port}}"
+                        required>
+                </div>
+            </div>
+            
             <div class="form-group row">
                 <label style="padding-top: 7px" class="col-lg-3 control-label">User <span class="text-danger">*</span>
                 </label>

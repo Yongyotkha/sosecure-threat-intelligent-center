@@ -13,6 +13,10 @@ use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\Facades\DataTables;
 use App\Entities\CompromisedServer;
+use Modules\Scans\Entities\Assets;
+use Auth;
+use Modules\SiteSettings\Entities\Domain;
+use Modules\Scans\Entities\AssetsData;
 
 class DataLeakController extends Controller
 {
@@ -1689,18 +1693,70 @@ class DataLeakController extends Controller
     }
 
     public function web_server_create(Request $request)
-    {
+    {   
+  
         $data = new CompromisedServer;
         $data->code = generator_uuid();
         $data->site_id = $request->site;
         $data->ip = $request->ip;
+        $data->port = $request->port;
         $data->user = $request->user;
         $data->password = $request->password;
         $data->path = $request->root_path;
         $data->os = $request->os;
         $data->active = $request->check;
-        
         $data->save();
+
+        $Assets = Assets::where('raw_data',$request->ip)->first();
+        $Domain = Domain::where('site_id',$request->site)->where('domain_default',1)->first();
+
+        if($Assets){
+            // dd($Assets);
+            $Assets->site_id = $request->site;
+            $Assets->port = $request->port;
+            $Assets->user = $request->user;
+            $Assets->password = $request->password;
+            $Assets->os = $request->os;
+            $Assets->status = $request->check;
+            $Assets->created_by = @Auth::user()->id;
+            $Assets->domain_id = $Domain->id;
+
+            
+            $Assets->save();
+            
+
+        }else{
+            $Assets_new = new Assets;
+            $Assets_new->code = generator_uuid();
+            $Assets_new->site_id = $request->site;
+            $Assets_new->raw_data = $request->ip;
+            $Assets_new->port = $request->port;
+            $Assets_new->user = $request->user;
+            $Assets_new->password = $request->password;
+            $Assets_new->os = $request->os;
+            $Assets_new->status = $request->check;
+            $Assets_new->created_by = @Auth::user()->id;
+            $Assets_new->domain_id = $Domain->id;
+            $Assets_new->domain_id = $Domain->id;
+
+            $Assets_new->save();
+
+            $AssetsData = new AssetsData;
+            $AssetsData->code = generator_uuid();
+            $AssetsData->site_id = $request->site;
+            $AssetsData->value = $request->ip;
+            $AssetsData->status = $request->check;
+            $AssetsData->created_by = @Auth::user()->id;
+            $AssetsData->domain_id = $Domain->id;
+            $AssetsData->data_type_id = 5;
+            $AssetsData->asset_id = $Assets_new->id;
+
+            $AssetsData->save();
+
+        }
+        
+        
+        
 
         $code_site = SiteSettings::where("id", '=', $request->site)->first();
 
@@ -1731,6 +1787,7 @@ class DataLeakController extends Controller
 
         
         $data->ip = $request->ip;
+        $data->port = $request->port;
         $data->user = $request->user;
         $data->password = $request->password;
         $data->path = $request->root_path;

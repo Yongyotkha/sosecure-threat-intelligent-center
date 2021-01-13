@@ -159,7 +159,7 @@
     var number_new_rows_assets = 0;
     var base_datatype = []; 
     $(document).ready(function(){
-        $("#asset-to-use-manual").click(function(){
+{{--$("#asset-to-use-manual").click(function(){
             loading('load');
             $('#show_asets_manual').html("");
             axios.get('/scans/get_data_type')
@@ -208,7 +208,7 @@
                 errorsHtml += "<li>" + errors + "</li>";
                 toastr.error(errorsHtml, '@langapp('response_status')');
             });
-        });
+        });--}}
 
         $("#asset-to-use").click(function(){
             $('#show_asets').html("");
@@ -424,14 +424,19 @@
             }
         });
         axios.post('/scans/save_assets', {
+            
             assets: values,
             assets_data: res,
         }).then(function (response) {
-            loading('stop_load');
+            
+            
             $('#table-scans-data').DataTable().ajax.reload();
             $('#asset-to-use').prop("disabled", true);
             $('#show_asets').html("");
             $('#asset_to_use').modal('hide');
+            loading('stop_load');
+            console.log(base_url+'/scans/scans-domain/asset/'+'{{ $site->code }}');
+            window.location.href = base_url+'/scans/scans-domain/asset/'+'{{ $site->code }}';
         }).catch(function (error) {
             loading('stop_load');
             var errors = error;

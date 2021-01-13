@@ -177,12 +177,19 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                <form >
+            <form onsubmit ="add_asset_click()">
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
                             <input type="text" id="ip" class="form-control" required="yes" >
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">Port <span
+                                class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" id="port" class="form-control" required >
                         </div>
                     </div>
                     <div class="form-group row">
@@ -238,7 +245,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" onclick="add_asset_click()">
+                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" >
                         <i class="fas fa-paper-plane"></i>
                         Save
                         {{-- Yes, approve --}}
@@ -268,7 +275,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="button" onclick="delete_web_server_save()" class="btn btn-info btn-rounded">
+                    <button type="button" onclick="delete_web_server_save()" data-dismiss="modal" class="btn btn-info btn-rounded">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>
@@ -307,12 +314,9 @@
         $('#detail_content').summernote('destroy');--}}
 
 
-    var search_val = 0;
-    var keywords = null;
-    var start_date = null;
-    var end_date = null;
-    var isDateSearch = null;
+   
     var ip = null;
+    var port = null;
     var user = null;
     var password = null;
     var root_path = null;
@@ -322,7 +326,7 @@
     var web_server_id_delete_chang = [];
     var web_server_id_delete = null;
 
-    
+
 
 
 
@@ -341,10 +345,12 @@
 
     $('#table_web_server').on('click', '.web_server_id', function () {
         if ($(this).is(':checked')) {
-
-            
             $('#btn-change-status,#btn_del_select').prop("disabled", false);
+            {{--if($('.web_server_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
         } else {
+            document.getElementById("select-all").checked = false;
             if ($('.web_server_id').filter(':checked').length < 1){
                 
                 $('#btn-change-status,#btn_del_select').attr('disabled',true);
@@ -383,18 +389,6 @@
         }, cb);
         cb(start, end);
 
-        $("#btn_darkweb_feed_reset").click(function() {
-            search_val = 0;
-            $("#search").val('');
-            $("#source_select").val('').trigger('change');
-            $("#check_all").prop("checked",false);
-            $("#check_pending").prop("checked",false);
-            $("#check_approved").prop("checked",false);
-
-            cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
-
-    
-        });
 
     });
 
@@ -414,64 +408,53 @@
 
     function add_asset_click() {
         ip = $('#ip').val();
+        port = $('#port').val();
         user = $('#user').val();
         password = $('#password').val();
         root_path = $('#root_path').val();
         os = $('#os').val();
 
-        if(ip==''||user==''||password==''||root_path==''){
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Please fill your information completely.',
-            })
-        }
 
+        $.ajax({
+            type:"POST",
+            url:"{{ route('compromised_web_server.web_server_create') }}",
+            data:{
+                check:Number(check),
+                os:os,
+                root_path:root_path,
+                password:password,
+                user:user,
+                ip:ip,
+                port:port,
+                id_chang: web_server_id_chang,
+                site:{!!json_encode($siteID)!!},
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
 
-
-        else{
-
-            $.ajax({
-                type:"POST",
-                url:"{{ route('compromised_web_server.web_server_create') }}",
-                data:{
-                    check:Number(check),
-                    os:os,
-                    root_path:root_path,
-                    password:password,
-                    user:user,
-                    ip:ip,
-                    id_chang: web_server_id_chang,
-                    site:{!!json_encode($siteID)!!},
-                },
-                beforeSend: function(){
-                    loading('load');
-                },
-                success:function(response) {
-                    loading('stop_load');
-                    toastr.success(response.message, '@langapp('response_status')');
-                    window.location.href = response.redirect;
-                },
-                error: function (error){
-                    loading('stop_load');
-                    var errors = error.response.data.errors;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += '<li>' + value[0] + '</li>';
-                    });
-                    toastr.error(errorsHtml, '@langapp('response_status') ');
-                }
-
-            });
-
-        }
-
+        });
        
    }
 
    $("#add_asset").on('click', function() {
 
         ip = null;
+        port = null;
         user = null;
         password = null;
         root_path = null;
@@ -480,6 +463,7 @@
         
         document.getElementById("status").checked = true;
         $("#ip").val('');
+        $("#port").val('');
         $("#user").val('');
         $("#password").val('');
         $("#root_path").val('');
@@ -637,7 +621,7 @@
                     render: function (data, type, full, meta) {
                     
             
-                        return full.ip;
+                        return full.ip+':'+full.port;
 
                     },
                 },
