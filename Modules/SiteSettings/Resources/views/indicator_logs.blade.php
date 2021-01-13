@@ -190,7 +190,7 @@
                                              </div>
 
                                              <div class="form-group">
-                                                 <textarea name="" id="text_protocal_format" cols="30" rows="5" class="form-control" readonly>
+                                                 <textarea name="" id="text_protocal_format" cols="30" rows="5" class="form-control">
                                                     {{@$LogsSetting->protocal_format=="2"?'SYS FORMAT':'CEF:0|SOSecure|INDICATOR|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$INDICATOR_ID cs1=$INDICATOR_ID_value cs2Label=$INDICATOR_Vendor cs2=$INDICATOR_Vendor_value cs3Label=$INDICATOR_Description cs3=$INDICATOR_Description_value requestUrl=$INDICATOR_URL'}}
                                                  </textarea>
                                               </div>
