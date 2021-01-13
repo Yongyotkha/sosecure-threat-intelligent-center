@@ -214,10 +214,20 @@
             </div>
  
             <div class="form-group row">
+                <label class="col-lg-4 control-label">Default </label>
+                <div class="col-lg-8">
+                    <label class="switch">
+                        <input type="checkbox" name="default" value="1" {{$domain->domain_default == 1 ? 'checked' : ''}}>
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label class="col-lg-4 control-label">Status </label>
                 <div class="col-lg-8">
                     <label class="switch">
-                        <input type="checkbox" name="status" checked value="1" {{$domain->status == 1 ? 'checked' : ''}}>
+                        <input type="checkbox" name="status" value="1" {{$domain->status == 1 ? 'checked' : ''}}>
                         <span></span>
                     </label>
                 </div>
