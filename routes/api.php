@@ -20,6 +20,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('register_site', 'Api\RegisterSiteController@register_site');
     Route::post('site_request_version', 'Api\RegisterSiteController@site_request_version');
     Route::post('save_deploy_history', 'Api\RegisterSiteController@save_deploy_history');
+    Route::post('save_deploy_system', 'Api\RegisterSiteController@save_deploy_system');
     Route::post('test_get', 'Api\ExampleApiController@test_get');
 });
 
