@@ -229,7 +229,7 @@
 <script>
 
 
-const chart = new Highcharts.chart('chart-pack', {
+var chart = new Highcharts.chart('chart-pack', {
   chart: {
     type: 'bar',
     height: '195px'
