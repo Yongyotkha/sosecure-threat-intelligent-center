@@ -513,6 +513,7 @@ class ScansController extends Controller
         $Assets = Assets::where('code',$id)->first();
         $data['scans'] = $Assets;
         $data['code'] = $code;
+        $data['DataTypes'] = DataTypes::all();
         return view('scans::modal.update_asset')->with($data);
     }
 
