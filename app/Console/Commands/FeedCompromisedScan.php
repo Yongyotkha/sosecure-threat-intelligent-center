@@ -12,7 +12,8 @@ use App\Entities\CompromisedFileOriginal;
 use App\Entities\CompromisedFileCheck;
 use App\DataLeakFeed;
 use App\DataLeakSocialRef;
-
+use App\DataLeakFeedTemp;
+use App\leak_socail_ref_temp;
 class FeedCompromisedScan extends Command
 {
     /**
@@ -31,6 +32,7 @@ class FeedCompromisedScan extends Command
     private $hashingAlgorithm  = 'md5';
     private $timeOutMain  = 59;
     private $timeOutSub  = 180;
+    private $pathPythonScan  = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-file";
     /**
      * Create a new command instance.
      */
@@ -47,30 +49,35 @@ class FeedCompromisedScan extends Command
      */
     public function handle()
     {
+        // $output = shell_exec("cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-file '/var/www/html/threat-intelligent-center/threat-intelligent-center/storage/compromised/webserver/1/e0763fe7-22f8-4502-b580-7a6584cc5f6b.php'");
+        // $savePythonScan = $this->searchError('/var/www/html/threat-intelligent-center/threat-intelligent-center/storage/compromised/webserver/1/e0763fe7-22f8-4502-b580-7a6584cc5f6b.php',$output);
+        // echo json_encode($savePythonScan);
+        // return 0;
         $CompromisedServer = CompromisedServer::where('active', '1')->whereNull('deleted_at')->get(); 
         if($CompromisedServer){
             foreach ($CompromisedServer as $server) {
                 try{
-                    $ip = $server->ip;
-                    $port = $server->port;
-                    $user = $server->user;
-                    $pass = $server->password;
-                    $ssh = new SSH2($ip,$port);
-                    $ssh->setTimeout($this->timeOutSub);
-                    $return_value = null;
-                    if (!$ssh->login($user, $pass)) {
-                        $return_value = null;
-                    } else {
-                        $this->scanFolder($server,$ssh);
-                    }
+                    
+                    // $ip = $server->ip;
+                    // $port = $server->port;
+                    // $user = $server->user;
+                    // $pass = $server->password;
+                    // $ssh = new SSH2($ip,$port);
+                    // $ssh->setTimeout($this->timeOutSub);
+                    // $return_value = null;
+                    // if (!$ssh->login($user, $pass)) {
+                    //     $return_value = null;
+                    // } else {
+                    //     $this->scanFolder($server,$ssh);
+                    // }
+
+                    $ssh = null;
+                    $this->scanFolder($server,$ssh);
                 } catch (Exception $e) {
                     echo $e->getMessage();
                 }
             }
         }
-
-        
-
     }
     
     private  function scanFolder($server,$ssh) {
@@ -82,47 +89,46 @@ class FeedCompromisedScan extends Command
                         $dir_file = $dir_folder . $file;
                         $pathinfo_file = pathinfo($dir_file);
                         $CompromisedFileOriginalCheck = CompromisedFileOriginal::where('code', $pathinfo_file["filename"])->first();
-                        $this->info($dir_file);
+                        // $this->info($dir_file);
                         if($CompromisedFileOriginalCheck){
                             $pythonCheck_output = $this->pythonCheck($ssh,$dir_file);
                             $savePythonScan = $this->searchError($dir_file,$pythonCheck_output);
                             if(!empty($savePythonScan)){
-
+                                $this->savePythonScan($server,$CompromisedFileOriginalCheck,$savePythonScan,'scanner','webserver');
                             }
-                        }else{
-                            $pythonCheck_output = $this->pythonCheck($ssh,$dir_file);
-                            $savePythonScan = $this->searchError($dir_file,$pythonCheck_output);
                         }
-                        // unlink($somefile);
+                        unlink($dir_file);
                     }
                 }
-                $this->info("--END--");
+                echo "Scan END: ".$dir_folder."\r\n";
                 closedir($dh);
             }
+            rmdir($dir_folder);
         }
         return 0;
     }
 
     private  function pythonCheck($ssh,$dir_file) {
-        $cmd = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-file '".$dir_file."'";
-        $output = @$ssh->exec($cmd);
+        $cmd = $this->pathPythonScan." '".$dir_file."'";
+        $output = shell_exec($cmd);
+        // $output = @$ssh->exec($cmd);
         return $output;
     }
 
-    private  function savePythonScan($server,$CompromisedFileOriginalCheck,$pythonCheck_output,$keyword) {
+    private  function savePythonScan($server,$CompromisedFileOriginalCheck,$savePythonScan,$keyword,$feel_type) {
         $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $CompromisedFileOriginalCheck->file_path)->where('site_id',$server->site_id)->first(); 
         $insertLeak = true;
         if(!$CompromisedFileCheck){
             $CompromisedFileCheck = new CompromisedFileCheck;
             $CompromisedFileCheck->code = generator_uuid();
             $CompromisedFileCheck->compromised_server_id = $server->id;
-            $CompromisedFileCheck->file_name = $detail["file_name"];
-            $CompromisedFileCheck->file_extension = $detail["file_extenstion"];
-            $CompromisedFileCheck->file_path = $detail["file_path"];
-            $CompromisedFileCheck->file_size = $detail["file_size"];
-            $CompromisedFileCheck->file_modified = $detail["file_modified"];
+            $CompromisedFileCheck->file_name = $CompromisedFileOriginalCheck->file_name;
+            $CompromisedFileCheck->file_extension = $CompromisedFileOriginalCheck->file_extension;
+            $CompromisedFileCheck->file_path = $CompromisedFileOriginalCheck->file_path;
+            $CompromisedFileCheck->file_size = $CompromisedFileOriginalCheck->file_size;
+            $CompromisedFileCheck->file_modified = $CompromisedFileOriginalCheck->file_modified;
             $CompromisedFileCheck->defacement_type = $keyword;
-            $CompromisedFileCheck->defacment_description = $implode_blacklist;
+            $CompromisedFileCheck->defacment_description = $savePythonScan;
             $CompromisedFileCheck->file_status = 1;
             $CompromisedFileCheck->active = 1;
             $CompromisedFileCheck->site_id = $server->site_id;
@@ -133,55 +139,63 @@ class FeedCompromisedScan extends Command
                 $insertLeak = false;
             }else if($CompromisedFileCheck->file_status==1){
                 //status จะเป็น 2 เมือ่ไร
-                $CompromisedFileCheck->file_size = $detail["file_size"];
-                $CompromisedFileCheck->defacment_description = $implode_blacklist;
+                $CompromisedFileCheck->file_size = $CompromisedFileOriginalCheck->file_size;
+                $CompromisedFileCheck->defacment_description = $savePythonScan;
                 $CompromisedFileCheck->site_id = $server->site_id;
                 // $CompromisedFileCheck->file_status = 2;
                 $CompromisedFileCheck->save();
             }
         }
 
-        // if(false){
-        //     $DataLeakFeedCheck = DataLeakFeed::where('data_id', $CompromisedFileCheck->id)
-        //     ->where('temp_id', $server->id)
-        //     ->where('feel_type', $keyword)
-        //     ->where('feedcontent',$server->site_id)->first();
-           
-        //     if(!$DataLeakFeedCheck){
-        //         $DataLeakFeedCheck = new DataLeakFeed;
-        //         $DataLeakFeedCheck->code = generator_uuid();
-        //         $DataLeakFeedCheck->data_id =$CompromisedFileCheck->id;
-        //         $DataLeakFeedCheck->temp_id =  $server->id;
-        //         $DataLeakFeedCheck->sourceid = 1000;
-        //         $DataLeakFeedCheck->keyword = $keyword;
-        //         $DataLeakFeedCheck->source_name = $detail["file_path"];
-        //         // $DataLeakFeedCheck->feedtimepost = $detail["file_modified"];
-        //         $DataLeakFeedCheck->feedtimepost = date("Y-m-d H:i:s");
-        //         $DataLeakFeedCheck->feedtimestamp = date("Y-m-d H:i:s");
-        //         $DataLeakFeedCheck->feedcontent = $implode_blacklist;
-        //         $DataLeakFeedCheck->status = 1;
-        //         $DataLeakFeedCheck->feel_type = $feedtype;
-        //         $DataLeakFeedCheck->view = 0;
-        //         $DataLeakFeedCheck->save();
-        //     }
+        if($insertLeak){
+            $DataLeakFeedCheck = DataLeakFeedTemp::where('source_name', $CompromisedFileOriginalCheck->file_path)
+            ->where('feedcontent', $savePythonScan)
+            ->where('keyword', $keyword)
+            ->where('feed_type', $feel_type)->first();
+            
+            if(!$DataLeakFeedCheck){
+                $DataLeakFeedCheck = new DataLeakFeedTemp;
+                $DataLeakFeedCheck->code = null;
+                $DataLeakFeedCheck->data_id = $CompromisedFileCheck->id;
+                $DataLeakFeedCheck->data_id = null;
+                $DataLeakFeedCheck->sourceid = 1000;
+                $DataLeakFeedCheck->keyword = $keyword;
+                $DataLeakFeedCheck->source_name = $CompromisedFileOriginalCheck->file_path;
+                // $DataLeakFeedCheck->feedtimepost = $detail["file_modified"];
+                $DataLeakFeedCheck->feedtimepost = date("Y-m-d H:i:s");
+                $DataLeakFeedCheck->feedtimestamp = date("Y-m-d H:i:s");
+                $DataLeakFeedCheck->feedcontent = $savePythonScan;
+                $DataLeakFeedCheck->status = 1;
+                $DataLeakFeedCheck->feed_type = $feel_type;
+                $DataLeakFeedCheck->approve = 0;
+                $DataLeakFeedCheck->save();
+                // $id_DataLeakFeedCheck = $DataLeakFeedCheck->id;
+            }else{
+                // $id_DataLeakFeedCheck = $DataLeakFeedCheck->id;
+                $DataLeakFeedCheck->source_name = $CompromisedFileOriginalCheck->file_path;
+                $DataLeakFeedCheck->feedtimepost = date("Y-m-d H:i:s");
+                $DataLeakFeedCheck->feedtimestamp = date("Y-m-d H:i:s");
+                $DataLeakFeedCheck->feedcontent = $savePythonScan;
+                $DataLeakFeedCheck->save();
 
-        //     $DataLeakSocialRefCheck = DataLeakSocialRef::where('data_leak_feed_id', $DataLeakFeedCheck->id)
-        //     ->where('site_id', $server->site_id)
-        //     ->where('temp_id', $server->id)->first();
-        //     if(!$DataLeakSocialRefCheck){
-        //         $DataLeakSocialRefCheck = new DataLeakSocialRef;
-        //         $DataLeakSocialRefCheck->code = generator_uuid();
-        //         $DataLeakSocialRefCheck->temp_id = $server->id;
-        //         $DataLeakSocialRefCheck->data_leak_feed_id =  $DataLeakFeedCheck->id;
-        //         $DataLeakSocialRefCheck->site_id = $server->site_id;
-        //         $DataLeakSocialRefCheck->keyword = $keyword ;
-        //         $DataLeakSocialRefCheck->status = 1;
-        //         $DataLeakSocialRefCheck->feel_type = $feedtype;
-        //         $DataLeakSocialRefCheck->view = 0;
-        //         $DataLeakSocialRefCheck->save();
+            }
 
-        //     }
-        // }
+            $DataLeakSocialRefCheck = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedCheck->id)
+            ->where('site_id', $server->site_id."")->first();
+            if(!$DataLeakSocialRefCheck){
+                $DataLeakSocialRefCheck = new leak_socail_ref_temp;
+                $DataLeakSocialRefCheck->code = null;
+                $DataLeakSocialRefCheck->data_leak_feed_id =  $DataLeakFeedCheck->id;
+                $DataLeakSocialRefCheck->site_id = $server->site_id;
+                $DataLeakSocialRefCheck->keyword = $keyword;
+                $DataLeakSocialRefCheck->status = 1;
+                $DataLeakSocialRefCheck->view = null;
+                $DataLeakSocialRefCheck->save();
+            }else{
+                $DataLeakSocialRefCheck->keyword = $keyword;
+                $DataLeakSocialRefCheck->save();
+            }
+        }
         return 0;
     }
 
@@ -192,14 +206,15 @@ class FeedCompromisedScan extends Command
 
 
     private  function searchError($dir_file,$pythonCheck_output) {
-        $output = array();
+        $output = null;
         $arrayError = $this->user_exec_mod($pythonCheck_output);//insert
         foreach ($arrayError as $value) {
             $splitError = $this->get_exec_subpython($dir_file,$value);
             if($splitError["result"]){
-                $output [] = $splitError["value_err"];
+                $output = $output.$splitError["value_err"].",";
             }
         }
+        $output = rtrim($output,",");
         return $output;
     }
 

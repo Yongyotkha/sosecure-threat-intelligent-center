@@ -15,6 +15,9 @@ use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 use DB;
+use Auth;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 class IndicatorsController extends Controller
 {
     /**
@@ -42,10 +45,41 @@ class IndicatorsController extends Controller
 
     public function events()
     {
-        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
         $data["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
         $data["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
-        $data["attr_type"] = IndicatorSummaryYear::select('type_name AS name',DB::raw('CONCAT(attribute_count, " Attribute") as description'))->where("type",'summary_attr_type')->take(15)->orderBy('attribute_count','desc')->get();
+        // DB::raw('CONCAT("[",attribute_count, "]") as data2')
+        $dataForloop = IndicatorSummaryYear::select('type_name AS name','attribute_count AS data')->where("type",'summary_attr_type')->orderBy('attribute_count','desc')->take(10)->get();
+        $data["attr_type"] = array();
+        foreach ($dataForloop as $document) {
+            array_push($data["attr_type"], array('name'=>$document->name,'data'=>[$document->data]));
+        }
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
         return view('indicators::events')->with($data);
