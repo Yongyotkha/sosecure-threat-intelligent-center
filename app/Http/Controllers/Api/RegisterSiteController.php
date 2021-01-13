@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller\Api;
 use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
 use App\file_version;
+use Modules\SiteSettings\Entities\Domain;
 
 class RegisterSiteController extends ApiController
 {
@@ -32,9 +33,11 @@ class RegisterSiteController extends ApiController
             //     $site_explode = explode('&', $data_key_decrypt);
                 $site = SiteSettings::where('code', $site['data']['code'])->first();
                 if($site->no_expiration_active === 0){
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
+                    $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain->domain]);
                 }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site]);
+                    $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain->domain]);
                 }else{
                     return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
                 }
