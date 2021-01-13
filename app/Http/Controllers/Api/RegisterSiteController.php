@@ -98,4 +98,38 @@ class RegisterSiteController extends ApiController
             return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'code' => $site->code, 'key' => $site->public_key]);
         }
     } 
+
+    public function save_deploy_system(Request $request){
+        $header = $request->bearerToken();
+        $site = $this->AuthorizationRegister($header, $request->mode);
+        if($site['status_code'] !== '200'){
+            return $this->AuthorizationRegister($header, $request->mode);
+        }
+        
+        $value = $request -> data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            try {
+                $data_key = json_decode($data, true);
+                $site = SiteSettings::where('id', $site['data']['id'])->first(); 
+                $site->laravel_version = $data_key['laravel_version'];
+                $site->os = $data_key['os'];
+                $site->server_time = $data_key['server_time']['date'];
+                $site->php_version = $data_key['php_version'];
+                $site->code_version = $data_key['code_version'];
+                $site->save();
+                
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);
+            } catch (\Exception $e) {
+                $response = array(
+                    'status' => 0,
+                    'message' => $e -> getMessage(),
+                );
+                return response()->json($response);
+            }
+            
+        }
+    } 
 }
