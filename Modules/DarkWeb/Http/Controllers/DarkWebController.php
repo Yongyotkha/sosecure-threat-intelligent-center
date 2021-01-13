@@ -318,7 +318,7 @@ class DarkWebController extends Controller
             }
 
             $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
-            $countGroupBy->get();
+            $countGroupBy = $countGroupBy->get();
 
 
         }

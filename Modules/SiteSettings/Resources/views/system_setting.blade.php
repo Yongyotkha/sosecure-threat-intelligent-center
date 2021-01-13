@@ -213,9 +213,9 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" id="mysql_password" value="{{ $siteSettings -> mysql_password }}" readonly>
+                                                    <input type="password" class="form-control" id="read_mysql_password" value="{{ $siteSettings -> mysql_password }}" readonly>
                                                     <span class="input-group-btn">
-                                                        <button type="button" class="btn btn-info" onclick="copy_text_id('mysql_password')">Copy</button>  
+                                                        <button type="button" class="btn btn-info" onclick="copy_password_mysql()">Copy</button>  
                                                     </span>
                                                 </div>
                                             </div>
@@ -246,9 +246,9 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" id="mongo_password" value="{{ $siteSettings -> mongo_password }}" readonly>
+                                                    <input type="password" class="form-control" id="read_mongo_password" value="{{ $siteSettings -> mongo_password }}" readonly>
                                                     <span class="input-group-btn">
-                                                        <button type="button" class="btn btn-info" onclick="copy_text_id('mongo_password')">Copy</button>  
+                                                        <button type="button" class="btn btn-info" onclick="copy_password_mongo()">Copy</button>  
                                                     </span>
                                                 </div>
                                             </div>
@@ -379,6 +379,26 @@ function copy_system_key(){
 
 function copy_public_key(){
     var copyText = document.getElementById("public_key");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function copy_password_mysql(){
+    var copyText = document.createElement("textarea");
+    document.body.appendChild(copyText);
+    copyText.value = '{{ $siteSettings -> mysql_password }}';
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    toastr.success("Copied", '@langapp('response_status')');
+}
+
+function copy_password_mongo(){
+    var copyText = document.createElement("textarea");
+    document.body.appendChild(copyText);
+    copyText.value = '{{ $siteSettings -> mongo_password }}';
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     document.execCommand("copy");
