@@ -14,6 +14,21 @@
                        </a> --}}
                         @endadmin
 
+                        <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                            <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                                <option value="">All Site</option>
+                                @if ($SiteSettings)
+                                
+                                @foreach ($SiteSettings as $SiteSettings)
+                                <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}} 
+                                </option>
+                                @endforeach
+            
+                                @endif
+                            </select>
+                        </div>
+
+
                         @can('users_delete')
                             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right" value="bulk-delete" data-rel="tooltip" title="Are you sure?" data-placement="bottom">
                                 @icon('solid/trash-alt') @langapp('delete')
@@ -141,11 +156,13 @@
 
 @push('pagestyle')
 @include('stacks.css.datatables')
+@include('stacks.css.form')
 @endpush
 
 @push('pagescript')
 
 @include('stacks.js.datatables')
+@include('stacks.js.form')
 
 <script>
 $(function() {
