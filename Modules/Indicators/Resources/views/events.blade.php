@@ -246,16 +246,7 @@ const chart = new Highcharts.chart('chart-pack', {
     }
   },
   series: load_graph()
-  {{--[{
-    name: 'Chaina',
-    data: [1]
-  }, {
-    name: 'United State',
-    data: [1]
-  }, {
-    name: 'Other',
-    data: [1]
-  }]--}}
+
 });
 
 
