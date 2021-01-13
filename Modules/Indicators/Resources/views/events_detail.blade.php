@@ -127,7 +127,7 @@
                                                     <th>Published</th>
                                                     <th>Last Status</th>
                                                     <th style="width: 200px;">DateTime</th>
-                                                    <th>View</th>
+                                                    <th>Attribute</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -262,7 +262,7 @@
                     data: 'TYPE',
                 },
                 {
-                    data: 'Attribute Name',
+                    data: 'AttributeName',
                 },
                 {
                     data: 'ROLE',
@@ -276,6 +276,15 @@
 
             ],
             columnDefs: [
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="'+row.Action+'">'+row.AttributeName+'</a>';
+                        return inner;
+                    }
+                      
+                },
  
                 {
                     targets: 4,
@@ -350,7 +359,7 @@
                     data: 'modified',
                 },
                 {
-                    data: 'count_view',
+                    data: 'attrCount',
                 },
                 {
                     data: 'pulse_id',
@@ -361,7 +370,15 @@
 
             ],
             columnDefs: [
-
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                        return inner;
+                    }
+                      
+                },
                 {
                     targets: 4,
                     render: function (data, type, row) {
