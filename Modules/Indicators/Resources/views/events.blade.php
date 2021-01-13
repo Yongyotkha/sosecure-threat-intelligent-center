@@ -84,41 +84,46 @@
 
             <div class="container-fluid" style="margin-bottom:10px;">
                 <div class="row">
-                    <div class="col-md-3 nopadding">
-                        <div class="card-ev">
-                            <div class="header-ev">
-                                Events
-                            </div>
-                            <div class="card-ev-body">
-                                <div class="ev-left">
-                                    <span>{{ @number_format($attr_all->event_count) }}</span>
-                                    <span>All</span>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12 nopadding">
+                                <div class="card-ev">
+                                    <div class="header-ev">
+                                        Events
+                                    </div>
+                                    <div class="card-ev-body">
+                                        <div class="ev-left">
+                                            <span>{{ @number_format($attr_all->event_count) }}</span>
+                                            <span>All</span>
+                                        </div>
+                                        <div class="ev-right">
+                                            <span>{{ @number_format($attr_current->event_count) }}</span>
+                                            <span>New Event</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="ev-right">
-                                    <span>{{ @number_format($attr_current->event_count) }}</span>
-                                    <span>New Event</span>
+                            </div>
+                            <div class="col-md-12 nopadding">
+                                <div class="card-ev">
+                                    <div class="header-ev">
+                                        Attribute
+                                    </div>
+                                    <div class="card-ev-body">
+                                        <div class="ev-left">
+                                            <span>{{ @number_format($attr_all->attribute_count) }}</span>
+                                            <span>All</span>
+                                        </div>
+                                        <div class="ev-right">
+                                            <span>{{ @number_format($attr_current->attribute_count) }}</span>
+                                            <span>New Attribute</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 nopadding">
-                        <div class="card-ev">
-                            <div class="header-ev">
-                                Attribute
-                            </div>
-                            <div class="card-ev-body">
-                                <div class="ev-left">
-                                    <span>{{ @number_format($attr_all->attribute_count) }}</span>
-                                    <span>All</span>
-                                </div>
-                                <div class="ev-right">
-                                    <span>{{ @number_format($attr_current->attribute_count) }}</span>
-                                    <span>New Attribute</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 nopadding">
+              
+                    <div class="col-md-8 nopadding">
                         <div id="chart-pack" style="background: #fff"></div>
                     </div>
                 </div>
@@ -220,10 +225,11 @@
 <script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
 <script>
 
+
 const chart = new Highcharts.chart('chart-pack', {
   chart: {
     type: 'bar',
-    height: '125px'
+    height: '250px'
   },
   title: {
     text: null
@@ -246,17 +252,16 @@ const chart = new Highcharts.chart('chart-pack', {
     }
   },
   series: load_graph()
-  {{--[{
-    name: 'Chaina',
-    data: [1]
-  }, {
-    name: 'United State',
-    data: [1]
-  }, {
-    name: 'Other',
-    data: [1]
-  }]--}}
 });
+
+
+chart = new Highcharts.setOptions({
+    lang: {
+      decimalPoint: '.',
+      thousandsSep: ','
+    }
+});
+
 
 
     $('.select2-option').select2();
