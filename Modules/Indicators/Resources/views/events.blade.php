@@ -153,7 +153,7 @@
                                     <th>Published</th>
                                     <th>Last Status</th>
                                     <th style="width: 200px;">DateTime</th>
-                                    <th>View</th>
+                                    <th>Attribute</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -228,43 +228,12 @@
 <script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
 <script>
 
-
-var chart = new Highcharts.chart('chart-pack', {
-  chart: {
-    type: 'bar',
-    height: '195px'
-  },
-  title: {
-    text: null
-  },
-  xAxis: {
-    categories: ['Attribute']
-  },
-  yAxis: {
-    min: 0,
-    title: {
-      text: null
-    }
-  },
-  legend: {
-    reversed: true
-  },
-  plotOptions: {
-    series: {
-      stacking: 'normal'
-    }
-  },
-  series: load_graph()
-});
-
-
-chart = new Highcharts.setOptions({
+Highcharts.setOptions({
     lang: {
       decimalPoint: '.',
       thousandsSep: ','
     }
 });
-
 
 
     $('.select2-option').select2();
@@ -278,7 +247,34 @@ chart = new Highcharts.setOptions({
     var datatable = [];
 
   $(function() {
-  
+    var chart = new Highcharts.chart('chart-pack', {
+        chart: {
+            type: 'bar',
+            height: '250px'
+        },
+        title: {
+            text: null
+        },
+        xAxis: {
+            categories: ['Attribute']
+        },
+        yAxis: {
+            min: 0,
+            title: {
+            text: null
+            }
+        },
+        legend: {
+            reversed: true
+        },
+        plotOptions: {
+            series: {
+            stacking: 'normal'
+            }
+        },
+        series: load_graph()
+    });
+
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');
 
@@ -341,13 +337,12 @@ chart = new Highcharts.setOptions({
 
     $(function() {
         load_table(1);
-        console.log(load_graph());
+  
     });
 
     function load_graph() {
         
         var graph = {!!json_encode(@$attr_type)!!};
-        console.log(graph);
         return graph;
 
     }
@@ -406,7 +401,7 @@ chart = new Highcharts.setOptions({
                     data: 'modified',
                 },
                 {
-                    data: 'count_view',
+                    data: 'attrCount',
                 },
                 {
                     data: 'pulse_id',
@@ -417,6 +412,15 @@ chart = new Highcharts.setOptions({
 
             ],
             columnDefs: [
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                        return inner;
+                    }
+                      
+                },
                 {
                     targets: 4,
                     render: function (data, type, row) {
@@ -452,7 +456,6 @@ chart = new Highcharts.setOptions({
                     }
                       
                 }
-
             ]
         });
 
@@ -520,7 +523,7 @@ chart = new Highcharts.setOptions({
                     data: 'modified',
                 },
                 {
-                    data: 'count_view',
+                    data: 'attrCount',
                 },
                 {
                     data: 'pulse_id',
@@ -531,6 +534,15 @@ chart = new Highcharts.setOptions({
 
             ],
             columnDefs: [
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                        return inner;
+                    }
+                      
+                },
                 {
                     targets: 4,
                     render: function (data, type, row) {

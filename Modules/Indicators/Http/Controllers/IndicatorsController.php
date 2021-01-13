@@ -329,6 +329,7 @@ class IndicatorsController extends Controller
                 $nestedData['tags'] = explode_val($cursor_2["tags"],'tags');
                 $nestedData['public'] = ($cursor_2["public"]);
                 $nestedData['is_modified'] = ($cursor_2["is_modified"]);
+                $nestedData['attrCount'] = $cursor_2["indicator_count"];
                 $nestedData['modified'] = change_date_utc_to_thai($cursor_2['modified']);
                 $nestedData['count_view'] = $cursor_2["count_view"];
                 $nestedData['pulse_id'] = $cursor_2["pulse_id"];
@@ -1346,7 +1347,7 @@ class IndicatorsController extends Controller
             //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
             $data[] = array( 
                 "TYPE"=>@$cursor_2['type'],
-                "Attribute Name"=>@$cursor_2['indicator_name'],
+                "AttributeName"=>@$cursor_2['indicator_name'],
                 "ROLE"=>@$value['role'],
                 "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
                 "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
@@ -1448,6 +1449,7 @@ class IndicatorsController extends Controller
                 $nestedData['groups'] = explode_val($document["groups"],'groups');
                 $nestedData['tags'] = explode_val($document["tags"],'tags');
                 $nestedData['attr'] = '';
+                $nestedData['attrCount'] = $document["indicator_count"];
                 $nestedData['public'] = ($document["public"]);
                 $nestedData['is_modified'] = ($document["is_modified"]);
                 $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
@@ -1485,7 +1487,7 @@ class IndicatorsController extends Controller
             4 => 'public',
             5 => 'is_modified',
             6 => 'modified',
-            7 => 'count_view',
+            7 => 'indicator_count',
             8 => 'pulse_id',
         );  
         $draw = $_POST['draw'];
@@ -1518,6 +1520,7 @@ class IndicatorsController extends Controller
                 'is_modified' => 1,
                 'modified' => 1,
                 'count_view' => 1,
+                'indicator_count' => 1,
                 'pulse_id' => 1,
                 
             ],
@@ -1608,13 +1611,14 @@ class IndicatorsController extends Controller
            foreach ($cursor as $document)
            {
     
-            
+
                 $order_number++;
                 $nestedData['No'] = $order_number;
                 $nestedData['name'] = $document["name"];
                 $nestedData['groups'] = explode_val($document["groups"],'groups');
                 $nestedData['tags'] = explode_val($document["tags"],'tags');
                 $nestedData['attr'] = '';
+                $nestedData['attrCount'] = $document["indicator_count"];
                 $nestedData['public'] = ($document["public"]);
                 $nestedData['is_modified'] = ($document["is_modified"]);
                 $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
@@ -1691,7 +1695,7 @@ class IndicatorsController extends Controller
             4 => 'public',
             5 => 'is_modified',
             6 => 'modified',
-            7 => 'count_view',
+            7 => 'indicator_count',
             8 => 'pulse_id',
         );  
         $draw = $_POST['draw'];
@@ -1729,7 +1733,7 @@ class IndicatorsController extends Controller
                 'modified' => 1,
                 'count_view' => 1,
                 'pulse_id' => 1,
-                
+                'indicator_count' => 1,
             ],
             'sort' => [
                 $order => $dir
@@ -1798,6 +1802,7 @@ class IndicatorsController extends Controller
                 $nestedData['groups'] = explode_val($document["groups"],'groups');
                 $nestedData['tags'] = explode_val($document["tags"],'tags');
                 $nestedData['attr'] = '';
+                $nestedData['attrCount'] = $document["indicator_count"];
                 $nestedData['public'] = ($document["public"]);
                 $nestedData['is_modified'] = ($document["is_modified"]);
                 $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
@@ -1841,7 +1846,7 @@ class IndicatorsController extends Controller
             4 => 'public',
             5 => 'is_modified',
             6 => 'modified',
-            7 => 'count_view',
+            7 => 'indicator_count',
             8 => 'pulse_id',
         );  
         $draw = $_POST['draw'];
@@ -1863,7 +1868,7 @@ class IndicatorsController extends Controller
         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
 
         $query = array(
-            'tags' => new Regex('^.*'.$request->tags.'.*$', 'i'),
+            'groups' => new Regex('^.*'.$request->tags.'.*$', 'i'),
             'status' => 1,
             'deleted_at' => null,
         );
@@ -1879,7 +1884,7 @@ class IndicatorsController extends Controller
                 'modified' => 1,
                 'count_view' => 1,
                 'pulse_id' => 1,
-                
+                'indicator_count' => 1,
             ],
             'sort' => [
                 $order => $dir
@@ -1948,6 +1953,7 @@ class IndicatorsController extends Controller
                 $nestedData['groups'] = explode_val($document["groups"],'groups');
                 $nestedData['tags'] = explode_val($document["tags"],'tags');
                 $nestedData['attr'] = '';
+                $nestedData['attrCount'] = $document["indicator_count"];
                 $nestedData['public'] = ($document["public"]);
                 $nestedData['is_modified'] = ($document["is_modified"]);
                 $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
