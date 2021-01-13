@@ -124,7 +124,10 @@
                     </div>
               
                     <div class="col-md-8 nopadding">
-                        <div id="chart-pack" style="background: #fff"></div>
+                        <div class="" style="background: #fff">
+                            <span class="header-txt-chart">Top 10</span>
+                            <div id="chart-pack"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -229,7 +232,7 @@
 const chart = new Highcharts.chart('chart-pack', {
   chart: {
     type: 'bar',
-    height: '250px'
+    height: '195px'
   },
   title: {
     text: null

@@ -3021,6 +3021,13 @@ input.input-login:focus {
     font-weight: 600;
     margin-bottom: 1rem;
 }
+.header-txt-chart{
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    display: inline-block;
+}
 
 .card-ev-body{
     display: flex;
