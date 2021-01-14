@@ -87,7 +87,7 @@
                         <div class="card-dash-compro none-bg none-shadow">
                             <div class="left-card">
                                 <div class="img-icon-card ice">
-                                    <img src="{{asset('images/iceberg1.png')}}" alt="">
+                                    <img src="{{asset('images/icebergline2.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
                                 <span class="number-card warning" id='compromise-count'>0</span>
@@ -98,7 +98,7 @@
                         <div class="card-dash-compro none-bg none-shadow">
                             <div class="left-card">
                                 <div class="img-icon-card ice">
-                                    <img src="{{asset('images/iceberg2.png')}}" alt="">
+                                    <img src="{{asset('images/icebergline1.png')}}" alt="">
                                 </div>
                                 <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
                                 <span class="number-card info"  id='darkweb-count'>0</span>

@@ -2735,6 +2735,13 @@ input.input-login:focus {
     flex-wrap: wrap;
     box-sizing: border-box;
 }
+.wdfm-inner-4{
+    padding: 0 15px !important;
+    max-width: 25%;
+    flex-basis: 25%;
+    display: flex;
+}
+
 .wdfm-inner{
     padding: 0 15px !important;
     max-width: 33.33333%;

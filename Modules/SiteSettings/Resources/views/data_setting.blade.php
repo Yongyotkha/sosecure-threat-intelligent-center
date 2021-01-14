@@ -189,6 +189,34 @@
                                         <div class="text-muted">Alert (News,Other)</div>
                                     </div>
                                 </div>
+                                <hr>
+
+                                <div class="row text-right">
+                                    <div class="col-lg-3">
+                                        <h3>Syslog Server Log</h3>
+                                    </div>
+                                </div>
+                             
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">IP <span class="text-danger">*</span></label>
+                                    <div class="col-lg-9">
+                                            <input type="text" class="form-control" value="192.168.1.1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Protocol <span class="text-danger">*</span></label>
+                                    <div class="col-lg-9">
+                                        <select name="" id="select-protocol" class="select2-option form-control">
+                                            <option value="">udp</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Port <span class="text-danger">*</span></label>
+                                    <div class="col-lg-9">
+                                            <input type="number" class="form-control" value="8000">
+                                    </div>
+                                </div>
 
 
                             </div>
@@ -220,6 +248,9 @@
 
 <script>
     $(document).ready(function () {
+
+        $('#select-protocol').select2();
+
         $('#email_alert').select2({
             tags: true,
             tokenSeparators: [' ']

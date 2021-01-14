@@ -39,6 +39,54 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
                         <div class="col-xs-6">
+                            <i class="fas fa-globe-europe"></i> Log
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <button id="togglelog" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
+                                <i class="fas fa-minus-square"></i>Collapse
+                            </button>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" id="wdfm-log">
+                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th>Description</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Datetime</th>
+                            
+                        </tr>
+                        @if ($webdefacment_data_log)            
+                            @foreach ($webdefacment_data_log as $webdefacment_data_log)
+                                <tr>
+                                    <td class="text-center">{!! @$loop->iteration !!}</td>
+                                    <td >
+                                        @if ($webdefacment_data_log->message) 
+                                        {!!@$webdefacment_data_log->message!!}
+                                        @else
+                                            -
+                                        @endif 
+                                    </td>
+                                    <td class="text-center">
+                                        @if ($webdefacment_data_log->status_val) 
+                                            {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
+                                        @else
+                                            -
+                                        @endif    
+                                    </td>
+                                    <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </table>
+                </div>
+            </section>
+            
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row d-flex-center">
+                        <div class="col-xs-6">
                             <i class="fas fa-globe-europe"></i> Web Defacement
                         </div>
                         <div class="col-xs-6 text-right">
@@ -238,53 +286,7 @@
             </section>
             @endif
 
-            <section class="panel panel-default">
-                <header class="panel-heading font-bold panel-header-blue">
-                    <div class="row d-flex-center">
-                        <div class="col-xs-6">
-                            <i class="fas fa-globe-europe"></i> Log
-                        </div>
-                        <div class="col-xs-6 text-right">
-                            <button id="togglelog" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
-                                <i class="fas fa-minus-square"></i>Collapse
-                            </button>
-                        </div>
-                    </div>
-                </header>
-                <div class="panel-body" id="wdfm-log">
-                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
-                        <tr>
-                            <th class="text-center">No</th>
-                            <th>Description</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Datetime</th>
-                            
-                        </tr>
-                        @if ($webdefacment_data_log)            
-                            @foreach ($webdefacment_data_log as $webdefacment_data_log)
-                                <tr>
-                                    <td class="text-center">{!! @$loop->iteration !!}</td>
-                                    <td >
-                                        @if ($webdefacment_data_log->message) 
-                                        {!!@$webdefacment_data_log->message!!}
-                                        @else
-                                            -
-                                        @endif 
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($webdefacment_data_log->status_val) 
-                                            {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
-                                        @else
-                                            -
-                                        @endif    
-                                    </td>
-                                    <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
-                                </tr>
-                            @endforeach
-                        @endif
-                    </table>
-                </div>
-            </section>
+
 
 
           </section>
