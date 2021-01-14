@@ -13,6 +13,7 @@
 
 Route::prefix('reauthenticate')->group(function() {
     Route::get('/', 'ReauthenticateController@index');
+    Route::get('/verify_success', 'ReauthenticateController@verify_success')->name('reauth.verify_success');
     Route::get('/{token}', 'ReauthenticateController@verify_site_user')->name('reauth.verify_site_user');
     Route::put('/verify_update_pass/{id}', 'ReauthenticateController@verify_update_pass')->name('reauth.verify_update_pass');
 });

@@ -96,6 +96,11 @@ class ReauthenticateController extends Controller
         //
     }
 
+    public function verify_success(Request $request)
+    {
+        return view('reauthenticate::verify_success');
+    }
+
     public function verify_update_pass(VerifyUserRequest $request, $id = null)
     {
         // dd($request);
@@ -137,7 +142,7 @@ class ReauthenticateController extends Controller
             [
                 'id'       => $user->id,
                 'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('index'),
+                'redirect' => route('reauth.verify_success'),
             ],
             true,
             Response::HTTP_OK
