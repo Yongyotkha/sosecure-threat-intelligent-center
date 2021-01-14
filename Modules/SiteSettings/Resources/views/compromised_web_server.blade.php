@@ -42,7 +42,7 @@
                         Change Status
                     </button>
                     {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>@langapp('Search_Advance')</span>
+                    <span>@langapp('Search_Advance')</span>
                     </button> --}}
                 </header>
                 <section class="scrollable wrapper">
@@ -68,128 +68,126 @@
                                                 @if($DataLeakSocial)
                                                 @foreach($DataLeakSocial as $DataLeakSocial_val)
                                                 <option value="{{$DataLeakSocial_val->id}}">
-                                                    {{$DataLeakSocial_val->source}}</option>
-                                                @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 text-center">
-                                    <div id="datafeed_date"
-                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 text-center">
-                                    <div style="margin-top: 8px;">
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_all" id="check_all" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">All</span>
-                                        </label>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Panding</span>
-                                        </label>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_approved" id="check_approved"
-                                                value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Approved</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_darkweb_feed_search"
-                                        class="btn btn-info btn-responsive">
-                                        <i class="fas fa-search"></i>
-                                        Search
-                                    </button>
-                                    <button type="button" id="btn_darkweb_feed_reset"
-                                        class="btn btn-default btn-responsive" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                </div>
-                            </div>
+                    {{$DataLeakSocial_val->source}}</option>
+                    @endforeach
+                    @endif
+                    </select>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div id="datafeed_date"
+                            style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                            <i class="fa fa-calendar"></i>&nbsp;
+                            <span></span> <i class="fa fa-caret-down"></i>
                         </div>
-                    </section> --}}
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div style="margin-top: 8px;">
+                            <label class="mr-3">
+                                <input type="checkbox" name="check_all" id="check_all" value="TRUE">
+                                <span class="label-text" style="font-size: 16px;">All</span>
+                            </label>
+                            <label class="mr-3">
+                                <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
+                                <span class="label-text" style="font-size: 16px;">Panding</span>
+                            </label>
+                            <label class="mr-3">
+                                <input type="checkbox" name="check_approved" id="check_approved" value="TRUE">
+                                <span class="label-text" style="font-size: 16px;">Approved</span>
+                            </label>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-right mt-2">
+                            <button type="button" id="btn_darkweb_feed_search" class="btn btn-info btn-responsive">
+                                <i class="fas fa-search"></i>
+                                Search
+                            </button>
+                            <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive"
+                                style="white-space: nowrap">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                </section> --}}
 
 
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Web Server
-                                </div>
-                            </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table_web_server">
-                                    <thead>
-                                        <tr>
-                                            <th class="no-sort w-10">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox"
-                                                        class="data_feed_id select-chk" />
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th>
-                                            <th>No.</th>
-                                            <th>Site Name</th>
-                                            <th >Name</th>
-                                            <th>User</th>
-                                            <th>Password</th>
-                                            <th>Root Path</th>
-                                            <th>status</th>
-                                            <th>Last Update</th>
-                                            
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
+                <section class="panel panel-default">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Web Server
                             </div>
                         </div>
-                    </section>
+                    </header>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table_web_server">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort w-10">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                    class="data_feed_id select-chk" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th>No.</th>
+                                        <th>Site Name</th>
+                                        <th>Name</th>
+                                        <th>User</th>
+                                        <th>Password</th>
+                                        <th>Root Path</th>
+                                        <th>status</th>
+                                        <th>Last Update</th>
+
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
             </section>
-        </aside>
     </section>
+    </aside>
+</section>
 
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-    <!-- Modal create_assets_vulnerability -->
+<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+<!-- Modal create_assets_vulnerability -->
 
-    <div class="modal in fixed-left" id="add_asset_modal" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-aside" role="document">
-            <div class="modal-content">
-                
-                <div class="modal-header bg-blue">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title text-white">
-                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();"
-                            datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                            Add Asset
-                    </h4>
-                </div>
-                <div class="modal-body">
-            <form onsubmit ="add_asset_click()">
+<div class="modal in fixed-left" id="add_asset_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-aside" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header bg-blue">
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                        title="Fullscreen" data-placement="right"></i>
+                    Add Asset
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="add_asset_click()">
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="ip" class="form-control check_test" required="yes" >
+                            <input type="text" id="ip" class="form-control check_test" required="yes">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Port <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="port" class="form-control check_test" required >
+                            <input type="text" id="port" class="form-control check_test" required>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -206,19 +204,13 @@
                             <input type="text" id="password" class="form-control check_test" required>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">Root Path <span
-                                class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" id="root_path" class="form-control check_test" required>
-                        </div>
-                    </div>
+
 
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <select id="os" class="form-control check_test" required>
+                            <select id="os" class="form-control check_test_select" required>
                                 <option selected value="Linux">Linux</option>
                                 <option value="Windows">Windows</option>
                             </select>
@@ -226,15 +218,24 @@
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
-                        <div class="col-lg-8" >
-                            <button type="button" class="btn btn-{{ get_option('theme_color')  }}" onclick="test_data()">TEST</button>
+                        <div class="col-lg-8">
+                            <button type="button" class="btn btn-{{ get_option('theme_color')  }}"
+                                onclick="test_data()">TEST</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">Root Path <span
+                                class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" id="root_path" class="form-control " required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Type<span
-                            class="text-danger">*</span></label>
-                        <div class="col-lg-8" >
-                            <select class="js-example-basic-multiple check_test" id="type" multiple="multiple" required>
+                                class="text-danger">*</span></label>
+                        <div class="col-lg-8">
+                            <select class="select2-option form-control " id="type1" multiple="multiple" required>
                                 <option value=".php">.PHP</option>
                                 <option value=".js">.JS</option>
                                 \<option value=".asp">.ASP</option>
@@ -245,61 +246,65 @@
                         <label class="col-lg-3 control-label">Status </label>
                         <div class="col-lg-8">
                             <label class="switch">
-                                <input type="checkbox" id="status" name="status" checked  value="1">
+                                <input type="checkbox" id="status" name="status" checked value="1">
                                 <span></span>
                             </label>
                         </div>
                     </div>
-                
 
-             
 
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+                <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="button_save"
+                    disabled>
+                    <i class="fas fa-paper-plane"></i>
+                    Save
+                    {{-- Yes, approve --}}
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal in fixed-left" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-aside" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-blue">
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                        title="Fullscreen" data-placement="right"></i>
+                    @langapp('delete')
+                </h4>
+            </div>
+            <form action="">
+                <div class="modal-body">
+                    <p class="text-danger">@langapp('delete_warning') </p>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="button_save" disabled>
+                    <button type="button" onclick="delete_web_server_save()" data-dismiss="modal"
+                        class="btn btn-info btn-rounded">
                         <i class="fas fa-paper-plane"></i>
                         Save
-                        {{-- Yes, approve --}}
                     </button>
                 </div>
             </form>
-            </div>
         </div>
     </div>
-
-        <div class="modal in fixed-left" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-aside" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-blue">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title text-white">
-                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                        @langapp('delete')
-                    </h4>
-                </div>
-                <form action="">
-                <div class="modal-body">
-                    <p class="text-danger">@langapp('delete_warning')  </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="button" onclick="delete_web_server_save()" data-dismiss="modal" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
+</div>
 
 
 
@@ -329,10 +334,7 @@
 
         $('#detail_content').summernote('destroy');--}}
 
-    $(document).ready(function(){
-        $('.js-example-basic-multiple').select2();
-    
-    });
+
    
     var ip = null;
     var port = null;
@@ -383,7 +385,17 @@
 
     $(function() {
         table_web_server();
+        $(".check_test").keypress(function() {
 
+            $('#button_save').prop("disabled", true);
+
+        });
+
+        $(".check_test_select").change(function() {
+
+            $('#button_save').prop("disabled", true);
+
+        });
     });
 
     $(function() { 
@@ -426,13 +438,7 @@
   
     });
 
-    $("#type").on('change', function() {
-        
-
-      
- 
-  
-    });
+    
 
 
     function add_asset_click() {
@@ -442,7 +448,7 @@
         password = $('#password').val();
         root_path = $('#root_path').val();
         os = $('#os').val();
-        type = $('#type').val();
+        type = $('#type1').val();
 
         $.ajax({
             type:"POST",
@@ -483,40 +489,47 @@
    }
    
    function test_data(){
-    $.ajax({
-        type:"POST",
-        url:"{{ route('compromised_web_server.web_server_create') }}",
-        data:{
-            check:Number(check),
-            os:os,
-            root_path:root_path,
-            password:password,
-            user:user,
-            ip:ip,
-            port:port,
-            id_chang: web_server_id_chang,
-            site:{!!json_encode($siteID)!!},
-            type:type.join(),
-        },
-        beforeSend: function(){
-            loading('load');
-        },
-        success:function(response) {
-            loading('stop_load');
-            toastr.success(response.message, '@langapp('response_status')');
-            window.location.href = response.redirect;
-        },
-        error: function (error){
-            loading('stop_load');
-            var errors = error.response.data.errors;
-            var errorsHtml = '';
-            $.each(errors, function (key, value) {
-                errorsHtml += '<li>' + value[0] + '</li>';
-            });
-            toastr.error(errorsHtml, '@langapp('response_status') ');
-        }
+        ip = $('#ip').val();
+        port = $('#port').val();
+        user = $('#user').val();
+        password = $('#password').val();
+        os = $('#os').val();
 
-    });
+        $.ajax({
+            type:"POST",
+            url:"{{ route('compromised_web_server.checkWebserverIP') }}",
+            data:{
+                ip:ip,
+                os:os,
+                password:password,
+                user:user,
+                port:port,
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                if(response.webserverConnect==true){
+                    toastr.success(response.message, '@langapp('response_status')');
+                    $('#button_save').prop("disabled", false);
+                   
+                }else{
+                    toastr.error(response.message, '@langapp('response_status')');
+                    
+                }
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+
+        });
 
    }
 
@@ -529,11 +542,9 @@
         root_path = null;
         os = null;
         check=1;
+        type=null;
         
-        if (ip!=null) {
 
-            $('#button_save').prop("disabled", false);
-            } 
         document.getElementById("status").checked = true;
         $("#ip").val('');
         $("#port").val('');
@@ -541,6 +552,7 @@
         $("#password").val('');
         $("#root_path").val('');
         $("#os").val('Linux').trigger('change');
+        $('#type1').val('').trigger('change');
       
  
   
