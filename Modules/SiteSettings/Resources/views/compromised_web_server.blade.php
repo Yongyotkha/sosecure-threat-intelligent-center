@@ -224,6 +224,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
+                        <div class="col-lg-8" >
+                            <button type="button" class="btn btn-{{ get_option('theme_color')  }}" >TEST</button>
+                        </div>
+                    </div>
 
                     <div class="form-group row" style="padding-top: 7px">
                         <label class="col-lg-3 control-label">Status </label>
@@ -245,7 +251,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" >
+                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="button_save" disabled>
                         <i class="fas fa-paper-plane"></i>
                         Save
                         {{-- Yes, approve --}}
@@ -329,7 +335,6 @@
 
 
 
-
     $('#table_web_server').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
 
@@ -356,8 +361,17 @@
                 $('#btn-change-status,#btn_del_select').attr('disabled',true);
             }
         }
-    });    
-   
+    });   
+
+    $("#ip").on('change', function() {
+
+        console.log($('#ip').val());
+      
+ 
+  
+    });
+
+
 
 
     $(function() {
@@ -461,6 +475,10 @@
         os = null;
         check=1;
         
+        if (ip!=null) {
+
+            $('#button_save').prop("disabled", false);
+            } 
         document.getElementById("status").checked = true;
         $("#ip").val('');
         $("#port").val('');
