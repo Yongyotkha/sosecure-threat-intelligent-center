@@ -182,35 +182,35 @@
                         <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="ip" class="form-control" required="yes" >
+                            <input type="text" id="ip" class="form-control check_test" required="yes" >
                         </div>
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Port <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="port" class="form-control" required >
+                            <input type="text" id="port" class="form-control check_test" required >
                         </div>
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">User <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="user" class="form-control" required>
+                            <input type="text" id="user" class="form-control check_test" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Password <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="password" class="form-control" required>
+                            <input type="text" id="password" class="form-control check_test" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Root Path <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <input type="text" id="root_path" class="form-control" required>
+                            <input type="text" id="root_path" class="form-control check_test" required>
                         </div>
                     </div>
 
@@ -218,7 +218,7 @@
                         <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
-                            <select id="os" class="form-control" required>
+                            <select id="os" class="form-control check_test" required>
                                 <option selected value="Linux">Linux</option>
                                 <option value="Windows">Windows</option>
                             </select>
@@ -227,10 +227,20 @@
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
                         <div class="col-lg-8" >
-                            <button type="button" class="btn btn-{{ get_option('theme_color')  }}" >TEST</button>
+                            <button type="button" class="btn btn-{{ get_option('theme_color')  }}" onclick="test_data()">TEST</button>
                         </div>
                     </div>
-
+                    <div class="form-group row">
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">Type<span
+                            class="text-danger">*</span></label>
+                        <div class="col-lg-8" >
+                            <select class="js-example-basic-multiple check_test" id="type" multiple="multiple" required>
+                                <option value=".php">.PHP</option>
+                                <option value=".js">.JS</option>
+                                \<option value=".asp">.ASP</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group row" style="padding-top: 7px">
                         <label class="col-lg-3 control-label">Status </label>
                         <div class="col-lg-8">
@@ -319,7 +329,10 @@
 
         $('#detail_content').summernote('destroy');--}}
 
-
+    $(document).ready(function(){
+        $('.js-example-basic-multiple').select2();
+    
+    });
    
     var ip = null;
     var port = null;
@@ -331,6 +344,7 @@
     var web_server_id_chang = [];
     var web_server_id_delete_chang = [];
     var web_server_id_delete = null;
+    var type = null;
 
 
 
@@ -363,13 +377,6 @@
         }
     });   
 
-    $("#ip").on('change', function() {
-
-        console.log($('#ip').val());
-      
- 
-  
-    });
 
 
 
@@ -419,6 +426,14 @@
   
     });
 
+    $("#type").on('change', function() {
+        
+
+      
+ 
+  
+    });
+
 
     function add_asset_click() {
         ip = $('#ip').val();
@@ -427,7 +442,7 @@
         password = $('#password').val();
         root_path = $('#root_path').val();
         os = $('#os').val();
-
+        type = $('#type').val();
 
         $.ajax({
             type:"POST",
@@ -442,6 +457,7 @@
                 port:port,
                 id_chang: web_server_id_chang,
                 site:{!!json_encode($siteID)!!},
+                type:type.join(),
             },
             beforeSend: function(){
                 loading('load');
@@ -462,7 +478,46 @@
             }
 
         });
+     
        
+   }
+   
+   function test_data(){
+    $.ajax({
+        type:"POST",
+        url:"{{ route('compromised_web_server.web_server_create') }}",
+        data:{
+            check:Number(check),
+            os:os,
+            root_path:root_path,
+            password:password,
+            user:user,
+            ip:ip,
+            port:port,
+            id_chang: web_server_id_chang,
+            site:{!!json_encode($siteID)!!},
+            type:type.join(),
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            toastr.success(response.message, '@langapp('response_status')');
+            window.location.href = response.redirect;
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+
+    });
+
    }
 
    $("#add_asset").on('click', function() {
@@ -725,7 +780,7 @@
                         html =`<a href="${base_url}/compromised_web_server/web_server_edit_modal/${full.code}" class="btn btn-{{get_option("theme_color") }} btn-xs" data-toggle='ajaxModal'>
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
                                 </a>`;
-                        html +=`<a href="#" onclick="delete_web_server(${full.id})" class="btn btn-{{get_option("theme_color")}} btn-xs"  data-toggle="modal" data-target="#delete_web_sever"><i class="fas fa-trash-alt"></i></a>`;
+                        html +=`<a href="#" onclick="delete_web_server(${full.id})" class="btn btn-danger btn-xs"  data-toggle="modal" data-target="#delete_web_sever"><i class="fas fa-trash-alt"></i></a>`;
                         return html;
                     },
                 },

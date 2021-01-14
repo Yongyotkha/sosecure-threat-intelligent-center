@@ -1694,7 +1694,10 @@ class DataLeakController extends Controller
 
     public function web_server_create(Request $request)
     {   
-  
+        // $myArray = explode(',', $request->type);
+        // $myArray1 = implode(',', $myArray);
+        //  dd($request->type);
+
         $data = new CompromisedServer;
         $data->code = generator_uuid();
         $data->site_id = $request->site;
@@ -1705,6 +1708,8 @@ class DataLeakController extends Controller
         $data->path = $request->root_path;
         $data->os = $request->os;
         $data->active = $request->check;
+        $data->file_extension = $request->type;
+
         $data->save();
 
         $Assets = Assets::where('raw_data',$request->ip)->first();
@@ -1775,7 +1780,8 @@ class DataLeakController extends Controller
     {
 
         $data["CompromisedServer"] = CompromisedServer::where('code', $code)->first();
-    
+        $data["type"] = explode(',', $data["CompromisedServer"]->file_extension);
+        
         return view('sitesettings::modal.update_compromised_web_server')->with($data);
     }
 

@@ -19,7 +19,7 @@
                 <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span class="text-danger">*</span>
                 </label>
                 <div class="col-lg-8">
-                    <input type="text" id="ip" name="ip" class="form-control" value="{{@$CompromisedServer->ip}}"
+                    <input type="text" id="ip" name="ip" class="form-control checkwebserver" value="{{@$CompromisedServer->ip}}"
                         required>
                 </div>
             </div>
@@ -71,6 +71,19 @@
                 </div>
             </div>
 
+            <div class="form-group row">
+                <label style="padding-top: 7px" class="col-lg-3 control-label">Type<span
+                    class="text-danger">*</span></label>
+                <div class="col-lg-8" >
+                    <select class="js-example-basic-multiple" id="type" multiple="multiple" required>
+                       
+                        <option value=".php" >.PHP</option>
+                        <option value=".js" >.JS</option>
+                        \<option value=".asp">.ASP</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group row" style="padding-top: 7px">
                 <label class="col-lg-3 control-label">Status</label>
                 <div class="col-lg-8">
@@ -82,64 +95,79 @@
                 </div>
             </div>
             <div class="modal-footer">
-                {!! closeModalButton() !!}
-                {!! renderAjaxButton() !!}
+                <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+                <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="button_save">
+                    <i class="fas fa-paper-plane"></i>
+                    Save
+  
+                </button>
             </div>
             {!! Form::close() !!}
         </div>
     </div>
 
-    @push('pagestyle')
-    @include('stacks.css.form')
-    @endpush
-    @push('pagescript')
-    @include('stacks.js.form')
-    @include('stacks.js.fullscreen')
+@push('pagestyle')
+@include('stacks.css.form')
+@endpush
+@push('pagescript')
+@include('stacks.js.form')
+@include('stacks.js.fullscreen')
 
 
-    <script>
-        var form_save = '.formSaving';
-        $('.ajaxifyForm_custom').submit(function (event) {
-            event.preventDefault();
+<script>
+ $(document).ready(function(){
+    $('.js-example-basic-multiple').select2();
     
-                $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-                
-                var data = new FormData(this);
-                if(form_save == '.formSavingAndRun'){
-                    data.append('formsubmit', 'formSavingAndRun');
-                }else if(form_save == '.formPreview'){
-                    data.append('formsubmit', 'formPreview');
-                }else if(form_save == '.formDraft'){
-                    data.append('formsubmit', 'formDraft');
-                }
-                axios.post($(this).attr("action"), data)
-                    .then(function (response) {
-                            toastr.success(response.data.message, '@langapp('response_status') ');
-                            $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                            window.location.href = response.data.redirect;
-                })
-                .catch(function (error) {
-                    if(error.response.data.exception){
-                        toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
-                        $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-                    }else{
-                        var errors = error.response.data.errors;
-                        var errorsHtml= '';
-                        $.each( errors, function( key, value ) {
-                            errorsHtml += '<li>' + value[0] + '</li>'; 
-                        });
-                        toastr.error( errorsHtml , '@langapp('response_status') ');
-                        $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-                    }
-                    
-                    
-                }); 
-           
-         
-             
-        });
-    </script>
-    @endpush
+});
 
-    @stack('pagestyle')
-    @stack('pagescript')
+    $('.js-example-basic-multiple').val(@json($type));
+
+
+    var form_save = '.formSaving';
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                        toastr.success(response.data.message, '@langapp('response_status') ');
+                        $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                        window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            }); 
+        
+        
+            
+    });
+</script>
+@endpush
+
+@stack('pagestyle')
+@stack('pagescript')
