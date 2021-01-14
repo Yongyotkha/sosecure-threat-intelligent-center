@@ -263,7 +263,7 @@ class WebDefacementController extends Controller
 
         foreach ($modal as $key) {
             $html .= 
-            '<div class="item-wdfm wdfm-inner">
+            '<div class="item-wdfm wdfm-inner-4">
                 <div class="wdfm-card">
                     <div class="wdfm-header">
                         <div class="wdfm-img">
@@ -285,10 +285,9 @@ class WebDefacementController extends Controller
                         <div class="wdfm-ft-left flex">
                             <div>Site : '.@$key->get_site->name.'</div>
                             <div class="status-flex mr-2">Status : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
-                        </div>
-                        <div class="wdfm-ft-right flex">
-                            <div>Last online: '.@$key->last_online.'</div>
-                            <div>Last Check: '.@$key->last_check.'</div>
+                            <div class="text-sm-date">Last online: '.@$key->last_online.'</div>
+                            <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
+                        
                         </div>
                     </div>
                 </div>
