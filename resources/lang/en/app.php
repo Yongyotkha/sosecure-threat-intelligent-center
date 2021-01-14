@@ -969,6 +969,7 @@ return [
     'news_detail'                                => 'News Detail',
     'assets_vulnerability'                       => 'Assets Vulnerability',
     'assets_compromised'                         => 'Assets Compromised',
+    'compromised_feed'                           => 'Compromised Feed',
     'vendor'                                     => 'Vendor',
     'edition'                                    => 'Edition',
     'site_ip'                                    => 'Site IP',
