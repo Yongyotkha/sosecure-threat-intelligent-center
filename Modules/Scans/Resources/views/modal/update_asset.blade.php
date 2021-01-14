@@ -29,28 +29,39 @@
                 <div class="col-md-12">
                     <table class="table table-bordered asset-table-manual-0">
                         <tbody id="assets_show_${number_tbody_rows}">
+                            @if ($AssetsData)
+                                @foreach ($AssetsData as $AssetsData)
                             <tr id="rows_manual_${number_add_rows}">
+                                
                                 <td>
-                                    <input type="text" name="assets_manual[]" class="form-control">
+                                    <input type="text" name="assets_manual[]" value="!{{$AssetsData[0]}}?1:0"  class="form-control">
                                 </td>
+                                
                                 <td>
-                                    <input type="text" name="raw_data_manual[]" class="form-control"
-                                        data-raw_data_manual="${0}">
+                                   
+                                    
+                                        <input type="text" name="raw_data_manual[]" class="form-control"
+                                        data-raw_data_manual="${0}" value="{{@$AssetsData->value}}">
                                 </td>
+                                   
                                 <td>
                                     <select name="data_type_manual[]" class="select2 form-control">
-                                        @if ($DataTypes)
+                                        {{-- @if ($DataTypes)
                                         
                                         @foreach ($DataTypes as $DataTypes)
                                         <option value="{{@$DataTypes->id}}">{{@$DataTypes->value}} 
                                         </option>
                                         @endforeach
 
-                                        @endif
+                                        @endif --}}
                                     </select>
+                                   
 
                                 </td>
+                                
                             </tr>
+                            @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
