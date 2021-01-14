@@ -45,7 +45,7 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12"></div>
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 d-none">
                             {!! Form::open(['route' => ['indisetting.upsert', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
                                 <section class="panel panel-default">
@@ -98,8 +98,6 @@
         
                     <div class="row">
                         <div class="col-lg-12">
-
-
                             {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
                                 {!! Form::open(['route' => ['indisetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                                 <section class="panel panel-default">
