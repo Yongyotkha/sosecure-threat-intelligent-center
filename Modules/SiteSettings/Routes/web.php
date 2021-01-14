@@ -109,6 +109,9 @@ Route::group(
     }
 );
 
+// credentials
+Route::get('/Credentials/{id}', 'CredentialsController@index')->name('credentials.index')->middleware('can:menu_items');
+
 Route::get('/WebDefacement-website/{id}', 'WebDefacementController@webdefacement_website')->name('webdefacement_website.index')->middleware('can:menu_items');
 Route::post('/WebDefacement-website/load_card_by_site', 'WebDefacementController@load_card_by_site')->name('webdefacement.load_card_by_site')->middleware('can:menu_items');
 Route::post('/WebDefacement-website/delete_websefacement_process', 'WebDefacementController@delete_websefacement_process')->name('webdefacement.delete_websefacement_process');

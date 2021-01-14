@@ -1,6 +1,6 @@
 <script>
     
-    $('.show-setting').show();
+    $('.show-setting').hide();
     $('.hide-setting').click(function(){
         $('#hide-settings').hide();
         if($('.show-setting').hide()){

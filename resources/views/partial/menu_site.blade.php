@@ -40,6 +40,12 @@
         </a>
     </li>
 
+    <li class="{{ $page === 'Credentials' ? 'active' : '' }}">
+        <a href="{{route('credentials.index', ['id' => $siteSettings->code])}}">
+            Credentials
+        </a>
+    </li>
+
     {{-- <li {{ $page === 'News' ? 'active' : '' }}>
         <a href="#">
             News
