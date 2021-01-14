@@ -15,6 +15,7 @@ Route::group(
 	['middleware' => 'web', 'prefix' => 'news'],
 	function () {
 		Route::get('/', 'NewsController@index')->name('news.index')->middleware('can:menu_items');
+		// Route::get('/client', 'NewsController@index')->name('news.index_client')->middleware('can:menu_items');
 		Route::get('/detail', 'NewsController@news_detail')->name('news.news_detail')->middleware('can:menu_items');
 		Route::get('/detail/{code}', 'NewsController@news_detail_code')->name('news.news_detail_code')->middleware('can:menu_items');
 
@@ -23,6 +24,14 @@ Route::group(
 		Route::get('/jqueryLoadMoreNewsTopic', 'NewsController@jqueryLoadMoreNewsTopic')->name('jqueryLoadMoreNewsTopic');
 		Route::get('/jqueryLoadMoreNewsBookmark', 'NewsController@jqueryLoadMoreNewsBookmark')->name('jqueryLoadMoreNewsBookmark');
 		Route::get('/bookmark', 'NewsController@bookmark')->name('bookmark');
+		
+	}
+);
+
+Route::group(
+	['middleware' => 'web', 'prefix' => 'news_client'],
+	function () {
+		Route::get('/', 'NewsController@index')->name('news.index_client')->middleware('can:menu_items');
 		
 	}
 );

@@ -286,6 +286,15 @@ class NewsController extends Controller
 
     public function index()
     {
+        $data['page'] = langapp('news');
+        // $data['Category'] = CategorySettings::where('active',1)->get();
+        $data['category'] = CategorySettings::where('active',1)->get();
+        return view('rssfeedsettings::rss_news')->with($data);
+
+    }
+
+    public function index_client()
+    {
         $RSSNews_count = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
         // dd($news_all);
         // $RSSNews_count = RSSNews::count("id");
