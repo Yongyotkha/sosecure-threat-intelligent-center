@@ -27,6 +27,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 Route::group(['prefix' => 'v1/client-transfer/'], function () {
     Route::post('rss_news/', 'Api\ApiTransferClients@getTranfer_News');
     Route::get('get_encode/{site_id}', 'Api\ApiTransferClients@get_encode');
+    Route::post('checkwebserverIP/', 'Api\ApiTransferClients@checkWebserverIP');
 });
 
 Route::group(['middleware' => 'api','prefix' => 'v1'], function ($router) {//, 'middleware' => 'auth:api'

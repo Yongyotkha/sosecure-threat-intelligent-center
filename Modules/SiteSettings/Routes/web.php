@@ -143,6 +143,10 @@ Route::post('/compromised_web_server/web_server_edit/{id}', 'DataLeakController@
 Route::post('/compromised_web_server/web_server_create', 'DataLeakController@web_server_create')->name('compromised_web_server.web_server_create')->middleware('can:menu_items');
 Route::post('/compromised_web_server/web_server_change_status', 'DataLeakController@web_server_change_status')->name('compromised_web_server.web_server_change_status')->middleware('can:menu_items');
 
+
+Route::post('/compromised_web_server_ip/checkwebserverIP', 'DataLeakController@checkWebserverIP')->name('compromised_web_server.checkWebserverIP')->middleware('can:menu_items');
+
+
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
 Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');
 Route::post('/datafeedsocial/datatables', 'DataLeakController@datafeedsocial_datatables')->name('socialdatas.datafeedsocial_datatables');
