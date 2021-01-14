@@ -27,11 +27,11 @@ class RegisterSiteController extends ApiController
         }else{
             try {
                 $data_key = json_decode($data, true);
-                // $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']['ip_key'],  $site['data']['mac_address_key']);
-                // if($data_key_decrypt === false){
-                //     return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400', 'data' => $data_key['key']]);
-                // }else{
-                //     $site_explode = explode('&', $data_key_decrypt);
+                $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                if($data_key_decrypt === false){
+                    return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400', 'data' => $data_key['key']]);
+                }else{
+                    $site_explode = explode('&', $data_key_decrypt);
                     $site = SiteSettings::where('code', $site['data']['code'])->first();
                     $logo = url('/').'/'.$site->logo;
                     if($site->no_expiration_active === 0){
@@ -47,7 +47,7 @@ class RegisterSiteController extends ApiController
                     }else{
                         return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);
                     }
-                // }
+                }
             } catch (\Exception $e) {
                 $response = array(
                     'status' => 0,
@@ -70,16 +70,31 @@ class RegisterSiteController extends ApiController
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
-            $data_key = json_decode($data, true);
-            $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']['ip_key'],  $site['data']['mac_address_key']);
-            if($data_key_decrypt === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400', 'data' => $data_key]);
-            }else{
-                $new_version = DeployCode::select('version', 'created_at')->where('status', 1)->where('access_type', 1)->orderBy('version', 'desc')->first();
-                $current_version = DeployCode::select('version', 'created_at')->where('version', $data_key_decrypt)->first();
-                $update_version = DeployCode::select('code','path')->where('status', 1)->where('access_type', 1)->where('version','>', $data_key_decrypt)->get();
-                $indecator = asset('indicator/indicator.zip');
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => ['new_version' => $new_version, 'current_version' => $current_version, 'update_version' => $update_version, 'indecator' => $indecator]]);
+            try {
+                $data_key = json_decode($data, true);
+                $data_key_decrypt = $this->encrypt_decrypt('decrypt', $data_key['key'], $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                if($data_key_decrypt === false){
+                    return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400', 'data' => $data_key]);
+                }else{
+                    $set_user = [
+                        "mysql_user" => $site['data']['mysql_user'],
+                        "mysql_password" => $site['data']['mysql_password'],
+                        "mongo_user" => $site['data']['mongo_user'],
+                        "mongo_password" => $site['data']['mongo_password'],
+                    ];
+                    $data_username = encrypt_decrypt('encrypt', $set_user, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                    $new_version = DeployCode::select('version', 'created_at')->where('status', 1)->where('access_type', 1)->orderBy('version', 'desc')->first();
+                    $current_version = DeployCode::select('version', 'created_at')->where('version', $data_key_decrypt)->first();
+                    $update_version = DeployCode::select('code','path')->where('status', 1)->where('access_type', 1)->where('version','>', $data_key_decrypt)->get();
+                    $indecator = asset('indicator/indicator.zip');
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => ['new_version' => $new_version, 'current_version' => $current_version, 'update_version' => $update_version, 'indecator' => $indecator, 'site_system' => $data_username]]);
+                }
+            } catch (\Exception $e) {
+                $response = array(
+                    'status' => 0,
+                    'message' => $e -> getMessage(),
+                );
+                return response()->json($response);
             }
         }
     }
