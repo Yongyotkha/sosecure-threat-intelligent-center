@@ -30,18 +30,23 @@
                     <table class="table table-bordered asset-table-manual-0">
                         <tbody id="assets_show_${number_tbody_rows}">
                             @if ($AssetsData)
-                                @foreach ($AssetsData as $AssetsData)
+                                @foreach ($AssetsData as $keyin => $Data)
                             <tr id="rows_manual_${number_add_rows}">
+                                @if ($keyin==0)
+                                    <td>
+                                        <input type="text" name="assets_manual[]" value="{{@$scans->raw_data}}"  class="form-control">
+                                    </td>
+                                @else 
+                                    <td>
+                                        
+                                    </td>
                                 
-                                <td>
-                                    <input type="text" name="assets_manual[]" value="!{{$AssetsData[0]}}?1:0"  class="form-control">
-                                </td>
-                                
+                                @endif
                                 <td>
                                    
                                     
                                         <input type="text" name="raw_data_manual[]" class="form-control"
-                                        data-raw_data_manual="${0}" value="{{@$AssetsData->value}}">
+                                        data-raw_data_manual="${0}" value="{{@$Data->value}}">
                                 </td>
                                    
                                 <td>
@@ -96,6 +101,8 @@
 
 
     <script>
+
+        console.log({{$AssetsData}});
         var form_save = '.formSaving';
         $('.ajaxifyForm_custom').submit(function (event) {
             event.preventDefault();

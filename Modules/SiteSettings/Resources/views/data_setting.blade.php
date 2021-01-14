@@ -200,21 +200,21 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">IP <span class="text-danger">*</span></label>
                                     <div class="col-lg-9">
-                                            <input type="text" class="form-control" value="192.168.1.1">
+                                            <input type="text" name="ip" class="form-control" value="192.168.1.1">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Protocol <span class="text-danger">*</span></label>
                                     <div class="col-lg-9">
-                                        <select name="" id="select-protocol" class="select2-option form-control">
-                                            <option value="">udp</option>
+                                        <select name="protocol" id="select-protocol" class="select2-option form-control">
+                                            <option value="udp" selected >udp</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Port <span class="text-danger">*</span></label>
                                     <div class="col-lg-9">
-                                            <input type="number" class="form-control" value="8000">
+                                            <input type="number" name="port" class="form-control" value="8000">
                                     </div>
                                 </div>
 
