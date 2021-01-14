@@ -89,40 +89,31 @@
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
-                        <div class="col-xs-12">
+                        <div class="col-xs-2">
                             <i class="fas fa-table"></i> Website
+                        </div>
+                        <div class="col-xs-10 text-right">
+                            <a href="#" id="all" class="btn-chart white d-il-flex mr-3">
+                                <span class="dot-all" style="height:8px;"></span>
+                                All
+                            </a>
+                            <a href="#" id="high" class="btn-chart white d-il-flex mr-3">
+                                <span class="dot critical"></span>
+                                High
+                            </a>
+                            <a href="#" id="medium" class="btn-chart white d-il-flex mr-3">
+                                <span class="dot high"></span>
+                                Medium
+                            </a>
+                            <a href="#" id="normal" class="btn-chart white d-il-flex">
+                                <span class="dot low"></span>
+                                Normal
+                            </a>
                         </div>
                     </div>
                 </header>
                 <div class="panel-body"  style="background: #f2f2f2;">
-                    <div class="row">
-                        <div class="col-12 text-right mb-2">
-                            <div class="padding-3">
-                                <a href="#" id="all" class="btn-chart white d-il-flex mr-3">
-                                    <span class=""></span>
-                                    All
-                                </a>
-                                <a href="#" id="high" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot critical"></span>
-                                    High
-                                </a>
-                                <a href="#" id="medium" class="btn-chart white d-il-flex mr-3">
-                                    <span class="dot high"></span>
-                                    Medium
-                                </a>
-                                <a href="#" id="normal" class="btn-chart white d-il-flex">
-                                    <span class="dot low"></span>
-                                    Normal
-                                </a>
-                            </div>
-                   
-                        </div>
-                    </div>
-
-                    <div class="wdfm-container" id='data_card'>
-                        
-                
-                    </div>
+                    <div class="wdfm-container" id='data_card'></div>
                 </div>
             </section>
 

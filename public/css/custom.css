@@ -3136,7 +3136,7 @@ input.input-login:focus {
 .ev-left,
 .ev-right{
     flex: 1;
-    background: #e1ebff87;
+    /* background: #e1ebff87; */
     padding: 1rem;
 }
 .ev-left{
