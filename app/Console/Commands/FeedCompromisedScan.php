@@ -14,6 +14,8 @@ use App\DataLeakFeed;
 use App\DataLeakSocialRef;
 use App\DataLeakFeedTemp;
 use App\leak_socail_ref_temp;
+
+
 class FeedCompromisedScan extends Command
 {
     /**
@@ -95,17 +97,17 @@ class FeedCompromisedScan extends Command
                             $pythonCheck_output = $this->pythonCheck($ssh,$dir_file);
                             $savePythonScan = $this->searchError($dir_file,$pythonCheck_output);
                             if(!empty($savePythonScan)){
-                                echo "Scan Found: ".$dir_folder." --->> " .json_encode($savePythonScan)."\r\n";
+                                echo "Scan Found: ".$CompromisedFileOriginalCheck->file_path." -IN- ".$dir_folder." --->> " .json_encode($savePythonScan)."\r\n";
                                 $this->savePythonScan($server,$CompromisedFileOriginalCheck,$savePythonScan,'scanner','webserver');
                             }
                         }
-                        unlink($dir_file);
+                        // unlink($dir_file);
                     }
                 }
                 echo "Scan END: ".$dir_folder."\r\n";
                 closedir($dh);
             }
-            rmdir($dir_folder);
+            // rmdir($dir_folder);
         }
         return 0;
     }

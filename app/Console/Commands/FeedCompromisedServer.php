@@ -128,57 +128,63 @@ class FeedCompromisedServer extends Command
         $checkPythonScan = true;
 
         foreach ($lines as $line) {
-            // $loop++;
-            // if($loop<$stop){
-                $rand = rand(0,30000);
-                $rand = $rand+30000;
-                usleep($rand);
-                $detail = $this->get_exec_subdetail($line,$ssh);
-                $this->info("Detail : " .json_encode($detail["file_path"]));
-                $CompromisedFileOriginal = new CompromisedFileOriginal;
-                $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
-                if($detail["file_name"]!=''){
-                    if (!$CompromisedFileOriginal){
-                        $CompromisedFileOriginal = new CompromisedFileOriginal;
-                        $CompromisedFileOriginal->code = generator_uuid();
-                        $CompromisedFileOriginal->compromised_server_id = $server->id;
-                        $CompromisedFileOriginal->file_name = $detail["file_name"];
-                        $CompromisedFileOriginal->file_extension = $detail["file_extenstion"];
-                        $CompromisedFileOriginal->file_path = $detail["file_path"];
-                        $CompromisedFileOriginal->file_size = $detail["file_size"];
-                        $CompromisedFileOriginal->file_modified = $detail["file_modified"];
-                        $CompromisedFileOriginal->file_hash = $detail["file_hash"];
-                        $CompromisedFileOriginal->file_status = 1;
-                        $CompromisedFileOriginal->active = 1;
-                        $CompromisedFileOriginal->site_id = $server->site_id;
-                        $CompromisedFileOriginal->save();
-                        $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
-                    }else{
-                       
-                        if($CompromisedFileOriginal->file_modified==$detail["file_modified"]){
-                            $CompromisedFileOriginal->file_status = 2;
+
+            try{
+                // $loop++;
+                // if($loop<$stop){
+                    $rand = rand(0,30000);
+                    $rand = $rand+30000;
+                    usleep($rand);
+                    $detail = $this->get_exec_subdetail($line,$ssh);
+                    
+                    $CompromisedFileOriginal = new CompromisedFileOriginal;
+                    $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
+                    $this->info("Detail : " .json_encode($detail["file_path"]));
+                    if($detail["file_name"]!=''){
+                        if (!$CompromisedFileOriginal){
+                            $CompromisedFileOriginal = new CompromisedFileOriginal;
+                            $CompromisedFileOriginal->code = generator_uuid();
+                            $CompromisedFileOriginal->compromised_server_id = $server->id;
+                            $CompromisedFileOriginal->file_name = $detail["file_name"];
+                            $CompromisedFileOriginal->file_extension = $detail["file_extenstion"];
+                            $CompromisedFileOriginal->file_path = $detail["file_path"];
+                            $CompromisedFileOriginal->file_size = $detail["file_size"];
+                            $CompromisedFileOriginal->file_modified = $detail["file_modified"];
+                            $CompromisedFileOriginal->file_hash = $detail["file_hash"];
+                            $CompromisedFileOriginal->file_status = 1;
+                            $CompromisedFileOriginal->active = 1;
+                            $CompromisedFileOriginal->site_id = $server->site_id;
                             $CompromisedFileOriginal->save();
+                            $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                         }else{
-                            if($CompromisedFileOriginal->file_hash!=$detail["file_hash"]){
-                                $CompromisedFileOriginal->file_size = $detail["file_size"];
-                                $CompromisedFileOriginal->file_modified = $detail["file_modified"];
-                                $CompromisedFileOriginal->file_hash = $detail["file_hash"];
-                                $CompromisedFileOriginal->file_status = 3;
-                                $CompromisedFileOriginal->save();
-                                $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
-                            }else{
+                        
+                            if($CompromisedFileOriginal->file_modified==$detail["file_modified"]){
                                 $CompromisedFileOriginal->file_status = 2;
                                 $CompromisedFileOriginal->save();
-                               
+                            }else{
+                                if($CompromisedFileOriginal->file_hash!=$detail["file_hash"]){
+                                    $CompromisedFileOriginal->file_size = $detail["file_size"];
+                                    $CompromisedFileOriginal->file_modified = $detail["file_modified"];
+                                    $CompromisedFileOriginal->file_hash = $detail["file_hash"];
+                                    $CompromisedFileOriginal->file_status = 3;
+                                    $CompromisedFileOriginal->save();
+                                    $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
+                                }else{
+                                    $CompromisedFileOriginal->file_status = 2;
+                                    $CompromisedFileOriginal->save();
+                                
+                                }
                             }
+                            $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                         }
-                        $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                     }
-                }
-            // }else{
-            //     break;
-            // }
+                // }else{
+                //     break;
+                // }
 
+            } catch (Exception $e) {
+                $this->info("line : ".$e->getLine()." Error :".$e->getMessage());
+            }
             
         }
     }
@@ -426,6 +432,7 @@ class FeedCompromisedServer extends Command
         $output = null;
         $ssh->setTimeout($this->timeOutMain);
         // if(!empty($split_line)&&count($split_line)==8){
+        if(count($split_line)>7){
             $output["file_size"] = $this->ConvertUserStrToBytes($split_line[4]);
             $output["file_path"] = implode("",array_slice($split_line, 7));
             $output["file_modified"] = $split_line[5]." ".$split_line[6];
@@ -433,7 +440,9 @@ class FeedCompromisedServer extends Command
             $pathInfo = pathinfo($output["file_path"]);
             $output["file_name"] = $pathInfo["basename"];
             $output["file_extenstion"] = ".".$pathInfo["extension"];
-
+        }else{
+            $this->info("Sub Error".$line.json_encode($split_line));
+        }
             // $split_point = "/";
             // $stringpos = strrpos($output["file_path"], $split_point, -1)+1;
             // $output["file_name"] = substr($output["file_path"],$stringpos);
