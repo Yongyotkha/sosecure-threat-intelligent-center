@@ -35,6 +35,7 @@ class FeedCompromisedScan extends Command
     private $timeOutMain  = 59;
     private $timeOutSub  = 180;
     private $pathPythonScan  = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-file";
+    // private $pathPythonScan  = "bash -c cd /python_scanner/yara-scanner && python3 yara_main.py --scan-file";
     private $pathToSave  = "";
     /**
      * Create a new command instance.
@@ -234,6 +235,17 @@ class FeedCompromisedScan extends Command
             $pos = strpos($split_first, $searchRe);
             if ($pos !== false) {
                 $split_detail["value_err"] = substr_replace($split_first, "", $pos, strlen($searchRe));
+
+                $myText = $split_detail["value_err"];
+                // $myText = preg_replace('/(?<='.preg_quote(' :"').').*?(?='.preg_quote('"').')/', ',', $myText);
+                $myText = preg_replace('/'.preg_quote('] :"').'.*?'.preg_quote('"').'/', '],', $myText);
+                $split_detail["value_err"] = rtrim($myText,",");;
+                
+                // $split_point = "]";
+                // $stringpos = strrpos($split_detail["value_err"], $split_point)+1;
+                // $split_detail["value_err"] = substr($split_detail["value_err"],0,$stringpos);
+
+
             }else{
                 $split_detail["value_err"] = $split_first;
             }
