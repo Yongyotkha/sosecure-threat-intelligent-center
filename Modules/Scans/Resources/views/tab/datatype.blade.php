@@ -81,9 +81,54 @@
                 </table>
             </div>
         </div>
+
+
     </div>
 
 </header>
+
+<div class="modal in fixed-left" id="modal_test_scan" style="z-index: 999999" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-blue"><button type="button" class="close text-white"  data-dismiss="modal">×</button>
+                <h4 class="modal-title text-white">
+                    Test Scan
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>List1</td>
+                            </tr>
+                            <tr>
+                                <td>List2</td>
+                            </tr>
+                            <tr>
+                                <td>List3</td>
+                            </tr>
+                        </table>
+                        <div class="form-group">
+                            <label for="">Result</label>
+                            <textarea name="" id="" cols="30" rows="10" class="form-control" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-rounded">
+                    <i class="fas fa-play"></i> Retry Test </button>
+                <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close </button>
+                <button type="button" class="btn btn-info btn-rounded">
+                    <i class="fas fa-paper-plane"></i>Close and Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @push('pagestyle')
 @include('stacks.css.datatables')
@@ -254,6 +299,9 @@
                                             html += `</select>
                                         </td>
                                         <td>
+                                            <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                                                <span>@icon('solid/play')
+                                            </button>
                                             <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
                                                 <span>@icon('solid/trash-alt')
                                             </button>
@@ -279,6 +327,10 @@
             });
         });
     });  
+
+    function retry_test(){
+        $('#modal_test_scan').modal('show');
+    }
 
     var number_rows_data_manual = 0;
     function add_new_assets_manual(){
@@ -306,6 +358,9 @@
                             html += `</select>
                         </td>
                         <td>
+                            <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                                <span>@icon('solid/play')
+                            </button>
                             <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_assets_manual_main(${number_new_rows_assets})">
                                 <span>@icon('solid/trash-alt')
                             </button>
@@ -342,6 +397,9 @@
             markup += `</select>
             </td>
             <td>
+                <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                    <span>@icon('solid/play')
+                </button>
                 <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_assets_manual(${number_add_rows})">
                     <span>@icon('solid/trash-alt')
                 </button>
@@ -368,6 +426,9 @@
             markup += `</select>
             </td>
             <td>
+                <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                    <span>@icon('solid/play')
+                </button>
                 <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_tr(${number_rows})">
                     <span>@icon('solid/trash-alt')
                 </button>
