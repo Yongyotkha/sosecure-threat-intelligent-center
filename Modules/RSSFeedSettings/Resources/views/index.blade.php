@@ -2,7 +2,7 @@
 @section('content')
 <section id="content" class="bg">
     <section class="hbox stretch">      
-        <aside id="hide-settings" class="aside aside-md b-r">
+        {{-- <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
@@ -38,7 +38,7 @@
                 </div>
                 </section>
             </section>
-        </aside>
+        </aside> --}}
     
         <aside>
             <section class="vbox">
@@ -46,7 +46,7 @@
                     {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                     @icon('solid/arrow-left')
                     </a> --}}
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                    {{-- <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a> --}}
                     <div class="bc-head">@langapp('rss_feed_settings')</div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                         title="@langapp('export') CSV">

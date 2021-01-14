@@ -7,16 +7,16 @@
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3 text-elipse-setting">Name Domain</p>
+                    <p class="h3 text-elipse-setting">Sub menu</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
-                            <li>
-                                <a href="{{route('rssfeedsettings.index')}}">
+                            <li class="active">
+                                <a href="{{route('rssfeedsettings.rss_data')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    RSS Settings
+                                    News
                                 </a>
                             </li>
                             <li>
@@ -25,12 +25,12 @@
                                     RSS Data
                                 </a>
                             </li>
-                            <li class="active">
-                                <a href="{{route('rssfeedsettings.rss_data')}}">
+                            {{-- <li>
+                                <a href="{{route('rssfeedsettings.index')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    News
+                                    RSS Settings
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </section>
                 </div>

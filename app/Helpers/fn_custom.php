@@ -23,6 +23,7 @@ use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 
 
+define("TYPE_WEB", 'center');//center , client
 define("PAGINATE_NUM", 10);
 define("DB_MONGO_01", 'mongodb://10.104.0.10:27017');
 
