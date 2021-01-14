@@ -122,9 +122,20 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                     
                                     if($menu_val->url) {// url
                                         if($menu_val->type_url == 'site_url') {
-                                            $url = site_url($menu_val->url);
+                                            // dd(TYPE_WEB);
+                                            if(TYPE_WEB == 'center') {
+                                                $url = site_url($menu_val->url);
+                                            } else {
+                                                $url = site_url($menu_val->url_client);
+                                            }
+                                            // $url = site_url($menu_val->url);
                                         } else if ($menu_val->type_url == 'route') {
-                                            $url = route($menu_val->url);
+                                            // $url = route($menu_val->url);
+                                            if(TYPE_WEB == 'center') {
+                                                $url = route($menu_val->url);
+                                            } else {
+                                                $url = route($menu_val->url_client);
+                                            }
                                         }
                                     }
 
@@ -188,8 +199,18 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                             if($menu_sub_val->url) {// url
                                                 if($menu_sub_val->type_url == 'site_url') {
                                                     $url_sub = site_url($menu_sub_val->url);
+                                                    if(TYPE_WEB == 'center') {
+                                                        $url = site_url($menu_sub_val->url);
+                                                    } else {
+                                                        $url = site_url($menu_sub_val->url_client);
+                                                    }
                                                 } else if ($menu_sub_val->type_url == 'route') {
-                                                    $url_sub = route($menu_sub_val->url);
+                                                    // $url_sub = route($menu_sub_val->url);
+                                                    if(TYPE_WEB == 'center') {
+                                                        $url = route($menu_sub_val->url);
+                                                    } else {
+                                                        $url = route($menu_sub_val->url_client);
+                                                    }
                                                 }
                                             }
 

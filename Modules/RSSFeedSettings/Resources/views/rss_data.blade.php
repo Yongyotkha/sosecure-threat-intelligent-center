@@ -16,16 +16,16 @@
                         data-target="#setting-nav">@icon('solid/bars')
                     </a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3 text-elipse-setting">Name Domain</p>
+                    <p class="h3 text-elipse-setting">Sub menu</p>
                 </header>
                 <section class="scrollable">
                     <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li>
-                                <a href="{{route('rssfeedsettings.index')}}">
+                                <a href="{{route('rssfeedsettings.news')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    RSS Settings
+                                    News
                                 </a>
                             </li>
                             <li class="active">
@@ -34,12 +34,12 @@
                                     RSS Data
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{route('rssfeedsettings.news')}}">
+                            {{-- <li>
+                                <a href="{{route('rssfeedsettings.index')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    News
+                                    RSS Settings
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </section>
                 </div>
@@ -60,7 +60,7 @@
                         @icon('solid/download') CSV
                     </a> --}}
                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
                             @langapp('delete')</span>
                     </button>
 
@@ -142,7 +142,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table News Data
+                                    <i class="fas fa-table"></i> Table RSS Data
                                 </div>
                             </div>
                         </header>
@@ -198,7 +198,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
-@include('stacks.js.hidesettings');
+@include('stacks.js.hidesettings')
 
 <script>
 
