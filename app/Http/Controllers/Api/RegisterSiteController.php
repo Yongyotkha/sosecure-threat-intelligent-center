@@ -82,7 +82,7 @@ class RegisterSiteController extends ApiController
                         "mongo_user" => $site['data']['mongo_user'],
                         "mongo_password" => $site['data']['mongo_password'],
                     ];
-                    $data_username = encrypt_decrypt('encrypt', $set_user, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                    $data_username = encrypt_decrypt('encrypt', json_encode($set_user, true), $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
                     $new_version = DeployCode::select('version', 'created_at')->where('status', 1)->where('access_type', 1)->orderBy('version', 'desc')->first();
                     $current_version = DeployCode::select('version', 'created_at')->where('version', $data_key_decrypt)->first();
                     $update_version = DeployCode::select('code','path')->where('status', 1)->where('access_type', 1)->where('version','>', $data_key_decrypt)->get();
