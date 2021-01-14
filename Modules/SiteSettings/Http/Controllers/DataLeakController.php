@@ -1789,7 +1789,7 @@ class DataLeakController extends Controller
 
     public function web_server_edit(Request $request,$id)
     {
-        // dd($request->site);
+         
         
         $data = CompromisedServer::where('id', $id)->first();
 
@@ -1800,7 +1800,8 @@ class DataLeakController extends Controller
         $data->password = $request->password;
         $data->path = $request->root_path;
         $data->os = $request->os;
-        $data->active = ($request->status)?1:0;
+        $data->active = $request->status;
+        $data->file_extension = $request->type;
         
         $data->save();
 
@@ -1834,17 +1835,17 @@ class DataLeakController extends Controller
                
                 if (!$ssh->login($user, $pass)) {
                     $checkConnect = false;
-                    $message = 'no login';
+                    $message = 'Connect Error';
                 } else {
                     $checkConnect = true;
-                    $message = 'success';
+                    $message = 'Connect Success';
                 }
             }else if($os=="Windows"){
                 $checkConnect = false;
-                $message = 'no make';
+                $message = 'Connect Error';
             }else{
                 $checkConnect = false;
-                $message = 'no os';
+                $message = 'Connect Error';
             }
         } catch (Exception $e) {
             $checkConnect = false;
