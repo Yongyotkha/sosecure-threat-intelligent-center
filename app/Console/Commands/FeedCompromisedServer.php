@@ -137,10 +137,10 @@ class FeedCompromisedServer extends Command
                     usleep($rand);
                     $detail = $this->get_exec_subdetail($line,$ssh);
                     
-                    $CompromisedFileOriginal = new CompromisedFileOriginal;
-                    $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
-                    $this->info("Detail : " .json_encode($detail["file_path"]));
-                    if($detail["file_name"]!=''){
+                    if(!empty($detail)){
+                        $CompromisedFileOriginal = new CompromisedFileOriginal;
+                        $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
+                        $this->info("Detail : " .json_encode($detail["file_path"]));
                         if (!$CompromisedFileOriginal){
                             $CompromisedFileOriginal = new CompromisedFileOriginal;
                             $CompromisedFileOriginal->code = generator_uuid();
@@ -440,8 +440,12 @@ class FeedCompromisedServer extends Command
             $pathInfo = pathinfo($output["file_path"]);
             $output["file_name"] = $pathInfo["basename"];
             $output["file_extenstion"] = ".".$pathInfo["extension"];
+
+            $cmd = "cat ".$output["file_path"];
+            $output["file_content"] = $ssh->exec($cmd);
+            $output["file_hash"] = hash($this->hashingAlgorithm, $output["file_content"]);
         }else{
-            $this->info("Sub Error".$line.json_encode($split_line));
+            // $this->info("Sub Error".$line.json_encode($split_line));
         }
             // $split_point = "/";
             // $stringpos = strrpos($output["file_path"], $split_point, -1)+1;
@@ -455,9 +459,7 @@ class FeedCompromisedServer extends Command
             //     $output["file_extenstion"] = substr($output["file_name"],$stringpos);
             // }
            
-            $cmd = "cat ".$output["file_path"];
-            $output["file_content"] = $ssh->exec($cmd);
-            $output["file_hash"] = hash($this->hashingAlgorithm, $output["file_content"]);
+            
             // $this->info($output["file_name"]);
         // }
         return $output;
