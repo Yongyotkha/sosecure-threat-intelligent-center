@@ -92,7 +92,7 @@
                                                         <h1 class="text-blue bold-500">Vulnerability Host</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-hl" style="height: 227px"></div>
+                                                    <div id="chart-show-hl" style="height: 207px"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
@@ -106,7 +106,7 @@
                                                         <h1 class="text-blue bold-500">Vulnerability Severity </h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-pie" style="height: 227px"></div>
+                                                    <div id="chart-show-pie" style="height: 207px"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -123,7 +123,7 @@
                                                         <h1 class="text-blue bold-500">Indicators</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-line" style="height: 227px"></div>
+                                                    <div id="chart-show-line" style="height: 207px"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
@@ -137,7 +137,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive cve_assets" style="max-height:227px;min-height: 227px;overflow: auto;">
+                                                    <div class="table-responsive cve_assets" style="max-height:207px;min-height: 207px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -350,7 +350,7 @@
                 if(result.status_code == 200){
                     const chart_line = new Highcharts.chart('chart-show-line', {
                         chart: {
-                            height: 227, 
+                            height: 207, 
                             plotBackgroundColor: null,
                             plotBorderWidth: null,
                             plotShadow: false,
@@ -535,7 +535,7 @@
 
             const chart_pie = new Highcharts.chart('chart-show-pie', {
                 chart: {
-                    height: 227, 
+                    height: 207, 
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
                     plotShadow: false,
@@ -683,7 +683,7 @@
                     }
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
-                            height: 227, 
+                            height: 207, 
                             type: 'bar'
                         },
                         title: {
@@ -744,7 +744,7 @@
 
        {{-- const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
-                height: 227, 
+                height: 207, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
