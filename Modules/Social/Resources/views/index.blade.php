@@ -11,14 +11,7 @@
                 <span>@langapp('Search_Advance')</span>
              </button>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
-                    <option value="">All Site</option>
-                    @if($SiteSettings)
-                        @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                        @endforeach
-                    @endif
-                </select>
+                
             </div>
 
         </header>

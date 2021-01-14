@@ -6,7 +6,7 @@
         <div id="login-darken"></div>
         <div id="login-form" class="container aside-xxl animated fadeInUp">
         <span class="navbar-brand block"> 
-                <img src="" class="img-responsive thumb-sm m-r-sm">
+                <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="img-responsive thumb-sm m-r-sm">
         </span>
 
         <section class="panel panel-default bg-white m-t-lg b-r-cust">
@@ -67,9 +67,6 @@
 
     <script>
 
-
-
-
     var form_save = '.formSaving';
     $('.ajaxifyForm_custom').submit(function (event) {
         event.preventDefault();
@@ -79,9 +76,9 @@
             var data = new FormData(this);
             if(form_save == '.formSavingAndRun'){
                 data.append('formsubmit', 'formSavingAndRun');
-            }else if(form_save == '.formPreview'){
+            } else if(form_save == '.formPreview'){
                 data.append('formsubmit', 'formPreview');
-            }else if(form_save == '.formDraft'){
+            } else if(form_save == '.formDraft'){
                 data.append('formsubmit', 'formDraft');
             }
             axios.post($(this).attr("action"), data)
@@ -106,9 +103,6 @@
                 
                 
             }); 
-    
-    
-        
     });
 
 
