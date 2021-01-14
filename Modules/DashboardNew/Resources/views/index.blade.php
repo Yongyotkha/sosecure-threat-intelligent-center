@@ -26,21 +26,22 @@
                     <div class="col-lg-12 col-md-12" id="count_cve"></div>
                     <div class="col-md-12">
                         <section class="">
-                            <div class="panel-body" id="chart-container">
+                            <div class="panel-body" style="padding: 0 15px;" id="chart-container">
                                 <div class="row">
-                                    <div class="col-xl-3 col-lg-3 col-md-12 padding-small-5px mb-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-12 padding-small-5px mb-2">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-6 mb-small-5px">
-                                                <div class="card-dash">
-                                                    <div class="left-card">
-                                                        <div class="img-icon-card">
-                                                            <img src="{{asset('images/database.png')}}" alt="">
+                                                <a href="#" data-toggle="modal" data-target="#modal_asset">
+                                                    <div class="card-dash">
+                                                        <div class="left-card">
+                                                            <div class="img-icon-card">
+                                                                <img src="{{asset('images/database.png')}}" alt="">
+                                                            </div>
+                                                            <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
+                                                            <span class="number-card info number_asset"></span>
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
-                                                        <a href="#" data-toggle="modal" data-target="#modal_asset" class="number-card info number_asset"></a>
                                                     </div>
-                                                   
-                                                </div>
+                                                </a>
                                             </div>
                                             <div class="col-lg-12 col-md-6 mb-small-5px">
                                                 <div class="card-dash">
@@ -78,7 +79,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-xl-9 col-lg-9 col-md-12">
+                                    <div class="col-xl-10 col-lg-10 col-md-12">
                                         <div class="row">
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                 <div class="loadhost backdrop-loader">
@@ -91,7 +92,7 @@
                                                         <h1 class="text-blue bold-500">Vulnerability Host</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-hl" style="height: 400px"></div>
+                                                    <div id="chart-show-hl" style="height: 227px"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
@@ -105,7 +106,7 @@
                                                         <h1 class="text-blue bold-500">Vulnerability Severity </h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-pie" style="height: 400px"></div>
+                                                    <div id="chart-show-pie" style="height: 227px"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -122,7 +123,7 @@
                                                         <h1 class="text-blue bold-500">Indicators</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-line" style="height: 400px"></div>
+                                                    <div id="chart-show-line" style="height: 227px"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
@@ -136,7 +137,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive cve_assets" style="max-height:280px;min-height: 400px;overflow: auto;">
+                                                    <div class="table-responsive cve_assets" style="max-height:227px;min-height: 227px;overflow: auto;">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>
@@ -349,7 +350,7 @@
                 if(result.status_code == 200){
                     const chart_line = new Highcharts.chart('chart-show-line', {
                         chart: {
-                            height: 400, 
+                            height: 227, 
                             plotBackgroundColor: null,
                             plotBorderWidth: null,
                             plotShadow: false,
@@ -534,7 +535,7 @@
 
             const chart_pie = new Highcharts.chart('chart-show-pie', {
                 chart: {
-                    height: 400, 
+                    height: 227, 
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
                     plotShadow: false,
@@ -682,7 +683,7 @@
                     }
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
-                            height: 400, 
+                            height: 227, 
                             type: 'bar'
                         },
                         title: {
@@ -743,7 +744,7 @@
 
        {{-- const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
-                height: 400, 
+                height: 227, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
