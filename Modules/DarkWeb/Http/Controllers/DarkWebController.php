@@ -355,9 +355,9 @@ class DarkWebController extends Controller
             $check_read_news = Read_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
             $checkBookmark = Bookmarks_compromised::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
             if($check_read_news){
-                $html .= '<div class="list-news" style="background-color:#ececec">';
+                $html .= '<div class="list-news space-none">';
             }else{
-                $html .= '<div class="list-news">';
+                $html .= '<div class="list-news space-none" style="background-color:#f2f2f2">';
             }
 
             $get_ref_name = '';
@@ -378,10 +378,22 @@ class DarkWebController extends Controller
                         <input type="checkbox" name="" class="chk-bookmark">
                         <span class="label-text checkbox-news-input"></span>
                     </label>
-                </div>-->
-                
-                    
-                        <article class="def-rlt">
+                </div>-->';
+                if($check_read_news){
+                    $html .= '<div class="float-left-type">';
+                }else{
+                    $html .= '<div class="float-left-type br-white">';
+                }
+                        // if($data->feel_type == 'webserver'){
+                        //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/icebergline2.png" style="width:100px;height:85px;"></div>';
+                        // }else if($data->feel_type == 'compromise'){
+                        //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/icebergline1.png" style="width:100px;height:85px;"></div>';
+                        // }else if($data->feel_type == 'darkweb'){
+                        //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/webserver.png" style="width:100px;height:85px;"></div>';
+                        // }
+                        $html .= '    <div class="text-type-pri">'.@$data -> feel_type.'</div>';
+                        $html .=  '</div>
+                        <article class="def-rlt pl-50">
                             <div class="entry">
                                 <span class="entry-category">
                                     <a href="#">'.$data -> source_name.'</a>
@@ -392,7 +404,6 @@ class DarkWebController extends Controller
                                     </a>
                                 </h3>
                                 <div class="entry-meta">
-                                    <span class="entry-date"> <b>'.@$data -> feel_type.'</b></span>
                                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
                                     <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
                                     <span class="entry-date"> <b>'.$get_ref_name.'</b></span>

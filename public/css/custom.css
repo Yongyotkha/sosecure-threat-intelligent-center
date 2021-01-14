@@ -3253,3 +3253,31 @@ input.input-login:focus {
     display: inline-block;
     margin-top: 9rem;
  }
+
+ .list-news.space-none{
+     justify-content: unset !important;
+ }
+
+ .float-left-type{
+    float: left;
+    display: inline-flex;
+    width: 100px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    border-right: 1px solid #eee;
+ }
+
+ .float-left-type.br-white{    border-right: 1px solid #fff;}
+
+ .float-left-type > .text-type-pri{
+    width: 100px;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    font-weight: 700;
+ }
