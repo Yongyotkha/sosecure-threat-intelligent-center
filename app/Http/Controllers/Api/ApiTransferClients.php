@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\TransactionClientNews;
 use App\Http\Controllers\Api\ApiController;
 
+use phpseclib\Net\SSH2;
+use Exception;
 
 
 class ApiTransferClients extends ApiController
@@ -55,4 +57,45 @@ class ApiTransferClients extends ApiController
        
         return response()->json($dataout); 
     }
+
+    protected function checkWebserverIP(Request $request)
+    {
+        $ip = @$request->ip;
+        $port = @$request->port;
+        $user = @$request->user;
+        $pass = @$request->password;
+        $os = @$request->os;
+        $checkConnect = null;
+        $message = '';
+        try {   
+            if($os=="Linux"){
+                $ssh = new SSH2($ip,$port);
+                $ssh->setTimeout(60);
+               
+                if (!$ssh->login($user, $pass)) {
+                    $checkConnect = false;
+                    $message = 'no login';
+                } else {
+                    $checkConnect = true;
+                    $message = 'success';
+                }
+            }else if($os=="Windows"){
+                $checkConnect = false;
+                $message = 'no make';
+            }else{
+                $checkConnect = false;
+                $message = 'no os';
+            }
+        } catch (Exception $e) {
+            $checkConnect = false;
+            $message = $e->getMessage();
+        }
+
+        $dataout = [
+            'webserverConnect' => $checkConnect,
+            'message' => $message
+        ];
+        return response()->json($dataout); 
+    }
+    
 }

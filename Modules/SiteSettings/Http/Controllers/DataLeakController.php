@@ -17,6 +17,8 @@ use Modules\Scans\Entities\Assets;
 use Auth;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\Scans\Entities\AssetsData;
+use phpseclib\Net\SSH2;
+use Exception;
 
 class DataLeakController extends Controller
 {
@@ -1808,6 +1810,46 @@ class DataLeakController extends Controller
             Response::HTTP_OK
         );
         
+    }
+
+    protected function checkWebserverIP(Request $request)
+    {
+        $ip = @$request->ip;
+        $port = @$request->port;
+        $user = @$request->user;
+        $pass = @$request->password;
+        $os = @$request->os;
+        $checkConnect = null;
+        $message = '';
+        try {   
+            if($os=="Linux"){
+                $ssh = new SSH2($ip,$port);
+                $ssh->setTimeout(60);
+               
+                if (!$ssh->login($user, $pass)) {
+                    $checkConnect = false;
+                    $message = 'no login';
+                } else {
+                    $checkConnect = true;
+                    $message = 'success';
+                }
+            }else if($os=="Windows"){
+                $checkConnect = false;
+                $message = 'no make';
+            }else{
+                $checkConnect = false;
+                $message = 'no os';
+            }
+        } catch (Exception $e) {
+            $checkConnect = false;
+            $message = $e->getMessage();
+        }
+
+        $dataout = [
+            'webserverConnect' => $checkConnect,
+            'message' => $message
+        ];
+        return response()->json($dataout); 
     }
 
 }

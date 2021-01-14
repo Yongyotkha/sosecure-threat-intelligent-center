@@ -33,6 +33,7 @@ class FeedCompromisedScan extends Command
     private $timeOutMain  = 59;
     private $timeOutSub  = 180;
     private $pathPythonScan  = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-file";
+    private $pathToSave  = "";
     /**
      * Create a new command instance.
      */
@@ -74,7 +75,7 @@ class FeedCompromisedScan extends Command
                     $ssh = null;
                     $this->scanFolder($server,$ssh);
                 } catch (Exception $e) {
-                    echo $e->getMessage();
+                    echo "line : ".$e->getLine()." Error :".$e->getMessage()."\r\n";
                 }
             }
         }
@@ -94,6 +95,7 @@ class FeedCompromisedScan extends Command
                             $pythonCheck_output = $this->pythonCheck($ssh,$dir_file);
                             $savePythonScan = $this->searchError($dir_file,$pythonCheck_output);
                             if(!empty($savePythonScan)){
+                                echo "Scan Found: ".$dir_folder." --->> " .json_encode($savePythonScan)."\r\n";
                                 $this->savePythonScan($server,$CompromisedFileOriginalCheck,$savePythonScan,'scanner','webserver');
                             }
                         }

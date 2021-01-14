@@ -54,41 +54,45 @@ class FeedCompromisedServer extends Command
         if($CompromisedServer){
             foreach ($CompromisedServer as $server) {
                 try{
-                    $this->info("Process: "."ip - ".$server->ip." site - ".$server->site_id." serverID - ".$server->id);
-                    $ip = $server->ip;
-                    $port = $server->port;
-                    $user = $server->user;
-                    $pass = $server->password;
-                    $ssh = new SSH2($ip,$port);
-                    $ssh->setTimeout($this->timeOutMain);
-                    $return_value = null;
-                    if (!$ssh->login($user, $pass)) {
+
+                    if($server->os=="Linux"){
+                        $this->info("Process: "."ip - ".$server->ip." site - ".$server->site_id." serverID - ".$server->id);
+                        $ip = $server->ip;
+                        $port = $server->port;
+                        $user = $server->user;
+                        $pass = $server->password;
+                        $ssh = new SSH2($ip,$port);
+                        $ssh->setTimeout($this->timeOutMain);
                         $return_value = null;
-                    } else {
-                        $server_path = $server->path;
-                        // $cmd = "find /var/www/html/threat-intelligent-center/threat-intelligent-clinet-online -type f \( -iname \*.php -o -iname \*.js \) -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
-                        
-                        $server_search_extenstion = "";
-                        if(!empty($server->file_extension)){
-                            $search_extensions = explode(",", $server->file_extension);
-                            $server_search_extenstion .= "\( ";
-                            foreach ($search_extensions as $search_extension) {
-                                $server_search_extenstion .= "-iname \*".$search_extension." -o ";
+                        if (!$ssh->login($user, $pass)) {
+                            $return_value = null;
+                        } else {
+                            $server_path = $server->path;
+                            // $cmd = "find /var/www/html/threat-intelligent-center/threat-intelligent-clinet-online -type f \( -iname \*.php -o -iname \*.js \) -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
+                            
+                            $server_search_extenstion = "";
+                            if(!empty($server->file_extension)){
+                                $search_extensions = explode(",", $server->file_extension);
+                                $server_search_extenstion .= "\( ";
+                                foreach ($search_extensions as $search_extension) {
+                                    $server_search_extenstion .= "-iname \*".$search_extension." -o ";
+                                }
+                                $server_search_extenstion = rtrim($server_search_extenstion, "-o ");
+                                $server_search_extenstion .= " \)";
+
+
                             }
-                            $server_search_extenstion = rtrim($server_search_extenstion, "-o ");
-                            $server_search_extenstion .= " \)";
-
-
+                            //$cmd = "find ".$server_path." -type f \( -iname \*.php -o -iname \*.js \) -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
+                            $cmd2 = "find ".$server_path." -type f ".$server_search_extenstion." -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
+                            //echo $cmd2;
+                            $return_value = $ssh->exec($cmd2);
+                    
+                            $this->FileSaveDetail($server,$ssh,$return_value);
                         }
-                        //$cmd = "find ".$server_path." -type f \( -iname \*.php -o -iname \*.js \) -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
-                        $cmd2 = "find ".$server_path." -type f ".$server_search_extenstion." -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
-                        //echo $cmd2;
-                        $return_value = $ssh->exec($cmd2);
-                  
-                        $this->FileSaveDetail($server,$ssh,$return_value);
                     }
+
                 } catch (Exception $e) {
-                    $this->info($e->getMessage());
+                    $this->info("line : ".$e->getLine()." Error :".$e->getMessage());
                 }
             }
         }
@@ -118,18 +122,19 @@ class FeedCompromisedServer extends Command
         $lines = $this->user_exec_mod($return_value);
         $updateAll = new CompromisedFileOriginal;
         $updateAll->where('compromised_server_id', $server->id)->update(['file_status' => 4]);
-        $loop = 0;
-        $stop = 10+1;
+        // $loop = 0;
+        // $stop = 10+1;
 
         $checkPythonScan = true;
 
         foreach ($lines as $line) {
-            $loop++;
-            if($loop<$stop){
+            // $loop++;
+            // if($loop<$stop){
                 $rand = rand(0,30000);
                 $rand = $rand+30000;
                 usleep($rand);
                 $detail = $this->get_exec_subdetail($line,$ssh);
+                $this->info("Detail : " .json_encode($detail["file_path"]));
                 $CompromisedFileOriginal = new CompromisedFileOriginal;
                 $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
                 if($detail["file_name"]!=''){
@@ -170,9 +175,11 @@ class FeedCompromisedServer extends Command
                         $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                     }
                 }
-            }else{
-                break;
-            }
+            // }else{
+            //     break;
+            // }
+
+            
         }
     }
 
@@ -418,27 +425,32 @@ class FeedCompromisedServer extends Command
         $split_line = preg_split('/\s+/', $line);
         $output = null;
         $ssh->setTimeout($this->timeOutMain);
-        if(!empty($split_line)&&count($split_line)==8){
-            $output["file_size"] = $this->ConvertUserStrToBytes(@$split_line[4]);
-            $output["file_path"] = @$split_line[7];
-            $output["file_modified"] = @$split_line[5]." ".@$split_line[6];
-            $split_point = "/";
-            $stringpos = strrpos($output["file_path"], $split_point, -1)+1;
-            $output["file_name"] = substr($output["file_path"],$stringpos);
-            $split_point = ".";
-            $stringpos = strrpos($output["file_name"], $split_point, -1);
-            if ($stringpos === false) { // note: three equal signs
-                // not found...
-                $output["file_extenstion"] = "";
-            }else{
-                $output["file_extenstion"] = substr($output["file_name"],$stringpos);
-            }
+        // if(!empty($split_line)&&count($split_line)==8){
+            $output["file_size"] = $this->ConvertUserStrToBytes($split_line[4]);
+            $output["file_path"] = implode("",array_slice($split_line, 7));
+            $output["file_modified"] = $split_line[5]." ".$split_line[6];
+
+            $pathInfo = pathinfo($output["file_path"]);
+            $output["file_name"] = $pathInfo["basename"];
+            $output["file_extenstion"] = ".".$pathInfo["extension"];
+
+            // $split_point = "/";
+            // $stringpos = strrpos($output["file_path"], $split_point, -1)+1;
+            // $output["file_name"] = substr($output["file_path"],$stringpos);
+            // $split_point = ".";
+            // $stringpos = strrpos($output["file_name"], $split_point, -1);
+            // if ($stringpos === false) { // note: three equal signs
+            //     // not found...
+            //     $output["file_extenstion"] = "";
+            // }else{
+            //     $output["file_extenstion"] = substr($output["file_name"],$stringpos);
+            // }
            
             $cmd = "cat ".$output["file_path"];
-            $output["file_content"] = @$ssh->exec($cmd);
+            $output["file_content"] = $ssh->exec($cmd);
             $output["file_hash"] = hash($this->hashingAlgorithm, $output["file_content"]);
             // $this->info($output["file_name"]);
-        }
+        // }
         return $output;
     }
 
