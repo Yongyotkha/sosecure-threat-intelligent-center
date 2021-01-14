@@ -350,7 +350,7 @@
                 if(result.status_code == 200){
                     const chart_line = new Highcharts.chart('chart-show-line', {
                         chart: {
-                            height: 207, 
+                            height: 223, 
                             plotBackgroundColor: null,
                             plotBorderWidth: null,
                             plotShadow: false,
@@ -535,7 +535,7 @@
 
             const chart_pie = new Highcharts.chart('chart-show-pie', {
                 chart: {
-                    height: 207, 
+                    height: 223, 
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
                     plotShadow: false,
@@ -683,7 +683,7 @@
                     }
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
-                            height: 207, 
+                            height: 223, 
                             type: 'bar'
                         },
                         title: {
@@ -744,7 +744,7 @@
 
        {{-- const chart_pie = new Highcharts.chart('chart-show-pie', {
             chart: {
-                height: 207, 
+                height: 223, 
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
