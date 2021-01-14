@@ -92,7 +92,7 @@
                                                         <h1 class="text-blue bold-500">Vulnerability Host</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-hl" style="height: 207px"></div>
+                                                    <div id="chart-show-hl" class="h-chart"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
@@ -106,7 +106,7 @@
                                                         <h1 class="text-blue bold-500">Vulnerability Severity </h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-pie" style="height: 207px"></div>
+                                                    <div id="chart-show-pie" class="h-chart"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -123,7 +123,7 @@
                                                         <h1 class="text-blue bold-500">Indicators</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div id="chart-show-line" style="height: 207px"></div>
+                                                    <div id="chart-show-line" class="h-chart"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
@@ -137,7 +137,7 @@
                                                         <h1 class="text-blue bold-500">Assets</h1>
                                                     </div>
                                                     <div class="divider-dark"></div>
-                                                    <div class="table-responsive cve_assets" style="max-height:207px;min-height: 207px;overflow: auto;">
+                                                    <div class="table-responsive cve_assets h-table">
                                                         <table class="table table-striped" id="table-assets">
                                                             <thead>
                                                                 <tr>

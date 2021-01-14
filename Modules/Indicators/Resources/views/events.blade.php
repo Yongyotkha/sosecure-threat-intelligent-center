@@ -97,7 +97,7 @@
                                             <span>All</span>
                                         </div>
                                         <div class="ev-right">
-                                            <span>{{ @number_format($attr_current->event_count) }}</span>
+                                            <span class="cl-orange">{{ @number_format($attr_current->event_count) }}</span>
                                             <span>New Event</span>
                                         </div>
                                     </div>
@@ -114,7 +114,7 @@
                                             <span>All</span>
                                         </div>
                                         <div class="ev-right">
-                                            <span>{{ @number_format($attr_current->attribute_count) }}</span>
+                                            <span class="cl-orange">{{ @number_format($attr_current->attribute_count) }}</span>
                                             <span>New Attribute</span>
                                         </div>
                                     </div>
@@ -125,8 +125,8 @@
               
                     <div class="col-md-8 nopadding">
                         <div class="" style="background: #fff">
-                            <span class="header-txt-chart">Top 10</span>
-                            <div id="chart-pack"></div>
+                            <span class="header-txt-chart">Top 10 Attribute Type</span>
+                            <div id="chart-pack" style="height: 251px"></div>
                         </div>
                     </div>
                 </div>
@@ -250,7 +250,7 @@ Highcharts.setOptions({
     var chart = new Highcharts.chart('chart-pack', {
         chart: {
             type: 'bar',
-            height: '250px'
+            height: '251px'
         },
         title: {
             text: null

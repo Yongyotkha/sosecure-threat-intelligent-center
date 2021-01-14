@@ -2211,6 +2211,40 @@ ul.topics-news-list li a:hover{
     border-bottom: 2px solid #e6e3e3; */
 }
 
+.card-dash-compro{
+    background-color: #f3f3f3;
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    min-height: 224px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.name-dash-text-compro{
+    margin: 10px !important;
+    font-size: 32px !important;
+}
+
+.h-chart{
+    height: 207px;
+    overflow: hidden;
+}
+.h-chart-vuln{
+    height: 135px;
+    overflow: hidden;
+}
+
+.cl-orange{
+    color: #f7a35c;
+}
+
+.h-table{
+    max-height:207px;
+    min-height: 207px;
+    overflow: auto;
+}
+
 .name-dash-text{
     margin-top: 10px !important;
     margin-bottom:0 !important;
@@ -3019,7 +3053,7 @@ input.input-login:focus {
     background: #fff;
     padding: 1rem;
     border: 1px solid #eee;
-    height: 125px;
+    height: 155px;
 }
 
 .header-ev{
@@ -3031,7 +3065,7 @@ input.input-login:focus {
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 1rem;
-    padding: 1rem;
+    padding: 1.2rem;
     display: inline-block;
 }
 
@@ -3042,6 +3076,8 @@ input.input-login:focus {
 .ev-left,
 .ev-right{
     flex: 1;
+    background: #e1ebff87;
+    padding: 1rem;
 }
 .ev-left{
     border-right: 1px solid #eee;
