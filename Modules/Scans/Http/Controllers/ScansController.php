@@ -511,6 +511,7 @@ class ScansController extends Controller
 
     public function scans_assets_edit_modal($id, $code){
         $Assets = Assets::where('code',$id)->first();
+        $data['AssetsData'] = AssetsData::where('asset_id',$Assets->id)->get();
         $data['scans'] = $Assets;
         $data['code'] = $code;
         $data['DataTypes'] = DataTypes::all();

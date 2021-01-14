@@ -329,6 +329,11 @@
             toastr.error(errorsHtml, '@langapp('response_status')');
         });
     }
+
+    function delete_assets_manual(c){
+         $('#rows_manual_' + c).remove();
+    }
+
 </script>
 
 
