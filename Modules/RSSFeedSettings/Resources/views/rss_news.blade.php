@@ -13,7 +13,7 @@
                     <section id="setting-nav" class="hidden-xs">
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li class="active">
-                                <a href="{{route('rssfeedsettings.rss_data')}}">
+                                <a href="{{route('rssfeedsettings.news')}}">
                                     @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     News
                                 </a>
@@ -61,7 +61,7 @@
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
 
-                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
                         <span>@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
         
