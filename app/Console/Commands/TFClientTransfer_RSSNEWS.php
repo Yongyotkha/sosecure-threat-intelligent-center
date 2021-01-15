@@ -6,14 +6,15 @@ use Illuminate\Console\Command;
 use Exception;
 use GuzzleHttp\Client as HttpClient;
 use DB;
-class ClientTransferRSSNEWS extends Command
+use App\DataScans;
+class TFClientTransfer_RSSNEWS extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:ClientTransferRSSNEWS';
+    protected $signature = 'app:TFClientTransferRSSNEWS';
 
     /**
      * The console command description.
@@ -25,6 +26,7 @@ class ClientTransferRSSNEWS extends Command
     private $site_id = 49;
     private $url = 'http://127.0.0.2/api/v1/client-transfer/rss_news';
     private $tbName = 'fx_r_s_s_news';
+
     /**
      * Create a new command instance.
      */

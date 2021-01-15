@@ -88,22 +88,22 @@ class MDMISPXMLrunXMLLLDown extends Command
         //$dir_folder = "127.0.0.1" . "\\Newfolder\\otx_export2\\";
         if (is_dir($dir_folder)) {
             if ($dh = opendir($dir_folder)) {
-                    // $start = 667-1;
-                    // $stop = 700+1;
-                    $start = 1-1;
-                    $stop = 2000+1;
-                    $loop = 0;
-                    // rematch 0-300
+                // $start = 667-1;
+                // $stop = 700+1;
+                $start = 1 - 1;
+                $stop = 2000 + 1;
+                $loop = 0;
+                // rematch 0-300
                 while (($file = readdir($dh)) !== false) {
                     if ($file != "." && $file != "..") {
                         $pieces = explode("_", $file)[1];
-                        $pieces = (int)(explode(".", $pieces)[0]);
+                        $pieces = (int) (explode(".", $pieces)[0]);
                         $this->info($pieces);
-                    if($pieces>$start&&$pieces<$stop){
-                        try {
-                            $dir_xmlfile = $dir_folder . $file;
-                            echo $dir_xmlfile;
-                            
+                        if ($pieces > $start && $pieces < $stop) {
+                            try {
+                                $dir_xmlfile = $dir_folder . $file;
+                                echo $dir_xmlfile;
+
                                 $content = file_get_contents($dir_xmlfile);
                                 $xmlIndex = strpos($content, "<?xml");
                                 $content = substr($content, $xmlIndex);
@@ -125,7 +125,7 @@ class MDMISPXMLrunXMLLLDown extends Command
 
                                         $tag = array();
                                         foreach ($Event->getElementsByTagName('Tag') as $Tags) {
-                                            if($Tags->nodeValue){
+                                            if ($Tags->nodeValue) {
                                                 $tag[] = array('name' => $Tags->getElementsByTagName('name')->item(0)->nodeValue);
                                             }
                                         }
@@ -149,7 +149,7 @@ class MDMISPXMLrunXMLLLDown extends Command
                                         $relatedattribute = array();
 
                                         foreach ($Event->getElementsByTagName('Attribute') as $RelatedAttributes) {
-                                            if($RelatedAttributes->nodeValue){
+                                            if ($RelatedAttributes->nodeValue) {
                                                 $relatedattribute[] = array(
                                                     'type' => $RelatedAttributes->getElementsByTagName('type')->item(0)->nodeValue,
                                                     'value' => $RelatedAttributes->getElementsByTagName('value')->item(0)->nodeValue,
@@ -180,23 +180,25 @@ class MDMISPXMLrunXMLLLDown extends Command
                                         $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
                                         $countEvent = $this->saveRelatedEvent($item, $stamp_event_id, $stamp_indicator_id);
                                         $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent);
+                                        unlink($dir_xmlfile);
                                     } catch (Exception $e) {
                                         echo json_encode($e->getMessage());
                                     }
+
+                                    
                                 }
 
-                            
-
-                        } catch (Exception $e) {
-                            echo json_encode($e->getMessage());
+                            } catch (Exception $e) {
+                                echo json_encode($e->getMessage());
+                            }
                         }
+
+                        
+
+
                     }
 
-
                 }
-
-                }
-
 
                 $this->info("END");
                 closedir($dh);
