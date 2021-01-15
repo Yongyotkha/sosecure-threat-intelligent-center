@@ -47,17 +47,41 @@
                     {{-- <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
                     </button> --}}
-                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                        <span>@icon('solid/trash-alt') @langapp('delete')</span>
+
+                    <button type="button" id="btn_rss_setting" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs" value="">
+                        <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
                     </button>
+
+                    <a id="btn_client_view" href="{{site_url('/news_client')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
+                        <span><i class="fas fa-eye"></i> Client view</span>
+                    </a>
 
                     <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
         
-                    <a href="{{route('rssfeedsettings.rss_news_create_news')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle='ajaxModal'>
+                    <div class="btn-group pull-right" role="group" aria-label="Button group with nested dropdown">
+                        {{-- <button type="button" class="btn btn-secondary">1</button>
+                        <button type="button" class="btn btn-secondary">2</button> --}}
+                      
+                        <div class="btn-group" role="group">
+                          <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @icon('solid/plus') @langapp('add')
+                          </button>
+                          <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                            <a class="dropdown-item" href="{{route('rssfeedsettings.rss_news_create_news')}}" style="display: block;" data-toggle='ajaxModal'>Create News</a>
+                            <a class="dropdown-item" href="#" style="display: block;">RSS Feed</a>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                        <span>@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
+                    {{-- <a href="{{route('rssfeedsettings.rss_news_create_news')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle='ajaxModal'>
                         @icon('solid/plus') @langapp('add')
-                    </a>
+                    </a> --}}
               
                 </header>
 
