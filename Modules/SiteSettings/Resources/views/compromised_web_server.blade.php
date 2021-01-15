@@ -1,7 +1,18 @@
 @extends('layouts.app')
 @section('content')
 
+<style>
+    .block {
+  display: block;
+  width: 100%;
+  border: none;
 
+
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+</style>
 <section id="content" class="bg">
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r">
@@ -174,6 +185,17 @@
             </div>
             <div class="modal-body">
                 <form onsubmit="add_asset_click()">
+                    
+                    <div class="form-group row">
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
+                                class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <select id="os" class="form-control check_test_select" required>
+                                <option selected value="Linux">Linux</option>
+                                <option value="Windows">Windows</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span
                                 class="text-danger">*</span> </label>
@@ -188,7 +210,7 @@
                             <input type="text" id="port" class="form-control check_test" required>
                         </div>
                     </div>
-                    <div class="form-group row">
+                    {{-- <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">User <span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
@@ -201,27 +223,30 @@
                         <div class="col-lg-8">
                             <input type="text" id="password" class="form-control check_test" required>
                         </div>
-                    </div>
-
+                    </div> --}}
 
                     <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">User & Password<span
                                 class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <select id="os" class="form-control check_test_select" required>
-                                <option selected value="Linux">Linux</option>
-                                <option value="Windows">Windows</option>
+                        <div class="col-lg-6">
+                            <select id="u_p" class="form-control check_test_select" required>
+         
                             </select>
+                            
                         </div>
+                        &nbsp;&nbsp;<button type="button" class="btn btn-{{ get_option('theme_color')  }}"
+                        onclick="new_credentials(1,'#area_modal_credentials')"><i class="fas fa-plus"></i>&nbsp; New</button>
                     </div>
+
+                    
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
                         <div class="col-lg-8">
-                            <button type="button" class="btn btn-{{ get_option('theme_color')  }}"
-                                onclick="test_data()">TEST</button>
+                            <button type="button" class="btn btn-{{ get_option('theme_color')  }} block"
+                                onclick="test_data()">Test Connection</button>
                         </div>
                     </div>
-
+                    
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Root Path <span
                                 class="text-danger">*</span> </label>
@@ -307,6 +332,8 @@
 
 
 </section>
+{{-- 
+<div id='area_modal_credentials'></div> --}}
 
 @push('pagestyle')
 @include('stacks.css.datatables')
@@ -324,6 +351,7 @@
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
+@include('stacks.js.modal_create_credentials')
 <script>
     {{--$('form').each(function () {
             if ($(this).data('validator'))
@@ -390,7 +418,12 @@
         });
 
         $(".check_test_select").change(function() {
-
+            if($('#os').val()=='Linux'){
+                $("#port").val('22');
+            }else{
+                $("#port").val('445');
+            }
+            
             $('#button_save').prop("disabled", true);
 
         });
@@ -436,7 +469,11 @@
   
     });
 
-    
+    function new_credentials(id,area_html) {
+  
+        create_credentials(id,area_html);
+        $("#modal_create_credentials").css("display","block");    
+    }
 
 
     function add_asset_click() {

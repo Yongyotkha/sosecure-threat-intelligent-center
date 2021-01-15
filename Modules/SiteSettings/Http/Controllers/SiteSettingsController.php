@@ -18,6 +18,7 @@ use Modules\SiteSettings\Entities\Tags_site;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use App\CredentialsController;
 
 class SiteSettingsController extends Controller
 {
@@ -502,6 +503,75 @@ class SiteSettingsController extends Controller
     //     }
     //     abort(404);
     // }
+
+    public function modal_create_credentials(Request $request){
+
+
+        
+        $html='';
+        // $id=$request->id;
+        //     $credentials = Credentials::where('id',$id)->first();
+        // if($id){
+            
+        // }else{
+        //     $html='<div class="modal" id="myModal">
+        //     <div class="modal-dialog">
+        //       <div class="modal-content">
+          
+        //         <!-- Modal Header -->
+        //         <div class="modal-header">
+        //           <h4 class="modal-title">Modal Heading</h4>
+        //           <button type="button" class="close" data-dismiss="modal">&times;</button>
+        //         </div>
+          
+        //         <!-- Modal body -->
+        //         <div class="modal-body">
+        //           Modal body..
+        //         </div>
+          
+        //         <!-- Modal footer -->
+        //         <div class="modal-footer">
+        //           <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        //         </div>
+          
+        //       </div>
+        //     </div>
+        //   </div>';
+        // }
+        
+        $html='<div class="modal" id="myModal" >
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                
+                        
+                        <div class="modal-header">
+                        <h4 class="modal-title">Modal Heading</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                
+                        <div class="modal-body">
+                        Modal body..
+                        </div>
+
+                        <div class="modal-footer">
+                        <button type="button" id ="btn_close_md_cr" class="btn btn-danger" >Close</button>
+                        </div>
+                
+                    </div>
+                    </div>
+                </div>';
+
+    return ajaxResponse(
+        [
+            'html' => $html,
+            'message' => '',
+        ],
+        true,
+        Response::HTTP_OK
+    );
+
+
+    }
 
 
 

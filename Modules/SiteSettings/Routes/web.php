@@ -176,6 +176,8 @@ Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@g
 
 Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkweb_data_change_status')->name('DataLeakController.darkweb_data_change_status')->middleware('can:menu_items');
 
+Route::post('modal_create_credentials', 'SiteSettingsController@modal_create_credentials')->name('SiteSettingsController.modal_create_credentials')->middleware('can:menu_items');
+
 
 // Route::post('/webdefacement/detail/update_original', 'WebDefacementController@update_original')->name('webdefacement.update_original')->middleware('can:menu_items');
 // Route::post('/webdefacement/detail/update_image', 'WebDefacementController@update_image')->name('webdefacement.update_image')->middleware('can:menu_items');
