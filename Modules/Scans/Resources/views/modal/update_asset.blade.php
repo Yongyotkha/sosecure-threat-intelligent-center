@@ -28,10 +28,10 @@
             <div id="show_asets_manual" class="row">
                 <div class="col-md-12">
                     <table class="table table-bordered asset-table-manual-0">
-                        <tbody id="assets_show_${number_tbody_rows}">
-                            @if ($AssetsData)
+                        <tbody id="assets_show_${number_tbody_rows}" class='test'>
+                            {{-- @if ($AssetsData)
                                 @foreach ($AssetsData as $keyin => $Data)
-                            <tr id="rows_manual_${number_add_rows}">
+                            <tr id="rows_manual_${number_add_rows}" >
                                 @if ($keyin==0)
                                     <td>
                                         <input type="text" name="assets_manual[]" value="{{@$scans->raw_data}}"  class="form-control">
@@ -49,24 +49,23 @@
                                         data-raw_data_manual="${0}" value="{{@$Data->value}}">
                                 </td>
                                    
-                                <td>
-                                    <select name="data_type_manual[]" class="select2 form-control">
-                                        {{-- @if ($DataTypes)
-                                        
+                                <td >
+                                      <select name="data_type_manual[]" class="select2 form-control">
+                                     
+                                         @if(is_array($DataTypes) || is_object($DataTypes)) 
                                         @foreach ($DataTypes as $DataTypes)
-                                        <option value="{{@$DataTypes->id}}">{{@$DataTypes->value}} 
+                                        <option value="{{@$DataTypes->id}}" {{$AssetsData->data_type_id == $DataTypes->id ? 'selected' : ''}}>{{@$DataTypes->value}} 
                                         </option>
                                         @endforeach
-
-                                        @endif --}}
-                                    </select>
-                                   
+                                        @endif 
+                                    
+                                    </select>  
 
                                 </td>
                                 
                             </tr>
                             @endforeach
-                            @endif
+                            @endif --}}
                         </tbody>
                     </table>
                 </div>
@@ -101,8 +100,41 @@
 
 
     <script>
+        $(document).ready(function () {
 
-        console.log({{$AssetsData}});
+            loading('load');
+            axios.get('/scans/get_data_type')
+            .then(function (response) {
+                loading('stop_load');
+                 var html = ``;
+                 let result = response.data;
+                 for(var i = 0;i<=@json($AssetsData).length;++i){
+                if(@json($AssetsData)[i]!=undefined){
+                    console.log(@json($AssetsData)[i]['data_type_id'])
+                }
+                     
+            }  
+                        html += `
+                                    
+                                        <select name="data_type_manual[]" class="select2 form-control">`;
+                                        base_datatype = result.data_type;
+                                        for(let b in result.data_type){
+                                            const data_type = result.data_type[b];
+                                            html += `<option value="${data_type.id}" ${data_type.id == 5 ? 'selected' : ''} data-raw_data_manual="${0}">${data_type.value}</option>`;
+                                        }
+                                    html += `</select>`;
+                   
+                     
+                $('.test').html(html);
+            }).catch(function (error) {
+                loading('stop_load');
+                var errors = error;
+                var errorsHtml = "";
+                errorsHtml += "<li>" + errors + "</li>";
+                toastr.error(errorsHtml, '@langapp('response_status')');
+            });
+
+        
         var form_save = '.formSaving';
         $('.ajaxifyForm_custom').submit(function (event) {
             event.preventDefault();
@@ -143,7 +175,7 @@
          
              
         });
-
+    });
        
     </script>
     @endpush
