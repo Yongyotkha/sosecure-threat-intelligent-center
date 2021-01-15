@@ -2,20 +2,17 @@
 @section('content')
 <section id="content" class="bg">
     <section class="hbox stretch">      
-        <aside id="hide-settings" class="aside aside-md b-r">
+        <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_site')
                     </section>
-                </div>
                 </section>
             </section>
         </aside>
@@ -26,7 +23,7 @@
                     {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                     @icon('solid/arrow-left')
                     </a> --}}
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
                     <div class="bc-head">@langapp('settings') > Indicators Logs</div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                         title="@langapp('export') CSV">

@@ -2,27 +2,24 @@
 @section('content')
 <section id="content" class="bg">
     <section class="hbox stretch">      
-        <aside id="hide-settings" class="aside aside-md b-r">
+        <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_site')
                     </section>
-                </div>
                 </section>
             </section>
         </aside>
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display: none">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
                     <div class="bc-head"> Credentials </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -30,8 +27,8 @@
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>Add Credentials</span>
+                    <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#add-credentials">
+                        <span>@icon('solid/plus') Add</span>
                      </button>
                 </header>
                 <section class="scrollable wrapper">
@@ -54,6 +51,7 @@
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
+                                            <th>Name</th>
                                             <th>User</th>
                                             <th>Password</th>
                                             <th>Reference</th>
@@ -73,6 +71,68 @@
             </section>
         </aside>
     </section>
+
+    <div class="modal in fixed-left" id="add-credentials" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Confirm Information
+                    </h4>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" name="name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">User <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" name="" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Password <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="password" name="" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Reference <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" name="" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label">Status </label>
+                        <div class="col-lg-8">
+                            <label class="switch">
+                                <input type="checkbox" name="status" checked value="TRUE">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-info btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')

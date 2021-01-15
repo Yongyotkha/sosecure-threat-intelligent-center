@@ -2,28 +2,24 @@
 @section('content')
 <section id="content" class="bg">
     <section class="hbox stretch">      
-        <aside id="hide-settings" class="aside aside-md b-r">
+        <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px">
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_site')
                     </section>
-                </div>
                 </section>
             </section>
         </aside>
         <aside>
             <section class="vbox">
-    
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
                     <div class="bc-head">Settings > Keyword </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -32,7 +28,7 @@
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <a href="{{route('keyword.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
-                        @icon('solid/plus') @langapp('create')
+                        @icon('solid/plus') @langapp('add')
                     </a>
                 </header>
                 <section class="scrollable wrapper">
