@@ -1,0 +1,155 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Exception;
+use GuzzleHttp\Client as HttpClient;
+use DB;
+use App\Entities\CompromisedFileCheck as MainTB;
+use App\Entities\Transaction_center_compromised_files_check as SubTB;
+
+class TFCenterTransfer_Compromised_Server extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'app:TFCenterTransfer_Compromised_Server';
+    protected $description = 'TFCenterTransfer_Compromised_Server';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    
+    private $urlLimit = 3;
+    private $url = 'http://127.0.0.2/api/v1/centerinto-transfer/insertToNoRef';
+    private $pathApi = 'insertTo';
+    private $ip = '127.0.0.1';
+    private $mac = 'abcd';
+    private $header ='header';
+    private $dbName = 'dummyDatabase';
+    private $site_code = '';
+    private $site_mode = '';
+    private $insertToTB = 'fx_transaction_center_compromised_files_check';
+    /**
+     * Create a new command instance.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->site_code = config('app.site_code');
+        $this->site_mode = config('app.mode');
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $ip = $this->ip;
+        $mac = $this->mac;
+        $header = $this->header;
+        $tableData = new SubTB;
+        $tableData->setConnection($this->dbName);
+        $tableData = $tableData->where('status',1)->where('transaction_data_status',1)->with('get_transfer')->orderBy('id','asc')->get()->toArray();
+        // print_r($tableData);
+
+        if(!$tableData){
+            //nodata
+        }else{
+            //insert Center
+            $dataEncode = encrypt_decrypt('encrypt', $this->site_code , $header,$ip,$mac);
+            $passBody = [
+                'site_code_en' => $dataEncode,
+                'queryData' => $tableData,
+                'tbName' => $this->insertToTB
+            ];
+
+            $httpData = $this->reconnnect($this->url,$passBody,$this->urlLimit);
+            print_r($httpData);
+            // echo json_encode($httpData);
+            if($httpData["success"]){
+
+
+            }else{
+
+                
+            }
+            // if($httpData["success"]){
+            //     $returnData = json_decode($httpData["result"],true);
+            //     if($returnData["connect"]){
+            //         if(!empty($returnData["result"])){
+            //             $dataBase = DB::connection('dummyDatabase');
+            //             foreach ($returnData["result"] as $value) {
+            //                 $dataBase = $dataBase->select('select * from '.$this->tbName.' WHERE center_id = "'.$value["news_id"].'" limit 1');
+                            
+            //                 if($value["transaction_mode"]=='insert'||$value["transaction_mode"]=='update'){
+            //                     if(empty($dataBase)){
+            //                         // DB::insert('insert into users (id, name) values (?, ?)', [1, 'Dayle']);
+            //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
+                                        
+            //                         }
+            //                     }else{
+            //                         // DB::update('update users set votes = 100 where name = ?', ['John']);
+            //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
+                                        
+            //                         }
+            //                     }
+            //                 }else if($value["transaction_mode"]=='delete'){
+                                
+
+            //                 }
+
+
+            //             }
+            //         }
+            //     }
+            // }
+            
+        }
+        
+    }
+
+    public function reconnnect($url,$passBody, $limit)
+    {
+        $_OTX_KEY = env("OTX_KEY", "");
+        $_clientHttp = new HttpClient;
+        $_reconnect = 0;
+        $_otxReconnect = true;
+        $_dataOut["result"] = null;
+        $_dataOut["success"] = false;
+        $_sleeptime = rand(0,2000);
+        while ($_otxReconnect && $_reconnect < $limit) {
+            try {
+                $_bodyData = $_clientHttp->request(
+                    'POST',
+                    $url,
+                    [
+                        'headers' => [
+                            'Accept' => 'application/json',
+                            'Content-type' => 'application/json',
+                        ],
+                        'delay' => $_sleeptime, //millisec == ms
+                        'timeout' => 59, //sec == 100sec
+                        'body' => json_encode($passBody)
+                    ]
+                )->getBody();
+                $_dataOut["result"] = json_decode($_bodyData,true);
+                $_dataOut["success"] = true;
+                $_otxReconnect = false;
+                //echo "  Pass : " . $_reconnect;
+            } catch (Exception $e) {
+                echo "  Fail : " . $e->getMessage();
+            }
+            $_reconnect++;
+        }
+        return $_dataOut;
+    }
+
+}

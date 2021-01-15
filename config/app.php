@@ -13,6 +13,8 @@ return [
      */
 
     'name'            => env('APP_NAME', 'WorkiceCRM'),
+    'mode' => env('APP_MODE', 'site_offline'),
+    'site_code' => env('SITE_CODE', 'null'),
 
     /*
     |--------------------------------------------------------------------------
