@@ -139,9 +139,23 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                         }
                                     }
 
+                                    $check_menu_active_langapp_valval = '';
+                                    $check_menu_active_langapp_val_last = '';
                                     if($menu_val->check_menu_active) {// check active
                                         if($menu_val->type_check_menu_active == 'langapp') {
-                                            $check_menu_active = langapp($menu_val->check_menu_active);
+                                            if($menu_val->check_menu_active) {
+                                                $check_menu_active_langapp_arr = explode(",",$menu_val->check_menu_active);
+                                                if(!empty($check_menu_active_langapp_arr)) {
+                                                    foreach($check_menu_active_langapp_arr as $check_menu_active_langapp_val) {
+                                                        $check_menu_active_langapp_valval .= langapp($check_menu_active_langapp_val).',';
+                                                    }
+                                                    // dd($check_menu_active_langapp_arr);
+                                                    $check_menu_active_langapp_val_last = rtrim($check_menu_active_langapp_valval,",");
+                                                }
+                                            }
+                                            
+                                            // dd($check_menu_active_langapp_val_last);
+                                            $check_menu_active = $check_menu_active_langapp_val_last;
                                             if($check_menu_active) {
                                                 $check_menu_active_arr = explode(",",$check_menu_active);
                                                 // if(count($check_menu_active_arr) > 0) {
@@ -215,8 +229,26 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                             }
 
                                             if($menu_sub_val->check_menu_active) {// check active
+
+                                                $check_menu_active_langapp_arr_sub ='';
+                                                $check_menu_active_langapp_valval_sub = '';
                                                 if($menu_sub_val->type_check_menu_active == 'langapp') {
-                                                    $check_menu_active_sub = langapp($menu_sub_val->check_menu_active);
+
+
+                                                    if($menu_val->check_menu_active) {
+                                                        $check_menu_active_langapp_arr_sub = explode(",",$menu_sub_val->check_menu_active);
+                                                        if(!empty($check_menu_active_langapp_arr_sub)) {
+                                                            foreach($check_menu_active_langapp_arr_sub as $check_menu_active_langapp_val_sub) {
+                                                                $check_menu_active_langapp_valval_sub .= langapp($check_menu_active_langapp_val_sub).',';
+                                                            }
+                                                            // dd($check_menu_active_langapp_arr_sub);
+                                                            $check_menu_active_langapp_val_last_sub = rtrim($check_menu_active_langapp_valval_sub,",");
+                                                        }
+                                                    }
+
+
+
+                                                    $check_menu_active_sub = $check_menu_active_langapp_val_last_sub;
                                                     if($check_menu_active_sub) {
                                                         $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
                                                         // if(count($check_menu_active_arr) > 0) {
@@ -225,6 +257,9 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                                         //     }
                                                         // }
                                                     }
+
+
+                                                    
 
                                                 } else if ($menu_sub_val->type_check_menu_active == '') {
                                                     $check_menu_active_sub = $menu_sub_val->check_menu_active;
