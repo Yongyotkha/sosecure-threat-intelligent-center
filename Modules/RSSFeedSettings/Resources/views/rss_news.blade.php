@@ -78,7 +78,7 @@
                                     <a href="{{route('rssfeedsettings.rss_news_create_news')}}"  data-toggle='ajaxModal'>
                                         Create News
                                     </a>
-                                    <a href="javascript:void(0)" id="btn_change_fix">
+                                    <a href="{{route('rssfeedsettings.rss_data')}}" id="">
                                         RSS Feed
                                     </a>
     
