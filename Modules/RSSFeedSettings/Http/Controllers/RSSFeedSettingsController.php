@@ -1501,7 +1501,7 @@ class RSSFeedSettingsController extends Controller
     public function rss_news()
     {
         // $data['page'] = langapp('rss_logs');
-        $data['page'] = 'news';
+        $data['page'] = langapp('news');
         // $data['Category'] = CategorySettings::where('active',1)->get();
         $data['category'] = CategorySettings::where('active',1)->get();
         return view('rssfeedsettings::rss_news')->with($data);
