@@ -7,8 +7,8 @@
                 {{  $scans->raw_data  }}</h4>
         </div>
 
-        {!! Form::open(['route' => ['scans_assets.scans_assets', "id" => $scans->id, "code" => $code], 'class'
-        => 'ajaxifyForm validator ajaxifyForm_custom', 'novalidate' => '', 'method' => 'POST', 'files' => true]) !!}
+        {{-- {!! Form::open(['route' => ['scans_assets.scans_assets', "id" => $scans->id, "code" => $code], 'class'
+        => 'ajaxifyForm validator ajaxifyForm_custom', 'novalidate' => '', 'method' => 'POST', 'files' => true]) !!} --}}
 
 
 
@@ -27,65 +27,77 @@
             </div>
             <div id="show_asets_manual" class="row">
                 <div class="col-md-12">
-                    <table class="table table-bordered asset-table-manual-0">
+                    <table class="table table-bordered asset-table-manual-0" id='table-data-assets'>
                         <tbody id="assets_show_${number_tbody_rows}" class='test'>
                             {{-- @if ($AssetsData)
                                 @foreach ($AssetsData as $keyin => $Data)
                             <tr id="rows_manual_${number_add_rows}" >
                                 @if ($keyin==0)
                                     <td>
-                                        <input type="text" name="assets_manual[]" value="{{@$scans->raw_data}}"  class="form-control">
-                                    </td>
-                                @else 
-                                    <td>
-                                        
-                                    </td>
-                                
-                                @endif
-                                <td>
-                                   
-                                    
-                                        <input type="text" name="raw_data_manual[]" class="form-control"
-                                        data-raw_data_manual="${0}" value="{{@$Data->value}}">
-                                </td>
-                                   
-                                <td >
-                                      <select name="data_type_manual[]" class="select2 form-control">
-                                     
-                                         @if(is_array($DataTypes) || is_object($DataTypes)) 
-                                        @foreach ($DataTypes as $DataTypes)
-                                        <option value="{{@$DataTypes->id}}" {{$AssetsData->data_type_id == $DataTypes->id ? 'selected' : ''}}>{{@$DataTypes->value}} 
-                                        </option>
-                                        @endforeach
-                                        @endif 
-                                    
-                                    </select>  
+                                        <input type="text" name="assets_manual[]" value="{{@$scans->raw_data}}"
+                            class="form-control">
+                            </td>
+                            @else
+                            <td>
 
-                                </td>
-                                
+                            </td>
+
+                            @endif
+                            <td>
+
+
+                                <input type="text" name="raw_data_manual[]" class="form-control"
+                                    data-raw_data_manual="${0}" value="{{@$Data->value}}">
+                            </td>
+
+                            <td>
+                                <select name="data_type_manual[]" class="select2 form-control">
+
+                                    @if(is_array($DataTypes) || is_object($DataTypes))
+                                    @foreach ($DataTypes as $DataTypes)
+                                    <option value="{{@$DataTypes->id}}"
+                                        {{$AssetsData->data_type_id == $DataTypes->id ? 'selected' : ''}}>
+                                        {{@$DataTypes->value}}
+                                    </option>
+                                    @endforeach
+                                    @endif
+
+                                </select>
+
+                            </td>
+
                             </tr>
                             @endforeach
                             @endif --}}
                         </tbody>
                     </table>
                 </div>
-                
-                <div class="text-right">
-                    <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row"
-                        onclick="add_assets_manual(0,${number_tbody_rows},0)">
+
+                <div class="text-right" id='add_referent'>
+                    {{-- <button type="button" class="btn btn-sm btn-info m-xs add-row" onclick="add(number_table_rows,number_tbody_rows,number_rows_data_manual)">
                         <span>@icon('solid/plus') Add Referent
-                    </button>
+                    </button> --}}
                 </div>
             </div>
             <div id="new_assets_show_${number_new_rows_assets}"></div>
 
-            <div class="modal-footer">
+            {{-- <div class="modal-footer">
 
                 {!! closeModalButton() !!}
                 {!! renderAjaxButton('ok') !!}
-    
+
             </div>
-            {!! Form::close() !!}
+            {!! Form::close() !!} --}}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                <i class="fas fa-times"></i>
+                Close
+            </button>
+            <button type="button" class="btn btn-info btn-rounded" onclick="save_assets_manual()">
+                <i class="fas fa-paper-plane"></i>
+                Save
+            </button>
         </div>
     </div>
 
@@ -100,39 +112,87 @@
 
 
     <script>
-        $(document).ready(function () {
+    var number_rows_data_manual = 0;
+    var number_rows = 0; 
+    var number_add_rows = 0;
+    var number_tbody_rows = 0;
+    var number_table_rows = 1;
+    var number_new_rows_assets = 0;
+    var base_datatype = []; 
+    var i = 0;
 
-            loading('load');
-            axios.get('/scans/get_data_type')
-            .then(function (response) {
-                loading('stop_load');
-                 var html = ``;
-                 let result = response.data;
-                 for(var i = 0;i<=@json($AssetsData).length;++i){
+
+
+    $(document).ready(function () {
+
+        loading('load');
+        axios.get('/scans/get_data_type')
+        .then(function (response) {
+            loading('stop_load');
+            var html = ``;
+            var html2 = ``;
+            let result = response.data;
+            for(i;i<=@json($AssetsData).length;++i){
+                
                 if(@json($AssetsData)[i]!=undefined){
-                    console.log(@json($AssetsData)[i]['data_type_id'])
+                
+        
+            
+                    html += `<tr id="rows_manual_${i}">
+                        <td>`;
+                        if(i==0){
+                            html += `
+                            <input type="hidden" id="domain_id_manual" class="form-control" value="{{ $site->domain_id }}">
+                            <input type="hidden" id="site_id_manual" class="form-control" value="{{ $site->site_id }}">
+                            <input type="text" name="assets_manual[]" data-raw_data_manual="${0}" value = "${@json($scans->raw_data)}" class="form-control">`;
+                        }else{
+                            html +='';
+                        }
+                            
+                        html += `</td>
+                        <td>
+                            <input type="text" name="raw_data_manual[]" class="form-control" value = "${@json($AssetsData)[i]['value']}" data-raw_data_manual="${0}">
+                        </td>
+                        <td>
+                            <select name="data_type_manual[]" class="select2 form-control">`;
+                            base_datatype = result.data_type;
+                            for(let b in result.data_type){
+                                const data_type = result.data_type[b];
+                                html += `<option value="${data_type.id},${@json($AssetsData)[i]['id']}" ${data_type.id == @json($AssetsData)[i]['data_type_id'] ? 'selected' : ''}  data-raw_data_manual="${0}">${data_type.value}</option>`;
+                            }
+                            html += `</select>
+                        </td>
+                        <td>`;
+                            if(i==0){
+                            html += ``;
+                        }else{
+                            html += `<button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_assets_manual(${i})">
+                                        <span>@icon('solid/trash-alt')
+                                    </button>`;
+                        }
+                        
+                        html +=`</td>
+                        
+                    </tr>`;
                 }
-                     
-            }  
-                        html += `
-                                    
-                                        <select name="data_type_manual[]" class="select2 form-control">`;
-                                        base_datatype = result.data_type;
-                                        for(let b in result.data_type){
-                                            const data_type = result.data_type[b];
-                                            html += `<option value="${data_type.id}" ${data_type.id == 5 ? 'selected' : ''} data-raw_data_manual="${0}">${data_type.value}</option>`;
-                                        }
-                                    html += `</select>`;
-                   
-                     
-                $('.test').html(html);
-            }).catch(function (error) {
-                loading('stop_load');
-                var errors = error;
-                var errorsHtml = "";
-                errorsHtml += "<li>" + errors + "</li>";
-                toastr.error(errorsHtml, '@langapp('response_status')');
-            });
+                
+            }
+
+            html2 += `<button type="button"  class="btn btn-sm btn-info m-xs add-row"  value="Add Row" onclick="add_assets_manual(0,${number_tbody_rows},0)">
+                        <span>@icon('solid/plus')  Add Referent
+                    </button>`;  
+                    
+            $('.test').html(html);
+            $('#add_referent').html(html2);
+        }).catch(function (error) {
+            loading('stop_load');
+            var errors = error;
+            var errorsHtml = "";
+            errorsHtml += "<li>" + errors + "</li>";
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+
+     
 
         
         var form_save = '.formSaving';
@@ -176,6 +236,83 @@
              
         });
     });
+
+    function add_assets_manual(table_row, tbody_rows, rows_data_manual){
+
+        i++;
+        var markup = ``;
+        markup = `
+        <tr id="rows_manual_${i}">
+            <td></td>
+            <td>
+                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
+            </td>
+            <td>
+                <select name="data_type_manual[]" class="select2 form-control">`;
+                for(let b in base_datatype){
+                    const data_type = base_datatype[b];
+                    markup += `<option value="${data_type.id}," data-raw_data_manual="${rows_data_manual}">${data_type.value}</option>`;
+                }
+            markup += `</select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_assets_manual(${i})">
+                    <span>@icon('solid/trash-alt')
+                </button>
+            </td>
+        </tr>
+        `;
+        $('.test').append(markup);
+    }
+
+    function delete_assets_manual(c){
+         $('#rows_manual_' + c).remove();
+    }
+
+    function save_assets_manual(){
+        loading('load');
+        var values = $("input[name='assets_manual[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual'), 'domain_id' : $("#domain_id_manual").val() , 'site_id' : $("#site_id_manual").val()};
+        }).get();
+        var raw_data = $("input[name='raw_data_manual[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual')};
+        }).get();
+        var data_type = $("select[name='data_type_manual[]'] option:selected").map(function(){
+            return {'data_type' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual')};
+        }).get();   
+        var res = raw_data.map(function(v, i) {
+            if(data_type[i].raw_data_base == v.raw_data_base){
+                return {
+                    data_type: data_type[i].data_type,
+                    raw_data: v.raw_data,
+                    raw_data_base: v.raw_data_base
+                };
+            }
+        });
+        console.log(values);
+        console.log(res); 
+
+        axios.post('{{ route('scans_assets.scans_assets_edit') }}', {
+            code_assets:'{{ $code_asset }}',
+            code:'{{ $code }}',
+            assets: values,
+            assets_data: res,
+        }).then(function (response) {
+            loading('stop_load');
+            toastr.success(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+            {{-- $('#table-data-assets').DataTable().ajax.reload();
+            $('#asset-to-use').prop("disabled", true);
+            $('#show_asets_manual').html("");
+            $('#asset_to_use_manual').modal('hide');--}}
+        }).catch(function (error) {
+            loading('stop_load');
+            var errors = error;
+            var errorsHtml = "";
+            errorsHtml += "<li>" + errors + "</li>";
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
        
     </script>
     @endpush
