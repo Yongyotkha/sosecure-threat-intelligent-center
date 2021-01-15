@@ -8,7 +8,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3 text-elipse-setting">Name Domain</p>
+                        <p class="h3 text-elipse-setting">Compromise</p>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
@@ -31,6 +31,8 @@
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
+                     <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
+
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
@@ -103,6 +105,45 @@
                             </div>
                         </div>
                     </section>
+
+
+                    <div class="container-fluid" style="margin-bottom:10px;">
+                        <div class="row">
+                            <div class="col-md-4 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                        <span class="number-card warning" id='compromise-count'>0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                        <span class="number-card info"  id='darkweb-count'>0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/webserver.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Web Server</h3>
+                                        <span class="number-card green"  id='webserver-count'>0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <section class="panel panel-default">
                         <header class="panel-heading font-bold panel-header-blue">

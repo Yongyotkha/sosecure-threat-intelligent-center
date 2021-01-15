@@ -971,6 +971,7 @@ return [
     'assets_vulnerability'                       => 'Assets Vulnerability',
     'assets_compromised'                         => 'Assets Compromised',
     'compromised_feed'                           => 'Compromised Feed',
+    'compromised_data'                           => 'Compromised Data',
     'vendor'                                     => 'Vendor',
     'edition'                                    => 'Edition',
     'site_ip'                                    => 'Site IP',
