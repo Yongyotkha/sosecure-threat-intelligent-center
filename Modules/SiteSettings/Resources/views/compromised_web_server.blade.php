@@ -545,7 +545,7 @@
 
         document.getElementById("status").checked = true;
         $("#ip").val('');
-        $("#port").val('');
+        $("#port").val('22');
         $("#user").val('');
         $("#password").val('');
         $("#root_path").val('');
