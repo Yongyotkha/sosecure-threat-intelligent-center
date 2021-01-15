@@ -152,7 +152,7 @@ class RegisterSiteController extends ApiController
                 $site->code_version = $data_key['code_version'];
                 $site->save();
                 
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'code' => $site->code, 'key' => $site->public_key]);
             } catch (\Exception $e) {
                 $response = array(
                     'status' => 0,
