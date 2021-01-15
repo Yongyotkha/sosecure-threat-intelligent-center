@@ -10,13 +10,11 @@
                     </a>
                      Site Setting > ธนาคารออมสิน | Scan Domain : baac.or.th
                 </div>
-                    
                 &nbsp;
 
             </header>
             <section class="scrollable wrapper bg-white" style="padding:0;">
                 <div class="sub-tab text-uc small m-b-sm">
-
                     <ul class="nav pro-nav-tabs nav-tabs-dashed">
                         <li class="{{ ($tab == 'overview') ? 'active' : '' }}">
                             <a href="{{ route('domain_detail.index', ['tab' => 'overview']) }}">

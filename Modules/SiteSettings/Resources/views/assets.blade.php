@@ -39,7 +39,7 @@
                     </button>
 
                     <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>@langapp('Search_Advance')</span>
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
 
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
