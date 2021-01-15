@@ -11,11 +11,9 @@
                     <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_data_compromised')
                     </section>
-                </div>
                 </section>
             </section>
         </aside>
