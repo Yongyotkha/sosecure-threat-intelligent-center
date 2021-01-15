@@ -137,6 +137,10 @@ class DataLeakController extends Controller
         $data['site'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
         $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
 
+        $data["webserver"] = 0;
+        $data["darkweb"] = 0;
+        $data["compromise"] = 0;
+
         $data['page'] = langapp('compromised_data');
         return view('sitesettings::darkweb-datas_all_site')->with($data);
     }
