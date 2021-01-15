@@ -242,7 +242,7 @@
 @include('stacks.js.form')
 @include('stacks.js.touchspin')
 @include('stacks.js.menusub')
-@include('stacks.js.hidesettings')
+@include('stacks.js.site_hidesettings')
 
 <script>
     $(document).ready(function () {

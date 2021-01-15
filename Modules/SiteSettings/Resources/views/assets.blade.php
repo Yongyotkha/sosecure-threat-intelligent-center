@@ -157,7 +157,7 @@
 @include('stacks.js.fullscreen')
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
-@include('stacks.js.hidesettings')
+@include('stacks.js.site_hidesettings')
 @include('stacks.js.advanced_search')
 
 

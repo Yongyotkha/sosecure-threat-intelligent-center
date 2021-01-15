@@ -33,7 +33,7 @@
                         Change Status
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>@langapp('Search_Advance')</span>
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
                 </header>
                 <section class="scrollable wrapper">
