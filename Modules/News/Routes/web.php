@@ -31,7 +31,7 @@ Route::group(
 Route::group(
 	['middleware' => 'web', 'prefix' => 'news_client'],
 	function () {
-		Route::get('/', 'NewsController@index')->name('news.index_client')->middleware('can:menu_items');
+		Route::get('/', 'NewsController@index_client')->name('news.index_client')->middleware('can:menu_items');
 		
 	}
 );
