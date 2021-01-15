@@ -3284,3 +3284,8 @@ input.input-login:focus {
     position: relative;
     font-weight: 700;
  }
+
+ .panel .table td, .panel .table th {
+    padding: 8px 8px !important;
+    border-top: 1px solid #f1f1f1;
+}
