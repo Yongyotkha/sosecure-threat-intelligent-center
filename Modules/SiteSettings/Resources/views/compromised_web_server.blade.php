@@ -25,10 +25,7 @@
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
                         style="margin-top: 0;display: none">@icon('solid/bars')</a>
                     <div class="bc-head">Web Server </div>
-                    <button id="add_asset" data-toggle="modal" data-target="#add_asset_modal"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>Add Asset</span>
-                    </button>
+              
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right"
                         value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
@@ -37,6 +34,10 @@
                     <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
                         data-toggle="modal" data-target="#change_status" disabled>
                         Change Status
+                    </button>
+                    <button id="add_asset" data-toggle="modal" data-target="#add_asset_modal"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span>@icon('solid/plus') Add</span>
                     </button>
                     {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
@@ -160,7 +161,7 @@
 
 <div class="modal in fixed-left" id="add_asset_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-aside" role="document">
+    <div class="modal-dialog modal-dialog-aside" role="document"></div>
         <div class="modal-content">
 
             <div class="modal-header bg-blue">
