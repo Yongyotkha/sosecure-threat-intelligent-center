@@ -11,7 +11,7 @@
 
             <a id="advance-search" href="#area_search"
                 class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span>@langapp('Search_Advance')</span>
+                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
             {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
