@@ -70,14 +70,23 @@
                         <button type="button" class="btn btn-secondary">2</button> --}}
                       
                         <div class="btn-group" role="group">
-                          <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @icon('solid/plus') @langapp('add')
-                          </button>
-                          <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                            <a class="dropdown-item" href="{{route('rssfeedsettings.rss_news_create_news')}}" style="display: block;" data-toggle='ajaxModal'>Create News</a>
-                            <a class="dropdown-item" href="#" style="display: block;">RSS Feed</a>
-                          </div>
+                            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle" data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-left">
+                                <li>
+                                    <a href="{{route('rssfeedsettings.rss_news_create_news')}}"  data-toggle='ajaxModal'>
+                                        Create News
+                                    </a>
+                                    <a href="javascript:void(0)" id="btn_change_fix">
+                                        RSS Feed
+                                    </a>
+    
+                                </li>
+                            </ul>
                         </div>
+
+                        
                     </div>
                       
                       
