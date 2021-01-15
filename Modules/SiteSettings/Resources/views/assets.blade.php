@@ -18,11 +18,9 @@
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_site')
                     </section>
-                </div>
                 </section>
             </section>
         </aside>
@@ -159,7 +157,7 @@
 @include('stacks.js.fullscreen')
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
-@include('stacks.js.hidesettings')
+@include('stacks.js.site_hidesettings')
 @include('stacks.js.advanced_search')
 
 

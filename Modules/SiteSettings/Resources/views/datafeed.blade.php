@@ -11,11 +11,9 @@
                     <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
-                    <div class="slim-scroll" data-color="#333333" data-disable-fade-out="true" data-distance="0" data-height="auto" data-size="3px"> 
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_data_dark')
                     </section>
-                </div>
                 </section>
             </section>
         </aside>
@@ -35,7 +33,7 @@
                         Change Status
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>@langapp('Search_Advance')</span>
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
                 </header>
                 <section class="scrollable wrapper">

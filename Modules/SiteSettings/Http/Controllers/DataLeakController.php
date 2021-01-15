@@ -75,7 +75,8 @@ class DataLeakController extends Controller
     {
         $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
         $data['DataLeakSocial'] = $DataLeakSocial;
-        $data['page'] = langapp('compromised_feed');
+        // $data['page'] = langapp('compromised_feed');
+        $data['page'] = 'Compromise Feed';
         return view('sitesettings::datafeed_darkweb')->with($data);
     }
 

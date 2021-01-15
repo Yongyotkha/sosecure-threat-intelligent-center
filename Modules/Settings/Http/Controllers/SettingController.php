@@ -144,7 +144,12 @@ class SettingController extends Controller
         $allowedSections = ['deals', 'email', 'estimate', 'field_builder', 'fields', 'general', 'invoice', 'clauses',
             'leads', 'menu', 'payments', 'support', 'currencies', 'system', 'theme', 'css', 'translations', 'commands', 'info'];
         $section         = in_array($section, $allowedSections) ? $section : 'general';
-        $data['page']    = $this->getPage();
+        if($section == 'general') {
+            $data['page']    = 'General';
+        } else {
+            $data['page']    = $this->getPage();
+        }
+        // $data['page']    = $this->getPage();
         $data['section'] = str_contains('{section', $section) ? 'general' : $section;
 
         return view('settings::index')->with($data);

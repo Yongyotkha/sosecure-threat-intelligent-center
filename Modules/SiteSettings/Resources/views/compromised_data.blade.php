@@ -2,11 +2,12 @@
 @section('content')
 <section id="content" class="bg">
     <section class="hbox stretch">      
-        <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
+        <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
+                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
@@ -19,7 +20,7 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                     <div class="bc-head"> Compromise Data </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -214,7 +215,7 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.menusub')
-@include('stacks.js.hidesettings')
+@include('stacks.js.site_hidesettings')
 @include('stacks.js.advanced_search')
 <script>
 

@@ -5,11 +5,12 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         
-        <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
+        <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
+                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                         <p class="h3 text-elipse-setting">Name Domain</p>
                 </header>
                 <section class="scrollable">
@@ -24,7 +25,7 @@
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting  &gt; {{ $siteSettings->name }}</div>
                 </header>
                 <section class="scrollable wrapper">
@@ -182,7 +183,7 @@
 @include('stacks.js.select2checkbox')
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
-@include('stacks.js.hidesettings')
+@include('stacks.js.site_hidesettings')
 @include('stacks.js.fullscreen')
 @include('stacks.js.cropple')
 {{-- var cropper_logo;
