@@ -12,10 +12,7 @@
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
-                        data-target="#setting-nav">@icon('solid/bars')
-                    </a>
-                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
                     <p class="h3 text-elipse-setting">Sub menu</p>
                 </header>
                 <section class="scrollable">
@@ -24,13 +21,11 @@
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li>
                                 <a href="{{route('rssfeedsettings.news')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     News
                                 </a>
                             </li>
                             <li class="active">
                                 <a href="{{route('rssfeedsettings.rss_data')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
                                     RSS Data
                                 </a>
                             </li>
@@ -53,7 +48,7 @@
                     {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                     @icon('solid/arrow-left')
                     </a> --}}
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
                     <div class="bc-head">@langapp('settings') > @langapp('rss_feed') Data</div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
                         title="@langapp('export') CSV">
@@ -65,7 +60,7 @@
                     </button>
 
                     <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>@langapp('Search_Advance')</span>
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         data-target="#rss_modal">

@@ -2,7 +2,7 @@
 
 return [
 
-    'Search_Advance'                            => 'Search Advance',
+    'Search_Advance'                            => 'Fillter',
     'Create_User'                               => 'Create User',
     'account_details'                            => 'Account Details',
     'activities'                                 => 'Activity Feed',
@@ -485,6 +485,7 @@ return [
     'braintree_merchant_account'                 => 'Merchant Account',
     'urgent'                                     => 'Urgent',
     'create'                                     => 'Create',
+    'add'                                        => 'Add',
     'refunded'                                   => 'Refunded',
     'refund_payment_warning'                     => 'This transaction will be marked as refunded',
     'transaction_refunded'                       => 'This transaction was marked as refunded',
