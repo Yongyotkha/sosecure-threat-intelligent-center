@@ -71,15 +71,10 @@
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                         <div class="col-sm-9 col-xs-12">
                                             <select id="source" class="select2-option form-control">
-                                                <option value="" selected>All</option>
-                                                @if ($source)
-
-                                                @foreach ($source as $source)
-                                                <option value="{{$source->id}}">{{$source->source}}
-                                                </option>
-                                                @endforeach
-                
-                                                @endif
+                                                <option value="" >All</option>
+                                                <option value="compromise" >Public</option>
+                                                <option value="darkweb" >Darkweb</option>
+                                                <option value="webserver" >Webserver</option>
                                             </select>
                                         </div>
                                     </div>
@@ -138,7 +133,7 @@
                                             <img src="{{asset('images/webserver.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Web Server</h3>
-                                        <span class="number-card green"  id='webserver-count'>0</span>
+                                        <span class="number-card green"  id='webserver-count'>{{$webserver}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -316,6 +311,7 @@
 
     $(function() {
         table_social_data();
+        get_count();
     });
 
     function search(){
@@ -327,6 +323,45 @@
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         
         table_social_data();
+        get_count();
+    }
+
+    function get_count() {
+
+        $.ajax({
+            type:"POST",
+            url:'{!! site_url('darkweb/count_val') !!}',
+            data: function ( d ) {
+                        d.keywords = keywords;
+                        d.site = site;
+                        d.social = source;
+                        d.search_val = search_val;
+                        d.startDate = startDate;
+                        d.endDate = endDate;
+                        d.isDateSearch = isDateSearch;
+
+                        return d;
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                $('#darkweb-count').text(response.darkweb);
+                $('#compromise-count').text(response.compromise);
+                $('#webserver-count').text(response.webserver);
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        
+        });
     }
 
 

@@ -67,7 +67,7 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_data()
     {
-        $data['page'] = "rss data";
+        $data['page'] = langapp('rss_data');
         return view('rssfeedsettings::rss_data')->with($data);
     }
 

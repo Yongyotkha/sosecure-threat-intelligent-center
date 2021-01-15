@@ -954,6 +954,7 @@ return [
     'site_settings'                              => 'Sites',
     'rss_feed_settings'                          => 'RSS Feed Settings',
     'rss_feed'                                   => 'RSS',
+    'rss_data'                                   => 'RSS Data',
     'manage_assets'                              => 'Manage Assets',
     'manage_customers'                           => 'Manage Customers',
     'manage_users'                               => 'Manage Users',
