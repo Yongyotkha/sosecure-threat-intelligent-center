@@ -28,6 +28,6 @@ Route::group(
         Route::delete('f_scans_assets_delete/{id}/{code}', 'ScansController@f_scans_assets_delete')->name('f_scans_assets.delete');
         Route::put('scan/redo_process/{code}', 'ScansController@redo_process')->name('scans.redo_process');
         Route::get('scans_assets_edit_modal/{id}/{code}', 'ScansController@scans_assets_edit_modal')->name('scans_assets.scans_assets_edit_modal');
-        Route::get('scans_assets_edit/{id}/{code}', 'ScansController@scans_assets_edit')->name('scans_assets.scans_assets');
+        Route::post('scans_assets_edit', 'ScansController@scans_assets_edit')->name('scans_assets.scans_assets_edit');
     }
 );
