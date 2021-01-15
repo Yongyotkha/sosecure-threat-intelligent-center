@@ -5,14 +5,19 @@
     <section id="content" class="m-t-lg wrapper-md content">
         <div id="login-darken"></div>
         <div id="login-form" class="container aside-xxl animated fadeInUp">
-        <span class="navbar-brand block"> 
+        <!--<span class="navbar-brand block"> 
                 {{-- <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="img-responsive thumb-sm m-r-sm"> --}}
-                <img src="{{asset('images/logo_threat/logo.png')}}" class="m-r-sm" onerror="setDefaultPic(this)">
-        
-        </span>
+                <img src="{{asset('images/logo_threat/logo_site.png')}}" class="m-r-sm" onerror="setDefaultPic(this)">
+        </span>-->
 
         <section class="panel panel-default bg-white m-t-lg b-r-cust">
-            <header class="panel-heading text-center" style="height: 80px;"><strong></strong>{{get_option('company_name')}}</header>
+            <header class="panel-heading text-center" style="height: 80px;">
+                {{-- <strong>{{get_option('company_name')}}</strong> --}}
+                <span class="navbar-brand block" style="margin-top: 0px;"> 
+                    {{-- <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="img-responsive thumb-sm m-r-sm"> --}}
+                    <img src="{{asset('images/logo_threat/logo_site.png')}}" class="m-r-sm" onerror="setDefaultPic(this)">
+                </span>
+            </header>
                 
 
             {{-- <form class="panel-body wrapper-lg" method="POST" action=""> --}}
