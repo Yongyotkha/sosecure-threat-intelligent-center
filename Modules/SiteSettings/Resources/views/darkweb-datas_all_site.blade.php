@@ -1,5 +1,14 @@
 @extends('layouts.app')
 @section('content')
+
+@php
+    // dd(get_role_custom());
+    // dd($site_admin);
+    // dd(get_role_custom()['superadmin']);
+    // dd(get_role_custom()['site_admin']);
+
+@endphp
+
 <section id="content" class="bg">
     <section class="hbox stretch">      
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
@@ -20,7 +29,9 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    @endif
                     <div class="bc-head"> Compromise Data </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -36,14 +47,23 @@
                         </select>
                     </div>
 
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
-                     <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
 
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+                    
+                    @if(!empty(get_role_custom()))
+                      
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                        // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
+                        @endif
+                     
+                    @endif
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
@@ -267,6 +287,11 @@
     </div> --}}
 
 </section>
+@if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+    @php $admin = 1;  @endphp
+@else 
+    @php $admin = 0;  @endphp
+@endif
 
 @push('pagestyle')
     @include('stacks.css.datatables')
@@ -386,10 +411,18 @@
 
 
 
+        var admin = '{{$admin}}';
+        var visible_c = '';
+
+        if(admin == 1) {
+            visible_c = true;
+        } else {
+            visible_c = false;
+        }
+
 
     function table_social_data(){
 
-      
 
         $('#table_social_datas').DataTable({
                 pageLength: 50,
@@ -409,14 +442,13 @@
                         d.isDateSearch = isDateSearch;
 
                         return d;
-                },
                     },
+                },
             
                 initComplete : function( settings, json){
                     $('[data-toggle="tooltip"]').tooltip();
 
                     {{--console.log(json);--}}
-                
                     
                 },
                 createdRow: function ( row, data, index ) {
@@ -535,6 +567,7 @@
                         },
                     },
                     {
+                        visible: visible_c,
                         targets: 8,
                         width: '10px',
                         render: function (data, type, full, meta) {
