@@ -1,3 +1,16 @@
+<style>
+    .block {
+        display: block;
+        width: 100%;
+        border: none;
+
+
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+    }   
+</style>
+
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         <div class="modal-header">
@@ -14,6 +27,21 @@
             <div class="modal-body">
 
                 <input type="hidden" name="site" id="site_edit" value="{{@$CompromisedServer->site_id}}">
+
+                <div class="form-group row">
+                    <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span class="text-danger">*</span>
+                    </label>
+                    <div class="col-lg-8">
+                        <select name="os" id="os_edit" class="form-control check_test_select" required>
+                            <option value="Linux" {{ $CompromisedServer->os=='Linux'  ? 'selected="selected"' : "" }}>
+                                Linux
+                            </option>
+                            <option value="Windows"
+                                {{ $CompromisedServer->os=='Windows'  ? 'selected="selected"' : "" }}>
+                                Windows</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <label style="padding-top: 7px" class="col-lg-3 control-label">IP <span class="text-danger">*</span>
@@ -34,49 +62,21 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
-                    <label style="padding-top: 7px" class="col-lg-3 control-label">User <span
-                            class="text-danger">*</span>
-                    </label>
-                    <div class="col-lg-8">
-                        <input type="text" name="user" id="user_edit" class="form-control check_test"
-                            value="{{@$CompromisedServer->user}}" required>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label style="padding-top: 7px" class="col-lg-3 control-label">Password <span
-                            class="text-danger">*</span> </label>
-                    <div class="col-lg-8">
-                        <input type="text" name="password" id="password_edit" class="form-control check_test"
-                            value="{{@$CompromisedServer->password}}" required>
-                    </div>
-                </div>
 
 
-                <div class="form-group row">
-                    <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span class="text-danger">*</span>
-                    </label>
-                    <div class="col-lg-8">
-                        <select name="os" id="os_edit" class="form-control check_test_select" required>
-                            <option value="Linux" {{ $CompromisedServer->os=='Linux'  ? 'selected="selected"' : "" }}>
-                                Linux
-                            </option>
-                            <option value="Windows"
-                                {{ $CompromisedServer->os=='Windows'  ? 'selected="selected"' : "" }}>
-                                Windows</option>
-                        </select>
-                    </div>
-                </div>
+
 
 
 
                 <div class="form-group row">
                     <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
+                    
                     <div class="col-lg-8">
-                        <button type="button" class="btn btn-{{ get_option('theme_color')  }}"
-                            onclick="test_data_edit()">TEST</button>
+                        <button type="button" class="btn btn-{{ get_option('theme_color')  }} block"
+                            onclick="test_data_edit()">Test Connection</button>
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label style="padding-top: 7px" class="col-lg-3 control-label">Root Path <span
                             class="text-danger">*</span> </label>

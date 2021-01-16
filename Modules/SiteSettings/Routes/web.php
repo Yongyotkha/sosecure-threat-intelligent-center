@@ -109,8 +109,7 @@ Route::group(
     }
 );
 
-// credentials
-Route::get('/Credentials/{id}', 'CredentialsController@index')->name('credentials.index')->middleware('can:menu_items');
+
 
 Route::get('/WebDefacement-website/{id}', 'WebDefacementController@webdefacement_website')->name('webdefacement_website.index')->middleware('can:menu_items');
 Route::post('/WebDefacement-website/load_card_by_site', 'WebDefacementController@load_card_by_site')->name('webdefacement.load_card_by_site')->middleware('can:menu_items');
@@ -146,8 +145,8 @@ Route::post('/compromised_web_server/web_server_edit/{id}', 'DataLeakController@
 Route::post('/compromised_web_server/web_server_create', 'DataLeakController@web_server_create')->name('compromised_web_server.web_server_create')->middleware('can:menu_items');
 Route::post('/compromised_web_server/web_server_change_status', 'DataLeakController@web_server_change_status')->name('compromised_web_server.web_server_change_status')->middleware('can:menu_items');
 
-
 Route::post('/compromised_web_server_ip/checkwebserverIP', 'DataLeakController@checkWebserverIP')->name('compromised_web_server.checkWebserverIP')->middleware('can:menu_items');
+Route::post('/compromised_web_server/web_server_add_user', 'DataLeakController@web_server_add_user')->name('compromised_web_server.web_server_add_user')->middleware('can:menu_items');
 
 
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
@@ -178,6 +177,13 @@ Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkw
 
 Route::post('modal_create_credentials', 'SiteSettingsController@modal_create_credentials')->name('SiteSettingsController.modal_create_credentials')->middleware('can:menu_items');
 
-
+// credentials
+Route::get('/Credentials/{id}', 'CredentialsController@index')->name('credentials.index')->middleware('can:menu_items');
+Route::post('/Credentials/create_credentials', 'CredentialsController@create_credentials')->name('credentials.create_credentials')->middleware('can:menu_items');
+Route::post('/Credentials/table_credentials', 'CredentialsController@table_credentials')->name('credentials.table_credentials');
+Route::post('/Credentials/credentials_delete', 'CredentialsController@credentials_delete')->name('credentials.credentials_delete')->middleware('can:menu_items');
+Route::get('/Credentials/credentials_edit_modal/{code}', 'CredentialsController@credentials_edit_modal')->name('credentials.credentials_edit_modal')->middleware('can:menu_items');
+Route::post('/Credentials/credentials_edit', 'CredentialsController@credentials_edit')->name('credentials.credentials_edit')->middleware('can:menu_items');
+Route::post('/Credentials/credentials_change_status', 'CredentialsController@credentials_change_status')->name('credentials.credentials_change_status')->middleware('can:menu_items');
 // Route::post('/webdefacement/detail/update_original', 'WebDefacementController@update_original')->name('webdefacement.update_original')->middleware('can:menu_items');
 // Route::post('/webdefacement/detail/update_image', 'WebDefacementController@update_image')->name('webdefacement.update_image')->middleware('can:menu_items');

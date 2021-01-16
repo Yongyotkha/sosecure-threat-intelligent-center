@@ -19,6 +19,7 @@ use Modules\SiteSettings\Entities\Domain;
 use Modules\Scans\Entities\AssetsData;
 use phpseclib\Net\SSH2;
 use Exception;
+use App\Credentials;
 
 class DataLeakController extends Controller
 {
@@ -1558,6 +1559,9 @@ class DataLeakController extends Controller
         $data['DataLeakSocial'] = $DataLeakSocial;
         $data['siteID'] = $siteID->id;
         $data['page'] = 'Web Server';
+
+        $data['Credentials'] = Credentials::all();
+
         return view('sitesettings::compromised_web_server')->with($data);
     }
 
@@ -1862,6 +1866,34 @@ class DataLeakController extends Controller
             'message' => $message
         ];
         return response()->json($dataout); 
+    }
+
+    public function web_server_add_user(Request $request)
+    {
+         
+        $data = New Credentials;
+        $data->code = generator_uuid();
+        $data->site_id = $request->site;
+        $data->name = $request->name;
+        $data->user = $request->user;
+        $data->password = $request->password;
+        $data->status = 1;
+        $data->save();    
+
+        $code_site = SiteSettings::where("id", '=', $request->site)->first();
+
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'id'    => $data->id,
+                'name'  =>  $data->name,
+
+            ],
+            true,
+            Response::HTTP_OK
+        );
+        
     }
 
 }

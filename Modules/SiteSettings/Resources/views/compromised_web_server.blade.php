@@ -184,7 +184,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <form onsubmit="add_asset_click()">
+                <form onsubmit="add_asset_click()" method="POST">
                     
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
@@ -210,32 +210,70 @@
                             <input type="text" id="port" class="form-control check_test" required>
                         </div>
                     </div>
-                    {{-- <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">User <span
-                                class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" id="user" class="form-control check_test" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">Password <span
-                                class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" id="password" class="form-control check_test" required>
-                        </div>
-                    </div> --}}
 
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">User & Password<span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-6">
+
                             <select id="u_p" class="form-control check_test_select" required>
-         
+                                <option  value="">Choose an User</option>
+                                @if($Credentials)
+                                    @foreach ($Credentials as $item)
+                                    <option  value="{{@$item->id}}">{{@$item->name}}</option>
+                                    @endforeach
+                                @endif
                             </select>
                             
                         </div>
                         &nbsp;&nbsp;<button type="button" class="btn btn-{{ get_option('theme_color')  }}"
-                        onclick="new_credentials(1,'#area_modal_credentials')"><i class="fas fa-plus"></i>&nbsp; New</button>
+                        data-toggle="collapse" data-target="#demo" onclick="add_new()" ><i class="fas fa-plus"></i>&nbsp; New</button>
+                    </div>
+                    <div id="demo" class="collapse box">
+                        
+                        <fieldset class="collapsible">
+                        
+                            <legend>Add User</legend>
+                            <div class="form-group row">
+                                <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
+                                        class="text-danger">*</span> </label>
+                                <div class="col-lg-8">
+                                    <input type="text" id="name_new" class="form-control check_test" >
+                                    <span style="color:red;"><small id = "check_n"></small></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label style="padding-top: 7px" class="col-lg-3 control-label">User <span
+                                        class="text-danger">*</span> </label>
+                                <div class="col-lg-8">
+                                    <input type="text" id="user_new" class="form-control check_test" >
+                                    <span style="color:red;"><small id = "check_u"></small></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label style="padding-top: 7px" class="col-lg-3 control-label">Password <span
+                                        class="text-danger">*</span> </label>
+                                <div class="col-lg-8">
+                                    <input type="password" id="pass_new" class="form-control check_test" >
+                                    <span style="color:red;"><small id = "check_p"></small></span>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger btn-rounded" data-toggle="collapse" data-target="#demo" >
+                                    <i class="fas fa-times"></i>
+                                    Close
+                                </button>
+                                <button type="button" onclick="new_credentials()"
+                                    class="btn btn-info btn-rounded">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Save
+                                </button>
+                            </div>
+                            <hr>
+                        </fieldset>
+         
+
+                        
                     </div>
 
                     
@@ -269,7 +307,7 @@
                         <label class="col-lg-3 control-label">Status </label>
                         <div class="col-lg-8">
                             <label class="switch">
-                                <input type="checkbox" id="status" name="status" checked value="1">
+                                <input type="checkbox" id="status" name="status" checked value="1" >
                                 <span></span>
                             </label>
                         </div>
@@ -374,6 +412,10 @@
     var web_server_id_delete = null;
     var type = null;
 
+    var user_new = null;
+    var password_new = null;
+    var name_new = null;
+
 
 
 
@@ -416,6 +458,8 @@
             $('#button_save').prop("disabled", true);
 
         });
+
+        
 
         $(".check_test_select").change(function() {
             if($('#os').val()=='Linux'){
@@ -469,10 +513,98 @@
   
     });
 
-    function new_credentials(id,area_html) {
-  
-        create_credentials(id,area_html);
-        $("#modal_create_credentials").css("display","block");    
+    function add_new() {
+        $("#name_new").val('');
+        $("#user_new").val('');
+        $("#pass_new").val('');
+        $('#check_p').html('');
+        $('#check_u').html('');
+        $('#check_n').html('');
+        name_new = null;
+        user_new = null;
+        password_new = null;
+    }
+
+    $(function() {
+
+        $("#name_new").keypress(function() {
+
+            $('#check_n').html('');
+
+        });
+        $("#user_new").keypress(function() {
+
+            $('#check_u').html('');
+
+        });
+        $("#pass_new").keypress(function() {
+
+            $('#check_p').html('');
+
+        });
+
+    });
+
+    function new_credentials() {
+        name_new = $('#name_new').val();
+        user_new = $('#user_new').val();
+        password_new = $('#pass_new').val();
+
+    
+        if(name_new==''){
+            $('#check_n').html('Please fill out.');
+
+        }else if(user_new==''){
+            $('#check_u').html('Please fill out.');
+
+        }else if(password_new==''){
+            $('#check_p').html('Please fill out.');
+
+        }else{
+            $.ajax({
+                type:"POST",
+                url:"{{ route('compromised_web_server.web_server_add_user') }}",
+                data:{
+                    name:user_new,
+                    password:password_new,
+                    user:user_new,
+                    site:{!!json_encode($siteID)!!},
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) {
+                    var data = {
+                        id: response.id,
+                        text: response.name,
+                    };
+                    var newOption = new Option(data.text, data.id, false, false);
+                    $('#u_p').append(newOption).trigger('change');
+                    $('#u_p').val(data.id).trigger('change');
+                    $("div.box").collapse("hide");
+                    loading('stop_load');
+                    toastr.success(response.message, '@langapp('response_status')');
+
+
+
+                    
+                },
+                error: function (error){
+                    loading('stop_load');
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                }
+
+            });
+        }
+
+        
+
+        
     }
 
 

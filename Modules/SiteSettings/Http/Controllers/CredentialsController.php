@@ -5,7 +5,10 @@ namespace Modules\SiteSettings\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Yajra\DataTables\Facades\DataTables;
 use Modules\SiteSettings\Entities\SiteSettings;
+use App\Credentials;
+
 
 class CredentialsController extends Controller
 {
@@ -100,4 +103,126 @@ class CredentialsController extends Controller
     {
         //
     }
+
+    public function create_credentials(Request $request)
+    {
+        $data_search = Credentials::where("name", $request->name)->first();
+
+
+        if(!$data_search){
+            $data = new Credentials;
+            $data->code = generator_uuid();
+            $data->site_id = $request->site;
+            $data->name = $request->name;
+            $data->user = $request->user;
+            $data->password = $request->password;
+            $data->status = $request->check;
+            $data->save();
+            $message = langapp('changes_saved_successful');
+        }else{
+            $message = '';
+        }
+        
+
+        return ajaxResponse(
+            [
+                'message' => $message,
+                'redirect' => route('credentials.index', ['code' => $request->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function table_credentials(Request $request)
+    {
+        $model = Credentials::where('site_id',$request->site)->with('get_compromised_server');
+        $model->get();
+
+
+
+        return DataTables::of($model)->toJson();
+    }
+
+    public function credentials_change_status(Request $request)
+    {
+        // dd($request->active);
+
+
+        $DataLeakFeed = Credentials::where('id', $request->id)->first();
+        $DataLeakFeed->status = $request->active;
+        $DataLeakFeed->save();
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                // 'redirect' => route('socialdatas.index',['id' => $site_code->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function credentials_delete(Request $request)
+    {
+
+        // dd($request->id);
+        if($request->id_change){
+            
+            foreach($request->id_change as $id_change ){
+
+                $data = Credentials::where("id", $id_change )->delete();
+
+            }
+        }else{
+
+            Credentials::where("id", $request->id)->delete();
+
+        }
+
+
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+  
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
+    }
+
+    public function credentials_edit_modal($code)
+    {
+        $data['Credentials']=Credentials::where("code", $code)->first();
+        $data['code']=$code;
+        return view('sitesettings::modal.update_credentials')->with($data);
+    }
+
+    public function credentials_edit(Request $request)
+    {
+        
+        $data = Credentials::where("code", $request->code)->first();
+        $data->name = $request->name;
+        $data->user = $request->user;
+        $data->password = $request->password;
+        if($request->check){
+            $data->status = $request->check;
+        }
+        $data->save();
+
+        $code_site = SiteSettings::where("id", '=', $data->site_id)->first();
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('credentials.index', ['code' => $code_site->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
+    }
+    
 }
