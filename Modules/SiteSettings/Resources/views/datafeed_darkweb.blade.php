@@ -30,7 +30,7 @@
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled style="display: none;">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
+                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" onclick="change_status_compromised_feed()" disabled>
                         Change Status
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -157,18 +157,29 @@
                 <form action="">
                 <div class="modal-body">
                     <div class="form-group row">
-                        <label for="" class="col-md-3">Content</label>
+                        <div class="col-md-3">
+                            <label for="">Content</label>
+                        </div>
                         <div class="col-md-9">
-                            <textarea name="" class="form-control" id="" cols="30" rows="10"></textarea>
+                            <div id="show_content_compromise_feed"></div>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
-                            <select id="status_action" class="form-control select2">
+                            <select id="status_action_compromise_feed" class="form-control select2">
                                 <option value="1">Approved</option>
                                 <option value="2">Cancle</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group row sent_mail_compromise_feed_row">
+                        <label for="" class="col-md-3">Send Mail</label>
+                        <div class="col-md-9">
+                            <label>
+                                <input type="checkbox" name="sent_mail" id="sent_mail_compromise_feed" class="" value="true">
+                                <span class="label-text">Sent mail to customers</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -177,7 +188,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="button" onclick="change_status()" class="btn btn-info btn-rounded">
+                    <button type="button" onclick="confirm_compromised_feed()" class="btn btn-info btn-rounded">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>
@@ -280,7 +291,7 @@
 </section>
 
 @push('pagestyle')
-    {{-- @include('stacks.css.summernote') --}}
+    @include('stacks.css.summernote')
     @include('stacks.css.datatables')
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
@@ -296,7 +307,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
-{{-- @include('scripts.summernote') --}}
+@include('scripts.summernote')
 <script>
 
         {{--$('form').each(function () {
@@ -340,6 +351,125 @@
         }
     });
 
+    function change_status_compromised_feed(){
+        let value_id = [];
+        $('.data_feed_id:checked').each(function () {
+            value_id.push(this.value);
+        });
+        $('#show_content_compromise_feed').empty();
+        $.ajax({
+            type:"POST",
+            url:"{{ route('socialdatas.get_data_feed') }}",
+            data:({
+                id: value_id,
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                if(response.status_code == 200){
+                    if(response.data.length > 0){
+                        let html = ``;
+                        for(let i in response.data){
+                            const data = response.data[i];
+                            html += `
+                                <textarea name="" class="form-control content_compromise_feed" id="content_compromise_feed_${data.id}" cols="30" rows="10"></textarea>
+                                <br>
+                            `;
+                        }
+                        $('#show_content_compromise_feed').html(html);
+                        $('.content_compromise_feed').summernote();
+                        for(let i in response.data){
+                            const data = response.data[i];
+                            $('#content_compromise_feed_' + data.id).summernote(
+                                'code' , data.feedcontent,
+                            );
+                        }
+                    }
+                    $('#change_status').modal('show');
+                    let status_action = $('#status_action_compromise_feed :selected').val();
+                    if(status_action == 1){
+                        $('#show_content_compromise_feed').show();
+                        $('.sent_mail_compromise_feed_row').show();
+                    }
+
+                    $('#status_action_compromise_feed').change(function(){
+                        if($(this).val() == 1){
+                            $('#show_content_compromise_feed').show();
+                            $('.sent_mail_compromise_feed_row').show();
+                        }else{
+                            $('#show_content_compromise_feed').hide();
+                            $('.sent_mail_compromise_feed_row').hide();
+                        }
+                        
+                    })
+
+                }else{
+
+                }
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
+    function confirm_compromised_feed(){
+        let value_id = [];
+        $('.data_feed_id:checked').each(function () {
+            value_id.push(this.value);
+        });
+
+        let content = [];
+        $('.content_compromise_feed').each(function () {
+            content.push($(this).val());
+        });
+
+        let sent_mail = 0;
+        if ($("#sent_mail_compromise_feed").is(':checked')) {
+            sent_mail = 1;
+        }
+
+        let status_action = $('#status_action_compromise_feed :selected').val();
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('socialdatas.approve_compromised_feed') }}",
+            data:({
+                id: value_id,
+                content: content,
+                status_action: status_action,
+                sent_mail: sent_mail
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                table_social_data();
+                $('#status_action_compromise_feed').val(1).change();
+                $('#sent_mail_compromise_feed').prop('checked', false);
+                $('#change_status').modal('hide');
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
 
 $(function() {
     table_social_data();
