@@ -15,6 +15,8 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Entities\CompromisedServer;
 use Modules\Scans\Entities\Assets;
 use Auth;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\Scans\Entities\AssetsData;
 use phpseclib\Net\SSH2;
@@ -134,7 +136,36 @@ class DataLeakController extends Controller
     {
         //    $get_data = $this->siteSettings->get_data($id);
         //    $data['siteSettings'] = $get_data;
-        $data['site'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+        
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+        
+        
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        $data['SiteSettings'] = $SiteSettings;
+
         $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
 
         $data["webserver"] = 0;
@@ -485,11 +516,14 @@ class DataLeakController extends Controller
         $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
         $where = ['deleted_at' => null];
         $orwhere = ['deleted_at' => null, 'feel_type' => 'compromise'];
+        $orwhere2 = ['deleted_at' => null, 'feel_type' => 'webserver'];
+        $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
 
         if ($request->search_val == 'true') {
 
             // $model = DataLeakFeed::where($where);
             $model = DataLeakSocialRef::where('deleted_at', null)->with('get_site')->with('get_data_leak_feed_one');
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
 
             // if($request -> keywords){
             //     $model = $model->where('source_name', 'LIKE', '%'.$request -> keywords.'%');
@@ -500,18 +534,22 @@ class DataLeakController extends Controller
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
                 $model = $model->where('keyword', 'LIKE', '%' . $request->keywords . '%');
                 // });
+                $countGroupBy = $countGroupBy->where('keyword', 'LIKE', '%' . $request->keywords . '%');
 
             }
 
             if ($request->source) {
-                $model = $model->whereHas('get_data_leak_feed_one', function ($qq) use ($request) {
-                    $qq->where('sourceid', $request->source);
-                });
+                $model = $model-> where('feel_type', '=' ,$request -> source);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> source);
+            } else {
+                $model = $model->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+                $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
             }
 
             if ($request->site) {
+                $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
-                $model = $model->where('site_id', $request->site);
+                $model = $model->where('site_id', $SiteSettings->id);
                 // });
             }
 
@@ -544,10 +582,12 @@ class DataLeakController extends Controller
                 });
             }
 
-            $model->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere) {
-                $q->where($where1);
-                $q->orwhere($orwhere);
-            });
+            // $model->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere, $orwhere2, $orwhere3) {
+            //     $q->where($where1);
+            //     $q->orwhere($orwhere);
+            //     $q->orwhere($orwhere2);
+            //     $q->orwhere($orwhere3);
+            // });
 
             $model->orderBy('id', 'desc');
         } else {
@@ -556,14 +596,16 @@ class DataLeakController extends Controller
             //                         $q->where($orwhere);
             //                     })->orderBy('id', 'desc')->with('get_social_ref');
 
-            $model = DataLeakSocialRef::where('deleted_at', null)
-                ->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere) {
-                    $q->where($where1);
-                    $q->orwhere($orwhere);
+            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server'])
+                ->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere, $orwhere2, $orwhere3) {
+                    // $q->where($where1);
+                    // $q->orwhere($orwhere);
+                    // $q->orwhere($orwhere2);
+                    // $q->orwhere($orwhere3);
                 })
                 ->with('get_site')->with('get_data_leak_feed_one');
 
-            $model->get();
+            $model->orderBy('id', 'desc')->get();
         }
 
         return DataTables::of($model)->toJson();
