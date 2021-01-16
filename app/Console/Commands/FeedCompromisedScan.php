@@ -196,7 +196,7 @@ class FeedCompromisedScan extends Command
 
                 $Transaction_center_compromised_files_check = new Transaction_center_data_leak_feed_temp;
                 $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $CompromisedFileCheck->id;
+                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakFeedCheck->id;
                 $Transaction_center_compromised_files_check -> transaction_mode = 'insert';
                 $Transaction_center_compromised_files_check -> transaction_data_status = 1;
                 $Transaction_center_compromised_files_check -> status = 1;
@@ -211,7 +211,7 @@ class FeedCompromisedScan extends Command
 
                 $Transaction_center_compromised_files_check = new Transaction_center_data_leak_feed_temp;
                 $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $CompromisedFileCheck->id;
+                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakFeedCheck->id;
                 $Transaction_center_compromised_files_check -> transaction_mode = 'update';
                 $Transaction_center_compromised_files_check -> transaction_data_status = 1;
                 $Transaction_center_compromised_files_check -> status = 1;
@@ -233,7 +233,7 @@ class FeedCompromisedScan extends Command
 
                 $Transaction_center_compromised_files_check = new Transaction_center_data_leak_socail_ref_temp;
                 $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $CompromisedFileCheck->id;
+                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakSocialRefCheck->id;
                 $Transaction_center_compromised_files_check -> transaction_mode = 'insert';
                 $Transaction_center_compromised_files_check -> transaction_data_status = 1;
                 $Transaction_center_compromised_files_check -> status = 1;
@@ -245,7 +245,7 @@ class FeedCompromisedScan extends Command
 
                 $Transaction_center_compromised_files_check = new Transaction_center_data_leak_socail_ref_temp;
                 $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $CompromisedFileCheck->id;
+                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakSocialRefCheck->id;
                 $Transaction_center_compromised_files_check -> transaction_mode = 'update';
                 $Transaction_center_compromised_files_check -> transaction_data_status = 1;
                 $Transaction_center_compromised_files_check -> status = 1;
