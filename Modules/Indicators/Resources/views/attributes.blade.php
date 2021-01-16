@@ -15,7 +15,7 @@
                 </div>
                 <a href="#" id="seach-advance" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive"
             title="Advance Search" data-placement="bottom">
-            <i class="fas fa-search"></i> Search
+            <i class="fas fa-search"></i> @langapp('apply')
             </a>
 
             </div> --}}
@@ -88,7 +88,7 @@
                             <label for="" class="d-block">&nbsp;</label>
                             <button class="btn btn-info" id="search_data">
                                 <i class="fas fa-search"></i>
-                                <span> Search </span>
+                                <span> @langapp('apply') </span>
                             </button>
                             <button class="btn btn-default" id="clear_data">
                                 <i class=" fas fa-broom"></i>

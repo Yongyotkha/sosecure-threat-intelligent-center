@@ -49,7 +49,7 @@
                         <div class="col-md-12 text-right">
                             <button class="btn btn-info" id="btn_search_data">
                                 <i class="fas fa-search"></i>
-                                <span> Search </span>
+                                <span> @langapp('apply') </span>
                             </button>
                             <button class="btn btn-default" id="btn_reset">
                                 <i class=" fas fa-broom"></i>

@@ -74,7 +74,7 @@
                         <div class="col-lg-12 text-right mt-2">
                             <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="search()">
                                 <i class="fas fa-search"></i>
-                                Search
+                                @langapp('apply')
                             </button>
                             <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" 
                             style="white-space: nowrap"  onclick="clear_search()">

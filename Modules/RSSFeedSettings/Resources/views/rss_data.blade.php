@@ -125,7 +125,7 @@
                                 <div class="col-lg-12 text-right">
                                     <button type="button" class="btn btn-info btn-responsive" onclick="search()">
                                         <i class="fas fa-search"></i>
-                                        Search
+                                        @langapp('apply')
                                     </button>
                                     <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>

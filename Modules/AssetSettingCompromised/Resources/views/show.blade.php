@@ -125,7 +125,7 @@
                                     <div class="btn-group">
                                         <button class="btn btn-info">
                                             <i class="fas fa-search"></i>
-                                            <span> Search </span>
+                                            <span> @langapp('apply') </span>
                                         </button>
                                         <button class="btn btn-default">
                                             <i class="fas fa-broom"></i>

@@ -1000,4 +1000,5 @@ return [
     'social_data'                               => 'Social Data',
     'darkweb_data'                              => 'Dark Web Data',
     'data_dark'                                 => 'Data Dark',
+    'apply'                                     => 'Apply',
 ];
