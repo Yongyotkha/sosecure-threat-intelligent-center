@@ -94,7 +94,7 @@
                                     <div class="card-ev-body">
                                         <div class="ev-left">
                                             <span>{{ @number_format($attr_all->event_count) }}</span>
-                                            <span>All</span>
+                                            <span class="ev-text-sec">All</span>
                                         </div>
                                         <div class="ev-right">
                                             <span class="cl-orange">{{ @number_format($attr_current->event_count) }}</span>
@@ -111,7 +111,7 @@
                                     <div class="card-ev-body">
                                         <div class="ev-left">
                                             <span>{{ @number_format($attr_all->attribute_count) }}</span>
-                                            <span>All</span>
+                                            <span class="ev-text-sec">All</span>
                                         </div>
                                         <div class="ev-right">
                                             <span class="cl-orange">{{ @number_format($attr_current->attribute_count) }}</span>

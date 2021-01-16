@@ -3135,26 +3135,32 @@ input.input-login:focus {
 .card-ev-body{
     display: flex;
     align-items: center;
+    flex-direction: row-reverse;
 }
 .ev-left,
 .ev-right{
     flex: 1;
-    /* background: #e1ebff87; */
     padding: 1rem;
 }
-.ev-left{
+.ev-right{
     border-right: 1px solid #eee;
 }
+
 .ev-left > span:first-child{
     font-size: 38px;
     font-weight: 700;
     height: 50px;
 }
-
-.ev-right > span:first-child{
-    font-size: 28px;
+.ev-left .ev-text-sec{
+    font-size: 22px !important;
     font-weight: 700;
     height: 50px;
+}
+
+.ev-right > span:first-child{
+    font-size: 18px;
+    font-weight: 700;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
