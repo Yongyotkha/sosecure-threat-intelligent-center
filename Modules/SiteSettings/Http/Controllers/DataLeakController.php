@@ -546,6 +546,34 @@ class DataLeakController extends Controller
                 $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
             }
 
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $model = $model->whereIn('site_id', $site_id_arr);
+            
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                 
+    
+                        } else {//not support and admin
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('status',1);
+            
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        }
+                    }
+                }
+            }
+
+
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
@@ -604,6 +632,35 @@ class DataLeakController extends Controller
                     // $q->orwhere($orwhere3);
                 })
                 ->with('get_site')->with('get_data_leak_feed_one');
+
+                if(Auth::check()) {
+
+                    $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                    if(Auth::user()->hasRole('admin')) {//if admin
+                        // dd(777);
+                        
+        
+                    } else { //if notAdmin
+                        // dd(888);
+                        if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                            if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                                // dd(99);
+        
+                                $model = $model->whereIn('site_id', $site_id_arr);
+                
+                                // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                     
+        
+                            } else {//not support and admin
+                                $model = $model->whereIn('site_id', $site_id_arr)->where('status',1);
+                
+                                // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                            }
+                        }
+                    }
+                }
+                        
+                   
 
             $model->orderBy('id', 'desc')->get();
         }
