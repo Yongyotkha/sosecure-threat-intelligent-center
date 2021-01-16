@@ -216,7 +216,7 @@
                     </div>
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
-                        <div class="col-lg-6">
+                        <div class="col-lg-9">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="port_web" id="port_web" value="80" required>
                                 <span class="input-group-btn">
@@ -226,15 +226,15 @@
                         </div>
                     </div>
 
+                    <button type="button" class="btn btn-link" id="btn_check_web">Check</button>  
+
                     <div id="area_check_message_row" class="form-group row" style="display: none;"><label class="col-lg-3 control-label"> </label>
                         <div class="col-lg-9">
-                            <div id="area_check_message">
-                               
-                            </div>
+                            <div id="area_check_message"></div>
                         </div>
                     </div>
 
-                    <div id="area_option" class="form-group row" style="display: none;">
+                    <div id="area_option" class="form-group row">
                         <label class="col-lg-3 control-label">Options</label>
                         <div class="col-sm-9">
                             <div class="checkbox">
@@ -480,7 +480,7 @@
                                                 </div>
                                             </div>
                                             <p>
-                                                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" expanded="false" aria-expanded="false" aria-controls="collapseExample">
+                                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseExample" expanded="false" aria-expanded="false" aria-controls="collapseExample">
                                                     View header
                                                 </button>
                                             </p>
