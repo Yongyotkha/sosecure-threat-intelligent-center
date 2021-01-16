@@ -2,40 +2,84 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\TransactionClientNews;
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Api\ApiController;
+
 
 use phpseclib\Net\SSH2;
 use Exception;
 
+use Modules\SiteSettings\Entities\SiteSettings;
 
-class ApiTransferClients extends ApiController
+use App\TransactionClientNews;
+use App\R_s_s_news;
+
+class ApiTransferClients extends Controller
 {
-    protected function getTranfer_News(Request $request)
-    {
-        $TransactionClientNews = null;
-        $connect = null;
-        $ip = '127.0.0.1';
-        $mac = 'abcd';
-        $header ='header';
-        $dataEncode = $request->site_id;
-        $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header,$ip,$mac);
 
+    private $ip = '127.0.0.1';
+    private $mac = 'abcd';
+    private $header = 'header';
+    private $dbName = 'mysql';
+    private $center_site_id = '0';
+
+
+    protected function getTranferData(Request $request)
+    {
+        $ip = $this->ip;
+        $mac = $this->mac;
+        $header = $this->header;
+        $code = $request->site_code_en;
+
+        $TransactionClient = null;
+        $messageErr = '';
+        $connect = true;
+        $result = true;
+        
+        $dataEncode = $code;
+        $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
+        
         if($dataDecode){
-            $connect = true;
-            $dataJson = json_decode($dataDecode,true);
-            $site_id = $dataJson["site_id"];
-            $TransactionClientNews = TransactionClientNews::where('site_id',$site_id)->where('status',1)->where('transaction_data_status',1)->with('get_Transaction_client_news')->orderBy('id','asc')->get();
+            $site = SiteSettings::where('code', $dataDecode)->first();
+            if($site){
+                $nameTable = $request->tbName;
+                if ($nameTable == 'fx_transaction_client_news') {
+                    $model_getData = new TransactionClientNews;
+                } else if ($nameTable == 'fx_transaction_client_news2') {
+                    $model_getData = new TransactionClientNews;
+                } else {
+                    $connect = false;
+                    $result = false;
+                }
+                
+                if ($result == true) {
+                    $TransactionClient = new $model_getData;
+                    $TransactionClient->setConnection($this->dbName);
+                    $TransactionClient = $TransactionClient->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->with('get_transfer_client')->orderBy('id','asc')->get()->toArray();
+                    
+                    $updater = new $model_getData;
+                    $updater->setConnection($this->dbName);
+                    $updater->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->update(['transaction_data_status' => 2]);
+                }
+            }else{
+                $connect = false;
+                $result = false;
+            }
             // $TransactionClientNews = TransactionClientNews::where('site_id',$site_id)->where('status',1)->where('transaction_data_status',1)->with('get_Transaction_client_news')->get();
         }else{
             $connect = false;
+            $result = false;
         }
 
+        $site_center = $this->center_site_id;
         $dataout = [
             'connect' => $connect,
-            'result' => $TransactionClientNews,
+            'result' => $result,
+            'queryData' => $TransactionClient,
+            'site_code_en' => $site_center,
+            'messageErr' => $messageErr,
         ];
         return response()->json($dataout); 
     }
@@ -45,10 +89,8 @@ class ApiTransferClients extends ApiController
         $ip = '127.0.0.1';
         $mac = 'abcd';
         $header ='header';
-        $site = [
-            'site_id' => $request->site_id,
-        ];
-        $dataEncode = encrypt_decrypt('encrypt', json_encode($site), $header,$ip,$mac);
+        $site = $request->site_id;
+        $dataEncode = encrypt_decrypt('encrypt', $site, $header,$ip,$mac);
         // $dataEncode = encrypt_decrypt('decrypt', $dataEncode, $header,$ip,$mac);
         $dataout = [
             'connect' => true,
