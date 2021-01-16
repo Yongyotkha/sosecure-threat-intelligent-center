@@ -53,7 +53,7 @@ class FeedTransactionDailyIndicator extends Command
         $db = $conn->$db_name;
         $col1 = $db->fx_otx_events_indicator_ref;
         $filter = array('status' => 1); // where query
-        $records = $col1->find($filter, ['sort' => ['feedtimepost' => -1], 'limit' => 10]);
+        $records = $col1->find($filter, ['sort' => ['feedtimepost' => -1], 'limit' => 500]);
         $docs = $records->toArray();
 
         $filename = public_path("indicator/indicator.csv");
