@@ -161,7 +161,7 @@ class DataLeakController extends Controller
                 $site_email_alert = site_config_email_alert::where("site_id",$site_id)->get();
                 if($site_email_alert) {
                     foreach($site_email_alert as $site_email_alert_val) {
-                        Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail));
+                        Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail , 'compromised'));
                     }
                 }
             }
@@ -1196,7 +1196,8 @@ class DataLeakController extends Controller
 
         // dd($request->sent_mail);
         $sent_mail = $request->sent_mail;
-
+        $site_id = 0;
+        $DataLeakFeed_send_mail = [];
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request->id)->get();
         foreach ($DataLeakFeedTemps as $DataLeakFeedTemp) {
             $check_DataLeakFeed = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->first();
@@ -1217,6 +1218,8 @@ class DataLeakController extends Controller
                 $DataLeakFeed->status = 1;
                 $DataLeakFeed->save();
 
+                $DataLeakFeed_send_mail[] = $DataLeakFeed;
+
                 $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
                 if (!empty($leak_socail_ref_temp)) {
                     $DataLeakSocialRef = new DataLeakSocialRef;
@@ -1225,13 +1228,27 @@ class DataLeakController extends Controller
                     $DataLeakSocialRef->data_leak_feed_id = $DataLeakFeed->id;
                     $DataLeakSocialRef->site_id = $leak_socail_ref_temp->site_id;
                     $DataLeakSocialRef->keyword = $leak_socail_ref_temp->keyword;
+                    $DataLeakSocialRef->feel_type = $DataLeakFeedTemp->feed_type;
                     $DataLeakSocialRef->status = 1;
                     $DataLeakSocialRef->view = 0;
                     $DataLeakSocialRef->save();
+
+                    if($site_id == 0){
+                        $site_id = $leak_socail_ref_temp->site_id;
+                    }
                 }
 
                 $DataLeakFeedTemp->approve = 1;
                 $DataLeakFeedTemp->save();
+            }
+        }
+
+        if($this->request->sent_mail == 1){
+            $site_email_alert = site_config_email_alert::where("site_id",$site_id)->get();
+            if($site_email_alert) {
+                foreach($site_email_alert as $site_email_alert_val) {
+                    Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                }
             }
         }
 
