@@ -14,6 +14,13 @@
                 pull-right" data-toggle="modal" data-target="#create_key_modal">
                 @icon('solid/plus') @langapp('create')
                     </a> --}}
+                    
+                    @can('users_delete')
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">
+                            <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
+                                @langapp('delete')</span>
+                        </button>
+                    @endcan
 
                     @if(isAdmin() || can('settings'))
                         <a href="{{ route('sitesettings.create') }}"
@@ -23,12 +30,7 @@
                         </a>
                     @endcan
 
-                    @can('users_delete')
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">
-                            <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
-                                @langapp('delete')</span>
-                        </button>
-                    @endcan
+      
 
         </header>
         <section class="scrollable wrapper">

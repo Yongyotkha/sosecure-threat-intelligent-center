@@ -17,7 +17,7 @@ $current_locale = get_option('locale');
             {!! Form::open(['route' => ['settings.edit', $section], 'class' => 'bs-example form-horizontal ajaxifyForm']) !!}
             
             <div class="panel-body">
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">Purchase Code <span data-toggle="tooltip" title="Get your code from Envato">@icon('regular/question-circle')</span> @required</label>
                     <div class="col-lg-6">
                         <input type="text" name="purchase_code" class="form-control"
@@ -64,7 +64,7 @@ $current_locale = get_option('locale');
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('default_currency_symbol')  </label>
                     <div class="col-lg-6">
                         <select name="default_currency_symbol" class="form-control select2-option">
@@ -77,7 +77,7 @@ $current_locale = get_option('locale');
                     <span class="help-block m-b-none small text-danger">Overwritten by Client's Currency</span>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('thousand_separator')</label>
                     <div class="col-lg-6">
                         <select name="thousand_separator" class="form-control">
@@ -86,7 +86,7 @@ $current_locale = get_option('locale');
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('decimal_separator')</label>
                     <div class="col-lg-6">
                         <select name="decimal_separator" class="form-control">
@@ -108,7 +108,7 @@ $current_locale = get_option('locale');
                 </div>
                 
                 
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('tax') 1</label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control money" value="{{  get_option('default_tax')  }}"
@@ -116,7 +116,7 @@ $current_locale = get_option('locale');
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">Default Subscription</label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control" value="{{ get_option('default_subscription') }}"
@@ -124,28 +124,28 @@ $current_locale = get_option('locale');
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">Tax1 Label</label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control" value="{{ get_option('tax1Label') }}"
                         name="tax1Label">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('tax') 2</label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control money" value="{{ get_option('default_tax2') }}"
                         name="default_tax2">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">Tax2 Label</label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control" value="{{ get_option('tax2Label') }}"
                         name="tax2Label">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('tax_decimals')</label>
                     <div class="col-lg-6">
                         <select name="tax_decimals" class="form-control">
@@ -155,7 +155,7 @@ $current_locale = get_option('locale');
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('quantity_decimals')</label>
                     <div class="col-lg-6">
                         <select name="quantity_decimals" class="form-control">

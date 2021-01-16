@@ -15,19 +15,21 @@
                 @icon('solid/plus') @langapp('create')
                     </a> --}}
 
-                    @if(isAdmin() || can('settings'))
-                        <a href="{{ route('categorysettings.create') }}"
-                            class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
-                            data-toggle="ajaxModal">
-                            @icon('solid/plus') @langapp('create')
-                        </a>
-                    @endcan
+          
 
-                    @can('users_delete')
+                @can('users_delete')
                     <button type="submit" id="btn-change-status"  class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    @endcan
+                @endcan
+
+                @if(isAdmin() || can('settings'))
+                    <a href="{{ route('categorysettings.create') }}"
+                        class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
+                        data-toggle="ajaxModal">
+                        @icon('solid/plus') @langapp('create')
+                    </a>
+                @endcan
 
         </header>
         <section class="scrollable wrapper">

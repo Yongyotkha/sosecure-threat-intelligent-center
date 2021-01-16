@@ -194,10 +194,11 @@
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" class="text-white">&times;</span>
-                    </button>
-                    <h4 class="modal-title text-white" id="exampleModalLabel">Add Website</h4>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Add Website
+                    </h4>
                 </div>
                 {{-- <form action="" class="ajaxifyForm_custom"> --}}
                 {!! Form::open(['route' => ['webdefacement.create_data'], 'class' => 'ajaxifyForm_custom', 'method' => 'POST']) !!}
@@ -225,8 +226,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <button type="button" class="btn btn-link" id="btn_check_web">Check</button>  
 
                     <div id="area_check_message_row" class="form-group row" style="display: none;"><label class="col-lg-3 control-label"> </label>
                         <div class="col-lg-9">
@@ -343,6 +342,7 @@
 @include('stacks.js.menusub')
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.lightbox')
+@include('stacks.js.fullscreen')
  
 
 <script>
