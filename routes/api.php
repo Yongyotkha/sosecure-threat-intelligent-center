@@ -25,13 +25,19 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
-    Route::post('rss_news/', 'Api\ApiTransferClients@getTranfer_News');
+    Route::post('getTranferData', 'Api\ApiTransferClients@getTranferData');
     Route::get('get_encode/{site_id}', 'Api\ApiTransferClients@get_encode');
-    Route::post('checkwebserverIP/', 'Api\ApiTransferClients@checkWebserverIP');
+    Route::post('checkwebserverIP', 'Api\ApiTransferClients@checkWebserverIP');
 });
+
 
 Route::group(['prefix' => 'v1/centerinto-transfer'], function () {
     Route::post('insertToNoRef', 'Api\ApiTransferCenterInsert@insertToNoRef');
+});
+
+Route::group(['prefix' => 'v1/clientinto-transfer'], function () {
+    Route::post('insertToNoRef', 'Api\ApiTransferClientInsert@insertToNoRef');
+    Route::post('insertToNoRefWithID', 'Api\ApiTransferClientInsert@insertToNoRefWithID');
 });
 
 Route::group(['middleware' => 'api','prefix' => 'v1'], function ($router) {//, 'middleware' => 'auth:api'

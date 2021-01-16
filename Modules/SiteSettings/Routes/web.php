@@ -151,6 +151,9 @@ Route::post('/compromised_web_server/web_server_add_user', 'DataLeakController@w
 
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
 Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');
+Route::post('/datafeed_darkweb/get_data_feed', 'DataLeakController@get_data_feed')->name('socialdatas.get_data_feed');
+Route::post('/datafeed_darkweb/approve_compromised_feed', 'DataLeakController@approve_compromised_feed')->name('socialdatas.approve_compromised_feed');
+
 Route::post('/datafeedsocial/datatables', 'DataLeakController@datafeedsocial_datatables')->name('socialdatas.datafeedsocial_datatables');
 Route::post('/datafeed_darkweb/datatables', 'DataLeakController@datafeed_darkweb_datatables')->name('datafeed.darkweb_datatables');
 Route::post('/datafeedsocial/approve/dataFeed', 'DataLeakController@approve_data_feed')->name('socialdatas.approve_data_feed');

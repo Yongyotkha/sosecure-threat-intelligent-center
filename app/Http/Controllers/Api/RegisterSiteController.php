@@ -42,7 +42,11 @@ class RegisterSiteController extends ApiController
                         }
                         return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain_name, 'logo' => $logo]);
                     }else if($site->no_expiration_active === 1 && ($site->start_active_key <= date("Y-m-d H:i:s") && $site->end_active_key >= date("Y-m-d H:i:s"))){
+                        $domain_name = 'ไม่ได้ระบุโดเมน';
                         $domain = Domain::where('site_id', $site->id)->where('domain_default', 1)->first();
+                        if($domain){
+                            $domain_name = $domain -> domain;
+                        }
                         return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $site, 'domain' => $domain_name, 'logo' => $logo]);
                     }else{
                         return response()->json(['error' => 'The key is invalid', 'status_code' => '401']);

@@ -162,6 +162,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label for="" class="col-md-3">Sent mail</label>
+                        <div class="col-md-9">
+                            <label><input type="checkbox" name="sent_mail" id="sent_mail" value="true"><span class="label-text">Sent mail to customers</span></label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
@@ -444,10 +450,17 @@ function confirm_approve(){
     $('.data_feed_id:checked').each(function () {
         data_feed_id.push(this.value);
     });
+    let sent_mail = 0;
+    if ($("#sent_mail").is(':checked')) {
+        sent_mail = 1;
+    }
     $.ajax({
         type:"POST",
         url:"{{ route('socialdatas.approve_data_feed') }}",
-        data:{id: data_feed_id},
+        data:{
+            id: data_feed_id,
+            sent_mail: sent_mail
+        },
         beforeSend: function(){
             loading('load');
         },

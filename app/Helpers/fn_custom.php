@@ -21,11 +21,52 @@ use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
+use Modules\Users\Entities\UserSite;
+use Illuminate\Support\Facades\Auth;
 
 
 define("TYPE_WEB", 'center');//center , client
 define("PAGINATE_NUM", 10);
 define("DB_MONGO_01", 'mongodb://10.104.0.10:27017');
+
+
+
+
+            
+function get_role_custom() {
+    $superadmin = 0;
+    $site_admin = 0;
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    $superadmin = 1;
+
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+                            $site_admin = 1;
+                            // $model = $model->whereIn('site_id', $site_id_arr);
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+
+                        } else {//not support and admin
+                            // $model = $model->whereIn('site_id', $site_id_arr);
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        }
+                    }
+                }
+            }
+            
+                $data = [
+                    "superadmin" => $superadmin,
+                    "site_admin" => $site_admin
+                ];
+                return $data; 
+            
+}
 
 
 function gen_uuid() {

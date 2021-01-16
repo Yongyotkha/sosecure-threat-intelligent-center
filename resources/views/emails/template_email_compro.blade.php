@@ -34,41 +34,19 @@
             <div class="miro__content-body" style="font-family:Helvetica,Arial,sans-serif">
                 {{-- Section TH --}}
                 <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 0px">
+                  @foreach($compromised as $data)
+                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background:#eee;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
+                        <a href="{{ $data -> feedlink }}" target="_blank" style="margin-bottom:10px;display:block;"><span style="font-weight:700;color:#2a79ff">{{ $data -> source_name }}</span></a>
+                        <a href="{{ $data -> feedlink }}" target="_blank">
+                        <p style="margin:0 !important;color:#3869d4;">
+                          {!! $data -> feedcontent !!}
+                        </p>
+                        </a>
+                      <span style="font-weight:500;font-size:14px;color:#060606">Date: {{ $data -> created_at }}
+                    </a>
+                  </div>
+                  @endforeach
                   
-                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background:#eee;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-                        <a href="" target="_blank" style="margin-bottom:10px;display:block;"><span style="font-weight:700;color:#2a79ff">PANTIP</span></a>
-                        <a href="" target="_blank">
-                        <p style="margin:0 !important;color:#3869d4;">
-                          ไรแว้.... อยากได้ PTT กระพริบเปิดลงแค่ 2 ช่อง: เเน่นอนจ้า
-                        </p>
-                        </a>
-                      <span style="font-weight:500;font-size:14px;color:#060606">Date: 2020-12-24 Time 17:23:26 View: 3
-                    </a>
-                  </div>
-
-                  {{-- ปล. ถ้าไม่ใส่สีพื้นให้เปลี่ยนตรง background : ... บรรทัดด้านล่างนี้ได้เลยครับ --}}
-                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background:#fff;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-                        <a href="" target="_blank" style="margin-bottom:10px;display:block;"><span style="font-weight:700;color:#2a79ff">ADOBE</span></a>
-                        <a href="" target="_blank">
-                        <p style="margin:0 !important;color:#3869d4;">
-                          In October 2013, 153 million Adobe accounts were breached with each containing an internal ID, username, email, encrypted password and a password hint in plain text. The password cryptography was poorly done and many were quickly resolved back to plain text. The
-                          unencrypted hints also disclosed much about the passwords adding further to the risk that hundreds of millions of Adobe customers already faced.
-                        </p>
-                        </a>
-                      <span style="font-weight:500;font-size:14px;color:#060606">Date: 2020-12-24 Time 17:23:26 View: 3
-                    </a>
-                  </div>
-
-                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background:#eee;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-                        <a href="" target="_blank" style="margin-bottom:10px;display:block;"><span style="font-weight:700;color:#2a79ff">PANTIP</span></a>
-                        <a href="" target="_blank">
-                        <p style="margin:0 !important;color:#3869d4;">
-                          เมื่อวาน ซื้อ PTTGC มา 39 วันนี้เห็นจะเปิด 40.25 ดีใจรีบขาย สรุปกดผิด กลายเป็นซื้อ แถมลงมาปิด 39.50 อีก ซวยแท้: กะเอากำไร 1.25 บ ต่อหุ้นจาก PTTGC   ซวยแท้
-                        </p>
-                        </a>
-                      <span style="font-weight:500;font-size:14px;color:#060606">Date: 2020-12-24 Time 17:23:26 View: 3
-                    </a>
-                  </div>
 
                 </div>
 
