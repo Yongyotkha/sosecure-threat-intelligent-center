@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Modules\RSSFeedSettings\Entities\RSS;
 use Modules\RSSFeedSettings\Entities\TransactionRssData;
-
+use App\Entities\TransactionBatchjob;
 class RSS_Feed extends Command
 {
     /**
@@ -41,6 +41,12 @@ class RSS_Feed extends Command
     public function handle()
     {
 
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','batchjob_rssfeed')->first();
+        $TransactionBatchjob_Update->progress = 2;
+        $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
+
         $RSSList = RSS::where('status', '1')->get();
         foreach ($RSSList as $key => $value) {
 
@@ -48,14 +54,10 @@ class RSS_Feed extends Command
 
         }
 
-        // $FeedReader_data =   FeedReader::read('https://www.darkreading.com/rss_simple.asp');
-        // foreach ($FeedReader_data as $key => $value) {
-        //     print_r($value);
-        //  }
-
-        //  $dateStamp = date("Y/m/d h:i:s");
-        // echo $dateStamp;
-
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','batchjob_rssfeed')->first();
+        $TransactionBatchjob_Update->progress = 1;
+        $TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
         $this->info('Update check completed');
     }
     public function GUID()
