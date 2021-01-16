@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
-
+use App\DataLeakSocialRef;
 use Carbon\Carbon;
 use Modules\Social\Entities\Data_leak_social;
 use Modules\Social\Entities\Data_leak_feed;
@@ -452,6 +452,13 @@ class DarkWebController extends Controller
 
     public function count_val(Request $request){
 
+        $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
+        $where = ['deleted_at' => null];
+        $orwhere = ['deleted_at' => null, 'feel_type' => 'compromise'];
+        $orwhere2 = ['deleted_at' => null, 'feel_type' => 'webserver'];
+        $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
+        
+
         $date_start = $request->date_start;
         $date_end = $request->date_end;
         $site_id = '';
@@ -492,33 +499,42 @@ class DarkWebController extends Controller
 
         if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) ){
 
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1);//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
-            $countGroupBy = Data_leak_feed::where('deleted_at', null)->where('status', 1);
+            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
+
+
             if($request -> social) {
-                $news = $news -> where('feel_type', '=' ,$request -> social);
+                $model = $model-> where('feel_type', '=' ,$request -> social);
                 $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> social);
             }else{
-                $news = $news->whereIn('feel_type', ['darkweb', 'compromise','webserver']);
-                $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver']);
+                $model = $model->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+                $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
             }
 
             if($request -> title){
-                $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+                $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
+                // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+                // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
             }
 
             
 
             if($date_start) {
-                // $news = $news -> whereDate('created_at','>', $date_start_datetime_format);
+              
                 if($request -> isDateSearch=="true"){
-                    $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
-                    $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                    // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                    // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
+                        $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
+                    });
+
+                    $model = $model->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
+                        $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
+                    });
+                
                 }
-            //     ->where(function($query) use ($date_start_datetime_format,$date_end_datetime_format){
-            //         $query->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
-            //               ->whereBetween('time',array($timfrom,$timto));
-            //    })
 
             }
 
@@ -541,23 +557,15 @@ class DarkWebController extends Controller
                         if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
                             // dd(99);
     
-                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $model = $model->whereIn('site_id', $site_id_arr);
             
-                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                  
     
                         } else {//not support and admin
-                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $model = $model->whereIn('site_id', $site_id_arr);
             
-                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                         }
                     }
                 }
@@ -566,13 +574,9 @@ class DarkWebController extends Controller
 
 
             if($site_id) {
-                $news = $news->whereHas('get_social', function ($query) use ($site_id) {
-                            $query->where('site_id', '=', $site_id);
-                        });
+                $model = $model->where('site_id', $site_id);
 
-                $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id) {
-                    $query->where('site_id', '=', $site_id);
-                });
+                $countGroupBy = $countGroupBy->where('site_id', $site_id);
             }
 
             // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
@@ -586,13 +590,13 @@ class DarkWebController extends Controller
             // dd($news->get());
             // dd($news);
             // dd($news->total);
-            $Data_leak_feed_all = $news->count();
+            $Data_leak_feed_all = $model->count();
             $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
-            $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
+            $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
         }else{
-            $Data_leak_feed_all = Data_leak_feed::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->orWhere('feel_type', 'webserver')->count();
-            $news = Data_leak_feed::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver']);//->get()
-            $countGroupBy = Data_leak_feed::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver'])->groupBy('feel_type');
+            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->orWhere('feel_type', 'webserver')->orWhere('feel_type', 'server')->count();
+            $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);//->get()
+            $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server'])->groupBy('feel_type');
            
 
             if(Auth::check()) {
@@ -607,29 +611,18 @@ class DarkWebController extends Controller
                         if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
                             // dd(99);
     
-                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
-            
-                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $news = $news->whereIn('site_id', $site_id_arr);
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                  
-    
                         } else {//not support and admin
-                            $news = $news->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
-            
-                            $countGroupBy = $countGroupBy->whereHas('get_social', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $news = $news->whereIn('site_id', $site_id_arr);
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                         }
                     }
                 }
             }
 
-            $news = $news->with('get_ref')->orderBy('feedtimepost','desc')->paginate(PAGINATE_NUM);
+            $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
             $countGroupBy = $countGroupBy->get();
 
 
@@ -638,110 +631,110 @@ class DarkWebController extends Controller
         // dd($news);
         $content = [];
 
-        foreach($news as $data){
+        // foreach($news as $data){
     
-            $n_title = @$data -> feedcontent;
-            if($site_id) {
-                // $related_news_site = SiteNewsRelated::where("news_id",$data -> id)->where("site_id",$site_id)->first();
-                // $news = $news->get_social;
-            }
+        //     $n_title = @$data -> get_data_leak_feed_one -> feedcontent;
+        //     if($site_id) {
+        //         // $related_news_site = SiteNewsRelated::where("news_id",$data -> id)->where("site_id",$site_id)->first();
+        //         // $news = $news->get_social;
+        //     }
             
  
     
 
-            // $n_detail = strip_tags($n_detail);
-            // dd($n_detail);
+        //     // $n_detail = strip_tags($n_detail);
+        //     // dd($n_detail);
 
-            // $content[] = strip_tags($n_detail);
-            // $content[] = $data -> detail_en;
-            // dd($content);
+        //     // $content[] = strip_tags($n_detail);
+        //     // $content[] = $data -> detail_en;
+        //     // dd($content);
 
             
-            $count_view = 0;
-            // if($data -> get_social) {
-            //     foreach($data -> get_social as $view_val) {
-            //         $count_view += $view_val->view;
-            //     }
-            // }
+        //     $count_view = 0;
+        //     // if($data -> get_social) {
+        //     //     foreach($data -> get_social as $view_val) {
+        //     //         $count_view += $view_val->view;
+        //     //     }
+        //     // }
 
-            $check_read_news = Read_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
-            $checkBookmark = Bookmarks_compromised::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
-            if($check_read_news){
-                $html .= '<div class="list-news space-none">';
-            }else{
-                $html .= '<div class="list-news space-none" style="background-color:#f2f2f2">';
-            }
+        //     $check_read_news = Read_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
+        //     $checkBookmark = Bookmarks_compromised::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $data -> id)->first();
+        //     if($check_read_news){
+        //         $html .= '<div class="list-news space-none">';
+        //     }else{
+        //         $html .= '<div class="list-news space-none" style="background-color:#f2f2f2">';
+        //     }
 
-            $get_ref_name = '';
-            $get_ref_name .= 'Site: ';
-            if(!empty($data -> get_ref)){
-                foreach ($data -> get_ref as $get_ref) {
+        //     $get_ref_name = '';
+        //     $get_ref_name .= 'Site: ';
+        //     if(!empty($data -> get_ref)){
+        //         foreach ($data -> get_ref as $get_ref) {
 
-                    if(isset($get_ref->get_site_name->name))
-                    $get_ref_name = $get_ref_name.$get_ref->get_site_name->name.", ";
-                }
-            }
+        //             if(isset($get_ref->get_site_name->name))
+        //             $get_ref_name = $get_ref_name.$get_ref->get_site_name->name.", ";
+        //         }
+        //     }
 
-            $get_ref_name = rtrim($get_ref_name,", ");
+        //     $get_ref_name = rtrim($get_ref_name,", ");
 
-            $html .= '
-                <!--<div class="checkbox-news-select">
-                    <label class="mr-3">
-                        <input type="checkbox" name="" class="chk-bookmark">
-                        <span class="label-text checkbox-news-input"></span>
-                    </label>
-                </div>-->';
-                if($check_read_news){
-                    $html .= '<div class="float-left-type">';
-                }else{
-                    $html .= '<div class="float-left-type br-white">';
-                }
-                        // if($data->feel_type == 'webserver'){
-                        //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/icebergline2.png" style="width:100px;height:85px;"></div>';
-                        // }else if($data->feel_type == 'compromise'){
-                        //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/icebergline1.png" style="width:100px;height:85px;"></div>';
-                        // }else if($data->feel_type == 'darkweb'){
-                        //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/webserver.png" style="width:100px;height:85px;"></div>';
-                        // }
-                        $html .= '    <div class="text-type-pri">'.@$data -> feel_type.'</div>';
-                        $html .=  '</div>
-                        <article class="def-rlt pl-50">
-                            <div class="entry">
-                                <span class="entry-category">
-                                    <a href="#">'.$data -> source_name.'</a>
-                                </span>
-                                <h3 style="font-size: 16px;">
-                                    <a href="'.$data -> feedlink.'" target="_blank" onclick="add_read('.$data -> id.')">
-                                    '.$n_title.'
-                                    </a>
-                                </h3>
-                                <div class="entry-meta">
-                                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
-                                    <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
-                                    <span class="entry-date"> <b>'.$get_ref_name.'</b></span>
-                                </div>
-                                <!--<div class="description-text hidden-xs">
-                                <span><p>&nbsp;'.strip_tags($n_title).'</p></span>
-                                </div>-->
-                            </div>
-                        </article>
+        //     $html .= '
+        //         <!--<div class="checkbox-news-select">
+        //             <label class="mr-3">
+        //                 <input type="checkbox" name="" class="chk-bookmark">
+        //                 <span class="label-text checkbox-news-input"></span>
+        //             </label>
+        //         </div>-->';
+        //         if($check_read_news){
+        //             $html .= '<div class="float-left-type">';
+        //         }else{
+        //             $html .= '<div class="float-left-type br-white">';
+        //         }
+        //                 // if($data->feel_type == 'webserver'){
+        //                 //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/icebergline2.png" style="width:100px;height:85px;"></div>';
+        //                 // }else if($data->feel_type == 'compromise'){
+        //                 //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/icebergline1.png" style="width:100px;height:85px;"></div>';
+        //                 // }else if($data->feel_type == 'darkweb'){
+        //                 //     $html .= '    <div class="text-type-pri"><img src="http://127.0.0.1:8000/images/webserver.png" style="width:100px;height:85px;"></div>';
+        //                 // }
+        //                 $html .= '    <div class="text-type-pri">'.@$data -> feel_type.'</div>';
+        //                 $html .=  '</div>
+        //                 <article class="def-rlt pl-50">
+        //                     <div class="entry">
+        //                         <span class="entry-category">
+        //                             <a href="#">'.$data -> source_name.'</a>
+        //                         </span>
+        //                         <h3 style="font-size: 16px;">
+        //                             <a href="'.$data -> feedlink.'" target="_blank" onclick="add_read('.$data -> id.')">
+        //                             '.$n_title.'
+        //                             </a>
+        //                         </h3>
+        //                         <div class="entry-meta">
+        //                             <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> feedtimepost.'</span>
+        //                             <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> view.'</span>
+        //                             <span class="entry-date"> <b>'.$get_ref_name.'</b></span>
+        //                         </div>
+        //                         <!--<div class="description-text hidden-xs">
+        //                         <span><p>&nbsp;'.strip_tags($n_title).'</p></span>
+        //                         </div>-->
+        //                     </div>
+        //                 </article>
                     
                 
-                <!--<div class="content-news-image">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <img src="'.$data -> logo.'" alt="">
-                    </a>
-                </div>-->
-                <div class="action-bookmark">';
-                if(!empty($checkBookmark)){
-                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$data -> id.'" onclick="Bookmarks(this, '.$data -> id.')"></i>';
-                }else{
-                    $html .= '<i class="fas fa-bookmark" id="mark'.$data -> id.'" onclick="Bookmarks(this, '.$data -> id.')"></i>';
-                }
-                    $html .= '</div>
-            </div>
-            ';
-        }
+        //         <!--<div class="content-news-image">
+        //             <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
+        //                 <img src="'.$data -> logo.'" alt="">
+        //             </a>
+        //         </div>-->
+        //         <div class="action-bookmark">';
+        //         if(!empty($checkBookmark)){
+        //             $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$data -> id.'" onclick="Bookmarks(this, '.$data -> id.')"></i>';
+        //         }else{
+        //             $html .= '<i class="fas fa-bookmark" id="mark'.$data -> id.'" onclick="Bookmarks(this, '.$data -> id.')"></i>';
+        //         }
+        //             $html .= '</div>
+        //     </div>
+        //     ';
+        // }
         // dd($content);
         $count_sub_type["webserver"] = 0;
         $count_sub_type["darkweb"] = 0;
