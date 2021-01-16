@@ -1216,6 +1216,7 @@ class DataLeakController extends Controller
                 $DataLeakFeed->feedtimestamp = $DataLeakFeedTemp->feedtimestamp;
                 $DataLeakFeed->feeduser = $DataLeakFeedTemp->feeduser;
                 $DataLeakFeed->tag = $DataLeakFeedTemp->tag;
+                $DataLeakFeed->feel_type = $DataLeakFeedTemp->feed_type;
                 $DataLeakFeed->status = 1;
                 $DataLeakFeed->save();
 
