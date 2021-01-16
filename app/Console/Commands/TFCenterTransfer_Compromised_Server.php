@@ -2,12 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Entities\Transaction_center_compromised_files_check as SubTB;
 use Exception;
 use GuzzleHttp\Client as HttpClient;
-use DB;
-use App\Entities\CompromisedFileCheck as MainTB;
-use App\Entities\Transaction_center_compromised_files_check as SubTB;
+use Illuminate\Console\Command;
 
 class TFCenterTransfer_Compromised_Server extends Command
 {
@@ -24,13 +22,12 @@ class TFCenterTransfer_Compromised_Server extends Command
      *
      * @var string
      */
-    
+
     private $urlLimit = 3;
     private $url = 'http://127.0.0.2/api/v1/centerinto-transfer/insertToNoRef';
-    private $pathApi = 'insertTo';
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
-    private $header ='header';
+    private $header = 'header';
     private $dbName = 'dummyDatabase';
     private $site_code = '';
     private $site_mode = '';
@@ -57,29 +54,39 @@ class TFCenterTransfer_Compromised_Server extends Command
         $header = $this->header;
         $tableData = new SubTB;
         $tableData->setConnection($this->dbName);
-        $tableData = $tableData->where('status',1)->where('transaction_data_status',1)->with('get_transfer')->orderBy('id','asc')->get()->toArray();
+        $tableData = $tableData->where('status', 1)->where('transaction_data_status', 1)->with('get_transfer')->orderBy('id', 'asc')->get()->toArray();
         // print_r($tableData);
 
-        if(!$tableData){
+        if (!$tableData) {
             //nodata
-        }else{
+        } else {
             //insert Center
-            $dataEncode = encrypt_decrypt('encrypt', $this->site_code , $header,$ip,$mac);
+            $dataEncode = encrypt_decrypt('encrypt', $this->site_code, $header, $ip, $mac);
             $passBody = [
                 'site_code_en' => $dataEncode,
                 'queryData' => $tableData,
-                'tbName' => $this->insertToTB
+                'tbName' => $this->insertToTB,
             ];
 
-            $httpData = $this->reconnnect($this->url,$passBody,$this->urlLimit);
+            $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
             print_r($httpData);
             // echo json_encode($httpData);
-            if($httpData["success"]){
+            if ($httpData["success"]) {
+                //update
 
+                if (!empty($httpData["result"]["returnUpdate"])) {
+                    $returnUpdate = $httpData["result"]["returnUpdate"];
+                    foreach ($returnUpdate as $valueReturn) {
+                        $updater = new SubTB;
+                        $updater->setConnection($this->dbName);
+                        $updater = $updater->where('id', $valueReturn)->first();
+                        $updater->transaction_data_status = 2;
+                        $updater->save();
+                    }
+                }
 
-            }else{
+            } else {
 
-                
             }
             // if($httpData["success"]){
             //     $returnData = json_decode($httpData["result"],true);
@@ -88,35 +95,33 @@ class TFCenterTransfer_Compromised_Server extends Command
             //             $dataBase = DB::connection('dummyDatabase');
             //             foreach ($returnData["result"] as $value) {
             //                 $dataBase = $dataBase->select('select * from '.$this->tbName.' WHERE center_id = "'.$value["news_id"].'" limit 1');
-                            
+
             //                 if($value["transaction_mode"]=='insert'||$value["transaction_mode"]=='update'){
             //                     if(empty($dataBase)){
             //                         // DB::insert('insert into users (id, name) values (?, ?)', [1, 'Dayle']);
             //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
-                                        
+
             //                         }
             //                     }else{
             //                         // DB::update('update users set votes = 100 where name = ?', ['John']);
             //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
-                                        
+
             //                         }
             //                     }
             //                 }else if($value["transaction_mode"]=='delete'){
-                                
 
             //                 }
-
 
             //             }
             //         }
             //     }
             // }
-            
+
         }
-        
+
     }
 
-    public function reconnnect($url,$passBody, $limit)
+    public function reconnnect($url, $passBody, $limit)
     {
         $_OTX_KEY = env("OTX_KEY", "");
         $_clientHttp = new HttpClient;
@@ -124,7 +129,7 @@ class TFCenterTransfer_Compromised_Server extends Command
         $_otxReconnect = true;
         $_dataOut["result"] = null;
         $_dataOut["success"] = false;
-        $_sleeptime = rand(0,2000);
+        $_sleeptime = rand(0, 2000);
         while ($_otxReconnect && $_reconnect < $limit) {
             try {
                 $_bodyData = $_clientHttp->request(
@@ -137,10 +142,11 @@ class TFCenterTransfer_Compromised_Server extends Command
                         ],
                         'delay' => $_sleeptime, //millisec == ms
                         'timeout' => 59, //sec == 100sec
-                        'body' => json_encode($passBody)
+                        'verify' => false,
+                        'body' => json_encode($passBody),
                     ]
                 )->getBody();
-                $_dataOut["result"] = json_decode($_bodyData,true);
+                $_dataOut["result"] = json_decode($_bodyData, true);
                 $_dataOut["success"] = true;
                 $_otxReconnect = false;
                 //echo "  Pass : " . $_reconnect;

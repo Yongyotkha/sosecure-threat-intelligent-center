@@ -10,7 +10,7 @@ class TransactionClientNews extends Model
 {
     protected $table = 'transaction_client_news';
 
-    public function get_Transaction_client_news()
+    public function get_transfer_client()
     {
         return $this->hasOne(R_s_s_news::class, 'id', 'news_id');
     }

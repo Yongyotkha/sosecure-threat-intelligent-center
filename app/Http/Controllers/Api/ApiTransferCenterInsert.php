@@ -14,7 +14,7 @@ class ApiTransferCenterInsert extends Controller
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
     private $header = 'header';
-    private $dbName = 'dummyDatabase';
+    private $dbName = 'mysql';
 
     protected function insertToNoRef(Request $request)
     {
@@ -51,14 +51,16 @@ class ApiTransferCenterInsert extends Controller
                             // $transfer_data_id = $dataTable["get_transfer"]["id"];
                             if(!empty($dataTable["get_transfer"][$pkey])){
                                 $findOne = new $model_insert;
-                                $findOne = $findOne->where('tansfer_site_id', $site->id)->where('tansfer_data_id', $dataTable["get_transfer"][$pkey])->first();
+                                $findOne->setConnection($this->dbName);
+                                $findOne = $findOne->where('transfer_site_id', $site->id)->where('transfer_data_id', $dataTable["get_transfer"][$pkey])->first();
                                 if ($dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
                                     if (empty($findOne)) {
                                         $findOne = new $model_insert;
-                                        $findOne->tansfer_site_id = $site->id;
-                                        $findOne->tansfer_data_id = $dataTable["get_transfer"][$pkey];
+                                        $findOne->setConnection($this->dbName);
+                                        $findOne->transfer_site_id = $site->id;
+                                        $findOne->transfer_data_id = $dataTable["get_transfer"][$pkey];
                                         foreach ($dataTable["get_transfer"] as $key => $subValue) {
-                                            if ($key != $pkey) {
+                                            if ($key != $pkey&&$key!='transfer_site_id'&&$key!='transfer_data_id') {
                                                 $findOne->{$key} = $subValue;
                                             }
     
@@ -67,10 +69,10 @@ class ApiTransferCenterInsert extends Controller
                                         $findOne->save();
     
                                     } else {
-                                        $findOne->tansfer_site_id = $site->id;
-                                        $findOne->tansfer_data_id = $dataTable["get_transfer"][$pkey];
+                                        $findOne->transfer_site_id = $site->id;
+                                        $findOne->transfer_data_id = $dataTable["get_transfer"][$pkey];
                                         foreach ($dataTable["get_transfer"] as $key => $subValue) {
-                                            if ($key != $pkey) {
+                                            if ($key != $pkey&&$key!='transfer_site_id'&&$key!='transfer_data_id') {
                                                 $findOne->{$key} = $subValue;
                                             }
     
@@ -82,8 +84,9 @@ class ApiTransferCenterInsert extends Controller
                                         $findOne->delete();
                                     }
                                 }
+                                $arrUpdate[] = $dataTable["id"];
                             }
-                            $arrUpdate[] = $dataTable["id"];
+                            
                         }
                     }
                 } else {
