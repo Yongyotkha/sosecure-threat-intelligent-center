@@ -933,6 +933,18 @@ class DataLeakController extends Controller
                 }
             )
             ->editColumn(
+                'site',
+                function (DataLeakFeedTemp $model) {
+                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id' , $model->id)->first();
+                    $site = SiteSettings::select('name')->whereIn('id', [$leak_socail_ref_temps -> site_id])->get();
+                    $name_site = '';
+                    foreach($site as $data){
+                        $name_site .= $data -> name . ' ,';
+                    }
+                    return rtrim($name_site, ", ");
+                }
+            )
+            ->editColumn(
                 'source',
                 function (DataLeakFeedTemp $model) {
                     if ($model->source_name) {
@@ -987,7 +999,7 @@ class DataLeakController extends Controller
                     return $html;
                 }
             )
-            ->rawColumns(['chk', 'source', 'keyword', 'content', 'data_feed', 'url', 'action'])
+            ->rawColumns(['chk', 'site', 'source', 'keyword', 'content', 'data_feed', 'url', 'action'])
             ->make(true);
     }
 
