@@ -20,5 +20,8 @@ Route::group(
         Route::post('/detail/update_original', 'WebDefacementController@update_original')->name('webdefacement.update_original')->middleware('can:menu_items');
         Route::post('/detail/update_image', 'WebDefacementController@update_image')->name('webdefacement.update_image')->middleware('can:menu_items');
         Route::post('/detail/update_original_detail', 'WebDefacementController@update_original_detail')->name('webdefacement.update_original_detail')->middleware('can:menu_items');
+
+        Route::post('/detail/deface_now', 'WebDefacementController@deface_now')->name('webdefacement.deface_now')->middleware('can:menu_items');
+        Route::post('/detail/deface_now_detail', 'WebDefacementController@deface_now_detail')->name('webdefacement.deface_now_detail')->middleware('can:menu_items');
     }
 );
