@@ -20,7 +20,10 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    @endif
+                    
                     <div class="bc-head">Data Leak Datas </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -203,6 +206,12 @@
         </aside>
     </section>
 
+    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+        @php $admin = 1;  @endphp
+    @else 
+        @php $admin = 0;  @endphp
+    @endif
+
     {{-- <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     <!-- Modal create_assets_vulnerability -->
     <div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -259,6 +268,16 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 <script>
+
+        var admin = '{{$admin}}';
+        var visible_c = '';
+
+        if(admin == 1) {
+            visible_c = true;
+        } else {
+            visible_c = false;
+        }
+
 
     var search_val = 0;
     var keywords = null;
@@ -438,6 +457,7 @@
                         },
                     },
                     {
+                        visible: visible_c,
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
