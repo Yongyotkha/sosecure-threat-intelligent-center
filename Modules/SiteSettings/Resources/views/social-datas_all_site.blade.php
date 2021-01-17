@@ -417,17 +417,24 @@
                             
                     
                     },
-                    
                     {
                         targets: 4,
                         width: '10px',
                         render: function (data, type, full, meta) {
                           
                             if(full.get_data_leak_feed_one){
-                                return '<div class="text-elip" data-rel="tooltip" title="'+full.get_data_leak_feed_one.feedcontent+'">'+full.get_data_leak_feed_one.feedcontent+'</div>';
+                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var res = full.keyword.split(",");
+                                let content = '';
+                                for(let i in res){
+                                    const data = res[i];
+                                    content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                                }
+                                return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
                             }else{
                                 return '';
                             }
+                           
                         },
                     },
                     {

@@ -90,9 +90,9 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th width="10%">Source</th>
                                         <th width="15%">Keyword Ref</th>
                                         <th>Content</th>
+                                        <th width="10%">Feed Type</th>
                                         <th width="10%">Data Feed</th>
                                         <th width="3%">View</th>
                                         <th width="5%">Status</th>
@@ -232,16 +232,16 @@ function table_social_data(){
                 className: 'w-10'
             },  
             {
-                data: 'source',
-                name: 'source'
-            },
-            {
                 data: 'keyword',
                 name: 'keyword'
             },
             {
                 data: 'content',
                 name: 'content'
+            },
+            {
+                data: 'source',
+                name: 'source'
             },
             {
                 data: 'data_feed',
@@ -258,6 +258,21 @@ function table_social_data(){
             {
                 data: 'action',
                 name: 'action'
+            },
+        ],
+        columnDefs: [
+            {
+                targets: 2,
+                render: function (data, type, full, meta) {
+                    var feedcontent = full.get_data_leak_feed.feedcontent;
+                    var res = full.keyword.split(",");
+                    let content = '';
+                    for(let i in res){
+                        const data = res[i];
+                        content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                    }
+                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                },
             },
         ]
     });
