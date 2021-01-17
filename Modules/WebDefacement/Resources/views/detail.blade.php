@@ -57,18 +57,18 @@
                             <th class="text-center">Datetime</th>
                             
                         </tr>
-                        @if ($webdefacment_data_log)            
+
+                        {{-- @if ($webdefacment_data_log)            
                             @foreach ($webdefacment_data_log as $webdefacment_data_log)
                                 <tr>
                                     <td class="text-center">{!! @$loop->iteration !!}</td>
-                                    <td >
+                                    <td>
                                         @if ($webdefacment_data_log->message) 
                                         {!!@$webdefacment_data_log->message!!}
                                         @else
                                             -
                                         @endif 
                                     </td>
-                                    
                                     <td class="text-center">
                                         @if ($webdefacment_data_log->status_val) 
                                             {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
@@ -79,7 +79,49 @@
                                     <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
                                 </tr>
                             @endforeach
-                        @endif
+                        @endif --}}
+
+                        <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> ไปใช้ด้านบนได้เลยนะครับ -->
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td> 
+                                <div class="main-card-log">
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>Hash Difference 30%</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>File Size Difference 30%</p>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>Hash Difference 30%</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>Element Difference 30%</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-log"  style="background: rgb(255, 211, 92)"> <!-- ปล. ถ้าใส่สีให้ใช้แบบนี้นะครับ -->
+                                        <div class="card-log-body">
+                                            <p>Total Difference 30% (Medium)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                               Medium
+                            </td>
+                            <td class="no-wrap">2021-01-17 09:47:38</td>
+                        </tr>
+
+
                     </table>
                 </div>
             </section>
@@ -109,7 +151,6 @@
                                 <td>
                                     {{@$webdefacement->url}}
                                     <a href="{{@$webdefacement->url}}" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
-    
                                 </td>
                                 
                             </tr>
@@ -160,21 +201,21 @@
                                 <tr>
                                     <th>Hash</th>
                                     <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
-                                    <td>{{@$webdefacment_data_check->hash_new}} ({{@$webdefacment_data_check->hash_percent}}%)</td>
+                                    <td>{{@$webdefacment_data_check->hash_new}} (Difference {{@$webdefacment_data_check->hash_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->filesize == 1)
                                 <tr>
                                     <th>File Size</th>
                                     <td id='FileSize'>{{@formatSizeUnits($webdefacment_data_original->filesize)}}</td>
-                                    <td>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} ({{@$webdefacment_data_check->filesize_percent}}%)</td>
+                                    <td>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} (Difference {{@$webdefacment_data_check->filesize_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->element == 1)
                                 <tr>
                                     <th>Element</th>
                                     <td id='Element'>{{@$webdefacment_data_original->element}}</td>
-                                    <td>{{@$webdefacment_data_check->element_new}} ({{@$webdefacment_data_check->element_percent}}%)</td>
+                                    <td>{{@$webdefacment_data_check->element_new}} (Difference {{@$webdefacment_data_check->element_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->blacklist_keyword_content == 1)
