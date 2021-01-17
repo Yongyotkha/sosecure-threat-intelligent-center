@@ -14,7 +14,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataLog;
 
 
-class WebDefacementProccess extends Command
+class WebDefacementProccessbyWebdefacment_id extends Command
 {
     /**
      * The name and signature of the console command.
@@ -22,14 +22,14 @@ class WebDefacementProccess extends Command
      * @var string
      */
 
-    protected $signature = 'app:WebDefacementProccess';
+    protected $signature = 'app:WebDefacementProccessbyWebdefacment_id  {webdefacment_id}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'WebDefacementProccess';
+    protected $description = 'WebDefacementProccessbyWebdefacment_id';
     private $hashingAlgorithm  = 'md5';
     /**
      * Create a new command instance.
@@ -49,10 +49,9 @@ class WebDefacementProccess extends Command
      */
     public function handle()
     {
-
-
-     $WebdefacmentSetting_datas =  WebdefacmentSetting::where('active',1)->where('webdeflacement_progress',1)->whereNull('deleted_at')->get();
-     foreach ($WebdefacmentSetting_datas as $key => $value) {
+      $webdefacment_id= $this->argument('webdefacment_id');
+      $WebdefacmentSetting_datas =  WebdefacmentSetting::where('id', $webdefacment_id)->where('webdeflacement_progress',1)->whereNull('deleted_at')->get();
+       foreach ($WebdefacmentSetting_datas as $key => $value) {
       $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
       $WebdefacmentSetting_update->webdeflacement_progress = 2;
       $WebdefacmentSetting_update->save();
