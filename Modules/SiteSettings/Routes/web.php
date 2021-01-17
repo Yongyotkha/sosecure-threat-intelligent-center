@@ -120,6 +120,8 @@ Route::post('/WebDefacement-website/get_check_site', 'WebDefacementController@ge
 Route::post('/WebDefacement-website/get_create_open_md_site_url', 'WebDefacementController@get_create_open_md_site_url')->name('webdefacement.get_create_open_md_site_url')->middleware('can:menu_items');
 Route::post('/WebDefacement-website/get_check_image_screenshot', 'WebDefacementController@get_check_image_screenshot')->name('webdefacement.get_check_image_screenshot')->middleware('can:menu_items');
 Route::post('/WebDefacement-website/save_data', 'WebDefacementController@WebDefacement_create_data')->name('webdefacement.create_data')->middleware('can:menu_items');
+Route::get('/WebDefacement-website/edit_data/{id}', 'WebDefacementController@WebDefacement_edit_data')->name('webdefacement.edit_data')->middleware('can:menu_items');
+Route::post('/WebDefacement-website/update_data', 'WebDefacementController@WebDefacement_update_data')->name('webdefacement.update_data')->middleware('can:menu_items');
 Route::get('/WebDefacement-server/{id}', 'WebDefacementController@webdefacement_server')->name('webdefacement_server.index')->middleware('can:menu_items');
 Route::post('/WebDefacement-save_item', 'WebDefacementController@save_item')->name('webdefacement_website.save_item')->middleware('can:menu_items');
 Route::post('/WebDefacement-get_image_data', 'WebDefacementController@get_image_data')->name('webdefacement_website.get_image_data')->middleware('can:menu_items');

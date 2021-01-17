@@ -194,7 +194,7 @@
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <button type="button" class="close text-white" data-dismiss="modal" onclick="close_wdfm_website()">&times;</button>
                     <h4 class="modal-title text-white">
                         <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
                         Add Website
@@ -202,6 +202,7 @@
                 </div>
                 {{-- <form action="" class="ajaxifyForm_custom"> --}}
                 {!! Form::open(['route' => ['webdefacement.create_data'], 'class' => 'ajaxifyForm_custom', 'method' => 'POST']) !!}
+                <input type="hidden" name="mode" id="mode" value="create">
                 <div class="modal-body">
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Name <span class="text-danger">*</span> </label>
@@ -221,7 +222,7 @@
                             <div class="input-group">
                                 <input type="text" class="form-control" name="port_web" id="port_web" value="80" required>
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-info" id="btn_check_web">Check</button>  
+                                    <button type="button" class="btn btn-info" onclick="get_check_site()">Check</button>  
                                 </span>
                             </div>
                         </div>
@@ -309,7 +310,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal" onclick="close_wdfm_website()">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -757,6 +758,85 @@
                 console.log("No response from server");
             });
         
+    }
+
+    function btn_click_edit_webdefacement(id){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '/WebDefacement-website/edit_data/' + id,
+            type: "get",
+            beforeSend: function(){
+                loading('load');
+            },
+        }).done(function(response){
+            loading('stop_load');
+            if(response.status_code == 200) {
+                $("#webdefacment_setting_id").val(response.data.id);
+                $('#mode').val('update');
+                $("#btn_save").prop("disabled",false);
+                $('#name_web').val(response.data.name);
+                $('#url_web').val(response.data.url);
+                $('#port_web').val(response.data.port);
+                $('#url_web').prop('readonly', true);
+                $('#port_web').prop('readonly', true);
+                if(response.data.hash == 1){
+                    $('#hash').prop('checked', true);
+                }else{
+                    $('#hash').prop('checked', false);
+                }
+                if(response.data.filesize == 1){
+                    $('#file_size').prop('checked', true);
+                }else{
+                    $('#file_size').prop('checked', false);
+                }
+                if(response.data.element == 1){
+                    $('#element').prop('checked', true);
+                }else{
+                    $('#element').prop('checked', false);
+                }
+                if(response.data.blacklist_keyword == 1){
+                    $('#blacklist').prop('checked', true);
+                    $('#blacklist_text').val(response.data.blacklist_keyword_content);
+                    $('#example-blacklist').show();
+                }else{
+                    $('#blacklist').prop('checked', false);
+                }
+                if(response.data.image_check == 1){
+                    $('#delay_screen_shot').prop('checked', true);
+                    $('#delay_screenshot_val').val(response.data.delay_screen_shot_val);
+                    $('#delay_screen_shot_val_div').show();
+                }else{
+                    $('#delay_screen_shot').prop('checked', false);
+                }
+                $('#wdfm_website').modal('show');
+            } else {
+                console.log(404);
+            }
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            loading('stop_load');
+            console.log("No response from server");
+        });
+    }
+
+    function close_wdfm_website(){
+        $('#mode').val('create');
+        $('#name_web').val("");
+        $('#url_web').val("");
+        $('#port_web').val("");
+        $('#url_web').prop('readonly', false);
+        $('#port_web').prop('readonly', false);
+        $('#hash').prop('checked', false);
+        $('#file_size').prop('checked', false);
+        $('#element').prop('checked', false);
+        $('#blacklist').prop('checked', false);
+        $('#blacklist_text').val("");
+        $('#example-blacklist').hide();
+        $('#delay_screen_shot').prop('checked', false);
+        $('#delay_screenshot_val').val("");
+        $('#delay_screen_shot_val_div').hide();
+        $("#area_check_message").empty();
     }
 
 
