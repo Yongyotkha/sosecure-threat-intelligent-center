@@ -70,6 +70,7 @@
                                                         {{-- <th class="">No.</th> --}}
                                                         {{-- <th>Site Name</th> --}}
                                                         <th>Domain</th>
+                                                        <th>Default</th>
                                                         <th>Started</th>
                                                         <th>Finished</th>
                                                         <th>Elements</th>
@@ -160,14 +161,19 @@
                     name: 'domain'
                 },
                 {
+                    data: 'domain_default',
+                    name: 'domain_default',
+                    className: 'w-10 text-center'
+                },
+                {
                     data: 'created_at',
                     name: 'created_at',
-                    className: 'text-center w100px'
+                    className: 'text-center w100px no-wrap'
                 },
                 {
                     data: 'updated_at',
                     name: 'updated_at',
-                    className: 'text-center w100px'
+                    className: 'text-center w100px no-wrap'
                 },
                 {
                     data: 'elements',

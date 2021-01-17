@@ -184,7 +184,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <form onsubmit="add_asset_click()" method="POST">
+                <form id='add_asset_click' method="POST">
                     
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
@@ -201,6 +201,7 @@
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
                             <input type="text" id="ip" class="form-control check_test" required="yes">
+                            <span style="color:red;"><small id = "check_i"></small></span>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -208,27 +209,10 @@
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
                             <input type="text" id="port" class="form-control check_test" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">User & Password<span
-                                class="text-danger">*</span> </label>
-                        <div class="col-lg-6">
-
-                            <select id="u_p" class="form-control check_test_select" required>
-                                <option  value="">Choose an User</option>
-                                @if($Credentials)
-                                    @foreach ($Credentials as $item)
-                                    <option  value="{{@$item->id}}">{{@$item->name}}</option>
-                                    @endforeach
-                                @endif
-                            </select>
                             
                         </div>
-                        &nbsp;&nbsp;<button type="button" class="btn btn-{{ get_option('theme_color')  }}"
-                        data-toggle="collapse" data-target="#demo" onclick="add_new()" ><i class="fas fa-plus"></i>&nbsp; New</button>
                     </div>
+
                     <div id="demo" class="collapse box">
                         
                         <fieldset class="collapsible">
@@ -469,6 +453,7 @@
             }
             
             $('#button_save').prop("disabled", true);
+            $('#check_u_p').html('');
 
         });
     });
@@ -542,6 +527,17 @@
             $('#check_p').html('');
 
         });
+        $("#ip").keypress(function() {
+
+        $('#check_i').html('');
+
+        $("#u_p").change(function() {
+
+            $('#check_u_p').html('');
+
+        });
+
+});
 
     });
 
@@ -565,7 +561,7 @@
                 type:"POST",
                 url:"{{ route('compromised_web_server.web_server_add_user') }}",
                 data:{
-                    name:user_new,
+                    name:name_new,
                     password:password_new,
                     user:user_new,
                     site:{!!json_encode($siteID)!!},
@@ -574,17 +570,26 @@
                     loading('load');
                 },
                 success:function(response) {
-                    var data = {
+                    loading('stop_load');
+                    
+                    console.log(response.message);
+                    
+                    if(response.message!=''){   
+                        var data = {
                         id: response.id,
                         text: response.name,
-                    };
-                    var newOption = new Option(data.text, data.id, false, false);
-                    $('#u_p').append(newOption).trigger('change');
-                    $('#u_p').val(data.id).trigger('change');
-                    $("div.box").collapse("hide");
-                    loading('stop_load');
-                    toastr.success(response.message, '@langapp('response_status')');
+                        };
+                        var newOption = new Option(data.text, data.id, false, false);
+                        $('#u_p').append(newOption).trigger('change');
+                        $('#u_p').val(data.id).trigger('change');
+                        $("div.box").collapse("hide");
+                        
+                        toastr.success(response.message, '@langapp('response_status')');
+                    }else{
 
+                    toastr.error('There is already this name in the system.', '@langapp('response_status')');
+
+                    }
 
 
                     
@@ -607,12 +612,11 @@
         
     }
 
+    $("#add_asset_click").submit(function(e) {
 
-    function add_asset_click() {
         ip = $('#ip').val();
         port = $('#port').val();
-        user = $('#user').val();
-        password = $('#password').val();
+        user = $('#u_p').val();
         root_path = $('#root_path').val();
         os = $('#os').val();
         type = $('#type1').val();
@@ -624,7 +628,6 @@
                 check:Number(check),
                 os:os,
                 root_path:root_path,
-                password:password,
                 user:user,
                 ip:ip,
                 port:port,
@@ -637,8 +640,14 @@
             },
             success:function(response) {
                 loading('stop_load');
-                toastr.success(response.message, '@langapp('response_status')');
-                window.location.href = response.redirect;
+                if(response.message!=''){
+                    $('#button_save').prop("disabled", true);
+                    toastr.success(response.message, '@langapp('response_status')');
+                    window.location.href = response.redirect;
+                }else{
+                    toastr.error('There is already this name in the system.', '@langapp('response_status')');
+                }
+                
             },
             error: function (error){
                 loading('stop_load');
@@ -651,6 +660,13 @@
             }
 
         });
+
+        e.preventDefault();
+    });
+
+
+    function add_asset_click() {
+
      
        
    }
@@ -658,47 +674,56 @@
    function test_data(){
         ip = $('#ip').val();
         port = $('#port').val();
-        user = $('#user').val();
+        user = $('#u_p').val();
         password = $('#password').val();
         os = $('#os').val();
 
-        $.ajax({
-            type:"POST",
-            url:"{{ route('compromised_web_server.checkWebserverIP') }}",
-            data:{
-                ip:ip,
-                os:os,
-                password:password,
-                user:user,
-                port:port,
-            },
-            beforeSend: function(){
-                loading('load');
-            },
-            success:function(response) {
-                loading('stop_load');
-                if(response.webserverConnect==true){
-                    toastr.success(response.message, '@langapp('response_status')');
-                    $('#button_save').prop("disabled", false);
-                   
-                }else{
-                    toastr.error(response.message, '@langapp('response_status')');
+        if(ip==''){
+            $('#check_i').html('Please fill out.');
+        }
+        else if(user==''){
+            $('#check_u_p').html('Choose an User.');
+        }else{
+            $.ajax({
+                type:"POST",
+                url:"{{ route('compromised_web_server.checkWebserverIP') }}",
+                data:{
+                    ip:ip,
+                    os:os,
+                    password:password,
+                    user:user,
+                    port:port,
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) {
+                    loading('stop_load');
+                    if(response.webserverConnect==true){
+                        toastr.success(response.message, '@langapp('response_status')');
+                        $('#button_save').prop("disabled", false);
                     
+                    }else{
+                        toastr.error(response.message, '@langapp('response_status')');
+                        
+                    }
+                },
+                error: function (error){
+                    loading('stop_load');
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
                 }
-            },
-            error: function (error){
-                loading('stop_load');
-                var errors = error.response.data.errors;
-                var errorsHtml = '';
-                $.each(errors, function (key, value) {
-                    errorsHtml += '<li>' + value[0] + '</li>';
-                });
-                toastr.error(errorsHtml, '@langapp('response_status') ');
-            }
 
-        });
+            });
 
-   }
+        }
+    }
+
+      
 
    $("#add_asset").on('click', function() {
 
