@@ -233,7 +233,7 @@
                         </div>
                     </div>
 
-                    <div id="area_option" class="form-group row">
+                    <div id="area_option" class="form-group row" style="display: none;">
                         <label class="col-lg-3 control-label">Options</label>
                         <div class="col-sm-9">
                             <div class="checkbox">

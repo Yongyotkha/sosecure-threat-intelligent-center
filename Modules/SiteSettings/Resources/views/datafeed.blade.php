@@ -9,11 +9,11 @@
                         data-target="#setting-nav">@icon('solid/bars')
                     </a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3 text-elipse-setting">Name Domain</p>
+                    <p class="h3 text-elipse-setting">Data Leak</p>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
-                        @include('partial.menu_data_dark')
+                        @include('partial.menu_data_leak')
                     </section>
                 </section>
             </section>

@@ -7,12 +7,12 @@
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                        <p class="h3 text-elipse-setting">Name Domain</p>
+                        <p class="h3 text-elipse-setting">Data Leak</p>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
-                        @include('partial.menu_data_dark')
+                        @include('partial.menu_data_leak')
                     </section>
                 </section>
             </section>
@@ -24,14 +24,35 @@
                     <div class="bc-head">Data Leak Datas </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
-                        --}}
-                    </a>
-                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
+                       
+                    </a> --}}
+                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                            <option value="">All Site</option>
+                            @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
+                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
+                   
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
+                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
+                    @if(!empty(get_role_custom()))
+                      
+                    {{-- // var_dump(get_role_custom()['superadmin']);
+                    // var_dump(get_role_custom()['site_admin']); --}}
+                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Dataleak feed</span></a>
+                    @endif
+                 
+                @endif
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
@@ -47,7 +68,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-4">
+                                {{-- <div class="col-lg-4">
                                     <div class="row d-flex align-items-center">
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Site</label>
                                         <div class="col-sm-9 col-xs-12">
@@ -64,7 +85,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="col-lg-4">
                                     <div class="row d-flex align-items-center">
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
