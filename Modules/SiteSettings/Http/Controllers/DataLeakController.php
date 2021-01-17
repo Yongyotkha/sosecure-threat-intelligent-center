@@ -436,7 +436,7 @@ class DataLeakController extends Controller
     public function socialdatas_datatables(Request $request)
     {
         $site = $this->siteSettings->get_data($request->site_code);
-        $model = DataLeakSocialRef::where('site_id', 'LIKE', '%' . $site->id . '%')->where('deleted_at', null)->orderBy('id', 'desc');
+        $model = DataLeakSocialRef::where('site_id', 'LIKE', '%' . $site->id . '%')->where('deleted_at', null)->with('get_data_leak_feed')->orderBy('id', 'desc');
         if ($request->search) {
             if ($request->search) {
                 $search = $request->search;

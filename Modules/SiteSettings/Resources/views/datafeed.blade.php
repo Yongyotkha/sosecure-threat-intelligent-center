@@ -436,7 +436,7 @@ function table_social_data(){
                         const data = res[i];
                         content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
                     }
-                    return content;
+                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
                 },
             },
         ]
