@@ -88,7 +88,7 @@ class WebDefacementProccess extends Command
             $result['image_url'] ="";
             $result["image_path_original"] ="";
             $result['blacklist'] =array();
-
+            $message =' <div class="main-card-log">';
             $result['image1Hash']  = "";
             $result['image2Hash']  = "";
             $result['image_diff']  = null;
@@ -111,6 +111,10 @@ class WebDefacementProccess extends Command
               $webContent = $response['content'];
 
               if ($WebdefacmentSetting_data->hash == 1) {
+
+
+
+
                $totalConfig += 1;
                $hashMD5 = hash($this->hashingAlgorithm, $webContent);
                $result['hash_code'] = $hashMD5;
@@ -121,6 +125,13 @@ class WebDefacementProccess extends Command
               {
                 $result['hash_parcent']  = 0;
               }
+
+              $message =$message.'
+              <div class="card-log">
+              <div class="card-log-body">
+              <p>Hash Difference '.$result['hash_parcent'].'%</p>
+              </div>
+              </div>';
 
             }
             if ($WebdefacmentSetting_data->filesize == 1) {
@@ -153,6 +164,14 @@ class WebDefacementProccess extends Command
                   $result['file_size_parcent'] = 100; 
                 }
 
+
+                $message =$message.'
+                <div class="card-log">
+                <div class="card-log-body">
+                <p>File Size Difference '.$result['file_size_parcent'].'%</p>
+                </div>
+                </div>';
+
               }
               if ($WebdefacmentSetting_data->element == 1) {
                $totalConfig += 1;
@@ -182,7 +201,12 @@ class WebDefacementProccess extends Command
               {
                 $result['all_element_parcent'] = 100; 
               }
-
+              $message =$message.'
+              <div class="card-log">
+              <div class="card-log-body">
+              <p>Element Difference '.$result['all_element_parcent'].'%</p>
+              </div>
+              </div>';
 
             }
             if ($WebdefacmentSetting_data->image_check == 1) {
@@ -281,7 +305,12 @@ class WebDefacementProccess extends Command
             $result['image2Hash']  = $compareImage["image2Hash"];
             $result['image_diff']  =  $compareImage["diff"];
 
-
+            $message =$message.'
+            <div class="card-log">
+            <div class="card-log-body">
+            <p>image Difference '.$result['image_parcent'].'%</p>
+            </div>
+            </div>';
           }
 
 
@@ -309,6 +338,12 @@ class WebDefacementProccess extends Command
             }
             
 
+            $message =$message.'
+            <div class="card-log">
+            <div class="card-log-body">
+            <p>blacklist Difference '.$result['blacklist_parcent'].'%</p>
+            </div>
+            </div>';
 
 
           }
@@ -353,60 +388,119 @@ class WebDefacementProccess extends Command
             $WebdefacmentDataCheck_save->image_part_2 = $image_path_2;
           }
           $WebdefacmentDataCheck_save->save();
+
+
           $WebdefacmentSetting_update =   WebdefacmentSetting::find($webdefacment_id);
 
-          if ($status == 'Normal' || $status == 'Meduim') {
-            $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
-            if ($status == 'Meduim') {
-             $WebdefacmentDataLog_save = new WebdefacmentDataLog;
-             $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
-             $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
-             $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
-             $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
-             $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
-             $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
-             $WebdefacmentDataLog_save->status_val  =  $status;
-             $WebdefacmentDataLog_save->save();
-           }
-         }else{
-          $WebdefacmentSetting_update->webdeflacement_progress = 3;
-          $WebdefacmentDataLog_save = new WebdefacmentDataLog;
-          $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
-          $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
-          $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
-          $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
-          $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
-          $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
-          
-          $WebdefacmentDataLog_save->status_val  =  $status;
-          $WebdefacmentDataLog_save->save();
+          $color="#88ce4f  !important";
+          if ($status=="High") {
+           $color="#e64732 !important";
+         }
+         if ($status=="Meduim") {
+           $color="#fcc838 !important";
+         }
 
-        }
-
-        $WebdefacmentSetting_update->image_last = $result['image_url'];
-        $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
-        $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
-        $WebdefacmentSetting_update->status_val = $status;
-        $WebdefacmentSetting_update->image_original = $result['image_url'];
-        $WebdefacmentSetting_update->blacklist_keyword_current = $WebdefacmentDataCheck_save->keyword;
-        $WebdefacmentSetting_update->save();
+         $message =$message.'<div class="card-log"  style="background: '.$color.' "> <!-- ปล. ถ้าใส่สีให้ใช้แบบนี้นะครับ -->
+         <div class="card-log-body">
+         <p style="color: #fff">Total Difference '.$pointAlert.'% ('.$status.')</p>
+         </div>
+         </div>
+         </div>';
 
 
+         if ($status == 'Normal' || $status == 'Meduim') {
+          $WebdefacmentSetting_update->webdeflacement_progress = 1;
+
+          if ($status == 'Meduim') {
+           $WebdefacmentDataLog_save = new WebdefacmentDataLog;
+           $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
+           $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
+         //  $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
+        // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
+        // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
+        // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
+      //   $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
+
+           $WebdefacmentDataLog_save->hash_percent  = $result['hash_parcent'];
+           $WebdefacmentDataLog_save->filesize_percent  = $result['file_size_parcent'];
+           $WebdefacmentDataLog_save->element_percent  = $result['hash_parcent'];
+           $WebdefacmentDataLog_save->image_percent  = $result['image_parcent'];
+           $WebdefacmentDataLog_save->all_percent  = $pointAlert;
+           $WebdefacmentDataLog_save->message =$message;
+           $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
+           $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
+           $WebdefacmentDataLog_save->status_val  =  $status;
+           $WebdefacmentDataLog_save->save();
+         }
+       }else{
+        $WebdefacmentSetting_update->webdeflacement_progress = 3;
+        $WebdefacmentDataLog_save = new WebdefacmentDataLog;
+        $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
+        $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
 
 
 
-        print_r($result);
+
+
+
+
+
+
+       //  $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
+        // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
+        // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
+        // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
+      //   $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
+        $WebdefacmentDataLog_save->message =$message;
+        $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
+        $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
+
+
+        $WebdefacmentDataLog_save->hash_percent  = $result['hash_parcent'];
+        $WebdefacmentDataLog_save->filesize_percent  = $result['file_size_parcent'];
+        $WebdefacmentDataLog_save->element_percent  = $result['hash_parcent'];
+        $WebdefacmentDataLog_save->image_percent  = $result['image_parcent'];
+        $WebdefacmentDataLog_save->all_percent  = $pointAlert;
+
+
+        $WebdefacmentDataLog_save->status_val  =  $status;
+        $WebdefacmentDataLog_save->save();
 
 
       }
 
+      $WebdefacmentSetting_update->image_last = $result['image_url'];
+      $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
+      $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
+      $WebdefacmentSetting_update->status_val = $status;
+      $WebdefacmentSetting_update->image_original = $result['image_url'];
+      $WebdefacmentSetting_update->blacklist_keyword_current = $WebdefacmentDataCheck_save->keyword;
+      $WebdefacmentSetting_update->save();
+
+        //delete 4 last row
+      $WebdefacmentDataLog_delete_list = array();
+      $WebdefacmentDataLog_delete =  WebdefacmentDataLog::where('webdefacment_setting_id',$webdefacment_id)->orderBy('created_at','desc')->take(3)->get();
+      foreach ($WebdefacmentDataLog_delete as $WebdefacmentDataLog_deletekey => $WebdefacmentDataLog_deletevalue) {
+       array_push($WebdefacmentDataLog_delete_list, $WebdefacmentDataLog_deletevalue->id);
+     }
+     WebdefacmentDataLog::whereNotIn('id',$WebdefacmentDataLog_delete_list)->where('webdefacment_setting_id',$webdefacment_id)->delete();
+
+   //delete 4 last row
+     $WebdefacmentDataCheck_delete_list = array();
+     $WebdefacmentDataCheck_delete =  WebdefacmentDataCheck::where('webdefacment_setting_id',$webdefacment_id)->orderBy('created_at','desc')->take(3)->get();
+     foreach ($WebdefacmentDataCheck_delete as $WebdefacmentDataCheck_deletekey => $WebdefacmentDataCheck_deletevalue) {
+       array_push($WebdefacmentDataCheck_delete_list, $WebdefacmentDataCheck_deletevalue->id);
+     }
+     WebdefacmentDataCheck::whereNotIn('id',$WebdefacmentDataCheck_delete_list)->where('webdefacment_setting_id',$webdefacment_id)->delete();
+
+
+
+
+     print_r($webdefacment_id);
+
+
+   }
 
 
 
@@ -415,14 +509,15 @@ class WebDefacementProccess extends Command
 
 
 
-    }else{
+
+ }else{
         // $result["Result"] = 0;
         // $result["messes "] = "The url is not formatted.";
-    }
-  }else{
+ }
+}else{
       // $result["Result"] = 0;
       // $result["messes "] = "No data found.";
-  }
+}
 }
 
 

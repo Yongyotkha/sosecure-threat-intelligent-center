@@ -99,6 +99,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
             $result['image_parcent']  = 0;
             $result['blacklist_parcent']  = 0;
             
+
             $image_path_2 ="";
             $response   = $this->getHtml($url);
             if ($response['content'] === FALSE){
