@@ -994,7 +994,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'site',
                 function (DataLeakFeedTemp $model) {
-                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id' , $model->id)->first();
+                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id' , $model->id)->where('keyword', '!=', 'scanner')->first();
                     $site = SiteSettings::select('name')->whereIn('id', [$leak_socail_ref_temps -> site_id])->get();
                     $name_site = '';
                     foreach($site as $data){
