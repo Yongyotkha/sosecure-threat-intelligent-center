@@ -14,6 +14,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataLog;
 use App\Entities\TransactionBatchjob;
 use Illuminate\Support\Facades\Artisan;
+
 class WebDefacementProccess extends Command
 {
     /**
