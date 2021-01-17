@@ -8,6 +8,7 @@ use App\DataLeakFeedTemp;
 use App\DataLeakSocial;
 use App\DataLeakSocialRef;
 use App\Entities\CompromisedServer;
+use App\DataLeakSocialRefTemp;
 use App\leak_socail_ref_temp;
 use App\Mail\CompromisedMail;
 use Auth;
@@ -63,6 +64,35 @@ class DataLeakController extends Controller
 
     public function datafeed()
     {
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+        
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+        
+        
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        $data['SiteSettings'] = $SiteSettings;
+
         $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
         $data['DataLeakSocial'] = $DataLeakSocial;
         $data['page'] = langapp('data_leak_feed');
@@ -79,6 +109,35 @@ class DataLeakController extends Controller
 
     public function datafeed_darkweb()
     {
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+        
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+        
+        
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        $data['SiteSettings'] = $SiteSettings;
+
         $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
         $data['DataLeakSocial'] = $DataLeakSocial;
         // $data['page'] = langapp('compromised_feed');
@@ -929,7 +988,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'site',
                 function (DataLeakFeedTemp $model) {
-                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id' , $model->id)->first();
+                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id' , $model->id)->where('keyword', '!=', 'scanner')->first();
                     $site = SiteSettings::select('name')->whereIn('id', [$leak_socail_ref_temps -> site_id])->get();
                     $name_site = '';
                     foreach($site as $data){
@@ -1022,29 +1081,32 @@ class DataLeakController extends Controller
             //     // $q->orwhere($orwhere);
             // });
 
-            $model = DataLeakFeedTemp::
-                where(function ($q) use ($request) {
+            $model = DataLeakSocialRefTemp:: where(function ($q) use ($request) {
                 $q->where('keyword', '!=', null);
                 $q->where('keyword', '!=', '');
-                $q->where('feed_type', 'darkweb');
-                // $q->orwhere($orwhere);
+            });
+
+            $model->whereHas('get_data_leak_feed_temp_one', function ($qq) use ($request) {
+               
+                $qq->whereIn('feed_type', ['darkweb', 'compromise','webserver','server']);
 
                 if ($request->search) {
-                    $q->where('keyword', 'LIKE', '%' . $request->search . '%');
+                    $qq->where('keyword', 'LIKE', '%' . $request->search . '%');
                 }
 
                 if ($request->source_select) {
-                    $q->where('sourceid', $request->source_select);
+                    $qq->where('sourceid', $request->source_select);
                 }
+
                 if ($request->check_all == 'true') {
 
                 } else {
                     if ($request->check_pending == 'true' && $request->check_approved == 'true') {
 
                     } else if ($request->check_pending == 'true') {
-                        $q->where('approve', '0');
+                        $qq->where('approve', '0');
                     } else if ($request->check_approved == 'true') {
-                        $q->where('approve', '1');
+                        $qq->where('approve', '1');
                     }
                 }
 
@@ -1072,95 +1134,73 @@ class DataLeakController extends Controller
                     // dd($date_end_time_time);
 
                     // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                    $q->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
-                }
-
-            });
-
-            $model = $model->orwhere(function ($q) use ($request) {
-                $q->where('keyword', '!=', null);
-                $q->where('keyword', '!=', '');
-                $q->where('feed_type', 'compromise');
-                // $q->orwhere($orwhere);
-
-                if ($request->search) {
-                    $q->where('keyword', 'LIKE', '%' . $request->search . '%');
-                }
-
-                if ($request->source_select) {
-                    $q->where('sourceid', $request->source_select);
-                }
-                if ($request->check_all == 'true') {
-
-                } else {
-                    if ($request->check_pending == 'true' && $request->check_approved == 'true') {
-
-                    } else if ($request->check_pending == 'true') {
-                        $q->where('approve', '0');
-                    } else if ($request->check_approved == 'true') {
-                        $q->where('approve', '1');
-                    }
-                }
-
-                if ($request->start_date) {
-                    $date_start = $request->start_date;
-                    $date_end = $request->end_date;
-
-                    $date_start_explode = explode(" ", $date_start);
-                    $date_start_date = @$date_start_explode[0];
-                    // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                    // dd($date_start_time);
-                    $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                    // dd($date_start_date_format);
-                    // $date_start_time_time = date("H:i", strtotime($date_start_time));
-                    // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                    // dd($date_start);
-
-                    $date_end_explode = explode(" ", $date_end);
-                    $date_end_date = @$date_end_explode[0];
-                    // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                    // dd($date_end_time);
-                    $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                    // $date_end_time_time = date("H:i", strtotime($date_end_time));
-                    // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                    // dd($date_end_time_time);
-
-                    // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                    $q->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
+                    $qq->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
                 }
             });
+
+
+
+
             $model = $model->get();
         } else {
-            $model = DataLeakFeedTemp::
-                where(function ($q) /*use ($where1,$orwhere)*/ {
+            $model = DataLeakSocialRefTemp::where(function ($q) /*use ($where1,$orwhere)*/ {
                 $q->where('keyword', '!=', null);
                 $q->where('keyword', '!=', '');
-                $q->where('feed_type', 'darkweb');
-                // $q->orwhere($orwhere);
+            })->with('get_site');
+
+            $model = $model->whereHas('get_data_leak_feed_temp_one', function ($qq) use ($request) {
+                $qq->where('keyword', 'LIKE', '%' . $request->search . '%');
+                $qq->whereIn('feed_type', ['darkweb', 'compromise','webserver','server']);
             });
 
-            $model = $model->orwhere(function ($q) /*use ($where1,$orwhere)*/ {
-                $q->where('keyword', '!=', null);
-                $q->where('keyword', '!=', '');
-                $q->where('feed_type', 'compromise');
-                // $q->orwhere($orwhere);
-            });
             $model = $model->get();
+
+            // dd($model);
 
         }
 
         return DataTables::of($model)
             ->editColumn(
                 'chk',
-                function (DataLeakFeedTemp $model) {
-                    return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id val_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                function ($model) {
+                    return '<label><input type="checkbox" name="data_feed_id" class="data_feed_id val_id" value="' . $model->get_data_leak_feed_temp_one->id . '"><span class="label-text"></span></label>';
+                }
+            )
+            ->editColumn(
+                'site',
+                function ($model) {
+                    // $data_leak_socail_ref_temp = DataLeakSocialRefTemp::select('site_id')->where('data_leak_feed_id' , $model->get_data_leak_feed_temp_one->id)->first();
+                    // $site = SiteSettings::select('name')->whereIn('id', [$data_leak_socail_ref_temp -> site_id])->get();
+                    // $name_site = '';
+                    // foreach($site as $data){
+                    //     $name_site .= $data -> name . ' ,';
+                    // }
+                    // return rtrim($name_site, ", ") . ' '.$model->get_data_leak_feed_temp_one->id;
+
+                    $site = SiteSettings::select('name')->whereIn('id', [$model -> site_id])->first();
+                    return @$site->name;
+
+                }
+            )
+
+
+
+            ->editColumn(
+                'type',
+                function ($model) {
+                    if ($model->get_data_leak_feed_temp_one) {
+                        return $model->get_data_leak_feed_temp_one->feed_type;
+                    } else {
+                        return '-';
+                    }
+
                 }
             )
             ->editColumn(
                 'source',
-                function (DataLeakFeedTemp $model) {
-                    if ($model->source_name) {
-                        return $model->source_name;
+                function ($model) {
+                    if ($model->get_data_leak_feed_temp_one) {
+                        return $model->get_data_leak_feed_temp_one->source_name;
                     } else {
                         return '-';
                     }
@@ -1169,7 +1209,7 @@ class DataLeakController extends Controller
             )
             ->editColumn(
                 'keyword',
-                function (DataLeakFeedTemp $model) {
+                function ($model) {
                     if ($model->keyword) {
                         return $model->keyword;
                     } else {
@@ -1179,42 +1219,51 @@ class DataLeakController extends Controller
             )
             ->editColumn(
                 'content',
-                function (DataLeakFeedTemp $model) {
-                    return '<div class="text-elip">' . $model->feedcontent . '</div>';
+                function ($model) {
+                    if($model->get_data_leak_feed_temp_one) {
+                        return '<div class="text-elip">' . $model->get_data_leak_feed_temp_one->feedcontent. '</div>';
+                    } else {
+                        return '-';
+                    }
+
                 }
             )
             ->editColumn(
                 'data_feed',
-                function (DataLeakFeedTemp $model) {
-                    return $model->feedtimestamp;
+                function ($model) {
+                    if($model->get_data_leak_feed_temp_one) {
+                        return $model->get_data_leak_feed_temp_one->feedtimestamp;
+                    } else {
+                        return '-';
+                    }
                 }
             )
             ->editColumn(
                 'url',
-                function (DataLeakFeedTemp $model) {
-                    return '<a href="' . $model->feedlink . '" target="_blank"><i class="fas fa-link"></i></a>';
+                function ($model) {
+                    return '<a href="' . @$model->get_data_leak_feed_temp_one->feedlink . '" target="_blank"><i class="fas fa-link"></i></a>';
                 }
             )
             ->editColumn(
                 'action',
-                function (DataLeakFeedTemp $model) {
+                function ($model) {
                     $html = '';
-                    if ($model->approve == 0) {
-                        $html .= '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed(' . $model->id . ')">
+                    if (@$model->get_data_leak_feed_temp_one->approve == 0) {
+                        $html .= '<button class="btn btn-success btn-xs" data-toggle="modal" data-target="#confirm-change-status" onclick="approve_dataFeed(' . @$model->get_data_leak_feed_temp_one->id . ')">
                         Approve
                     </button>';
 
                         // $html .= '<a href="'.route('').'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>';
 
                     } else {
-                        $html .= '<button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status-cancle" onclick="cancle_dataFeed(' . $model->id . ')">
+                        $html .= '<button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirm-change-status-cancle" onclick="cancle_dataFeed(' . @$model->get_data_leak_feed_temp_one->id . ')">
                         Cancel
                     </button>';
                     }
                     return $html;
                 }
             )
-            ->rawColumns(['chk', 'source', 'keyword', 'content', 'data_feed', 'url', 'action'])
+            ->rawColumns(['chk','site','type','source', 'keyword', 'content', 'data_feed', 'url', 'action'])
             ->make(true);
     }
 

@@ -27,15 +27,41 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled style="display: none;">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" onclick="change_status_compromised_feed()" disabled>
-                        Change Status
-                    </button>
+                    
+
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
+
+                     @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                        // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                            <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise data</span></a>
+                        @endif
+                    @endif
+
+                     <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" onclick="change_status_compromised_feed()" disabled>
+                        Change Status
+                    </button>
+
+                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                            <option value="">All Site</option>
+                            @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
+                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+
+                    {{-- <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button> --}}
+                    
+                    
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none;">
@@ -124,6 +150,8 @@
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
+                                            <th>Site</th>
+                                            <th>Type</th>
                                             <th>Source</th>
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
@@ -571,6 +599,14 @@ function table_social_data(){
                 sortable: false,
                 className: 'w-10'
             },  
+            {
+                data: 'site',
+                name: 'site'
+            },
+            {
+                data: 'type',
+                name: 'type'
+            },
             {
                 data: 'source',
                 name: 'source'
