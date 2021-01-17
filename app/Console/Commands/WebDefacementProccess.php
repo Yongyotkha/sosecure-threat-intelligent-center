@@ -13,7 +13,7 @@ use Modules\WebDefacement\Entities\WebdefacmentImageMark;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataLog;
 use App\Entities\TransactionBatchjob;
-
+use Illuminate\Support\Facades\Artisan;
 class WebDefacementProccess extends Command
 {
     /**
@@ -67,6 +67,12 @@ class WebDefacementProccess extends Command
         $WebdefacmentSetting_data =    $value;
         if ($WebdefacmentSetting_data) {
           $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
+          if ($WebdefacmentDataOriginal_data ) {
+
+            Artisan::call('app:WebDefacementUpdateOriginal', ['webdefacment_id' => $webdefacment_id]);
+            Artisan::call('app:WebDefacementsCreenshotCheck', ['url' => $value->url,'port'=>$value->port,'site_id'=>$value->site_id,'url_id'=>0,'delay'=>$value->delay_screen_shot_val]);
+            $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
+          }
           if ($WebdefacmentDataOriginal_data) {
 
             $totalPoint = 0;
@@ -621,8 +627,8 @@ private function trackKeyWords($webContent, $blacklistKeywords,$Keyword_checks)
 {
   $keywordOK =array();
   if ($blacklistKeywords) {
-   
-    
+
+
     $keywords = explode(',', $blacklistKeywords);
     foreach ($keywords as $keyword) {
       $trackFound = $this->CheckKeyword($webContent,$keyword);
