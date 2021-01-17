@@ -12,6 +12,7 @@ use Auth;
 use Artisan;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 
 class WebDefacementController extends Controller
 {
@@ -367,10 +368,20 @@ class WebDefacementController extends Controller
         // );
     }  
 
+    public function deface_now(Request $request){
+        $webdefacment_id = $request->id;
+        $command = 'app:WebDefacementProccessbyWebdefacment_id';
+        $params = [
+            'webdefacment_id' => $webdefacment_id,
+        ];
+
+        Artisan::call($command, $params);
+    }
+
     public function update_original_detail(Request $request)
     {
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
-        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->first();
+        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->orderBy('created_at', 'desc')->first();
         $html_h = $webdefacement_original->hash;
         $html_f = $webdefacement_original->filesize;
         $html_e = $webdefacement_original->element;
@@ -393,6 +404,32 @@ class WebDefacementController extends Controller
             Response::HTTP_OK
         );
     }  
+
+    public function deface_now_detail(Request $request){
+        $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
+        $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->first();
+        $html_h = $webdefacement_check->hash_new;
+        $html_f = formatSizeUnits($webdefacement_check->filesize_new) . ' (Difference ' . $webdefacement_check->filesize_percent . '%)';
+        $html_e = $webdefacement_check->element_new;
+        $html_b = $webdefacement->blacklist_keyword_current;
+        $html_l = $webdefacement_check->last_update;
+
+
+        
+        return ajaxResponse(
+            [
+                'html_h'  => $html_h,
+                'html_f'  => $html_f,
+                'html_e'  => $html_e,
+                'html_b'  => $html_b,
+                'html_l'  => $html_l,
+                'message'  => langapp('changes_saved_successful'),
+                // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
 
     public function update_image(Request $request)
     {
