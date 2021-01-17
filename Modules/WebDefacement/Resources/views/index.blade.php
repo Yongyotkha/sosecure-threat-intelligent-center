@@ -10,9 +10,12 @@
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
              </button>
 
-             <a href="#" id="btn_md_create" style="margin-top: 8px;" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
-                @icon('solid/plus') @langapp('add')
-            </a>
+            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                <a href="#" id="btn_md_create" style="margin-top: 8px;" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
+                    @icon('solid/plus') @langapp('add')
+                </a>
+            @endif
+
             
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
