@@ -62,7 +62,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
         $WebdefacmentSetting_data =    $value;
         if ($WebdefacmentSetting_data) {
           $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
-          if ($WebdefacmentDataOriginal_data ) {
+          if (!$WebdefacmentDataOriginal_data ) {
 
             Artisan::call('app:WebDefacementUpdateOriginal', ['webdefacment_id' => $webdefacment_id]);
             Artisan::call('app:WebDefacementsCreenshotCheck', ['url' => $value->url,'port'=>$value->port,'site_id'=>$value->site_id,'url_id'=>0,'delay'=>$value->delay_screen_shot_val]);
