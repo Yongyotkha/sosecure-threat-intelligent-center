@@ -2616,6 +2616,18 @@ a.author-by{
     background-position: center top;
     /* overflow: hidden; */
 }
+@media screen and (max-height:400px){
+    .center-middle{
+        display: flex;
+        align-items: center;
+        justify-content:center;
+        height: auto;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center top;
+        /* overflow: hidden; */
+    }
+}
 
 @media screen and (max-width:560px){
     .center-middle{
