@@ -48,6 +48,7 @@ class WebDefacementController extends Controller
             if(Auth::user()->hasRole('admin')) {//if admin
                 // dd(777);
                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+                $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)->get();
 
             } else { //if notAdmin
                 // dd(888);
@@ -58,18 +59,26 @@ class WebDefacementController extends Controller
                         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
                         ->whereIn('id', $site_id_arr)//['49', '56']
                         ->get();
+
+                        $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)
+                        ->get();
              
 
                     } else {//not support and admin
                         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
                         ->whereIn('id', $site_id_arr)//['49', '56']
                         ->get();
+
+                        $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)
+                        ->get();
                     }
                 }
             }
         }
-
         $data['SiteSettings'] = $SiteSettings;
+        $data['SiteSettings_add'] = $SiteSettings_add;
 
         return view('webdefacement::index')->with($data);
     }

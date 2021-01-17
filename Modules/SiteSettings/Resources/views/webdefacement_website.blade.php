@@ -822,11 +822,12 @@
     }
 
     function close_wdfm_website(){
-        $('#title_head').text("Add Website");
+        $("#btn_save").prop("disabled",true);
+        $('#title_head').text(" Add Website");
         $('#mode').val('create');
         $('#name_web').val("");
         $('#url_web').val("");
-        $('#port_web').val("");
+        $('#port_web').val("80");
         $('#url_web').prop('readonly', false);
         $('#port_web').prop('readonly', false);
         $('#hash').prop('checked', false);
@@ -839,6 +840,7 @@
         $('#delay_screenshot_val').val("");
         $('#delay_screen_shot_val_div').hide();
         $("#area_check_message").empty();
+        $("#area_option").css("display","none");
     }
 
 
