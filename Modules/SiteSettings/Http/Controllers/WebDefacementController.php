@@ -113,7 +113,7 @@ class WebDefacementController extends Controller
     }
 
     public function WebDefacement_edit_data(Request $request){
-        $WebdefacmentSetting = WebdefacmentSetting::select('id','name','url','port','hash','filesize','element','blacklist_keyword','image_check','blacklist_keyword_content','delay_screen_shot_val')->where('code', $request -> id)->first();
+        $WebdefacmentSetting = WebdefacmentSetting::select('site_id','id','name','url','port','hash','filesize','element','blacklist_keyword','image_check','blacklist_keyword_content','delay_screen_shot_val')->where('code', $request -> id)->first();
         if($WebdefacmentSetting){
             $response = [
                 'message' => 'Successful', 
@@ -338,19 +338,29 @@ class WebDefacementController extends Controller
             // $WebdefacmentSetting->save();
         }
 
-    
-
-        $SiteSettings = SiteSettings::where('id',$site_id)->first();
-
-        return ajaxResponse(
-            [
-                'id'       => $WebdefacmentSetting->id,
-                'message'  => langapp('saved_successfully'),
-                'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
-            ],
-            true,
-            Response::HTTP_CREATED
-        );
+        if($request->channel == 'main_webdefacement'){
+            return ajaxResponse(
+                [
+                    'id'       => $WebdefacmentSetting->id,
+                    'message'  => langapp('saved_successfully'),
+                    'redirect' =>route('webdefacement.index'),
+                ],
+                true,
+                Response::HTTP_CREATED
+            );
+        }else{
+            $SiteSettings = SiteSettings::select('code')->where('id',$site_id)->first();
+            return ajaxResponse(
+                [
+                    'id'       => $WebdefacmentSetting->id,
+                    'message'  => langapp('saved_successfully'),
+                    'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
+                ],
+                true,
+                Response::HTTP_CREATED
+            );
+        }
+       
     }
 
     public function get_create_open_md_site_url(Request $request) {
