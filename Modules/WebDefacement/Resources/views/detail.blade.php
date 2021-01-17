@@ -239,7 +239,7 @@
                                         <button class="btn btn-info" onclick="update_original()">Update Original</button>
                                     </td>
                                     <td>
-                                        <button class="btn btn-info" onclick="deface_now()">Deface Now</button>
+                                        <button class="btn btn-info" onclick="deface_now()">Defacement Now</button>
                                     </td>
                                 </tr>
                             </tfoot>
