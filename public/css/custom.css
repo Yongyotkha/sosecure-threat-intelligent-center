@@ -3111,6 +3111,16 @@ input.input-login:focus {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    .card-dash{
+        box-shadow: 0 2px 3px rgba(0,0,0,.5);
+        display: flex;
+        min-height: 140px;
+        padding: 3rem;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
 }
 .form-custom{
     margin-bottom: 0;

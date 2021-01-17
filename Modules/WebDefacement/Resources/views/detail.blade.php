@@ -68,6 +68,7 @@
                                             -
                                         @endif 
                                     </td>
+                                    
                                     <td class="text-center">
                                         @if ($webdefacment_data_log->status_val) 
                                             {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
@@ -146,7 +147,7 @@
                         </table>
                     </div>
                     <div class="table-responsive" id='updateO'>
-                        <table class="table table-striped table-bordered table-hover">
+                        <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
                             <thead>
                                 <tr>
                                     <th width="250px"></th>
