@@ -13,7 +13,7 @@ use Modules\WebDefacement\Entities\WebdefacmentImageMark;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataLog;
 
-
+use Illuminate\Support\Facades\Artisan;
 class WebDefacementProccessbyWebdefacment_id extends Command
 {
     /**
