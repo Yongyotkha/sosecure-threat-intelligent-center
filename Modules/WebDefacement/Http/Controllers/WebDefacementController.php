@@ -381,7 +381,7 @@ class WebDefacementController extends Controller
     public function update_original_detail(Request $request)
     {
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
-        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->latest('created_at')->first();
+        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->orderBy('created_at', 'desc')->first();
         $html_h = $webdefacement_original->hash;
         $html_f = $webdefacement_original->filesize;
         $html_e = $webdefacement_original->element;
