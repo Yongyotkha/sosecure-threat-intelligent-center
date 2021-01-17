@@ -61,7 +61,7 @@ class TFClientTransfer_client_data_datacve_mapping extends Command
             'tbName' => $this->insertToTB,
         ];
 
-
+        print_r($this->site_code);
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
         
         if ($httpData["success"]) {

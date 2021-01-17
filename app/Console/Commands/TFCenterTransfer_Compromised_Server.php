@@ -58,9 +58,9 @@ class TFCenterTransfer_Compromised_Server extends Command
         // print_r($tableData);
 
         if (!$tableData) {
-            //nodata
+            
         } else {
-            //insert Center
+           
             $dataEncode = encrypt_decrypt('encrypt', $this->site_code, $header, $ip, $mac);
             $passBody = [
                 'site_code_en' => $dataEncode,
@@ -69,10 +69,8 @@ class TFCenterTransfer_Compromised_Server extends Command
             ];
 
             $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
-            print_r($httpData);
-            // echo json_encode($httpData);
+
             if ($httpData["success"]) {
-                //update
 
                 if (!empty($httpData["result"]["returnUpdate"])) {
                     $returnUpdate = $httpData["result"]["returnUpdate"];

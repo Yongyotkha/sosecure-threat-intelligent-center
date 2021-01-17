@@ -61,7 +61,7 @@ class TFClientTransfer_client_webdefacment_data_original extends Command
             'tbName' => $this->insertToTB,
         ];
 
-
+        print_r($this->site_code);
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
         // print_r($tableData);
 

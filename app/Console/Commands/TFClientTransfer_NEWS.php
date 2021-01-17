@@ -60,7 +60,7 @@ class TFClientTransfer_NEWS extends Command
             'tbName' => $this->insertToTB,
         ];
 
-
+        print_r($this->site_code);
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
         // print_r($tableData);
 

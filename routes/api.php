@@ -28,10 +28,12 @@ Route::group(['prefix' => 'v1/client-transfer'], function () {
     Route::post('getTranferData', 'Api\ApiTransferClients@getTranferData');
     Route::get('get_encode/{site_id}', 'Api\ApiTransferClients@get_encode');
     Route::post('checkwebserverIP', 'Api\ApiTransferClients@checkWebserverIP');
+   
 });
 
 
 Route::group(['prefix' => 'v1/centerinto-transfer'], function () {
+    Route::post('updateTFBatchJob', 'Api\ApiTransferCenterInsert@updateBatchJob');
     Route::post('insertToNoRef', 'Api\ApiTransferCenterInsert@insertToNoRef');
 });
 

@@ -60,7 +60,7 @@ class TFClientTransfer_client_cve_assets extends Command
             'site_code_en' => $dataEncode,
             'tbName' => $this->insertToTB,
         ];
-
+        print_r($this->site_code);
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
         
         if ($httpData["success"]) {
@@ -76,7 +76,7 @@ class TFClientTransfer_client_cve_assets extends Command
 
                 $httpDataRecon = $this->reconnnect($this->url, $passBody, $this->urlLimit);
                 print_r($httpDataRecon);
-                // echo json_encode($httpData);
+
                 if ($httpDataRecon["success"]) {
 
                 } else {
