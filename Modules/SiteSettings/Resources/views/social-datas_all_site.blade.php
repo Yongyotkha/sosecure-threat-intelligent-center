@@ -26,7 +26,29 @@
                         @icon('solid/download') CSV
                        
                     </a> --}}
-                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                    
+
+                    
+
+                    
+                   
+                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                     </button>
+
+                     @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                        // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                            <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Dataleak feed</span></a>
+                        @endif
+                    @endif
+
+                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
+                     <div class="pull-right" style="margin-top: 8px; width: 300px;">
                         <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                             <option value="">All Site</option>
                             @if($SiteSettings)
@@ -36,23 +58,11 @@
                             @endif
                         </select>
                     </div>
-                   
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
-                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
 
-                    @if(!empty(get_role_custom()))
-                      
-                    {{-- // var_dump(get_role_custom()['superadmin']);
-                    // var_dump(get_role_custom()['site_admin']); --}}
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Dataleak feed</span></a>
-                    @endif
-                 
-                @endif
+
+                    
+                    
+
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
