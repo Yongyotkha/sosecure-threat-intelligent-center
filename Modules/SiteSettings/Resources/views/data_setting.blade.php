@@ -173,6 +173,22 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Web Defacement</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="" value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">URL Add</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin" name="asset_limit" value="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label class="col-lg-3 control-label">E-mail Alert : </label>
                                     <div class="col-lg-9">
                                         <select name="email_alert[]" id="email_alert" class="select2-option form-control" multiple="multiple">
@@ -191,7 +207,7 @@
 
                                 <div class="row text-right">
                                     <div class="col-lg-3">
-                                        <h3>Syslog Server Log</h3>
+                                        <label class="col-lg-3 control-label">>Syslog Server Log</label>
                                     </div>
                                 </div>
                              
