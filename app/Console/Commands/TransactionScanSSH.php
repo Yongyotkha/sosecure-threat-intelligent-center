@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\TransactionTimeStampScans;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
+use App\Entities\TransactionBatchjob;
 
 class TransactionScanSSH extends Command
 {
@@ -40,6 +41,14 @@ class TransactionScanSSH extends Command
      */
     public function handle()
     {
+
+
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','Asset_scan_ssh')->first();
+        $TransactionBatchjob_Update->progress = 2;
+        $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
+
         try {
             $TransactionTimeStampScans = TransactionTimeStampScans::where('progress', 0)->where('status', 1)->get();
             foreach($TransactionTimeStampScans as $TransactionTimeStampScan){
@@ -74,9 +83,9 @@ class TransactionScanSSH extends Command
                 $cmd_port_scanner = $cmd.'-m sfp_portscan_tcp -s '.$domain.' -q -F TCP_PORT_OPEN,TCP_PORT_OPEN_BANNER';
 
                 $descriptorspec = array(
-                0 => array("pipe", "r"),
-                1 => array("pipe", "w"),
-                2 => array("pipe", "w")
+                    0 => array("pipe", "r"),
+                    1 => array("pipe", "w"),
+                    2 => array("pipe", "w")
                 );
                 flush();
 
@@ -93,7 +102,7 @@ class TransactionScanSSH extends Command
                         
                         $path = public_path().'/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
                         File::makeDirectory($path, $mode = 0777, true, true);
-            
+
                         $file = $path.'/looking_for_subdomain.txt';
                         file_put_contents($file, $current_looking_for_subdomain);
                         break;
@@ -298,5 +307,11 @@ class TransactionScanSSH extends Command
         } catch (\Throwable $th) {
             //throw $th;
         }
+
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','Asset_scan_ssh')->first();
+        $TransactionBatchjob_Update->progress = 1;
+        $TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
     }
 }
