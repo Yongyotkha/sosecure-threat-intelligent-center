@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
 
-
+use App\Entities\TF_Center_transaction_batchjob;
 use App\Entities\CompromisedFileCheck;
 use App\Entities\TF_Client_R_s_s_news;
 use App\Entities\TF_Client_webdefacment_data_check;

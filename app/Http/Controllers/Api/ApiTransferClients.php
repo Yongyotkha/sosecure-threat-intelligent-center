@@ -12,6 +12,7 @@ use phpseclib\Net\SSH2;
 use Exception;
 
 use Modules\SiteSettings\Entities\SiteSettings;
+use App\Entities\TF_Center_transaction_batchjob;
 
 use App\Entities\Transaction_client_News;
 use App\Entities\Transaction_client_webdefacment_data_check;
