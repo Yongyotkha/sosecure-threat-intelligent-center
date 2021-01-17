@@ -6,15 +6,15 @@ use Exception;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Console\Command;
 
-class TFClientTransfer_NEWS extends Command
+class TFClientTransfer_client_webdefacment_data_logs extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:TFClientTransfer_NEWS';
-    protected $description = 'TFClientTransfer_NEWS';
+    protected $signature = 'app:TFClientTransfer_client_webdefacment_data_logs';
+    protected $description = 'TFClientTransfer_client_webdefacment_data_logs';
 
     /**
      * The console command description.
@@ -31,7 +31,8 @@ class TFClientTransfer_NEWS extends Command
     private $header = 'header';
     private $site_code = '';
     private $site_mode = '';
-    private $insertToTB = 'fx_transaction_client_news';
+    private $insertToTB = 'fx_transaction_client_webdefacment_data_logs';
+
     /**
      * Create a new command instance.
      */

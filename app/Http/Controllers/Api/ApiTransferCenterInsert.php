@@ -49,11 +49,11 @@ class ApiTransferCenterInsert extends Controller
                         foreach ($dataTables as $dataTable) {
 
                             // $transfer_data_id = $dataTable["get_transfer"]["id"];
-                            if(!empty($dataTable["get_transfer"][$pkey])){
+                            if(!empty($dataTable["transaction_id"])){
                                 $findOne = new $model_insert;
                                 $findOne->setConnection($this->dbName);
-                                $findOne = $findOne->where('transfer_site_id', $site->id)->where('transfer_data_id', $dataTable["get_transfer"][$pkey])->first();
-                                if ($dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
+                                $findOne = $findOne->where('transfer_site_id', $site->id)->where('transfer_data_id', $dataTable["transaction_id"])->first();
+                                if (!empty($dataTable["get_transfer"][$pkey]) && $dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
                                     if (empty($findOne)) {
                                         $findOne = new $model_insert;
                                         $findOne->setConnection($this->dbName);

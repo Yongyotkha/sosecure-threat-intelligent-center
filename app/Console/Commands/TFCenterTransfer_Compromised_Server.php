@@ -24,7 +24,7 @@ class TFCenterTransfer_Compromised_Server extends Command
      */
 
     private $urlLimit = 3;
-    private $url = 'http://127.0.0.2/api/v1/centerinto-transfer/insertToNoRef';
+    private $url = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/insertToNoRef';
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
     private $header = 'header';

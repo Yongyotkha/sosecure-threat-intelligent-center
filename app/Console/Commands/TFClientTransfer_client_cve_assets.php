@@ -6,15 +6,15 @@ use Exception;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Console\Command;
 
-class TFClientTransfer_NEWS extends Command
+class TFClientTransfer_client_cve_assets extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:TFClientTransfer_NEWS';
-    protected $description = 'TFClientTransfer_NEWS';
+    protected $signature = 'app:TFClientTransfer_client_cve_assets';
+    protected $description = 'TFClientTransfer_client_cve_assets';
 
     /**
      * The console command description.
@@ -31,7 +31,8 @@ class TFClientTransfer_NEWS extends Command
     private $header = 'header';
     private $site_code = '';
     private $site_mode = '';
-    private $insertToTB = 'fx_transaction_client_news';
+    private $insertToTB = 'fx_transaction_client_cve_assets';
+
     /**
      * Create a new command instance.
      */
@@ -60,10 +61,8 @@ class TFClientTransfer_NEWS extends Command
             'tbName' => $this->insertToTB,
         ];
 
-
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
-        // print_r($tableData);
-
+        
         if ($httpData["success"]) {
             if (!empty($httpData["result"]["queryData"])) {
                 
