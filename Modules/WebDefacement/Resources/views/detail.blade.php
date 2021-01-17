@@ -450,6 +450,7 @@
                                 $('#filesize_new').html(response.html_f);
                                 $('#element_new').html(response.html_e);
                                 $('#last_update').html(response.html_l);
+                                $('#blacklist_keyword_current').html(response.html_b);
                                 $('#updateO').loading('stop');
                                 {{--window.location.href = response.redirect;--}}
                             },
