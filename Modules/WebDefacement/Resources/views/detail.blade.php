@@ -452,7 +452,12 @@
                                 $('#last_update').html(response.html_l);
                                 $('#blacklist_keyword_current').html(response.html_b);
                                 $('#updateO').loading('stop');
-                                {{--window.location.href = response.redirect;--}}
+                               
+                                if(response.success){
+                                    toastr.success('Update Success', '@langapp('response_status')');
+                                } else {
+                                    toastr.error(data.message, '@langapp('response_status')');
+                                }
                             },
                             error: function (error){
                                 $('#updateO').loading('stop');
@@ -465,19 +470,6 @@
                             }
             
                         });
-
-
-                    
-              
-                        let data = JSON.parse(response);
-        
-                        if(data.Result==1){
-                            toastr.success('Update Success', '@langapp('response_status')');
-                        } else {
-                            toastr.error(data.message, '@langapp('response_status')');
-                        }
-                        
-                        {{--window.location.href = response.redirect;--}}
                     },
                     error: function (error){
                         $('#updateO').loading('stop');
