@@ -84,34 +84,6 @@ class TFClientTransfer_client_webdefacment_setting extends Command
                 } else {
 
                 }
-                // if($httpData["success"]){
-                //     $returnData = json_decode($httpData["result"],true);
-                //     if($returnData["connect"]){
-                //         if(!empty($returnData["result"])){
-                //             $dataBase = DB::connection('dummyDatabase');
-                //             foreach ($returnData["result"] as $value) {
-                //                 $dataBase = $dataBase->select('select * from '.$this->tbName.' WHERE center_id = "'.$value["news_id"].'" limit 1');
-
-                //                 if($value["transaction_mode"]=='insert'||$value["transaction_mode"]=='update'){
-                //                     if(empty($dataBase)){
-                //                         // DB::insert('insert into users (id, name) values (?, ?)', [1, 'Dayle']);
-                //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
-
-                //                         }
-                //                     }else{
-                //                         // DB::update('update users set votes = 100 where name = ?', ['John']);
-                //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
-
-                //                         }
-                //                     }
-                //                 }else if($value["transaction_mode"]=='delete'){
-
-                //                 }
-
-                //             }
-                //         }
-                //     }
-                // }
             } else {
 
             }
