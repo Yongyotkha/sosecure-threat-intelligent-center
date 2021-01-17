@@ -42,7 +42,7 @@
                             <i class="fas fa-globe-europe"></i> Log
                         </div>
                         <div class="col-xs-6 text-right">
-                            <button id="togglelog" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
+                            <button id="togglelog" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
                                 <i class="fas fa-minus-square"></i>Collapse
                             </button>
                         </div>
@@ -58,7 +58,7 @@
                             
                         </tr>
 
-                        {{-- @if ($webdefacment_data_log)            
+                        @if ($webdefacment_data_log)            
                             @foreach ($webdefacment_data_log as $webdefacment_data_log)
                                 <tr>
                                     <td class="text-center">{!! @$loop->iteration !!}</td>
@@ -79,9 +79,9 @@
                                     <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
                                 </tr>
                             @endforeach
-                        @endif --}}
+                        @endif
 
-                        <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> ไปใช้ด้านบนได้เลยนะครับ -->
+                        <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> 
                         <tr>
                             <td class="text-center">1</td>
                             <td> 
@@ -108,7 +108,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="card-log"  style="background: rgb(255, 211, 92)"> <!-- ปล. ถ้าใส่สีให้ใช้แบบนี้นะครับ -->
+                                    <div class="card-log"  style="background: #fcc838 ">
                                         <div class="card-log-body">
                                             <p>Total Difference 30% (Medium)</p>
                                         </div>
@@ -120,6 +120,7 @@
                             </td>
                             <td class="no-wrap">2021-01-17 09:47:38</td>
                         </tr>
+                        -->
 
 
                     </table>
@@ -133,7 +134,7 @@
                             <i class="fas fa-globe-europe"></i> Web Defacement
                         </div>
                         <div class="col-xs-6 text-right">
-                            <button id="togglecollapsechart" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#details_webdefacement','#togglecollapsechart')">
+                            <button id="togglecollapsechart" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#details_webdefacement','#togglecollapsechart')">
                                 <i class="fas fa-minus-square"></i>Collapse
                             </button>
                         </div>
