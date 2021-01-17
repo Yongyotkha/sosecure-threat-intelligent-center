@@ -6,9 +6,14 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head"> @langapp('webdefacement')</div>    
 
-            <button id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <button id="advance-search" style="margin-top: 8px;" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
              </button>
+
+             <a href="#" id="btn_md_create" style="margin-top: 8px;" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
+                @icon('solid/plus') @langapp('add')
+            </a>
+            
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
@@ -22,6 +27,7 @@
                     @endif
                 </select>
             </div>
+          
         </header>
 
         <section class="scrollable wrapper">
@@ -262,6 +268,52 @@
         search (null);
     });
   
+  
+    
+
+    function btn_click_del_webdefacement(id) {
+     
+     Swal.fire({
+         title: 'Are you sure?',
+         text: "You won't be able to revert this!",
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonColor: '#3085d6',
+         cancelButtonColor: '#d33',
+         heightAuto: false,
+         confirmButtonText: 'Yes'
+     }).then((result) => {
+         if (result.isConfirmed) {
+             console.log(id);
+             $.ajax({
+                 type:"POST",
+                 url:"{{ route('webdefacement.delete_websefacement_process') }}",
+                 data:{id: id},
+                 beforeSend: function(){
+                     loading('load');
+                 },
+                 success:function(response) {
+                     loading('stop_load');
+                     toastr.success(response.message, '@langapp('response_status')');
+                     load_card();
+                     {{--window.location.href = response.redirect;--}}
+                 },
+                 error: function (error){
+                     loading('stop_load');
+                     var errors = error.response.data.errors;
+                     var errorsHtml = '';
+                     $.each(errors, function (key, value) {
+                         errorsHtml += '<li>' + value[0] + '</li>';
+                     });
+                     toastr.error(errorsHtml, '@langapp('response_status') ');
+                 }
+         
+             });
+
+         }
+     })
+  }
+
 </script>
 @endpush
 @endsection

@@ -475,8 +475,8 @@
                         let d_header = DomainHeaders;
                         let message_html = `<div class="form-group row">
                                                 <div class="col-lg-12">
-                                                    <div style="width: 100%; background: #b3ffb3;">
-                                                        <i class="fas fa-check"></i> ${message}
+                                                    <div class="bg-success" style="display:inline-block;padding:5px;border-radius:5px;">
+                                                        <i class="fas fa-check-circle text-white fa-2x"></i> ${message}
                                                     </div>
                                                 </div>
                                             </div>
