@@ -187,7 +187,7 @@
                                         <input type="text" class="form-control touch_spin" name="asset_limit" value="">
                                     </div>
                                 </div>
-
+                                <hr>
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">E-mail Alert : </label>
                                     <div class="col-lg-9">

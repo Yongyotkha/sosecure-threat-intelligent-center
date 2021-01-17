@@ -1,8 +1,12 @@
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Add Domain </h4>
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white">
+                <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();"
+                    datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                Add Domain
+            </h4>
         </div>
        
         {!! Form::open(['route' => ['domain.save',$code], 'class' => 'ajaxifyForm_custom validator', 'novalidate' => '', 'files' => true]) !!}
@@ -226,7 +230,7 @@
                 <div class="col-lg-8">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="default" value="TRUE">
+                        <input type="checkbox" name="default" checked value="TRUE">
                         <span></span>
                     </label>
                 </div>
