@@ -278,7 +278,7 @@ class WebDefacementController extends Controller
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
-                        <h4>'.@$key->name.'</h4>
+                        <h4 class="wdfm-elip">'.@$key->name.'</h4>
                         <p class="mdfm-text-muted">'.@$key->url.'</p>
                     </div>
                     <div class="wdfm-footer">
