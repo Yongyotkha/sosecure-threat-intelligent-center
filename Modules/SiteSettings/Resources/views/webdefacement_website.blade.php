@@ -197,7 +197,7 @@
                     <button type="button" class="close text-white" data-dismiss="modal" onclick="close_wdfm_website()">&times;</button>
                     <h4 class="modal-title text-white">
                         <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                        Add Website
+                        <span id="title_head"> Add Website</span>
                     </h4>
                 </div>
                 {{-- <form action="" class="ajaxifyForm_custom"> --}}
@@ -773,6 +773,7 @@
         }).done(function(response){
             loading('stop_load');
             if(response.status_code == 200) {
+                $('#title_head').text("Edit Website");
                 $("#webdefacment_setting_id").val(response.data.id);
                 $('#mode').val('update');
                 $("#btn_save").prop("disabled",false);
@@ -821,6 +822,7 @@
     }
 
     function close_wdfm_website(){
+        $('#title_head').text("Add Website");
         $('#mode').val('create');
         $('#name_web').val("");
         $('#url_web').val("");
