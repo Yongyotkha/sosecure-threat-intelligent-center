@@ -3099,6 +3099,8 @@ input.input-login:focus {
     }
 }
 
+
+
 @media screen and (max-width:768px){
     .bc-head {
         font-size: 16px;
@@ -3340,4 +3342,18 @@ input.input-login:focus {
  .panel .table td, .panel .table th {
     padding: 8px 8px !important;
     border-top: 1px solid #f1f1f1;
+}
+
+.card-log{
+    background: #eeeeee;
+    padding: 8px;
+    border: 1px solid rgb(180, 180, 180);
+    display: inline-block;
+}
+.card-log:not(:first-child){
+    border-left: unset !important;
+}
+
+.card-log-body p{
+    margin: 0;
 }
