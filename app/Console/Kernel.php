@@ -25,11 +25,7 @@ class Kernel extends ConsoleKernel
     {
         // Uncomment for shared hosting
 
-        $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
-        $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
-        
-        $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
-        $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
+
 
         // $schedule->command('app:FeedCompromisedServer')->cron('0 6 * * *')->withoutOverlapping(5);
         
@@ -76,8 +72,21 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         $delay_WebDefacementProccess = rand(1,55);
-        $schedule->command('app:WebDefacementProccess')->everyMinute();
+        if (env('Server_id') =="10.104.0.11") {
+           $schedule->command('app:WebDefacementProccess')->everyMinute();
+       }else{
+        $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
+        $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
+        
+        $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
+        $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
+
+        $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
+        $schedule->command('app:MDCVEBatchJob')->dailyAt('8:00')->name('lang.progress')->withoutOverlapping(5);
     }
+
+
+}
 
     /**
      * Register the Closure based commands for the application.

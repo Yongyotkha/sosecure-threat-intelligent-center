@@ -1,6 +1,6 @@
 <?php
-// ##################################### SETTING SQL ########################################
-// #update fern 10/7/2019 14:40
+##################################### SETTING SQL ########################################
+#update fern 10/7/2019 14:40
 // date_default_timezone_set("Asia/Bangkok");
 // $serversql = "db-mysql-sgp1-sosecure-do-user-5073486-0.a.db.ondigitalocean.com";
 // $dbuser = "threatintelligent";
@@ -494,77 +494,77 @@
 //     echo json_encode($th->getMessage());
 // }
 
-// function search_revisions($dataArray, $search_value, $key_to_search, $other_matching_value = null, $other_matching_key = null)
-// {
-//     // This function will search the revisions for a certain value
-//     // related to the associative key you are looking for.
-//     $keys = array();
-//     foreach ($dataArray as $key => $cur_value) {
-//         if ($cur_value[$key_to_search] == $search_value) {
-//             if (isset($other_matching_key) && isset($other_matching_value)) {
-//                 if ($cur_value[$other_matching_key] == $other_matching_value) {
-//                     $keys[] = $cur_value;
-//                 }
-//             } else {
-//                 // I must keep in mind that some searches may have multiple
-//                 // matches and others would not, so leave it open with no continues.
-//                 $keys[] = $cur_value;
-//             }
-//         }
-//     }
-//     return $keys;
-// }
+function search_revisions($dataArray, $search_value, $key_to_search, $other_matching_value = null, $other_matching_key = null)
+{
+    // This function will search the revisions for a certain value
+    // related to the associative key you are looking for.
+    $keys = array();
+    foreach ($dataArray as $key => $cur_value) {
+        if ($cur_value[$key_to_search] == $search_value) {
+            if (isset($other_matching_key) && isset($other_matching_value)) {
+                if ($cur_value[$other_matching_key] == $other_matching_value) {
+                    $keys[] = $cur_value;
+                }
+            } else {
+                // I must keep in mind that some searches may have multiple
+                // matches and others would not, so leave it open with no continues.
+                $keys[] = $cur_value;
+            }
+        }
+    }
+    return $keys;
+}
 
-// function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
-// {
+function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
+{
 
-//     $insertdata = "INSERT INTO fx_data_datacve (namecve, published, modified, description, cvss_score, severity, updated_at, created_at)
-//   VALUES  ('" . $add_name . "',
-//   '" . $add_published . "',
-//   '" . $add_modified . "',
-//   '" . $add_descript . "',
-//   '" . $add_cvsssore . "',
-//   '" . $add_severity . "',
-//   '" . $add_pub_date . "','" . $created_at . "')";
+    $insertdata = "INSERT INTO fx_data_datacve (namecve, published, modified, description, cvss_score, severity, updated_at, created_at)
+  VALUES  ('" . $add_name . "',
+  '" . $add_published . "',
+  '" . $add_modified . "',
+  '" . $add_descript . "',
+  '" . $add_cvsssore . "',
+  '" . $add_severity . "',
+  '" . $add_pub_date . "','" . $created_at . "')";
 
-//     $insert_data_query = mysqli_query($conn, $insertdata);
+    $insert_data_query = mysqli_query($conn, $insertdata);
 
-//     if ($insert_data_query) {
-//         echo "Insert Success";
-//         $st = array('sector' => "INSERT", 'status' => "Success");
-//         //  echo json_encode($st);
-//     } else {
-//         echo "Error" . mysqli_error($conn);
-//         $st = array('sector' => "INSERT", 'status' => "Fail");
-//         // echo json_encode($st);
-//     }
+    if ($insert_data_query) {
+        echo "Insert Success";
+        $st = array('sector' => "INSERT", 'status' => "Success");
+        //  echo json_encode($st);
+    } else {
+        echo "Error" . mysqli_error($conn);
+        $st = array('sector' => "INSERT", 'status' => "Fail");
+        // echo json_encode($st);
+    }
 
-// }
+}
 
-// function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
-// {
-//     $updatedata = "UPDATE fx_data_datacve SET
-//   published = '" . $add_published . "' ,
-//   modified = '" . $add_modified . "' ,
-//   description = '" . $add_descript . "' ,
-//   cvss_score = '" . $add_cvsssore . "' ,
-//   severity = '" . $add_severity . "' ,
-//   updated_at = '" . $add_pub_date . "' ,
-//   created_at = '" . $created_at . "'
-//   WHERE namecve = '" . $add_name . "' ";
+function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
+{
+    $updatedata = "UPDATE fx_data_datacve SET
+  published = '" . $add_published . "' ,
+  modified = '" . $add_modified . "' ,
+  description = '" . $add_descript . "' ,
+  cvss_score = '" . $add_cvsssore . "' ,
+  severity = '" . $add_severity . "' ,
+  updated_at = '" . $add_pub_date . "' ,
+  created_at = '" . $created_at . "'
+  WHERE namecve = '" . $add_name . "' ";
 
-//     $update_data_query = mysqli_query($conn, $updatedata);
-//     if ($update_data_query) {
-//         echo "Insert Success";
-//         $st = array('sector' => "UPDATE", 'status' => "Success");
-//         //  echo json_encode($st);
-//     } else {
-//         echo "Error" . mysqli_error($conn);
-//         $st = array('sector' => "UPDATE", 'status' => "Fail");
-//         //  echo json_encode($st);
-//     }
+    $update_data_query = mysqli_query($conn, $updatedata);
+    if ($update_data_query) {
+        echo "Insert Success";
+        $st = array('sector' => "UPDATE", 'status' => "Success");
+        //  echo json_encode($st);
+    } else {
+        echo "Error" . mysqli_error($conn);
+        $st = array('sector' => "UPDATE", 'status' => "Fail");
+        //  echo json_encode($st);
+    }
 
-// }
+}
 
 
 ?>
