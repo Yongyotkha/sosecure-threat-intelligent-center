@@ -312,7 +312,7 @@ class WebDefacementController extends Controller
                 $WebdefacmentSetting->active = 1;
                 $WebdefacmentSetting->domain = '';
                 $WebdefacmentSetting->user_agent = '';
-                $WebdefacmentSetting->webdeflacement_progress = 3;
+                $WebdefacmentSetting->webdeflacement_progress = 1;
                 $WebdefacmentSetting->image_last = '';
                 $WebdefacmentSetting->status_add = 1;
             }
