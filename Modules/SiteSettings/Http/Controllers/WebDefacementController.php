@@ -114,6 +114,11 @@ class WebDefacementController extends Controller
 
     public function WebDefacement_edit_data(Request $request){
         $WebdefacmentSetting = WebdefacmentSetting::select('site_id','id','name','url','port','hash','filesize','element','blacklist_keyword','image_check','blacklist_keyword_content','delay_screen_shot_val')->where('code', $request -> id)->first();
+        $site = SiteSettings::find($WebdefacmentSetting -> site_id);
+        $webdefacment_data_original = WebdefacmentDataOriginal::where('webdefacment_setting_id',$WebdefacmentSetting -> id)->orderBy('id','desc')->first();
+        $WebdefacmentSetting -> site_code = $site -> code;
+        $WebdefacmentSetting -> image = $webdefacment_data_original -> image;
+        $WebdefacmentSetting -> part_image = $webdefacment_data_original -> part_image;
         if($WebdefacmentSetting){
             $response = [
                 'message' => 'Successful', 
@@ -312,7 +317,6 @@ class WebDefacementController extends Controller
                 $WebdefacmentSetting->status_add = 1;
             }
             $WebdefacmentSetting->save();
-
         } else {
             // $WebdefacmentSetting = new WebdefacmentSetting;
             // $WebdefacmentSetting->code = generator_uuid();
@@ -337,7 +341,7 @@ class WebDefacementController extends Controller
             // $WebdefacmentSetting->status_add = 1;
             // $WebdefacmentSetting->save();
         }
-
+       
         if($request->channel == 'main_webdefacement'){
             return ajaxResponse(
                 [
@@ -361,6 +365,27 @@ class WebDefacementController extends Controller
             );
         }
        
+    }
+
+    private function webDefacementUpdateOriginal($webdefacment_setting_id){
+        $command = 'app:WebDefacementUpdateOriginal';
+        $params = [
+                'webdefacment_id' => $webdefacment_setting_id,
+        ];
+        Artisan::call($command, $params);
+    }
+
+    private function webDefacementsCreenshotCheck($url_web, $port_web, $site_id, $url_id, $delay_screenshot_val){
+        $command_2 = 'app:WebDefacementsCreenshotCheck';
+        $params_2 = [
+                'url' => $url_web,
+                'port' => $port_web,
+                'site_id' => $site_id,
+                'url_id' => $url_id,
+                'delay' => $delay_screenshot_val,
+        ];
+
+        Artisan::call($command_2, $params_2);
     }
 
     public function get_create_open_md_site_url(Request $request) {
