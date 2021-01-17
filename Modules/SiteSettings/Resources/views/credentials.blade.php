@@ -88,7 +88,7 @@
                     <h4 class="modal-title text-white">
                         <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();"
                             datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                        Confirm Information
+                        Add Credentials
                     </h4>
                 </div>
                 <form id='add_credentials_click' method="POST">
