@@ -202,34 +202,34 @@
                                 <tr>
                                     <th>Hash</th>
                                     <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
-                                    <td>{{@$webdefacment_data_check->hash_new}} (Difference {{@$webdefacment_data_check->hash_percent}}%)</td>
+                                    <td id='hash_new'>{{@$webdefacment_data_check->hash_new}} (Difference {{@$webdefacment_data_check->hash_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->filesize == 1)
                                 <tr>
                                     <th>File Size</th>
                                     <td id='FileSize'>{{@formatSizeUnits($webdefacment_data_original->filesize)}}</td>
-                                    <td>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} (Difference {{@$webdefacment_data_check->filesize_percent}}%)</td>
+                                    <td id='filesize_new'>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} (Difference {{@$webdefacment_data_check->filesize_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->element == 1)
                                 <tr>
                                     <th>Element</th>
                                     <td id='Element'>{{@$webdefacment_data_original->element}}</td>
-                                    <td>{{@$webdefacment_data_check->element_new}} (Difference {{@$webdefacment_data_check->element_percent}}%)</td>
+                                    <td id='element_new'>{{@$webdefacment_data_check->element_new}} (Difference {{@$webdefacment_data_check->element_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->blacklist_keyword_content == 1)
                                 <tr>
                                     <th>Blacklist Keyword</th>
                                     <td id='BlacklistKeyword'>{{@$webdefacement->blacklist_keyword_content}}</td>
-                                    <td>{{@$webdefacement->blacklist_keyword_current}}</td>
+                                    <td id='blacklist_keyword_current'>{{@$webdefacement->blacklist_keyword_current}}</td>
                                 </tr>
                                 @endif
                                 <tr>
                                     <th>Last Update</th>
                                     <td id='LastUpdate'>{{@$webdefacment_data_original->last_update}}</td>
-                                    <td>{{@$webdefacment_data_check->last_update}}</td>
+                                    <td id='last_update'>{{@$webdefacment_data_check->last_update}}</td>
                                 </tr>
                             </tbody>
                             <tfoot>
@@ -239,9 +239,7 @@
                                         <button class="btn btn-info" onclick="update_original()">Update Original</button>
                                     </td>
                                     <td>
-                                        {{-- @if ($webdefacement->status_val != 'Normal')
-                                            <span id='check_status_val_current'><button class="btn btn-info"  onclick="accept_risk()">Accept Risk</button></span>
-                                        @endif --}}
+                                        <button class="btn btn-info" onclick="deface_now()">Deface Now</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -417,6 +415,84 @@
             }   
         })
     };
+
+    function deface_now(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('webdefacement.deface_now') }}",
+                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    beforeSend: function(){
+                        $('#updateO').loading('start');
+                        
+                    },
+                    success:function(response) {
+                        $.ajax({
+                            type:"POST",
+                            url:"{{ route('webdefacement.deface_now_detail') }}",
+                            data:{id: {!!json_encode($webdefacement->id)!!}},
+                            beforeSend: function(){
+                                
+                            },
+                            success:function(response) {
+                        
+                                $('#hash_new').html(response.html_h);
+                                $('#filesize_new').html(response.html_f);
+                                $('#element_new').html(response.html_e);
+                                $('#last_update').html(response.html_l);
+                                $('#updateO').loading('stop');
+                                {{--window.location.href = response.redirect;--}}
+                            },
+                            error: function (error){
+                                $('#updateO').loading('stop');
+                                var errors = error.response.data.errors;
+                                var errorsHtml = '';
+                                $.each(errors, function (key, value) {
+                                    errorsHtml += '<li>' + value[0] + '</li>';
+                                });
+                                toastr.error(errorsHtml, '@langapp('response_status') ');
+                            }
+            
+                        });
+
+
+                    
+              
+                        let data = JSON.parse(response);
+        
+                        if(data.Result==1){
+                            toastr.success('Update Success', '@langapp('response_status')');
+                        } else {
+                            toastr.error(data.message, '@langapp('response_status')');
+                        }
+                        
+                        {{--window.location.href = response.redirect;--}}
+                    },
+                    error: function (error){
+                        $('#updateO').loading('stop');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+    
+                });
+
+            }   
+        })
+    }
 
     function update_original() { 
      
