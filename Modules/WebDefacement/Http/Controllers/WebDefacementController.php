@@ -409,7 +409,7 @@ class WebDefacementController extends Controller
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
         $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->first();
         $html_h = $webdefacement_check->hash_new;
-        $html_f = $webdefacement_check->filesize_new;
+        $html_f = formatSizeUnits($webdefacement_check->filesize_new) . ' (Difference ' . $webdefacement_check->filesize_percent . '%)';
         $html_e = $webdefacement_check->element_new;
         $html_b = $webdefacement->blacklist_keyword_current;
         $html_l = $webdefacement_check->last_update;
