@@ -36,6 +36,24 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
+
+                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                     </button>
+
+                     @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                        // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
+                        @endif
+                    @endif
+
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
+
                     <div class="pull-right" style="margin-top: 8px; width: 300px;">
                         <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                             <option value="">All Site</option>
@@ -47,23 +65,8 @@
                         </select>
                     </div>
 
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
-
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
                     
-                    @if(!empty(get_role_custom()))
-                      
-                        {{-- // var_dump(get_role_custom()['superadmin']);
-                        // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
-                        @endif
-                     
-                    @endif
+                    
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
