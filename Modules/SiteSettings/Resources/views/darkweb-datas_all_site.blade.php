@@ -36,6 +36,24 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
+
+                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                     </button>
+
+                     @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                        // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
+                        @endif
+                    @endif
+
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
+
                     <div class="pull-right" style="margin-top: 8px; width: 300px;">
                         <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                             <option value="">All Site</option>
@@ -47,23 +65,8 @@
                         </select>
                     </div>
 
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
-
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
                     
-                    @if(!empty(get_role_custom()))
-                      
-                        {{-- // var_dump(get_role_custom()['superadmin']);
-                        // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
-                        @endif
-                     
-                    @endif
+                    
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
@@ -192,10 +195,12 @@
                                                 </label>
                                             </th>
                                             <th>Site</th>
-                                            <th>Source</th>
-                                            <th>Path</th>
+                                            <th>Type</th>
+                                            
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
+                                            <th>remark</th>
+
                                             <th>Data Feed</th>
                                             <th>View</th>
                                             <th>Status</th>
@@ -310,6 +315,16 @@
 @include('stacks.js.advanced_search')
 <script>
 
+        var admin = '{{$admin}}';
+        var visible_c = '';
+
+        if(admin == 1) {
+            visible_c = true;
+        } else {
+            visible_c = false;
+        }
+
+
     var search_val = false;
     var keywords = null;
     var site = null;
@@ -410,17 +425,6 @@
 
 
 
-
-        var admin = '{{$admin}}';
-        var visible_c = '';
-
-        if(admin == 1) {
-            visible_c = true;
-        } else {
-            visible_c = false;
-        }
-
-
     function table_social_data(){
 
 
@@ -498,8 +502,38 @@
                         },
                     
                     },
+
                     {
                         targets: 3,
+                        width: '10px',
+                        render: function (data, type, full, meta) {
+                
+        
+                            return full.keyword;
+
+                        },
+                            
+                    
+                    },
+                    
+                    {
+                        targets: 4,
+                        width: '10px',
+                        render: function (data, type, full, meta) {
+                            let val = '';
+                            val = full.get_data_leak_feed_one;
+                            if(val) {
+                                    val = full.get_data_leak_feed_one.feedcontent;
+                                
+                            }
+        
+                            return '<div class="text-elip" data-rel="tooltip" title="'+val+'">'+val+'</div>';
+
+                        },
+                    },
+
+                    {
+                        targets: 5,
                         width: '60px',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
@@ -515,34 +549,7 @@
                         },
                     
                     },
-                    {
-                        targets: 4,
-                        width: '10px',
-                        render: function (data, type, full, meta) {
-                
-        
-                            return full.keyword;
 
-                        },
-                            
-                    
-                    },
-                    
-                    {
-                        targets: 5,
-                        width: '10px',
-                        render: function (data, type, full, meta) {
-                            let val = '';
-                            val = full.get_data_leak_feed_one;
-                            if(val) {
-                                    val = full.get_data_leak_feed_one.feedcontent;
-                                
-                            }
-        
-                            return '<div class="text-elip" data-rel="tooltip" title="'+val+'">'+val+'</div>';
-
-                        },
-                    },
                     {
                         targets: 6,
                         width: '80px',

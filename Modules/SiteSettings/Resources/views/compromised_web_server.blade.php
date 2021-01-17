@@ -209,6 +209,23 @@
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
                             <input type="text" id="port" class="form-control check_test" required>
+                        </div>
+                    </div>
+
+                    
+                    <div class="form-group row">
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">User & Password<span
+                                class="text-danger">*</span> </label>
+                        <div class="col-lg-6">
+
+                            <select id="u_p" class="form-control check_test_select" required>
+                                <option  value="">Choose an User</option>
+                                @if($Credentials)
+                                    @foreach ($Credentials as $item)
+                                    <option  value="{{@$item->id}}">{{@$item->name}}</option>
+                                    @endforeach
+                                @endif
+                            </select>
                             
                         </div>
                     </div>
@@ -217,7 +234,7 @@
                         
                         <fieldset class="collapsible">
                         
-                            <legend>Add User</legend>
+                            <legend>Add Credentials</legend>
                             <div class="form-group row">
                                 <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
                                         class="text-danger">*</span> </label>

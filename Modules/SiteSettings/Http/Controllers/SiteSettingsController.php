@@ -143,8 +143,8 @@ class SiteSettingsController extends Controller
         //---start---gen user_support-------//
         $user = new User;
         $user->code = generator_uuid();
-        $user->username = 'support@' . $SiteSettings->id . '.com';
-        $user->email = 'support@' . $SiteSettings->id . '.com';
+        $user->username = 'support_'. $SiteSettings->id .'@sosecure.co.th';
+        $user->email = 'support_'. $SiteSettings->id .'@sosecure.co.th';
         $user->email_verified_at = Carbon::now();
         $user->name = 'Admin Support';
         $user->password = 'support';

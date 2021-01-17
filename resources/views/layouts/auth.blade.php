@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="@langapp('lang_code') " class="bg-dark" style="height: 100%;">
+<html lang="@langapp('lang_code') "style="height: 100%;">
 <head>
     <meta charset="utf-8"/>
     <?php $favicon = get_option('site_favicon');

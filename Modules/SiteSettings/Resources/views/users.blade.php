@@ -298,7 +298,7 @@
                 {
                     data: 'lastupdate',
                     name: 'lastupdate',
-                    className:'w-25',
+                    className:'nowrap',
                 },
                 {
                     data: 'action',

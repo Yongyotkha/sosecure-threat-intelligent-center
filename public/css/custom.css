@@ -2229,7 +2229,7 @@ ul.topics-news-list li a:hover{
     background-color: #f3f3f3;
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
     min-height: 224px;
-    padding: 1rem;
+    padding: 0rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -2614,8 +2614,28 @@ a.author-by{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center top;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
+@media screen and (max-height:400px){
+    .center-middle{
+        display: flex;
+        align-items: center;
+        justify-content:center;
+        height: auto;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center top;
+        /* overflow: hidden; */
+    }
+}
+
+@media screen and (max-width:560px){
+    .center-middle{
+        background-image: unset !important;
+    }
+}
+
+
 .h100{
     height: 100%;
 }
@@ -2763,6 +2783,14 @@ input.input-login:focus {
     display: flex;
 }
 
+@media screen and (max-width:767px){
+    .wdfm-inner-4{
+        padding: 0 15px !important;
+        max-width: 100%;
+        flex-basis: 100%;
+        display: flex;
+    } 
+}
 .wdfm-inner{
     padding: 0 15px !important;
     max-width: 33.33333%;
@@ -2847,7 +2875,7 @@ input.input-login:focus {
     position: relative;
     text-align: center;
     background: #fff;
-    height: 110px;
+    height: 105px;
 }
 
 .wdfm-header-upper{
@@ -3002,14 +3030,34 @@ input.input-login:focus {
         display: flex;
     }
     
+    .wdfm-container{
+        width: 100% !important;
+    }
+
     .mdfm-text-muted {
         color: #9e9d9d;
         font-size: 16px;
     }
 }
+
+.wdfm-elip{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.5;
+    height: 20px;
+    white-space: nowrap;
+}
+
 @media (min-width:1220px) and (max-width:1470px){
     .wdfm-inner {
         padding: 0 8px !important;
+        max-width: 50%;
+        flex-basis: 50%;
+        display: flex;
+    }
+
+    .wdfm-inner-4{
+        padding: 0 15px !important;
         max-width: 50%;
         flex-basis: 50%;
         display: flex;
@@ -3063,6 +3111,8 @@ input.input-login:focus {
     }
 }
 
+
+
 @media screen and (max-width:768px){
     .bc-head {
         font-size: 16px;
@@ -3074,6 +3124,16 @@ input.input-login:focus {
         max-width: 320px;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .card-dash{
+        box-shadow: 0 2px 3px rgba(0,0,0,.5);
+        display: flex;
+        min-height: 140px;
+        padding: 3rem;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 }
 .form-custom{
@@ -3294,4 +3354,18 @@ input.input-login:focus {
  .panel .table td, .panel .table th {
     padding: 8px 8px !important;
     border-top: 1px solid #f1f1f1;
+}
+
+.card-log{
+    background: #eeeeee;
+    padding: 8px;
+    border: 1px solid rgb(180, 180, 180);
+    display: inline-block;
+}
+.card-log:not(:first-child){
+    border-left: unset !important;
+}
+
+.card-log-body p{
+    margin: 0;
 }

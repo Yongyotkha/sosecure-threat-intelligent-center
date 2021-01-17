@@ -44,7 +44,7 @@
                             <div class="panel-body">
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">System Online </label>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-3 d-none">
                                         <div class="checkbox">
                                             <label>
                                                 <input type="checkbox" name="system_web_online" {{ $siteSettings -> system_web_online === 1 ? 'checked' : '' }} value="1">

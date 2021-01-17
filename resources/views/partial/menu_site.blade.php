@@ -4,21 +4,10 @@
             Site
         </a>
     </li>
-    <li class="{{ $page === 'SystemSettings' ? 'active' : '' }}">
-        <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
-            System
-        </a>
-    </li>
-    
+
     <li class="{{ $page === 'DataSetting' ? 'active' : '' }}">
         <a href="{{route('datasettings.index', ['id' => $siteSettings->code])}}">
             Permission & Config
-        </a>
-    </li>
-
-    <li class="{{ $page === 'Users' ? 'active' : '' }}">
-        <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
-            Users
         </a>
     </li>
 
@@ -28,23 +17,42 @@
         </a>
     </li>
 
-    <li class="{{ $page === 'Keyword Setting' ? 'active' : '' }}">
-        <a href="{{route('keyword.index', ['id' => $siteSettings->code])}}">
-            Keywords
+    <li class="{{ $page === 'SystemSettings' ? 'active' : '' }}">
+        <a href="{{route('systemsetting.index', ['id' => $siteSettings->code])}}">
+            System
+        </a>
+    </li>
+    
+
+
+    <li class="{{ $page === 'Users' ? 'active' : '' }}">
+        <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
+            Users
         </a>
     </li>
 
+
+    
+    <li class="{{ $page === 'Credentials' ? 'active' : '' }}">
+        <a href="{{route('credentials.index', ['id' => $siteSettings->code])}}">
+            Credentials
+        </a>
+    </li>
+
+    
     <li class="{{ $page === 'Assets' ? 'active' : '' }}">
         <a href="{{route('assetssite.index', ['id' => $siteSettings->code])}}">
             Assets
         </a>
     </li>
 
-    <li class="{{ $page === 'Credentials' ? 'active' : '' }}">
-        <a href="{{route('credentials.index', ['id' => $siteSettings->code])}}">
-            Credentials
+
+    <li class="{{ $page === 'Keyword Setting' ? 'active' : '' }}">
+        <a href="{{route('keyword.index', ['id' => $siteSettings->code])}}">
+            Keywords
         </a>
     </li>
+
 
     {{-- <li {{ $page === 'News' ? 'active' : '' }}>
         <a href="#">

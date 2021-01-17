@@ -68,7 +68,7 @@ class WebDefacementController extends Controller
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </div>
-                                <h4>'.@$key->name.'</h4>
+                                <h4 class="wdfm-elip">'.@$key->name.'</h4>
                                 <p class="mdfm-text-muted">'.@$key->url.'</p>
                             </div>
                             <div class="wdfm-footer start-top">
@@ -92,7 +92,8 @@ class WebDefacementController extends Controller
                                     <strong>Update Original</strong>
                                 </div>
                                 <div class="flex-end">
-                                    <a href="#" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
+                                    <a href="'.route('webdefacement.detail',['code' => $key->code]).'" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View</a>
+                                    <a href="#" onclick="btn_click_edit_webdefacement(\''.$key->code.'\')" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
                                     <a href="#" onclick="btn_click_del_webdefacement('.$key->id.')" class="btn btn-danger btn-sm btn_del_webdefacment"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg> Delete</a>
                                 </div>
                             </div>
@@ -111,6 +112,31 @@ class WebDefacementController extends Controller
        
     }
 
+    public function WebDefacement_edit_data(Request $request){
+        $WebdefacmentSetting = WebdefacmentSetting::select('site_id','id','name','url','port','hash','filesize','element','blacklist_keyword','image_check','blacklist_keyword_content','delay_screen_shot_val')->where('code', $request -> id)->first();
+        $site = SiteSettings::find($WebdefacmentSetting -> site_id);
+        $webdefacment_data_original = WebdefacmentDataOriginal::where('webdefacment_setting_id',$WebdefacmentSetting -> id)->orderBy('id','desc')->first();
+        $WebdefacmentSetting -> site_code = $site -> code;
+        $WebdefacmentSetting -> image = $webdefacment_data_original -> image;
+        $WebdefacmentSetting -> part_image = $webdefacment_data_original -> part_image;
+        if($WebdefacmentSetting){
+            $response = [
+                'message' => 'Successful', 
+                'error' => '', 
+                'status_code' => '200', 
+                'data' => $WebdefacmentSetting
+            ];
+        }else{
+            $response = [
+                'message' => 'Not Found', 
+                'error' => '', 
+                'status_code' => '404', 
+                'data' => ''
+            ];
+        }
+        
+        return response()->json($response);
+    }
 
     public function delete_websefacement_process(Request $request)
     {
@@ -221,19 +247,17 @@ class WebDefacementController extends Controller
                     $webdefacment_data_original->part_image = $part_image;
                     $webdefacment_data_original->save();
                 }
-            }
+                if($webdefacment_data_original) {
 
-
-            if($webdefacment_data_original) {
-
-                $response = array(
-                    'message' => '', 
-                    'status_code' => '200',
-                    'data' => $webdefacment_data_original
-                );
-    
-    
-                return response()->json($response);
+                    $response = array(
+                        'message' => '', 
+                        'status_code' => '200',
+                        'data' => $webdefacment_data_original
+                    );
+        
+        
+                    return response()->json($response);
+                }
             }else{
                 return response()->json(['error' => 'Not Found', 'status_code' => '404']);
             }
@@ -261,25 +285,38 @@ class WebDefacementController extends Controller
         if($webdefacment_setting_id) {
             $WebdefacmentSetting = WebdefacmentSetting::where('id',$webdefacment_setting_id)->first();
             $WebdefacmentSetting->name = $name_web;
-            $WebdefacmentSetting->url = $url_web;
-            $WebdefacmentSetting->port = $port_web;
+            if($request->mode == 'create'){
+                $WebdefacmentSetting->url = $url_web;
+                $WebdefacmentSetting->port = $port_web;
+            }
+           
             $WebdefacmentSetting->hash = $hash;
             $WebdefacmentSetting->filesize = $file_size;
             $WebdefacmentSetting->element = $element;
             $WebdefacmentSetting->DomainHeaders = '';
             $WebdefacmentSetting->blacklist_keyword = $blacklist;
             $WebdefacmentSetting->image_check = $delay_screen_shot;
-            $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
-            $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
-            $WebdefacmentSetting->site_id = $site_id;
-            $WebdefacmentSetting->active = 1;
-            $WebdefacmentSetting->domain = '';
-            $WebdefacmentSetting->user_agent = '';
-            $WebdefacmentSetting->webdeflacement_progress = 3;
-            $WebdefacmentSetting->image_last = '';
-            $WebdefacmentSetting->status_add = 1;
+            if($delay_screen_shot == 1){
+                $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+            }else{
+                $WebdefacmentSetting->delay_screen_shot_val = null;
+            }
+            if($blacklist == 1){
+                $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+            }else{
+                $WebdefacmentSetting->blacklist_keyword_content = null;
+            }
+            
+            if($request->mode == 'create'){
+                $WebdefacmentSetting->site_id = $site_id;
+                $WebdefacmentSetting->active = 1;
+                $WebdefacmentSetting->domain = '';
+                $WebdefacmentSetting->user_agent = '';
+                $WebdefacmentSetting->webdeflacement_progress = 3;
+                $WebdefacmentSetting->image_last = '';
+                $WebdefacmentSetting->status_add = 1;
+            }
             $WebdefacmentSetting->save();
-
         } else {
             // $WebdefacmentSetting = new WebdefacmentSetting;
             // $WebdefacmentSetting->code = generator_uuid();
@@ -304,20 +341,51 @@ class WebDefacementController extends Controller
             // $WebdefacmentSetting->status_add = 1;
             // $WebdefacmentSetting->save();
         }
+       
+        if($request->channel == 'main_webdefacement'){
+            return ajaxResponse(
+                [
+                    'id'       => $WebdefacmentSetting->id,
+                    'message'  => langapp('saved_successfully'),
+                    'redirect' =>route('webdefacement.index'),
+                ],
+                true,
+                Response::HTTP_CREATED
+            );
+        }else{
+            $SiteSettings = SiteSettings::select('code')->where('id',$site_id)->first();
+            return ajaxResponse(
+                [
+                    'id'       => $WebdefacmentSetting->id,
+                    'message'  => langapp('saved_successfully'),
+                    'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
+                ],
+                true,
+                Response::HTTP_CREATED
+            );
+        }
+       
+    }
 
-    
+    private function webDefacementUpdateOriginal($webdefacment_setting_id){
+        $command = 'app:WebDefacementUpdateOriginal';
+        $params = [
+                'webdefacment_id' => $webdefacment_setting_id,
+        ];
+        Artisan::call($command, $params);
+    }
 
-        $SiteSettings = SiteSettings::where('id',$site_id)->first();
+    private function webDefacementsCreenshotCheck($url_web, $port_web, $site_id, $url_id, $delay_screenshot_val){
+        $command_2 = 'app:WebDefacementsCreenshotCheck';
+        $params_2 = [
+                'url' => $url_web,
+                'port' => $port_web,
+                'site_id' => $site_id,
+                'url_id' => $url_id,
+                'delay' => $delay_screenshot_val,
+        ];
 
-        return ajaxResponse(
-            [
-                'id'       => $WebdefacmentSetting->id,
-                'message'  => langapp('saved_successfully'),
-                'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
-            ],
-            true,
-            Response::HTTP_CREATED
-        );
+        Artisan::call($command_2, $params_2);
     }
 
     public function get_create_open_md_site_url(Request $request) {

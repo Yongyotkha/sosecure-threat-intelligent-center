@@ -9,11 +9,11 @@
                         data-target="#setting-nav">@icon('solid/bars')
                     </a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                    <p class="h3 text-elipse-setting">Name Domain</p>
+                    <p class="h3 text-elipse-setting">Data Leak</p>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
-                        @include('partial.menu_data_dark')
+                        @include('partial.menu_data_leak')
                     </section>
                 </section>
             </section>
@@ -23,6 +23,7 @@
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    <a href="{{ url('/socialdatas') }}" class="btn btn-info btn-sm btn-responsive m-r-5" style="margin-top: 0;"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"></path></svg></a>
                     <div class="bc-head">Data Leak Feed</div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
@@ -124,6 +125,7 @@
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
+                                            <th>Site</th>
                                             <th>Source</th>
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
@@ -393,6 +395,10 @@ function table_social_data(){
                 sortable: false,
                 className: 'w-10'
             },  
+            {
+                data: 'site',
+                name: 'site'
+            },
             {
                 data: 'source',
                 name: 'source'

@@ -12,6 +12,7 @@ use Auth;
 use Artisan;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 
 class WebDefacementController extends Controller
 {
@@ -47,6 +48,7 @@ class WebDefacementController extends Controller
             if(Auth::user()->hasRole('admin')) {//if admin
                 // dd(777);
                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+                $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)->get();
 
             } else { //if notAdmin
                 // dd(888);
@@ -57,18 +59,26 @@ class WebDefacementController extends Controller
                         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
                         ->whereIn('id', $site_id_arr)//['49', '56']
                         ->get();
+
+                        $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)
+                        ->get();
              
 
                     } else {//not support and admin
                         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
                         ->whereIn('id', $site_id_arr)//['49', '56']
                         ->get();
+
+                        $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)
+                        ->get();
                     }
                 }
             }
         }
-
         $data['SiteSettings'] = $SiteSettings;
+        $data['SiteSettings_add'] = $SiteSettings_add;
 
         return view('webdefacement::index')->with($data);
     }
@@ -278,7 +288,7 @@ class WebDefacementController extends Controller
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
-                        <h4>'.@$key->name.'</h4>
+                        <h4 class="wdfm-elip">'.@$key->name.'</h4>
                         <p class="mdfm-text-muted">'.@$key->url.'</p>
                     </div>
                     <div class="wdfm-footer">
@@ -287,7 +297,13 @@ class WebDefacementController extends Controller
                             <div class="status-flex mr-2">Status : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
                             <div class="text-sm-date">Last online: '.@$key->last_online.'</div>
                             <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
-                        
+                        </div>
+                    </div>
+                    <div class="wdfm-footer-action">
+                        <div style="display: flex;justify-content:center;">
+                            <a href="'.route('webdefacement.detail',['code' => $key->code]).'" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View</a>
+                            <a href="#" onclick="btn_click_edit_webdefacement(\''.$key->code.'\')" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
+                            <a href="#" onclick="btn_click_del_webdefacement('.$key->id.')" class="btn btn-danger btn-sm btn_del_webdefacment"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg> Delete</a>
                         </div>
                     </div>
                 </div>
@@ -361,10 +377,20 @@ class WebDefacementController extends Controller
         // );
     }  
 
+    public function deface_now(Request $request){
+        $webdefacment_id = $request->id;
+        $command = 'app:WebDefacementProccessbyWebdefacment_id';
+        $params = [
+            'webdefacment_id' => $webdefacment_id,
+        ];
+
+        Artisan::call($command, $params);
+    }
+
     public function update_original_detail(Request $request)
     {
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
-        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->first();
+        $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->orderBy('created_at', 'desc')->first();
         $html_h = $webdefacement_original->hash;
         $html_f = $webdefacement_original->filesize;
         $html_e = $webdefacement_original->element;
@@ -387,6 +413,32 @@ class WebDefacementController extends Controller
             Response::HTTP_OK
         );
     }  
+
+    public function deface_now_detail(Request $request){
+        $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
+        $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->first();
+        $html_h = $webdefacement_check->hash_new;
+        $html_f = formatSizeUnits($webdefacement_check->filesize_new) . ' (Difference ' . $webdefacement_check->filesize_percent . '%)';
+        $html_e = $webdefacement_check->element_new;
+        $html_b = $webdefacement->blacklist_keyword_current;
+        $html_l = $webdefacement_check->last_update;
+
+
+        
+        return ajaxResponse(
+            [
+                'html_h'  => $html_h,
+                'html_f'  => $html_f,
+                'html_e'  => $html_e,
+                'html_b'  => $html_b,
+                'html_l'  => $html_l,
+                'message'  => langapp('changes_saved_successful'),
+                // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
 
     public function update_image(Request $request)
     {

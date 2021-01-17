@@ -42,7 +42,7 @@
                             <i class="fas fa-globe-europe"></i> Log
                         </div>
                         <div class="col-xs-6 text-right">
-                            <button id="togglelog" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
+                            <button id="togglelog" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#wdfm-log','#togglelog')">
                                 <i class="fas fa-minus-square"></i>Collapse
                             </button>
                         </div>
@@ -57,11 +57,12 @@
                             <th class="text-center">Datetime</th>
                             
                         </tr>
+
                         @if ($webdefacment_data_log)            
                             @foreach ($webdefacment_data_log as $webdefacment_data_log)
                                 <tr>
                                     <td class="text-center">{!! @$loop->iteration !!}</td>
-                                    <td >
+                                    <td>
                                         @if ($webdefacment_data_log->message) 
                                         {!!@$webdefacment_data_log->message!!}
                                         @else
@@ -79,6 +80,49 @@
                                 </tr>
                             @endforeach
                         @endif
+
+                        <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> 
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td> 
+                                <div class="main-card-log">
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>Hash Difference 30%</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>File Size Difference 30%</p>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>Hash Difference 30%</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-log">
+                                        <div class="card-log-body">
+                                            <p>Element Difference 30%</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-log"  style="background: #fcc838 ">
+                                        <div class="card-log-body">
+                                            <p>Total Difference 30% (Medium)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                               Medium
+                            </td>
+                            <td class="no-wrap">2021-01-17 09:47:38</td>
+                        </tr>
+                        -->
+
+
                     </table>
                 </div>
             </section>
@@ -90,7 +134,7 @@
                             <i class="fas fa-globe-europe"></i> Web Defacement
                         </div>
                         <div class="col-xs-6 text-right">
-                            <button id="togglecollapsechart" style="margin-left:5px;" class="btn text-dark" onclick="collpase_chart('#details_webdefacement','#togglecollapsechart')">
+                            <button id="togglecollapsechart" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#details_webdefacement','#togglecollapsechart')">
                                 <i class="fas fa-minus-square"></i>Collapse
                             </button>
                         </div>
@@ -108,7 +152,6 @@
                                 <td>
                                     {{@$webdefacement->url}}
                                     <a href="{{@$webdefacement->url}}" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
-    
                                 </td>
                                 
                             </tr>
@@ -146,7 +189,7 @@
                         </table>
                     </div>
                     <div class="table-responsive" id='updateO'>
-                        <table class="table table-striped table-bordered table-hover">
+                        <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
                             <thead>
                                 <tr>
                                     <th width="250px"></th>
@@ -159,34 +202,34 @@
                                 <tr>
                                     <th>Hash</th>
                                     <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
-                                    <td>{{@$webdefacment_data_check->hash_new}} ({{@$webdefacment_data_check->hash_percent}}%)</td>
+                                    <td id='hash_new'>{{@$webdefacment_data_check->hash_new}} (Difference {{@$webdefacment_data_check->hash_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->filesize == 1)
                                 <tr>
                                     <th>File Size</th>
                                     <td id='FileSize'>{{@formatSizeUnits($webdefacment_data_original->filesize)}}</td>
-                                    <td>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} ({{@$webdefacment_data_check->filesize_percent}}%)</td>
+                                    <td id='filesize_new'>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} (Difference {{@$webdefacment_data_check->filesize_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->element == 1)
                                 <tr>
                                     <th>Element</th>
                                     <td id='Element'>{{@$webdefacment_data_original->element}}</td>
-                                    <td>{{@$webdefacment_data_check->element_new}} ({{@$webdefacment_data_check->element_percent}}%)</td>
+                                    <td id='element_new'>{{@$webdefacment_data_check->element_new}} (Difference {{@$webdefacment_data_check->element_percent}}%)</td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->blacklist_keyword_content == 1)
                                 <tr>
                                     <th>Blacklist Keyword</th>
                                     <td id='BlacklistKeyword'>{{@$webdefacement->blacklist_keyword_content}}</td>
-                                    <td>{{@$webdefacement->blacklist_keyword_current}}</td>
+                                    <td id='blacklist_keyword_current'>{{@$webdefacement->blacklist_keyword_current}}</td>
                                 </tr>
                                 @endif
                                 <tr>
                                     <th>Last Update</th>
                                     <td id='LastUpdate'>{{@$webdefacment_data_original->last_update}}</td>
-                                    <td>{{@$webdefacment_data_check->last_update}}</td>
+                                    <td id='last_update'>{{@$webdefacment_data_check->last_update}}</td>
                                 </tr>
                             </tbody>
                             <tfoot>
@@ -196,9 +239,7 @@
                                         <button class="btn btn-info" onclick="update_original()">Update Original</button>
                                     </td>
                                     <td>
-                                        {{-- @if ($webdefacement->status_val != 'Normal')
-                                            <span id='check_status_val_current'><button class="btn btn-info"  onclick="accept_risk()">Accept Risk</button></span>
-                                        @endif --}}
+                                        <button class="btn btn-info" onclick="deface_now()">Defacement Now</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -374,6 +415,77 @@
             }   
         })
     };
+
+    function deface_now(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('webdefacement.deface_now') }}",
+                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    beforeSend: function(){
+                        $('#updateO').loading('start');
+                        
+                    },
+                    success:function(response) {
+                        $.ajax({
+                            type:"POST",
+                            url:"{{ route('webdefacement.deface_now_detail') }}",
+                            data:{id: {!!json_encode($webdefacement->id)!!}},
+                            beforeSend: function(){
+                                
+                            },
+                            success:function(response) {
+                        
+                                $('#hash_new').html(response.html_h);
+                                $('#filesize_new').html(response.html_f);
+                                $('#element_new').html(response.html_e);
+                                $('#last_update').html(response.html_l);
+                                $('#blacklist_keyword_current').html(response.html_b);
+                                $('#updateO').loading('stop');
+                               
+                                if(response.success){
+                                    toastr.success('Update Success', '@langapp('response_status')');
+                                } else {
+                                    toastr.error(data.message, '@langapp('response_status')');
+                                }
+                            },
+                            error: function (error){
+                                $('#updateO').loading('stop');
+                                var errors = error.response.data.errors;
+                                var errorsHtml = '';
+                                $.each(errors, function (key, value) {
+                                    errorsHtml += '<li>' + value[0] + '</li>';
+                                });
+                                toastr.error(errorsHtml, '@langapp('response_status') ');
+                            }
+            
+                        });
+                    },
+                    error: function (error){
+                        $('#updateO').loading('stop');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+    
+                });
+
+            }   
+        })
+    }
 
     function update_original() { 
      

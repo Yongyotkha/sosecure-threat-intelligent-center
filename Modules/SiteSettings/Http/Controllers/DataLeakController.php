@@ -65,7 +65,7 @@ class DataLeakController extends Controller
     {
         $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
         $data['DataLeakSocial'] = $DataLeakSocial;
-        $data['page'] = 'Data Leak Feed';
+        $data['page'] = langapp('data_leak_feed');
         return view('sitesettings::datafeed')->with($data);
     }
 
@@ -236,12 +236,39 @@ class DataLeakController extends Controller
 
     public function socialdatas_all_site()
     {
-        //    $get_data = $this->siteSettings->get_data($id);
-        //    $data['siteSettings'] = $get_data;
-        $data['site'] = SiteSettings::where("active", '=', 1)->get();
+        
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+        
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+        
+        
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        $data['SiteSettings'] = $SiteSettings;
+        
         $data['source'] = DataLeakSocial::where("status", '=', 1)->get();
 
-        $data['page'] = 'DataLeakDatas';
+        $data['page'] = langapp('data_leak');
         return view('sitesettings::social-datas_all_site')->with($data);
     }
 
@@ -458,11 +485,42 @@ class DataLeakController extends Controller
                 });
             }
 
-            if ($request->site) {
+            if(Auth::check()) {
 
-                $model->where('site_id', $request->site);
-
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $model = $model->whereIn('site_id', $site_id_arr);
+            
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                 
+    
+                        } else {//not support and admin
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('status',1);
+            
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        }
+                    }
+                }
             }
+
+
+            if ($request->site) {
+                $SiteSettings = SiteSettings::where('code', @$request->site)->first();
+                // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
+                $model = $model->where('site_id', $SiteSettings->id);
+                // });
+            }
+
+
 
             if ($request->source) {
 
@@ -503,6 +561,34 @@ class DataLeakController extends Controller
 
             $model->get();
         } else {
+
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $model = $model->whereIn('site_id', $site_id_arr);
+            
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                 
+    
+                        } else {//not support and admin
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('status',1);
+            
+                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        }
+                    }
+                }
+            }
+            
 
             $model->get();
         }
@@ -841,6 +927,18 @@ class DataLeakController extends Controller
                 }
             )
             ->editColumn(
+                'site',
+                function (DataLeakFeedTemp $model) {
+                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id' , $model->id)->first();
+                    $site = SiteSettings::select('name')->whereIn('id', [$leak_socail_ref_temps -> site_id])->get();
+                    $name_site = '';
+                    foreach($site as $data){
+                        $name_site .= $data -> name . ' ,';
+                    }
+                    return rtrim($name_site, ", ");
+                }
+            )
+            ->editColumn(
                 'source',
                 function (DataLeakFeedTemp $model) {
                     if ($model->source_name) {
@@ -895,7 +993,7 @@ class DataLeakController extends Controller
                     return $html;
                 }
             )
-            ->rawColumns(['chk', 'source', 'keyword', 'content', 'data_feed', 'url', 'action'])
+            ->rawColumns(['chk', 'site', 'source', 'keyword', 'content', 'data_feed', 'url', 'action'])
             ->make(true);
     }
 

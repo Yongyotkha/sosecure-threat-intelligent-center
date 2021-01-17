@@ -14,7 +14,7 @@
                     </select>
                 </div>
 
-                <div class="button-control pull-right">
+                <div class="button-control">
                     <div class="btn-group">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">@icon('solid/plus') Add</button>
                     </div>
