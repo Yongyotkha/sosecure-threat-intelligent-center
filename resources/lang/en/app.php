@@ -926,6 +926,8 @@ return [
     'vulnerability'                              => 'Vulnerability',
     'compromised'                                => 'Compromised',
     'data_leak'                                  => 'Data Leak',
+    'dataleak_data'                              => 'Data Leak Data',
+    'data_leak_feed'                             => 'Data Leak Feed',
     'data_feed_Social'                           => 'Social Feed',
     'data_feed_darkweb'                          => 'Dark Web Feed',
     'dark_web'                                   => 'Dark Web',
