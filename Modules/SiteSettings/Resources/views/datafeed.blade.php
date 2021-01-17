@@ -28,11 +28,11 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="button" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled style="display: none;">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
                     <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
                         Change Status
+                    </button>
+                    <button type="button" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled style="display: none;">
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
@@ -423,6 +423,21 @@ function table_social_data(){
             {
                 data: 'action',
                 name: 'action'
+            },
+        ],
+        columnDefs: [
+            {
+                targets: 4,
+                render: function (data, type, full, meta) {
+                    var feedcontent = full.feedcontent;
+                    var res = full.keyword.split(",");
+                    let content = '';
+                    for(let i in res){
+                        const data = res[i];
+                        content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                    }
+                    return content;
+                },
             },
         ]
     });
