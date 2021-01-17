@@ -16,7 +16,7 @@
                     </a> --}}
                     
                     @can('users_delete')
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete">
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete" disabled>
                             <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                                 @langapp('delete')</span>
                         </button>
@@ -53,7 +53,7 @@
                                     <tr>
                                         <th class="no-sort">
                                             <label>
-                                                <input name="select_all" value="1" onclick="go(); return false;" id="select-all" type="checkbox" />
+                                                <input name="select_all" value="1"  id="select-all" type="checkbox"  class="select-chk" />
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
@@ -165,25 +165,6 @@
                 ]
             });
 
-            let del_val = [];
-            $("#btn_del_select").click(function(){
-                del_val = [];
-                $("input[type='checkbox'][name='checked']").each(function(){
-                    
-                    if($(this).is(":checked")) {
-                        del_val.push($(this).val());
-                        /* alert(3);*/
-                    }
-                });
-                /*console.log(del_val);*/
-
-                if(del_val.length > 0) {
-                    del_site_select(del_val);
-                } else {
-                    toastr.warning('Please select atleast 1', '@langapp('response_status')');
-                }
-
-            });
 
         });
 
@@ -220,6 +201,82 @@
                 toastr.error(errorsHtml, '@langapp('response_status')');
             });
         }
+
+        $('#table-site-template').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-site-template').on('click', '.site_settings_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.site_settings_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.site_settings_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });  
+
+            let del_val = [];
+    $("#btn_del_select").click(function() {
+        $('.site_settings_id:checked').each(function () {
+            del_val.push(this.value);
+            
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('sitesettings.sitesettings_delete') }}",
+                    data:{
+                        id_change: del_val,
+                    },
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
     </script>
 @endpush
 @endsection

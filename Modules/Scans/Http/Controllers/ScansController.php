@@ -553,14 +553,16 @@ class ScansController extends Controller
                 
 
             }
-            array_push($arr, $AssetsData->id);
+            
 
             $AssetsData->save();
+
+            array_push($arr, $AssetsData->id);
         }
 
-        dd($arr);
         
-        $AssetsData1 = AssetsData::where('asset_id', $Assets_id)->get();
+        
+        AssetsData::where('asset_id', $Assets_id)->whereNotIn('id',$arr)->delete();
         
 
         return ajaxResponse(

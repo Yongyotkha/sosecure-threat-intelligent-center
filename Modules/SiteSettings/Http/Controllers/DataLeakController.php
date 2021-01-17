@@ -94,6 +94,7 @@ class DataLeakController extends Controller
         $data['SiteSettings'] = $SiteSettings;
 
         $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
+        $data['site_settings'] = SiteSettings::where('deleted_at', null)->where('active', 1)->get();
         $data['DataLeakSocial'] = $DataLeakSocial;
         $data['page'] = langapp('data_leak_feed');
         return view('sitesettings::datafeed')->with($data);
@@ -524,6 +525,32 @@ class DataLeakController extends Controller
             ->make(true);
     }
 
+    public function socialdatas_change_delete(Request $request)
+    {
+        
+        $site_code = DataLeakSocialRef::where("id", $request->id_change )->first();
+        $site_code = SiteSettings::where('id',$site_code->site_id)->first();
+
+        foreach($request->id_change as $id_change ){
+
+            
+            DataLeakSocialRef::where("id", $id_change )->delete();
+
+        }
+
+       
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('socialdatas.index',['id' => $site_code->code]),
+  
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
     public function socialdatas_all_site_tb(Request $request)
     {
 
@@ -925,9 +952,19 @@ class DataLeakController extends Controller
 
     public function datafeedsocial_datatables(Request $request)
     {
+
+        
         if ($request->search_val == 1) {
+
+
             $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social');
 
+            if ($request->site) {
+                $model->whereHas('get_socail_ref_temp', function ($query) use ($request) {
+  
+                    $query->where('site_id','LIKE', '%'.$request->site.'%');
+                });
+            }
             if ($request->search) {
                 $model = $model->where('keyword', 'LIKE', '%' . $request->search . '%');
             }
