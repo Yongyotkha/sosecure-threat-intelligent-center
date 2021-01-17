@@ -206,9 +206,7 @@
                                 <hr>
 
                                 <div class="row text-right">
-                                    <div class="col-lg-3">
-                                        <label class="col-lg-3 control-label">>Syslog Server Log</label>
-                                    </div>
+                                        <label class="col-lg-3 control-label">Syslog Server Log</label>
                                 </div>
                              
                                 <div class="form-group row">
