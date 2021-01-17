@@ -31,12 +31,27 @@
                     <button type="button" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled style="display: none;">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
-                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
-                        Change Status
-                    </button>
+
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
+                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
+                        Change Status
+                    </button>
+                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;">
+                            <option value="">All Site</option>
+                            @if (@$site_settings)
+        
+                            @foreach ($site_settings as $site_settings)
+                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                            </option>
+                            @endforeach
+        
+                            @endif
+                        </select>
+                    </div>
+                    
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none;">
@@ -339,6 +354,8 @@ $(function() {
 
 $("#btn_data_leak_search").click(function() {
     search_val = 1;
+
+    
     if ($('#check_all').is(":checked")) {
         check_all = true;
     } else {
@@ -364,6 +381,7 @@ $("#btn_data_leak_search").click(function() {
 
 function table_social_data(){
     let search = $('#search').val();
+    let site = $('#site').val();
     let source_select = $('#source_select').val();
     $('#table_data_feed').DataTable({
         processing: true,
@@ -381,6 +399,7 @@ function table_social_data(){
                 "check_all" : check_all,
                 "check_pending" : check_pending,
                 "check_approved" : check_approved,
+                "site" : site,
             },
             type: "POST",
         },

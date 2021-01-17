@@ -52,7 +52,7 @@
                         title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                    <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
                             @langapp('delete')</span>
                     </button>
@@ -91,7 +91,7 @@
                                             <th class="hide"></th>
                                             <th class="no-sort">
                                                 <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
@@ -291,10 +291,38 @@
         });
     });
 
+    
+    $('#table-rss-setting-template').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-rss-setting-template').on('click', '.rss_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.rss_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.rss_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });   
+
 
     $(function () {
         
-
 
         var table = $('#table-rss-setting-template').DataTable({
             pageLength: 50,
@@ -353,6 +381,54 @@
             toastr.error(errorsHtml, '@langapp('response_status')');
         });
     }
+    var rss_id_delete_chang =[];
+
+    $("#btn_del_select").click(function() {
+        $('.rss_id:checked').each(function () {
+            rss_id_delete_chang.push(this.value);
+            
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('rssfeedsettings.rss_news_delete_change') }}",
+                    data:{
+                        id_chang: rss_id_delete_chang,
+                    },
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
 
 
 </script>

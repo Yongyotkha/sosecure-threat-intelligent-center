@@ -141,7 +141,7 @@
                                         <th class="no-sort w-10">
                                             <label>
                                                 <input name="select_all" value="1" id="select-all" type="checkbox"
-                                                    class="data_feed_id select-chk" />
+                                                    class="select-chk" />
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
