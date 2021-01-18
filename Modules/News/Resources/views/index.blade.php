@@ -28,7 +28,7 @@
 
             {{-- Search --}}
             {{-- Tab Content --}}
-            <section id="scrollable_news" class="scrollable wrapper bg-grey">
+            <section id="scrollable_news" class="scrollable wrapper">
                 <section class="panel panel-default" id="area-advance-search" style="display: none;">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
