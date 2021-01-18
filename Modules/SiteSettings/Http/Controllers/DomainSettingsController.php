@@ -358,7 +358,7 @@ class DomainSettingsController extends Controller
                 $site_code = $this->siteSettings->find_code($model->site_id);
             }
             if($TransactionTimeStampScans){
-                if($TransactionTimeStampScans -> progress !== 2){
+                if($TransactionTimeStampScans -> progress == 3){
                     $model->delete();
                     $TransactionTimeStampScans -> status = 0;
                     $TransactionTimeStampScans -> save();
