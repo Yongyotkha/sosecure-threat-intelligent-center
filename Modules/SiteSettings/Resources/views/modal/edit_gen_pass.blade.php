@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-blue">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $user->name }}</h4>
         </div>
