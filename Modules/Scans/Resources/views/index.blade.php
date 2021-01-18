@@ -11,7 +11,8 @@
                 title="@langapp('export') CSV">
                 @icon('solid/download') CSV
             </a> --}}
-            <a href="#" class="btn btn-sm btn-default pull-right">
+
+            {{-- <a href="#" class="btn btn-sm btn-default pull-right">
                 <i class="fa fa-sync-alt"></i> Refresh
             </a>
             <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
@@ -21,6 +22,10 @@
 
             <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#scans_create">
                 @icon('solid/plus') @langapp('create')
+            </a> --}}
+
+            <a href="{{route('assets.index')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                @icon('solid/link') Assets
             </a>
         </header>
         <section class="scrollable wrapper">
