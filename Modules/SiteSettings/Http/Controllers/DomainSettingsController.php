@@ -459,7 +459,7 @@ class DomainSettingsController extends Controller
             ->addColumn('action', function ($domain) {
                 $html = '';
                             if(@$domain -> get_transaction_time_stamp_scans -> progress !== 3){
-                                $html .= "<div style='display: flex;'><a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
+                                $html .= "<div style='display: flex;'><a href='#' class='disabled btn btn-". get_option('theme_color') ." btn-xs'>
                                     <i class='far fa-eye'></i>
                                 </a>";
                             }else{
@@ -467,12 +467,12 @@ class DomainSettingsController extends Controller
                                     <i class='far fa-eye'></i>
                                 </a>";
                             }
-                            if(@$domain -> get_transaction_time_stamp_scans -> progress == 2){
-                                $html .= "<a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
+                            if(@$domain -> get_transaction_time_stamp_scans -> progress !== 1 && @$domain -> get_transaction_time_stamp_scans -> progress !== 2){
+                                $html .= "<a href='". route('domainsettings.redo', ['id' => $domain->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                     <i class='fas fa-redo'></i>
                                 </a>";
                             }else{
-                                $html .= "<a href='". route('domainsettings.redo', ['id' => $domain->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                                $html .= "<a href='#' class='disabled btn btn-". get_option('theme_color') ." btn-xs'>
                                     <i class='fas fa-redo'></i>
                                 </a>";
                             }
@@ -530,7 +530,7 @@ class DomainSettingsController extends Controller
             $TransactionTimeStampScans -> progress = 0;
             $TransactionTimeStampScans -> save();
         }else{
-            $TransactionTimeStampScans->code = new TransactionTimeStampScans(); 
+            $TransactionTimeStampScans = new TransactionTimeStampScans(); 
             $TransactionTimeStampScans->code = generator_uuid(); 
             $TransactionTimeStampScans->created_by = @Auth::user()->id;
             $TransactionTimeStampScans->site_id = $get_data->site_id;
