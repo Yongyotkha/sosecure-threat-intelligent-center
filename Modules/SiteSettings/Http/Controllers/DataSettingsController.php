@@ -46,6 +46,7 @@ class DataSettingsController extends Controller
         $data['site_user_limit_default'] = DB::table("config")->where("config_key", "site_user_limit_default")->first();
         $data['site_domain_limit_default'] = DB::table("config")->where("config_key", "site_domain_limit_default")->first();
         $data['site_asset_limit_default'] = DB::table("config")->where("config_key", "site_asset_limit_default")->first();
+        $data['site_web_defacement_limit_default'] = DB::table("config")->where("config_key", "site_web_defacement_limit_default")->first();
         $result_menu_permission = DB::table("site_menu_permission")->select('menu_code')->where("site_id", $get_data->id)->where("deleted_at", null)->get()->toArray();
         $result_menu_sub_permission = DB::table("site_menu_sub_permission")->select('menu_sub_code')->where("site_id", $get_data->id)->where("deleted_at", null)->get()->toArray();
         // dd($data['site_menu_permission']);
@@ -64,8 +65,10 @@ class DataSettingsController extends Controller
         $data['site_menu_sub_permission'] = $arr_menu_sub_permission;
 
         $data['siteSettings'] = $get_data;
+        // dd($get_data);
         $data['menus'] = $Menu;
         $data['page'] = 'DataSetting';
+        $data['page'] = langapp('data_setting');
         return view('sitesettings::data_setting')->with($data);
     }
 
@@ -123,7 +126,7 @@ class DataSettingsController extends Controller
             if ($request->user_limit) {
                 $SiteSettings->user_limit_amount = $request->user_limit;
             }
-            $SiteSettings->role_allow_admin = $request->site_role_allow ? 'Y' : 'N';
+            $SiteSettings->role_allow_admin = $request->site_role_allow ? 'Y' : 'Y';//defalut Y ไว้ ไม่ให้ลูกค้าเลือก
             $SiteSettings->domain_allow = $request->site_domain_allow ? 'Y' : 'N';
             if ($request->domain_limit) {
                 $SiteSettings->domain_limit = $request->domain_limit;
@@ -132,10 +135,14 @@ class DataSettingsController extends Controller
             if ($request->asset_limit) {
                 $SiteSettings->asset_limit = $request->asset_limit;
             }
+            $SiteSettings->web_defacement_allow = $request->web_defacement_allow ? 'Y' : 'N';
+            if ($request->web_defacement_limit) {
+                $SiteSettings->web_defacement_limit = $request->web_defacement_limit;
+            }
 
-            $SiteSettings->server_log_port = $request->port;
-            $SiteSettings->server_log_protocol = $request->protocol;
-            $SiteSettings->server_log_ip = $request->ip;
+            $SiteSettings->server_log_port = trim($request->port);
+            $SiteSettings->server_log_protocol = trim($request->protocol);
+            $SiteSettings->server_log_ip = trim($request->ip);
 
             $SiteSettings->save();
         }

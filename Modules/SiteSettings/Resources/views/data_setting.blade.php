@@ -98,7 +98,7 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="site_user_allow" {{$siteSettings->user_allow == 'Y' ? 'checked' : '' }} value="TRUE">
+                                                <input type="checkbox" name="site_user_allow" {{$siteSettings->user_allow == 'Y' || $siteSettings->user_allow == null ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
@@ -108,7 +108,7 @@
                                         <input type="text" class="form-control touch_spin" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else{{$site_user_limit_default->value}}@endif">
                                     </div>
                                 </div>
-
+                                <!--
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Role Allow </label>
                                     <div class="col-lg-2">
@@ -136,6 +136,7 @@
                                         </div> --}}
                                     </div>
                                 </div>
+                               -->
 
                                 
                                 <div class="form-group row">
@@ -143,7 +144,7 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="site_domain_allow" {{$siteSettings->domain_allow == 'Y' ? 'checked' : '' }} value="TRUE">
+                                                <input type="checkbox" name="site_domain_allow" {{$siteSettings->domain_allow == 'Y' || $siteSettings->domain_allow == null ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
@@ -161,7 +162,7 @@
                                         <div class="checkbox">
                                             <label>
                                                 {{-- @php var_dump($siteSettings->name) @endphp --}}
-                                                <input type="checkbox" name="site_asset_allow" {{$siteSettings->asset_allow == 'Y' ? 'checked' : '' }} value="TRUE">
+                                                <input type="checkbox" name="site_asset_allow" {{$siteSettings->asset_allow == 'Y' || $siteSettings->asset_allow == null ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Site Add</span>
                                             </label>
                                         </div>
@@ -177,14 +178,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="" value="TRUE">
+                                                <input type="checkbox" name="site_web_defacement_allow" {{$siteSettings->web_defacement_allow == 'Y' || $siteSettings->web_defacement_allow == null ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">URL Add</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="asset_limit" value="">
+                                        <input type="text" class="form-control touch_spin" name="web_defacement_limit" value="@if($siteSettings->web_defacement_limit){{$siteSettings->web_defacement_limit}}@else{{$site_web_defacement_limit_default->value}}@endif">
                                     </div>
                                 </div>
                                 <hr>
@@ -210,23 +211,25 @@
                                 </div>
                              
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">IP <span class="text-danger">*</span></label>
+                                    <label class="col-lg-3 control-label">IP </label>
                                     <div class="col-lg-9">
-                                            <input type="text" name="ip" class="form-control" value="192.168.1.1">
+                                            <input type="text" name="ip" class="form-control" value="@if($siteSettings->server_log_ip){{$siteSettings->server_log_ip}}@else '' @endif"><!--192.168.1.1-->
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">Protocol <span class="text-danger">*</span></label>
+                                    <label class="col-lg-3 control-label">Protocol </label>
                                     <div class="col-lg-9">
-                                        <select name="protocol" id="select-protocol" class="select2-option form-control">
-                                            <option value="udp" selected >udp</option>
+                                        <select name="protocol" id="select-protocol" class="form-control">
+                                            <option value="">--Protocal--</option>
+                                            <option value="udp" @if($siteSettings->server_log_protocol == 'udp') selected @else  @endif>udp</option>
+                                            <option value="tcp" @if($siteSettings->server_log_protocol == 'tcp') selected @else  @endif>tcp</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">Port <span class="text-danger">*</span></label>
+                                    <label class="col-lg-3 control-label">Port </label>
                                     <div class="col-lg-9">
-                                            <input type="number" name="port" class="form-control" value="8000">
+                                            <input type="number" name="port" class="form-control" value="@if($siteSettings->server_log_port){{$siteSettings->server_log_port}}@else '' @endif"><!--80-->
                                     </div>
                                 </div>
 
@@ -261,7 +264,9 @@
 <script>
     $(document).ready(function () {
 
-        $('#select-protocol').select2();
+        $('#select-protocol').select2({
+            minimumResultsForSearch: -1
+        });
 
         $('#email_alert').select2({
             tags: true,
