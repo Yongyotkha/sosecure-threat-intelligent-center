@@ -31,11 +31,11 @@ Route::group(['prefix' => 'v1/client-transfer'], function () {
    
 });
 
-
 Route::group(['prefix' => 'v1/centerinto-transfer'], function () {
     Route::post('updateTFBatchJob', 'Api\ApiTransferCenterInsert@updateBatchJob');
     Route::post('insertToNoRef', 'Api\ApiTransferCenterInsert@insertToNoRef');
     Route::post('insertToRef', 'Api\ApiTransferCenterInsert@insertToRef');
+    Route::post('updateIsFix_datacve_mapping', 'Api\ApiTransferCenterInsert@updateIsFix_fx_data_datacve_mapping');
 });
 
 Route::group(['prefix' => 'v1/clientinto-transfer'], function () {
