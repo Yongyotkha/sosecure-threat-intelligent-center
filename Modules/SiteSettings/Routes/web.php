@@ -50,6 +50,7 @@ Route::group(
         Route::post('/keyword-setting/keyword/save/{code}', 'KeywordSettingController@save')->name('keyword.save')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
         Route::get('/domain-setting/domain/redo/{id}', 'DomainSettingsController@redo')->name('domainsettings.redo')->middleware('can:categorysettings_update');
         Route::post('/domain-setting/domain/change_status', 'DomainSettingsController@change_status')->name('domainsettings.change_status')->middleware(['can:categorysettings_update']);
+        Route::post('/domain-setting/domain/del_domain_select', 'DomainSettingsController@del_domain_select')->name('domainsettings.del_domain_select')->middleware(['can:categorysettings_delete']);
         Route::post('/keyword-setting/keyword/change_status', 'KeywordSettingController@change_status')->name('keyword.change_status')->middleware(['can:menu_items']);
         Route::post('/domain-setting/domain/bulk-delete', 'DomainSettingsController@bulkDelete')->name('domainsettings.bulk.delete')->middleware(['can:categorysettings_delete']);//->middleware(['can:categorysettings_delete', 'demo']);
         Route::post('/domain-setting/domain/data', 'DomainSettingsController@tableData')->name('domainsettings.data')->middleware('can:menu_items');
