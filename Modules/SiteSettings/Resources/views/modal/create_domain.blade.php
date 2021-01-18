@@ -243,7 +243,7 @@
                 <div class="col-lg-8">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="status" value="TRUE"   >
+                        <input type="checkbox" name="status" value="TRUE" checked>
                         <span></span>
                     </label>
                 </div>
@@ -260,10 +260,10 @@
                 Close
             </button> --}}
             {!! closeModalButton() !!}
-            {{-- <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
+            <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
                 <i class="fas fa-play"></i>
                 Run Scan And Save Now
-            </button> --}}
+            </button>
             {{-- <button type="submit" class="btn btn-info btn-rounded">
                 <i class="fas fa-paper-plane"></i>
                 Save
@@ -308,7 +308,6 @@
         </div>
     </div>
 </div>
-
 @push('pagestyle')
 @include('stacks.css.form')
 @endpush
@@ -321,6 +320,15 @@
     <script>
       
         var form_save = '.formSaving';
+        $('.formSavingAndRun').click(function() {
+            form_save = '.formSavingAndRun';
+        });
+        $('.formPreview').click(function() {
+            form_save = '.formPreview';
+        });
+        $('.formDraft').click(function() {
+            form_save = '.formDraft';
+        });
         $('.ajaxifyForm_custom').submit(function (event) {
             event.preventDefault();
     
@@ -334,6 +342,7 @@
                 }else if(form_save == '.formDraft'){
                     data.append('formsubmit', 'formDraft');
                 }
+                console.log(form_save);
                 axios.post($(this).attr("action"), data)
                     .then(function (response) {
                             toastr.success(response.data.message, '@langapp('response_status') ');
