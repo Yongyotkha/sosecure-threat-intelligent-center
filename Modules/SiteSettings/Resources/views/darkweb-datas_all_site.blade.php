@@ -255,9 +255,38 @@
         </aside>
     </section>
 
-    {{-- <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+      <div class="modal in fixed-left" id="delete_all" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <span class="modal-title" id="exampleModalLabel">Delete</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <p class="text-danger">@langapp('delete_warning')  </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="delete-all btn btn-danger btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Delete
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal create_assets_vulnerability -->
-    <div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{--<div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
@@ -690,17 +719,8 @@
             
         });
 
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes!'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        $('#delete_all').modal('show');
+        $('.delete-all').click(function(){
                 $.ajax({
                     type:"POST",
                     url:"{{ route('darkweb.delete_select_process') }}",
@@ -712,6 +732,7 @@
                         loading('stop_load');
                         toastr.success(response.message, '@langapp('response_status')');
                         window.location.href = response.redirect;
+                        $('#delete_all').modal('hide');
                     },
                     error: function (error){
                         loading('stop_load');
