@@ -451,19 +451,22 @@ class UsersSettingsController extends Controller
         // $site_code = $this->request->site_code;
         // $site_id = $this->request->site_id;
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
-        $model = $this->user->query();
-        $test = 1;
-        $model->when(
-            $test == 1,
-            function ($q) use ($site_id) {
-                return $q->where('site_id','=', $site_id);
-            }
-        );
+        $model = User::where('deleted_at', null)->where('active',1)->where('site_id', $site_id)->orderBy('id','ASC')->get();
+        
+        // $model = $this->user->query();
+        // $test = 1;
+        // $model->when(
+        //     $test == 1,
+        //     function ($q) use ($site_id) {
+        //         return $q->where('site_id','=', $site_id);
+        //     }
+        // );
+
         // $model = $this->user->where('site_id','43')->query();
         // $model = User::all()->toArray();
         // var_dump($model);
         // exit();
-        return DataTables::eloquent($model)
+        return DataTables::of($model)
             ->editColumn(
                 'no',
                 function ($user) {
