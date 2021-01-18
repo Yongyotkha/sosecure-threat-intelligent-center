@@ -37,6 +37,10 @@
                         @icon('solid/download') CSV
                     </a> --}}
 
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                      </button>
@@ -45,13 +49,11 @@
                         {{-- // var_dump(get_role_custom()['superadmin']);
                         // var_dump(get_role_custom()['site_admin']); --}}
                         @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise feed</span></a>
+                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}" class="btn btn-sm btn-info pull-right m-xs"><span><i class="fas fa-rss"></i> Compromise feed</span></a>
                         @endif
                     @endif
 
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
+                
 
 
                     <div class="pull-right" style="margin-top: 8px; width: 300px;">
@@ -597,7 +599,7 @@
                         render: function (data, type, full, meta) {
                 
 
-                            return `<a href="${base_url}/darkweb_data/delete_darkwebdata_modal/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                            return `<a href="${base_url}/darkweb_data/delete_darkwebdata_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                             
                         },
                     },
