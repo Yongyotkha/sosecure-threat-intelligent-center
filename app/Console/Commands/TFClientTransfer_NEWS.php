@@ -32,6 +32,7 @@ class TFClientTransfer_NEWS extends Command
     private $site_code = '';
     private $site_mode = '';
     private $insertToTB = 'fx_transaction_client_news';
+    private $urlUpdateBatchJob = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/updateTFBatchJob';
     /**
      * Create a new command instance.
      */
@@ -79,7 +80,15 @@ class TFClientTransfer_NEWS extends Command
                 print_r($httpDataRecon);
                 // echo json_encode($httpData);
                 if ($httpDataRecon["success"]) {
-
+                    if($httpDataRecon["result"]["connect"]){
+                        $passBody = [
+                            'modeFor' => 'done',
+                            'modeInsert' => 'fx_transaction_client_news',
+                            'nameBJ' => 'Transaction Client client_news - everyMinute()  Or Request',
+                            'sitecode' => config('app.site_code'),
+                        ];
+                        $httpDataUpdate = $this->reconnnect($this->urlUpdateBatchJob, $passBody, $this->urlLimit);
+                    }
                 } else {
 
                 }

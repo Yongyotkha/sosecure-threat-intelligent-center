@@ -2,19 +2,20 @@
 
 namespace App\Console\Commands;
 
+use App\Entities\Transaction_center_data_leak_feed_temp as SubTB;
 use Exception;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Console\Command;
 
-class TFClientTransfer_client_cve_assets extends Command
+class TFCenterTransfer_center_data_leak_feed_temp extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:TFClientTransfer_client_cve_assets';
-    protected $description = 'TFClientTransfer_client_cve_assets';
+    protected $signature = 'app:TFCenterTransfer_center_data_leak_feed_temp';
+    protected $description = 'TFCenterTransfer_center_data_leak_feed_temp';
 
     /**
      * The console command description.
@@ -23,20 +24,17 @@ class TFClientTransfer_client_cve_assets extends Command
      */
 
     private $urlLimit = 3;
-    private $urlCenterData = PATH_CENTER_IP_TF.'/api/v1/client-transfer/getTranferData'; //center ip path
-    // private $url = 'http://127.0.0.2/api/v1/clientinto-transfer/insertToNoRef'; //my ip path
-    private $url = PATH_MY_IP_TF.'/api/v1/clientinto-transfer/insertToNoRefWithID'; //my ip path
+    private $url = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/insertToRef';
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
     private $header = 'header';
+    private $dbName = 'dummyDatabase';
     private $site_code = '';
     private $site_mode = '';
-    private $insertToTB = 'fx_transaction_client_cve_assets';
-    private $urlUpdateBatchJob = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/updateTFBatchJob';
+    private $insertToTB = 'fx_transaction_center_data_leak_feed_temp';
     /**
      * Create a new command instance.
      */
-    
     public function __construct()
     {
         parent::__construct();
@@ -54,42 +52,38 @@ class TFClientTransfer_client_cve_assets extends Command
         $ip = $this->ip;
         $mac = $this->mac;
         $header = $this->header;
+        $tableData = new SubTB;
+        $tableData->setConnection($this->dbName);
+        $tableData = $tableData->where('status', 1)->where('transaction_data_status', 1)->with('get_transfer')->with('get_transfer_ref')->orderBy('id', 'asc')->get()->toArray();
+        // print_r($tableData);
 
-        $dataEncode = encrypt_decrypt('encrypt', $this->site_code, $header, $ip, $mac);
-        $passBody = [
-            'site_code_en' => $dataEncode,
-            'tbName' => $this->insertToTB,
-        ];
-        print_r($this->site_code);
-        $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
-        
-        if ($httpData["success"]) {
-            if (!empty($httpData["result"]["queryData"])) {
-                
-                $tableData = $httpData["result"]["queryData"];
-                $dataEncode = encrypt_decrypt('encrypt', $httpData["result"]["site_code_en"], $header, $ip, $mac);
-                $passBody = [
-                    'site_code_en' => $dataEncode,
-                    'queryData' => $tableData,
-                    'tbName' => $this->insertToTB,
-                ];
+        if (!$tableData) {
+            
+        } else {
+           
+            $dataEncode = encrypt_decrypt('encrypt', $this->site_code, $header, $ip, $mac);
+            $passBody = [
+                'site_code_en' => $dataEncode,
+                'queryData' => $tableData,
+                'tbName' => $this->insertToTB,
+            ];
 
-                $httpDataRecon = $this->reconnnect($this->url, $passBody, $this->urlLimit);
-                print_r($httpDataRecon);
+            $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
 
-                if ($httpDataRecon["success"]) {
-                    if($httpDataRecon["result"]["connect"]){
-                        $passBody = [
-                            'modeFor' => 'done',
-                            'modeInsert' => 'fx_transaction_client_cve_assets',
-                            'nameBJ' => 'Transaction Client cve_assets - everyMinute()  Or Request',
-                            'sitecode' => config('app.site_code'),
-                        ];
-                        $httpDataUpdate = $this->reconnnect($this->urlUpdateBatchJob, $passBody, $this->urlLimit);
+            print_r($httpData);
+            if ($httpData["success"]) {
+
+                if (!empty($httpData["result"]["returnUpdate"])) {
+                    $returnUpdate = $httpData["result"]["returnUpdate"];
+                    foreach ($returnUpdate as $valueReturn) {
+                        $updater = new SubTB;
+                        $updater->setConnection($this->dbName);
+                        $updater = $updater->where('id', $valueReturn)->first();
+                        $updater->transaction_data_status = 2;
+                        $updater->save();
                     }
-                } else {
-
                 }
+
             } else {
 
             }
@@ -117,7 +111,7 @@ class TFClientTransfer_client_cve_assets extends Command
                             'Content-type' => 'application/json',
                         ],
                         'delay' => $_sleeptime, //millisec == ms
-                        'timeout' => 59, //sec == 100sec
+                        'timeout' => 180, //sec == 100sec
                         'verify' => false,
                         'body' => json_encode($passBody),
                     ]
