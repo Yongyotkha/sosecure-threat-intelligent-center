@@ -33,7 +33,7 @@
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
 
-                    <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                    <button type="button" onclick="delete_domain_select()" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#add-domain">
@@ -95,6 +95,25 @@
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 
+    <div class="modal fade" id="delete_domain_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_domain_submit" onclick="delete_domain_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </section>
@@ -108,7 +127,7 @@
 @include('stacks.js.form')
 @include('stacks.js.datatables')
 @include('stacks.js.fullscreen')
-@include('partial.ajaxify')
+{{-- @include('partial.ajaxify') --}}
 @include('stacks.js.menusub')
 @include('stacks.js.site_hidesettings')
 
@@ -221,6 +240,42 @@
 
 
     });
+
+    function delete_domain_select(){
+        $('#delete_domain_modal').modal('show');
+    }
+
+    function delete_domain_select_confirm(){
+        let del_domain_select = [];
+        $("input[type='checkbox'][name='checked']").each(function(){
+            if($(this).is(":checked")) {
+                del_domain_select.push($(this).val());
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"{{ route('domainsettings.del_domain_select') }}",
+            data:{
+                id:del_domain_select
+            },
+            beforeSend: function(){
+                $('.delete_domain_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_domain_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
 
     function del_cate_select(id) {
         axios.post('{{ route('domainsettings.bulk.delete') }}', {checked: id})

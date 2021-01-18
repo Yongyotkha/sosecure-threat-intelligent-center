@@ -13,7 +13,7 @@ use Modules\SiteSettings\Entities\Domain;
 use Modules\SiteSettings\Http\Requests\DomainRequest;
 use App\TransactionTimeStampScans;
 
-use Modules\SiteSettings\Jobs\BulkDeleteDomainSettings;
+// use Modules\SiteSettings\Jobs\BulkDeleteDomainSettings;
 
 class DomainSettingsController extends Controller
 {
@@ -125,7 +125,7 @@ class DomainSettingsController extends Controller
 
                     $domain = $request->domain;
                     if($domain) {
-                        $Domain_check_domain = Domain::where('domain',$domain)->where('deleted_at',null)->get()->count();
+                        $Domain_check_domain = Domain::where('domain',$domain)->where('deleted_at', null)->get()->count();
                         if($Domain_check_domain > 0) {
                             return response()->json(['message' => 'this domain already exist', 'errors' => ['missing' => ["this domain already exist "]]], 500);
                         }
@@ -328,22 +328,55 @@ class DomainSettingsController extends Controller
 
 
 
-    public function bulkDelete()
-    {
-        if ($this->request->has('checked')) {
-            BulkDeleteDomainSettings::dispatch($this->request->checked, Auth::id());
-            $data['message']  = langapp('deleted_successfully');
-            $data['redirect'] = url()->previous();
-            return ajaxResponse($data);
-        }
-        return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
-    }
+    // public function bulkDelete()
+    // {
+    //     if ($this->request->has('checked')) {
+    //         BulkDeleteDomainSettings::dispatch($this->request->checked, Auth::id());
+    //         $data['message']  = langapp('deleted_successfully');
+    //         $data['redirect'] = url()->previous();
+    //         return ajaxResponse($data);
+    //     }
+    //     return response()->json(['message' => 'No selected', 'errors' => ['missing' => ["Please select atleast 1 "]]], 500);
+    // }
 
     public function test() {
         $model = $this->domain->query();
         // dd($model);
         // return $modal;
        dd(DataTables::eloquent($model)->make(true));
+    }
+
+    public function del_domain_select(Request $request){
+        $site_code = 0;
+        foreach($request -> id as $key => $id){
+            $model = Domain::find($id);
+            $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $model->site_id)
+            ->where('status', 1)
+            ->where('domain_id', $id)
+            ->first();
+            if($key == 0){
+                $site_code = $this->siteSettings->find_code($model->site_id);
+            }
+            if($TransactionTimeStampScans){
+                if($TransactionTimeStampScans -> progress !== 2){
+                    $model->delete();
+                    $TransactionTimeStampScans -> status = 0;
+                    $TransactionTimeStampScans -> save();
+                } 
+            }else{
+                $model->delete();
+            }
+        }
+        
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('domain.index',['id' => $site_code->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
     public function tableData(Request $request)
@@ -425,18 +458,23 @@ class DomainSettingsController extends Controller
 
             ->addColumn('action', function ($domain) {
                 $html = '';
-                $html .= "<div style='display: flex;'><a href='". route('scans.index', ['tab' => 'overview', 'site_code' => @$domain->get_transaction_time_stamp_scans->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs'>
-                                <i class='far fa-eye'></i>
-                            </a>";
                             if(@$domain -> get_transaction_time_stamp_scans -> progress !== 3){
-                                $html .= "<a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
-                                    <i class='fas fa-redo'></i>
+                                $html .= "<div style='display: flex;'><a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
+                                    <i class='far fa-eye'></i>
                                 </a>";
                             }else{
+                                $html .= "<div style='display: flex;'><a href='". route('scans.index', ['tab' => 'overview', 'site_code' => @$domain->get_transaction_time_stamp_scans->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs'>
+                                    <i class='far fa-eye'></i>
+                                </a>";
+                            }
+                            // if(@$domain -> get_transaction_time_stamp_scans -> progress !== 3){
+                            //     $html .= "<a href='#' class='btn btn-". get_option('theme_color') ." btn-xs' disabled>
+                            //         <i class='fas fa-redo'></i>
+                            //     </a>";
+                            // }else{
                                 $html .= "<a href='". route('domainsettings.redo', ['id' => $domain->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                     <i class='fas fa-redo'></i>
                                 </a>";
-                            }
                             if(@$domain -> get_transaction_time_stamp_scans -> progress !== 3){
                                 $html .= "<a href='". route('domainsettings.edit', ['id' => $domain->id]) ."' class='disabled btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
