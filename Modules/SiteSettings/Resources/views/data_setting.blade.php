@@ -213,7 +213,7 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">IP </label>
                                     <div class="col-lg-9">
-                                            <input type="text" name="ip" class="form-control" value="@if($siteSettings->server_log_ip){{$siteSettings->server_log_ip}}@else '' @endif"><!--192.168.1.1-->
+                                            <input type="text" name="ip" class="form-control" value="@if($siteSettings->server_log_ip){{$siteSettings->server_log_ip}}@else  @endif"><!--192.168.1.1-->
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -229,7 +229,7 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Port </label>
                                     <div class="col-lg-9">
-                                            <input type="number" name="port" class="form-control" value="@if($siteSettings->server_log_port){{$siteSettings->server_log_port}}@else '' @endif"><!--80-->
+                                            <input type="number" name="port" class="form-control" value="@if($siteSettings->server_log_port){{$siteSettings->server_log_port}}@else  @endif"><!--80-->
                                     </div>
                                 </div>
 

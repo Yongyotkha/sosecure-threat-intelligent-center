@@ -280,90 +280,103 @@ class WebDefacementController extends Controller
         $site_id = $request->site_id;
         $webdefacment_setting_id = $request->webdefacment_setting_id;
 
+        $WebdefacmentSetting_count = WebdefacmentSetting::where('deleted_at', null)->get()->count();
 
-        // dd($file_size);
-        if($webdefacment_setting_id) {
-            $WebdefacmentSetting = WebdefacmentSetting::where('id',$webdefacment_setting_id)->first();
-            $WebdefacmentSetting->name = $name_web;
-            if($request->mode == 'create'){
-                $WebdefacmentSetting->url = $url_web;
-                $WebdefacmentSetting->port = $port_web;
-            }
-           
-            $WebdefacmentSetting->hash = $hash;
-            $WebdefacmentSetting->filesize = $file_size;
-            $WebdefacmentSetting->element = $element;
-            $WebdefacmentSetting->DomainHeaders = '';
-            $WebdefacmentSetting->blacklist_keyword = $blacklist;
-            $WebdefacmentSetting->image_check = $delay_screen_shot;
-            if($delay_screen_shot == 1){
-                $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
-            }else{
-                $WebdefacmentSetting->delay_screen_shot_val = null;
-            }
-            if($blacklist == 1){
-                $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
-            }else{
-                $WebdefacmentSetting->blacklist_keyword_content = null;
-            }
-            
-            if($request->mode == 'create'){
-                $WebdefacmentSetting->site_id = $site_id;
-                $WebdefacmentSetting->active = 1;
-                $WebdefacmentSetting->domain = '';
-                $WebdefacmentSetting->user_agent = '';
-                $WebdefacmentSetting->webdeflacement_progress = 1;
-                $WebdefacmentSetting->image_last = '';
-                $WebdefacmentSetting->status_add = 1;
-            }
-            $WebdefacmentSetting->save();
-        } else {
-            // $WebdefacmentSetting = new WebdefacmentSetting;
-            // $WebdefacmentSetting->code = generator_uuid();
-            // $WebdefacmentSetting->name = $name_web;
-            // $WebdefacmentSetting->url = $url_web;
-            // $WebdefacmentSetting->port = $port_web;
-            // $WebdefacmentSetting->hash = $hash;
-            // $WebdefacmentSetting->filesize = $file_size;
-            // $WebdefacmentSetting->element = $element;
-            // $WebdefacmentSetting->DomainHeaders = '';
-            // $WebdefacmentSetting->blacklist_keyword = $blacklist;
-            // $WebdefacmentSetting->image_check = $delay_screen_shot;
-            // $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
-            // $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
-            // $WebdefacmentSetting->site_id = $site_id;
-            // $WebdefacmentSetting->active = 1;
-            // $WebdefacmentSetting->domain = '';
-            // $WebdefacmentSetting->user_agent = '';
-            // $WebdefacmentSetting->webdeflacement_progress = 3;
-            // $WebdefacmentSetting->image_last = '';
-            // $WebdefacmentSetting->user_id = @Auth::user()->id;
-            // $WebdefacmentSetting->status_add = 1;
-            // $WebdefacmentSetting->save();
-        }
+        $SiteSettings = SiteSettings::where('id',$site_id)->first();
+        if($SiteSettings) {
+            if($SiteSettings->web_defacement_allow == 'Y') {
+                if($WebdefacmentSetting_count >= $SiteSettings->web_defacement_limit) {
+                    return response()->json(['message' => 'Failure, Web Defacement exceeded limit!', 'errors' => ['missing' => ["Failure, Web Defacement exceeded limit! "]]], 500);
+                }
+            } else {
+                // dd($file_size);
+                if($webdefacment_setting_id) {
+                    $WebdefacmentSetting = WebdefacmentSetting::where('id',$webdefacment_setting_id)->first();
+                    $WebdefacmentSetting->name = $name_web;
+                    if($request->mode == 'create'){
+                        $WebdefacmentSetting->url = $url_web;
+                        $WebdefacmentSetting->port = $port_web;
+                    }
+                
+                    $WebdefacmentSetting->hash = $hash;
+                    $WebdefacmentSetting->filesize = $file_size;
+                    $WebdefacmentSetting->element = $element;
+                    $WebdefacmentSetting->DomainHeaders = '';
+                    $WebdefacmentSetting->blacklist_keyword = $blacklist;
+                    $WebdefacmentSetting->image_check = $delay_screen_shot;
+                    if($delay_screen_shot == 1){
+                        $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+                    }else{
+                        $WebdefacmentSetting->delay_screen_shot_val = null;
+                    }
+                    if($blacklist == 1){
+                        $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+                    }else{
+                        $WebdefacmentSetting->blacklist_keyword_content = null;
+                    }
+                    
+                    if($request->mode == 'create'){
+                        $WebdefacmentSetting->site_id = $site_id;
+                        $WebdefacmentSetting->active = 1;
+                        $WebdefacmentSetting->domain = '';
+                        $WebdefacmentSetting->user_agent = '';
+                        $WebdefacmentSetting->webdeflacement_progress = 1;
+                        $WebdefacmentSetting->image_last = '';
+                        $WebdefacmentSetting->status_add = 1;
+                    }
+                    $WebdefacmentSetting->save();
+                } else {
+                    // $WebdefacmentSetting = new WebdefacmentSetting;
+                    // $WebdefacmentSetting->code = generator_uuid();
+                    // $WebdefacmentSetting->name = $name_web;
+                    // $WebdefacmentSetting->url = $url_web;
+                    // $WebdefacmentSetting->port = $port_web;
+                    // $WebdefacmentSetting->hash = $hash;
+                    // $WebdefacmentSetting->filesize = $file_size;
+                    // $WebdefacmentSetting->element = $element;
+                    // $WebdefacmentSetting->DomainHeaders = '';
+                    // $WebdefacmentSetting->blacklist_keyword = $blacklist;
+                    // $WebdefacmentSetting->image_check = $delay_screen_shot;
+                    // $WebdefacmentSetting->delay_screen_shot_val = $delay_screenshot_val;
+                    // $WebdefacmentSetting->blacklist_keyword_content = $blacklist_text;
+                    // $WebdefacmentSetting->site_id = $site_id;
+                    // $WebdefacmentSetting->active = 1;
+                    // $WebdefacmentSetting->domain = '';
+                    // $WebdefacmentSetting->user_agent = '';
+                    // $WebdefacmentSetting->webdeflacement_progress = 3;
+                    // $WebdefacmentSetting->image_last = '';
+                    // $WebdefacmentSetting->user_id = @Auth::user()->id;
+                    // $WebdefacmentSetting->status_add = 1;
+                    // $WebdefacmentSetting->save();
+                }
        
-        if($request->channel == 'main_webdefacement'){
-            return ajaxResponse(
-                [
-                    'id'       => $WebdefacmentSetting->id,
-                    'message'  => langapp('saved_successfully'),
-                    'redirect' =>route('webdefacement.index'),
-                ],
-                true,
-                Response::HTTP_CREATED
-            );
-        }else{
-            $SiteSettings = SiteSettings::select('code')->where('id',$site_id)->first();
-            return ajaxResponse(
-                [
-                    'id'       => $WebdefacmentSetting->id,
-                    'message'  => langapp('saved_successfully'),
-                    'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
-                ],
-                true,
-                Response::HTTP_CREATED
-            );
+                if($request->channel == 'main_webdefacement'){
+                    return ajaxResponse(
+                        [
+                            'id'       => $WebdefacmentSetting->id,
+                            'message'  => langapp('saved_successfully'),
+                            'redirect' =>route('webdefacement.index'),
+                        ],
+                        true,
+                        Response::HTTP_CREATED
+                    );
+                }else{
+                    $SiteSettings = SiteSettings::select('code')->where('id',$site_id)->first();
+                    return ajaxResponse(
+                        [
+                            'id'       => $WebdefacmentSetting->id,
+                            'message'  => langapp('saved_successfully'),
+                            'redirect' =>route('webdefacement_website.index', ['id' => $SiteSettings->code]),
+                        ],
+                        true,
+                        Response::HTTP_CREATED
+                    );
+                }
+            }
+
         }
+
+
        
     }
 

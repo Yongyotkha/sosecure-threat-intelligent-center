@@ -93,7 +93,15 @@ class UsersSettingsController extends Controller
 
     public function create(Request $request)
     {
-        $Roles = Roles::get();
+        $SiteSettings = SiteSettings::where('code',$request->code)->first();
+        if($SiteSettings) {
+            if($SiteSettings->role_allow_admin == 'Y') {
+                $Roles = Roles::whereIn('id',['4','5'])->get();
+            } else {
+                $Roles = Roles::whereIn('id',['5'])->get();
+            }
+        }
+
         $data['Roles'] = $Roles;
         $data['code'] = $request->code;
 
@@ -443,19 +451,22 @@ class UsersSettingsController extends Controller
         // $site_code = $this->request->site_code;
         // $site_id = $this->request->site_id;
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
-        $model = $this->user->query();
-        $test = 1;
-        $model->when(
-            $test == 1,
-            function ($q) use ($site_id) {
-                return $q->where('site_id','=', $site_id);
-            }
-        );
+        $model = User::where('deleted_at', null)->where('active',1)->where('site_id', $site_id)->orderBy('id','ASC')->get();
+        
+        // $model = $this->user->query();
+        // $test = 1;
+        // $model->when(
+        //     $test == 1,
+        //     function ($q) use ($site_id) {
+        //         return $q->where('site_id','=', $site_id);
+        //     }
+        // );
+
         // $model = $this->user->where('site_id','43')->query();
         // $model = User::all()->toArray();
         // var_dump($model);
         // exit();
-        return DataTables::eloquent($model)
+        return DataTables::of($model)
             ->editColumn(
                 'no',
                 function ($user) {

@@ -113,7 +113,8 @@ class FeedCompromisedServer extends Command
         Artisan::call($commandArtisan);
         $commandArtisan = 'app:TFCenterTransfer_Compromised_Server';
         Artisan::call($commandArtisan);
-
+        $commandArtisan = 'app:TFCenterTransfer_center_data_leak_feed_temp';
+        Artisan::call($commandArtisan);
         $passBody = [
             'modeFor' => 'done',
             'modeInsert' => 'Compromised_scan_webserver',
