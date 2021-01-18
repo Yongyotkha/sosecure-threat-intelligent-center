@@ -98,7 +98,7 @@
     <div class="modal fade" id="delete_domain_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-danger">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">@langapp('delete')</h4>
                 </div>
