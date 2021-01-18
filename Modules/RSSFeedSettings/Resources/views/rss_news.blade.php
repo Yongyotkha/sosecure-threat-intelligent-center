@@ -53,6 +53,10 @@
                         <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
                     </a>
 
+                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
+                        <span>@icon('solid/trash-alt') @langapp('delete')</span>
+                    </button>
+
                     <a id="btn_client_view" href="{{site_url('/news_client')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
                         <span><i class="fas fa-eye"></i> Client view</span>
                     </a>
@@ -61,10 +65,7 @@
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
 
-                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
-                        <span>@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-        
+
                     <div class="btn-group pull-right" role="group" aria-label="Button group with nested dropdown">
                         {{-- <button type="button" class="btn btn-secondary">1</button>
                         <button type="button" class="btn btn-secondary">2</button> --}}
