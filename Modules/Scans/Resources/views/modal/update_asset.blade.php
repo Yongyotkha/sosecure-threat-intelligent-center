@@ -150,9 +150,7 @@
                         }
                             
                         html += `</td>
-                        <td>
-                            <input type="text" name="raw_data_manual[]" class="form-control" value = "${@json($AssetsData)[i]['value']}" data-raw_data_manual="${0}">
-                        </td>
+
                         <td>
                             <select name="data_type_manual[]" class="select2 form-control">`;
                             base_datatype = result.data_type;
@@ -161,6 +159,9 @@
                                 html += `<option value="${data_type.id},${@json($AssetsData)[i]['id']}" ${data_type.id == @json($AssetsData)[i]['data_type_id'] ? 'selected' : ''}  data-raw_data_manual="${0}">${data_type.value}</option>`;
                             }
                             html += `</select>
+                        </td>
+                        <td>
+                            <input type="text" name="raw_data_manual[]" class="form-control" value = "${@json($AssetsData)[i]['value']}" data-raw_data_manual="${0}">
                         </td>
                         <td>`;
                             if(i==0){
@@ -178,9 +179,9 @@
                 
             }
 
-            html2 += `<button type="button"  class="btn btn-sm btn-info m-xs add-row"  value="Add Row" onclick="add_assets_manual(0,${number_tbody_rows},0)">
-                        <span>@icon('solid/plus')  Add Referent
-                    </button>`;  
+            html2 += `<div class="text-center"><button type="button"  class="btn btn-sm btn-info m-xs add-row"  value="Add Row" onclick="add_assets_manual(0,${number_tbody_rows},0)">
+                        <span>@icon('solid/plus')  Add
+                    </button></div>`;  
                     
             $('.test').html(html);
             $('#add_referent').html(html2);
@@ -244,9 +245,7 @@
         markup = `
         <tr id="rows_manual_${i}">
             <td></td>
-            <td>
-                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
-            </td>
+
             <td>
                 <select name="data_type_manual[]" class="select2 form-control">`;
                 for(let b in base_datatype){
@@ -254,6 +253,9 @@
                     markup += `<option value="${data_type.id}," data-raw_data_manual="${rows_data_manual}">${data_type.value}</option>`;
                 }
             markup += `</select>
+            </td>
+            <td>
+                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
             </td>
             <td>
                 <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_assets_manual(${i})">
@@ -268,6 +270,8 @@
     function delete_assets_manual(c){
          $('#rows_manual_' + c).remove();
     }
+    
+
 
     function save_assets_manual(){
         loading('load');
@@ -289,8 +293,7 @@
                 };
             }
         });
-        console.log(values);
-        console.log(res); 
+
 
         axios.post('{{ route('scans_assets.scans_assets_edit') }}', {
             code_assets:'{{ $code_asset }}',

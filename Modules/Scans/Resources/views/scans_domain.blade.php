@@ -94,75 +94,9 @@
                         <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Asset To Use</button>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
+                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">@langapp('Search_Advance')</button>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-left">
-                            <li>
-                                <a href="#">
-                                    Internet Name
-                                </a>
-                            </li>   
-                            <li>
-                                <a href="#">
-                                    Affiliate - Internet Name
-                                </a>
-                            </li>   
-                            <li>
-                                <a href="#">
-                                    Affiliate - Domain Name
-                                </a>
-                            </li>   
-                            <li>
-                                <a href="#">
-                                    Domain Name
-                                </a>
-                            </li>  
-                            <li>
-                                <a href="#">
-                                    IP Address
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    IPv6 Address
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Malicious Internet Name
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Human Name
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Internet Name
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Email Address
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Domain Name (Parent)
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Phone Number
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+
                 </div>
                 @endif
                 &nbsp;

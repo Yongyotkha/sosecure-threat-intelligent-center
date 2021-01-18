@@ -1,44 +1,40 @@
 <header class="header b-b clearfix">
     <div class="panel-body">
-        <div class="hide-fillter" style="margin-bottom: 1rem">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="form-group m-b-md">
-                        <label for="" class="">Keyword</label>
-                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+
+
+        <section class="panel panel-default hide-fillter" id="area-advance-search" style="display: none;">
+            <div class="container-fluid" style="padding: 2rem;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group m-b-md">
+                            <label for="" class="">Keyword</label>
+                            <input type="text" class="form-control" name="keyword" placeholder="Search">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group m-b-md">
+                            <label for="" class="">Referent</label>
+                            <input type="text" class="form-control" name="keyword" placeholder="">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="" class="">Datatype Type</label>
-                        <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                            <option value="1">All</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group m-b-md">
-                        <label for="" class="">Referent</label>
-                        <input type="text" class="form-control" name="keyword" placeholder="">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group m-b-md">
-                        <label for="" class="d-block">&nbsp;</label>
-                        <button class="btn btn-info">
-                            <i class="fas fa-search"></i>
-                            <span> @langapp('apply') </span>
-                        </button>
-                        <button class="btn btn-default">
-                            <i class="fas fa-broom"></i>
-                            <span> Clear </span>
-                        </button>
+                <div class="row pull-right" >
+                    <div class="col-md-12">
+                        <div class="form-group m-b-md">
+                            <label for="" class="d-block">&nbsp;</label>
+                            <button class="btn btn-info">
+                                <i class="fas fa-search"></i>
+                                <span> @langapp('apply') </span>
+                            </button>
+                            <button class="btn btn-default">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <div class="row">
             <div class="col-md-12">
@@ -188,9 +184,7 @@
                                     <td>
                                         <input type="text" name="assets_manual[]" data-raw_data_manual="${0}" class="form-control">
                                     </td>
-                                    <td>
-                                        <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${0}">
-                                    </td>
+
                                     <td>
                                         <select name="data_type_manual[]" class="select2 form-control">`;
                                         base_datatype = result.data_type;
@@ -199,6 +193,9 @@
                                             html += `<option value="${data_type.id}" data-raw_data_manual="${0}">${data_type.value}</option>`;
                                         }
                                         html += `</select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${0}">
                                     </td>
                                     <td></td>
                                 </tr>`;
@@ -228,9 +225,7 @@
         markup = `
         <tr id="rows_manual_${number_add_rows}">
             <td></td>
-            <td>
-                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
-            </td>
+
             <td>
                 <select name="data_type_manual[]" class="select2 form-control">`;
                 for(let b in base_datatype){
@@ -238,6 +233,9 @@
                     markup += `<option value="${data_type.id}" data-raw_data_manual="${rows_data_manual}">${data_type.value}</option>`;
                 }
             markup += `</select>
+            </td>
+            <td>
+                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
             </td>
             <td>
                 <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_assets_manual(${number_add_rows})">
@@ -263,9 +261,7 @@
                         <td>
                             <input type="text" name="assets_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
                         </td>
-                        <td>
-                            <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
-                        </td>
+
                         <td>
                             <select name="data_type_manual[]" class="select2 form-control">`;
                             for(let b in base_datatype){
@@ -273,6 +269,9 @@
                                 html += `<option value="${data_type.id}" data-raw_data_manual="${number_rows_data_manual}">${data_type.value}</option>`;
                             }
                             html += `</select>
+                        </td>
+                        <td>
+                            <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
                         </td>
                         <td>
                             <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_assets_manual_main(${number_new_rows_assets})">
@@ -291,6 +290,11 @@
         <div id="new_assets_show_${number_new_rows_assets+1}"></div>`;
         $("#new_assets_show_" + number_new_rows_assets).append(html);
         number_new_rows_assets++;
+    }
+    function delete_assets_manual_main(c){
+        $('#new_add_assets_' + c).remove();
+        number_new_rows_assets--;
+        number_rows_data_manual--;
     }
     function save_assets_manual(){
         loading('load');
