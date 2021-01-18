@@ -180,11 +180,11 @@
                                         <span class="badge badge-success">Active</span>
                                     </td>
                                     <td class="no-wrap">
-                                        <button type="submit" class="btn btn-sm btn-info m-xs">
+                                        <button type="submit" class="btn btn-sm btn-info btn-xs m-xs">
                                             <span>@icon('solid/edit')
                                         </button>
         
-                                        <button type="submit" class="btn btn-sm btn-danger m-xs">
+                                        <button type="submit" class="btn btn-sm btn-danger btn-xs m-xs">
                                             <span>@icon('solid/trash-alt')
                                         </button>
                                     </td>
