@@ -105,7 +105,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else{{$site_user_limit_default->value}}@endif">
+                                        <input type="text" class="form-control touch_spin text-center" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else{{$site_user_limit_default->value}}@endif">
                                     </div>
                                 </div>
                                 <!--
@@ -151,7 +151,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="domain_limit" value="@if($siteSettings->domain_limit){{$siteSettings->domain_limit}}@else{{$site_domain_limit_default->value}}@endif">
+                                        <input type="text" class="form-control touch_spin text-center" name="domain_limit" value="@if($siteSettings->domain_limit){{$siteSettings->domain_limit}}@else{{$site_domain_limit_default->value}}@endif">
                                     </div>
                                 </div>
 
@@ -169,7 +169,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="asset_limit" value="@if($siteSettings->asset_limit){{$siteSettings->asset_limit}}@else{{$site_asset_limit_default->value}}@endif">
+                                        <input type="text" class="form-control touch_spin text-center" name="asset_limit" value="@if($siteSettings->asset_limit){{$siteSettings->asset_limit}}@else{{$site_asset_limit_default->value}}@endif">
                                     </div>
                                 </div>
 
@@ -185,7 +185,7 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin" name="web_defacement_limit" value="@if($siteSettings->web_defacement_limit){{$siteSettings->web_defacement_limit}}@else{{$site_web_defacement_limit_default->value}}@endif">
+                                        <input type="text" class="form-control touch_spin text-center" name="web_defacement_limit" value="@if($siteSettings->web_defacement_limit){{$siteSettings->web_defacement_limit}}@else{{$site_web_defacement_limit_default->value}}@endif">
                                     </div>
                                 </div>
                                 <hr>
