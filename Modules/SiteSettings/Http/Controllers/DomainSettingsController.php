@@ -524,11 +524,22 @@ class DomainSettingsController extends Controller
 
     public function redo_process($id){
         $get_data = $this->domain->get_data($id);
-        $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $get_data->site_id)->where('domain_id', $get_data->id)->first();
-        $TransactionTimeStampScans -> progress = 0;
-        $TransactionTimeStampScans -> save();
-
         $site_code = $this->siteSettings->find_code($get_data->site_id);
+        $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $get_data->site_id)->where('domain_id', $get_data->id)->first();
+        if($TransactionTimeStampScans){
+            $TransactionTimeStampScans -> progress = 0;
+            $TransactionTimeStampScans -> save();
+        }else{
+            $TransactionTimeStampScans->code = new TransactionTimeStampScans(); 
+            $TransactionTimeStampScans->code = generator_uuid(); 
+            $TransactionTimeStampScans->created_by = @Auth::user()->id;
+            $TransactionTimeStampScans->site_id = $get_data->site_id;
+            $TransactionTimeStampScans->domain_id = $get_data->id;
+            $TransactionTimeStampScans->status = 1;
+            $TransactionTimeStampScans->progress = 0;
+            $TransactionTimeStampScans->save();
+        }
+       
         return ajaxResponse(
             [
                 'message'  => "Successfully",
