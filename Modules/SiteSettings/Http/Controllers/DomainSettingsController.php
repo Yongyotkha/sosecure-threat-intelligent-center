@@ -145,7 +145,7 @@ class DomainSettingsController extends Controller
                     $Domain = $this->domain;
                     $Domain->code = generator_uuid();
                     $Domain->name = $request->name;
-                    $Domain->domain = $request->domain;
+                    $Domain->domain = $this->remove_http($request->domain);
                     // $Domain->created_by = @Auth::user()->id;
                     $Domain->status = $request->status ? 1 : 0;
                     $Domain->domain_default = $request->default ? 1 : 0;
@@ -226,7 +226,7 @@ class DomainSettingsController extends Controller
         $domain = $this->domain->findOrFail($id);
         // $domain->update($request->all());
         $domain->name = $request->name;
-        $domain->domain = $request->domain;
+        $domain->domain = $this->remove_http($request->domain);
         // $domain->open_scan = $request->open_scan;
         // $domain->scan_interval = $request->scan_interval;
         $domain->status = $request->status ? 1 : 0;
@@ -251,6 +251,16 @@ class DomainSettingsController extends Controller
             Response::HTTP_OK
         );
     }
+
+    private function remove_http($url) {
+        $disallowed = array('http://', 'https://', 'http://www.', 'https://www.', 'www.');
+        foreach($disallowed as $d) {
+           if(strpos($url, $d) === 0) {
+              return str_replace($d, '', $url);
+           }
+        }
+        return $url;
+     }
 
     public function delete_process($id = null)
     {
