@@ -3048,16 +3048,25 @@ input.input-login:focus {
     white-space: nowrap;
 }
 
-@media (min-width:1220px) and (max-width:1470px){
-    .wdfm-inner {
-        padding: 0 8px !important;
+@media (min-width:1200px) and (max-width:1400px){
+    .wdfm-inner-4{
+        padding: 0 15px !important;
+        max-width: 33.33333%;
+        flex-basis: 33.33333%;
+        display: flex;
+    }
+}
+@media (min-width:768px) and (max-width:1200px){
+    .wdfm-inner-4{
+        padding: 0 15px !important;
         max-width: 50%;
         flex-basis: 50%;
         display: flex;
     }
-
-    .wdfm-inner-4{
-        padding: 0 15px !important;
+}
+@media (min-width:1220px) and (max-width:1470px){
+    .wdfm-inner {
+        padding: 0 8px !important;
         max-width: 50%;
         flex-basis: 50%;
         display: flex;

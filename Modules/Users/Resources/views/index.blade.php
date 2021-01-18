@@ -14,19 +14,7 @@
                        </a> --}}
                         @endadmin
 
-                        <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                            <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
-                                <option value="">All Site</option>
-                                @if ($SiteSettings)
-                                
-                                @foreach ($SiteSettings as $SiteSettings)
-                                <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}} 
-                                </option>
-                                @endforeach
-            
-                                @endif
-                            </select>
-                        </div>
+         
 
 
                         @can('users_delete')
@@ -35,17 +23,19 @@
                             </button>
                         @endcan
 
-                        @can('users_create')
-                        <a href="{{ route('users.create') }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
-                           @icon('solid/plus') @langapp('create')
-                       </a>
-                        @endcan
+                     
 
                         @if(isAdmin() || can('announcements_create'))
                         <a href="{{ route('announcements.index') }}" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-rel="tooltip" title="@langapp('announcements')" data-placement="bottom">
                             @icon('solid/bullhorn') @langapp('announcements')
                         </a>
                         @endif
+
+                        @can('users_create')
+                        <a href="{{ route('users.create') }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
+                           @icon('solid/plus') @langapp('create')
+                       </a>
+                        @endcan
 
                     <div class="btn-group">
 						<button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown"> @langapp('filter') 
@@ -66,6 +56,19 @@
 						</ul>
 					</div>
 
+                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                            <option value="">All Site</option>
+                            @if ($SiteSettings)
+                            
+                            @foreach ($SiteSettings as $SiteSettings)
+                            <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}} 
+                            </option>
+                            @endforeach
+        
+                            @endif
+                        </select>
+                    </div>
                        
 
                         @can('roles_view_all')

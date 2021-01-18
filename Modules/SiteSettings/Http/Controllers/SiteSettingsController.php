@@ -284,7 +284,7 @@ class SiteSettingsController extends Controller
             //     $Tags_site->save();
             // }
 
-            if ($request->hasFile('logo')) {
+            if ($request->logo) {
                 $image_path = $SiteSettings->logo;
                 if (File::exists($image_path)) {
                     File::delete($image_path);

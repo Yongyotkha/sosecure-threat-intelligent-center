@@ -3,7 +3,7 @@
         <div class="modal-header bg-warning">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">Make a new list again   {{  $domain->name  }}</h4>
-        </div>
+        </div> 
 
         {!! Form::open(['route' => ['domainsettings.redo_process', $domain->code], 'class' => 'ajaxifyForm', 'method' => 'PUT']) !!}
 

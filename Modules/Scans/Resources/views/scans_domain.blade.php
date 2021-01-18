@@ -5,7 +5,7 @@
         <section class="vbox">
             <header class="header bg-white b-b b-light head-d-flex-nowrap" style="white-space: nowrap;">
                 <div class="bc-head m-none" style="width:100%;">
-                    <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                    <a href="javascript:history.back()" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
                      Site Setting > {{ $site -> get_site -> name }} | Scan Domain : {{ $site -> get_domain -> domain }}

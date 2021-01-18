@@ -925,6 +925,7 @@ return [
     'vulnerabilitys'                             => 'Vulnerabilities',
     'vulnerability'                              => 'Vulnerability',
     'compromised'                                => 'Compromised',
+    'data_setting'                                => 'DataSetting',
     'data_leak'                                  => 'Data Leak',
     'dataleak_data'                              => 'Data Leak Data',
     'data_leak_feed'                             => 'Data Leak Feed',

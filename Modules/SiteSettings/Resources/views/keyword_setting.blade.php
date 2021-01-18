@@ -26,7 +26,7 @@
                         @icon('solid/download') CSV
                     </a> --}}
                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="left">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <a href="{{route('keyword.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
                         @icon('solid/plus') @langapp('add')
@@ -118,6 +118,35 @@
         </div>
     </div>
 
+
+    <div class="modal in fixed-left" id="delete_all" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <span class="modal-title" id="exampleModalLabel">Delete</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="">
+                <div class="modal-body">
+                    <p class="text-danger">@langapp('delete_warning')  </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="delete-all btn btn-danger btn-rounded">
+                        <i class="fas fa-paper-plane"></i>
+                        Delete
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')
@@ -167,42 +196,33 @@
             $('.keyword_id:checked').each(function () {
                 keyword_id.push(this.value);
             });
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type:"POST",
-                        url:"{{ route('KeywordsController.delete_checked') }}",
-                        data:{id: keyword_id},
-                        beforeSend: function(){
-                            loading('load');
-                        },
-                        success:function(response) {
-                            loading('stop_load');
-                            toastr.success(response.message, '@langapp('response_status')');
-                            window.location.href = response.redirect;
-                        },
-                        error: function (error){
-                            loading('stop_load');
-                            var errors = error.response.data.errors;
-                            var errorsHtml = '';
-                            $.each(errors, function (key, value) {
-                                errorsHtml += '<li>' + value[0] + '</li>';
-                            });
-                            toastr.error(errorsHtml, '@langapp('response_status') ');
-                        }
-      
-                    });
-
-                }
-            })
+            $('#delete_all').modal('show');
+            $('.delete-all').click(function(){
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('KeywordsController.delete_checked') }}",
+                    data:{id: keyword_id},
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                        $('#delete_all').modal('hide');
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+    
+                });
+            });
         });
 
 

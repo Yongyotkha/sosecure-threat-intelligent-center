@@ -9,176 +9,27 @@
                 </header>
                 <div class="scrollable wrapper">
                     <div class="row m-b">
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
+                        <div class="col-lg-12">
+                            <section class="scrollable wrapper bg" id="clauses">
+                                <div class="panel-group m-b" id="accordion2">
+                                    <ul class="list no-style" id="clauses-list">
+                                        @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
+                                        <li class="panel panel-default" id="clause-{{ $clause->id }}">
+                                            <div class="panel-heading">
+                                                <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($clause->name) }}">
+                                                    @icon('solid/caret-right') {{ humanize($clause->name) }}
+                                                </a>
+                                            </div>
+                                            <div id="{{ slugify($clause->name) }}" class="panel-collapse collapse">
+                                                <div class="panel-body clause">
+                                                    @parsedown($clause->clause)
+                                                </div>
+                                            </div>
+                                        </li>
+                                        @endforeach
+                                    </ul>   
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title  Title  Title  Title  Title  Title Title  Title  Title  Title  Title  Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-3 m-b">
-                            <a href="">
-                                <div class="search-card">
-                                    <div class="search-card-body">
-                                        <div class="search-title">
-                                            Title
-                                        </div>
-                                        <div class="search-details">
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                            Lorem ipsum dolor sit amet.
-                                        </div>
-                                    </div>
-                                    <div class="seacrh-card-footer">
-                                        <a href="" class="author-by">Author Name</a>
-                                        <span>Date : 3 December 2020</span>
-                                    </div>
-                  
-                                </div>
-                            </a>
+                            </section>
                         </div>
                     </div>
                 </div>
@@ -192,3 +43,4 @@
 
 @endpush
 @endsection
+

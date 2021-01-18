@@ -15,7 +15,7 @@
                         <div class="col-sm-12 m-b-xs">
 
                         @if($section == 'general')
-                        <a href="{{ route('settings.index', 'clauses') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}">@icon('solid/file-contract') @langapp('clauses')</a>
+                        <a href="{{ route('settings.index', 'clauses') }}" class="d-none btn btn-sm btn-{{ get_option('theme_color') }}">@icon('solid/file-contract') @langapp('clauses')</a>
                         @endif
 
                         @if($section == 'payments')
