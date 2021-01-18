@@ -58,9 +58,9 @@
                     </tr>
                 </table>
                 <div class="text-center">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    {{-- <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         Logs
-                    </button>
+                    </button> --}}
                     @if(@$site -> progress !== 3)
                         <button type="button" class="btn btn-success btn-rounded" disabled>
                             <i class="fas fa-play"></i>

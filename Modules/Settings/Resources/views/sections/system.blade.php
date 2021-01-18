@@ -54,7 +54,7 @@ $current_locale = get_option('locale');
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">@langapp('default_currency')  </label>
                     <div class="col-lg-6">
                         <select name="default_currency" class="form-control select2-option">
@@ -96,7 +96,7 @@ $current_locale = get_option('locale');
                     </div>
                 </div>  
 
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('default_calendar')</label>
                     <div class="col-lg-6">
                         <select class="form-control select2-option" name="default_calendar" required>
@@ -195,7 +195,7 @@ $current_locale = get_option('locale');
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">Privacy Policy URL </label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control" value="{{ get_option('privacy_policy_url') }}" name="privacy_policy_url">
@@ -203,7 +203,7 @@ $current_locale = get_option('locale');
                 </div>
 
                 
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">Slack Webhook URL <span data-toggle="tooltip" title="Receives system alerts">@icon('regular/question-circle')</span></label>
                     <div class="col-lg-6">
                         <input type="text" class="form-control" value="{{ get_option('slack_webhook') }}" name="slack_webhook">
@@ -211,7 +211,7 @@ $current_locale = get_option('locale');
                 </div>
                 
 
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">Open Exchange API</label>
                     <div class="col-lg-6">
                         <input type="text" name="xrates_app_id" class="form-control" placeholder="Leave blank" value="{{ get_option('xrates_app_id') }}">
@@ -219,21 +219,21 @@ $current_locale = get_option('locale');
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">Google Calendar API Key</label>
                     <div class="col-lg-6">
                         <input type="text" name="gcal_api_key" class="form-control" placeholder="API Key" value="{{ get_option('gcal_api_key') }}">
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">Google Calendar ID</label>
                     <div class="col-lg-6">
                         <input type="text" name="gcal_id" class="form-control" placeholder="Calendar ID" value="{{ get_option('gcal_id') }}">
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group  d-none">
                     <label class="col-lg-3 control-label">@langapp('default_role')  </label>
                     <div class="col-lg-6">
                         <select name="default_role" class="form-control">

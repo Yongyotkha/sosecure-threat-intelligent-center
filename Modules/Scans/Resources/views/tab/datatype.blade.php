@@ -156,6 +156,7 @@
                     return JSON.stringify( d );
                 }
             },
+            
             columns: [
                 {
                     data: 'chk',

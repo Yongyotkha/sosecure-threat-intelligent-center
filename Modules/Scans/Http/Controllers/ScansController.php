@@ -382,7 +382,7 @@ class ScansController extends Controller
     public function tableDataScans(Request $request)
     {
         $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
-        $TransactionScans = TransactionScans::where('site_id', $SiteSettings->site_id)->where('domain_id', $SiteSettings->domain_id)->get();
+        $TransactionScans = TransactionScans::where('site_id', $SiteSettings->site_id)->where('domain_id', $SiteSettings->domain_id)->orderBy('status', 'desc')->get();
         return DataTables::of($TransactionScans)
             ->editColumn('chk', function (TransactionScans $data) {
                 $res = '';
