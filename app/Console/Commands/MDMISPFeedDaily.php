@@ -125,8 +125,7 @@ class MDMISPFeedDaily extends Command
         $time_stamp_start = Carbon::now()->subDays(2)->format('Y-m-d');
         $time_stamp_end = Carbon::now()->format('Y-m-d');
         $url_1 = "https://10.104.0.9/events/xml/download/null/false/null/" . $time_stamp_start . "/" . $time_stamp_end . "/";
-        $url_1 = "https://10.104.0.9/events/xml/download/null/false/null/2020-12-29/2020-12-30/";
-        //$url_1 = "https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C12h&page=1&limit=100";
+        // $url_1 = "https://10.104.0.9/events/xml/download/null/false/null/2020-12-29/2020-12-30/";
         $reconCall = $this->reconnnect($url_1, $urlLimit);
         $this->info($url_1);
         echo json_encode($reconCall);

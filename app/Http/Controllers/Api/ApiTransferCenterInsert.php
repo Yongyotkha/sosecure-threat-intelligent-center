@@ -14,6 +14,7 @@ use App\Entities\TF_Center_transaction_batchjob;
 
 use App\Entities\TF_Center_data_leak_feed_temp;
 use App\Entities\TF_Center_data_leak_socail_ref_temp;
+use App\Entities\TF_Center_data_datacve_mapping;
 
 class ApiTransferCenterInsert extends Controller
 {
@@ -270,7 +271,36 @@ class ApiTransferCenterInsert extends Controller
         return response()->json($dataout);
     }
 
-    
+    protected function updateIsFix_fx_data_datacve_mapping(Request $request)
+    {
+        $ip = $this->ip;
+        $mac = $this->mac;
+        $header = $this->header;
+        $connect = true;
+
+        $code = $request->site_code_en;
+        $statusCVE = $request->statusCVE;
+        $transaction_id = $request->transaction_id;
+
+        $dataEncode = $code;
+        $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
+        $site = SiteSettings::where('code', $dataDecode)->first();
+        
+        if($site){
+            $TF_Center_data_datacve_mapping = TF_Center_data_datacve_mapping::where('site_id', $site->id)->where('id', $transaction_id)->first();
+            if($TF_Center_data_datacve_mapping){
+                $TF_Center_data_datacve_mapping->is_fix = $statusCVE;
+                $TF_Center_data_datacve_mapping->save();
+            }
+        }else{
+            $connect = false;
+        }
+        $dataout = [
+            'connect' => true,
+        ];
+
+        return response()->json($dataout);
+    }
 
     protected function updateBatchJob(Request $request)
     {
