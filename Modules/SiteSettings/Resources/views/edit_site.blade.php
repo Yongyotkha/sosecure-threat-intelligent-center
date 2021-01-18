@@ -42,6 +42,7 @@
                                     <div class="col-lg-6">
                                         <div class="">
                                             <input id="file-input-demo" type="file" class="form-control" name="logo">
+                                            <span>Remark Upload File Extension (.png .jpg) <span class="text-danger">Max Size 2MB</span></span>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
