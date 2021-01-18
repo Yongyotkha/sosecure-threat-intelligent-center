@@ -176,6 +176,7 @@ class FeedCompromisedScan extends Command
             ->where('feedcontent', $savePythonScan)
             ->where('keyword', $keyword)
             ->where('feed_type', $feel_type)->first();
+            $mode_Transaction_center_data_leak_feed_temp = 'insert';
             if(!$DataLeakFeedCheck){
                 $DataLeakFeedCheck = new DataLeakFeedTemp;
                 $DataLeakFeedCheck->code = null;
@@ -192,30 +193,15 @@ class FeedCompromisedScan extends Command
                 $DataLeakFeedCheck->feed_type = $feel_type;
                 $DataLeakFeedCheck->approve = 0;
                 $DataLeakFeedCheck->save();
-                // $id_DataLeakFeedCheck = $DataLeakFeedCheck->id;
+                
 
-                $Transaction_center_compromised_files_check = new Transaction_center_data_leak_feed_temp;
-                $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakFeedCheck->id;
-                $Transaction_center_compromised_files_check -> transaction_mode = 'insert';
-                $Transaction_center_compromised_files_check -> transaction_data_status = 1;
-                $Transaction_center_compromised_files_check -> status = 1;
-                $Transaction_center_compromised_files_check -> save();
             }else{
-                // $id_DataLeakFeedCheck = $DataLeakFeedCheck->id;
+                $mode_Transaction_center_data_leak_feed_temp = 'update';
                 $DataLeakFeedCheck->source_name = $CompromisedFileOriginalCheck->file_path;
                 $DataLeakFeedCheck->feedtimepost = date("Y-m-d H:i:s");
                 $DataLeakFeedCheck->feedtimestamp = date("Y-m-d H:i:s");
                 $DataLeakFeedCheck->feedcontent = $savePythonScan;
                 $DataLeakFeedCheck->save();
-
-                $Transaction_center_compromised_files_check = new Transaction_center_data_leak_feed_temp;
-                $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakFeedCheck->id;
-                $Transaction_center_compromised_files_check -> transaction_mode = 'update';
-                $Transaction_center_compromised_files_check -> transaction_data_status = 1;
-                $Transaction_center_compromised_files_check -> status = 1;
-                $Transaction_center_compromised_files_check -> save();
 
             }
 
@@ -230,27 +216,22 @@ class FeedCompromisedScan extends Command
                 $DataLeakSocialRefCheck->status = 1;
                 $DataLeakSocialRefCheck->view = null;
                 $DataLeakSocialRefCheck->save();
-
-                $Transaction_center_compromised_files_check = new Transaction_center_data_leak_socail_ref_temp;
-                $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakSocialRefCheck->id;
-                $Transaction_center_compromised_files_check -> transaction_mode = 'insert';
-                $Transaction_center_compromised_files_check -> transaction_data_status = 1;
-                $Transaction_center_compromised_files_check -> status = 1;
-                $Transaction_center_compromised_files_check -> save();
                 
             }else{
+                $mode_Transaction_center_data_leak_feed_temp = 'update';
                 $DataLeakSocialRefCheck->keyword = $keyword;
                 $DataLeakSocialRefCheck->save();
 
-                $Transaction_center_compromised_files_check = new Transaction_center_data_leak_socail_ref_temp;
-                $Transaction_center_compromised_files_check -> site_id = $server->site_id;
-                $Transaction_center_compromised_files_check -> transaction_id = $DataLeakSocialRefCheck->id;
-                $Transaction_center_compromised_files_check -> transaction_mode = 'update';
-                $Transaction_center_compromised_files_check -> transaction_data_status = 1;
-                $Transaction_center_compromised_files_check -> status = 1;
-                $Transaction_center_compromised_files_check -> save();
             }
+
+            $Transaction_center_data_leak_feed_temp = new Transaction_center_data_leak_feed_temp;
+            $Transaction_center_data_leak_feed_temp -> site_id = $server->site_id;
+            $Transaction_center_data_leak_feed_temp -> transaction_id = $DataLeakFeedCheck->id;
+            $Transaction_center_data_leak_feed_temp -> transaction_id_ref = $DataLeakSocialRefCheck->id;
+            $Transaction_center_data_leak_feed_temp -> transaction_mode = $mode_Transaction_center_data_leak_feed_temp;
+            $Transaction_center_data_leak_feed_temp -> transaction_data_status = 1;
+            $Transaction_center_data_leak_feed_temp -> status = 1;
+            $Transaction_center_data_leak_feed_temp -> save();
         }
         return 0;
     }
