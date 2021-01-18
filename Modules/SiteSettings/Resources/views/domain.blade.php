@@ -68,7 +68,7 @@
                                                             </label>
                                                         </th>
                                                         {{-- <th class="">No.</th> --}}
-                                                        {{-- <th>Site Name</th> --}}
+                                                        <th>Name</th>
                                                         <th>Domain</th>
                                                         <th>Default</th>
                                                         <th>Started</th>
@@ -155,6 +155,10 @@
                     searchable: false,
                     sortable: false,
                     className: 'w-10'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
                 },
                 {
                     data: 'domain',
