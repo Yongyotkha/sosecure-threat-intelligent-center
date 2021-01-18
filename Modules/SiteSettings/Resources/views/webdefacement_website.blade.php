@@ -367,6 +367,8 @@
             }else{
                 $('#delay_screen_shot_val_div').hide();
                 $('.review_image_screenshot').css("display","none");
+                $(".review-image-capture").html("");
+                $("#link_edit_image_screenshot").html("");
             }
         });
         
@@ -808,6 +810,15 @@
                     $('#delay_screen_shot').prop('checked', true);
                     $('#delay_screenshot_val').val(response.data.delay_screen_shot_val);
                     $('#delay_screen_shot_val_div').show();
+                    $('.review_image_screenshot').css("display","block");
+                    let image_screenshot = response.data.image;
+                    let image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
+                    let link_edit_image_screenshot_html = `
+                            <a href="${base_url}/edit-image/${response.data.site_code}/${response.data.id}" target="_blank">
+                                Edit Image
+                            </a>`;
+                    $(".review-image-capture").html(image_screenshot_html);
+                    $("#link_edit_image_screenshot").html(link_edit_image_screenshot_html);
                 }else{
                     $('#delay_screen_shot').prop('checked', false);
                 }
@@ -841,6 +852,8 @@
         $('#delay_screen_shot_val_div').hide();
         $("#area_check_message").empty();
         $("#area_option").css("display","none");
+        $(".review-image-capture").html("");
+        $('.review_image_screenshot').css("display","none");
     }
 
 

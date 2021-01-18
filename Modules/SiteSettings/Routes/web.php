@@ -30,6 +30,7 @@ Route::group(
         Route::post('sitesettings', 'SiteSettingsController@store')->name('sitesettings.save')->middleware('can:sitesettings_create');
         Route::put('sitesettings/{id}', 'SiteSettingsController@update')->name('sitesettings.update.settings')->middleware('can:sitesettings_update');
         Route::post('sitesettings/change_status', 'SiteSettingsController@change_status')->name('sitesettings.change_status.settings')->middleware('can:sitesettings_update');
+        Route::post('sitesettings/sitesettings_delete', 'SiteSettingsController@sitesettings_delete')->name('sitesettings.sitesettings_delete');
         // Route::get('/test', 'SiteSettingsController@test')->name('sitesettings.test')->middleware('can:menu_items');
 
         Route::get('/systemsetting/{id}', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
@@ -93,6 +94,7 @@ Route::group(
         Route::get('/vulnerability_assets/cve_assets/data', 'VulnerabilityController@tableData')->name('cve_assets.data')->middleware('can:menu_items');
         Route::get('/vulnerability_assets/create/{code}', 'VulnerabilityController@create')->name('vul_assets.create')->middleware('can:menu_items');
         Route::post('/vulnerability_assets/save/{code}', 'VulnerabilityController@saveCveAsset')->name('vul_assets.save')->middleware('can:menu_items');//->middleware('can:categorysettings_create')
+        Route::post('/vulnerability_assets/vulsetting_delete', 'VulnerabilityController@vulsetting_delete')->name('vul_assets.vulsetting_delete')->middleware('can:menu_items');
 
         Route::get('/keywordsetting/{id}', 'DataLeakController@keyword')->name('keyword.index')->middleware('can:menu_items');
        
@@ -104,6 +106,7 @@ Route::group(
         Route::post('/socialdatas/change_status', 'DataLeakController@change_status')->name('socialdatas.change_status');
         Route::get('/socialdatas/delete_socialdatas/{code}', 'DataLeakController@delete_socialdatas')->name('socialdatas.delete');
         Route::delete('/socialdatas/delete_socialdata/{code}', 'DataLeakController@delete_socialdata')->name('socialdatas.delete_socialdata');
+        Route::post('/socialdatas/socialdatas_change_delete', 'DataLeakController@socialdatas_change_delete')->name('socialdatas.socialdatas_change_delete')->middleware('can:menu_items');
 
 
     }

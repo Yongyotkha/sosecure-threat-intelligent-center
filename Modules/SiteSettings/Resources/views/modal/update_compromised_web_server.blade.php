@@ -230,8 +230,7 @@
 
         ip_edit = $('#ip_edit').val();
         port_edit = $('#port_edit').val();
-        user_edit = $('#user_edit').val();
-        password_edit = $('#password_edit').val();
+        user_edit = {{$CompromisedServer->credentials_id}};
         os_edit = $('#os_edit').val();
 
 
@@ -239,11 +238,10 @@
             type:"POST",
             url:"{{ route('compromised_web_server.checkWebserverIP') }}",
             data:{
-                ip:ip,
-                os:os,
-                password:password,
-                user:user,
-                port:port,
+                ip:ip_edit,
+                port:port_edit,
+                user:user_edit,
+                os:os_edit,
             },
             beforeSend: function(){
                 loading('load');

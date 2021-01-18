@@ -17,11 +17,12 @@
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Type <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <select name="type" id="type" class="select2-option form-control select-site" style="min-width: 300px;">
+                    <select name="type[]" id="type" class="select2-option form-control "  multiple="multiple" style="min-width: 300px;">
                         <option  value="social">Social</option>
                         <option  value="darkweb">Dark Web</option>
                     </select>
                 </div>
+                
             </div>
 
             <div class="form-group row">

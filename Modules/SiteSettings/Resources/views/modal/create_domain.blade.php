@@ -230,7 +230,9 @@
                 <div class="col-lg-8">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="default" checked value="TRUE">
+                        
+                        <input type="checkbox" name="default" value="TRUE" {{$Domain ? '' : 'disabled checked'}} >
+
                         <span></span>
                     </label>
                 </div>
@@ -241,7 +243,7 @@
                 <div class="col-lg-8">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
-                        <input type="checkbox" name="status" checked value="TRUE">
+                        <input type="checkbox" name="status" value="TRUE"   >
                         <span></span>
                     </label>
                 </div>

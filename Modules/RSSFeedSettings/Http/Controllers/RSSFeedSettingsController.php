@@ -488,7 +488,7 @@ class RSSFeedSettingsController extends Controller
         $model = RSSData::all();
         return DataTables::of($model)
             ->editColumn('chk', function (RSSData $model) {
-                    return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
+                    return '<label><input type="checkbox" name="rss_id" class="rss_id" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
             ->addColumn('link', function (RSSData $model) {
                 $html = '';
@@ -620,19 +620,7 @@ class RSSFeedSettingsController extends Controller
     public function rss_data_delete_process($id = null)
     {
         // dd($id);
-        $check_TransactionRssData = TransactionRssData::where("code",$id)->first();
-        $model = TransactionRssData::where("code",$id);
-        $model->delete();
-
-       
-        $RSSNews = RSSNews::where('transaction_rss_id',$check_TransactionRssData->id)->first();
-        if($RSSNews) {
-            $RSSNews_del = RSSNews::where('transaction_rss_id',$check_TransactionRssData);
-            $RSSNews_del->delete();
-
-            $RSSNewsCategory = RSSNewsCategory::where('rss_news_id',$RSSNews->id);
-            $RSSNewsCategory->delete();
-        }
+        RssData::where("code",$id)->delete();
         
 
         // $RSSNews = RSSNews::where("transaction_rss_id",)->
@@ -641,7 +629,29 @@ class RSSFeedSettingsController extends Controller
         return ajaxResponse(
             [
                 'message'  => langapp('deleted_successfully'),
-                'redirect' => route('rssfeedsettings.rss_data'),
+                'redirect' => route('rssfeedsettings.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function rss_news_delete_change(Request $request)
+    {
+   
+        foreach($request->id_chang as $id ){
+
+           RssData::where("code",$id)->delete();
+
+        }
+
+        // $RSSNews = RSSNews::where("transaction_rss_id",)->
+        // RSSNewsCategory
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('rssfeedsettings.index'),
             ],
             true,
             Response::HTTP_OK

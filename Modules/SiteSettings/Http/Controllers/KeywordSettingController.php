@@ -131,6 +131,8 @@ class KeywordSettingController extends Controller
 
     public function save(KeywordsRequest $request)//DomainRequest
     {
+
+     
         
         // $this->authorize('create', Domain::class);
         // $Domain = $this->Domain->create($request->all());
@@ -153,14 +155,18 @@ class KeywordSettingController extends Controller
 
         $SiteSettings = SiteSettings::where('code',$code)->first();
 
-        $Site_keywords = new Site_keywords;
-        $Site_keywords->code = generator_uuid();
-        $Site_keywords->site_id = $SiteSettings->id;
-        $Site_keywords->name = $request->name;
-        $Site_keywords->type = $request->type;
-        $Site_keywords->status = $request->status ? 1 : 0;
-        $Site_keywords->created_by = @Auth::user()->id;
-        $Site_keywords->save();
+
+        foreach ($request->type as $key) {
+            $Site_keywords = new Site_keywords;
+            $Site_keywords->code = generator_uuid();
+            $Site_keywords->site_id = $SiteSettings->id;
+            $Site_keywords->name = $request->name;
+            $Site_keywords->type = $key;
+            $Site_keywords->status = $request->status ? 1 : 0;
+            $Site_keywords->created_by = @Auth::user()->id;
+            $Site_keywords->save();
+        }
+        
 
 
         // foreach($request->category AS $cate) {

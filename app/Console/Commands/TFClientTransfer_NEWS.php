@@ -23,9 +23,9 @@ class TFClientTransfer_NEWS extends Command
      */
 
     private $urlLimit = 3;
-    private $urlCenterData = 'http://127.0.0.2/api/v1/client-transfer/getTranferData'; //center ip path
+    private $urlCenterData = PATH_CENTER_IP_TF.'/api/v1/client-transfer/getTranferData'; //center ip path
     // private $url = 'http://127.0.0.2/api/v1/clientinto-transfer/insertToNoRef'; //my ip path
-    private $url = 'http://127.0.0.2/api/v1/clientinto-transfer/insertToNoRefWithID'; //my ip path
+    private $url = PATH_MY_IP_TF.'/api/v1/clientinto-transfer/insertToNoRefWithID'; //my ip path
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
     private $header = 'header';
@@ -59,8 +59,8 @@ class TFClientTransfer_NEWS extends Command
             'site_code_en' => $dataEncode,
             'tbName' => $this->insertToTB,
         ];
-        print_r($passBody);
 
+        print_r($this->site_code);
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
         // print_r($tableData);
 

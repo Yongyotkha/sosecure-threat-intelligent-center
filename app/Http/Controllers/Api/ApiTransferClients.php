@@ -12,10 +12,16 @@ use phpseclib\Net\SSH2;
 use Exception;
 
 use Modules\SiteSettings\Entities\SiteSettings;
+use App\Entities\TF_Center_transaction_batchjob;
 
-use App\TransactionClientNews;
-use App\R_s_s_news;
-
+use App\Entities\Transaction_client_News;
+use App\Entities\Transaction_client_webdefacment_data_check;
+use App\Entities\Transaction_client_webdefacment_data_logs;
+use App\Entities\Transaction_client_webdefacment_data_original;
+use App\Entities\Transaction_client_webdefacment_image_mark;
+use App\Entities\Transaction_client_webdefacment_setting;
+use App\Entities\Transaction_client_data_datacve_mapping;
+use App\Entities\Transaction_client_cve_assets;
 class ApiTransferClients extends Controller
 {
 
@@ -43,12 +49,25 @@ class ApiTransferClients extends Controller
         
         if($dataDecode){
             $site = SiteSettings::where('code', $dataDecode)->first();
+            
             if($site){
                 $nameTable = $request->tbName;
                 if ($nameTable == 'fx_transaction_client_news') {
-                    $model_getData = new TransactionClientNews;
-                } else if ($nameTable == 'fx_transaction_client_news2') {
-                    $model_getData = new TransactionClientNews;
+                    $model_getData = new Transaction_client_News;
+                } else if ($nameTable == 'fx_transaction_client_webdefacment_data_check') {
+                    $model_getData = new Transaction_client_webdefacment_data_check;
+                } else if ($nameTable == 'fx_transaction_client_webdefacment_data_logs') {
+                    $model_getData = new Transaction_client_webdefacment_data_logs;
+                } else if ($nameTable == 'fx_transaction_client_webdefacment_data_original') {
+                    $model_getData = new Transaction_client_webdefacment_data_original;
+                } else if ($nameTable == 'fx_transaction_client_webdefacment_image_mark') {
+                    $model_getData = new Transaction_client_webdefacment_image_mark;
+                } else if ($nameTable == 'fx_transaction_client_webdefacment_setting') {
+                    $model_getData = new Transaction_client_webdefacment_setting;
+                } else if ($nameTable == 'fx_transaction_client_data_datacve_mapping') {
+                    $model_getData = new Transaction_client_data_datacve_mapping;
+                } else if ($nameTable == 'fx_transaction_client_cve_assets') {
+                    $model_getData = new Transaction_client_cve_assets;
                 } else {
                     $connect = false;
                     $result = false;
@@ -58,16 +77,15 @@ class ApiTransferClients extends Controller
                     $TransactionClient = new $model_getData;
                     $TransactionClient->setConnection($this->dbName);
                     $TransactionClient = $TransactionClient->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->with('get_transfer_client')->orderBy('id','asc')->get()->toArray();
-                    
-                    $updater = new $model_getData;
-                    $updater->setConnection($this->dbName);
-                    $updater->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->update(['transaction_data_status' => 2]);
+  
+                    // $updater = new $model_getData;
+                    // $updater->setConnection($this->dbName);
+                    // $updater->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->update(['transaction_data_status' => 2]);
                 }
             }else{
                 $connect = false;
                 $result = false;
             }
-            // $TransactionClientNews = TransactionClientNews::where('site_id',$site_id)->where('status',1)->where('transaction_data_status',1)->with('get_Transaction_client_news')->get();
         }else{
             $connect = false;
             $result = false;

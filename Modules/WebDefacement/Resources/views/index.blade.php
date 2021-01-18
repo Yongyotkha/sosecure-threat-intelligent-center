@@ -10,9 +10,12 @@
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
              </button>
 
-             <a href="#" id="btn_md_create" style="margin-top: 8px;" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
-                @icon('solid/plus') @langapp('add')
-            </a>
+            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                <a href="#" id="btn_md_create" style="margin-top: 8px;" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
+                    @icon('solid/plus') @langapp('add')
+                </a>
+            @endif
+
             
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
@@ -321,14 +324,12 @@
             }else{
                 $('#delay_screen_shot_val_div').hide();
                 $('.review_image_screenshot').css("display","none");
+                $(".review-image-capture").html("");
+                $("#link_edit_image_screenshot").html("");
             }
         });
         
         $(document).ready(function(){
-            load_card();
-        {{--setInterval(function(){ 
-            load_card(); 
-        }, 1000);--}}
             $('.wdfm-card').hover(function(){
                 $(this).find('.wdfm-header').addClass('wdfm-header-upper');
             }); 
@@ -605,7 +606,6 @@
                         var image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
 
                         let webdefacment_setting_id = $("#webdefacment_setting_id").val();
-                        site_code = '';
                         let link_edit_image_screenshot_html = `
                                 <a href="${base_url}/edit-image/${site_code}/${webdefacment_setting_id}" target="_blank">
                                     Edit Image
@@ -643,7 +643,6 @@
                                             image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
 
                                             webdefacment_setting_id = $("#webdefacment_setting_id").val();
-                                            site_code = '';
                                             link_edit_image_screenshot_html = `
                                                     <a href="${base_url}/edit-image/${site_code}/${webdefacment_setting_id}" target="_blank">
                                                         Edit Image
@@ -793,6 +792,7 @@
             loading('stop_load');
             if(response.status_code == 200) {
                 site_id = response.data.site_id;
+                site_code = response.data.site_code;
                 $('#site_id_show').hide();
                 $('#title_head').text(" Edit Website");
                 $("#webdefacment_setting_id").val(response.data.id);
@@ -829,6 +829,16 @@
                     $('#delay_screen_shot').prop('checked', true);
                     $('#delay_screenshot_val').val(response.data.delay_screen_shot_val);
                     $('#delay_screen_shot_val_div').show();
+                    $('.review_image_screenshot').css("display","block");
+                    
+                    let image_screenshot = response.data.image;
+                    let image_screenshot_html = `<img src="${base_url}${image_screenshot}" id="preview-img-wdfm">`;
+                    let link_edit_image_screenshot_html = `
+                            <a href="${base_url}/edit-image/${response.data.site_code}/${response.data.id}" target="_blank">
+                                Edit Image
+                            </a>`;
+                    $(".review-image-capture").html(image_screenshot_html);
+                    $("#link_edit_image_screenshot").html(link_edit_image_screenshot_html);
                 }else{
                     $('#delay_screen_shot').prop('checked', false);
                 }
@@ -863,6 +873,10 @@
         $('#delay_screen_shot_val_div').hide();
         $("#area_check_message").hide();
         $("#area_option").css("display","none");
+        $('#site_id').val("").change();
+        $(".review-image-capture").html("");
+        $("#link_edit_image_screenshot").html("");
+        $('.review_image_screenshot').css("display","none");
     }
   
   

@@ -9,8 +9,10 @@ use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\Site_keywords;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\Users\Entities\UserSite;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SiteSettings extends Model{
+    use SoftDeletes;
     protected $table = "site";
     public $timestamps = true;
     protected $fillable = [

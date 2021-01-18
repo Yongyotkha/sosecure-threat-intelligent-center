@@ -217,7 +217,8 @@
                 <label class="col-lg-4 control-label">Default </label>
                 <div class="col-lg-8">
                     <label class="switch">
-                        <input type="checkbox" name="default" value="1" {{$domain->domain_default == 1 ? 'checked' : ''}}>
+                        <input type="checkbox" name="default" value="1" {{$domain->domain_default == 1 ? 'checked' : ''}}
+                        {{$Domain_count == 1 ? 'disabled' : ''}}>
                         <span></span>
                     </label>
                 </div>

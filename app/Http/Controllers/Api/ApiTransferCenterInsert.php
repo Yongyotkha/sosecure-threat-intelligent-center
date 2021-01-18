@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Entities\CompromisedFileCheck;
+
 use App\Http\Controllers\Api\ApiController;
 use Exception;
 use Illuminate\Http\Request;
+
+use App\Entities\CompromisedFileCheck;
 use Modules\SiteSettings\Entities\SiteSettings;
+use App\Entities\TF_Center_transaction_batchjob;
 
 class ApiTransferCenterInsert extends Controller
 {
@@ -49,11 +52,11 @@ class ApiTransferCenterInsert extends Controller
                         foreach ($dataTables as $dataTable) {
 
                             // $transfer_data_id = $dataTable["get_transfer"]["id"];
-                            if(!empty($dataTable["get_transfer"][$pkey])){
+                            if(!empty($dataTable["transaction_id"])){
                                 $findOne = new $model_insert;
                                 $findOne->setConnection($this->dbName);
-                                $findOne = $findOne->where('transfer_site_id', $site->id)->where('transfer_data_id', $dataTable["get_transfer"][$pkey])->first();
-                                if ($dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
+                                $findOne = $findOne->where('transfer_site_id', $site->id)->where('transfer_data_id', $dataTable["transaction_id"])->first();
+                                if (!empty($dataTable["get_transfer"][$pkey]) && $dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
                                     if (empty($findOne)) {
                                         $findOne = new $model_insert;
                                         $findOne->setConnection($this->dbName);
@@ -110,6 +113,45 @@ class ApiTransferCenterInsert extends Controller
             'returnUpdate' => $arrUpdate,
             'messageErr' => $messageErr,
         ];
+        return response()->json($dataout);
+    }
+
+    protected function updateBatchJob(Request $request)
+    {
+        $modeFor = $request->modeFor;
+        $modeInsert = $request->modeInsert;
+        $nameBJ = $request->nameBJ;
+
+        $sitecode = $request->sitecode;
+        $site = SiteSettings::where('code', $sitecode)->first();
+       
+        if($site){
+            if($modeFor=='wait'||$modeFor=='done'){
+                $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('mode', $modeInsert)->where('site_id', $site->id)->first();
+                if(!$TF_Center_transaction_batchjob){
+                    $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
+                    $TF_Center_transaction_batchjob->status = 1;
+                    $TF_Center_transaction_batchjob->code = generator_uuid();
+                }
+                $TF_Center_transaction_batchjob->name = $nameBJ;
+                $TF_Center_transaction_batchjob->mode = $modeInsert; 
+                $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
+                $TF_Center_transaction_batchjob->site_id = $site->id;
+                if($modeFor=='wait'){
+                    $TF_Center_transaction_batchjob->progress = 0;
+                    $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
+                }else if($modeFor=='done'){
+                    $TF_Center_transaction_batchjob->progress = 1;
+                    $TF_Center_transaction_batchjob->transcation_date_end = date('Y-m-d H:i:s');
+                }
+                $TF_Center_transaction_batchjob->save();
+            }
+        }
+        
+        $dataout = [
+            'connect' => true,
+        ];
+
         return response()->json($dataout);
     }
 

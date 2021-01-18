@@ -25,7 +25,7 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="submit" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete">
+                    <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -86,13 +86,13 @@
                                     <tr>
                                         <th class="no-sort w-10">
                                             <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th width="10%">Source</th>
                                         <th width="15%">Keyword Ref</th>
                                         <th>Content</th>
+                                        <th width="10%">Feed Type</th>
                                         <th width="10%">Data Feed</th>
                                         <th width="3%">View</th>
                                         <th width="5%">Status</th>
@@ -232,16 +232,16 @@ function table_social_data(){
                 className: 'w-10'
             },  
             {
-                data: 'source',
-                name: 'source'
-            },
-            {
                 data: 'keyword',
                 name: 'keyword'
             },
             {
                 data: 'content',
                 name: 'content'
+            },
+            {
+                data: 'source',
+                name: 'source'
             },
             {
                 data: 'data_feed',
@@ -258,6 +258,21 @@ function table_social_data(){
             {
                 data: 'action',
                 name: 'action'
+            },
+        ],
+        columnDefs: [
+            {
+                targets: 2,
+                render: function (data, type, full, meta) {
+                    var feedcontent = full.get_data_leak_feed.feedcontent;
+                    var res = full.keyword.split(",");
+                    let content = '';
+                    for(let i in res){
+                        const data = res[i];
+                        content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                    }
+                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                },
             },
         ]
     });
@@ -305,6 +320,82 @@ function change_status(code) {
         toastr.error(errorsHtml, '@langapp('response_status')');
     });
 }
+
+    $('#table_social_datas').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table_social_datas').on('click', '.data_feed_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.data_feed_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.data_feed_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });  
+
+    let del_val = [];
+    $("#btn_del_select").click(function() {
+        $('.data_feed_id:checked').each(function () {
+            del_val.push(this.value);
+            
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('socialdatas.socialdatas_change_delete') }}",
+                    data:{
+                        id_change: del_val,
+                    },
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
 
 </script>
 @endpush

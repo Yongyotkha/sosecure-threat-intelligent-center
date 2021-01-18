@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Exception;
 use Artisan;
 //lib
+use GuzzleHttp\Client as HttpClient;
 use phpseclib\Net\SSH2;
 //model
 use App\Entities\CompromisedServer;
@@ -33,6 +34,9 @@ class FeedCompromisedServer extends Command
     private $timeOutMain  = 59;
     private $timeOutSub  = 1200;
     private $pathToSave  = "";
+    private $urlLimit  = 3;
+    private $url = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/updateTFBatchJob';
+
     /**
      * Create a new command instance.
      */
@@ -50,6 +54,14 @@ class FeedCompromisedServer extends Command
     public function handle()
     {
         $this->info("--Start Process--");
+        $passBody = [
+            'modeFor' => 'wait',
+            'modeInsert' => 'Compromised_scan_webserver',
+            'nameBJ' => 'Compromised Scan Webserver - DailyAt(\'06:00\')  Or Request',
+            'sitecode' => config('app.site_code'),
+        ];
+        $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
+
         $CompromisedServer = CompromisedServer::where('active', '1')->whereNull('deleted_at')->get(); 
         if($CompromisedServer){
             foreach ($CompromisedServer as $server) {
@@ -99,6 +111,16 @@ class FeedCompromisedServer extends Command
         $this->info("--Start ScanPython--");
         $commandArtisan = 'app:FeedCompromisedScan';
         Artisan::call($commandArtisan);
+        $commandArtisan = 'app:TFCenterTransfer_Compromised_Server';
+        Artisan::call($commandArtisan);
+
+        $passBody = [
+            'modeFor' => 'done',
+            'modeInsert' => 'Compromised_scan_webserver',
+            'nameBJ' => 'Compromised Scan Webserver - DailyAt(\'06:00\')  Or Request',
+            'sitecode' => config('app.site_code'),
+        ];
+        $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
         $this->info("--END Process--");
         // $ip = '10.104.0.7';
         // $port = '22';
@@ -536,5 +558,42 @@ class FeedCompromisedServer extends Command
             $lastPos = $lastPos + strlen($needle);
         }
         return $positions;
+    }
+
+    public function reconnnect($url, $passBody, $limit)
+    {
+        $_OTX_KEY = env("OTX_KEY", "");
+        $_clientHttp = new HttpClient;
+        $_reconnect = 0;
+        $_otxReconnect = true;
+        $_dataOut["result"] = null;
+        $_dataOut["success"] = false;
+        $_sleeptime = rand(0, 2000);
+        while ($_otxReconnect && $_reconnect < $limit) {
+            try {
+                $_bodyData = $_clientHttp->request(
+                    'POST',
+                    $url,
+                    [
+                        'headers' => [
+                            'Accept' => 'application/json',
+                            'Content-type' => 'application/json',
+                        ],
+                        'delay' => $_sleeptime, //millisec == ms
+                        'timeout' => 59, //sec == 100sec
+                        'verify' => false,
+                        'body' => json_encode($passBody),
+                    ]
+                )->getBody();
+                $_dataOut["result"] = json_decode($_bodyData, true);
+                $_dataOut["success"] = true;
+                $_otxReconnect = false;
+                //echo "  Pass : " . $_reconnect;
+            } catch (Exception $e) {
+                echo "  Fail : " . $e->getMessage();
+            }
+            $_reconnect++;
+        }
+        return $_dataOut;
     }
 }

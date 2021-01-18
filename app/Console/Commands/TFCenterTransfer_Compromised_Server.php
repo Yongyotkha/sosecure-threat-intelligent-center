@@ -24,7 +24,7 @@ class TFCenterTransfer_Compromised_Server extends Command
      */
 
     private $urlLimit = 3;
-    private $url = 'http://127.0.0.2/api/v1/centerinto-transfer/insertToNoRef';
+    private $url = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/insertToNoRef';
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
     private $header = 'header';
@@ -58,9 +58,9 @@ class TFCenterTransfer_Compromised_Server extends Command
         // print_r($tableData);
 
         if (!$tableData) {
-            //nodata
+            
         } else {
-            //insert Center
+           
             $dataEncode = encrypt_decrypt('encrypt', $this->site_code, $header, $ip, $mac);
             $passBody = [
                 'site_code_en' => $dataEncode,
@@ -69,10 +69,8 @@ class TFCenterTransfer_Compromised_Server extends Command
             ];
 
             $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
-            print_r($httpData);
-            // echo json_encode($httpData);
+
             if ($httpData["success"]) {
-                //update
 
                 if (!empty($httpData["result"]["returnUpdate"])) {
                     $returnUpdate = $httpData["result"]["returnUpdate"];
@@ -88,35 +86,6 @@ class TFCenterTransfer_Compromised_Server extends Command
             } else {
 
             }
-            // if($httpData["success"]){
-            //     $returnData = json_decode($httpData["result"],true);
-            //     if($returnData["connect"]){
-            //         if(!empty($returnData["result"])){
-            //             $dataBase = DB::connection('dummyDatabase');
-            //             foreach ($returnData["result"] as $value) {
-            //                 $dataBase = $dataBase->select('select * from '.$this->tbName.' WHERE center_id = "'.$value["news_id"].'" limit 1');
-
-            //                 if($value["transaction_mode"]=='insert'||$value["transaction_mode"]=='update'){
-            //                     if(empty($dataBase)){
-            //                         // DB::insert('insert into users (id, name) values (?, ?)', [1, 'Dayle']);
-            //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
-
-            //                         }
-            //                     }else{
-            //                         // DB::update('update users set votes = 100 where name = ?', ['John']);
-            //                         foreach ($value["get_Transaction_client_news"] as $key => $subValue) {
-
-            //                         }
-            //                     }
-            //                 }else if($value["transaction_mode"]=='delete'){
-
-            //                 }
-
-            //             }
-            //         }
-            //     }
-            // }
-
         }
 
     }

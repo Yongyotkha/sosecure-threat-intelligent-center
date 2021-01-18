@@ -71,8 +71,12 @@ class DomainSettingsController extends Controller
      */
     public function create(Request $request)
     {
-        $code = $request->code;
-        return view('sitesettings::modal.create_domain',compact('code'));
+        $SiteSettings = SiteSettings::where('code',$request->code)->first();
+        $data['Domain'] = Domain::where('site_id',$SiteSettings->id)->where('domain_default',1)->first();
+    
+        // dd($data['Domain1'] );
+        $data['code']  = $request->code;
+        return view('sitesettings::modal.create_domain')->with($data);
     }
 
     /**
@@ -405,25 +409,19 @@ class DomainSettingsController extends Controller
                 $html = get_name_scan_status(@$domain->get_transaction_time_stamp_scans->progress , 'badg');
                 return $html;
             })
-            // ->editColumn(
-            //     'status',
-            //     function ($domain) {
-            //         if($domain->status == '1') {
-            //             $checked_val = 'checked';
-            //         } else {
-            //             $checked_val = '';
-            //         }
-            //         $html = '';
-                    
-            //         // $html = '';
-            //         $html .= '<label class="switch">
-            //                     <input type="checkbox" id="domain_active_'.$domain->code.'" onchange="change_domain_active(\''. $domain->code .'\')" '.$checked_val.' name="active" value="1">
-            //                     <span></span>
-            //                   </label>';
+            ->editColumn(
+                'domain_default',
+                function ($domain) {
+                    if($domain->domain_default == '1') {
+                        $html = '<div><i class="fas fa-check"></i></div>';
+                    } else {
+                        $html = '';
+                    }
 
-            //         return $html;
-            //     }
-            // )
+
+                    return $html;
+                }
+            )
 
             ->addColumn('action', function ($domain) {
                 $html = '';
@@ -448,7 +446,7 @@ class DomainSettingsController extends Controller
                             </a></div>";
                 return $html;
             })
-            ->rawColumns(['chk','name','domain','progress','elements','action'])
+            ->rawColumns(['chk','name','domain','domain_default','progress','elements','action'])
             ->make(true);
     }
 
@@ -456,6 +454,9 @@ class DomainSettingsController extends Controller
     public function edit(Domain $id)
     {
         $data['domain'] = $id;
+        $domain = Domain::where('id',$id->id)->first();
+        $data['Domain_count'] = Domain::where('site_id',$domain->site_id)->count();
+
         // dd($id);
         return view('sitesettings::modal.update_domain')->with($data);
     }

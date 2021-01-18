@@ -525,10 +525,11 @@ class ScansController extends Controller
 
     public function scans_assets_edit(Request $request)
     {
+        
 
         $Assets = Assets::where('code', $request->code_assets)->first();
         $Assets_id = $Assets->id;
-        
+        $arr= [];
         // $Assets->raw_data = $request->assets[0]['raw_data'];
         // $Assets->save();
 
@@ -549,45 +550,21 @@ class ScansController extends Controller
                 $AssetsData->value = $data['raw_data'];
                 $AssetsData->data_type_id = $myArray[0];
                 $AssetsData->asset_id = $Assets_id;
+                
 
             }
+            
+
             $AssetsData->save();
+
+            array_push($arr, $AssetsData->id);
         }
 
-        // foreach($request -> assets as $data){
-        //     $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
-        //     if(!$Assets){
-        //         $Assets = new Assets;
-        //         $Assets -> code = generator_uuid();
-        //         $Assets -> created_by = Auth::user()->id;
-        //         $Assets -> site_id = $data['site_id'];
-        //         $Assets -> domain_id = $data['domain_id'];
-        //         $Assets -> status = 1;
-        //         $Assets -> raw_data = $data['raw_data'];
-        //         $Assets -> save();
-        //     }
-        //     foreach($request -> assets_data as $item){
-        //         $AssetsData = AssetsData::where('site_id', $data['site_id'])
-        //         ->where('domain_id', $data['domain_id'])
-        //         ->where('value', $item['raw_data'])
-        //         ->where('data_type_id', $item['data_type'])
-        //         ->first();
-        //         if(!$AssetsData){
-        //             if($item['raw_data_base'] == $data['raw_data_base']){
-        //                 $AssetsData = new AssetsData;
-        //                 $AssetsData -> code = generator_uuid();
-        //                 $AssetsData -> created_by = Auth::user()->id;
-        //                 $AssetsData -> site_id = $data['site_id'];
-        //                 $AssetsData -> domain_id = $data['domain_id'];
-        //                 $AssetsData -> status = 1;
-        //                 $AssetsData -> value = $item['raw_data'];
-        //                 $AssetsData -> data_type_id = $item['data_type'];
-        //                 $AssetsData -> asset_id = $Assets -> id;
-        //                 $AssetsData -> save();
-        //             }
-        //         }
-        //     }
-        // }
+        
+        
+        AssetsData::where('asset_id', $Assets_id)->whereNotIn('id',$arr)->delete();
+        
+
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),

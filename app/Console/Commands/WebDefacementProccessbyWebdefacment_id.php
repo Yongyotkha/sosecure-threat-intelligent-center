@@ -12,7 +12,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentImageMark;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataLog;
-
+use Illuminate\Support\Facades\Artisan;
 
 class WebDefacementProccessbyWebdefacment_id extends Command
 {
@@ -51,90 +51,96 @@ class WebDefacementProccessbyWebdefacment_id extends Command
     {
       $webdefacment_id= $this->argument('webdefacment_id');
       $WebdefacmentSetting_datas =  WebdefacmentSetting::where('id', $webdefacment_id)->where('webdeflacement_progress',1)->whereNull('deleted_at')->get();
-       foreach ($WebdefacmentSetting_datas as $key => $value) {
-      $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
-      $WebdefacmentSetting_update->webdeflacement_progress = 2;
-      $WebdefacmentSetting_update->save();
+      foreach ($WebdefacmentSetting_datas as $key => $value) {
+        $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
+        $WebdefacmentSetting_update->webdeflacement_progress = 2;
+        $WebdefacmentSetting_update->save();
 
 
 
-      $webdefacment_id= $value->id;
-      $WebdefacmentSetting_data =    $value;
-      if ($WebdefacmentSetting_data) {
-        $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
-        if ($WebdefacmentDataOriginal_data) {
+        $webdefacment_id= $value->id;
+        $WebdefacmentSetting_data =    $value;
+        if ($WebdefacmentSetting_data) {
+          $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
+          if (!$WebdefacmentDataOriginal_data ) {
 
-          $totalPoint = 0;
-          $totalConfig = 0;
-          $trackList['blacklist_parcent']  = 0;
-          $trackList['file_size_parcent']  = 0;
-          $trackList['hash_parcent']  = 0;
-          $trackList['image_parcent']  = 0;
-          $trackList['all_element_parcent'] = 0;
-          $blackListFoundString = array();
+            Artisan::call('app:WebDefacementUpdateOriginal', ['webdefacment_id' => $webdefacment_id]);
+            Artisan::call('app:WebDefacementsCreenshotCheck', ['url' => $value->url,'port'=>$value->port,'site_id'=>$value->site_id,'url_id'=>0,'delay'=>$value->delay_screen_shot_val]);
+            $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
+          }
+          if ($WebdefacmentDataOriginal_data) {
 
-
-
-          $url =$WebdefacmentSetting_data->url;
-          $Keyword_check = array();
-          $result = array();
-          if ($this->is_url($url)) {
-            $result["Result"] = 1;
-            $result["messes "] = "";
-            $result['hash_code'] = "";
-            $result["file_size"] = 0 ;
-            $result["all_element"] = 0 ;
-            $result['image_url'] ="";
-            $result["image_path_original"] ="";
-            $result['blacklist'] =array();
-            $message =' <div class="main-card-log">';
-            $result['image1Hash']  = "";
-            $result['image2Hash']  = "";
-            $result['image_diff']  = null;
-
-
-            $result['all_element_parcent']  = 0;
-            $result['file_size_parcent']  =0;
-            $result['hash_parcent']  = 0;
-            $result['image_parcent']  = 0;
-            $result['blacklist_parcent']  = 0;
-            
-
-            $image_path_2 ="";
-            $response   = $this->getHtml($url);
-            if ($response['content'] === FALSE){
-              $webContent = "";
-              $result["Result"] = 0;
-              $result["messes "] = "Html not found";
-            }else{
-              $webContent = $response['content'];
-
-              if ($WebdefacmentSetting_data->hash == 1) {
+            $totalPoint = 0;
+            $totalConfig = 0;
+            $trackList['blacklist_parcent']  = 0;
+            $trackList['file_size_parcent']  = 0;
+            $trackList['hash_parcent']  = 0;
+            $trackList['image_parcent']  = 0;
+            $trackList['all_element_parcent'] = 0;
+            $blackListFoundString = array();
 
 
 
+            $url =$WebdefacmentSetting_data->url;
+            $Keyword_check = array();
+            $result = array();
+            if ($this->is_url($url)) {
+              $result["Result"] = 1;
+              $result["messes "] = "";
+              $result['hash_code'] = "";
+              $result["file_size"] = 0 ;
+              $result["all_element"] = 0 ;
+              $result['image_url'] ="";
+              $result["image_path_original"] ="";
+              $result['blacklist'] =array();
+              $message =' <div class="main-card-log">';
+              $result['image1Hash']  = "";
+              $result['image2Hash']  = "";
+              $result['image_diff']  = null;
 
-               $totalConfig += 1;
-               $hashMD5 = hash($this->hashingAlgorithm, $webContent);
-               $result['hash_code'] = $hashMD5;
-               if ( $result['hash_code'] !=$WebdefacmentDataOriginal_data->hash)
-               {
-                $result['hash_parcent']  = 100;
-              }else
-              {
-                $result['hash_parcent']  = 0;
+
+              $result['all_element_parcent']  = 0;
+              $result['file_size_parcent']  =0;
+              $result['hash_parcent']  = 0;
+              $result['image_parcent']  = 0;
+              $result['blacklist_parcent']  = 0;
+              
+
+              $image_path_2 ="";
+              $response   = $this->getHtml($url);
+              if ($response['content'] === FALSE){
+                $webContent = "";
+                $result["Result"] = 0;
+                $result["messes "] = "Html not found";
+              }else{
+                $webContent = $response['content'];
+
+                if ($WebdefacmentSetting_data->hash == 1) {
+
+
+
+
+                 $totalConfig += 1;
+                 $hashMD5 = hash($this->hashingAlgorithm, $webContent);
+                 $result['hash_code'] = $hashMD5;
+                 if ( $result['hash_code'] !=$WebdefacmentDataOriginal_data->hash)
+                 {
+                  $result['hash_parcent']  = 100;
+                }else
+                {
+                  $result['hash_parcent']  = 0;
+                }
+
+                $message =$message.'
+                <div class="card-log">
+                <div class="card-log-body">
+                <p>Hash Difference '.$result['hash_parcent'].'%</p>
+                </div>
+                </div>';
+
               }
-
-              $message =$message.'
-              <div class="card-log">
-              <div class="card-log-body">
-              <p>Hash Difference '.$result['hash_parcent'].'%</p>
-              </div>
-              </div>';
-
-            }
-            if ($WebdefacmentSetting_data->filesize == 1) {
-             $totalConfig += 1;
+              if ($WebdefacmentSetting_data->filesize == 1) {
+               $totalConfig += 1;
                  $file_size = strlen($webContent);//filesize
                  $result["file_size"] = $file_size ;
                  $all_element_parcent = ($WebdefacmentDataOriginal_data->filesize- $result['file_size']);
@@ -611,40 +617,44 @@ function get_dataa($url) {
 private function trackKeyWords($webContent, $blacklistKeywords,$Keyword_checks)
 {
   $keywordOK =array();
-  $keywords = explode(',', $blacklistKeywords);
-  foreach ($keywords as $keyword) {
-    $trackFound = $this->CheckKeyword($webContent,$keyword);
-    if (count($trackFound) > 0)
-    {
-      if (count($Keyword_checks) > 0)
+  if ($blacklistKeywords) {
+   
+    
+    $keywords = explode(',', $blacklistKeywords);
+    foreach ($keywords as $keyword) {
+      $trackFound = $this->CheckKeyword($webContent,$keyword);
+      if (count($trackFound) > 0)
       {
-        $filtereds = array();
-        $rows = $Keyword_checks;
-        foreach($rows as $index => $columns) {
-          foreach($columns as $key => $value) {
-            if ($key == 'key' && $value == $keyword) {
-              $filtereds[] = $columns;
+        if (count($Keyword_checks) > 0)
+        {
+          $filtereds = array();
+          $rows = $Keyword_checks;
+          foreach($rows as $index => $columns) {
+            foreach($columns as $key => $value) {
+              if ($key == 'key' && $value == $keyword) {
+                $filtereds[] = $columns;
+              }
             }
           }
-        }
 
-        foreach ($trackFound as $position)
-        {
+          foreach ($trackFound as $position)
+          {
                         //ถ้ามีให้หาตำแหน่ง
 
-          if (!in_array($position, array_column($filtereds, 'position')))
-          {
+            if (!in_array($position, array_column($filtereds, 'position')))
+            {
                             //ไม่มีอยู่ใน ignore
-            array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
+              array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
+            }
           }
-        }
 
-      }else
-      {
-        foreach ($trackFound as $position)
+        }else
         {
-          array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
+          foreach ($trackFound as $position)
+          {
+            array_push($keywordOK, array("key"=>$keyword,"position"=>$position));
 
+          }
         }
       }
     }
