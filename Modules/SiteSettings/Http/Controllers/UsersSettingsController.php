@@ -93,7 +93,15 @@ class UsersSettingsController extends Controller
 
     public function create(Request $request)
     {
-        $Roles = Roles::get();
+        $SiteSettings = SiteSettings::where('code',$request->code)->first();
+        if($SiteSettings) {
+            if($SiteSettings->role_allow_admin == 'Y') {
+                $Roles = Roles::whereIn('id',['4','5'])->get();
+            } else {
+                $Roles = Roles::whereIn('id',['5'])->get();
+            }
+        }
+
         $data['Roles'] = $Roles;
         $data['code'] = $request->code;
 
