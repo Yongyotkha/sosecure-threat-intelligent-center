@@ -24,7 +24,7 @@ $current_locale = get_option('locale');
                         value="{{ get_option('purchase_code') }}">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('default_language')  </label>
                     <div class="col-lg-6">
                         <select name="default_language" class="form-control select2-option">
@@ -166,7 +166,7 @@ $current_locale = get_option('locale');
                     </div>
                 </div>
                 @php $date_format = get_option('date_format') @endphp
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-lg-3 control-label">@langapp('date_format')  </label>
                     <div class="col-lg-6">
                         <select name="date_format" class="form-control">
@@ -246,10 +246,9 @@ $current_locale = get_option('locale');
 
 
                 <div class="line line-dashed line-lg pull-in"></div>
-                <div class="form-group">
+                <div class="form-group d-none">
                     <label class="col-sm-3 control-label">Options</label>
-                    <div class="col-sm-9">
-                        
+                    <div class="col-sm-9">  
                         <div class="row">
                             <div class="col-sm-6">
 
