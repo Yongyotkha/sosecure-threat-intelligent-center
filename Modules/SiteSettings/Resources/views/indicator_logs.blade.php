@@ -40,12 +40,12 @@
                     </a> --}}
                 </header>
 
-                <section class="scrollable wrapper">
+                {{-- <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12"></div>
                         <div class="col-lg-12 d-none">
                             {!! Form::open(['route' => ['indisetting.upsert', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
-                            {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
+                           
                                 <section class="panel panel-default">
                                     <header class="panel-heading accordion">
                                         Config Syslog
@@ -75,10 +75,6 @@
                                         </div>  
                                         <div class="panel-footer bg-white">
 
-                                            {{-- <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i
-                                                    class="fas fa-paper-plane"></i>
-                                                Save
-                                            </button> --}}
 
                                             <button type="submit" class="btn btn-info submit btn-rounded"  id="btn-submitA"><i
                                                     class="fas fa-paper-plane"></i>
@@ -88,11 +84,11 @@
                                     </div>
                                     
                                 </section>
-                            {{-- </form> --}}
+                  
                             {!! Form::close() !!}
 
                         </div>
-                    </div>
+                    </div> --}}
         
                     <div class="row">
                         <div class="col-lg-12">
@@ -186,8 +182,8 @@
                                              </div>
 
                                              <div class="form-group">
-                                                 <textarea name="" id="text_protocal_format" cols="30" rows="5" class="form-control">
-                                                    {{@$LogsSetting->protocal_format=="2"?'SYS FORMAT':'CEF:0|SOSecure|INDICATOR|1.0|101|$Event_Name|1| dst=$ip_dst dhost=$Destination_Hostname dvchost=$Site cs1Label=$INDICATOR_ID cs1=$INDICATOR_ID_value cs2Label=$INDICATOR_Vendor cs2=$INDICATOR_Vendor_value cs3Label=$INDICATOR_Description cs3=$INDICATOR_Description_value requestUrl=$INDICATOR_URL'}}
+                                                 <textarea name="text_protocal_format" id="text_protocal_format" cols="30" rows="5"  class="form-control">
+                                                    {{@$content}}
                                                  </textarea>
                                               </div>
                                         </div>  

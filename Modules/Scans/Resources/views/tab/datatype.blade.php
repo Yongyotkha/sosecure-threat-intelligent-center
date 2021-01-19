@@ -287,9 +287,7 @@
                                         html += `<input type="hidden" name="assets[]" class="form-control" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id}" data-site_id="${data_transaction_val.site_id}">`;
                                     }
                                     html += `<tr id="rows_${number_rows}">
-                                        <td>
-                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
-                                        </td>
+
                                         <td>
                                             <select name="data_type[]" class="select2 form-control">`;
                                             for(let b in result.data_type){
@@ -298,6 +296,9 @@
                                                 html += `<option value="${data_type.id}" ${data_type.value == data_transaction_val.data_type ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
                                             }
                                             html += `</select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
@@ -386,9 +387,7 @@
         markup = `
         <tr id="rows_manual_${number_add_rows}">
             <td></td>
-            <td>
-                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
-            </td>
+            
             <td>
                 <select name="data_type_manual[]" class="select2 form-control">`;
                 for(let b in base_datatype){
@@ -396,6 +395,9 @@
                     markup += `<option value="${data_type.id}" data-raw_data_manual="${rows_data_manual}">${data_type.value}</option>`;
                 }
             markup += `</select>
+            </td>
+            <td>
+                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
             </td>
             <td>
                 <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
@@ -415,9 +417,7 @@
         var markup = ``;
         markup = `
         <tr id="rows_${number_rows}">
-            <td>
-                <input type="text" name="raw_data[]" class="form-control" data-raw_data="${raw_data}">
-            </td>
+
             <td>
                 <select name="data_type[]" class="select2 form-control">`;
                 for(let b in base_datatype){
@@ -425,6 +425,9 @@
                     markup += `<option value="${data_type.id}" data-raw_data="${raw_data}">${data_type.value}</option>`;
                 }
             markup += `</select>
+            </td>
+            <td>
+                <input type="text" name="raw_data[]" class="form-control" data-raw_data="${raw_data}">
             </td>
             <td>
                 <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">

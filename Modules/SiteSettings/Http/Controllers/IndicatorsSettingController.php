@@ -46,6 +46,14 @@ class IndicatorsSettingController extends Controller
        $get_Logdata = new LogsSetting;
        
        $get_Logdata = $get_Logdata->get_data( $get_data->id,"INDICATOR");
+
+       if($get_Logdata){
+           $content=$get_Logdata->content;
+       }else{
+        $content=null;
+       }
+       
+       $data['content'] = $content;
        $data['siteSettings'] = $get_data;
        $data['LogsSetting'] = $get_Logdata;
        $data['page'] = 'Indicators Logs';
@@ -92,18 +100,20 @@ class IndicatorsSettingController extends Controller
 
     public function upsert_IndicatorsSysFormat(VlogsSysFormatRequest $request, $id = null)
     {
+
+        // dd($request->text_protocal_format);
         $get_data = $this->siteSettings->get_data($id);
         $LogsSetting = LogsSetting::where('site_id', $get_data->id)->where('type','INDICATOR')->first();
         if($LogsSetting){
             $LogsSetting->site_id = $get_data->id;
             $LogsSetting->type = "INDICATOR";
-            $LogsSetting->protocal_format = $request->protocal_format;
+            $LogsSetting->content = $request->text_protocal_format;
             $LogsSetting->save();
         }else{
             $LogsSetting = new LogsSetting;
             $LogsSetting->site_id = $get_data->id;
             $LogsSetting->type = "INDICATOR";
-            $LogsSetting->protocal_format = $request->protocal_format;
+            $LogsSetting->content = $request->text_protocal_format;
             $LogsSetting->save();
             
         }
