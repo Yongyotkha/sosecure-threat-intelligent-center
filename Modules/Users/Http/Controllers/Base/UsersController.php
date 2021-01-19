@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use Auth;
 use DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 use Modules\Users\Exports\UsersExport;
 use Modules\Users\Jobs\BulkDeleteUsers;
 use Modules\Users\Jobs\GDPRExportData;
-use Modules\Users\Entities\UserSite;
-use Modules\SiteSettings\Entities\SiteSettings;
 
 abstract class UsersController extends Controller
 {
@@ -34,7 +35,7 @@ abstract class UsersController extends Controller
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
-        $this->user    = $user;
+        $this->user = $user;
     }
 
     /**
@@ -44,28 +45,28 @@ abstract class UsersController extends Controller
      */
     public function index()
     {
-        if(Auth::check()) {
+        $SiteSettings ='';
+        if (Auth::check()) {
 
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
+            if (Auth::user()->hasRole('admin')) { //if admin
                 // dd(777);
-                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+                $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
 
             } else { //if notAdmin
                 // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
                         // dd(99);
 
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-             
+                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                            ->whereIn('id', $site_id_arr) //['49', '56']
+                            ->get();
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+                    } else { //not support and admin
+                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                            ->whereIn('id', $site_id_arr) //['49', '56']
+                            ->get();
                     }
                 }
             }
@@ -73,7 +74,7 @@ abstract class UsersController extends Controller
 
         $data['SiteSettings'] = $SiteSettings;
         $data['filter'] = $this->request->filter;
-        $data['page']   = $this->getPage();
+        $data['page'] = $this->getPage();
 
         return view('users::index')->with($data);
     }
@@ -167,7 +168,7 @@ abstract class UsersController extends Controller
             }
             $user->syncPermissions($permissions);
         }
-        $data['message']  = langapp('changes_saved_successful');
+        $data['message'] = langapp('changes_saved_successful');
         $data['redirect'] = url()->previous();
 
         return ajaxResponse($data);
@@ -183,7 +184,7 @@ abstract class UsersController extends Controller
     {
         if ($this->request->has('checked')) {
             BulkDeleteUsers::dispatch($this->request->checked, Auth::id());
-            $data['message']  = langapp('deleted_successfully');
+            $data['message'] = langapp('deleted_successfully');
             $data['redirect'] = url()->previous();
             return ajaxResponse($data);
         }
@@ -220,11 +221,11 @@ abstract class UsersController extends Controller
      */
     public function view(User $user, $tab = 'overview')
     {
-        $allowed      = ['deals', 'files', 'overview', 'projects', 'tickets', 'timesheet'];
-        $tab          = in_array($tab, $allowed) ? $tab : 'overview';
+        $allowed = ['deals', 'files', 'overview', 'projects', 'tickets', 'timesheet'];
+        $tab = in_array($tab, $allowed) ? $tab : 'overview';
         $data['user'] = $user;
         $data['page'] = $this->getPage();
-        $data['tab']  = $tab;
+        $data['tab'] = $tab;
 
         return view('users::view')->with($data);
     }
@@ -234,46 +235,93 @@ abstract class UsersController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function tableData()
+    public function tableData(Request $request)
     {
-        $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
+        // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
 
-        return DataTables::eloquent($model)
+        // if($request->site){
+
+        //             $model->whereHas('gey_UserSite', function ($query,$request) {
+        //                 $query->where('site_id', $request->site);
+        //             })
+        //     );
+        //     $model = $model->query();
+
+        // }
+
+        if(!empty(get_role_custom()))
+            if(get_role_custom()['superadmin'] == 1){
+                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile');
+            }else if(get_role_custom()['site_admin'] == 1){
+                
+                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile');
+                $model2 = UserSite::select('site_id')->where('user_id',@Auth::user()->id)->get()->toArray();
+                
+                $model = $model->whereHas('get_UserSite', function ($query) use ($model2) {
+                    $query->whereIn('site_id',@$model2);
+                });
+
+            }else{
+
+                $model = User::where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile');
+            }
+        
+
+        if ($request->role) {
+            $model = $model->where('site_role_id', $request->role);
+
+        }
+
+        if ($request->site) {
+
+            $model = $model->whereHas('get_UserSite', function ($query) use($request) {
+                $query->where('site_id', $request->site);
+            });
+        }
+
+        $model->get();
+
+        return DataTables::of($model)
             ->editColumn(
                 'name',
-                function ($user) {
-                    return '<a href="' . route('users.view', $user->id) . '"><span class="thumb-xs avatar lobilist-check"><img src="' . @$user->profile->photo . '" class="img-circle"></span> ' . str_limit($user->name, 15) . '</a>';
+                function ($model) {
+                    return '<a href="' . route('users.view', $model->id) . '"><span class="thumb-xs avatar lobilist-check"><img src="' . @$model->profile->photo . '" class="img-circle"></span> ' . str_limit($model->name, 15) . '</a>';
                 }
             )
             ->editColumn(
                 'chk',
-                function ($user) {
-                    return '<label><input type="checkbox" name="checked[]" value="' . $user->id . '"><span class="label-text"></span></label>';
+                function ($model) {
+                    if ($model->site_role_id == 99 || $model->site_role_id == null) {
+                        return '<label><input type="checkbox" disabled  name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                    } else {
+                        return '<label><input type="checkbox"   name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                    }
+
                 }
             )
             ->editColumn(
                 'job_title',
-                function ($user) {
-                    $str = $user->on_holiday ? '<i class="fas fa-plane-departure text-danger"></i> ' : '';
-                    return $str .= str_limit(@$user->profile->job_title, 15);
+                function ($model) {
+                    $str = $model->on_holiday ? '<i class="fas fa-plane-departure text-danger"></i> ' : '';
+                    return $str .= str_limit(@$model->profile->job_title, 15);
                 }
             )
             ->editColumn(
                 'mobile',
-                function ($user) {
-                    return @$user->profile->mobile;
+                function ($model) {
+                    return @$model->profile->mobile;
                 }
             )
             ->editColumn(
                 'city',
-                function ($user) {
-                    return @$user->profile->city;
+                function ($model) {
+                    return @$model->profile->city;
                 }
             )
             ->editColumn(
                 'created_at',
-                function ($user) {
-                    return dateFormatted($user->created_at);
+                function ($model) {
+                    return dateFormatted($model->created_at);
                 }
             )
             ->rawColumns(['name', 'chk', 'job_title', 'role', 'user'])
@@ -291,5 +339,30 @@ abstract class UsersController extends Controller
     private function getPage()
     {
         return langapp('users');
+    }
+
+    public function del_user(Request $request)
+    {
+
+        foreach ($request->id as $id_chang) {
+
+            $user = User::where("id", '=', $id_chang)->first();
+            if ($user->site_role_id == 99 || $user->site_role_id == null) {
+                $message = '';
+            } else {
+                $data = User::where("id", $id_chang)->delete();
+                $message = langapp('changes_saved_successful');
+            }
+
+        }
+
+        return ajaxResponse(
+            [
+                'message' => $message,
+                'redirect' => route('users.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 }

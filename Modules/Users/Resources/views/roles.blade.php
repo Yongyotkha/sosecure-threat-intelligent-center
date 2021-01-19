@@ -46,7 +46,7 @@
                                         <a href="{{ route('users.roles.edit', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                             @icon('solid/pencil-alt')
                                         </a>
-                                        <a href="{{ route('users.roles.delete', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                        <a href="{{ route('users.roles.delete', ['id' => $role->id]) }}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
                                             @icon('solid/trash-alt')
                                         </a>
                                         

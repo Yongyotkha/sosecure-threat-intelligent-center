@@ -28,6 +28,7 @@ Route::group(
         Route::delete('roles/{id}', 'RoleController@destroy')->name('roles.destroy')->middleware(['can:roles_delete', 'demo']);
 
         Route::get('data', 'UserCustomController@tableData')->name('users.data')->middleware('can:menu_users');
+        Route::post('del_user', 'UserCustomController@del_user')->name('users.del_user')->middleware('can:menu_users');
         Route::get('create', 'UserCustomController@create')->name('users.create')->middleware('can:users_create');
         Route::get('view/{user}/{tab?}', 'UserCustomController@view')->name('users.view');
         Route::get('suspend/{user}', 'UserCustomController@suspend')->name('users.suspend')->middleware('can:users_update');

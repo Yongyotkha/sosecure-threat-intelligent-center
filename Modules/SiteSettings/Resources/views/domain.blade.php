@@ -33,7 +33,7 @@
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; {{ $siteSettings->name }}</div>
 
-                    <button type="button" onclick="delete_domain_select()" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
+                    <button type="button" onclick="delete_domain_select()" id="btn_del_select" class="btn btn-sm btn-danger pull-right m-xs"  disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#add-domain">
@@ -63,7 +63,7 @@
                                                         {{-- <th class="hide"></th> --}}
                                                         <th class="no-sort">
                                                             <label>
-                                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
                                                                 <span class="label-text"></span>
                                                             </label>
                                                         </th>
@@ -95,7 +95,7 @@
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 
-    <div class="modal fade" id="delete_domain_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+    <div class="modal" id="delete_domain_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
@@ -150,12 +150,40 @@
         $('#'+id).slideToggle(150);
     }
 
+    $('#table-domain-template').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-domain-template').on('click', '.domain_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.domain_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.domain_id').filter(':checked').length < 1){
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
 
     $(function () {
 
         var table = $('#table-domain-template').DataTable({
             processing: true,
             serverSide: true,
+            
             "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('domainsettings.data') !!}',
@@ -217,41 +245,24 @@
             ]
         });
 
-        let del_val = [];
-        $("#btn_del_select").click(function(){
-            del_val = [];
-            $("input[type='checkbox'][name='checked']").each(function(){
-                
-                if($(this).is(":checked")) {
-                    del_val.push($(this).val());
-                    /* alert(3);*/
-                }
-            });
-            console.log(del_val);
-
-            if(del_val.length > 0) {
-                del_cate_select(del_val);
-            } else {
-                toastr.warning('Please select atleast 1', '@langapp('response_status')');
-            }
-
-        });
 
 
 
     });
-
+    let del_domain_select = [];
     function delete_domain_select(){
+        del_domain_select = [];
         $('#delete_domain_modal').modal('show');
     }
 
     function delete_domain_select_confirm(){
-        let del_domain_select = [];
+        
         $("input[type='checkbox'][name='checked']").each(function(){
             if($(this).is(":checked")) {
                 del_domain_select.push($(this).val());
             }
         });
+        console.log(del_domain_select);
         $.ajax({
             type:"POST",
             url:"{{ route('domainsettings.del_domain_select') }}",

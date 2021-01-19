@@ -551,14 +551,21 @@
                         targets: 4,
                         width: '10px',
                         render: function (data, type, full, meta) {
+                                                    
                             let val = '';
+                            let content = '';
                             val = full.get_data_leak_feed_one;
                             if(val) {
-                                    val = full.get_data_leak_feed_one.feedcontent;
+                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var res = full.keyword.split(",");
+                                for(let i in res){
+                                    var data = res[i];
+                                    content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                                }
                                 
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" title="'+val+'">'+val+'</div>';
+                            return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
 
                         },
                     },

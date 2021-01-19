@@ -632,6 +632,22 @@ function table_social_data(){
                 data: 'action',
                 name: 'action'
             },
+        ],
+        columnDefs: [
+            {
+                targets: 5,
+                render: function (data, type, full, meta) {
+
+                    var feedcontent = full.content;
+                    var res = full.keyword.split(",");
+                    let content = '';
+                    for(let i in res){
+                        const data = res[i];
+                        content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                    }
+                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                },
+            },
         ]
     });
 }
