@@ -2,9 +2,11 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use App\TransactionTimeStampScans;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\SiteSettings\Entities\Domain;
 use Modules\SiteSettings\Entities\SiteSettings;
 
 class AssetsSiteController extends Controller
@@ -99,5 +101,36 @@ class AssetsSiteController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function get_domain(Request $request){
+        $SiteSettings = TransactionTimeStampScans::select('domain_id')->where('site_id', $request->site_id)->get();
+        if($SiteSettings){
+            $domain_id = [];
+            foreach($SiteSettings as $data){
+                $domain_id[] = $data -> domain_id;
+            }
+            $domain = Domain::whereIn('id', $domain_id)->get();
+            return ajaxResponse(
+                [
+                    'message' => '',
+                    'redirect' => '',
+                    'data' => $domain,
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else{
+            return ajaxResponse(
+                [
+                    'message' => '',
+                    'redirect' => '',
+                    'data' => '',
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }
+        
     }
 }
