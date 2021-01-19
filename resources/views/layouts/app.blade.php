@@ -254,7 +254,7 @@
         <div id="nest6"></div>
         <h3 class="center_text">WAITING</h3>
     </div>
-    @include('cookie_consent')
+    {{-- @include('cookie_consent') --}}
     
 <section class="vbox" id="app">
 
