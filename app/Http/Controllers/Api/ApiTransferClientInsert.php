@@ -36,7 +36,7 @@ class ApiTransferClientInsert extends Controller
         $connect = true;
         $result = true;
         $arrUpdate = array();
-        if ($dataDecode||$dataDecode===0) {
+        if ($dataDecode||$dataDecode==0) {
             try {
                     $site = new StdClass();
                     $site->id = $dataDecode;
@@ -198,7 +198,7 @@ class ApiTransferClientInsert extends Controller
 
         // $dataDecode = false;
 
-        if ($dataDecode||$dataDecode === 0) {
+        if ($dataDecode||$dataDecode == 0) {
             try {
                 $siteID = $dataDecode;
                 $nameTable = $request->tbName;
@@ -317,10 +317,11 @@ class ApiTransferClientInsert extends Controller
         $connect = true;
         $result = true;
         $arrUpdate = array();
-
+        
         // $dataDecode = false;
 
-        if ($dataDecode||$dataDecode === 0) {
+        if ($dataDecode||$dataDecode == 0) {
+            
             try {
                 $siteID = $dataDecode;
                 $nameTable = $request->tbName;
