@@ -113,17 +113,10 @@
                                                     </th>                                      
                                                     <th>Asset</th>
                                                     <th>Referent</th>
-                                                    <th>Status</th>
-                                                    <th>Action</th>
+                                                    <th style="width: 20px" class="text-center">Status</th>
+                                                    <th style="width: 20px" class="text-center">Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -176,6 +169,45 @@
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
+        });
+    });
+
+    $(function () {
+        $('#table-assets-data').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('scans.data_scans_assets') !!}',
+                data: function ( d ) {
+                    d.code = '{{ $siteSettings->code }}';
+                    d.menu = 'site';
+                    return JSON.stringify( d );
+                }
+            },
+            columns: [
+                {
+                    data: 'assets',
+                    name: 'assets',
+                },
+                {
+                    data: 'referent',
+                    name: 'referent',
+                }, 
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },  
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },    
+            ],
         });
     });
 </script>
