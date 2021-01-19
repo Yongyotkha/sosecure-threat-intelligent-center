@@ -161,7 +161,7 @@
                                                                 <span class="label-text" data-rel="tooltip" title="">Role Sub</span>
                                                             </label>
                                                         </span>
-                                                    </div>
+                                                  </div>
                                                 </li>
                                             </ul>
                                         </li>
