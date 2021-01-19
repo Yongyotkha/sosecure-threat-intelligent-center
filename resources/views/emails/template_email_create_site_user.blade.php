@@ -39,7 +39,7 @@
 				</div>
               </div>
               <div class="miro-confirmation-code-block" style="font-family:Helvetica,Arial,sans-serif;padding:0 40px">
-                <div class="miro-confirmation-code-block__code" style="background-color:#f3f4f8;border-radius:4px;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-stretch:normal;font-style:normal;font-weight:200;height:50px;letter-spacing:normal;line-height:20px;text-align:center"><a href="{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}">{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}</a></div>
+                <div class="miro-confirmation-code-block__code" style="padding: 20px; height: auto;background-color:#f3f4f8;border-radius:4px;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-stretch:normal;font-style:normal;font-weight:200;height:50px;letter-spacing:normal;line-height:20px;text-align:center"><a href="{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}">{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}</a></div>
               </div>
               {{-- <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 0 40px">
                 <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24"></div>
