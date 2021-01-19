@@ -10,15 +10,11 @@ use phpseclib\Net\SSH2;
 use App\Entities\CompromisedServer;
 use App\Entities\CompromisedFileOriginal;
 use App\Entities\CompromisedFileCheck;
-use App\DataLeakFeed;
-use App\DataLeakSocialRef;
-use App\DataLeakFeedTemp;
-use App\leak_socail_ref_temp;
 
 use App\Entities\Transaction_center_compromised_files_check;
-use App\Entities\Transaction_center_data_leak_feed_temp;
-use App\Entities\Transaction_center_data_leak_socail_ref_temp;
-
+use App\Entities\Transaction_center_data_leak_feed;
+use App\Entities\TF_Center_data_leak_feed;
+use App\Entities\TF_Center_data_leak_socail_ref;
 class FeedCompromisedScan extends Command
 {
     /**
@@ -170,28 +166,27 @@ class FeedCompromisedScan extends Command
 
             
         }
-
         if($insertLeak){
-            $DataLeakFeedCheck = DataLeakFeedTemp::where('source_name', $CompromisedFileOriginalCheck->file_path)
+            $DataLeakFeedCheck = TF_Center_data_leak_feed::where('source_name', $CompromisedFileOriginalCheck->file_path)
             ->where('feedcontent', $savePythonScan)
             ->where('keyword', $keyword)
-            ->where('feed_type', $feel_type)->first();
+            ->where('feel_type', $feel_type)->first();
+           
             $mode_Transaction_center_data_leak_feed_temp = 'insert';
             if(!$DataLeakFeedCheck){
-                $DataLeakFeedCheck = new DataLeakFeedTemp;
-                $DataLeakFeedCheck->code = null;
+                $DataLeakFeedCheck = new TF_Center_data_leak_feed;
+                $DataLeakFeedCheck->code = generator_uuid();
                 $DataLeakFeedCheck->data_id = $CompromisedFileCheck->id;
-                $DataLeakFeedCheck->data_id = null;
                 $DataLeakFeedCheck->sourceid = 1000;
                 $DataLeakFeedCheck->keyword = $keyword;
+                $DataLeakFeedCheck->view = 0;
                 $DataLeakFeedCheck->source_name = $CompromisedFileOriginalCheck->file_path;
                 // $DataLeakFeedCheck->feedtimepost = $detail["file_modified"];
                 $DataLeakFeedCheck->feedtimepost = date("Y-m-d H:i:s");
                 $DataLeakFeedCheck->feedtimestamp = date("Y-m-d H:i:s");
                 $DataLeakFeedCheck->feedcontent = $savePythonScan;
                 $DataLeakFeedCheck->status = 1;
-                $DataLeakFeedCheck->feed_type = $feel_type;
-                $DataLeakFeedCheck->approve = 0;
+                $DataLeakFeedCheck->feel_type = $feel_type;
                 $DataLeakFeedCheck->save();
                 
 
@@ -205,16 +200,17 @@ class FeedCompromisedScan extends Command
 
             }
 
-            $DataLeakSocialRefCheck = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedCheck->id)
-            ->where('site_id', $server->site_id."")->first();
+            $DataLeakSocialRefCheck = TF_Center_data_leak_socail_ref::where('data_leak_feed_id', $DataLeakFeedCheck->id)
+            ->where('site_id', $server->site_id."")->where('feel_type', $feel_type)->first();
             if(!$DataLeakSocialRefCheck){
-                $DataLeakSocialRefCheck = new leak_socail_ref_temp;
-                $DataLeakSocialRefCheck->code = null;
+                $DataLeakSocialRefCheck = new TF_Center_data_leak_socail_ref;
+                $DataLeakSocialRefCheck->code = generator_uuid();
                 $DataLeakSocialRefCheck->data_leak_feed_id =  $DataLeakFeedCheck->id;
                 $DataLeakSocialRefCheck->site_id = $server->site_id;
                 $DataLeakSocialRefCheck->keyword = $keyword;
                 $DataLeakSocialRefCheck->status = 1;
-                $DataLeakSocialRefCheck->view = null;
+                $DataLeakSocialRefCheck->view = 0;
+                $DataLeakSocialRefCheck->feel_type = $feel_type;
                 $DataLeakSocialRefCheck->save();
                 
             }else{
@@ -224,7 +220,7 @@ class FeedCompromisedScan extends Command
 
             }
 
-            $Transaction_center_data_leak_feed_temp = new Transaction_center_data_leak_feed_temp;
+            $Transaction_center_data_leak_feed_temp = new Transaction_center_data_leak_feed;
             $Transaction_center_data_leak_feed_temp -> site_id = $server->site_id;
             $Transaction_center_data_leak_feed_temp -> transaction_id = $DataLeakFeedCheck->id;
             $Transaction_center_data_leak_feed_temp -> transaction_id_ref = $DataLeakSocialRefCheck->id;

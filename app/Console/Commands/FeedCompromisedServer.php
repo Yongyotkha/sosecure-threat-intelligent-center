@@ -113,8 +113,9 @@ class FeedCompromisedServer extends Command
         Artisan::call($commandArtisan);
         $commandArtisan = 'app:TFCenterTransfer_Compromised_Server';
         Artisan::call($commandArtisan);
-        $commandArtisan = 'app:TFCenterTransfer_center_data_leak_feed_temp';
+        $commandArtisan = 'app:TFCenterTransfer_center_data_leak_feed';
         Artisan::call($commandArtisan);
+        
         $passBody = [
             'modeFor' => 'done',
             'modeInsert' => 'Compromised_scan_webserver',
@@ -122,6 +123,7 @@ class FeedCompromisedServer extends Command
             'sitecode' => config('app.site_code'),
         ];
         $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
+
         $this->info("--END Process--");
         // $ip = '10.104.0.7';
         // $port = '22';
