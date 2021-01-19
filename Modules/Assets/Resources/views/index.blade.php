@@ -159,66 +159,6 @@
                                     <th style="width: 20px" class="text-center">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        ออมสิน
-                                    </td>
-                                    <td>
-                                        secureserver.net
-                                    </td>
-                                    <td>
-                                        <ul class="asset-list-tb">
-                                            <li>Ip-166-62-28-135.ip.secureserver.net</li>
-                                            <li>admin.sosecure.co.th</li>
-                                        </ul>
-                                    </td>
-                                    <td class="text-center">
-                                        -
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge badge-success">Active</span>
-                                    </td>
-                                    <td class="no-wrap">
-                                        <button type="submit" class="btn btn-sm btn-info btn-xs m-xs">
-                                            <span>@icon('solid/edit')
-                                        </button>
-        
-                                        <button type="submit" class="btn btn-sm btn-danger btn-xs m-xs">
-                                            <span>@icon('solid/trash-alt')
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        ออมสิน
-                                    </td>
-                                    <td>
-                                        secureserver.net
-                                    </td>
-                                    <td>
-                                        <ul class="asset-list-tb">
-                                            <li>Ip-166-62-28-135.ip.secureserver.net</li>
-                                            <li>admin.sosecure.co.th</li>
-                                        </ul>
-                                    </td>
-                                    <td class="text-center">
-                                        -
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge badge-danger">Inactive</span>
-                                    </td>
-                                    <td class="no-wrap">
-                                        <button type="submit" class="btn btn-sm btn-info btn-xs m-xs">
-                                            <span>@icon('solid/edit')
-                                        </button>
-        
-                                        <button type="submit" class="btn btn-sm btn-danger btn-xs m-xs">
-                                            <span>@icon('solid/trash-alt')
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
                         </table>
                     </div>
                 </section>
@@ -293,11 +233,51 @@
             $('.hide-fillter').toggle();
         });
     });
-
+    var site_id = 0;
     $(function () {
         $('#table-assets-template').DataTable({
             processing: true,
-            order: [[0, "desc"]],
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('scans.data_scans_assets') !!}',
+                data: function ( d ) {
+                    d.menu = 'system';
+                    d.site_id = site_id;
+                    return JSON.stringify( d );
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    name: 'chk',
+                },
+                {
+                    data: 'site',
+                    name: 'site',
+                },
+                {
+                    data: 'assets',
+                    name: 'assets',
+                },
+                {
+                    data: 'referent',
+                    name: 'referent',
+                }, 
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },  
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },    
+            ],
         });
     });
 </script>

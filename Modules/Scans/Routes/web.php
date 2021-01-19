@@ -29,5 +29,7 @@ Route::group(
         Route::put('scan/redo_process/{code}', 'ScansController@redo_process')->name('scans.redo_process');
         Route::get('scans_assets_edit_modal/{id}/{code}/{page}', 'ScansController@scans_assets_edit_modal')->name('scans_assets.scans_assets_edit_modal');
         Route::post('scans_assets_edit', 'ScansController@scans_assets_edit')->name('scans_assets.scans_assets_edit');
+        Route::post('delete_assets_select', 'ScansController@delete_assets_select')->name('scans.delete_assets');
+        
     }
 );
