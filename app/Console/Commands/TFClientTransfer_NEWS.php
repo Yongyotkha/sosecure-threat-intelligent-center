@@ -63,7 +63,7 @@ class TFClientTransfer_NEWS extends Command
 
         print_r($this->site_code);
         $httpData = $this->reconnnect($this->urlCenterData, $passBody, $this->urlLimit);
-        // print_r($tableData);
+        print_r($httpData);
 
         if ($httpData["success"]) {
             if (!empty($httpData["result"]["queryData"])) {

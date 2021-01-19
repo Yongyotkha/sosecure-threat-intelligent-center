@@ -13,8 +13,27 @@
                             <section class="scrollable wrapper bg" id="clauses">
                                 <div class="panel-group m-b" id="accordion2">
                                     <ul class="list no-style" id="clauses-list">
+
+                                        <li class="panel panel-default" id="clause-news">
+                                            <div class="panel-heading">
+                                                <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#news">
+                                                    @icon('solid/caret-right') {{ humanize("News") }}
+                                                </a>
+                                            </div>
+                                            <div id="news" class="panel-collapse collapse">
+                                                @foreach ($news as $key => $value)
+                                                    <div class="panel-body clause">
+                                                        <a href="#{{$value["id"]}}">
+                                                            {{$value["content"]}}
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </li>
+
+
                                         @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
-                                        <li class="panel panel-default" id="clause-{{ $clause->id }}">
+                                        {{-- <li class="panel panel-default" id="clause-{{ $clause->id }}">
                                             <div class="panel-heading">
                                                 <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($clause->name) }}">
                                                     @icon('solid/caret-right') {{ humanize($clause->name) }}
@@ -25,7 +44,7 @@
                                                     @parsedown($clause->clause)
                                                 </div>
                                             </div>
-                                        </li>
+                                        </li> --}}
                                         @endforeach
                                     </ul>   
                                 </div>

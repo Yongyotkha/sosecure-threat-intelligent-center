@@ -111,9 +111,9 @@ class ApiTransferClients extends Controller
                     $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
                     $TF_Center_transaction_batchjob->save();
 
-                    // $updater = new $model_getData;
-                    // $updater->setConnection($this->dbName);
-                    // $updater->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->update(['transaction_data_status' => 2]);
+                    $updater = new $model_getData;
+                    $updater->setConnection($this->dbName);
+                    $updater->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->update(['transaction_data_status' => 2]);
                 }
             }else{
                 $connect = false;
