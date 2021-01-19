@@ -105,7 +105,7 @@
                                         <table class="table table-striped" id="table-assets-data">
                                             <thead>
                                                 <tr>
-                                                    <th class="no-sort">
+                                                    <th class="no-sort" style="width: 12px">
                                                         <label>
                                                             <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
                                                             <span class="label-text"></span>
@@ -236,6 +236,10 @@
                 }
             },
             columns: [
+                {
+                    data: 'chk',
+                    name: 'chk',
+                },
                 {
                     data: 'assets',
                     name: 'assets',
@@ -448,7 +452,7 @@
             assets_data: res,
         }).then(function (response) {
             loading('stop_load');
-            $('#table-scans-data-assets').DataTable().ajax.reload();
+            $('#table-assets-data').DataTable().ajax.reload();
             $('#asset-to-use').prop("disabled", true);
             $('#show_asets_manual').html("");
             $('#asset_to_use_manual').modal('hide');
