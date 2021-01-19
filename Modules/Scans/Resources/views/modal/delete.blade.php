@@ -5,7 +5,7 @@
             <h4 class="modal-title">@langapp('delete')   {{  $scans->raw_data  }}</h4>
         </div>
 
-        {!! Form::open(['route' => ['f_scans_assets.delete', "id" => $scans->id, "code" => $code], 'class' => 'ajaxifyForm', 'method' => 'DELETE']) !!}
+        {!! Form::open(['route' => ['f_scans_assets.delete', "id" => $scans->id, "code" => $code, "page" => $page], 'class' => 'ajaxifyForm', 'method' => 'DELETE']) !!}
 
         <div class="modal-body">
             <p class="text-danger">@langapp('delete_warning')  </p>

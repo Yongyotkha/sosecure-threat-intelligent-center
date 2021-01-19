@@ -34,8 +34,8 @@ class AuthController extends ApiController
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
             $data_key = json_decode($data, true);
-            // ->where('site_id', $site['data']['id'])
-            $user = User::where('email', $data_key['email'])->first();
+            // 
+            $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->first();
             if ($user != null) {
                 $passwordHasher = new PasswordHash(8, true);
                 $passwordMatch  = $passwordHasher->CheckPassword($data_key['password'], $user->password);
