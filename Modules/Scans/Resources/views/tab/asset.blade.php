@@ -124,6 +124,7 @@
                 url: '{!! route('scans.data_scans_assets') !!}',
                 data: function ( d ) {
                     d.code = '{{ $site->code }}';
+                    d.menu = 'scan';
                     return JSON.stringify( d );
                 }
             },
@@ -342,4 +343,3 @@
 
 
 @endpush
-

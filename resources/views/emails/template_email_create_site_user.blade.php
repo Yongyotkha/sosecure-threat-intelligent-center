@@ -13,12 +13,12 @@
       <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
         <td class="miro__content-wrapper" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:43px;text-align:left;vertical-align:top;word-wrap:break-word">
           <div class="miro__content" style="background-color:#fff;font-family:Helvetica,Arial,sans-serif">
-            <div class="miro__header" style="font-family:Helvetica,Arial,sans-serif;height:100%;min-height:100px;padding:0 40px">
+            <div class="miro__header" style="background:#263042;font-family:Helvetica,Arial,sans-serif;height:100%;min-height:100px;padding:0 40px">
               <table class="miro__header-content" style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top;width:100%">
                 <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
                   <td class="miro__col-header-logo" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:32px;text-align:left;vertical-align:top;width:50%;word-wrap:break-word">
                     <a href="{{route('index')}}" target="_blank" style="Margin:0;color:#2a79ff;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.43;margin:0;padding:0;text-align:left;text-decoration:none">
-						<img src="{{asset('images/logo_site.png')}}" style="-ms-interpolation-mode:bicubic;border:none;clear:both;display:block;font-family:Helvetica,Arial,sans-serif;height:45px;max-height:100%;max-width:100%;outline:0;text-decoration:none;width:auto">
+						<img src="{{asset('images/logo_threat/logo.png')}}" style="-ms-interpolation-mode:bicubic;border:none;clear:both;display:block;font-family:Helvetica,Arial,sans-serif;height:45px;max-height:100%;max-width:100%;outline:0;text-decoration:none;width:auto">
                     </a>
                   </td>
                   <td class="miro__col-header-btn" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:26px;text-align:right;vertical-align:top;width:50%;word-wrap:break-word">
@@ -33,21 +33,21 @@
             </div>
             <div class="miro__content-body" style="font-family:Helvetica,Arial,sans-serif">
               <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:40px 40px 36px">
-                <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24">Complete registration</div>
-                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">Please enter this confirmation code in the window where you started creating your
-              <br> account: <span style="font-weight:700">{{$summary['User']->email}}</span>
+              <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24;text-align:center">Complete registration</div>
+                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;text-align:center;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">Please enter this confirmation code in the window <br> where you started creating your
+                <div style="margin-top: 10px;text-align:center;color:#000;font-weight:700"> account : <span style="font-weight:700;margin-left:15px;">{{$summary['User']->email}}</span></div>
 				</div>
               </div>
               <div class="miro-confirmation-code-block" style="font-family:Helvetica,Arial,sans-serif;padding:0 40px">
-                <div class="miro-confirmation-code-block__code" style="background-color:#f3f4f8;border-radius:4px;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-stretch:normal;font-style:normal;font-weight:200;height:50px;letter-spacing:normal;line-height:20px;text-align:center"><a href="{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}">{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}</a></div>
+                <div class="miro-confirmation-code-block__code" style="padding: 20px; height: auto;background-color:#f3f4f8;border-radius:4px;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-stretch:normal;font-style:normal;font-weight:200;height:50px;letter-spacing:normal;line-height:20px;text-align:center"><a href="{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}">{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}</a></div>
               </div>
               {{-- <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 0 40px">
                 <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24"></div>
                 <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">From your mobile device use the code to confirm email.</div>
               </div> --}}
-              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 12px 40px">
+              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 12px 0px;text-align:center">
                 <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24"></div>
-                <div style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6" class="miro-title-block__subtitle font-size-20 m-top-16">Or click this button to confirm your email:</div>
+                <div style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6;text-align:center" class="miro-title-block__subtitle font-size-20 m-top-16">Or click this button to confirm your email:</div>
               </div>
               <table class="spacer" style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top;width:100%">
                 <tbody style="font-family:Helvetica,Arial,sans-serif">
@@ -59,11 +59,11 @@
               <table class="row" style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;padding:0;position:relative;text-align:left;vertical-align:top;width:100%">
                 <tbody style="font-family:Helvetica,Arial,sans-serif">
                   <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
-                    <th class="small-12 large-12 columns first last" style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.43;margin:0 auto;padding:0;padding-bottom:0;padding-left:40px;padding-right:40px;text-align:left;width:440px">
+                    <th class="small-12 large-12 columns first last" style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.43;margin:0 auto;padding:0;padding-bottom:0;padding-left:40px;padding-right:40px;text-align:center;width:440px">
                       <table style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top;width:100%">
                         <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
-                          <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.43;margin:0;padding:0;text-align:left">
-                            <a href="{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}" class="btn layout-3__btn" target="_blank" style="Margin:0;background:#2a79ff;border-radius:4px;color:#fff;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;line-height:1.43;margin:0;outline:0;padding:20px 21px;text-align:center;text-decoration:none;width:238px">Confirm your email</a>
+                          <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.43;margin:0;padding:0;text-align:center">
+                            <a href="{{route('reauth.verify_site_user',['token' => $summary['site_add_user_token']])}}" class="btn layout-3__btn" target="_blank" style="Margin:0;background:#2a79ff;border-radius:4px;color:#fff;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;line-height:1.43;margin:0;outline:0;padding:6px 20px;text-align:center;text-decoration:none;width:238px;">Confirm your email</a>
                           </th>
                           <th class="expander" style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.43;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>
                         </tr>
@@ -72,9 +72,9 @@
                   </tr>
                 </tbody>
               </table>
-              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 23px 40px">
+              <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 23px 0px">
                 <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24"></div>
-                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">If you didn't create an account in Sosecure, please ignore this message.</div>
+                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:15px!important;text-align:center;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">If you didn't create an account in Sosecure, please ignore this message.</div>
               </div>
               <div class="miro__sep" style="background-color:#e1e0e7;font-family:Helvetica,Arial,sans-serif;height:1px"></div>
             </div>

@@ -43,7 +43,7 @@
                     </a>
 
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
-                        data-target="#rss_modal">
+                        data-target="#asset_to_use_manual" id="asset-to-use-manual">
                         @icon('solid/plus') @langapp('create')
                     </a>
                 </header>
@@ -105,7 +105,7 @@
                                         <table class="table table-striped" id="table-assets-data">
                                             <thead>
                                                 <tr>
-                                                    <th class="no-sort">
+                                                    <th class="no-sort" style="width: 12px">
                                                         <label>
                                                             <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
                                                             <span class="label-text"></span>
@@ -113,17 +113,10 @@
                                                     </th>                                      
                                                     <th>Asset</th>
                                                     <th>Referent</th>
-                                                    <th>Status</th>
-                                                    <th>Action</th>
+                                                    <th style="width: 20px" class="text-center">Status</th>
+                                                    <th style="width: 20px" class="text-center">Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -137,7 +130,54 @@
     {{-- ------------------- --}}
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    <div class="modal in fixed-left" id="asset_to_use_manual" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        Asset To Use
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h3 class="text-dark">Domain</h3>
+                            <div id="select_domain"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-3 text-center">
+                            <h3 class="text-dark">Assets</h3>
+                        </div>
+                        <div class="col-xs-9 text-center">
+                            <h3 class="text-dark">Referent</h3>
+                        </div>
+                        <div class="col-md-12">
+                            <hr>
+                        </div>
+                    </div>
+                    <div id="show_asets_manual" class="row">
+                    </div>
+                    <button type="button" class="btn btn-sm btn-info m-xs" onclick="add_new_assets_manual()">
+                        <span>@icon('solid/plus')  Add Assets
+                    </button>
+                </div>
 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-info btn-rounded" onclick="save_assets_manual()">
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </section>
 
@@ -178,6 +218,256 @@
             $('.hide-fillter').toggle();
         });
     });
+
+    $(function () {
+        $('#table-assets-data').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: "POST",
+                url: '{!! route('scans.data_scans_assets') !!}',
+                data: function ( d ) {
+                    d.code = '{{ $siteSettings->code }}';
+                    d.menu = 'site';
+                    return JSON.stringify( d );
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    name: 'chk',
+                },
+                {
+                    data: 'assets',
+                    name: 'assets',
+                },
+                {
+                    data: 'referent',
+                    name: 'referent',
+                }, 
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },  
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },    
+            ],
+        });
+    });
+
+    var number_rows = 0; 
+    var number_add_rows = 0;
+    var number_tbody_rows = 0;
+    var number_table_rows = 1;
+    var number_new_rows_assets = 0;
+    var base_datatype = []; 
+    $(document).ready(function () {
+        $('#datatype').select2();
+        $('#source').select2();
+
+        $('.select2').select2();
+
+        $('.hide-fillter').hide();
+        $('#fillter-advance').click(function(){
+            $('.hide-fillter').toggle();
+        });
+
+        $("#asset-to-use-manual").click(function(){
+            loading('load');
+            $('#select_domain').html();
+            $('#show_asets_manual').html("");
+            axios.post('/sitesettings/assets/get_domain', {
+                site_id: '{{ $siteSettings->id }}',
+            }).then(function (response) {
+               let html = ``;
+               html += `<select id="domain_id_manual" class="select2 form-control">`;
+                for(let b in response.data.data){
+                    const domain = response.data.data[b];
+                    html += `<option value="${domain.id}">${domain.name}</option>`;
+                }
+                html += `</select>`;
+                $('#select_domain').html(html);
+            }).catch(function (error) {
+                loading('stop_load');
+                var errors = error;
+                var errorsHtml = "";
+                errorsHtml += "<li>" + errors + "</li>";
+                toastr.error(errorsHtml, '@langapp('response_status')');
+            });
+            axios.get('/scans/get_data_type')
+            .then(function (response) {
+                loading('stop_load');
+                 var html = ``;
+                 let result = response.data;
+                    html += `
+                    <input type="hidden" id="site_id_manual" class="form-control" value="{{ $siteSettings->id }}">
+                    <div class="col-md-12">
+                        <table class="table table-bordered asset-table-manual-0">
+                            <tbody id="assets_show_${number_tbody_rows}">
+                                <tr id="rows_manual_${number_add_rows}">
+                                    <td>
+                                        <input type="text" name="assets_manual[]" data-raw_data_manual="${0}" class="form-control">
+                                    </td>
+
+                                    <td>
+                                        <select name="data_type_manual[]" class="select2 form-control">`;
+                                        base_datatype = result.data_type;
+                                        for(let b in result.data_type){
+                                            const data_type = result.data_type[b];
+                                            html += `<option value="${data_type.id}" data-raw_data_manual="${0}">${data_type.value}</option>`;
+                                        }
+                                        html += `</select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${0}">
+                                    </td>
+                                    <td></td>
+                                </tr>`;
+                        html += `</tbody>
+                        </table>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets_manual(0,${number_tbody_rows},0)">
+                                <span>@icon('solid/plus')  Add
+                            </button>
+                        </div>
+                    </div>
+                    <div id="new_assets_show_${number_new_rows_assets}"></div>`;   
+                $('#show_asets_manual').html(html);
+            }).catch(function (error) {
+                loading('stop_load');
+                var errors = error;
+                var errorsHtml = "";
+                errorsHtml += "<li>" + errors + "</li>";
+                toastr.error(errorsHtml, '@langapp('response_status')');
+            });
+        });
+    });
+
+    function add_assets_manual(table_row, tbody_rows, rows_data_manual){
+        number_add_rows++;
+        var markup = ``;
+        markup = `
+        <tr id="rows_manual_${number_add_rows}">
+            <td></td>
+
+            <td>
+                <select name="data_type_manual[]" class="select2 form-control">`;
+                for(let b in base_datatype){
+                    const data_type = base_datatype[b];
+                    markup += `<option value="${data_type.id}" data-raw_data_manual="${rows_data_manual}">${data_type.value}</option>`;
+                }
+            markup += `</select>
+            </td>
+            <td>
+                <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_assets_manual(${number_add_rows})">
+                    <span>@icon('solid/trash-alt')
+                </button>
+            </td>
+        </tr>
+        `;
+        $("table.asset-table-manual-"+table_row+" tbody#assets_show_" + tbody_rows).append(markup);
+    }
+
+    var number_rows_data_manual = 0;
+    function add_new_assets_manual(){
+        number_rows_data_manual++;
+        number_add_rows++;
+        number_table_rows++;
+        number_tbody_rows++;
+        var html = ``;
+        html += `<div class="col-md-12" id="new_add_assets_${number_new_rows_assets}">
+            <table class="table table-bordered asset-table-manual-${number_table_rows}">
+                <tbody id="assets_show_${number_tbody_rows}">
+                    <tr id="rows_manual_${number_add_rows}">
+                        <td>
+                            <input type="text" name="assets_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
+                        </td>
+
+                        <td>
+                            <select name="data_type_manual[]" class="select2 form-control">`;
+                            for(let b in base_datatype){
+                                const data_type = base_datatype[b];
+                                html += `<option value="${data_type.id}" data-raw_data_manual="${number_rows_data_manual}">${data_type.value}</option>`;
+                            }
+                            html += `</select>
+                        </td>
+                        <td>
+                            <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_assets_manual_main(${number_new_rows_assets})">
+                                <span>@icon('solid/trash-alt')
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center">
+                <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets_manual(${number_table_rows},${number_tbody_rows},${number_rows_data_manual})">
+                    <span>@icon('solid/plus')  Add
+                </button>
+            </div>
+        </div>
+        <div id="new_assets_show_${number_new_rows_assets+1}"></div>`;
+        $("#new_assets_show_" + number_new_rows_assets).append(html);
+        number_new_rows_assets++;
+    }
+    function delete_assets_manual_main(c){
+        $('#new_add_assets_' + c).remove();
+        number_new_rows_assets--;
+        number_rows_data_manual--;
+    }
+    function save_assets_manual(){
+        loading('load');
+        var values = $("input[name='assets_manual[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual'), 'domain_id' : $("#domain_id_manual :selected").val() , 'site_id' : $("#site_id_manual").val()};
+        }).get();
+        var raw_data = $("input[name='raw_data_manual[]']").map(function(){
+            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual')};
+        }).get();
+        var data_type = $("select[name='data_type_manual[]'] option:selected").map(function(){
+            return {'data_type' : $(this).val(), 'raw_data_base' : $(this).data('raw_data_manual')};
+        }).get();   
+        var res = raw_data.map(function(v, i) {
+            if(data_type[i].raw_data_base == v.raw_data_base){
+                return {
+                    data_type: data_type[i].data_type,
+                    raw_data: v.raw_data,
+                    raw_data_base: v.raw_data_base
+                };
+            }
+        }); 
+        axios.post('/scans/save_assets_new', {
+            assets: values,
+            assets_data: res,
+        }).then(function (response) {
+            loading('stop_load');
+            $('#table-assets-data').DataTable().ajax.reload();
+            $('#asset-to-use').prop("disabled", true);
+            $('#show_asets_manual').html("");
+            $('#asset_to_use_manual').modal('hide');
+        }).catch(function (error) {
+            loading('stop_load');
+            var errors = error;
+            var errorsHtml = "";
+            errorsHtml += "<li>" + errors + "</li>";
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
+
+    function delete_assets_manual(c){
+         $('#rows_manual_' + c).remove();
+    }
 </script>
 @endpush
 @endsection

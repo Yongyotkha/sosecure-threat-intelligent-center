@@ -2,20 +2,20 @@
 
 namespace App\Console\Commands;
 
-use App\Entities\Transaction_center_compromised_files_check as SubTB;
+use App\Entities\Transaction_center_data_leak_feed as SubTB;
 use Exception;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Console\Command;
 
-class TFCenterTransfer_Compromised_Server extends Command
+class TFCenterTransfer_center_data_leak_feed extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:TFCenterTransfer_Compromised_Server';
-    protected $description = 'TFCenterTransfer_Compromised_Server';
+    protected $signature = 'app:TFCenterTransfer_center_data_leak_feed';
+    protected $description = 'TFCenterTransfer_center_data_leak_feed';
 
     /**
      * The console command description.
@@ -24,14 +24,14 @@ class TFCenterTransfer_Compromised_Server extends Command
      */
 
     private $urlLimit = 3;
-    private $url = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/insertToNoRef';
+    private $url = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/insertToRef';
     private $ip = '127.0.0.1';
     private $mac = 'abcd';
     private $header = 'header';
     private $dbName = 'dummyDatabase';
     private $site_code = '';
     private $site_mode = '';
-    private $insertToTB = 'fx_transaction_center_compromised_files_check';
+    private $insertToTB = 'fx_transaction_center_data_leak_feed';
     /**
      * Create a new command instance.
      */
@@ -54,8 +54,7 @@ class TFCenterTransfer_Compromised_Server extends Command
         $header = $this->header;
         $tableData = new SubTB;
         $tableData->setConnection($this->dbName);
-        $tableData = $tableData->where('status', 1)->where('transaction_data_status', 1)->with('get_transfer')->orderBy('id', 'asc')->get()->toArray();
-        // print_r($tableData);
+        $tableData = $tableData->where('status', 1)->where('transaction_data_status', 1)->with('get_transfer')->with('get_transfer_ref')->orderBy('id', 'asc')->get()->toArray();
 
         if (!$tableData) {
             
@@ -67,11 +66,10 @@ class TFCenterTransfer_Compromised_Server extends Command
                 'queryData' => $tableData,
                 'tbName' => $this->insertToTB,
             ];
-
             $httpData = $this->reconnnect($this->url, $passBody, $this->urlLimit);
+
             print_r($httpData);
             if ($httpData["success"]) {
-
                 if (!empty($httpData["result"]["returnUpdate"])) {
                     $returnUpdate = $httpData["result"]["returnUpdate"];
                     foreach ($returnUpdate as $valueReturn) {
@@ -110,7 +108,7 @@ class TFCenterTransfer_Compromised_Server extends Command
                             'Content-type' => 'application/json',
                         ],
                         'delay' => $_sleeptime, //millisec == ms
-                        'timeout' => 59, //sec == 100sec
+                        'timeout' => 180, //sec == 100sec
                         'verify' => false,
                         'body' => json_encode($passBody),
                     ]

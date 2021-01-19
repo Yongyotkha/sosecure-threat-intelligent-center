@@ -75,7 +75,7 @@ return [
         
         'dummyDatabase'  => [
             'driver'         => 'mysql',
-            'host'           => '192.168.1.116',
+            'host'           => '192.168.1.115',
             'port'           => '3306',
             'database'       => 'test_server',
             'username'       => 'client',

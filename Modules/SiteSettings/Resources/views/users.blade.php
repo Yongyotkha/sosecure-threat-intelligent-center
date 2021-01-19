@@ -278,7 +278,7 @@
                 {
                     data: 'email',
                     name: 'email',
-                    className:'w-100',
+                    className:'w-100 nowrap',
                 },
                 {
                     data: 'confirm',
@@ -288,7 +288,7 @@
                 {
                     data: 'role',
                     name: 'role',
-                    className:'w-25',
+                    className:'w-25 nowrap',
                 },
                 {
                     data: 'status',
@@ -305,7 +305,7 @@
                     orderable: false,
                     searchable: false,
                     sortable: false,
-                    className:'w-80',
+                    className:'w-80 nowrap',
                 }
             ]
         });

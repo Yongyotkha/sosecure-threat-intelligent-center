@@ -100,6 +100,7 @@ Route::group(
         Route::get('/keywordsetting/{id}', 'DataLeakController@keyword')->name('keyword.index')->middleware('can:menu_items');
        
         Route::get('/assets/{id}', 'AssetsSiteController@assets')->name('assetssite.index')->middleware('can:menu_items');
+        Route::post('/assets/get_domain', 'AssetsSiteController@get_domain')->name('assetssite.get_domain')->middleware('can:menu_items');
 
         Route::get('/socialdatas/{id}', 'DataLeakController@socialdatas')->name('socialdatas.index')->middleware('can:menu_items');
         Route::get('/darkweb_datas/{id}', 'DataLeakController@darkweb_datas')->name('darkweb_datas.index')->middleware('can:menu_items');
