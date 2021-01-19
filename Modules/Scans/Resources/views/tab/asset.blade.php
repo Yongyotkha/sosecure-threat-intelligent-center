@@ -41,6 +41,12 @@
                 <table class="table table-striped table-bordered" id="table-scans-data-assets">
                     <thead>
                         <tr>
+                            <th class="no-sort" style="width: 12px">
+                                <label>
+                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                    <span class="label-text"></span>
+                                </label>
+                            </th>  
                             <th>Asset</th>
                             <th>Referent</th>
                             <th style="width: 20px" class="text-center">Status</th>
@@ -112,6 +118,66 @@
 @include('stacks.js.form')
 
 <script>
+    $('#table-scans-data-assets').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $("#btn_del_select").click(function() {
+        let del_val = [];
+        $('.asset_id:checked').each(function () {
+            del_val.push(this.value);
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('scans.delete_assets') }}",
+                    data:{
+                        asset_id: del_val,
+                        page: 'scan'
+                    },
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
     $(function () {
         $('#table-scans-data-assets').DataTable({
             processing: true,
@@ -129,6 +195,10 @@
                 }
             },
             columns: [
+                {
+                    data: 'chk',
+                    name: 'chk',
+                },
                 {
                     data: 'assets',
                     name: 'assets',

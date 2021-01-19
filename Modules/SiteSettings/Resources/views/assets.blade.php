@@ -33,9 +33,9 @@
                     </a> --}}
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
                     <div class="bc-head">@langapp('settings') > @langapp('assets')</div>
-                    <button type="submit" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
-                            @langapp('delete')</span>
+
+                    <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
 
                     <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
@@ -207,6 +207,68 @@
             "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
         });
     });
+
+    $('#table-assets-data').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $("#btn_del_select").click(function() {
+        let del_val = [];
+        $('.asset_id:checked').each(function () {
+            del_val.push(this.value);
+        });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('scans.delete_assets') }}",
+                    data:{
+                        asset_id: del_val,
+                        page: 'site'
+                    },
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+                        loading('stop_load');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+        })
+    });
+
     $(document).ready(function () {
         $('#datatype').select2();
         $('#source').select2();

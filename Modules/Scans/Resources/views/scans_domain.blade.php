@@ -96,6 +96,11 @@
                     <div class="btn-group">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"><i class="fas fa-filter"></i> @langapp('Search_Advance')</button>
                     </div>
+                    <div class="btn-group">
+                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                        </button>
+                    </div>
 
                 </div>
                 @endif

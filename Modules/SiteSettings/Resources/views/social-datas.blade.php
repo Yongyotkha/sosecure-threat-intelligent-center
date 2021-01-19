@@ -349,11 +349,10 @@ function change_status(code) {
         }
     });  
 
-    let del_val = [];
     $("#btn_del_select").click(function() {
+        let del_val = [];
         $('.data_feed_id:checked').each(function () {
             del_val.push(this.value);
-            
         });
 
         Swal.fire({
