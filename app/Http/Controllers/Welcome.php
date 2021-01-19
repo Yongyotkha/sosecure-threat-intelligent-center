@@ -47,7 +47,7 @@ class Welcome extends Controller
 
     public function emailtest()
     {
-        return view('emails.template_email_compro');
+        return view('emails.template_email_create_site_user');
     }
 
     public function clientlogin()
