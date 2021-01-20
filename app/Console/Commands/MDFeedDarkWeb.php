@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Modules\SiteSettings\Entities\SiteSettings;
 use MongoDB\BSON\UTCDateTime;
+use App\Entities\TransactionBatchjob;
 
 class MDFeedDarkWeb extends Command
 {

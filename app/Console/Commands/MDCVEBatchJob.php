@@ -8,6 +8,8 @@ use Modules\RSSFeedSettings\Entities\RSS;
 use Modules\RSSFeedSettings\Entities\TransactionRssData;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
+use App\Entities\TransactionBatchjob;
+use App\Entities\Transaction_client_cve_assets;
 
 class MDCVEBatchJob extends Command
 {
@@ -43,36 +45,44 @@ class MDCVEBatchJob extends Command
     public function handle()
     {
 
-        date_default_timezone_set("Asia/Bangkok");
-        $serversql = env('DB_HOST');
-        $dbuser =env('DB_USERNAME');
-        $dbpass = env('DB_PASSWORD');
-        $dbname =env('DB_DATABASE');
-        $dbport =env('DB_PORT');
-        $conn = mysqli_connect($serversql, $dbuser, $dbpass, $dbname, $dbport);
+      $TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEBatchJob')->first();
+      $TransactionBatchjob_Update->progress = 2;
+      $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
+      $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+      $TransactionBatchjob_Update->save();
 
-        if (!$conn) {
-            die("Connection failed: " . mysqli_connect_error());
-        } else {
+
+
+      date_default_timezone_set("Asia/Bangkok");
+      $serversql = env('DB_HOST');
+      $dbuser =env('DB_USERNAME');
+      $dbpass = env('DB_PASSWORD');
+      $dbname =env('DB_DATABASE');
+      $dbport =env('DB_PORT');
+      $conn = \mysqli_connect($serversql, $dbuser, $dbpass, $dbname, $dbport);
+
+      if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    } else {
 
     //GET URL FORM DATABASE
 
-            $urldata = "SELECT * FROM fx_logs_setting WHERE UPPER(type) = 'CVE' ";
+        $urldata = "SELECT * FROM fx_logs_setting WHERE UPPER(type) = 'CVE' ";
 
-            $result_final = mysqli_query($conn, $urldata);
+        $result_final = mysqli_query($conn, $urldata);
 
     //echo "Download url form : $linkurl";
-        }
+    }
 
 
 
 
 
 
-        try {
+    try {
 
 
-            while ($row = $result_final->fetch_assoc()) {
+        while ($row = $result_final->fetch_assoc()) {
     # code...
 
 
@@ -93,291 +103,292 @@ class MDCVEBatchJob extends Command
 
 // download & setting //
 
-                try {
-                    $linkurl = $row["link"];
-                    $path =  app_path()."/Console/Commands/temp/adddatabase/";
-                    $output_filename = app_path()."/Console/Commands/temp/adddatabase/nvdcve-1.1-modified.json.zip";
-                    $output_filename_json = app_path()."/Console/Commands/temp/adddatabase/nvdcve-1.1-modified.json";
-                    $host = $linkurl;
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $host);
-                    curl_setopt($ch, CURLOPT_VERBOSE, 1);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($ch, CURLOPT_AUTOREFERER, false);
-                    curl_setopt($ch, CURLOPT_REFERER, "http://nvd.nist.gov");
-                    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-                    curl_setopt($ch, CURLOPT_HEADER, 0);
-                    $result = curl_exec($ch);
-                    curl_close($ch);
+            try {
+                $linkurl = $row["link"];
+                $path =  app_path()."/Console/Commands/temp/adddatabase/";
+                $output_filename = app_path()."/Console/Commands/temp/adddatabase/nvdcve-1.1-modified.json.zip";
+                $output_filename_json = app_path()."/Console/Commands/temp/adddatabase/nvdcve-1.1-modified.json";
+                $host = $linkurl;
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $host);
+                curl_setopt($ch, CURLOPT_VERBOSE, 1);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_AUTOREFERER, false);
+                curl_setopt($ch, CURLOPT_REFERER, "http://nvd.nist.gov");
+                curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+                curl_setopt($ch, CURLOPT_HEADER, 0);
+                $result = curl_exec($ch);
+                curl_close($ch);
 
         //print_r($result); // prints the contents of the collected file before writing..
 
-                    $fp = fopen($output_filename, 'w');
-                    fwrite($fp, $result);
-                    fclose($fp);
-                } catch (Exception $e) {
+                $fp = fopen($output_filename, 'w');
+                fwrite($fp, $result);
+                fclose($fp);
+            } catch (Exception $e) {
 
-                } finally {
+            } finally {
 
-                }
+            }
 
-                ini_set('memory_limit', '1000M');
-                echo $output_filename;
-                $zip = \zip_open($output_filename);
-                if ($zip) {
-                    while ($zip_entry = \zip_read($zip)) {
-                        $_zip_entry_name = \zip_entry_name($zip_entry);
+            ini_set('memory_limit', '1000M');
+            echo $output_filename;
+            $zip = \zip_open($output_filename);
+            if ($zip) {
+                while ($zip_entry = \zip_read($zip)) {
+                    $_zip_entry_name = \zip_entry_name($zip_entry);
             //echo "<p>";
             //echo "Found File : " . $_zip_entry_name . "<br />";
 
-                        if ($_zip_entry_name[strlen($_zip_entry_name) - 1] == '/') {
-                            mkdir($_zip_entry_name);
-                            chmod($_zip_entry_name, 0777);
-                        } else if (zip_entry_open($zip, $zip_entry)) {
-                            $fname = zip_entry_name($zip_entry);
-                            if ($fd = fopen($path . $fname, 'w')) {
-                                fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
-                                fclose($fd);
-                            } else {
-                                echo "fopen($fname) error<br>";
-                            }
-
-                            zip_entry_close($zip_entry);
-                //chmod($fname, 0775);
+                    if ($_zip_entry_name[strlen($_zip_entry_name) - 1] == '/') {
+                        mkdir($_zip_entry_name);
+                        chmod($_zip_entry_name, 0777);
+                    } else if (zip_entry_open($zip, $zip_entry)) {
+                        $fname = zip_entry_name($zip_entry);
+                        if ($fd = fopen($path . $fname, 'w')) {
+                            fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
+                            fclose($fd);
+                        } else {
+                            echo "fopen($fname) error<br>";
                         }
-            //echo "</p>";
+
+                        zip_entry_close($zip_entry);
+                //chmod($fname, 0775);
                     }
-
-                    zip_close($zip);
-
+            //echo "</p>";
                 }
 
-                ini_set('memory_limit', '100000M');
-                $strJsonFileContents = file_get_contents($output_filename_json) or die("Error: Cannot create object");
-                $json_o = json_decode($strJsonFileContents, true);
+                zip_close($zip);
+
+            }
+
+            ini_set('memory_limit', '100000M');
+            $strJsonFileContents = file_get_contents($output_filename_json) or die("Error: Cannot create object");
+            $json_o = json_decode($strJsonFileContents, true);
 
     ////////////// real xaml file ///////////////
 
     //search_revisions
 
-                $site_id_fx_cve_assets = $row["site_id"];
-                $sql = "SELECT * FROM fx_cve_assets WHERE active = 1 AND site_id = " . $site_id_fx_cve_assets . " ";
-                $result = $conn->query($sql);
-                $data_utable_list = [];
+            $site_id_fx_cve_assets = $row["site_id"];
+            $sql = "SELECT * FROM fx_cve_assets WHERE active = 1 AND site_id = " . $site_id_fx_cve_assets . " ";
+            $result = $conn->query($sql);
+            $data_utable_list = [];
 
-                if ($result->num_rows > 0) {
-                    while ($row2 = $result->fetch_assoc()) {
+            if ($result->num_rows > 0) {
+                while ($row2 = $result->fetch_assoc()) {
 
-                        $data_utable = array();
-                        $data_utable['vendor'] = $row2['vendor'];
-                        $data_utable['title'] = $row2['title'];
-                        array_push($data_utable_list, $data_utable);
-                    }
-                } else {
-                    echo "0 results";
+                    $data_utable = array();
+                    $data_utable['vendor'] = $row2['vendor'];
+                    $data_utable['title'] = $row2['title'];
+                    array_push($data_utable_list, $data_utable);
                 }
+            } else {
+                echo "0 results";
+            }
 
-                foreach ($json_o["CVE_Items"] as $json_data) {
+            foreach ($json_o["CVE_Items"] as $json_data) {
 
-                    if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
-                        $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
+               // if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
+                if ($json_data['cve']['data_type'] == "CVE") {
+                    $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
 
-                        foreach ($json_data['configurations']['nodes'] as $vendorkey => $vendor) {
-                            try {
-                                $array_cpe_match = array();
-                                if (isset($vendor['children'])) {
-                                    foreach ($vendor['children'] as $children) {
-                                        foreach ($children['cpe_match'] as $cpe_match) {
+                    foreach ($json_data['configurations']['nodes'] as $vendorkey => $vendor) {
+                        try {
+                            $array_cpe_match = array();
+                            if (isset($vendor['children'])) {
+                                foreach ($vendor['children'] as $children) {
+                                    foreach ($children['cpe_match'] as $cpe_match) {
                                 //if($cpe_match['vulnerable']==true)
-                                            array_push($array_cpe_match, $cpe_match);
-
-                                        }
-                                    }
-                                } 
-
-                                if (isset($vendor['cpe_match']))  {
-                                    foreach ($vendor['cpe_match'] as $cpe_match) {
-                            //if($cpe_match['vulnerable']==true)
                                         array_push($array_cpe_match, $cpe_match);
+
                                     }
                                 }
+                            } 
 
-                                if (!empty($array_cpe_match)) {
-                                    foreach ($array_cpe_match as $keycpe_match => $valuecpe_match) {
-                                        if ($valuecpe_match['vulnerable'] == true) {
-                                            $cpe23Uri = explode(":", $valuecpe_match['cpe23Uri']);
+                            if (isset($vendor['cpe_match']))  {
+                                foreach ($vendor['cpe_match'] as $cpe_match) {
+                            //if($cpe_match['vulnerable']==true)
+                                    array_push($array_cpe_match, $cpe_match);
+                                }
+                            }
+
+                            if (!empty($array_cpe_match)) {
+                                foreach ($array_cpe_match as $keycpe_match => $valuecpe_match) {
+                                    if ($valuecpe_match['vulnerable'] == true) {
+                                        $cpe23Uri = explode(":", $valuecpe_match['cpe23Uri']);
                                 //print PHP_EOL.$cpe23Uri[3].PHP_EOL;
 
-                                            $data_count = search_revisions($data_utable_list, $cpe23Uri[3], 'vendor', $cpe23Uri[4], 'title');
+                                        $data_count = search_revisions($data_utable_list, $cpe23Uri[3], 'vendor', $cpe23Uri[4], 'title');
 
 
-                                            if (count($data_count) > 0) {
-                                                print PHP_EOL . '=================================================================';
-                                                print PHP_EOL . $CVE_Code . PHP_EOL;
+                                        if (count($data_count) > 0) {
+                                            print PHP_EOL . '=================================================================';
+                                            print PHP_EOL . $CVE_Code . PHP_EOL;
 
-                                                $vendor_name = $cpe23Uri[3];
-                                                $product_name = $cpe23Uri[4];
-                                                $versionvalue = $cpe23Uri[5];
-                                                $edition = $cpe23Uri[6];
-                                                if ($edition == "*") {
-                                                    $edition = "";
-                                                }
-                                                echo PHP_EOL . 'check...';
+                                            $vendor_name = $cpe23Uri[3];
+                                            $product_name = $cpe23Uri[4];
+                                            $versionvalue = $cpe23Uri[5];
+                                            $edition = $cpe23Uri[6];
+                                            if ($edition == "*") {
+                                                $edition = "";
+                                            }
+                                            echo PHP_EOL . 'check...';
 
-                                                $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $product_name . "' and vendor='" . $vendor_name . "' and version='" . $versionvalue . "' and edition='" . $edition . "'";
+                                            $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $product_name . "' and vendor='" . $vendor_name . "' and version='" . $versionvalue . "' and edition='" . $edition . "'";
 
-                                                $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-                                                $num = mysqli_num_rows($result1);
+                                            $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
+                                            $num = mysqli_num_rows($result1);
                                     //echo 'end check';
                                     //$num  = 0;
 
-                                                if ($num == 0) {
-                                                    $created_atz = date("Y-m-d H:i:s");
-                                                    $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
+                                            if ($num == 0) {
+                                                $created_atz = date("Y-m-d H:i:s");
+                                                $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
 
-                                                    try {
+                                                try {
 
-                                                        $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,created_at)
-                                                        VALUES ('" . $CVE_Code . "','" . $product_name . "','" . $vendor_name . "','" . $versionvalue . "','" . $edition . "','" . $created_at . "')";
-                                                        $result = mysqli_query($conn, $sql);
+                                                    $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,created_at)
+                                                    VALUES ('" . $CVE_Code . "','" . $product_name . "','" . $vendor_name . "','" . $versionvalue . "','" . $edition . "','" . $created_at . "')";
+                                                    $result = mysqli_query($conn, $sql);
 
-                                                    } catch (Exception $e) {
+                                                } catch (Exception $e) {
 
-                                                    } finally {
-
-                                                    }
+                                                } finally {
 
                                                 }
+
+                                            }
 
                                     //================
 
-                                                $description_data = "";
-                                                if(isset($json_data['cve']['description']['description_data'])){
-                                                    foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
-                                                        $description_data = $description_data . $descriptionvalue['value'];
-                                                    }
+                                            $description_data = "";
+                                            if(isset($json_data['cve']['description']['description_data'])){
+                                                foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
+                                                    $description_data = $description_data . $descriptionvalue['value'];
                                                 }
+                                            }
                                     // else{
                                     //     foreach ($json_data['cve']['description'] as $descriptionkey => $descriptionvalue) {
                                     //         $description_data = $description_data . $descriptionvalue['value'];
                                     //     }
                                     // }
 
-                                                $description_data = htmlspecialchars($description_data, ENT_QUOTES);
+                                            $description_data = htmlspecialchars($description_data, ENT_QUOTES);
 
-                                                $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
-                                                $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
+                                            $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
+                                            $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
 
-                                                if (!$json_data['impact']['baseMetricV3']['cvssV3']['baseScore']) {
-                                                    $baseScore = $json_data['impact']['baseMetricV2']['exploitabilityScore'];
-                                                    $baseSeverity = $json_data['impact']['baseMetricV2']['cvssV3']['severity'];
+                                            if (!$json_data['impact']['baseMetricV3']['cvssV3']['baseScore']) {
+                                                $baseScore = $json_data['impact']['baseMetricV2']['exploitabilityScore'];
+                                                $baseSeverity = $json_data['impact']['baseMetricV2']['cvssV3']['severity'];
 
-                                                }
+                                            }
 
-                                                print PHP_EOL . 'baseScore :' . $baseScore;
-                                                print PHP_EOL . 'baseSeverity :' . $baseSeverity;
+                                            print PHP_EOL . 'baseScore :' . $baseScore;
+                                            print PHP_EOL . 'baseSeverity :' . $baseSeverity;
 
-                                                $publishedDate = $json_data['publishedDate'];
-                                                $lastModifiedDate = $json_data['lastModifiedDate'];
-                                                print PHP_EOL . 'publishedDate : ' . explode('T', $publishedDate)[0];
-                                                print PHP_EOL . 'lastModifiedDate : ' . explode('T', $lastModifiedDate)[0];
+                                            $publishedDate = $json_data['publishedDate'];
+                                            $lastModifiedDate = $json_data['lastModifiedDate'];
+                                            print PHP_EOL . 'publishedDate : ' . explode('T', $publishedDate)[0];
+                                            print PHP_EOL . 'lastModifiedDate : ' . explode('T', $lastModifiedDate)[0];
 
                                     //=================================
-                                                $sql_samename = "SELECT namecve FROM fx_data_datacve WHERE namecve = '" . $CVE_Code . "'";
-                                                $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-                                                $num = mysqli_num_rows($result1);
+                                            $sql_samename = "SELECT namecve FROM fx_data_datacve WHERE namecve = '" . $CVE_Code . "'";
+                                            $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
+                                            $num = mysqli_num_rows($result1);
                                     //$num = 0;
 
-                                                if ($num > 0) {
+                                            if ($num > 0) {
 
-                                                    $add_name = $CVE_Code;
+                                                $add_name = $CVE_Code;
 
-                                                    $add_published = explode('T', $publishedDate)[0];
+                                                $add_published = explode('T', $publishedDate)[0];
 
-                                                    $add_modified = explode('T', $lastModifiedDate)[0];
+                                                $add_modified = explode('T', $lastModifiedDate)[0];
 
-                                                    $add_descript = $description_data;
+                                                $add_descript = $description_data;
 
-                                                    $add_cvsssore = $baseScore;
+                                                $add_cvsssore = $baseScore;
 
-                                                    $add_severity = $baseSeverity;
+                                                $add_severity = $baseSeverity;
 
-                                                    $add_pub_datez = date("Y-m-d H:i:s ");
-                                                    $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
+                                                $add_pub_datez = date("Y-m-d H:i:s ");
+                                                $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
 
-                                                    $created_atz = date("Y-m-d H:i:s ");
+                                                $created_atz = date("Y-m-d H:i:s ");
 
-                                                    $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
+                                                $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
 
-                                                    try {
+                                                try {
 
-                                                        update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+                                                    update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
 
-                                                    } catch (Exception $e) {
+                                                } catch (Exception $e) {
 
-                                                    } finally {
-
-                                                    }
-
-                                                } else {
-
-                                                    $add_name = $CVE_Code;
-
-                                                    $add_published = explode('T', $publishedDate)[0];
-
-                                                    $add_modified = explode('T', $lastModifiedDate)[0];
-
-                                                    $add_descript = $description_data;
-
-                                                    $add_cvsssore = $baseScore;
-
-                                                    $add_severity = $baseSeverity;
-
-                                                    $add_pub_datez = date("Y-m-d H:i:s ");
-                                                    $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
-
-                                                    $created_atz = date("Y-m-d H:i:s ");
-
-                                                    $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-
-                                                    try {
-
-                                                        insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
-
-                                                    } catch (Exception $e) {
-
-                                                    } finally {
-
-                                                    }
+                                                } finally {
 
                                                 }
+
+                                            } else {
+
+                                                $add_name = $CVE_Code;
+
+                                                $add_published = explode('T', $publishedDate)[0];
+
+                                                $add_modified = explode('T', $lastModifiedDate)[0];
+
+                                                $add_descript = $description_data;
+
+                                                $add_cvsssore = $baseScore;
+
+                                                $add_severity = $baseSeverity;
+
+                                                $add_pub_datez = date("Y-m-d H:i:s ");
+                                                $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
+
+                                                $created_atz = date("Y-m-d H:i:s ");
+
+                                                $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
+
+                                                try {
+
+                                                    insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+
+                                                } catch (Exception $e) {
+
+                                                } finally {
+
+                                                }
+
+                                            }
                                     //==========================
 
                                     //==========
 
-                                            }
-
                                         }
+
                                     }
                                 }
-
-                            } catch (Exception $e) {
-
                             }
+
+                        } catch (Exception $e) {
 
                         }
 
                     }
-        //break;
+
                 }
+        //break;
+            }
 // extract file //
 
 
-                $sql = "SELECT * FROM fx_cve_assets";
-                $result2 = mysqli_query($conn, $sql) or die(mysqli_error());
+            $sql = "SELECT * FROM fx_cve_assets";
+            $result2 = mysqli_query($conn, $sql) or die(mysqli_error());
 
     //Save Mapping
-                echo "=====================Maping===================//////";
+            echo "=====================Maping===================//////";
     /*
     $urldata2 = "SELECT * FROM fx_logs_setting WHERE id LIKE 1 ";
 
@@ -414,13 +425,13 @@ class MDCVEBatchJob extends Command
         $created_atz = date("Y-m-d H:i:s ");
         $modified = date("Y-m-d", strtotime($created_atz));
 
-        $modified_start = date('Y-m-d', strtotime(' -1 day'));
-         $sql3 =   "SELECT * FROM fx_data_datacve WHERE modified between '".$modified_start."' AND '".$modified."' and namecve IN ('".implode("','", $namecveList)."') ";
+        // $modified_start = date('Y-m-d', strtotime(' -1 day'));
+        // $sql3 =   "SELECT * FROM fx_data_datacve WHERE modified between '".$modified_start."' AND '".$modified."' and namecve IN ('".implode("','", $namecveList)."') ";
         
         //$modified ='2019-08-08';
-      //  $sql3  = 'SELECT *
-       // FROM `fx_data_datacve`
-      //  WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        $sql3  = 'SELECT *
+        FROM `fx_data_datacve`
+        WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
         // $sql3  = 'SELECT *
         // FROM `data_datacve`
@@ -453,7 +464,24 @@ class MDCVEBatchJob extends Command
                 '" . $row3['site_id'] . "',
                 '" . $row4['updated_at'] . "','" . $created_at . "','" . $row3['id'] . "')";
 
-                $result = mysqli_query($conn, $insertdata);
+
+
+
+                $result = \mysqli_query($conn, $insertdata);
+
+
+
+                 $sql_samename_last = "SELECT id FROM fx_data_datacve_mapping order by id desc";
+                 $result1_last = mysqli_query($conn, $sql_samename_last) or die(mysqli_error());
+                 $num_last = mysqli_fetch_assoc($result1_last);
+                
+                $insertdata_mapping = "INSERT INTO fx_transaction_client_data_datacve_mapping (site_id, transaction_id, transaction_mode, transaction_data_status, status, created_at)
+                VALUES  ('" . $row3['site_id'] . "',
+                '" .  $num_last['id'] . "',
+                '" . "insert". "',
+                '" . "1". "','" . "1". "','" .  date("Y-m-d H:i:s ") . "')";
+                $result = \mysqli_query($conn, $insertdata_mapping);
+
             }
 
             
@@ -539,7 +567,11 @@ class MDCVEBatchJob extends Command
 }
 
 
-
+$TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEBatchJob')->first();
+$TransactionBatchjob_Update->progress = 1;
+$TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
+$TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+$TransactionBatchjob_Update->save();
 
 }
 
