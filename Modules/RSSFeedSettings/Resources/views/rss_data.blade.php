@@ -154,7 +154,8 @@
                                                     <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
                                                     <span class="label-text"></span>
                                                 </label>
-                                            </th>                                      
+                                            </th>   
+                                            <th>Source</th>                                   
                                             <th>Title</th>
                                             <th>Description</th>
                                             <th>Link</th>
@@ -177,7 +178,25 @@
     {{-- ------------------- --}}
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-
+    <div class="modal" id="delete_rss_data_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_domain_submit" onclick="delete_rssData_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </section>
 
@@ -258,49 +277,40 @@
         datatable();
     }
 
-
+    $( "#btn-change-status" ).click(function() {
+        rss_id = [];
+        $('#delete_rss_data_modal').modal('show');
+    });
     
-    $("#btn-change-status").click(function() {
+    function delete_rssData_select_confirm(){
         $('.rss_id:checked').each(function () {
             rss_id.push(this.value);
         });
-        Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('RSSFeedSettingsController.delete_checked') }}",
-                    data:{id: rss_id},
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                    success:function(response) {
-                        loading('stop_load');
-                        toastr.success(response.message, '@langapp('response_status')');
-                        window.location.href = response.redirect;
-                    },
-                    error: function (error){
-                        loading('stop_load');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-    
+        $.ajax({
+            type:"POST",
+            url:"{{ route('RSSFeedSettingsController.delete_checked') }}",
+            data:{
+                id:rss_id
+            },
+            beforeSend: function(){
+                $('.delete_domain_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_domain_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
                 });
-
+                toastr.error(errorsHtml, '@langapp('response_status') ');
             }
-        })
-    });
+        });
+
+    };
         
     $(function () {
         $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
@@ -355,6 +365,23 @@
                 },
                 {
                     targets: 1,
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    width: '1px',
+                    render: function (data, type, full, meta) {
+
+                        if(full.get_rss_source!=null){
+                           
+                            return '<a href="'+full.get_rss_source.url+'" target="_blank" class="btn btn-xs btn-info"><i class="fas fa-link"></i>'+' '+full.get_rss_source.name.charAt(0).toUpperCase() + full.get_rss_source.name.slice(1)+'</a>';
+                        }else{
+                            return '';
+                        }
+                       
+                    },
+                },
+                {
+                    targets: 2,
                     width: '10px',
                     render: function (data, type, full, meta) {
     
@@ -362,7 +389,7 @@
                     },
                 },
                 {
-                    targets: 2,
+                    targets: 3,
                     width: '10px',
                     ype: 'html',
                     render: function (data, type, full, meta) {
@@ -372,7 +399,7 @@
                     },
                 },
                 {
-                    targets: 3,
+                    targets: 4,
                     orderable: false,
                     searchable: false,
                     sortable: false,
@@ -388,7 +415,7 @@
                 },
                 
                 {
-                    targets: 4,
+                    targets: 5,
                     width: '60px',
                     render: function (data, type, full, meta) {
               
@@ -399,7 +426,7 @@
                 },
 
                 {
-                    targets: 5,
+                    targets: 6,
                     width: '10px',
                     render: function (data, type, full, meta) {
                         if(full.get_rss_news!=null){
@@ -411,7 +438,7 @@
                     },
                 },
                 {
-                    targets: 6,
+                    targets: 7,
                     orderable: false,
                     searchable: false,
                     sortable: false,
@@ -419,12 +446,12 @@
                     render: function (data, type, full, meta) {
                         if(full.get_rss_news!=null){
                 
-                                return '<a href="{{config("base_url")}}delete-rss_data/'+full.code+'" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
+                                return '<a href="{{config("base_url")}}delete-rss_data/'+full.code+'" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>';
 
                         }else {
                             let html = '';
                             html += `<a href="${base_url}/rssfeedsettings/rss_data/news/create/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-share-square"></i></a>`;
-                            html += `&nbsp <a href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                            html += `&nbsp <a href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                        
                             return html;
                         }

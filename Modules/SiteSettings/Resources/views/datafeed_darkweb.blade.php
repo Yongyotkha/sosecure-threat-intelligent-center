@@ -50,7 +50,7 @@
                             <option value="">All Site</option>
                             @if($SiteSettings)
                             @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                            <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
                             @endforeach
                             @endif
                         </select>
@@ -567,8 +567,10 @@ $("#btn_darkweb_feed_search").click(function() {
 
 
 function table_social_data(){
+    let site = $('#site').val();
     let search = $('#search').val();
     let source_select = $('#source_select').val();
+
     $('#table_darkweb_feed').DataTable({
         processing: true,
         serverSide: true,
@@ -585,6 +587,7 @@ function table_social_data(){
                 "check_all" : check_all,
                 "check_pending" : check_pending,
                 "check_approved" : check_approved,
+                "site" : site;
             },
             type: "POST",
         },

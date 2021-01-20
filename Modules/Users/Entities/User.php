@@ -84,7 +84,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
 
      public function get_UserSite()
     {
-        return $this->hasMany(UserSite::class, 'user_id','id');
+        return $this->hasMany(UserSite::class, 'user_id','id')->with('get_site');
     }
 
     public function profile()

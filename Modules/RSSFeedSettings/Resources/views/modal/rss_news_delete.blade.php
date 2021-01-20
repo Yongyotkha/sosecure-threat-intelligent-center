@@ -5,7 +5,7 @@
             <h4 class="modal-title">@langapp('delete')   {{  $rssfeedsettings->title  }}</h4>
         </div>
 
-        {!! Form::open(['route' => ['rssfeedsettings.rss_news_delete_process', $rssfeedsettings->code], 'class' => 'ajaxifyForm', 'method' => 'DELETE']) !!}
+        {!! Form::open(['route' => ['rssfeedsettings.rss_news_delete_process', $rssfeedsettings->code], 'class' => 'ajaxifyForm', 'method' => 'post']) !!}
 
         <div class="modal-body">
             <p class="text-danger">@langapp('delete_warning')  </p>

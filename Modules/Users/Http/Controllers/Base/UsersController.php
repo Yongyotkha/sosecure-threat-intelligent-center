@@ -251,10 +251,10 @@ abstract class UsersController extends Controller
 
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile');
+                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
-                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile');
+                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
                 $model2 = UserSite::select('site_id')->where('user_id',@Auth::user()->id)->get()->toArray();
                 
                 $model = $model->whereHas('get_UserSite', function ($query) use ($model2) {
@@ -263,7 +263,7 @@ abstract class UsersController extends Controller
 
             }else{
 
-                $model = User::where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile');
+                $model = User::where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }
         
 
@@ -278,9 +278,10 @@ abstract class UsersController extends Controller
                 $query->where('site_id', $request->site);
             });
         }
-
+        // $model = $model->first();
+        // dd([0]->get_site->name);
         $model->get();
-
+        
         return DataTables::of($model)
             ->editColumn(
                 'name',
@@ -304,6 +305,27 @@ abstract class UsersController extends Controller
                 function ($model) {
                     $str = $model->on_holiday ? '<i class="fas fa-plane-departure text-danger"></i> ' : '';
                     return $str .= str_limit(@$model->profile->job_title, 15);
+                }
+            )
+            ->editColumn(
+                'site_name',
+                function ($model) {
+                    $html = '';
+                    if($model->get_UserSite){
+
+                        foreach ($model->get_UserSite as $key) {
+                            if($key->get_site){
+                                $html .= $key->get_site->name.',';
+                            }
+                            
+                            // $site = $key->get_site->name;
+                            // $html.= '"'.$site.'"';
+                            # code...
+                        }
+                    }
+                    $html=rtrim($html,",");
+                    
+                    return $html;
                 }
             )
             ->editColumn(
