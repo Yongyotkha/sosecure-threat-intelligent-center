@@ -2,6 +2,8 @@
 
 namespace Modules\SiteSettings\Http\Controllers;
 
+use App\Entities\Transaction_client_webdefacment_image_mark;
+use App\Entities\Transaction_client_webdefacment_setting;
 use Auth;
 use Artisan;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
@@ -151,6 +153,11 @@ class WebDefacementController extends Controller
             $site_id = $WebdefacmentSetting->site_id;
             $SiteSettings = SiteSettings::where('id',$site_id)->first();
             if($SiteSettings) {
+                $Transaction_client_webdefacment_setting = Transaction_client_webdefacment_setting::where('site_id', $site_id)->where('transaction_id', $WebdefacmentSetting -> id)->first();
+                $Transaction_client_webdefacment_setting -> transaction_mode = 'delete';
+                $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+                $Transaction_client_webdefacment_setting -> status = 1;
+                $Transaction_client_webdefacment_setting -> save();
                 $site_code = $SiteSettings->code;
             }
         }
@@ -325,6 +332,13 @@ class WebDefacementController extends Controller
                         $WebdefacmentSetting->status_add = 1;
                     }
                     $WebdefacmentSetting->save();
+
+                    $Transaction_client_webdefacment_setting = Transaction_client_webdefacment_setting::where('transaction_id', $WebdefacmentSetting -> id)->first();
+                    $Transaction_client_webdefacment_setting -> site_id = $site_id;
+                    $Transaction_client_webdefacment_setting -> transaction_mode = 'update';
+                    $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+                    $Transaction_client_webdefacment_setting -> status = 1;
+                    $Transaction_client_webdefacment_setting -> save();
                 } else {
                     // $WebdefacmentSetting = new WebdefacmentSetting;
                     // $WebdefacmentSetting->code = generator_uuid();
@@ -417,6 +431,14 @@ class WebDefacementController extends Controller
             $WebdefacmentSetting->status_add = 0;
             $WebdefacmentSetting->active = 0;
             $WebdefacmentSetting->save();
+
+            $Transaction_client_webdefacment_setting = new Transaction_client_webdefacment_setting();
+            $Transaction_client_webdefacment_setting -> site_id = $site_id;
+            $Transaction_client_webdefacment_setting -> transaction_id = $WebdefacmentSetting -> id;
+            $Transaction_client_webdefacment_setting -> transaction_mode = 'insert';
+            $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+            $Transaction_client_webdefacment_setting -> status = 1;
+            $Transaction_client_webdefacment_setting -> save();
         }
 
 
@@ -491,6 +513,14 @@ class WebDefacementController extends Controller
         $WebdefacmentImageMark -> width = $request -> width;
         $WebdefacmentImageMark -> save();
 
+        $Transaction_client_webdefacment_image_mark = new Transaction_client_webdefacment_image_mark();
+        $Transaction_client_webdefacment_image_mark -> transaction_id = $WebdefacmentImageMark -> id;
+        $Transaction_client_webdefacment_image_mark -> transaction_mode = 'insert';
+        $Transaction_client_webdefacment_image_mark -> transaction_data_status = 1;
+        $Transaction_client_webdefacment_image_mark -> status = 1;
+        $Transaction_client_webdefacment_image_mark -> save();
+
+
         $res = [
             'data' => $WebdefacmentImageMark -> id
         ];
@@ -503,6 +533,13 @@ class WebDefacementController extends Controller
             $WebdefacmentImageMark -> top = $request -> top;
             $WebdefacmentImageMark -> left = $request -> left;
             $WebdefacmentImageMark -> save();
+
+            $Transaction_client_webdefacment_image_mark = Transaction_client_webdefacment_image_mark::where('transaction_id', $WebdefacmentImageMark -> id)->first();
+            $Transaction_client_webdefacment_image_mark -> transaction_mode = 'update';
+            $Transaction_client_webdefacment_image_mark -> transaction_data_status = 1;
+            $Transaction_client_webdefacment_image_mark -> status = 1;
+            $Transaction_client_webdefacment_image_mark -> save();
+
             $response = array(
                 'error' => '', 
                 'status_code' => '200',
@@ -520,6 +557,13 @@ class WebDefacementController extends Controller
             $WebdefacmentImageMark -> hight = $request -> height;
             $WebdefacmentImageMark -> width = $request -> width;
             $WebdefacmentImageMark -> save();
+
+            $Transaction_client_webdefacment_image_mark = Transaction_client_webdefacment_image_mark::where('transaction_id', $WebdefacmentImageMark -> id)->first();
+            $Transaction_client_webdefacment_image_mark -> transaction_mode = 'update';
+            $Transaction_client_webdefacment_image_mark -> transaction_data_status = 1;
+            $Transaction_client_webdefacment_image_mark -> status = 1;
+            $Transaction_client_webdefacment_image_mark -> save();
+
             $response = array(
                 'error' => '', 
                 'status_code' => '200',
@@ -548,6 +592,12 @@ class WebDefacementController extends Controller
     public function remove_item(Request $request){
         $WebdefacmentImageMark = WebdefacmentImageMark::find($request->web_defacment_image_mark_id);
         if($WebdefacmentImageMark){
+            $Transaction_client_webdefacment_image_mark = Transaction_client_webdefacment_image_mark::where('transaction_id', $WebdefacmentImageMark -> id)->first();
+            $Transaction_client_webdefacment_image_mark -> transaction_mode = 'delete';
+            $Transaction_client_webdefacment_image_mark -> transaction_data_status = 1;
+            $Transaction_client_webdefacment_image_mark -> status = 1;
+            $Transaction_client_webdefacment_image_mark -> save();
+
             $WebdefacmentImageMark -> delete();
             $response = array(
                 'error' => '', 

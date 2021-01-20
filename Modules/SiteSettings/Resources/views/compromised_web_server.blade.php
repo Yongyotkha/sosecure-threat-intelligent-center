@@ -337,7 +337,27 @@
     </div>
 </div>
 
-<div class="modal in fixed-left" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+    <div class="modal-dialog modal-dialog-aside" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">@langapp('delete')</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <p class="text-danger">@langapp('delete_warning')  </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit" onclick="delete_web_server_save()"><i class="fas fa-paper-plane"></i> OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- <div class="modal in fixed-left" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-aside" role="document">
         <div class="modal-content">
@@ -367,7 +387,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> --}}
 
 
 
@@ -1083,14 +1103,16 @@
 
     function delete_web_server(id){
         web_server_id_delete = id;
+        web_server_id_delete_chang=[];
      
     }
 
     function delete_web_server_save(){
-        console.log(web_server_id_delete);
+      
         axios.post('{{route('compromised_web_server.web_server_delete')}}', {
             id: web_server_id_delete,
             site:{!!json_encode($siteID)!!},
+            id_chang: web_server_id_delete_chang,
         }).then(function (response) {
 
             toastr.success(response.data.message, '@langapp('response_status')');
@@ -1107,61 +1129,12 @@
     }
 
     $("#btn_del_select").click(function() {
+        $('#delete_web_sever').modal('show');
         $('.web_server_id:checked').each(function () {
             web_server_id_delete_chang.push(this.value);
             
         });
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('compromised_web_server.web_server_delete') }}",
-                    data:{
-                        id_chang: web_server_id_delete_chang,
-                        site:{!!json_encode($siteID)!!},
-                    },
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                    success:function(response) {
-                        loading('stop_load');
-                        toastr.success(response.message, '@langapp('response_status')');
-                        window.location.href = response.redirect;
-                    },
-                    error: function (error){
-                        loading('stop_load');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-                
-                });
-
-            }
-        })
     });
-
-
-
-
-
-
-
-
-
 
 
 </script>

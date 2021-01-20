@@ -8,6 +8,7 @@ use Modules\RSSFeedSettings\Entities\RSS;
 use Modules\RSSFeedSettings\Entities\TransactionRssData;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
+use App\Entities\TransactionBatchjob;
 
 class MDCVEDataYear extends Command
 {
@@ -43,7 +44,11 @@ class MDCVEDataYear extends Command
     public function handle()
     {
 
-
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEDataYear')->first();
+        $TransactionBatchjob_Update->progress = 1;
+        $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
 
         date_default_timezone_set("Asia/Bangkok");
         $serversql = env('DB_HOST');
@@ -56,103 +61,103 @@ class MDCVEDataYear extends Command
 // download & setting //
 
         try {
-    $year = date('Y');
-    $output_filename = app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json.zip";
-    $linkurl = 'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-' . $year . '.json.zip';
-    $host = $linkurl;
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $host);
-    curl_setopt($ch, CURLOPT_VERBOSE, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_AUTOREFERER, false);
-    curl_setopt($ch, CURLOPT_REFERER, "http://nvd.nist.gov");
-    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    $result = curl_exec($ch);
-    curl_close($ch);
+            $year = date('Y');
+            $output_filename = app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json.zip";
+            $linkurl = 'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-' . $year . '.json.zip';
+            $host = $linkurl;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $host);
+            curl_setopt($ch, CURLOPT_VERBOSE, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_AUTOREFERER, false);
+            curl_setopt($ch, CURLOPT_REFERER, "http://nvd.nist.gov");
+            curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            $result = curl_exec($ch);
+            curl_close($ch);
 
     //print_r($result); // prints the contents of the collected file before writing..
-    echo $output_filename;
-    $fp = fopen($output_filename, 'w');
-    fwrite($fp, $result);
-    fclose($fp);
+            echo $output_filename;
+            $fp = fopen($output_filename, 'w');
+            fwrite($fp, $result);
+            fclose($fp);
 
-} catch (Exception $e) {
+        } catch (Exception $e) {
 
-} finally {
+        } finally {
 
-}
+        }
 
 // extract file //
-ini_set('memory_limit', '1000M');
+        ini_set('memory_limit', '1000M');
 
-$zip = \zip_open(app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json.zip");
+        $zip = \zip_open(app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json.zip");
 
-if ($zip) {
-    while ($zip_entry = \zip_read($zip)) {
-        $_zip_entry_name = app_path()."/Console/Commands/temp/" . zip_entry_name($zip_entry);
+        if ($zip) {
+            while ($zip_entry = \zip_read($zip)) {
+                $_zip_entry_name = app_path()."/Console/Commands/temp/" . zip_entry_name($zip_entry);
         // echo "<p>";
         // echo "Found File : " . $_zip_entry_name . "<br />";
-        if ($_zip_entry_name[strlen($_zip_entry_name) - 1] == '/') {
-            mkdir($_zip_entry_name);
-            chmod($_zip_entry_name, 0777);
-        } else if (zip_entry_open($zip, $zip_entry)) {
-            $fname = app_path()."/Console/Commands/temp/" . zip_entry_name($zip_entry);
-            if ($fd = fopen($fname, 'w')) {
-                fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
-                fclose($fd);
-            } else {
-                echo "fopen($fname) error<br>";
+                if ($_zip_entry_name[strlen($_zip_entry_name) - 1] == '/') {
+                    mkdir($_zip_entry_name);
+                    chmod($_zip_entry_name, 0777);
+                } else if (zip_entry_open($zip, $zip_entry)) {
+                    $fname = app_path()."/Console/Commands/temp/" . zip_entry_name($zip_entry);
+                    if ($fd = fopen($fname, 'w')) {
+                        fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
+                        fclose($fd);
+                    } else {
+                        echo "fopen($fname) error<br>";
+                    }
+
+                    \zip_entry_close($zip_entry);
+//chmod($fname, 0775);
+                }
+        //echo "</p>";
             }
 
-            \zip_entry_close($zip_entry);
-//chmod($fname, 0775);
+            zip_close($zip);
+
         }
-        //echo "</p>";
-    }
-
-    zip_close($zip);
-
-}
 
 ////////////// real xaml file ///////////////
 
 ////////////// real xaml file ///////////////
 
-ini_set('memory_limit', '100000M');
-$strJsonFileContents = file_get_contents(app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json") or die("Error: Cannot create object");
-$json_o = json_decode($strJsonFileContents, true);
-foreach ($json_o["CVE_Items"] as $json_data) {
-    if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
+        ini_set('memory_limit', '100000M');
+        $strJsonFileContents = file_get_contents(app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json") or die("Error: Cannot create object");
+        $json_o = json_decode($strJsonFileContents, true);
+        foreach ($json_o["CVE_Items"] as $json_data) {
+            if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
    // if ($json_data['cve']['data_type'] == "CVE") {
-        $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
-        print PHP_EOL . '=================================================================';
-        print PHP_EOL . $CVE_Code . PHP_EOL;
-        $array_cpe_match = array();
+                $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
+                print PHP_EOL . '=================================================================';
+                print PHP_EOL . $CVE_Code . PHP_EOL;
+                $array_cpe_match = array();
         //print_r($json_data['configurations']['nodes']);
-        foreach ($json_data['configurations']['nodes'] as $vendorkey => $vendor) {
-            $array_cpe_match = array();
-            if (isset($vendor['children'])) {
-                foreach ($vendor['children'] as $children) {
-                    foreach ($children['cpe_match'] as $cpe_match) {
-                        if($cpe_match['vulnerable']==true)
-                            array_push($array_cpe_match, $cpe_match);
+                foreach ($json_data['configurations']['nodes'] as $vendorkey => $vendor) {
+                    $array_cpe_match = array();
+                    if (isset($vendor['children'])) {
+                        foreach ($vendor['children'] as $children) {
+                            foreach ($children['cpe_match'] as $cpe_match) {
+                                if($cpe_match['vulnerable']==true)
+                                    array_push($array_cpe_match, $cpe_match);
 
+                            }
+                        }
+                    } 
+                    if (isset($vendor['cpe_match'])) {
+                        foreach ($vendor['cpe_match'] as $cpe_match) {
+                            if($cpe_match['vulnerable']==true)
+                                array_push($array_cpe_match, $cpe_match);
+                        }
                     }
                 }
-            } 
-            if (isset($vendor['cpe_match'])) {
-                foreach ($vendor['cpe_match'] as $cpe_match) {
-                    if($cpe_match['vulnerable']==true)
-                        array_push($array_cpe_match, $cpe_match);
-                }
-            }
-        }
-        print_r($array_cpe_match);
-        print PHP_EOL . '==========================CPE=======================================';
-        foreach ($array_cpe_match as $vendorkey => $vendor) {
-            $vendor_text = @$vendor['cpe23Uri'];
-            $vender_split = explode(":", $vendor_text);
+                print_r($array_cpe_match);
+                print PHP_EOL . '==========================CPE=======================================';
+                foreach ($array_cpe_match as $vendorkey => $vendor) {
+                    $vendor_text = @$vendor['cpe23Uri'];
+                    $vender_split = explode(":", $vendor_text);
             $vendor_name = @$vender_split[4]; //microsoft
             $product_name = @$vender_split[3];
             $product_version = @$vender_split[5];
@@ -294,15 +299,15 @@ foreach ($json_o["CVE_Items"] as $json_data) {
 
             try {
 
-             $this->update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+               $this->update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
 
-         } catch (Exception $e) {
+           } catch (Exception $e) {
 
-         } finally {
+           } finally {
 
-         }
+           }
 
-     } else {
+       } else {
 
         $add_name = $CVE_Code;
 
@@ -325,22 +330,26 @@ foreach ($json_o["CVE_Items"] as $json_data) {
 
         try {
 
-         $this->insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+           $this->insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
 
-     } catch (Exception $e) {
+       } catch (Exception $e) {
 
-     } finally {
+       } finally {
 
-     }
+       }
 
- }
+   }
         //==========================
 
 }
     //break;
 
 
-
+$TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEDataYear')->first();
+$TransactionBatchjob_Update->progress = 1;
+$TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
+$TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+$TransactionBatchjob_Update->save();
 }
 
 

@@ -117,41 +117,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{-- <tr>
-                                            <td>
-                                                <label>
-                                                    <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                Pantip
-                                            </td>
-                                            <td>
-                                                Fibre
-                                            </td>
-                                            <td>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                            </td>
-                                            <td class="no-wrap">
-                                                2020-12-2020 12:12
-                                            </td>
-                                            <td>
-                                                1
-                                            </td>
-                                            <td>
-                                                <label class="switch">
-                                                    <input type="hidden" value="FALSE" name="">
-                                                    <input type="checkbox" name="status" checked value="TRUE">
-                                                    <span></span>
-                                                </label>
-                                            </td>
-                                            <td class="no-wrap text-center">
-                                                <button class="btn btn-danger btn-xs">
-                                                    @icon('solid/trash-alt')
-                                                </button>
-                                            </td>
-                                        </tr> --}}
+
                                     </tbody>
                                 </table>
                             </div>
@@ -199,6 +165,26 @@
             </div>
         </div>
     </div> --}}
+
+    <div class="modal" id="delete_com_data_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_com_data_submit" onclick="delete_com_data_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </section>
 
@@ -517,52 +503,41 @@
 
     });
 
+
+    function delete_com_data_select_confirm(){
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('compromised_feed.delete_select_process') }}",
+            data:{
+                id: val_id,
+                site_id : {!!json_encode($siteID)!!},
+            },
+            beforeSend: function(){
+                $('.delete_com_data_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_com_data_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
     $("#btn_del_select").click(function() {
+        $('#delete_com_data_modal').modal('show');
         $('.val_id:checked').each(function () {
             val_id.push(this.value);
             
         });
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('compromised_feed.delete_select_process') }}",
-                    data:{
-                        id: val_id,
-                        site_id : {!!json_encode($siteID)!!},
-                    },
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                    success:function(response) {
-                        loading('stop_load');
-                        toastr.success(response.message, '@langapp('response_status')');
-                        window.location.href = response.redirect;
-                    },
-                    error: function (error){
-                        loading('stop_load');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-                
-                });
-
-            }
-        })
     });
 
 
