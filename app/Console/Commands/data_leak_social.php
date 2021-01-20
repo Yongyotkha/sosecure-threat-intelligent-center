@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 use DB;
 use App\leak_socail_ref_temp;
 use Modules\SiteSettings\Entities\Site_keywords;
+use App\Entities\TransactionBatchjob;
 
 class data_leak_social extends Command
 {
@@ -34,6 +35,12 @@ class data_leak_social extends Command
      */
     public function handle()
     {
+
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','data_leak_social')->first();
+        $TransactionBatchjob_Update->progress = 2;
+        $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
        // require 'C://xampp//htdocs//threat-intelligent-center//vendor//autoload.php'; // include Composer's autoloader]
        // $mongo = new \MongoDB\Client('mongodb://10.104.0.10:27017');
 // Manager Class
@@ -127,8 +134,8 @@ class data_leak_social extends Command
                         $DataLeakFeedTemp -> data_id = $data -> _id;
                         $DataLeakFeedTemp -> sourceid = $data -> sourceid;
                         $DataLeakFeedTemp -> keyword = $keyword;
-                        $DataLeakFeedTemp -> source_name = $source -> source;
-                        $DataLeakFeedTemp -> tag = $source -> tag;
+                        $DataLeakFeedTemp -> source_name = @$source -> source;
+                        $DataLeakFeedTemp -> tag = @$source -> tag;
                         $DataLeakFeedTemp -> feedtimepost = Carbon::now();
                         $DataLeakFeedTemp -> feedcontent = $data -> feedcontent;
                         $DataLeakFeedTemp -> feedtimestamp = Carbon::now();
@@ -157,5 +164,10 @@ class data_leak_social extends Command
             }
 
         } 
+        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','data_leak_social')->first();
+        $TransactionBatchjob_Update->progress = 1;
+        $TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+        $TransactionBatchjob_Update->save();
     }
 }
