@@ -7,7 +7,73 @@
                 @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">@langapp('monitoring')>Batch Job</div>
+
+            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="display: none;">
+                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+            </button>
+             <div class="pull-right" style="margin-top: 8px; width: 300px; display: none;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                    <option value="">All Site</option>
+                    @if($SiteSettings)
+                        @foreach($SiteSettings as $SiteSettings_val)
+                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
         </header>
+
+        <section id="scrollable_news" class="scrollable wrapper bg-white" >
+            <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                <div class="container-fluid" style="padding: 2rem;">
+                    <div class="row m-b-md">
+                        <div class="col-lg-12">
+                            <div class="row d-flex align-items-center">
+                                <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
+                                <div class="col-sm-11 col-xs-12">
+                                    <input type="text" id="Keywords" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="row d-flex align-items-center">
+                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Data Leak</label>
+                                <div class="col-sm-9 col-xs-12">
+                                    <select id="social" class="select2-option form-control">
+                                        <option value="" >All</option>
+                                        <option value="1" selected>All</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down"></i>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <div style="margin-top: 8px;">
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-right mt-2">
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive">
+                                <i class="fas fa-search"></i>
+                                @langapp('apply')
+                            </button>
+                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
         <section class="scrollable wrapper">
             <section class="panel panel-default">
@@ -46,19 +112,86 @@
 
 @push('pagestyle')
     @include('stacks.css.datatables')
+    @include('stacks.css.datepicker')
+    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
 @push('pagescript')
 @include('stacks.js.datatables')
+@include('stacks.js.datepicker')
+@include('stacks.js.daterangpicker')
 
 <script>
 $(function () {
     data_table();
+    $('#hide-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#hide-advance-search').toggle();
+    });
+    var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+    var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
+    function cb(start, end) {
+        $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        console.log(start.format('YYYY-MM-DD hh:mm A'));
+    }
+    
+    $('#newsrange').daterangepicker({
+        timePicker: true,
+        {{--timePicker24Hour: true,--}}
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'{{--format: 'M/DD HH:mm A'--}}
+        },
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    
+    cb(start, end);
+
+    $("#btn_news_search").click(function() {
+        let startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        let endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        console.log(startDate);
+        console.log(endDate);
+        let Keywords = $("#Keywords").val();
+        let social = $("#social").val();
+        
+        console.log(social);
+        f_search = 1;
+        page = 1;
+        $('#count_news').text(0);
+        page_stop = true;
+        load_more_search(page,f_search)
+    });
+
+
+        $("#btn_news_reset").click(function() {
+            $("#Keywords").val('');
+            $("#social").val('').trigger("change");
+           
+            start = moment();
+            end = moment();
+            cb(start, end);
+
+            f_search = 0;
+            page = 1;
+            $('#count_news').text(0);
+            page_stop = true;
+            load_more_search(page,f_search)
+
+        });
 });
 
 function data_table(){
         $('#table-monitoring-batchjob').DataTable({
-            searching: true,
+            searching: false,
             ordering: true,
             pageLength: 25,
             processing: true,
@@ -103,13 +236,13 @@ function data_table(){
                     targets: 2,
                     render: function (data, type, row) {
                         let inner = '';
-                        if(row.progress == 0){
+                        if(row.progress == 999){
                             inner = '';
                             inner = '<span class="badge badge-danger" style="background-color: #ea2e49;">Not Working</span';
-                        }else if(row.progress == 1){
+                        }else if(row.progress == 0){
                             inner = '';
                             inner = '<span class="badge badge-wait" style="background-color: #ea2e49;">Waiting</span';
-                        }else if(row.progress == 2){
+                        }else if(row.progress == 2 || row.progress == 1){
                             inner = '';
                             inner = '<span class="badge badge-success" style="background-color: #ea2e49;">Progress</span';
                         }else{
