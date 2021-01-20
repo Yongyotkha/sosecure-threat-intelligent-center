@@ -126,6 +126,7 @@
                                             <th class="">@langapp('name') </th>
                                             <th class="">@langapp('email') </th>
                                             <th class=" ">@langapp('job_title') </th>
+                                            <th class=" "> Site Name </th>
                                             <th class="">@langapp('mobile') </th>
                                             <th class="">@langapp('city') </th>
                                             <th class="col-date">@langapp('date') </th>
@@ -237,12 +238,13 @@
                     "role" :role,
                 }
             },
-            order: [[ 0, "desc" ]],
+            order: [[ 7, "desc" ]],
             columns: [
                 { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
                 { data: 'job_title', name: 'profile.job_title' },
+                { data: 'site_name', name: 'site_name' },
                 { data: 'mobile', name: 'profile.mobile' },
                 { data: 'city', name: 'profile.city' },
                 { data: 'created_at', name: 'created_at' }
