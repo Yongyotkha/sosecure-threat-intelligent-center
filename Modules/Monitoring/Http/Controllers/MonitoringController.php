@@ -114,12 +114,61 @@ class MonitoringController extends Controller
         
         $model = '';
         $html = '';
-        if ($request->search_ == 1) {   
+        if ($request->isSearch == 1) {
+            
+            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name')->where('status', 1);
+
+            if($request->isDateSearch==1){
+                $date_start_explode = explode(" ",$request->startDate);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start_time_time);
+
+                $date_end_explode = explode(" ",$request->endDate);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                $model = $model -> whereBetween('transcation_date',array($date_start_datetime_format,$date_end_datetime_format));
+                
+            }
+
+            if($request->Keywords){
+                $keywords = "%".$request->Keywords."%";
+                $model = $model->where(function ($query) use ($keywords){
+                    $query->where('transaction_batchjob.name','LIKE', $keywords)
+                    ->orWhere('mode', 'LIKE', $keywords);
+                });
+            }
+
+            if($request->select||$request->select==="0"){
+                if($request->select==="0"){
+                    $model = $model->where('progress', $request->select);
+                }else if($request->select=='1'){
+                    $model = $model->whereIn('progress', [1, 2]);
+                }else{
+
+                }
+            }
+
+            if($request->sitecode){
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$request->sitecode)->first();
+                $model = $model->where('site_id', $SiteSettings->id);
+            }
+
+            $model = $model->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
             
         } else {
-            //DB::raw('site_id as dd'),
-            $model = TransactionBatchjob::where('status', 1)->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id')
-            ->select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name');
+
+            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name')->where('status', 1)->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
+        
         }
         
             $model = $model;

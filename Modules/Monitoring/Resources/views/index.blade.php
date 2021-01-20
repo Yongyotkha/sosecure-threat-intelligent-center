@@ -8,10 +8,10 @@
             </a> --}}
             <div class="bc-head">@langapp('monitoring')>Batch Job</div>
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="display: none;">
+            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </button>
-             <div class="pull-right" style="margin-top: 8px; width: 300px; display: none;">
+             <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
                     @if($SiteSettings)
@@ -39,11 +39,13 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Data Leak</label>
+                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Progress</label>
                                 <div class="col-sm-9 col-xs-12">
-                                    <select id="social" class="select2-option form-control">
-                                        <option value="" >All</option>
-                                        <option value="1" selected>All</option>
+                                    <select id="select_val" class="select2-option form-control">
+                                        <option value="" selected>All</option>
+                                        {{-- <option value="0" >Not Working</option> --}}
+                                        <option value="0" >Waiting</option>
+                                        <option value="1" >Progress</option>
                                     </select>
                                 </div>
                             </div>
@@ -121,8 +123,18 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 
+
 <script>
+    var isDateSearch = 0;
+    var isSearch = 0;
+    var startDate =  '';
+    var endDate = '';
+    var Keywords = '';
+    var select = '';
+    var sitecode = '';
 $(function () {
+    
+    
     data_table();
     $('#hide-advance-search').hide();
     $('#advance-search').click(function(){
@@ -130,11 +142,8 @@ $(function () {
     });
     var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
     var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
-    function cb(start, end) {
-        $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-        console.log(start.format('YYYY-MM-DD hh:mm A'));
-    }
     
+
     $('#newsrange').daterangepicker({
         timePicker: true,
         {{--timePicker24Hour: true,--}}
@@ -155,42 +164,57 @@ $(function () {
     
     cb(start, end);
 
+    $('#newsrange').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        console.log(isDateSearch);
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+            
+        }
+    });
+
     $("#btn_news_search").click(function() {
-        let startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-        let endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        console.log(startDate);
-        console.log(endDate);
-        let Keywords = $("#Keywords").val();
-        let social = $("#social").val();
-        
-        console.log(social);
-        f_search = 1;
-        page = 1;
-        $('#count_news').text(0);
-        page_stop = true;
-        load_more_search(page,f_search)
+        isSearch = 1;
+        startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        Keywords = $("#Keywords").val();
+        select = $("#select_val").val();
+        sitecode = $("#site").val();
+        data_table();
+
     });
 
 
-        $("#btn_news_reset").click(function() {
-            $("#Keywords").val('');
-            $("#social").val('').trigger("change");
-           
-            start = moment();
-            end = moment();
-            cb(start, end);
+    $("#btn_news_reset").click(function() {
+        $("#Keywords").val('');
+        $("#select_val").val('').trigger("change");
+        $("#site").val('').trigger("change");
 
-            f_search = 0;
-            page = 1;
-            $('#count_news').text(0);
-            page_stop = true;
-            load_more_search(page,f_search)
+        isSearch = 0;
+        isDateSearch = 0;
+        var startDate =  '';
+        var endDate =  '';
+        start = moment();
+        end = moment();
+        cb(start, end);
 
-        });
+        startDate=  '';
+        endDate=  '';
+        Keywords = '';
+        select = '';
+        sitecode = '';
+        data_table();
+
+    });
 });
 
+
+function cb(start, end) {
+    $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+}
+
+
 function data_table(){
-        $('#table-monitoring-batchjob').DataTable({
+    var myTable = $('#table-monitoring-batchjob').DataTable({
             searching: false,
             ordering: true,
             pageLength: 25,
@@ -206,6 +230,13 @@ function data_table(){
                     return json.data;
                 },
                 data:function(d){
+                    d.isSearch = isSearch;
+                    d.isDateSearch = isDateSearch;
+                    d.startDate = startDate;
+                    d.endDate = endDate;
+                    d.Keywords = Keywords;
+                    d.select = select;
+                    d.sitecode = sitecode;
                 }
             },
             initComplete : function( settings, json){
