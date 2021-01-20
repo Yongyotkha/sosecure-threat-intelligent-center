@@ -216,7 +216,7 @@
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">User & Password<span
                                 class="text-danger">*</span> </label>
-                        <div class="col-lg-6">
+                        <div class="col-lg-5">
 
                             <select id="u_p" class="form-control check_test_select" required>
                                 <option  value="">Choose an User</option>
@@ -228,7 +228,7 @@
                             </select>
                             <span style="color:red;"><small id = "check_u_p"></small></span>
                         </div>
-                        &nbsp;<button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }}">New</button>
+                        &nbsp;<button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }}">Add User</button>
                     </div>
                    
                     <div id="demo" class="collapse box">
