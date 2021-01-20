@@ -5,6 +5,7 @@ namespace Modules\RSSFeedSettings\Http\Controllers;
 use App\Mail\NewsMail;
 use App\siteNewsRelated;
 use App\Topic;
+use App\TransactionClientNews;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
 use Carbon\Carbon;
@@ -1127,11 +1128,13 @@ class RSSFeedSettingsController extends Controller
         // dd($SiteCategory[0]->site_email_alert);
 
         $email_site_alert = [];
+        $site_news = [];
         if($SiteCategory) {
             foreach($SiteCategory as $SiteCategory_val) {
                 if($SiteCategory_val) {
                     if(@$SiteCategory_val->site_email_alert->email) {
                         $email_site_alert[] = @$SiteCategory_val->site_email_alert->email;
+                        $site_news[] = @$SiteCategory_val->site_email_alert->site_id;
                     }
                 }
             }
@@ -1296,10 +1299,16 @@ class RSSFeedSettingsController extends Controller
                         //     ];
                         //     Mail::to($data)->send(new NewsMail($this->news));
                         // }
-                    }
-
-
-
+                        foreach($site_news as $data){
+                            $TransactionClientNews = new TransactionClientNews();
+                            $TransactionClientNews -> site_id = $data;
+                            $TransactionClientNews -> transaction_id = $RSSNews_check -> id;
+                            $TransactionClientNews -> transaction_mode = 'update';
+                            $TransactionClientNews -> transaction_data_status = 1;
+                            $TransactionClientNews -> status = 1;
+                            $TransactionClientNews -> save();
+                        }
+                    } 
                 } else {
 
                     $RSSNews = new RSSNews();
@@ -1479,6 +1488,15 @@ class RSSFeedSettingsController extends Controller
                         //     ];
                         //     Mail::to($data)->send(new NewsMail($this->news));
                         // }
+                        foreach($site_news as $data){
+                            $TransactionClientNews = new TransactionClientNews();
+                            $TransactionClientNews -> site_id = $data;
+                            $TransactionClientNews -> transaction_id = $RSSNews_check -> id;
+                            $TransactionClientNews -> transaction_mode = 'update';
+                            $TransactionClientNews -> transaction_data_status = 1;
+                            $TransactionClientNews -> status = 1;
+                            $TransactionClientNews -> save();
+                        }
                     }
 
                 }
