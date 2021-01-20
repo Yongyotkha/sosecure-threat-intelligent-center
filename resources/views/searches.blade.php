@@ -31,29 +31,33 @@
                                                 @endforeach
                                             </div>
                                         </li> --}}
-
-                                        @foreach ($dataSearch as $key => $value)
-                                            @if ($value["count"] > 0)
-                                                <li class="panel panel-default" id="clause-news">
-                                                    <div class="panel-heading">
-                                                        <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
-                                                            @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
-                                                        </a>
-                                                    </div>
-                                                    <div id="{{ slugify($key) }}" class="panel-collapse collapse">
-                                                        @foreach ($value["queryData"] as $key => $value2)
-                                                            <div class="panel-body clause">
-                                                                <a href="#{{$value2["id"]}}">
-                                                                    {!!$value2["name"]!!}
-                                                                </a>
-                                                                <div>{!!$value2["content"]!!}</div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </li>
-                                            @endif
-                                        @endforeach
-                                        
+                                        @if (isset($dataSearch))
+                                            @foreach ($dataSearch as $key => $value)
+                                                @if ($value["count"] > 0)
+                                                    <li class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
+                                                                @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
+                                                            </a>
+                                                        </div>
+                                                        <div id="{{ slugify($key) }}" class="panel-collapse collapse">
+                                                            @foreach ($value["queryData"] as $key => $value2)
+                                                                <div class="panel-body clause">
+                                                                    <a href="{{$value2["link"]}}">
+                                                                        {{$value2["name"]}}
+                                                                    </a>
+                                                                    <div style="
+                                                                    max-height:100px;
+                                                                    overflow:hidden;
+                                                                    text-overflow: ellipsis;
+                                                                    -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                        @endif
                                         {{-- @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
                                         <li class="panel panel-default" id="clause-{{ $clause->id }}">
                                             <div class="panel-heading">
