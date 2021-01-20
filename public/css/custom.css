@@ -1510,11 +1510,15 @@ ul.role-group li ul.role-group-sub li{
   .badge-success{
     background-color: #179f83 !important;
   }
-
+  .badge-wait{
+    background-color: #beb310 !important;
+  }
   .badge-danger{
     background-color: #fa5542 !important;
   }
-
+  .badge-none{
+    background-color: #0f0f0f !important;
+  }
   .asset-list-tb{
       list-style: none;
       padding: 0;
