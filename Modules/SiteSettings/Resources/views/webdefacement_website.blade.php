@@ -328,6 +328,26 @@
     <input type="hidden" id="url_id">
     <input type="hidden" id="webdefacment_setting_id">
 
+    <div class="modal" id="delete_webdefacement_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit" onclick="delete_defacement_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')
@@ -856,10 +876,43 @@
         $('.review_image_screenshot').css("display","none");
     }
 
+    
 
+    var web_id = null;
 
     function btn_click_del_webdefacement(id) {
-     
+        $('#delete_webdefacement_modal').modal('show');
+        web_id = id;
+        
+       
+     }
+
+     function delete_defacement_select_confirm(){
+        console.log(web_id);
+        $.ajax({
+            type:"POST",
+            url:"{{ route('webdefacement.delete_websefacement_process') }}",
+            data:{id: web_id},
+            beforeSend: function(){
+                $('.delete_webdefacement_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_webdefacement_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+    
+    function test(){
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -898,9 +951,8 @@
                 });
 
             }
-        })
-     }
-
+        }) 
+    }
 
 
 </script>

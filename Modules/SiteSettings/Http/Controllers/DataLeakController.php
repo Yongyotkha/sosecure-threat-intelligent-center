@@ -104,6 +104,7 @@ class DataLeakController extends Controller
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
         $data['page'] = 'Data Leak Datas';
+        
         return view('sitesettings::social-datas')->with($data);
     }
 
