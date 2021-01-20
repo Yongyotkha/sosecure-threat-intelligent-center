@@ -226,10 +226,11 @@
                                     @endforeach
                                 @endif
                             </select>
-                            
+                            <span style="color:red;"><small id = "check_u_p"></small></span>
                         </div>
+                        &nbsp;<button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }}">New</button>
                     </div>
-
+                   
                     <div id="demo" class="collapse box">
                         
                         <fieldset class="collapsible">
