@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\DB;
 use Modules\Scans\Entities\Assets;
 use Modules\SiteSettings\Entities\DataCveven;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Illuminate\Support\Facades\Auth;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 
 class DashboardNewController extends Controller
 {
@@ -41,28 +44,82 @@ class DashboardNewController extends Controller
      */
     public function index()
     {
-        // session_start();
-        // $menu = session('menu');
-        $menu = array();
-        if(isset($_SESSION["menu"])){
-            // unset($_SESSION["lastname"]);
-            $menu = $_SESSION["menu"];
-        }
+        
+        // $menu = array();
+        // if(isset($_SESSION["menu"])){
+        //     // unset($_SESSION["lastname"]);
+        //     $menu = $_SESSION["menu"];
+        // }
         
         // dd($menu[4]->get_menu_sub);
+
+        if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1) {
+
+        }
+
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        $data['site_settings'] = $SiteSettings;
+            
+        
+
         $data['page'] = langapp('dashboard');
-        $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
-        $data['count_CVEMapping'] = CVEMapping::count();
-        $data['count_compromised'] = DataLeakFeed::where("status", '=', 1)
+        if(@get_role_custom()['superadmin'] == 1) {
+            $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
+            $data['count_CVEMapping'] = CVEMapping::count();
+            $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->get();
+            $data['count_compromised'] = DataLeakSocialRef::where("status", '=', 1)
                                     ->where("deleted_at", '=', null)
                                     ->where("feel_type", '!=', 'social')
                                     ->count();
-        $data['count_dataLeak'] = DataLeakFeed::where("status", '=', 1)
+            $data['count_dataLeak'] = DataLeakSocialRef::where("status", '=', 1)
                                     ->where("deleted_at", '=', null)
                                     ->where("feel_type", '=', 'social')
                                     ->count();
-        $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->get();                            
-        $data['site_settings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+        } else {
+            $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id', $site_id_arr)->count();
+            $data['count_CVEMapping'] = CVEMapping::whereIn('site_id', $site_id_arr)->count();
+            $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id', $site_id_arr)->get();
+            $data['count_compromised'] = DataLeakSocialRef::where("status", '=', 1)
+                                    ->where("deleted_at", '=', null)
+                                    ->where("feel_type", '!=', 'social')
+                                    ->whereIn('site_id', $site_id_arr)
+                                    ->count();
+            $data['count_dataLeak'] = DataLeakSocialRef::where("status", '=', 1)
+                                    ->where("deleted_at", '=', null)
+                                    ->where("feel_type", '=', 'social')
+                                    ->whereIn('site_id', $site_id_arr)
+                                    ->count();
+        }
+
+        
+        // $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->get();                            
+        // $data['site_settings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
 
         return view('dashboardnew::index')->with($data);
     }
@@ -73,11 +130,24 @@ class DashboardNewController extends Controller
     }
 
     public function cve_assets(Request $request){
-        if($request -> site == 0){
-            $assets = Assets::where('status', 1)->get();
-        }else{
-            $assets = Assets::where('site_id', $request -> site)->where('status', 1)->get();
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $assets = Assets::where('status', 1)->get();
+                }else{
+                    $assets = Assets::where('site_id', $request -> site)->where('status', 1)->get();
+                }
+            } else {
+                if($request -> site == 0){
+                    $assets = Assets::where('status', 1)->whereIn('site_id', $site_id_arr)->get();
+                }else{
+                    $assets = Assets::where('site_id', $request -> site)->whereIn('site_id', $site_id_arr)->where('status', 1)->get();
+                }
+            }
         }
+        
+
         $response = array(
             'error' => '', 
             'status_code' => '200',
@@ -87,11 +157,23 @@ class DashboardNewController extends Controller
     }
 
     public function count_asset(Request $request){
-        if($request -> site == 0){
-            $assets = Assets::select('id')->where('status', 1)->count();
-        }else{
-            $assets = Assets::select('id')->where('site_id', $request -> site)->where('status', 1)->count();
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $assets = Assets::select('id')->where('status', 1)->count();
+                }else{
+                    $assets = Assets::select('id')->where('site_id', $request -> site)->where('status', 1)->count();
+                }
+            } else {
+                if($request -> site == 0){
+                    $assets = Assets::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->count();
+                }else{
+                    $assets = Assets::select('id')->where('site_id', $request -> site)->whereIn('site_id', $site_id_arr)->where('status', 1)->count();
+                }
+            }
         }
+
         $response = array(
             'error' => '', 
             'status_code' => '200',
@@ -101,11 +183,23 @@ class DashboardNewController extends Controller
     }
 
     public function count_vulnerability(Request $request){
-        if($request -> site == 0){
-            $CVEMapping = CVEMapping::select('id')->count();
-        }else{
-            $CVEMapping = CVEMapping::select('id')->where('site_id', $request -> site)->count();
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $CVEMapping = CVEMapping::select('id')->count();
+                }else{
+                    $CVEMapping = CVEMapping::select('id')->where('site_id', $request -> site)->count();
+                }
+            } else {
+                if($request -> site == 0){
+                    $CVEMapping = CVEMapping::select('id')->whereIn('site_id', $site_id_arr)->count();
+                }else{
+                    $CVEMapping = CVEMapping::select('id')->where('site_id', $request -> site)->whereIn('site_id', $site_id_arr)->count();
+                }
+            }
         }
+
         $response = array(
             'error' => '', 
             'status_code' => '200',
@@ -115,11 +209,24 @@ class DashboardNewController extends Controller
     }
 
     public function count_compromised(Request $request){
-        if($request -> site == 0){
-            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromised'])->count();
-        }else{
-            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromised'])->count();
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
+                }else{
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                }
+            } else {
+                if($request -> site == 0){
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
+                }else{
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                }
+            }
         }
+
+
         $response = array(
             'error' => '', 
             'status_code' => '200',
@@ -129,11 +236,23 @@ class DashboardNewController extends Controller
     }
 
     public function count_data_leak(Request $request){
-        if($request -> site == 0){
-            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
-        }else{
-            $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->where('feel_type', 'social')->count();
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
+                }else{
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->where('feel_type', 'social')->count();
+                }
+            } else {
+                if($request -> site == 0){
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                }else{
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                }
+            }
         }
+
         $response = array(
             'error' => '', 
             'status_code' => '200',
@@ -143,11 +262,24 @@ class DashboardNewController extends Controller
     }
 
     public function count_vulnerability_host(Request $request){
-        if($request -> site == 0){
-            $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-        }else{
-            $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $request -> site)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+                }else{
+                    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $request -> site)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+                }
+            } else {
+                if($request -> site == 0){
+                    $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+                }else{
+                    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $request -> site)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+                }
+            }
         }
+
+
         
         $vendor = [];
         $title = [];
@@ -167,7 +299,17 @@ class DashboardNewController extends Controller
                 'title' => $data -> title
             ]);
         }
-        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+            } else {
+                $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('site_id', $site_id_arr)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+            }
+        }
+
+
         foreach($CVEMapping as $data){
             foreach($check_total_namecve as $item){
                 if($data -> namecve == $item['namecve']){
@@ -310,21 +452,46 @@ class DashboardNewController extends Controller
     public function load_chart(Request $request)
     {
         $model = new CVEMapping;
-        if($request -> site == 0){
-            $model->get();
-            $high = $model->where('severity', '=', 'HIGH')->count();
-            $medium = $model->where('severity', '=', 'MEDIUM')->count();
-            $critical = $model->where('severity', '=', 'CRITICAL')->count();
-            $low = $model->where('severity', '=', 'LOW')->count();
-            $none = $model->where('severity', '=', 'NONE')->count();
-        }else{
-            $model->get();
-            $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->count();
-            $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->count();
-            $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->count();
-            $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->count();
-            $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->count();
+
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(@get_role_custom()['superadmin'] == 1) {
+                if($request -> site == 0){
+                    $model->get();
+                    $high = $model->where('severity', '=', 'HIGH')->count();
+                    $medium = $model->where('severity', '=', 'MEDIUM')->count();
+                    $critical = $model->where('severity', '=', 'CRITICAL')->count();
+                    $low = $model->where('severity', '=', 'LOW')->count();
+                    $none = $model->where('severity', '=', 'NONE')->count();
+                }else{
+                    $model->get();
+                    $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->count();
+                    $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->count();
+                    $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->count();
+                    $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->count();
+                    $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->count();
+                }
+            } else {
+                if($request -> site == 0){
+                    $model->get();
+                    $high = $model->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
+                    $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
+                    $critical = $model->where('severity', '=', 'CRITICAL')->whereIn('site_id', $site_id_arr)->count();
+                    $low = $model->where('severity', '=', 'LOW')->whereIn('site_id', $site_id_arr)->count();
+                    $none = $model->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
+                }else{
+                    $model->get();
+                    $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
+                    $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
+                    $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->whereIn('site_id', $site_id_arr)->count();
+                    $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->whereIn('site_id', $site_id_arr)->count();
+                    $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
+                }
+            }
         }
+
+
+
 
         // $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         // $clientMD = new MongoClient($DB_MONGO_KEY);
