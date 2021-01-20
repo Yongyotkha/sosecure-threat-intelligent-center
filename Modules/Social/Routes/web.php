@@ -18,5 +18,6 @@ Route::group(
         Route::get('/jqueryLoadMoreNews', 'SocialController@jqueryLoadMoreNews')->name('social.jqueryLoadMoreNews');
         Route::get('/bookmark', 'SocialController@bookmark')->name('social.bookmark');
         Route::get('/add_read', 'SocialController@add_read')->name('social.add_read');
+        Route::post('/count_val', 'SocialController@count_val')->name('social.count_val')->middleware('can:menu_items');
     }
 );
