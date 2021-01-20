@@ -6,6 +6,10 @@ use App\Traits\Taggable;
 use Illuminate\Http\Request;
 use Modules\Invoices\Entities\Invoice;
 use App\DataLeakFeed;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
+use App\R_s_s_news;
+
+use DB;
 
 class SearchController extends Controller
 {
@@ -26,11 +30,36 @@ class SearchController extends Controller
         // dd(json_encode($this->request->keyword));
         $this->request->validate(['keyword' => 'required']);
         $keyword = '%'.$this->request->keyword.'%';
-        $data['news'] = DataLeakFeed::select('id','feedcontent as content')->where('feel_type','social')->where(function ($query) use ($keyword){
+
+        $dataWait['queryData'] = R_s_s_news::select('id','title_th as name','detail_th as content')->where('title_th','LIKE',$keyword);
+        $dataWait['count'] =  $dataWait['queryData']->count();
+        $dataWait['queryData'] = $dataWait['queryData']->get()->toArray();
+        $data['dataSearch']["News"] = $dataWait;
+
+        $dataWait['queryData'] = CVEMapping::select('id','namecve as name','description as content')->where('namecve','LIKE',$keyword);
+        $dataWait['count'] =  $dataWait['queryData']->count();
+        $dataWait['queryData'] = $dataWait['queryData']->get()->toArray();
+        $data['dataSearch']["Vulnerabilities"] = $dataWait;
+
+
+
+        $dataWait["queryData"] = DataLeakFeed::select('id','feedcontent as content','sourceid','keyword as name')->where('feel_type','!=','social')->where(function ($query) use ($keyword){
             $query->where('keyword','LIKE', $keyword)
                 ->orWhere('source_name', 'LIKE', $keyword);
-                // ->orWhere('feedcontent', 'LIKE', $keyword);
-        })->get()->toArray();
+        });
+        $dataWait["count"] = $dataWait["queryData"]->count();
+        $dataWait["queryData"] = $dataWait["queryData"]->get()->toArray();
+        $data['dataSearch']["Compromised"] = $dataWait;
+
+
+
+        $dataWait["queryData"] = DataLeakFeed::select('id','feedcontent as content','sourceid','keyword as name')->where('feel_type','social')->where(function ($query) use ($keyword){
+            $query->where('keyword','LIKE', $keyword)
+                ->orWhere('source_name', 'LIKE', $keyword);
+        });
+        $dataWait["count"] = $dataWait["queryData"]->count();
+        $dataWait["queryData"] = $dataWait["queryData"]->get()->toArray();
+        $data['dataSearch']["Data Leak"] = $dataWait;
 
         // dd(json_encode($data['news']));
         // $data['invoices'] = \Modules\Invoices\Entities\Invoice::select('id', 'reference_no', 'title')->WithAnyTags($this->request->keyword)->get();
