@@ -8,7 +8,7 @@
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
                         <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3 text-elipse-setting">Name Domain</p>
+                        <p class="h3 text-elipse-setting">{{@$siteSettings->name}}</p>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
@@ -21,7 +21,7 @@
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                    <div class="bc-head">Settings > Social Datas </div>
+                    <div class="bc-head">Settings > Data Leak Feed </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
