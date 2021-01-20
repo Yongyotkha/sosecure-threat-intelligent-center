@@ -22,6 +22,10 @@ use App\Entities\Transaction_client_webdefacment_image_mark;
 use App\Entities\Transaction_client_webdefacment_setting;
 use App\Entities\Transaction_client_data_datacve_mapping;
 use App\Entities\Transaction_client_cve_assets;
+use App\Entities\TFClient_R_s_s_news_categories;
+use App\Entities\fx_transaction_client_news_categories;
+
+
 class ApiTransferClients extends Controller
 {
 
@@ -56,6 +60,10 @@ class ApiTransferClients extends Controller
                     $model_getData = new Transaction_client_News;
                     $modeInsert = 'fx_transaction_client_news';
                     $nameBJ = 'Transaction Client client_news - everyMinute()  Or Request';
+                } else if ($nameTable == 'fx_transaction_client_news_categories') {
+                    $model_getData = new fx_transaction_client_news_categories;
+                    $modeInsert = 'fx_transaction_client_news_categories';
+                    $nameBJ = 'Transaction Client webdefacment_data_check - everyMinute()  Or Request';
                 } else if ($nameTable == 'fx_transaction_client_webdefacment_data_check') {
                     $model_getData = new Transaction_client_webdefacment_data_check;
                     $modeInsert = 'fx_transaction_client_webdefacment_data_check';
@@ -88,16 +96,16 @@ class ApiTransferClients extends Controller
                     $connect = false;
                     $result = false;
                 }
-                
+
                 if ($result == true) {
                     $TransactionClient = new $model_getData;
                     $TransactionClient->setConnection($this->dbName);
                     $TransactionClient = $TransactionClient->where('site_id',$site->id)->where('status',1)->where('transaction_data_status',1)->with('get_transfer_client')->orderBy('id','asc')->get()->toArray();
-  
+
                     $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
                     $TF_Center_transaction_batchjob->setConnection($this->dbName);
                     $TF_Center_transaction_batchjob = $TF_Center_transaction_batchjob->where('mode', $modeInsert)->where('site_id', $site->id)->first();
-                   
+
                     if(!$TF_Center_transaction_batchjob){
                         $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
                         $TF_Center_transaction_batchjob->status = 1;
@@ -147,7 +155,7 @@ class ApiTransferClients extends Controller
             'connect' => true,
             'result' => $dataEncode,
         ];
-       
+
         return response()->json($dataout); 
     }
 
@@ -164,7 +172,7 @@ class ApiTransferClients extends Controller
             if($os=="Linux"){
                 $ssh = new SSH2($ip,$port);
                 $ssh->setTimeout(60);
-               
+
                 if (!$ssh->login($user, $pass)) {
                     $checkConnect = false;
                     $message = 'no login';
@@ -190,5 +198,5 @@ class ApiTransferClients extends Controller
         ];
         return response()->json($dataout); 
     }
-    
+
 }
