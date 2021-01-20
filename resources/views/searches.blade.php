@@ -14,26 +14,48 @@
                                 <div class="panel-group m-b" id="accordion2">
                                     <ul class="list no-style" id="clauses-list">
 
-                                        <li class="panel panel-default" id="clause-news">
+                                        {{-- <li class="panel panel-default" id="clause-news">
                                             <div class="panel-heading">
-                                                <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#news">
-                                                    @icon('solid/caret-right') {{ humanize("News") }}
+                                                <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify('news') }}">
+                                                    @icon('solid/caret-right') {{ humanize("news") }}({{$searchNews["count"]}})
                                                 </a>
                                             </div>
-                                            <div id="news" class="panel-collapse collapse">
-                                                @foreach ($news as $key => $value)
+                                            <div id="{{ slugify('news') }}" class="panel-collapse collapse">
+                                                @foreach ($searchNews["news"] as $key => $value)
                                                     <div class="panel-body clause">
                                                         <a href="#{{$value["id"]}}">
-                                                            {{$value["content"]}}
+                                                            {{$value["name"]}}
                                                         </a>
+                                                        <div class='text-ellipsis'>{{$value["content"]}}</div>
                                                     </div>
                                                 @endforeach
                                             </div>
-                                        </li>
+                                        </li> --}}
 
-
-                                        @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
-                                        {{-- <li class="panel panel-default" id="clause-{{ $clause->id }}">
+                                        @foreach ($dataSearch as $key => $value)
+                                            @if ($value["count"] > 0)
+                                                <li class="panel panel-default" id="clause-news">
+                                                    <div class="panel-heading">
+                                                        <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
+                                                            @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
+                                                        </a>
+                                                    </div>
+                                                    <div id="{{ slugify($key) }}" class="panel-collapse collapse">
+                                                        @foreach ($value["queryData"] as $key => $value2)
+                                                            <div class="panel-body clause">
+                                                                <a href="#{{$value2["id"]}}">
+                                                                    {!!$value2["name"]!!}
+                                                                </a>
+                                                                <div>{!!$value2["content"]!!}</div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </li>
+                                            @endif
+                                        @endforeach
+                                        
+                                        {{-- @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
+                                        <li class="panel panel-default" id="clause-{{ $clause->id }}">
                                             <div class="panel-heading">
                                                 <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($clause->name) }}">
                                                     @icon('solid/caret-right') {{ humanize($clause->name) }}
@@ -44,8 +66,8 @@
                                                     @parsedown($clause->clause)
                                                 </div>
                                             </div>
-                                        </li> --}}
-                                        @endforeach
+                                        </li>
+                                        @endforeach --}}
                                     </ul>   
                                 </div>
                             </section>
