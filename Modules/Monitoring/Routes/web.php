@@ -14,5 +14,6 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'monitoring'],
     function () {
         Route::get('/', 'MonitoringController@index')->name('monitoring.index')->middleware('can:menu_items');
+        Route::get('/batchjob', 'MonitoringController@batchjob')->name('monitoring.batchjob')->middleware('can:menu_items');
     }
 );

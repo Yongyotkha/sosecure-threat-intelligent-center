@@ -35,6 +35,11 @@ class MonitoringController extends Controller
         $data['page'] = langapp('monitoring');
         return view('monitoring::index')->with($data);
     }
+    public function batchjob()
+    {
+        $data['page'] = langapp('batchjob');
+        return view('monitoring::index')->with($data);
+    }
 
     /**
      * Show the form for creating a new resource.

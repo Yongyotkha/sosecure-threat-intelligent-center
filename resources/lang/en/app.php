@@ -924,6 +924,7 @@ return [
     'alert'                                      => 'Alert',
     'vulnerabilitys'                             => 'Vulnerabilities',
     'vulnerability'                              => 'Vulnerability',
+    'batchjob'                                   => 'Batch Job',
     'compromised'                                => 'Compromised',
     'data_setting'                                => 'DataSetting',
     'data_leak'                                  => 'Data Leak',

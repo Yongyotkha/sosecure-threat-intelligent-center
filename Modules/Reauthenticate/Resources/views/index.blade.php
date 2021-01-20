@@ -5,8 +5,9 @@
     <section id="content" class="m-t-lg wrapper-md content">
         <div id="login-darken"></div>
         <div id="login-form" class="container aside-xxl animated fadeInUp">
-        <span class="navbar-brand block"> 
-                <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="img-responsive thumb-sm m-r-sm">
+        <span class="" style="display: flex;align-items: center;justify-content: center;text-align: center;"> 
+                {{-- <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo'))  }}" class="img-responsive thumb-sm m-r-sm"> --}}
+                <img src="{{ site_url('images/logo_threat/logo_site.png')  }}" style="width: 217px;height: 67px;" class="">
         </span>
 
         <section class="panel panel-default bg-white m-t-lg b-r-cust">
