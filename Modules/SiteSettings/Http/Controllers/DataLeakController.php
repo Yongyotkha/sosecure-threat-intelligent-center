@@ -1945,7 +1945,7 @@ class DataLeakController extends Controller
         $data['siteID'] = $siteID->id;
         $data['page'] = 'Web Server';
 
-        $data['Credentials'] = Credentials::where('site_id',$get_data->id);
+        $data['Credentials'] = Credentials::where('site_id',$get_data->id)->get();
 
         return view('sitesettings::compromised_web_server')->with($data);
     }
