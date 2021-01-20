@@ -1110,6 +1110,9 @@ class DataLeakController extends Controller
             $model = DataLeakSocialRefTemp::where(function ($q) use ($request) {
                 $q->where('keyword', '!=', null);
                 $q->where('keyword', '!=', '');
+                if($request->site){
+                    $q->where('site_id',$request->site);
+                }
             });
 
             $model->whereHas('get_data_leak_feed_temp_one', function ($qq) use ($request) {

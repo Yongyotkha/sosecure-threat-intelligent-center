@@ -119,7 +119,7 @@
                                             <th class="no-sort">
                                                 <label>
                                                     <input name="select_all" value="1" id="select-all" type="checkbox"
-                                                        class="" />
+                                                        class="select-chk" />
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>

@@ -47,6 +47,8 @@ Route::group(
         
         //News
         Route::get('/news', 'RSSFeedSettingsController@rss_news')->name('rssfeedsettings.news')->middleware('can:menu_items');
+        Route::post('/news/rss_news_delete_process/{id}', 'RSSFeedSettingsController@rss_news_delete_process')->name('rssfeedsettings.rss_news_delete_process')->middleware('can:menu_items');
+        Route::post('/news/rss_news_delete_select', 'RSSFeedSettingsController@rss_news_delete_select')->name('rssfeedsettings.rss_news_delete_select')->middleware('can:menu_items');
         Route::post('rss_news_table', 'RSSFeedSettingsController@tableNews')->name('rssfeedsettings.rss_news_table')->middleware('can:menu_items');
         Route::post('rssfeedsettings/change_status_news', 'RSSFeedSettingsController@change_status_news')->name('rssfeedsettings.change_status_news')->middleware('can:menu_items');
         Route::post('/rss_data/source', 'RSSFeedSettingsController@rss_data_source')->name('rssfeedsettings.rss_data_source');

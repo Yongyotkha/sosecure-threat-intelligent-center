@@ -278,8 +278,8 @@ abstract class UsersController extends Controller
                 $query->where('site_id', $request->site);
             });
         }
-        $model = $model->first();
-        dd($model->get_UserSite[0]->get_site->name);
+        // $model = $model->first();
+        // dd([0]->get_site->name);
         $model->get();
         
         return DataTables::of($model)
@@ -310,8 +310,22 @@ abstract class UsersController extends Controller
             ->editColumn(
                 'site_name',
                 function ($model) {
+                    $html = '';
+                    if($model->get_UserSite){
+
+                        foreach ($model->get_UserSite as $key) {
+                            if($key->get_site){
+                                $html .= $key->get_site->name.',';
+                            }
+                            
+                            // $site = $key->get_site->name;
+                            // $html.= '"'.$site.'"';
+                            # code...
+                        }
+                    }
+                    $html=rtrim($html,",");
                     
-                    return @$model->get_UserSite->get_site->name;
+                    return $html;
                 }
             )
             ->editColumn(

@@ -1,11 +1,12 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <section class="hbox stretch">      
+    <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
                 <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
+                        data-target="#setting-nav">@icon('solid/bars')</a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                     <p class="h3 text-elipse-setting">Sub menu</p>
                 </header>
@@ -26,42 +27,48 @@
                             </li>
                             {{-- <li>
                                 <a href="{{route('rssfeedsettings.index')}}">
-                                    @icon('solid/angle-right', 'text-'.get_option('theme_color'))
-                                    RSS Settings
-                                </a>
+                            @icon('solid/angle-right', 'text-'.get_option('theme_color'))
+                            RSS Settings
+                            </a>
                             </li> --}}
                         </ul>
                     </section>
                 </section>
             </section>
         </aside>
-    
+
         <aside>
             <section class="vbox">
-    
+
                 <header class="header panel-heading bg-white b-b b-light">
-                    <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</button>
+                    <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
+                        style="margin-top: 0;">@icon('solid/bars')</button>
                     <div class="bc-head">News</div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
+                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
+                    data-rel="tooltip" title="@langapp('export') CSV">
+                    @icon('solid/download') CSV
                     </a> --}}
                     {{-- <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
                         <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
                     </button> --}}
 
-                    <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
+                    <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
                         <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
                     </a>
 
-                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
+                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs"
+                        value="bulk-delete" disabled>
                         <span>@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
 
-                    <a id="btn_client_view" href="{{site_url('/news_client')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
+                    <a id="btn_client_view" href="{{site_url('/news_client')}}"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
                         <span><i class="fas fa-eye"></i> Client view</span>
                     </a>
 
-                    <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <a id="advance-search" href="#area-advance-search"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
 
@@ -69,142 +76,167 @@
                     <div class="btn-group pull-right" role="group" aria-label="Button group with nested dropdown">
                         {{-- <button type="button" class="btn btn-secondary">1</button>
                         <button type="button" class="btn btn-secondary">2</button> --}}
-                      
+
                         <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle" data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
+                            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle"
+                                data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-left">
                                 <li>
-                                    <a href="{{route('rssfeedsettings.rss_news_create_news')}}"  data-toggle='ajaxModal'>
+                                    <a href="{{route('rssfeedsettings.rss_news_create_news')}}" data-toggle='ajaxModal'>
                                         Create News
                                     </a>
                                     <a href="{{route('rssfeedsettings.rss_data')}}" id="">
                                         RSS Feed
                                     </a>
-    
+
                                 </li>
                             </ul>
                         </div>
 
-                        
+
                     </div>
-                      
-                      
-                    {{-- <a href="{{route('rssfeedsettings.rss_news_create_news')}}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle='ajaxModal'>
-                        @icon('solid/plus') @langapp('add')
+
+
+                    {{-- <a href="{{route('rssfeedsettings.rss_news_create_news')}}" class="btn btn-sm
+                    btn-{{ get_option('theme_color')  }} pull-right" data-toggle='ajaxModal'>
+                    @icon('solid/plus') @langapp('add')
                     </a> --}}
-              
+
                 </header>
 
-            {{-- Search --}}
-            {{-- Tab Content --}}
-            <section class="scrollable wrapper">
-                <section class="panel panel-default" id="area-advance-search" style="display: none;">
-                    <div class="container-fluid" style="padding: 2rem;">
-                        <div class="row m-b-md">
-                            <div class="col-lg-3">
-                                <label for="">Title</label>
-                                <input type="text" class="form-control" name="keywords" id="keywords">
-                            </div>
-                            <div class="col-lg-6">
-                                <label for="">Select Date</label>
-                                    <div id="date_srange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                {{-- Search --}}
+                {{-- Tab Content --}}
+                <section class="scrollable wrapper">
+                    <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                        <div class="container-fluid" style="padding: 2rem;">
+                            <div class="row m-b-md">
+                                <div class="col-lg-3">
+                                    <label for="">Title</label>
+                                    <input type="text" class="form-control" name="keywords" id="keywords">
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="">Select Date</label>
+                                    <div id="date_srange"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="">Status</label>
-                                <select id="status_news" class="select2-option form-control">
-                                    <option value="">All</option>
-                                    <option value="1">Public</option>
-                                    <option value="2">Darft</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <label for="">Source</label>
-                                <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
-                                   
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="">Category</label>
-                                <select name="news_category[]" id="news_category" class="select2-option form-control" multiple="multiple">
-                                    {{-- <option value="" >All</option> --}}
-                                    @foreach(@$category as $cate)
-                                        <option value="{{$cate->id}}" >{{$cate->name}}</option>
-                                    @endforeach
-                                    {{-- <option value="1" selected>All</option> --}}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12 text-right">
-                                <button type="button" class="btn btn-info btn-responsive" onclick="search()">
-                                    <i class="fas fa-search"></i>
-                                    @langapp('apply')
-                                </button>
-                                <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <section class="scrollable">              
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table News
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="">Status</label>
+                                    <select id="status_news" class="select2-option form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Public</option>
+                                        <option value="2">Darft</option>
+                                    </select>
                                 </div>
                             </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table  class="table table-striped" id="table-rss-news-template">
-                                    <thead>
-                                        <tr>
-                                            <th class="no-sort">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th>
-                                            {{-- <th>Site Name</th> --}}
-                                            <th width="20px">Source name</th>
-                                            <th width="20%">Title</th>
-                                            <th>Category</th>
-                                            <th width="20px">Data Satatus</th>
-                                            <th width="30px">Public Date</th>
-                                            <th>View Count</th>
-                                            <th width="40px">Link</th>
-                                            <th>Status</th>
-                                            <th width="5%">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-            
-                                    </tbody>
-                                </table>   
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <label for="">Source</label>
+                                    <select name="news_source[]" id="news_source" class="select2-option form-control"
+                                        multiple="multiple">
+
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="">Category</label>
+                                    <select name="news_category[]" id="news_category"
+                                        class="select2-option form-control" multiple="multiple">
+                                        {{-- <option value="" >All</option> --}}
+                                        @foreach(@$category as $cate)
+                                        <option value="{{$cate->id}}">{{$cate->name}}</option>
+                                        @endforeach
+                                        {{-- <option value="1" selected>All</option> --}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" class="btn btn-info btn-responsive" onclick="search()">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive"
+                                        style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </section>
-                </section>
 
-                
-            </section>
+                    <section class="scrollable">
+                        <section class="panel panel-default">
+                            <header class="panel-heading font-bold panel-header-blue">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <i class="fas fa-table"></i> Table News
+                                    </div>
+                                </div>
+                            </header>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="table-rss-news-template">
+                                        <thead>
+                                            <tr>
+                                                <th class="no-sort">
+                                                    <label>
+                                                        <input name="select_all" value="1" id="select-all"
+                                                            type="checkbox" class="select-chk" />
+                                                        <span class="label-text"></span>
+                                                    </label>
+                                                </th>
+                                                {{-- <th>Site Name</th> --}}
+                                                <th width="20px">Source name</th>
+                                                <th width="20%">Title</th>
+                                                <th>Category</th>
+                                                <th width="20px">Data Satatus</th>
+                                                <th width="30px">Public Date</th>
+                                                <th>View Count</th>
+                                                <th width="40px">Link</th>
+                                                <th>Status</th>
+                                                <th width="5%">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    </section>
+
+
+                </section>
             </section>
         </aside>
     </section>
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
- 
+    <div class="modal" id="delete_rss_new_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_domain_submit" onclick="delete_rssNews_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </section>
 
@@ -213,7 +245,7 @@
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
 @include('stacks.css.summernote')
-<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -226,7 +258,6 @@
 @include('stacks.js.daterangpicker')
 
 <script>
-
     $('#area-advance-search').hide();
     $('#advance-search').click(function(){
         $('#area-advance-search').toggle();
@@ -290,7 +321,7 @@
 $(function() {
 
     $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true });
-    $(document).ready(function () {
+    {{--$(document).ready(function () {
         $('#keywords').select2({
             tags: true,
             tokenSeparators: [' ']
@@ -298,7 +329,7 @@ $(function() {
         $('#news_source').select2();
 
 
-    });
+    });--}}
 
 
     $(function () {
@@ -306,6 +337,75 @@ $(function() {
     });
 
 });
+
+    $('#table-rss-news-template').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_news_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_news_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-rss-news-template').on('click', '.rss_new_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_news_del_select').prop("disabled", false);
+            {{--if($('.rss_new_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.rss_new_id').filter(':checked').length < 1){
+                $('#btn_news_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    let del_rss_new_select = [];
+
+    $( "#btn_news_del_select" ).click(function() {
+        del_rss_new_select = [];
+        $('#delete_rss_new_modal').modal('show');
+    });
+
+    function delete_rssNews_select_confirm(){
+        
+        $(".rss_new_id").each(function(){
+            if($(this).is(":checked")) {
+                del_rss_new_select.push($(this).val());
+            }
+        });
+
+
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('rssfeedsettings.rss_news_delete_select') }}",
+            data:{
+                id:del_rss_new_select
+            },
+            beforeSend: function(){
+                $('.delete_domain_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_domain_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
 
     function datatable(){
         $('#table-rss-news-template').DataTable({

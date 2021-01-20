@@ -6,30 +6,31 @@
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }}
             btn-sm btn-responsive pull-left m-r-5">
             @icon('solid/arrow-left')
-                </a> --}}
-                <div class="bc-head">@langapp('settings') > Categorys</div>
+            </a> --}}
+            <div class="bc-head">@langapp('settings') > Categorys</div>
 
 
-                {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }}
-                pull-right" data-toggle="modal" data-target="#create_key_modal">
+            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }}
+            pull-right" data-toggle="modal" data-target="#create_key_modal">
+            @icon('solid/plus') @langapp('create')
+            </a> --}}
+
+
+
+            @can('users_delete')
+            <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right"
+                value="bulk-delete" disabled>
+                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
+                    @langapp('delete')</span>
+            </button>
+            @endcan
+
+            @if(isAdmin() || can('settings'))
+            <a href="{{ route('categorysettings.create') }}"
+                class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-toggle="ajaxModal">
                 @icon('solid/plus') @langapp('create')
-                    </a> --}}
-
-          
-
-                @can('users_delete')
-                    <button type="submit" id="btn-change-status"  class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-                @endcan
-
-                @if(isAdmin() || can('settings'))
-                    <a href="{{ route('categorysettings.create') }}"
-                        class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right"
-                        data-toggle="ajaxModal">
-                        @icon('solid/plus') @langapp('create')
-                    </a>
-                @endcan
+            </a>
+            @endcan
 
         </header>
         <section class="scrollable wrapper">
@@ -45,14 +46,15 @@
                     <form id="frm-category" method="POST">
                         <div class="table-responsive">
                             @php
-                                // dd(lastMonth());
+                            // dd(lastMonth());
                             @endphp
                             <table class="table table-striped" id="table-category-template">
                                 <thead>
                                     <tr>
                                         <th class="no-sort">
                                             <label>
-                                                <input name="select_all" value="1"  id="select-all" type="checkbox" class="select-chk"/>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                    class="select-chk" />
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
@@ -78,70 +80,42 @@
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
-    <!-- Modal Gen Category -->
-    {{-- <div class="modal fade" id="create_key_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal" id="delete_categorys_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+        aria-hidden="true" style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <span class="modal-title" id="exampleModalLabel">Category</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
                 </div>
-                <form action="">
                 <div class="modal-body">
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">Key <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="generate_key" value="" readonly>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info">Gen</button>
-                            </span>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">Status </label>
-                        <div class="col-lg-6">
-                            <label class="switch">
-                                <input type="hidden" value="FALSE" name="">
-                                <input type="checkbox" name="" value="TRUE">
-                                <span></span>
-                            </label>
-                        </div>
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning') </p>
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                            class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_categorys_submit"
+                        onclick="delete_categorys_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
                 </div>
-                </form>
             </div>
         </div>
-    </div> --}}
+    </div>
 
 </section>
 
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
+@include('stacks.css.datatables')
 @endpush
 
 @push('pagescript')
 
-    @include('stacks.js.datatables')
+@include('stacks.js.datatables')
 
-    <script>
-
-        var categorySettings_id = [];
+<script>
+    var categorySettings_id = [];
 
         $('#table-category-template').on('click', '.select-chk', function () {
             if ($(this).is(':checked')) {
@@ -249,36 +223,27 @@
                 });
         }
 
+    $( "#btn-change-status" ).click(function() {
+        categorySettings_id = [];
+        $('#delete_categorys_modal').modal('show');
+    });
+    
+    function delete_categorys_select_confirm(){
 
-
-        $("#btn-change-status").click(function() {
-
-            
-            $('.categorySettings_id:checked').each(function () {
+        $('.categorySettings_id:checked').each(function () {
                 categorySettings_id.push(this.value);
                 
-            });
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                heightAuto: false,
-                confirmButtonText: 'Yes, Is Fixed!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
+        });
+        $.ajax({
             type:"POST",
             url:"{{ route('categorysettings.change_delete') }}",
             data:{id: categorySettings_id},
             beforeSend: function(){
-                loading('load');
+                $('.delete_categorys_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
             },
             success:function(response) {
-                loading('stop_load');
+                $('.delete_categorys_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                $('.delete_categorys_submit').prop("disabled", true);
                 toastr.success(response.message, '@langapp('response_status')');
                 window.location.href = response.redirect;
             },
@@ -291,11 +256,17 @@
                 });
                 toastr.error(errorsHtml, '@langapp('response_status') ');
             }
-        
+    
         });
 
-            }
-        })
+    }
+
+
+
+        $("#btn-change-status").click(function() {
+
+            
+ 
     });
 
 
@@ -324,6 +295,6 @@
                 }
             });
         }
-    </script>
+</script>
 @endpush
 @endsection
