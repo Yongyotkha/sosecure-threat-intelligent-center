@@ -2,6 +2,7 @@
 
 namespace Modules\RSSFeedSettings\Http\Controllers;
 
+use App\Entities\fx_transaction_client_news_categories;
 use App\Mail\NewsMail;
 use App\siteNewsRelated;
 use App\Topic;
@@ -715,6 +716,27 @@ class RSSFeedSettingsController extends Controller
                         $TransactionClientNews -> status = 1;
                         $TransactionClientNews -> save();
                     }
+                    if($SiteCategory){
+                        foreach($SiteCategory as $SiteCategories){
+                            $fx_transaction_client_news_categories = fx_transaction_client_news_categories::where('site_id', $data)->where('transaction_id', $SiteCategories -> category_id)->first();
+                            if($fx_transaction_client_news_categories){
+                                $fx_transaction_client_news_categories -> transaction_mode = 'delete';
+                                $fx_transaction_client_news_categories -> transaction_data_status = 1;
+                                $fx_transaction_client_news_categories -> status = 1;
+                                $fx_transaction_client_news_categories -> save();
+                            }else{
+                                $fx_transaction_client_news_categories = new fx_transaction_client_news_categories();
+                                $fx_transaction_client_news_categories -> site_id = $data;
+                                $fx_transaction_client_news_categories -> transaction_id = $SiteCategories -> category_id;
+                                $fx_transaction_client_news_categories -> transaction_mode = 'delete';
+                                $fx_transaction_client_news_categories -> transaction_data_status = 1;
+                                $fx_transaction_client_news_categories -> status = 1;
+                                $fx_transaction_client_news_categories -> save();
+                            }
+                        }
+                    }
+                   
+                    
                 }
                 
             $RSSNewsCategory = RSSNewsCategory::where('rss_news_id',$RSS_news->id);
@@ -981,6 +1003,25 @@ class RSSFeedSettingsController extends Controller
                         $TransactionClientNews -> status = 1;
                         $TransactionClientNews -> save();
                     }
+                    if($SiteCategory){
+                        foreach($SiteCategory as $SiteCategories){
+                            $fx_transaction_client_news_categories = fx_transaction_client_news_categories::where('site_id', $data)->where('transaction_id', $SiteCategories -> category_id)->first();
+                            if($fx_transaction_client_news_categories){
+                                $fx_transaction_client_news_categories -> transaction_mode = 'update';
+                                $fx_transaction_client_news_categories -> transaction_data_status = 1;
+                                $fx_transaction_client_news_categories -> status = 1;
+                                $fx_transaction_client_news_categories -> save();
+                            }else{
+                                $fx_transaction_client_news_categories = new fx_transaction_client_news_categories();
+                                $fx_transaction_client_news_categories -> site_id = $data;
+                                $fx_transaction_client_news_categories -> transaction_id = $SiteCategories -> category_id;
+                                $fx_transaction_client_news_categories -> transaction_mode = 'update';
+                                $fx_transaction_client_news_categories -> transaction_data_status = 1;
+                                $fx_transaction_client_news_categories -> status = 1;
+                                $fx_transaction_client_news_categories -> save();
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1174,6 +1215,25 @@ class RSSFeedSettingsController extends Controller
                         $TransactionClientNews -> transaction_data_status = 1;
                         $TransactionClientNews -> status = 1;
                         $TransactionClientNews -> save();
+                    }
+                    if($SiteCategory){
+                        foreach($SiteCategory as $SiteCategories){
+                            $fx_transaction_client_news_categories = fx_transaction_client_news_categories::where('site_id', $data)->where('transaction_id', $SiteCategories -> category_id)->first();
+                            if($fx_transaction_client_news_categories){
+                                $fx_transaction_client_news_categories -> transaction_mode = 'insert';
+                                $fx_transaction_client_news_categories -> transaction_data_status = 1;
+                                $fx_transaction_client_news_categories -> status = 1;
+                                $fx_transaction_client_news_categories -> save();
+                            }else{
+                                $fx_transaction_client_news_categories = new fx_transaction_client_news_categories();
+                                $fx_transaction_client_news_categories -> site_id = $data;
+                                $fx_transaction_client_news_categories -> transaction_id = $SiteCategories -> category_id;
+                                $fx_transaction_client_news_categories -> transaction_mode = 'insert';
+                                $fx_transaction_client_news_categories -> transaction_data_status = 1;
+                                $fx_transaction_client_news_categories -> status = 1;
+                                $fx_transaction_client_news_categories -> save();
+                            }
+                        }
                     }
                 }
             }
