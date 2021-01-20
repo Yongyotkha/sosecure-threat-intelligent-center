@@ -2,6 +2,7 @@
 use App\Menu;
 $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
 // dd($menu);
+// dd($menu);
 @endphp
 
 {{-- <aside class="bg-{{ get_option('sidebar_theme') }} aside-md b-r {{ settingEnabled('hide_sidebar') ? 'nav-xs' : '' }} hidden-print hidden-xs" id="nav"> --}}
@@ -198,11 +199,13 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
 
                                     if(@$menu_val->get_menu_sub) {
 
-
                                         
                                         $menu_sub_html = '';
                                         foreach($menu_val->get_menu_sub as $menu_sub_val) {
-
+                                            if($menu_sub_val->name == 'Batch Job') {
+                                                // dd($menu_sub_val);
+                                            }
+                                            
 
                                             $active_sub = '';
                                             $url_sub = '#';
@@ -214,16 +217,16 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                                                 if($menu_sub_val->type_url == 'site_url') {
                                                     $url_sub = site_url($menu_sub_val->url);
                                                     if(TYPE_WEB == 'center') {
-                                                        $url = site_url($menu_sub_val->url);
+                                                        $url_sub = site_url($menu_sub_val->url);
                                                     } else {
-                                                        $url = site_url($menu_sub_val->url_client);
+                                                        $url_sub = site_url($menu_sub_val->url_client);
                                                     }
                                                 } else if ($menu_sub_val->type_url == 'route') {
                                                     // $url_sub = route($menu_sub_val->url);
                                                     if(TYPE_WEB == 'center') {
-                                                        $url = route($menu_sub_val->url);
+                                                        $url_sub = route($menu_sub_val->url);
                                                     } else {
-                                                        $url = route($menu_sub_val->url_client);
+                                                        $url_sub = route($menu_sub_val->url_client);
                                                     }
                                                 }
                                             }
