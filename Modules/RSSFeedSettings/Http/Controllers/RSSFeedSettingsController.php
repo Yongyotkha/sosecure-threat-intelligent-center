@@ -674,13 +674,49 @@ class RSSFeedSettingsController extends Controller
         $RSS_news = RSSNews::where("code",$id)->first();
         $model = RSSNews::where("code",$id);
         $model->delete();
-
-       
         // $RSSNews = RSSNews::where('transaction_rss_id',$check_TransactionRssData->id)->first();
         if($RSS_news) {
             // $RSSNews_del = RSSNews::where('transaction_rss_id',$check_TransactionRssData);
             // $RSSNews_del->delete();
-
+            $RSSNewsCategorycheck = RSSNewsCategory::where('rss_news_id',$RSS_news->id)->get();
+            $category_id = [];
+            foreach($RSSNewsCategorycheck as $item){
+                $category_id[] = $item -> news_category_id;
+            }
+            $SiteCategory = SiteCategory::whereIn("category_id", $category_id)->get();
+                // dd($SiteCategory[0]->site_email_alert);
+        
+                $site_news = [];
+                if($SiteCategory) {
+                    foreach($SiteCategory as $SiteCategory_val) {
+                        if($SiteCategory_val) {
+                            $site_email_alert = site_config_email_alert::where("site_id",$SiteCategory_val->site_id)->get();
+                            if($site_email_alert) {
+                                foreach($site_email_alert as $site_email_alert_val) {
+                                    $site_news[] = @$SiteCategory_val->site_email_alert->site_id;
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach($site_news as $data){
+                    $TransactionClientNews = TransactionClientNews::where('site_id', $data)->where('transaction_id', $RSS_news -> id)->first();
+                    if($TransactionClientNews){
+                        $TransactionClientNews -> transaction_mode = 'delete';
+                        $TransactionClientNews -> transaction_data_status = 1;
+                        $TransactionClientNews -> status = 1;
+                        $TransactionClientNews -> save();
+                    }else{
+                        $TransactionClientNews = new TransactionClientNews();
+                        $TransactionClientNews -> site_id = $data;
+                        $TransactionClientNews -> transaction_id = $RSS_news -> id;
+                        $TransactionClientNews -> transaction_mode = 'delete';
+                        $TransactionClientNews -> transaction_data_status = 1;
+                        $TransactionClientNews -> status = 1;
+                        $TransactionClientNews -> save();
+                    }
+                }
+                
             $RSSNewsCategory = RSSNewsCategory::where('rss_news_id',$RSS_news->id);
             $RSSNewsCategory->delete();
         }
