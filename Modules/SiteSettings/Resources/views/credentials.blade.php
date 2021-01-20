@@ -557,16 +557,17 @@
 
     function delete_credentials(id){
         credentials_id_delete = id;
+        credentials_id_delete_change=[];
      
     }
 
     function delete_credentials_save(){
-       
         $.ajax({
             type:"POST",
             url:"{{ route('credentials.credentials_delete') }}",
             data:{
                 id: credentials_id_delete,
+                id_change: credentials_id_delete_change,
             },
             beforeSend: function(){
                 loading('load');
@@ -576,6 +577,7 @@
                 toastr.success(response.message, '@langapp('response_status')');
                 window.$('#delete_credentials').modal('hide');
                 $('#table_credentials').DataTable().ajax.reload();
+                
             },
             error: function (error){
                 loading('stop_load');
@@ -592,12 +594,16 @@
     }
 
     $("#btn_del_select").click(function() {
+        $('#delete_credentials').modal('show');
         $('.credentials_id:checked').each(function () {
-            credentials_id_delete_change.push(this.value);
-            
+            credentials_id_delete_change.push(this.value);     
         });
+    });
 
-        console.log(credentials_id_delete_change);
+    {{--$("#btn_del_select").click(function() {
+        
+        
+
 
        Swal.fire({
             title: 'Are you sure?',
@@ -622,6 +628,7 @@
                     },
                     success:function(response) {
                         loading('stop_load');
+                        credentials_id_delete_change=[];
                         toastr.success(response.message, '@langapp('response_status')');
                         $('#table_credentials').DataTable().ajax.reload();
                     },
@@ -639,7 +646,7 @@
 
             }
         })
-    });
+    });--}}
      
        
   

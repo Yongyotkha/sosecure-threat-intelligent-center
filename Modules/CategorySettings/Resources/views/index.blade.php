@@ -263,11 +263,7 @@
 
 
 
-        $("#btn-change-status").click(function() {
 
-            
- 
-    });
 
 
         function change_category_active (category_id) {
