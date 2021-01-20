@@ -14,6 +14,8 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use App\DataLeakSocialRef;
+use DB;
 
 class SocialController extends Controller
 {
@@ -617,5 +619,205 @@ class SocialController extends Controller
         }
 
         // dd($addread);
+    }
+
+
+    public function count_val(Request $request){
+
+        $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
+        $where = ['deleted_at' => null];
+        $orwhere = ['deleted_at' => null, 'feel_type' => 'compromise'];
+        $orwhere2 = ['deleted_at' => null, 'feel_type' => 'webserver'];
+        $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
+        
+
+        $date_start = $request->date_start;
+        $date_end = $request->date_end;
+        $site_id = '';
+        $site_code = $request ->site_id;
+
+        if($site_code) {
+            $site_id_m = SiteSettings::where('code',$site_code)->first();
+            $site_id = @$site_id_m->id;
+        }
+
+        $title = $request ->title;
+        $social = $request ->social;
+       
+
+        $date_start_explode = explode(" ",$date_start);
+        $date_start_date = @$date_start_explode[0];
+        $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+        // dd($date_start_time);
+        $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+        // dd($date_start_date_format);
+        $date_start_time_time = date("H:i", strtotime($date_start_time));
+        $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+        // dd($date_start_time_time);
+
+        $date_end_explode = explode(" ",$date_end);
+        $date_end_date = @$date_end_explode[0];
+        $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+        // dd($date_end_time);
+        $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        $date_end_time_time = date("H:i", strtotime($date_end_time));
+        $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+        // dd($date_end_time_time);
+
+        // date("H:i", strtotime("04:25 PM"))
+        $html = '';
+
+        
+
+        if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) ){
+
+            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
+
+
+            if($request -> social) {
+                $model = $model-> where('feel_type', '=' ,$request -> social);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> social);
+            }else{
+                $model = $model->whereIn('feel_type', ['social', 'darkweb_public']);
+                $countGroupBy = $countGroupBy->whereIn('feel_type', ['social', 'darkweb_public']);
+            }
+
+            if($request -> title){
+                $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
+                // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+                // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
+            }
+
+            
+
+            if($date_start) {
+              
+                if($request -> isDateSearch=="true"){
+                    // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                    // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
+                        $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
+                    });
+
+                    $model = $model->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
+                        $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
+                    });
+                
+                }
+
+            }
+
+            if($date_end) {
+
+            }
+
+
+
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $model = $model->whereIn('site_id', $site_id_arr);
+            
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                 
+    
+                        } else {//not support and admin
+                            $model = $model->whereIn('site_id', $site_id_arr);
+            
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        }
+                    }
+                }
+            }
+
+
+
+            if($site_id) {
+                $model = $model->where('site_id', $site_id);
+
+                $countGroupBy = $countGroupBy->where('site_id', $site_id);
+            }
+
+            // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+
+            //  $news = $news->get();
+            // $news->orderBy('created_at','desc')->paginate(10);
+            // $news = RSSNews::where('save_draft', 0);//->get()
+            // $news -> paginate(10);//->get()
+            // $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(10);//->get()
+            // $news = $news->get();
+            // dd($news->get());
+            // dd($news);
+            // dd($news->total);
+            $Data_leak_feed_all = $model->count();
+            $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
+            $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+        }else{
+            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orWhere('feel_type', 'darkweb_public')->count();
+            $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public']);//->get()
+            $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public'])->groupBy('feel_type');
+           
+
+            if(Auth::check()) {
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                if(Auth::user()->hasRole('admin')) {//if admin
+                    // dd(777);
+                    
+                } else { //if notAdmin
+                    // dd(888);
+                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                            // dd(99);
+    
+                            $news = $news->whereIn('site_id', $site_id_arr);
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                 
+                        } else {//not support and admin
+                            $news = $news->whereIn('site_id', $site_id_arr);
+                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        }
+                    }
+                }
+            }
+
+            $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+            $countGroupBy = $countGroupBy->get();
+
+
+        }
+
+        // dd($news);
+        $content = [];
+
+        // dd($content);
+        $count_sub_type["darkweb"] = 0;
+        $count_sub_type["social"] = 0;
+        
+        foreach ($countGroupBy as $countGroup) {
+            $count_sub_type[$countGroup->feel_type] = $countGroup->total;
+        }
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+                "count" => $Data_leak_feed_all,
+                "darkweb" => $count_sub_type["darkweb"],
+                "social" => $count_sub_type["social"],
+            ];
+            return response()->json($data); 
+        }
     }
 }

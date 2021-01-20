@@ -139,6 +139,36 @@
                         </div>
                     </section>
 
+
+
+                    <div class="container-fluid" style="margin-bottom:10px;">
+                        <div class="row">
+                            <div class="col-md-6 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                        <span class="number-card warning" id='compromise-count'>0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                        <span class="number-card info"  id='darkweb-count'>0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     
                     <section class="panel panel-default">
                         <div class="table-responsive">
@@ -345,6 +375,7 @@
 
     $(function() {
         table_social_data();
+        get_count();
     });
 
     function search(){
@@ -356,6 +387,7 @@
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
 
         table_social_data();
+        get_count();
     }
 
     function table_social_data(){
@@ -634,6 +666,51 @@
             });
         });
     });
+
+
+
+    function get_count() {
+
+        if(search_val == true) {
+            search_val = 1;
+        } else {
+            search_val = 0;
+        }
+
+        $.ajax({
+            type:"POST",
+            url:'{!! site_url('social/count_val') !!}',
+            data: ({
+                keywords : keywords,
+                site_id : site,
+                social : source,
+                search_val : search_val,
+                startDate : startDate,
+                endDate : endDate,
+                isDateSearch : isDateSearch
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                $('#darkweb-count').text(response.darkweb);
+                $('#compromise-count').text(response.social);
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+
+        });
+}
+
+
 
    
 
