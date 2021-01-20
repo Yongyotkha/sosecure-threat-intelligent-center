@@ -93,7 +93,7 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Compromised' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Compromised' || $page == 'Web Server' || $page == 'Compromised Feed' || $page == 'Compromised Data' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Compromised
@@ -118,7 +118,7 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Social Datas' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Social Datas' || $page == 'Data Leak Feed' || $page == '' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Data Leak

@@ -471,17 +471,17 @@
         cb(start, end);
         
         $("#btn_data_leak_reset").click(function() {
-        search_val = 0;
-        $("#search").val('');
-        $("#source_select").val('').trigger('change');
-        $("#check_all").prop("checked",false);
-        $("#check_pending").prop("checked",false);
-        $("#check_approved").prop("checked",false);
+            search_val = 0;
+            $("#search").val('');
+            $("#source_select").val('').trigger('change');
+            $("#check_all").prop("checked",false);
+            $("#check_pending").prop("checked",false);
+            $("#check_approved").prop("checked",false);
 
-        cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
+            cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
 
-        table_social_data();
-    });
+            table_social_data();
+        });
     });
 
     $('#table_data_feed').on('click', '.select-chk', function () {
@@ -513,13 +513,13 @@
     });
 
     function approve_dataFeed(id){
-    data_feed_id = [];
-    data_feed_id.push(id);
+        data_feed_id = [];
+        data_feed_id.push(id);
     }
 
-function cancle_dataFeed(id){
-    data_feed_id = [];
-    data_feed_id.push(id);
+    function cancle_dataFeed(id){
+        data_feed_id = [];
+        data_feed_id.push(id);
     }
 
     function confirm_approve(){
