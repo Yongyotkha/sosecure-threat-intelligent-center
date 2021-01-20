@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
 use App\Entities\TransactionBatchjob;
 use DB;
+use Modules\SiteSettings\Entities\SiteSettings;
 class MonitoringController extends Controller
 {
     /**
@@ -34,12 +35,15 @@ class MonitoringController extends Controller
      */
     public function index()
     {
+        
         $data['page'] = langapp('monitoring');
         return view('monitoring::index')->with($data);
     }
 
     public function batchjob()
     {
+        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('batchjob');
         return view('monitoring::index')->with($data);
     }
