@@ -22,7 +22,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('save_deploy_history', 'Api\RegisterSiteController@save_deploy_history');
     Route::post('save_deploy_system', 'Api\RegisterSiteController@save_deploy_system');
     Route::post('test_get', 'Api\ExampleApiController@test_get');
-    Route::post('tranferTransactionUpdateCode', 'Api\ApiTransferCenterInsert@tranfer_transaction_update_code');
+    Route::post('tranferTransactionUpdateCode', 'Api\ApiTransactionUpdateCodeController@tranfer_transaction_update_code');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
