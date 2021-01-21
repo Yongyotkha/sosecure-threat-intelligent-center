@@ -555,11 +555,11 @@
                                 var res = full.keyword.split(",");
                                 for(let i in res){
                                     var data = res[i];
-                                    content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                                    content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                                 }
                                 
                             }
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+content+'">'+content+'</div>';
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+feedcontent+'">'+content+'</div>';
                         },
                     },
 

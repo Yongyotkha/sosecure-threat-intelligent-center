@@ -534,7 +534,7 @@
                                     console.log(data2);
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                                return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                             }else{
                                 return '';
                             }
