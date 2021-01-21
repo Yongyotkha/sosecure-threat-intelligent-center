@@ -17,7 +17,8 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Illuminate\Support\Facades\Auth;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
-
+use Yajra\DataTables\DataTables;
+use App\Entities\TransactionBatchjob;
 class DashboardNewController extends Controller
 {
     /**
@@ -447,6 +448,45 @@ class DashboardNewController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function table_dashboard(Request $request)
+    {
+        $model = '';
+        $html = '';
+        if ($request->isSearch == 1) {
+            // $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name')->where('status', 1);
+            // if($request->Keywords){
+            //     $keywords = "%".$request->Keywords."%";
+            //     $model = $model->where(function ($query) use ($keywords){
+            //         $query->where('transaction_batchjob.name','LIKE', $keywords)
+            //         ->orWhere('mode', 'LIKE', $keywords);
+            //     });
+            // }
+
+            // if($request->select||$request->select==="0"){
+            //     $model = $model->where('progress', $request->select);
+            // }
+
+            // if($request->sitecode){
+            //     $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$request->sitecode)->first();
+            //     $model = $model->where('site_id', $SiteSettings->id);
+            // }
+
+            // $model = $model->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
+            
+        } else {
+
+            $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id');
+            $dataCVEMapping = $dataCVEMapping->get()->toArray();
+        
+        }
+        
+            $model = $dataCVEMapping;
+            $dataOut = array();
+
+            $dataOut["data"] = $model;
+            return response()->json($dataOut);
     }
 
     public function load_chart(Request $request)
