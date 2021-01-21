@@ -164,7 +164,7 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
                         <div class="col-md-6">
-                            <i class="fas fa-table"></i> Table Event
+                            <i class="fas fa-table"></i> Table Activities
                         </div>
                         <div class="col-md-6 text-right">
                             <button id="togglecollapsetable" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#table-container','#togglecollapsetable')">
