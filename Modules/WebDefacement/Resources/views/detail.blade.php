@@ -3,30 +3,29 @@
 <section id="content" class="bg">
     <section class="vbox">
         {{-- Head --}}
-        <header class="header bg-white b-b b-light head-d-flex-nowrap"
-        style="white-space: nowrap;overflow-x: auto;">
-        <div class="bc-head m-none" style="width:100%;">
+        <header class="header panel-heading bg-white b-b b-light">
+        <div class="bc-head" style="margin-top: 10px;max-width: 265px !important;">
             <a href="{{route('webdefacement.index')}}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                 @icon('solid/arrow-left')
             </a>
             @langapp('webdefacement') > {{@$webdefacement->name}}
+        </div>
 
-            <div class="pull-right" style="display: flex;align-items:center;" id='load_status'>
-                <span>Status &nbsp;</span>
-                <span id="status_val_webdefacement">
-                {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
-                </span>
-                &nbsp;
-                <span id="check_status_val_webdefacement">
-                @if (@$webdefacement->status_val != 'Normal')   
-                    <a href="#" id="accept_risk" onclick="accept_risk()"
-                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
-                        Accept Risk
-                    </a>
-                </span>    
-                @endif
-            </div>
+        <div class="pull-right" style="margin-top: 10px" id='load_status'>
+            <span>Status &nbsp;</span>
+            <span id="status_val_webdefacement">
+            {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
+            </span>
+            &nbsp;
+            <span id="check_status_val_webdefacement">
+            @if (@$webdefacement->status_val != 'Normal')   
+                <a href="#" id="accept_risk" onclick="accept_risk()"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
+                    Accept Risk
+                </a>
+            </span>    
+            @endif
         </div>
 
         &nbsp;
@@ -34,7 +33,6 @@
     </header>
 
         <section class="scrollable wrapper">
-            
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
@@ -49,81 +47,83 @@
                     </div>
                 </header>
                 <div class="panel-body" id="wdfm-log">
-                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
-                        <tr>
-                            <th class="text-center">No</th>
-                            <th>Description</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Datetime</th>
-                            
-                        </tr>
-
-                        @if ($webdefacment_data_log)            
-                            @foreach ($webdefacment_data_log as $webdefacment_data_log)
-                                <tr>
-                                    <td class="text-center">{!! @$loop->iteration !!}</td>
-                                    <td>
-                                        @if ($webdefacment_data_log->message) 
-                                        {!!@$webdefacment_data_log->message!!}
-                                        @else
-                                            -
-                                        @endif 
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($webdefacment_data_log->status_val) 
-                                            {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
-                                        @else
-                                            -
-                                        @endif    
-                                    </td>
-                                    <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
-                                </tr>
-                            @endforeach
-                        @endif
-
-                        <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> 
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td> 
-                                <div class="main-card-log">
-                                    <div class="card-log">
-                                        <div class="card-log-body">
-                                            <p>Hash Difference 30%</p>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover" style="margin-bottom:0 !important;">
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th>Description</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Datetime</th>
+                                
+                            </tr>
+    
+                            @if ($webdefacment_data_log)            
+                                @foreach ($webdefacment_data_log as $webdefacment_data_log)
+                                    <tr>
+                                        <td class="text-center">{!! @$loop->iteration !!}</td>
+                                        <td class="nowrap">
+                                            @if ($webdefacment_data_log->message) 
+                                            {!!@$webdefacment_data_log->message!!}
+                                            @else
+                                                -
+                                            @endif 
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($webdefacment_data_log->status_val) 
+                                                {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
+                                            @else
+                                                -
+                                            @endif    
+                                        </td>
+                                        <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+    
+                            <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> 
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td> 
+                                    <div class="main-card-log">
+                                        <div class="card-log">
+                                            <div class="card-log-body">
+                                                <p>Hash Difference 30%</p>
+                                            </div>
+                                        </div>
+                                        <div class="card-log">
+                                            <div class="card-log-body">
+                                                <p>File Size Difference 30%</p>
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="card-log">
+                                            <div class="card-log-body">
+                                                <p>Hash Difference 30%</p>
+                                            </div>
+                                        </div>
+                                        <div class="card-log">
+                                            <div class="card-log-body">
+                                                <p>Element Difference 30%</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card-log"  style="background: #fcc838 ">
+                                            <div class="card-log-body">
+                                                <p>Total Difference 30% (Medium)</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="card-log">
-                                        <div class="card-log-body">
-                                            <p>File Size Difference 30%</p>
-                                        </div>
-                                       
-                                    </div>
-                                    <div class="card-log">
-                                        <div class="card-log-body">
-                                            <p>Hash Difference 30%</p>
-                                        </div>
-                                    </div>
-                                    <div class="card-log">
-                                        <div class="card-log-body">
-                                            <p>Element Difference 30%</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="card-log"  style="background: #fcc838 ">
-                                        <div class="card-log-body">
-                                            <p>Total Difference 30% (Medium)</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                               Medium
-                            </td>
-                            <td class="no-wrap">2021-01-17 09:47:38</td>
-                        </tr>
-                        -->
-
-
-                    </table>
+                                </td>
+                                <td class="text-center">
+                                   Medium
+                                </td>
+                                <td class="no-wrap">2021-01-17 09:47:38</td>
+                            </tr>
+                            -->
+    
+    
+                        </table>
+                    </div>
                 </div>
             </section>
             
@@ -270,8 +270,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img" id='updateImage_original'>
-                                                <a href="{{asset(@$webdefacement->image_original)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacement->image_original)}}" onerror="setDefaultPic(this)"/>
+                                                <a href="{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                    <img src="{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -297,8 +297,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="{{asset(@$webdefacement->image_last)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacement->image_last)}}" onerror="setDefaultPic(this)"/>
+                                                <a href="{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                    <img src="{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>

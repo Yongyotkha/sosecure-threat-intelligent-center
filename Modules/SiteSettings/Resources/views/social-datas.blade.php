@@ -289,9 +289,9 @@ function table_social_data(){
                     let content = '';
                     for(let i in res){
                         const data = res[i];
-                        content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                        content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                     }
-                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                    return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                 },
             },
         ]

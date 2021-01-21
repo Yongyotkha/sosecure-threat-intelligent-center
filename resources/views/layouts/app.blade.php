@@ -453,6 +453,7 @@
 
 
 <script src="{{ getAsset('js/plugins.js') }}"></script>
+<script src="{{ getAsset('js/custom.js') }}"></script>
 @isset($help) 
     <script src="{{ getAsset('plugins/intro/intro.min.js') }}"></script>
     <script src="{{ getAsset('plugins/intro/demo.js') }}"></script>

@@ -20,7 +20,7 @@
             @endif
 
 
-            <div class="pull-right" style="margin-top: 8px; width: 300px;">
+            <div class="pull-right" style="margin-top: 8px;" style="width: 300px">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
                     @if ($SiteSettings)
@@ -103,10 +103,10 @@
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
-                        <div class="col-xs-2">
+                        <div class="col-lg-2 col-sm-3">
                             <i class="fas fa-table"></i> Website
                         </div>
-                        <div class="col-xs-10 text-right">
+                        <div class="col-lg-10 col-sm-9 text-right">
                             <a href="#" id="all" class="btn-chart white d-il-flex mr-3">
                                 <span class="dot-all" style="height:8px;"></span>
                                 All

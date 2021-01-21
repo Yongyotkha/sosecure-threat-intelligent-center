@@ -28,50 +28,56 @@
         </aside>
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
-                        style="margin-top: 0;">@icon('solid/bars')</a>
-                    @endif
-                    <div class="bc-head"> Compromise Data </div>
+                <header class="header panel-heading bg-white b-b b-light" style="display: flex;justify-content:space-between;">
+                    <div class="bc-head">
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
+                            style="margin-top: 0;">@icon('solid/bars')</a>
+                        @endif 
+                        Compromise Data
+                    </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
                     data-rel="tooltip" title="@langapp('export') CSV">
                     @icon('solid/download') CSV
                     </a> --}}
 
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right"
-                        value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                            @langapp('delete')</span>
-                    </button>
+                    <div class="text-right">
+                     
+                        <div class="text-left" style="margin-top: 8px; max-width: 120px;display:inline-block;">
+                            <select name="site" id="site" class="text-left select2-option form-control select-site"
+                                style="max-width: 120px">
+                                <option value="">All Site</option>
+                                @if($SiteSettings)
+                                @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+                        </div>
 
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </button>
+                        @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                            // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
+                            class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
+                                feed</span></a>
+                        @endif
+                        @endif
 
-                    @if(!empty(get_role_custom()))
-                    {{-- // var_dump(get_role_custom()['superadmin']);
-                        // var_dump(get_role_custom()['site_admin']); --}}
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                    <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                        class="btn btn-sm btn-info pull-right m-xs"><span><i class="fas fa-rss"></i> Compromise
-                            feed</span></a>
-                    @endif
-                    @endif
+                        <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                        </button>
+    
+                 
+    
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  "
+                            value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
+                                @langapp('delete')</span>
+                        </button>
 
-
-
-
-                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                        <select name="site" id="site" class="select2-option form-control select-site"
-                            style="min-width: 300px">
-                            <option value="">All Site</option>
-                            @if($SiteSettings)
-                            @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                            @endforeach
-                            @endif
-                        </select>
+                 
                     </div>
 
 
@@ -521,7 +527,7 @@
                         render: function (data, type, full, meta) {
                             let val = full.feel_type;
                             if(val) {
-                                val = full.feel_type;
+                                val = get_word_leak_compromise(full.feel_type,'compromise');
                             }
         
                             return val;
@@ -529,7 +535,6 @@
                         },
                     
                     },
-
                     {
                         targets: 3,
                         width: '10px',
@@ -555,11 +560,11 @@
                                 var res = full.keyword.split(",");
                                 for(let i in res){
                                     var data = res[i];
-                                    content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                                    content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                                 }
                                 
                             }
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+content+'">'+content+'</div>';
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+feedcontent+'">'+content+'</div>';
                         },
                     },
 
@@ -576,7 +581,7 @@
                                 }
                             }
         
-                            return val;
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+val+'">'+val+'</div>';
 
                         },
                     

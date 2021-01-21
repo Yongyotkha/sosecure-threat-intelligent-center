@@ -211,7 +211,7 @@
                     <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Confirm Information</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group row">
+                    {{-- <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
                             <select id="status_action" class="form-control select2">
@@ -219,11 +219,11 @@
                                 <option value="2">Cancle</option>
                             </select>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="form-group row">
                         <label for="" class="col-md-3">Sent mail</label>
                         <div class="col-md-9">
-                            <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label>
+                            <label><input type="checkbox" name="sent_mail" class="sent_mail" value="true"><span class="label-text">Sent mail to customers</span></label>
                         </div>
                     </div>
                 </div>
@@ -233,7 +233,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" class="btn btn-info btn-rounded" onclick="confirm_approve()">
+                    <button type="submit" class="btn btn-info btn-rounded" onclick="confirm_approve('one')">
                         <i class="fas fa-paper-plane"></i>
                         Yes, approve
                     </button>
@@ -252,7 +252,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <div class="form-group row">
+                    {{-- <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
                             <select id="status_action" class="form-control select2">
@@ -260,7 +260,7 @@
                                 <option value="2">Cancle</option>
                             </select>
                         </div>
-                    </div>
+                    </div> --}}
                     
                     <span class="modal-title">Are you sure you want to cancel this item?</span>
                     <br>
@@ -455,9 +455,9 @@ function table_social_data(){
                     let content = '';
                     for(let i in res){
                         const data = res[i];
-                        content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                        content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                     }
-                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                    return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                 },
             },
         ]
@@ -488,14 +488,21 @@ function cancle_dataFeed(id){
     data_feed_id.push(id);
 }
 
-function confirm_approve(){
+function confirm_approve(mode){
     $('.data_feed_id:checked').each(function () {
         data_feed_id.push(this.value);
     });
     let sent_mail = 0;
-    if ($("#sent_mail").is(':checked')) {
-        sent_mail = 1;
+    if(mode == 'one'){
+        if ($(".sent_mail").is(':checked')) {
+            sent_mail = 1;
+        }
+    }else{
+        if ($("#sent_mail").is(':checked')) {
+            sent_mail = 1;
+        }
     }
+    
     $.ajax({
         type:"POST",
         url:"{{ route('socialdatas.approve_data_feed') }}",
@@ -554,7 +561,7 @@ function confirm_cancle(){
 function change_status(){
     let status_action = $('#status_action :selected').val();
     if(status_action == 1){
-        confirm_approve();
+        confirm_approve('many');
     }else{
         confirm_cancle();
     }

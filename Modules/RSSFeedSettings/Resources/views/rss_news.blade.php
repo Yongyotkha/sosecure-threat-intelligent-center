@@ -41,8 +41,7 @@
             <section class="vbox">
 
                 <header class="header panel-heading bg-white b-b b-light">
-                    <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
-                        style="margin-top: 0;">@icon('solid/bars')</button>
+                    <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</button>
                     <div class="bc-head">News</div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
                     data-rel="tooltip" title="@langapp('export') CSV">

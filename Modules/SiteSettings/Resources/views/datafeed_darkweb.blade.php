@@ -580,7 +580,7 @@ function table_social_data(){
                 "check_all" : check_all,
                 "check_pending" : check_pending,
                 "check_approved" : check_approved,
-                "site" : site,
+                "site" : site
             },
             type: "POST",
         },
@@ -641,7 +641,7 @@ function table_social_data(){
                         const data = res[i];
                         content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
                     }
-                    return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                    return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                 },
             },
         ]
