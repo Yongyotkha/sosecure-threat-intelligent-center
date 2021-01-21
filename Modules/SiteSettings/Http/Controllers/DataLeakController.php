@@ -1210,9 +1210,12 @@ class DataLeakController extends Controller
                 $model = $model->where('keyword', 'LIKE', '%' . $request->search . '%');
             }
 
-            if ($request->source_select) {
-                $model = $model->where('sourceid', $request->source_select);
+            if ($request->type) {
+                $model = $model->where('feel_type', $request->type);
             }
+            // if ($request->source_select) {
+            //     $model = $model->where('sourceid', $request->source_select);
+            // }
             if ($request->check_all == 'true') {
 
             } else {

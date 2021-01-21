@@ -69,6 +69,19 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="row d-flex align-items-center">
+                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Type</label>
+                                        <div class="col-sm-9 col-xs-12">
+                                            <select id="type" class="form-control">
+                                                <option value="">All</option>
+                                                <option value="social">PUBLIC</option>
+                                                <option value="darkweb_public">DARK WEB</option>
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{-- <div class="col-lg-4">
+                                    <div class="row d-flex align-items-center">
                                         <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                         <div class="col-sm-9 col-xs-12">
                                             <select id="source_select" class="form-control">
@@ -81,7 +94,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="col-lg-4 text-center">
                                     <div id="datafeed_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
@@ -141,7 +154,7 @@
                                                 </label>
                                             </th>
                                             <th>Site</th>
-                                            <th>Source</th>
+                                            <th>Type</th>
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
                                             <th>Data Leak Feed</th>
@@ -384,7 +397,7 @@ $("#btn_data_leak_search").click(function() {
 function table_social_data(){
     let search = $('#search').val();
     let site = $('#site').val();
-    let source_select = $('#source_select').val();
+    let type = $('#type').val();
     $('#table_data_feed').DataTable({
         processing: true,
         serverSide: true,
@@ -395,7 +408,7 @@ function table_social_data(){
             data: {
                 "search_val" : search_val,
                 "search" : search,
-                "source_select" : source_select,
+                "type" : type,
                 "start_date" : start_date,
                 "end_date" : end_date,
                 "check_all" : check_all,
