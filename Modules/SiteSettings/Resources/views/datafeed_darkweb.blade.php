@@ -182,7 +182,7 @@
                         Confirm Information
                     </h4>
                 </div>
-                <form action="">
+                
                 <div class="modal-body">
                     <div class="form-group row">
                         <div class="col-md-3">
@@ -210,6 +210,7 @@
                             </label>
                         </div>
                     </div>
+                </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
@@ -221,7 +222,7 @@
                         Save
                     </button>
                 </div>
-                </form>
+                
             </div>
         </div>
     </div>
@@ -338,15 +339,7 @@
 @include('scripts.summernote')
 <script>
 
-        {{--$('form').each(function () {
-            if ($(this).data('validator'))
-                $(this).data('validator').settings.ignore = ".note-editor *";
-        });
-
-        $('#detail_content').summernote('destroy');--}}
-
-
-    var search_val = 0;
+var search_val = 0;
     var keywords = null;
     var site = null;
     var source = null;
@@ -587,7 +580,7 @@ function table_social_data(){
                 "check_all" : check_all,
                 "check_pending" : check_pending,
                 "check_approved" : check_approved,
-                "site" : site;
+                "site" : site,
             },
             type: "POST",
         },

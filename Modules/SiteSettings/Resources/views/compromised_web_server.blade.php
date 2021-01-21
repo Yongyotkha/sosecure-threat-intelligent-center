@@ -3,15 +3,15 @@
 
 <style>
     .block {
-  display: block;
-  width: 100%;
-  border: none;
+        display: block;
+        width: 100%;
+        border: none;
 
 
-  font-size: 16px;
-  cursor: pointer;
-  text-align: center;
-}
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+    }
 </style>
 <section id="content" class="bg">
     <section class="hbox stretch">
@@ -20,13 +20,13 @@
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                     <p class="h3 text-elipse-setting">{{@$siteSettings->name}}</p>
                 </header>
                 <section class="scrollable">
-                        <section id="setting-nav" class="hidden-xs">
-                            @include('partial.menu_site')
-                        </section>
+                    <section id="setting-nav" class="hidden-xs">
+                        @include('partial.menu_site')
+                    </section>
                 </section>
             </section>
         </aside>
@@ -36,7 +36,7 @@
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
                         style="margin-top: 0;display: none">@icon('solid/bars')</a>
                     <div class="bc-head">Web Server </div>
-              
+
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right"
                         value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
@@ -185,7 +185,7 @@
             </div>
             <div class="modal-body">
                 <form id='add_asset_click' method="POST">
-                    
+
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
                                 class="text-danger">*</span> </label>
@@ -201,7 +201,7 @@
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-8">
                             <input type="text" id="ip" class="form-control check_test" required="yes">
-                            <span style="color:red;"><small id = "check_i"></small></span>
+                            <span style="color:red;"><small id="check_i"></small></span>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -212,73 +212,74 @@
                         </div>
                     </div>
 
-                    
+
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">User & Password<span
                                 class="text-danger">*</span> </label>
                         <div class="col-lg-5">
 
                             <select id="u_p" class="form-control check_test_select" required>
-                                <option  value="">Choose an User</option>
+                                <option value="">Choose an User</option>
                                 @if($Credentials)
-                                    @foreach ($Credentials as $item)
-                                    <option  value="{{@$item->id}}">{{@$item->name}}</option>
-                                    @endforeach
+                                @foreach ($Credentials as $item)
+                                <option value="{{@$item->id}}">{{@$item->name}}</option>
+                                @endforeach
                                 @endif
                             </select>
-                            <span style="color:red;"><small id = "check_u_p"></small></span>
+                            <span style="color:red;"><small id="check_u_p"></small></span>
                         </div>
-                        &nbsp;<button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }}">Add User</button>
+                        &nbsp;<button type="button" data-toggle="collapse" href="#demo"
+                            class="btn btn-{{ get_option('theme_color')  }}"><i class="fas fa-plus"></i>&nbsp; Add User</button>
                     </div>
-                   
+
                     <div id="demo" class="collapse box">
-                        
+
                         <fieldset class="collapsible">
-                        
-                            <legend>Add Credentials</legend>
+
+                            <legend>Add User</legend>
                             <div class="form-group row">
                                 <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
                                         class="text-danger">*</span> </label>
                                 <div class="col-lg-8">
-                                    <input type="text" id="name_new" class="form-control check_test" >
-                                    <span style="color:red;"><small id = "check_n"></small></span>
+                                    <input type="text" id="name_new" class="form-control check_test">
+                                    <span style="color:red;"><small id="check_n"></small></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label style="padding-top: 7px" class="col-lg-3 control-label">User <span
                                         class="text-danger">*</span> </label>
                                 <div class="col-lg-8">
-                                    <input type="text" id="user_new" class="form-control check_test" >
-                                    <span style="color:red;"><small id = "check_u"></small></span>
+                                    <input type="text" id="user_new" class="form-control check_test">
+                                    <span style="color:red;"><small id="check_u"></small></span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label style="padding-top: 7px" class="col-lg-3 control-label">Password <span
                                         class="text-danger">*</span> </label>
                                 <div class="col-lg-8">
-                                    <input type="password" id="pass_new" class="form-control check_test" >
-                                    <span style="color:red;"><small id = "check_p"></small></span>
+                                    <input type="password" id="pass_new" class="form-control check_test">
+                                    <span style="color:red;"><small id="check_p"></small></span>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger btn-rounded" data-toggle="collapse" data-target="#demo" >
+                                <button type="button" class="btn btn-danger btn-rounded" data-toggle="collapse"
+                                    data-target="#demo">
                                     <i class="fas fa-times"></i>
                                     Close
                                 </button>
-                                <button type="button" onclick="new_credentials()"
-                                    class="btn btn-info btn-rounded">
+                                <button type="button" onclick="new_credentials()" class="btn btn-info btn-rounded">
                                     <i class="fas fa-paper-plane"></i>
                                     Save
                                 </button>
                             </div>
                             <hr>
                         </fieldset>
-         
 
-                        
+
+
                     </div>
 
-                    
+
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
                         <div class="col-lg-8">
@@ -286,7 +287,7 @@
                                 onclick="test_data()">Test Connection</button>
                         </div>
                     </div>
-                    
+
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Root Path <span
                                 class="text-danger">*</span> </label>
@@ -309,7 +310,7 @@
                         <label class="col-lg-3 control-label">Status </label>
                         <div class="col-lg-8">
                             <label class="switch">
-                                <input type="checkbox" id="status" name="status" checked value="1" >
+                                <input type="checkbox" id="status" name="status" checked value="1">
                                 <span></span>
                             </label>
                         </div>
@@ -337,7 +338,8 @@
     </div>
 </div>
 
-<div class="modal" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+<div class="modal" id="delete_web_sever" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
+    style="left: unset">
     <div class="modal-dialog modal-dialog-aside" role="document">
         <div class="modal-content">
             <div class="modal-header bg-danger">
@@ -346,12 +348,14 @@
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
-                    <p class="text-danger">@langapp('delete_warning')  </p>
+                    <p class="text-danger">@langapp('delete_warning') </p>
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit" onclick="delete_web_server_save()"><i class="fas fa-paper-plane"></i> OK</button>
+                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                        class="fas fa-times text-muted"></i> Close</a>
+                <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit"
+                    onclick="delete_web_server_save()"><i class="fas fa-paper-plane"></i> OK</button>
             </div>
         </div>
     </div>
@@ -388,7 +392,27 @@
         </div>
     </div>
 </div> --}}
-
+    <div class="modal-dialog modal-dialog-aside" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-blue">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                    Confirm Information
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <span class="modal-title">Are you sure you want to change fix this datas?</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                <button type="button" class="btn btn-info submit btn-rounded change_fix_submit"><i class="fas fa-paper-plane"></i> OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 </section>
@@ -1054,52 +1078,44 @@
     }
 
     $("#btn-change-status").click(function() {
+        $('#change_fix').modal('show');
         $('.web_server_id:checked').each(function () {
             web_server_id_chang.push(this.value);
             
         });
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('compromised_web_server.web_server_change_status') }}",
-                    data:{
-                        id_chang: web_server_id_chang,
-                        site:{!!json_encode($siteID)!!},
-                    },
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                    success:function(response) {
-                        loading('stop_load');
-                        toastr.success(response.message, '@langapp('response_status')');
-                        window.location.href = response.redirect;
-                    },
-                    error: function (error){
-                        loading('stop_load');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-                
-                });
-
-            }
-        })
     });
+    $(".change_status_submit").click(function() {    
+
+        $.ajax({
+             type:"POST",
+            url:"{{ route('compromised_web_server.web_server_change_status') }}",
+            data:{
+                id_chang: web_server_id_chang,
+                site:{!!json_encode($siteID)!!},
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        
+                
+        });
+
+    });
+
 
     function delete_web_server(id){
         web_server_id_delete = id;

@@ -168,8 +168,9 @@
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Confirm Information</h4>
                 </div>
-                <form action="">
+                
                 <div class="modal-body">
+                    <form action="">
                     <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
                         <div class="col-md-9">
@@ -185,6 +186,7 @@
                             <label><input type="checkbox" name="sent_mail" id="sent_mail" value="true"><span class="label-text">Sent mail to customers</span></label>
                         </div>
                     </div>
+                </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
@@ -196,7 +198,7 @@
                         Save
                     </button>
                 </div>
-                </form>
+               
             </div>
         </div>
     </div>
