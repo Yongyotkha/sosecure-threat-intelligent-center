@@ -159,6 +159,89 @@
                     </div>
                 </div>
             </div>
+            <hr>
+            <section class="panel panel-default" style="margin-top: 5rem">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row d-flex-center">
+                        <div class="col-md-6">
+                            <i class="fas fa-table"></i> Table Event
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button id="togglecollapsetable" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#table-container','#togglecollapsetable')">
+                                <i class="fas fa-minus-square"></i>Collapse
+                            </button>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" id="table-container">
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <div class="button-group">
+                                <button class="btn btn-xs btn-default">News</button>
+                                <button class="btn btn-xs btn-default">Vulnerability</button>
+                                <button class="btn btn-xs btn-default">Indicators</button>
+                                <button class="btn btn-xs btn-default">Compromised</button>
+                                <button class="btn btn-xs btn-default">Data Leak</button>
+                                <button class="btn btn-xs btn-default">WebDefacement</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-event">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Site</th>
+                                    <th>Page</th>
+                                    <th>Content</th>
+                                    <th>DateTime</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td class="nowrap">บริษัท เมจิกเทคโซลูชั่น</td>
+                                    <td>News</td>
+                                    <td>
+                                        <div class="text-elip">
+                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus, aliquam? Repellat tenetur nam perspiciatis aspernatur 
+                                        blanditiis dolorem vel quaerat rerum iste! Totam dolorem quis,
+                                        nam temporibus asperiores deserunt tempore aliquam!
+                                        </div>
+                                    </td>
+                                    <td class="nowrap">
+                                        2020-01-01 15:13:00
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-book-reader"></i> Read</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td class="nowrap">บริษัท เมจิกเทคโซลูชั่น</td>
+                                    <td>Indicator</td>
+                                    <td>
+                                        <div class="text-elip">
+                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus, aliquam? Repellat tenetur nam perspiciatis aspernatur 
+                                        blanditiis dolorem vel quaerat rerum iste! Totam dolorem quis,
+                                        nam temporibus asperiores deserunt tempore aliquam!am temporibus asperiores deserunt tempore aliquam!am temporibus asperiores deserunt tempore aliquam!am temporibus asperiores deserunt tempore aliquam!
+                                        </div>
+                                    </td>
+                                    <td class="nowrap">
+                                        2020-01-01 15:13:00
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i> View</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
@@ -236,6 +319,20 @@
 @include('stacks.js.highchart')
 
 <script>
+
+    $('#table-event').DataTable({
+        processing: true,
+    });
+
+    function collpase_chart(id,text){
+        $(id).slideToggle();
+        if($(text).text() == 'Expanded'){
+            $(text).html('<i class="fas fa-minus-square"></i>Collapse');
+        }else{
+            $(text).html('<i class="fas fa-plus-square"></i>Expanded');
+        }
+    }
+
     var site = 0;
     function changeSite(value) {
         site = value;
