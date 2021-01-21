@@ -499,8 +499,9 @@
                                 var res = full.keyword.split(",");
                                 let content = '';
                                 for(let i in res){
-                                    const data = res[i];
-                                    content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
+                                    const data2 = res[i];
+                                    console.log(data2);
+                                    content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
                                 return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
                             }else{
