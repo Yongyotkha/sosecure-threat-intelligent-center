@@ -590,7 +590,7 @@
                         width: '10px',
                         render: function (data, type, full, meta) {
       
-                            return `<a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                            return `<a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                       
                             
         
