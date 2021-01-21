@@ -3435,3 +3435,10 @@ input.input-login:focus {
         background: #f3f3f3;
     }
 }
+
+.modal-footer {
+    background: #fff;
+    position: relative;
+    bottom: 0;
+    right: 0;
+}
