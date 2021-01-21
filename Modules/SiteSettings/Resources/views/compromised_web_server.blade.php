@@ -392,6 +392,7 @@
         </div>
     </div>
 </div> --}}
+<div class="modal" id="change_fix" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
     <div class="modal-dialog modal-dialog-aside" role="document">
         <div class="modal-content">
             <div class="modal-header bg-blue">
