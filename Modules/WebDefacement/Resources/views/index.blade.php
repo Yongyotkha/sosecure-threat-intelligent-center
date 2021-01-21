@@ -4,38 +4,41 @@
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            <div class="bc-head"> @langapp('webdefacement')</div>    
+            <div class="bc-head"> @langapp('webdefacement')</div>
 
-            <button id="advance-search" style="margin-top: 8px;" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <button id="advance-search" style="margin-top: 8px;" href="#area-advance-search"
+                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-             </button>
+            </button>
 
             @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                <a href="#" id="btn_md_create" style="margin-top: 8px;" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
-                    @icon('solid/plus') @langapp('add')
-                </a>
+            <a href="#" id="btn_md_create" style="margin-top: 8px;"
+                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                data-target="#wdfm_website">
+                @icon('solid/plus') @langapp('add')
+            </a>
             @endif
 
-            
-             <div class="pull-right" style="margin-top: 8px; width: 300px;">
+
+            <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
                     @if ($SiteSettings)
-                    
+
                     @foreach ($SiteSettings as $SiteSettings)
-                    <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}} 
+                    <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}}
                     </option>
                     @endforeach
 
                     @endif
                 </select>
             </div>
-          
+
         </header>
 
         <section class="scrollable wrapper">
             {{-- Search --}}
-            <section class="panel panel-default"   id="area-advance-search" style="display: none">
+            <section class="panel panel-default" id="area-advance-search" style="display: none">
                 <div class="container-fluid" style="padding: 2rem;">
                     <div class="row m-b-md">
                         <div class="col-lg-12">
@@ -67,13 +70,14 @@
                         </div> --}}
                         <div class="col-lg-4">
                             <div class="form-group row">
-                                <label for=""  class="col-sm-3 col-xs-12 col-form-label">Status</label>
+                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                 <div class="col-sm-9 col-xs-12">
-                                <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Normal">Normal</option>
-                                </select>
+                                    <select name="" id="datatype" class="select2-option form-control"
+                                        multiple="multiple">
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Normal">Normal</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -81,18 +85,19 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="search()">
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive"
+                                onclick="search()">
                                 <i class="fas fa-search"></i>
                                 @langapp('apply')
                             </button>
-                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" 
-                            style="white-space: nowrap"  onclick="clear_search()">
+                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive"
+                                style="white-space: nowrap" onclick="clear_search()">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
                         </div>
                     </div>
-                </div> 
+                </div>
             </section>
 
             <section class="panel panel-default">
@@ -121,27 +126,31 @@
                         </div>
                     </div>
                 </header>
-                <div class="panel-body"  style="background: #f2f2f2;">
+                <div class="panel-body" style="background: #f2f2f2;">
                     <div class="wdfm-container" id='data_card'></div>
                 </div>
             </section>
 
-          </section>
+        </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
-    <div class="modal fade fixed-left" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade fixed-left" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
-                    <button type="button" class="close text-white" data-dismiss="modal" onclick="close_wdfm_website()">&times;</button>
+                    <button type="button" class="close text-white" data-dismiss="modal"
+                        onclick="close_wdfm_website()">&times;</button>
                     <h4 class="modal-title text-white">
-                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();"
+                            datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
                         <span id="title_head"> Add Website</span>
                     </h4>
                 </div>
                 {{-- <form action="" class="ajaxifyForm_custom"> --}}
-                {!! Form::open(['route' => ['webdefacement.create_data'], 'class' => 'ajaxifyForm_custom', 'method' => 'POST']) !!}
+                {!! Form::open(['route' => ['webdefacement.create_data'], 'class' => 'ajaxifyForm_custom', 'method' =>
+                'POST']) !!}
                 <input type="hidden" name="mode" id="mode" value="create">
                 <div class="modal-body">
                     <div id="site_id_show" class="form-group row">
@@ -150,7 +159,7 @@
                             <select name="site_id" id="site_id" class="select2-option form-control">
                                 <option value="">Select</option>
                                 @foreach ($SiteSettings_add as $SiteSetting)
-                                    <option value="{{$SiteSetting->id}}">{{$SiteSetting->name}} </option>
+                                <option value="{{$SiteSetting->id}}">{{$SiteSetting->name}} </option>
                                 @endforeach
                             </select>
                         </div>
@@ -164,22 +173,24 @@
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
-                                <input type="text" class="form-control" name="url_web" id="url_web" value="" required>
+                            <input type="text" class="form-control" name="url_web" id="url_web" value="" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
                             <div class="input-group">
-                                <input type="text" class="form-control" name="port_web" id="port_web" value="80" required>
+                                <input type="text" class="form-control" name="port_web" id="port_web" value="80"
+                                    required>
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-info" onclick="get_check_site()">Check</button>  
+                                    <button type="button" class="btn btn-info" onclick="get_check_site()">Check</button>
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <div id="area_check_message_row" class="form-group row" style="display: none;"><label class="col-lg-3 control-label"> </label>
+                    <div id="area_check_message_row" class="form-group row" style="display: none;"><label
+                            class="col-lg-3 control-label"> </label>
                         <div class="col-lg-9">
                             <div id="area_check_message"></div>
                         </div>
@@ -221,7 +232,8 @@
                                 </label>
                             </div>
                             <div id="example-blacklist" style="display: none">
-                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5" class="form-control" placeholder="Ex: hacking,hacked,decript"></textarea>
+                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5"
+                                    class="form-control" placeholder="Ex: hacking,hacked,decript"></textarea>
                                 <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
                             </div>
                             <div class="checkbox">
@@ -234,8 +246,9 @@
                                 </label>
                             </div>
                             <div id="delay_screen_shot_val_div" style="display: none">
-                                Delay Screenshot <input type="text" name="delay_screenshot_val" id="delay_screenshot_val" value="2000"> milliseconds
-                                <button type="button" class="btn btn-info" id="btn_screenshot">screen shot</button> 
+                                Delay Screenshot <input type="text" name="delay_screenshot_val"
+                                    id="delay_screenshot_val" value="2000"> milliseconds
+                                <button type="button" class="btn btn-info" id="btn_screenshot">screen shot</button>
                                 {{-- <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
                                 <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span> --}}
                             </div>
@@ -247,11 +260,12 @@
                         <div class="col-lg-9 review_image_screenshot" style="display: none;">
                             <div class="review-image-capture">
                                 {{-- <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" > --}}
-                                
+
                             </div>
                             <div id="link_edit_image_screenshot" class="edit-capture text-center">
-                                {{-- <a href="{{route('webdefacement_website.edit_image',['site_id' => @$siteSettings->id])}}" target="_blank">
-                                    Edit Image
+                                {{-- <a href="{{route('webdefacement_website.edit_image',['site_id' => @$siteSettings->id])}}"
+                                target="_blank">
+                                Edit Image
                                 </a> --}}
                             </div>
                         </div>
@@ -261,7 +275,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal" onclick="close_wdfm_website()">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal"
+                        onclick="close_wdfm_website()">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -276,17 +291,40 @@
         </div>
     </div>
 
+    <div class="modal" id="delete_web_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+        aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning') </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                            class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_web_submit"
+                        onclick="delete_web_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 <input type="hidden" id="url_id">
 <input type="hidden" id="webdefacment_setting_id">
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.form')
+@include('stacks.css.datatables')
+@include('stacks.css.form')
 
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
-    @include('stacks.css.lightbox')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+@include('stacks.css.lightbox')
 @endpush
 
 @push('pagescript')
@@ -297,7 +335,6 @@
 @include('stacks.js.lightbox')
 
 <script>
-
     var keywords = null;
     var site = null;
     var datatype = null;
@@ -878,52 +915,43 @@
         $("#link_edit_image_screenshot").html("");
         $('.review_image_screenshot').css("display","none");
     }
-  
-  
-    
 
     function btn_click_del_webdefacement(id) {
-     
-     Swal.fire({
-         title: 'Are you sure?',
-         text: "You won't be able to revert this!",
-         icon: 'warning',
-         showCancelButton: true,
-         confirmButtonColor: '#3085d6',
-         cancelButtonColor: '#d33',
-         heightAuto: false,
-         confirmButtonText: 'Yes'
-     }).then((result) => {
-         if (result.isConfirmed) {
-             console.log(id);
-             $.ajax({
-                 type:"POST",
-                 url:"{{ route('webdefacement.delete_websefacement_process') }}",
-                 data:{id: id},
-                 beforeSend: function(){
-                     loading('load');
-                 },
-                 success:function(response) {
-                     loading('stop_load');
-                     toastr.success(response.message, '@langapp('response_status')');
-                     load_card();
-                     {{--window.location.href = response.redirect;--}}
-                 },
-                 error: function (error){
-                     loading('stop_load');
-                     var errors = error.response.data.errors;
-                     var errorsHtml = '';
-                     $.each(errors, function (key, value) {
-                         errorsHtml += '<li>' + value[0] + '</li>';
-                     });
-                     toastr.error(errorsHtml, '@langapp('response_status') ');
-                 }
-         
-             });
+        web_id=id;
+        $('#delete_web_modal').modal('show');
+    }
 
-         }
-     })
-  }
+    function delete_web_select_confirm(){
+
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('webdefacement.delete_websefacement_process') }}",
+            data:{id: web_id},
+            beforeSend: function(){
+                $('.delete_web_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_web_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                $('.delete_web_submit').prop("disabled", true);
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+
+        });
+
+    }
+  
+
 
 </script>
 @endpush

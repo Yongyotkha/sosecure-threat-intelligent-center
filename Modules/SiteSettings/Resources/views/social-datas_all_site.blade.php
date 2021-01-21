@@ -1,14 +1,14 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <section class="hbox stretch">      
+    <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                        <p class="h3 text-elipse-setting">Data Leak</p>
-                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
+                    <p class="h3 text-elipse-setting">Data Leak</p>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
@@ -21,38 +21,44 @@
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
+                        style="margin-top: 0;">@icon('solid/bars')</a>
                     @endif
-                    
+
                     <div class="bc-head">Data Leak Datas </div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                       
+                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
+                    data-rel="tooltip" title="@langapp('export') CSV">
+                    @icon('solid/download') CSV
+
                     </a> --}}
-                    
 
-                    
 
-                    
-                   
+
+
+
+
                     <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
-
-                     @if(!empty(get_role_custom()))
-                        {{-- // var_dump(get_role_custom()['superadmin']);
-                        // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Dataleak feed</span></a>
-                        @endif
-                    @endif
-
-                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
 
-                     <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                    @if(!empty(get_role_custom()))
+                    {{-- // var_dump(get_role_custom()['superadmin']);
+                        // var_dump(get_role_custom()['site_admin']); --}}
+                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                    <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}"
+                        class="btn btn-sm btn-info pull-right m-xs"><span> Dataleak feed</span></a>
+                    @endif
+                    @endif
+
+                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right"
+                        value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
+                            @langapp('delete')</span>
+                    </button>
+
+                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                        <select name="site" id="site" class="select2-option form-control select-site"
+                            style="min-width: 300px">
                             <option value="">All Site</option>
                             @if($SiteSettings)
                             @foreach($SiteSettings as $SiteSettings_val)
@@ -63,8 +69,8 @@
                     </div>
 
 
-                    
-                    
+
+
 
                 </header>
                 <section class="scrollable wrapper">
@@ -91,51 +97,54 @@
 
                                                 @foreach ($site as $data)
                                                 <option value="{{$data->id}}">{{$data->name}}
-                                                </option>
-                                                @endforeach
-                
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div> --}}
-                                <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="source" class="select2-option form-control">
-                                                <option value="" selected>All</option>
-                                                @if ($source)
+                                </option>
+                                @endforeach
 
-                                                @foreach ($source as $source)
-                                                <option value="{{$source->id}}">{{$source->source}}
-                                                </option>
-                                                @endforeach
-                
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 text-center">
-                                    <div id="social_datas_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
-                                    </div>
+                                @endif
+                                </select>
+                            </div>
+                        </div>
+                        </div> --}}
+                        <div class="col-lg-4">
+                            <div class="row d-flex align-items-center">
+                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
+                                <div class="col-sm-9 col-xs-12">
+                                    <select id="source" class="select2-option form-control">
+                                        <option value="" selected>All</option>
+                                        @if ($source)
+
+                                        @foreach ($source as $source)
+                                        <option value="{{$source->id}}">{{$source->source}}
+                                        </option>
+                                        @endforeach
+
+                                        @endif
+                                    </select>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="search()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="social_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                </div>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <div id="social_datas_date"
+                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down"></i>
                             </div>
+                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 text-right mt-2">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive"
+                                    onclick="search()">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="social_reset" class="btn btn-default btn-responsive"
+                                    style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                            </div>
+                        </div>
                         </div>
                     </section>
 
@@ -170,7 +179,7 @@
                     </div>
 
 
-                    
+
                     <section class="panel panel-default">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
@@ -247,14 +256,14 @@
     </section>
 
     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-        @php $admin = 1;  @endphp
-    @else 
-        @php $admin = 0;  @endphp
+    @php $admin = 1; @endphp
+    @else
+    @php $admin = 0; @endphp
     @endif
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
-    <div class="modal in fixed-left" id="delete_all" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- <div class="modal in fixed-left" id="delete_all" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
@@ -280,10 +289,33 @@
                 </form>
             </div>
         </div>
+    </div> --}}
+
+    <div class="modal" id="delete_all" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
+        style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning') </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                            class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete-all">
+                        <i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal create_assets_vulnerability -->
-     {{--<div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{--<div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
@@ -322,10 +354,10 @@
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+@include('stacks.css.datatables')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -337,8 +369,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 <script>
-
-        var admin = '{{$admin}}';
+    var admin = '{{$admin}}';
         var visible_c = '';
 
         if(admin == 1) {
