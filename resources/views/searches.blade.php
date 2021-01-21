@@ -31,9 +31,9 @@
                                                 @endforeach
                                             </div>
                                         </li> --}}
-                                        @if (isset($dataSearch))
+                                        @if (!empty($dataSearch))
                                             @foreach ($dataSearch as $key => $value)
-                                                @if ($value["count"] > 0)
+                                                @if (isset($value["count"])&&$value["count"] > 0)
                                                     <li class="panel panel-default">
                                                         <div class="panel-heading">
                                                             <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
@@ -41,9 +41,10 @@
                                                             </a>
                                                         </div>
                                                         <div id="{{ slugify($key) }}" class="panel-collapse collapse">
-                                                            @foreach ($value["queryData"] as $key => $value2)
+
+                                                            @foreach ($value["queryData"] as $key2 => $value2)
                                                                 <div class="panel-body clause">
-                                                                    <a href="{{$value2["link"]}}">
+                                                                    <a href="{{$value2["link"]}}" target="_blank">
                                                                         {{$value2["name"]}}
                                                                     </a>
                                                                     <div style="
@@ -53,10 +54,26 @@
                                                                     -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
                                                                 </div>
                                                             @endforeach
+                                                            
+                                                            @if ($key == "Events" && $value["count"] > 100)
+                                                                <div class="panel-body clause">
+                                                                    <a href="{{$value["moreDetail"]}}" target="_blank">
+                                                                        กดเพื่อดูเพิ่มเติม
+                                                                    </a>
+                                                                    <div style="
+                                                                    max-height:100px;
+                                                                    overflow:hidden;
+                                                                    text-overflow: ellipsis;
+                                                                    -webkit-box-orient: vertical;"></div>
+                                                                </div>
+                    
+                                                            @endif
                                                         </div>
                                                     </li>
                                                 @endif
                                             @endforeach
+                                        @else
+                                            Notfound
                                         @endif
                                         {{-- @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
                                         <li class="panel panel-default" id="clause-{{ $clause->id }}">
