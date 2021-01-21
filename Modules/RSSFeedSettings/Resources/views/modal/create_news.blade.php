@@ -9,7 +9,7 @@
                      <div class="container-fluid">
                          <div class="row">
                              <div class="col-md-4">
-                                <h5>Date : </h5>
+                                {{-- <h5>Date : </h5> --}}
                                 <h5>Update : {{ $rss -> transcation_datetime }}</h5>
                              </div>
                              <div class="col-md-4">
