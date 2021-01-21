@@ -3091,7 +3091,7 @@ input.input-login:focus {
     }
 }
 
-@media (min-width:768px) and (max-width:1024){
+@media (min-width:768px) and (max-width:1024px){
     .wdfm-inner-4{
         padding: 0 15px !important;
         max-width: 100%;
