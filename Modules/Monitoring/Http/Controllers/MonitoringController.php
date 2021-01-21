@@ -117,7 +117,6 @@ class MonitoringController extends Controller
         if ($request->isSearch == 1) {
             
             $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name')->where('status', 1);
-
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
                 $date_start_date = @$date_start_explode[0];
@@ -137,7 +136,6 @@ class MonitoringController extends Controller
                 $date_end_time_time = date("H:i", strtotime($date_end_time));
                 $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
                 $model = $model -> whereBetween('transcation_date',array($date_start_datetime_format,$date_end_datetime_format));
-                
             }
 
             if($request->Keywords){
@@ -149,13 +147,7 @@ class MonitoringController extends Controller
             }
 
             if($request->select||$request->select==="0"){
-                if($request->select==="0"){
-                    $model = $model->where('progress', $request->select);
-                }else if($request->select=='1'){
-                    $model = $model->whereIn('progress', [1, 2]);
-                }else{
-
-                }
+                $model = $model->where('progress', $request->select);
             }
 
             if($request->sitecode){
