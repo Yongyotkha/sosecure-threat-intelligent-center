@@ -1282,7 +1282,7 @@ class DataLeakController extends Controller
                 'source',
                 function (DataLeakFeedTemp $model) {
                     if ($model->source_name) {
-                        return $model->source_name;
+                        return get_word_leak_compromise($model->feel_type,'data_leak');
                     } else {
                         return '-';
                     }
