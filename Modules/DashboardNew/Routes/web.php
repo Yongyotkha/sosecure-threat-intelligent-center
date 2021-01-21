@@ -21,6 +21,7 @@ Route::group(
         Route::post('count_vulnerability_host', 'DashboardNewController@count_vulnerability_host')->name('dashboardnew.count_vulnerability_host')->middleware('can:menu_items');
         Route::post('chart_indicators', 'DashboardNewController@chart_indicators')->name('dashboardnew.chart_indicators')->middleware('can:menu_items');
         Route::post('cve_assets', 'DashboardNewController@cve_assets')->name('dashboardnew.cve_assets')->middleware('can:menu_items');
+        Route::post('/table_dashboard', 'DashboardNewController@table_dashboard')->name('dashboardnew.table_dashboard')->middleware('can:menu_items');
     }
 );
 

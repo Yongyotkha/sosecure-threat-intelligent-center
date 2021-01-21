@@ -187,7 +187,7 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-event">
+                        <table class="table table-striped" id="table-dashboard">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -199,7 +199,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                {{-- <tr>
                                     <td>1</td>
                                     <td class="nowrap">บริษัท เมจิกเทคโซลูชั่น</td>
                                     <td>News</td>
@@ -234,7 +234,7 @@
                                     <td>
                                         <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i> View</a>
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                         </table>
                     </div>
@@ -319,10 +319,22 @@
 @include('stacks.js.highchart')
 
 <script>
+    var isDateSearch = 0;
+    var isSearch = 0;
+    var startDate =  '';
+    var endDate = '';
+    var Keywords = '';
+    var select = '';
+    var sitecode = '';
 
-    $('#table-event').DataTable({
+    var today_date = new Date();
+    var dd = String(today_date.getDate()).padStart(2, '0');
+    var mm = String(today_date.getMonth() + 1).padStart(2, '0');
+    var yyyy = today_date.getFullYear();
+    today_date = mm + '-' + dd + '-' + yyyy;
+    {{--$('#table-event').DataTable({
         processing: true,
-    });
+    });--}}
 
     function collpase_chart(id,text){
         $(id).slideToggle();
@@ -346,6 +358,7 @@
     }
 
     $( document ).ready(function() {
+        data_table();
         count_asset();
         count_vulnerability();
         count_compromised();
@@ -354,7 +367,119 @@
         load_chart();
         chart_indicators();
         cve_assets();
+
+
+        {{--document.getElementById('current-date').innerHTML = today_date;--}}
+        
+
+        $('[data-toggle="tooltip"]').tooltip(); 
+
+        if (typeof myTable !== 'undefined' && myTable.data().length != 0) {
+            myTable.on( 'draw.dt', function () {
+            myTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                    cell.innerHTML = i+1;
+                } );
+            } ).draw();
+        }
+
+
     });
+
+    function data_table(){
+        var myTable = $('#table-dashboard').DataTable({
+            searching: true,
+            ordering: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: false,
+            order: [[ 4, "desc" ]],
+            dom: 'Blfrtip',
+            ajax: {
+                type: "POST",
+                url: '{!! route('dashboardnew.table_dashboard')!!}',
+                dataSrc: function ( json ) {
+                    return json.data;
+                },
+                data:function(d){
+                    d.isSearch = isSearch;
+                    d.isDateSearch = isDateSearch;
+                    d.startDate = startDate;
+                    d.endDate = endDate;
+                    d.Keywords = Keywords;
+                    d.select = select;
+                    d.sitecode = sitecode;
+                }
+            },
+            initComplete : function( settings, json){
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+            columns: [
+                {
+                    data: 'id', 
+                    defaultContent: ''
+                }
+            ],
+            columnDefs: [
+                {
+                    searchable: false,
+                    orderable: false,
+                    targets: 0
+                },
+                {
+                    targets: 1,
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+                        
+                        return full.sitename;
+                            
+                    },
+                },
+                {
+                    targets: 2,
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+                        
+                        return full.pagename;
+                            
+                    },
+                },
+                {
+                    targets: 3,
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+                        
+                        return full.content;
+                            
+                    },
+                },
+                {
+                    targets: 4,
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+                        
+                        return full.datetime;
+                            
+                    },
+                },
+                {
+                    targets: 5,
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+                        
+                        return full.link;
+                            
+                    },
+                }
+            ]
+
+        });
+    
+        myTable.on( 'order.dt search.dt', function () {
+            myTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
+        } ).draw();
+    }
 
     function count_asset(){
         $.ajax({
@@ -546,17 +671,9 @@
 
     $('#table-assets-modal').DataTable();
 
-    var today_date = new Date();
-    var dd = String(today_date.getDate()).padStart(2, '0');
-    var mm = String(today_date.getMonth() + 1).padStart(2, '0');
-    var yyyy = today_date.getFullYear();
-    today_date = mm + '-' + dd + '-' + yyyy;
-    document.getElementById('current-date').innerHTML = today_date;
     
-
-    $(document).ready(function(){
-        $('[data-toggle="tooltip"]').tooltip(); 
-    });
+    
+    
 
     function collpase_chart(id,text){
         $(id).slideToggle();
