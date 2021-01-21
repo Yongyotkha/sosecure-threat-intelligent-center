@@ -3436,18 +3436,6 @@ input.input-login:focus {
     }
 }
 
-.modal-content {
-    height: 100%;
-    border-radius: 0;
-    position: relative;
-}
-
-.modal-footer {
-    border-radius: 0;
-    bottom: 0px;
-    position: absolute;
-    width: 100%;
-}
 
 /* .modal-footer {
     background: #fff;
