@@ -336,7 +336,14 @@ Highcharts.setOptions({
     });
 
     $(function() {
-        load_table(1);
+
+        if({!!json_encode($Search_Link_All)!!}===""){
+            load_table(1);
+        }else{
+            event_name = {!!json_encode($Search_Link_All)!!};
+            search_table(1);
+        }
+       
   
     });
 

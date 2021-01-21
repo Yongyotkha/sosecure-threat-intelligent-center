@@ -82,6 +82,13 @@ class IndicatorsController extends Controller
         }
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
+
+        if(isset($this->request->Search_Link_All)){
+            $data['Search_Link_All'] = $this->request->Search_Link_All;
+        }else{
+            $data['Search_Link_All'] = "";
+        }
+
         return view('indicators::events')->with($data);
     }
 
@@ -199,7 +206,7 @@ class IndicatorsController extends Controller
 
 
     public function load_general(Request $request)
-    {   
+    {
         $reqType = $request->type;
         $reqIndicator = $request->indicator;
         $reqId = (string)$request->id;

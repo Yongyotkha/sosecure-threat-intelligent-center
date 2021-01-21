@@ -43,9 +43,9 @@
                                 <div class="col-sm-9 col-xs-12">
                                     <select id="select_val" class="select2-option form-control">
                                         <option value="" selected>All</option>
-                                        {{-- <option value="0" >Not Working</option> --}}
-                                        <option value="0" >Waiting</option>
-                                        <option value="1" >Progress</option>
+                                        <option value="0" >Not Working</option>
+                                        <option value="1" >Waiting</option>
+                                        <option value="2" >Progress</option>
                                     </select>
                                 </div>
                             </div>
@@ -267,13 +267,13 @@ function data_table(){
                     targets: 2,
                     render: function (data, type, row) {
                         let inner = '';
-                        if(row.progress == 999){
+                        if(row.progress == 0){
                             inner = '';
                             inner = '<span class="badge badge-danger" style="background-color: #ea2e49;">Not Working</span';
-                        }else if(row.progress == 0){
+                        }else if(row.progress == 1){
                             inner = '';
                             inner = '<span class="badge badge-wait" style="background-color: #ea2e49;">Waiting</span';
-                        }else if(row.progress == 2 || row.progress == 1){
+                        }else if(row.progress == 2){
                             inner = '';
                             inner = '<span class="badge badge-success" style="background-color: #ea2e49;">Progress</span';
                         }else{
