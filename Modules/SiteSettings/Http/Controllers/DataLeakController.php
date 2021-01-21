@@ -678,6 +678,15 @@ class DataLeakController extends Controller
                 // });
             }
 
+            if ($request->type) {
+
+                $type = $request->type;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
+                    $query->where('feel_type', 'LIKE', '%' . $type . '%');
+                });
+
+            }
+
             if ($request->source) {
 
                 $source = $request->source;
@@ -1456,7 +1465,7 @@ class DataLeakController extends Controller
                 'type',
                 function ($model) {
                     if ($model->get_data_leak_feed_temp_one) {
-                        return $model->get_data_leak_feed_temp_one->feed_type;
+                        return get_word_leak_compromise($model->get_data_leak_feed_temp_one->feed_type,'compromise');
                     } else {
                         return '-';
                     }

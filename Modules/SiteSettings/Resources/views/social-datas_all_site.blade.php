@@ -107,6 +107,18 @@
                         </div> --}}
                         <div class="col-lg-4">
                             <div class="row d-flex align-items-center">
+                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Type</label>
+                                <div class="col-sm-9 col-xs-12">
+                                    <select id="type" class="select2-option form-control">
+                                        <option value="" selected>All</option>
+                                        <option value="social" selected>PUBLIC</option>
+                                        <option value="darkweb_public" selected>DARK WEB</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="row d-flex align-items-center">
                                 <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                 <div class="col-sm-9 col-xs-12">
                                     <select id="source" class="select2-option form-control">
@@ -200,6 +212,7 @@
                                                 </label>
                                             </th>
                                             <th>Site</th>
+                                            <th>Type</th>
                                             <th>Source</th>
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
@@ -382,6 +395,7 @@
     var search_val = 0;
     var keywords = null;
     var site = null;
+    var type = null;
     var source = null;
     var startDate = null;
     var endDate = null;
@@ -423,6 +437,7 @@
         search_val = 1;
         keywords = $('#keyword').val();
         site = $('#site option:selected').val();
+        type = $('#type option:selected').val();
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
@@ -446,6 +461,7 @@
                     data: function ( d ) {
                         d.keywords = keywords;
                         d.site = site;
+                        d.type = type;
                         d.source = source;
                         d.search_val = search_val;
                         d.startDate = startDate;
@@ -501,7 +517,7 @@
                         render: function (data, type, full, meta) {
                 
                             if(full.get_data_leak_feed_one){
-                                return full.get_data_leak_feed_one.source_name;
+                                return get_word_leak_compromise(full.get_data_leak_feed_one.feel_type,'data_leak');
                             }
                             return '';
 
@@ -510,6 +526,19 @@
                     },
                     {
                         targets: 3,
+                        width: '60px',
+                        render: function (data, type, full, meta) {
+                
+                            if(full.get_data_leak_feed_one){
+                                return full.get_data_leak_feed_one.source_name;
+                            }
+                            return '';
+
+                        },
+                    
+                    },
+                    {
+                        targets: 4,
                         width: '10px',
                         render: function (data, type, full, meta) {
                 
@@ -521,7 +550,7 @@
                     
                     },
                     {
-                        targets: 4,
+                        targets: 5,
                         width: '10px',
                         render: function (data, type, full, meta) {
                           
@@ -542,7 +571,7 @@
                         },
                     },
                     {
-                        targets: 5,
+                        targets: 6,
                         width: '80px',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
@@ -556,7 +585,7 @@
                         },
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
                 
@@ -570,7 +599,7 @@
                     },
                     {
                         visible: visible_c,
-                        targets: 7,
+                        targets: 8,
                         width: '10px',
                         render: function (data, type, full, meta) {
 
@@ -587,7 +616,7 @@
 
                     },
                     {
-                        targets: 8,
+                        targets: 9,
                         width: '10px',
                         render: function (data, type, full, meta) {
       
@@ -727,6 +756,7 @@
             data: ({
                 keywords : keywords,
                 site_id : site,
+                type : type,
                 social : source,
                 search_val : search_val,
                 startDate : startDate,
