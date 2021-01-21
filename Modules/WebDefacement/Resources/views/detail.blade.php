@@ -270,8 +270,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img" id='updateImage_original'>
-                                                <a href="{{asset(@$webdefacement->image_original)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacement->image_original)}}" onerror="setDefaultPic(this)"/>
+                                                <a href="{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                    <img src="{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -297,8 +297,8 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="{{asset(@$webdefacement->image_last)}}" data-lightbox="name-img-2">
-                                                    <img src="{{asset(@$webdefacement->image_last)}}" onerror="setDefaultPic(this)"/>
+                                                <a href="{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                    <img src="{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
