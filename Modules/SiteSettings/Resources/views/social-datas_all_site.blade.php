@@ -110,9 +110,9 @@
                                 <label for="" class="col-sm-3 col-xs-12 col-form-label">Type</label>
                                 <div class="col-sm-9 col-xs-12">
                                     <select id="type" class="select2-option form-control">
-                                        <option value="" selected>All</option>
-                                        <option value="social" selected>PUBLIC</option>
-                                        <option value="darkweb_public" selected>DARK WEB</option>
+                                        <option value="">All</option>
+                                        <option value="social">PUBLIC</option>
+                                        <option value="darkweb_public">DARK WEB</option>
                                     </select>
                                 </div>
                             </div>
@@ -122,7 +122,7 @@
                                 <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
                                 <div class="col-sm-9 col-xs-12">
                                     <select id="source" class="select2-option form-control">
-                                        <option value="" selected>All</option>
+                                        <option value="">All</option>
                                         @if ($source)
 
                                         @foreach ($source as $source)
