@@ -314,8 +314,6 @@
     var check_approved = false;
     var val_id = [];
 
-    console.log({!!json_encode($siteID)!!});
-
     $('#table_darkweb_feed').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
             $('#btn_del_select').prop("disabled", false);
@@ -423,7 +421,7 @@ function table_social_data(){
                 "check_all" : check_all,
                 "check_pending" : check_pending,
                 "check_approved" : check_approved,
-                "site_id" : {!!json_encode($siteID)!!},
+                "site_id" : '{!!json_encode($siteID)!!}',
             },
             type: "POST",
         },
