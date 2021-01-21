@@ -3421,4 +3421,15 @@ input.input-login:focus {
     .show-setting{
         margin-top: -15px !important;
     }
+    .btn-chart:not(:last-child) {
+        margin-right: 2px;
+    }
+    .btn-chart {
+        color: #000;
+        border: 1px solid #f3f3f3;
+        cursor: pointer;
+        border-radius: 5px;
+        padding: .2rem .2rem;
+        background: #f3f3f3;
+    }
 }
