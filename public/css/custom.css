@@ -3412,3 +3412,7 @@ input.input-login:focus {
 .card-log-body p{
     margin: 0;
 }
+
+.w-50{
+    width: 50px;
+}

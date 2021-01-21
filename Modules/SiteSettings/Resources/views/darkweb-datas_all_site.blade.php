@@ -202,7 +202,6 @@
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
                                             <th>remark</th>
-
                                             <th>Data Feed</th>
                                             <th>View</th>
                                             <th>Status</th>
@@ -464,6 +463,7 @@
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                autoWidth:false,
                 ajax: {
                     type: "POST",
                     url: '{!! route('socialdatas.darkweb_all_site_tb') !!}',
@@ -549,7 +549,6 @@
                     
                     {
                         targets: 4,
-                        width: '10px',
                         render: function (data, type, full, meta) {
                                                     
                             let val = '';
@@ -565,7 +564,7 @@
                                 
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" title="'+content+'">'+content+'</div>';
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+content+'">'+content+'</div>';
 
                         },
                     },
