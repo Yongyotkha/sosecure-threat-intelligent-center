@@ -576,7 +576,7 @@
                                 }
                             }
         
-                            return val;
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+val+'">'+val+'</div>';
 
                         },
                     
