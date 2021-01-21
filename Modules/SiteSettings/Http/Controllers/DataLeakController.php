@@ -234,7 +234,7 @@ class DataLeakController extends Controller
                             
                             $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
                             if($transaction_client_leak_social_ref){
-                                $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                                $transaction_client_leak_social_ref -> transaction_mode = 'insert';
                                 $transaction_client_leak_social_ref -> transaction_data_status = 1;
                                 $transaction_client_leak_social_ref -> status = 1;
                                 $transaction_client_leak_social_ref -> save();
@@ -242,7 +242,7 @@ class DataLeakController extends Controller
                                 $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
                                 $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
                                 $transaction_client_leak_social_ref -> transaction_id = $DataLeakSocialRef->id;
-                                $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                                $transaction_client_leak_social_ref -> transaction_mode = 'insert';
                                 $transaction_client_leak_social_ref -> transaction_data_status = 1;
                                 $transaction_client_leak_social_ref -> status = 1;
                                 $transaction_client_leak_social_ref -> save();
@@ -274,10 +274,51 @@ class DataLeakController extends Controller
             if (!empty($this->request->id)) {
                 $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $this->request->id)->where('approve', '=', 1)->get();
                 foreach ($DataLeakFeedTemps as $DataLeakFeedTemp) {
-                    DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
-                    DataLeakSocialRef::where('temp_id', $DataLeakFeedTemp->id)->delete();
-                    $DataLeakFeedTemp->approve = 0;
-                    $DataLeakFeedTemp->save();
+                    if($DataLeakFeedTemp){
+                        $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
+                        if($DataLeakFeeds){
+                            foreach($DataLeakFeeds as $DataLeakFeed){
+                                $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
+                                $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakFeed->id)->first();
+                                if($transaction_client_leak_feed){
+                                    $transaction_client_leak_feed -> transaction_mode = 'delete';
+                                    $transaction_client_leak_feed -> transaction_data_status = 1;
+                                    $transaction_client_leak_feed -> status = 1;
+                                    $transaction_client_leak_feed -> save();
+                                }else{
+                                    $transaction_client_leak_feed = new transaction_client_leak_feed();
+                                    $transaction_client_leak_feed -> site_id = $leak_socail_ref_temp->site_id;
+                                    $transaction_client_leak_feed -> transaction_id = $DataLeakFeed->id;
+                                    $transaction_client_leak_feed -> transaction_mode = 'delete';
+                                    $transaction_client_leak_feed -> transaction_data_status = 1;
+                                    $transaction_client_leak_feed -> status = 1;
+                                    $transaction_client_leak_feed -> save();
+                                }
+                            }
+                            $DataLeakSocialRefs = DataLeakSocialRef::where('temp_id', $DataLeakFeedTemp->id)->get();
+                            foreach($DataLeakSocialRefs as $DataLeakSocialRef){
+                                $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
+                                if($transaction_client_leak_social_ref){
+                                    $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                                    $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                                    $transaction_client_leak_social_ref -> status = 1;
+                                    $transaction_client_leak_social_ref -> save();
+                                }else{
+                                    $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
+                                    $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
+                                    $transaction_client_leak_social_ref -> transaction_id = $DataLeakSocialRef->id;
+                                    $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                                    $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                                    $transaction_client_leak_social_ref -> status = 1;
+                                    $transaction_client_leak_social_ref -> save();
+                                }
+                            }
+                        }
+                        DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
+                        DataLeakSocialRef::where('temp_id', $DataLeakFeedTemp->id)->delete();
+                        $DataLeakFeedTemp->approve = 0;
+                        $DataLeakFeedTemp->save();
+                    }
                 }
             }
             $response = [
@@ -731,7 +772,52 @@ class DataLeakController extends Controller
     public function delete_darkwebdata_process($code)
     {
         // dd($code);
-        DataLeakSocialRef::where('code', $code)->delete();
+        $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
+        $DataLeakFeedTemp = DataLeakFeedTemp::where('id', $DataLeakSocialRef->temp_id)->first();
+        if($DataLeakFeedTemp){
+            $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
+            if($DataLeakFeeds){
+                foreach($DataLeakFeeds as $DataLeakFeed){
+                    $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
+                    $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakFeed->id)->first();
+                    if($transaction_client_leak_feed){
+                        $transaction_client_leak_feed -> transaction_mode = 'delete';
+                        $transaction_client_leak_feed -> transaction_data_status = 1;
+                        $transaction_client_leak_feed -> status = 1;
+                        $transaction_client_leak_feed -> save();
+                    }else{
+                        $transaction_client_leak_feed = new transaction_client_leak_feed();
+                        $transaction_client_leak_feed -> site_id = $leak_socail_ref_temp->site_id;
+                        $transaction_client_leak_feed -> transaction_id = $DataLeakFeed->id;
+                        $transaction_client_leak_feed -> transaction_mode = 'delete';
+                        $transaction_client_leak_feed -> transaction_data_status = 1;
+                        $transaction_client_leak_feed -> status = 1;
+                        $transaction_client_leak_feed -> save();
+                    }
+
+                    $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
+                    if($transaction_client_leak_social_ref){
+                        $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                        $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                        $transaction_client_leak_social_ref -> status = 1;
+                        $transaction_client_leak_social_ref -> save();
+                    }else{
+                        $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
+                        $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
+                        $transaction_client_leak_social_ref -> transaction_id = $DataLeakSocialRef->id;
+                        $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                        $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                        $transaction_client_leak_social_ref -> status = 1;
+                        $transaction_client_leak_social_ref -> save();
+                    }
+        
+                }
+            }
+            DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
+            $DataLeakSocialRef->delete();
+            $DataLeakFeedTemp->approve = 0;
+            $DataLeakFeedTemp->save();
+        }
 
         return ajaxResponse(
             [
@@ -885,7 +971,52 @@ class DataLeakController extends Controller
     {
         // dd($request->id);
         foreach ($request->id as $val_id) {
-            $data = DataLeakSocialRef::where('id', $val_id)->delete();
+            $DataLeakSocialRef = DataLeakSocialRef::where('id', $val_id)->first();
+            $DataLeakFeedTemp = DataLeakFeedTemp::where('id', $DataLeakSocialRef->temp_id)->first();
+            if($DataLeakFeedTemp){
+                $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
+                if($DataLeakFeeds){
+                    foreach($DataLeakFeeds as $DataLeakFeed){
+                        $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
+                        $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakFeed->id)->first();
+                        if($transaction_client_leak_feed){
+                            $transaction_client_leak_feed -> transaction_mode = 'delete';
+                            $transaction_client_leak_feed -> transaction_data_status = 1;
+                            $transaction_client_leak_feed -> status = 1;
+                            $transaction_client_leak_feed -> save();
+                        }else{
+                            $transaction_client_leak_feed = new transaction_client_leak_feed();
+                            $transaction_client_leak_feed -> site_id = $leak_socail_ref_temp->site_id;
+                            $transaction_client_leak_feed -> transaction_id = $DataLeakFeed->id;
+                            $transaction_client_leak_feed -> transaction_mode = 'delete';
+                            $transaction_client_leak_feed -> transaction_data_status = 1;
+                            $transaction_client_leak_feed -> status = 1;
+                            $transaction_client_leak_feed -> save();
+                        }
+
+                        $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
+                        if($transaction_client_leak_social_ref){
+                            $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                            $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                            $transaction_client_leak_social_ref -> status = 1;
+                            $transaction_client_leak_social_ref -> save();
+                        }else{
+                            $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
+                            $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
+                            $transaction_client_leak_social_ref -> transaction_id = $DataLeakSocialRef->id;
+                            $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                            $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                            $transaction_client_leak_social_ref -> status = 1;
+                            $transaction_client_leak_social_ref -> save();
+                        }
+            
+                    }
+                }
+                DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
+                $data = DataLeakSocialRef::where('id', $val_id)->delete();
+                $DataLeakFeedTemp->approve = 0;
+                $DataLeakFeedTemp->save();
+            }
         }
         return ajaxResponse(
             [
@@ -1535,7 +1666,7 @@ class DataLeakController extends Controller
                     
                     $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
                     if($transaction_client_leak_social_ref){
-                        $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                        $transaction_client_leak_social_ref -> transaction_mode = 'insert';
                         $transaction_client_leak_social_ref -> transaction_data_status = 1;
                         $transaction_client_leak_social_ref -> status = 1;
                         $transaction_client_leak_social_ref -> save();
@@ -1543,7 +1674,7 @@ class DataLeakController extends Controller
                         $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
                         $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
                         $transaction_client_leak_social_ref -> transaction_id = $DataLeakSocialRef->id;
-                        $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                        $transaction_client_leak_social_ref -> transaction_mode = 'insert';
                         $transaction_client_leak_social_ref -> transaction_data_status = 1;
                         $transaction_client_leak_social_ref -> status = 1;
                         $transaction_client_leak_social_ref -> save();
@@ -1931,7 +2062,7 @@ class DataLeakController extends Controller
                     
                     $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
                     if($transaction_client_leak_social_ref){
-                        $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                        $transaction_client_leak_social_ref -> transaction_mode = 'insert';
                         $transaction_client_leak_social_ref -> transaction_data_status = 1;
                         $transaction_client_leak_social_ref -> status = 1;
                         $transaction_client_leak_social_ref -> save();
@@ -1939,7 +2070,7 @@ class DataLeakController extends Controller
                         $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
                         $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
                         $transaction_client_leak_social_ref -> transaction_id = $DataLeakSocialRef->id;
-                        $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                        $transaction_client_leak_social_ref -> transaction_mode = 'insert';
                         $transaction_client_leak_social_ref -> transaction_data_status = 1;
                         $transaction_client_leak_social_ref -> status = 1;
                         $transaction_client_leak_social_ref -> save();
