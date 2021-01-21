@@ -2239,6 +2239,36 @@ ul.topics-news-list li a:hover{
     justify-content: center;
 }
 
+.main-card-dash-flex{
+    display: flex;
+    flex-direction: column;
+    background-color: #f3f3f3;
+
+}
+
+.card-dash-compro.custom-w-50{
+    width: 100%;
+} 
+
+.main-card-dash-flex .card-dash-compro.none-bg{
+    background-color: unset !important;
+}
+.main-card-dash-flex .card-dash-compro.none-shadow{
+    box-shadow: unset !important;
+}
+
+@media screen and (min-width:768px){
+    .main-card-dash-flex{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    }
+    .card-dash-compro.custom-w-50{
+        width: 400px;
+    } 
+}
+
 .card-dash-vuln{
     background-color: #f3f3f3;
     box-shadow: 0 1px 2px rgba(0,0,0,.2);

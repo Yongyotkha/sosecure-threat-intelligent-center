@@ -143,27 +143,28 @@
 
                     <div class="container-fluid" style="margin-bottom:10px;">
                         <div class="row">
-                            <div class="col-md-6 nopadding">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/icebergline2.png')}}" alt="">
+                            <div class="col-md-12 nopadding">
+                                <div class="main-card-dash-flex">
+                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                            <span class="number-card warning" id='compromise-count'>0</span>
                                         </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
-                                        <span class="number-card warning" id='compromise-count'>0</span>
+                                    </div>
+                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                            <span class="number-card info"  id='darkweb-count'>0</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 nopadding">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/icebergline1.png')}}" alt="">
-                                        </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
-                                        <span class="number-card info"  id='darkweb-count'>0</span>
-                                    </div>
-                                </div>
+                             
                             </div>
                         </div>
                     </div>
@@ -171,64 +172,73 @@
 
                     
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table  class="table table-striped" id="table_social_datas">
-                                <thead>
-                                    <tr>
-                                        <th class="no-sort w-10">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        <th>Site</th>
-                                        <th>Source</th>
-                                        <th>Keyword Ref</th>
-                                        <th>Content</th>
-                                        <th>Data Feed</th>
-                                        <th>View</th>
-                                        <th>Status</th>
-                                        <th>@langapp('action')</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- <tr>
-                                        <td>
-                                            <label>
-                                                <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            Pantip
-                                        </td>
-                                        <td>
-                                            Fibre
-                                        </td>
-                                        <td>
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                        </td>
-                                        <td class="no-wrap">
-                                            2020-12-2020 12:12
-                                        </td>
-                                        <td>
-                                            1
-                                        </td>
-                                        <td>
-                                            <label class="switch">
-                                                <input type="hidden" value="FALSE" name="">
-                                                <input type="checkbox" name="status" checked value="TRUE">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                        <td class="no-wrap text-center">
-                                            <button class="btn btn-danger btn-xs">
-                                                @icon('solid/trash-alt')
-                                            </button>
-                                        </td>
-                                    </tr> --}}
-                                </tbody>
-                            </table>
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Data Leak Datas
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table  class="table table-striped" id="table_social_datas">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort w-10">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            <th>Site</th>
+                                            <th>Source</th>
+                                            <th>Keyword Ref</th>
+                                            <th>Content</th>
+                                            <th>Data Feed</th>
+                                            <th>View</th>
+                                            <th>Status</th>
+                                            <th>@langapp('action')</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{-- <tr>
+                                            <td>
+                                                <label>
+                                                    <input name="select_all" value="1" type="checkbox" class="select-chk"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                Pantip
+                                            </td>
+                                            <td>
+                                                Fibre
+                                            </td>
+                                            <td>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
+                                            </td>
+                                            <td class="no-wrap">
+                                                2020-12-2020 12:12
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                <label class="switch">
+                                                    <input type="hidden" value="FALSE" name="">
+                                                    <input type="checkbox" name="status" checked value="TRUE">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                            <td class="no-wrap text-center">
+                                                <button class="btn btn-danger btn-xs">
+                                                    @icon('solid/trash-alt')
+                                                </button>
+                                            </td>
+                                        </tr> --}}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </section>
@@ -440,6 +450,7 @@
                     {
                         targets: 1,
                         width: '10px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
 
                                 val = full.get_site;
@@ -501,6 +512,7 @@
                     {
                         targets: 5,
                         width: '80px',
+                        className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
                             if(full.get_data_leak_feed_one){

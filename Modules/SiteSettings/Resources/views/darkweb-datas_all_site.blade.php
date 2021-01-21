@@ -503,7 +503,7 @@
                     },
                     {
                         targets: 1,
-                        width: '10px',
+                        className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full;
                             if(val) {
@@ -573,6 +573,7 @@
                     {
                         targets: 5,
                         width: '60px',
+                        className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
                             if(val) {
@@ -591,6 +592,7 @@
                     {
                         targets: 6,
                         width: '80px',
+                        className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = '';
                             val = full.get_data_leak_feed_one;
