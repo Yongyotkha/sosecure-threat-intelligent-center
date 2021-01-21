@@ -675,12 +675,17 @@ class SocialController extends Controller
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
 
 
-            if($request -> social) {
-                $model = $model-> where('feel_type', '=' ,$request -> social);
-                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> social);
+            if($request -> type) {
+                $model = $model-> where('feel_type', '=' ,$request -> type);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> type);
             }else{
                 $model = $model->whereIn('feel_type', ['social', 'darkweb_public']);
                 $countGroupBy = $countGroupBy->whereIn('feel_type', ['social', 'darkweb_public']);
+            }
+
+            if($request -> social) {
+                $model = $model-> where('sourceid', '=' ,$request -> social);
+                $countGroupBy = $countGroupBy -> where('sourceid', '=' ,$request -> social);
             }
 
             if($request -> title){
