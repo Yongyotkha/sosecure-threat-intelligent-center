@@ -34,7 +34,7 @@
                         <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
                             style="margin-top: 0;">@icon('solid/bars')</a>
                         @endif 
-                        Compromise Data 
+                        Compromise Data
                     </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
                     data-rel="tooltip" title="@langapp('export') CSV">
@@ -43,9 +43,9 @@
 
                     <div class="text-right">
                      
-                        <div class="text-left" style="margin-top: 8px; min-width: 200px;display:inline-block;">
+                        <div class="text-left" style="margin-top: 8px; max-width: 120px;display:inline-block;">
                             <select name="site" id="site" class="text-left select2-option form-control select-site"
-                                style="min-width: 200px">
+                                style="max-width: 120px">
                                 <option value="">All Site</option>
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
