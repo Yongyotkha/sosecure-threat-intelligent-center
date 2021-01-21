@@ -527,7 +527,7 @@
                         render: function (data, type, full, meta) {
                             let val = full.feel_type;
                             if(val) {
-                                val = full.feel_type;
+                                val = get_word_leak_compromise(full.feel_type,'compromise');
                             }
         
                             return val;
@@ -535,7 +535,6 @@
                         },
                     
                     },
-
                     {
                         targets: 3,
                         width: '10px',
