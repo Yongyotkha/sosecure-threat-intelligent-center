@@ -563,9 +563,7 @@
                                 }
                                 
                             }
-        
                             return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+content+'">'+content+'</div>';
-
                         },
                     },
 

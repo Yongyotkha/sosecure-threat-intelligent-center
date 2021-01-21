@@ -184,7 +184,7 @@
                         orderable: false,
                         searchable: false,
                         sortable: false,
-                        className: 'w-50'
+                        className: 'w-50 nowrap'
                     }
                 ]
             });
