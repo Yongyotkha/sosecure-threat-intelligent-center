@@ -8,7 +8,16 @@
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            <a href="{{route('news.index')}}"
+            @php
+            $url_back = '#';
+            if(@get_role_custom()['superadmin'] == 1) {
+                $url_back = route('news.index');
+            } else {
+                $url_back = site_url('/news_client');
+            }
+            @endphp
+
+            <a href="{{@$url_back}}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a>
