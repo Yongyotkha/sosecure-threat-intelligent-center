@@ -104,6 +104,7 @@ class DataLeakController extends Controller
     public function socialdatas($id)
     {
         $get_data = $this->siteSettings->get_data($id);
+      
         $data['siteSettings'] = $get_data;
         $data['page'] = 'Data Leak Data';
         $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
@@ -339,7 +340,8 @@ class DataLeakController extends Controller
         $data['DataLeakSocial'] = $DataLeakSocial;
         $data['siteSettings'] = $get_data;
         $data['page'] = 'Data Leack Data';
-        $data['id']  = ($get_data->id);
+        $data['id']  = ($get_data->code);
+
         return view('sitesettings::darkweb-datas')->with($data);
     }
 
@@ -517,7 +519,7 @@ class DataLeakController extends Controller
     public function socialdatas_datatables(Request $request)
     {
         $site = $this->siteSettings->get_data($request->site_code);
-        $model = DataLeakSocialRef::where('site_id', 'LIKE', '%' . $site->id . '%')->where('deleted_at', null)->with('get_data_leak_feed')->orderBy('id', 'desc');
+        $model = DataLeakSocialRef::where('site_id', 'LIKE', '%' . $site->id . '%')->where('deleted_at', null)->where('feel_type', 'social')->with('get_data_leak_feed')->orderBy('id', 'desc');
         if($request->search_val == 1){
             if ($request->search) {
                 $search = $request->search;
@@ -633,7 +635,17 @@ class DataLeakController extends Controller
 
         foreach ($request->id_change as $id_change) {
 
-            DataLeakSocialRef::where("id", $id_change)->delete();
+            $DataLeakSocialRef = DataLeakSocialRef::where('id', $id_change)->first();
+            $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', [$DataLeakSocialRef->temp_id])->get();
+            DataLeakFeed::where('id', $DataLeakSocialRef->data_leak_feed_id)->delete();
+            DataLeakSocialRef::where('temp_id', $DataLeakSocialRef->temp_id)->delete();
+    
+            if($DataLeakFeedTemps){
+                foreach($DataLeakFeedTemps as $DataLeakFeedTemps){
+                    $DataLeakFeedTemps->approve = 0;
+                    $DataLeakFeedTemps->save();
+                }
+            } 
 
         }
 
@@ -1617,12 +1629,19 @@ class DataLeakController extends Controller
 
     public function delete_socialdata(Request $request)
     {
+        
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $request->code)->first();
-        $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $DataLeakSocialRef->temp_id)->get();
+        $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', [$DataLeakSocialRef->temp_id])->get();
         DataLeakFeed::where('id', $DataLeakSocialRef->data_leak_feed_id)->delete();
         DataLeakSocialRef::where('temp_id', $DataLeakSocialRef->temp_id)->delete();
-        $DataLeakFeedTemps->approve = 0;
-        $DataLeakFeedTemps->save();
+
+        if($DataLeakFeedTemps){
+            foreach($DataLeakFeedTemps as $DataLeakFeedTemps){
+                $DataLeakFeedTemps->approve = 0;
+                $DataLeakFeedTemps->save();
+            }
+        }
+
         $site_code = $this->siteSettings->find_code($DataLeakSocialRef->site_id);
         return ajaxResponse(
             [
@@ -1728,11 +1747,15 @@ class DataLeakController extends Controller
                 }
             }
         }
-
+        if($request->site){
+            $site = route('darkweb_datas.index',['id'=>$request->site]);
+        }else{
+            $site = route('datafeed.index');
+        }
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),
-                'redirect' => route('datafeed.index'),
+                'redirect' => $site,
             ],
             true,
             Response::HTTP_OK
@@ -1785,6 +1808,13 @@ class DataLeakController extends Controller
             $DataLeakFeedTemp->approve = 0;
             $DataLeakFeedTemp->save();
         }
+
+        if($request->site){
+            $site = route('darkweb_datas.index',['id'=>$request->site]);
+        }else{
+            $site = route('datafeed.index');
+        }
+        
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),

@@ -383,11 +383,10 @@
                     "check_all" : check_all,
                     "check_pending" : check_pending,
                     "check_approved" : check_approved,
-                    "site" : {{$id}},
+                    "site" : "{!!$id!!}",
                 },
                 type: "POST",
             },
-
             columns: [
                 {
                     data: 'chk',
@@ -535,7 +534,8 @@
             url:"{{ route('socialdatas.approve_data_feed') }}",
             data:{
                 id: data_feed_id,
-                sent_mail: sent_mail
+                sent_mail: sent_mail,
+                site : "{!!$id!!}"
             },
             beforeSend: function(){
                 loading('load');
@@ -564,7 +564,12 @@
         $.ajax({
             type:"POST",
             url:"{{ route('socialdatas.cancle_data_feed') }}",
-            data:{id: data_feed_id},
+            data:{
+                
+                id: data_feed_id,
+                site : "{!!$id!!}"
+
+            },
             beforeSend: function(){
                 loading('load');
             },

@@ -757,23 +757,7 @@
 
 
 
-    {{--function change_status(code) {
-        let checkState = $("#status_" + code).is(":checked") ? 1 : 0;
-        axios.post('{{route('socialdatas.change_status')}}', {
-            status: checkState,
-            code: code,
-        }).then(function (response) {
-            toastr.success(response.data.message, '@langapp('response_status')');
-            window.location.href = response.data.redirect;
-        }).catch(function (error) {
-            var errors = error.response.data.errors;
-            var errorsHtml = "";
-            $.each(errors, function (key, value) {
-                errorsHtml += "<li>" + value[0] + "</li>";
-            });
-            toastr.error(errorsHtml, '@langapp('response_status')');
-        });
-    }--}}
+
 
 </script>
 @endpush

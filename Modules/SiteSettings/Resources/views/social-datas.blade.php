@@ -327,7 +327,11 @@ function table_social_data(search_val){
             {
                 targets: 2,
                 render: function (data, type, full, meta) {
-                    var feedcontent = full.get_data_leak_feed.feedcontent;
+                    var feedcontent = '';
+                    if(full.get_data_leak_feed){
+                        var feedcontent = full.get_data_leak_feed.feedcontent;
+                    }
+                    
                     var res = full.keyword.split(",");
                     let content = '';
                     for(let i in res){
