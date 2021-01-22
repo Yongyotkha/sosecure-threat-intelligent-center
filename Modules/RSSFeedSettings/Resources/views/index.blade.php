@@ -423,7 +423,7 @@
         });
         $.ajax({
             type:"POST",
-            url:"{{ route('rssfeedsettings.rss_news_delete_change') }}",
+            url:"{{ route('rssfeedsettings.rss_feed_seting_delete') }}",
             data:{id_chang: rss_id_delete_chang},
             beforeSend: function(){
                 $('.delete_rss_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');

@@ -489,7 +489,7 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function tableRssSetting(){
-        $model = RSSData::all();
+        $model = RSSData::where('deleted_at',null)->get();
         return DataTables::of($model)
             ->editColumn('chk', function (RSSData $model) {
                     return '<label><input type="checkbox" name="rss_id" class="rss_id" value="' . $model->code . '"><span class="label-text"></span></label>';
@@ -656,6 +656,28 @@ class RSSFeedSettingsController extends Controller
             [
                 'message'  => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.rss_data'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function rss_feed_seting_delete(Request $request)
+    {
+   
+        foreach($request->id_chang as $id ){
+
+            RSSData::where("code",$id)->delete();
+
+        }
+
+        // $RSSNews = RSSNews::where("transaction_rss_id",)->
+        // RSSNewsCategory
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => site_url('/rssfeedsettings'),
             ],
             true,
             Response::HTTP_OK
