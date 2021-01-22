@@ -62,9 +62,9 @@
 
 
 
-                <div class="pull-right" style="padding-top: 10px; width: 300px;">
+                <div class="pull-right" style="padding-top: 10px; width: 120px;">
                     <select name="site" id="site" class="select2-option form-control select-site"
-                        style="min-width: 300px">
+                        style="min-width: 120px">
                         <option value="">All Site</option>
                         @if ($SiteSettings)
 

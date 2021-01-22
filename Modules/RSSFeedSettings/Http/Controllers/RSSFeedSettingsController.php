@@ -403,13 +403,13 @@ class RSSFeedSettingsController extends Controller
             //     return rtrim($html, ' , ');
             // })
             ->addColumn('source', function (RSSNews $model) {
-                return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+                return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
             })
             ->addColumn('title', function (RSSNews $model) {
                 if($model -> title_th){
-                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</div>';
+                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</div>';
                 }else if($model -> title_en){
-                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</div>';
+                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</div>';
                 }else{
                     return '-';
                 }

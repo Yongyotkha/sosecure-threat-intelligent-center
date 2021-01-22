@@ -56,9 +56,9 @@
                             @langapp('delete')</span>
                     </button>
 
-                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                    <div class="pull-right" style="margin-top: 8px; max-width: 120px;">
                         <select name="site" id="site" class="select2-option form-control select-site"
-                            style="min-width: 300px">
+                            style="max-width: 120px">
                             <option value="">All Site</option>
                             @if($SiteSettings)
                             @foreach($SiteSettings as $SiteSettings_val)

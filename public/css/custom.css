@@ -3443,3 +3443,6 @@ input.input-login:focus {
     bottom: 0;
     right: 0;
 } */
+.max-w-fit{
+    width: max-content;
+}
