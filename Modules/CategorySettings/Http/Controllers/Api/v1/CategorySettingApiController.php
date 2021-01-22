@@ -2,6 +2,7 @@
 
 namespace Modules\CategorySettings\Http\Controllers\Api\v1;
 
+use App\transaction_client_categories;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -82,6 +83,21 @@ class CategorySettingApiController extends Controller
         $CategorySettings->name = $request->name;
         $CategorySettings->active = $request->active ? 1 : 0;
         $CategorySettings->save();
+
+        $transaction_client_categories = transaction_client_categories::where('transaction_id', $CategorySettings -> id)->first();
+        if($transaction_client_categories){
+            $transaction_client_categories -> transaction_mode = 'insert';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }else{
+            $transaction_client_categories = new transaction_client_categories();
+            $transaction_client_categories -> transaction_id = $CategorySettings -> id;
+            $transaction_client_categories -> transaction_mode = 'insert';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }
 
         // if (!empty($request->contact_email)) {
         //     $user = User::create(
