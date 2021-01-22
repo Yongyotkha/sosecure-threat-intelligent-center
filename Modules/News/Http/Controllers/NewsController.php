@@ -670,11 +670,22 @@ class NewsController extends Controller
         // date("H:i", strtotime("04:25 PM"))
         $html = '';
 
-        $news_all = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
+        $news_all = RSSNews::where('save_draft',0)->orwhere('save_draft',null)->where('status', 1)->where('public_date', '<=', Carbon::now());
+        $news_all = $news_all->get()->count();
+        // $news_all = $news_all->where(function($q) ) {
+        //     $q->where('save_draft',1);
+        // }
+
+        // $news_all = $news_all->where(function ($query) {
+        //     $query->orwhere('save_draft', 0);
+        // });
+
+        // $news_all->get()->count();
+        // dd($news_all->get()->count());
 
         if(($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end) && $request -> f_search == 1){
 
-            $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+            $news = RSSNews::where('save_draft', 0)->orwhere('save_draft',null)->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
             if($request -> title){
                 $news = $news -> where('title_th', 'LIKE' ,'%'.$request -> title.'%');
             }
@@ -747,7 +758,7 @@ class NewsController extends Controller
             $news_all = $news->count();
             $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = RSSNews::where('save_draft', 0)->orwhere('save_draft',null)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(PAGINATE_NUM);//->get()
         }
 
         // dd($news);

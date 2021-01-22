@@ -221,6 +221,17 @@ class SiteSettingApiController extends Controller
         $model = $this->SiteSettings->find($id);
         // dd($model);
         $model->delete();
+
+        $SiteCategory = SiteCategory::where('site_id',$id)->delete();
+        // dd($SiteCategory);
+        // if($SiteCategory) {
+        //     foreach($SiteCategory as $SiteCategory_key => $SiteCategory_val) {
+        //         $SiteCategory_val->active = $request->active;
+        //         $SiteCategory_val->save();
+        //     }
+        // }
+
+
         return ajaxResponse(
             [
                 'message'  => langapp('deleted_successfully'),
