@@ -20,7 +20,7 @@ class ApiController extends Controller
             if(empty($site)){
                 return ['error' => 'Unauthorized', 'status_code' => '401'];
             }else{
-                if($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s") && $site->deleted_at !== null){
+                if(($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s")) && $site->deleted_at == null){
                     return ['error' => '', 'status_code' => '200', 'data' => $site];
                 }else{
                     return ['error' => 'Site expried or Site deleted', 'status_code' => '403'];
@@ -43,7 +43,7 @@ class ApiController extends Controller
             if(empty($site)){
                 return ['error' => 'The request parameters are invalid', 'status_code' => '400'];
             }else{
-                if($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s") && $site->deleted_at !== null){
+                if(($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s")) && $site->deleted_at == null){
                     return ['error' => '', 'status_code' => '200', 'data' => $site];
                 }else{
                     return ['error' => 'Site expried or Site deleted', 'status_code' => '403'];
