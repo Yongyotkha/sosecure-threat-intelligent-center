@@ -39,7 +39,7 @@
                          <div class="row">
                              <label for="" class="col-md-12 control-label" id="label_category">Category <span class="text-danger">*</span></label>
                              <div class="col-md-12">
-                                <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple">
+                                <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple" required>
                                     @foreach ($category as $item)
                                         
                                         <option value="{{ $item -> id }}"
@@ -109,14 +109,14 @@
                                                                 $title_default = $rss->title;
                                                             }
                                                         @endphp --}}
-                                                        <input type="text" class="form-control" name="title_th" id="title_th">
+                                                        <input type="text" class="form-control" name="title_th" id="title_th" value="{{ @$rss -> title }}" required>
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
                                                     <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
                                                     <div class="col-lg-12">
-                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1"></textarea>
+                                                        <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1" required></textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -186,7 +186,7 @@
                                         }
                                     @endphp --}}
 
-                                    <input type="checkbox" name="status" value="TRUE">
+                                    <input type="checkbox" name="status" checked value="TRUE">
                                     <span></span>
                                 </label>
                              </div>
@@ -298,7 +298,7 @@ $('#detail_th').summernote('destroy');
         }
         axios.post($(this).attr("action"), data)
             .then(function (response) {
-                console.log(response);
+
                     toastr.success(response.data.message, '@langapp('response_status') ');
                     $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
                     window.location.href = response.data.redirect;
@@ -384,7 +384,7 @@ $('#detail_th').summernote('destroy');
                 },
             }
         });--}}
-        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days'),defaultDate: moment()});
     }); 
     function copy_link(value) {
         var tempInput = document.createElement("input");

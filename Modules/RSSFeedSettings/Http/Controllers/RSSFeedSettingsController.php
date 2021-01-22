@@ -1652,7 +1652,7 @@ class RSSFeedSettingsController extends Controller
                 [
                     // 'test' => $_POST['detail_th'],
                     'message'  => "Successfully",
-                    'redirect' => route('rssfeedsettings.rss_data'),
+                    'redirect' => route('rssfeedsettings.news'),
                 ],
                 true,
                 Response::HTTP_OK

@@ -429,6 +429,7 @@
                     targets: 6,
                     width: '10px',
                     render: function (data, type, full, meta) {
+
                         if(full.get_rss_news!=null){
                             return '<span class="badge badge-success">Used</span>';
                         }else{
