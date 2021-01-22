@@ -17,6 +17,7 @@ use App\Entities\TF_Client_webdefacment_setting;
 use App\Entities\TF_Client_cve_assets;
 use App\Entities\TF_Client_data_datacve_mapping;
 use App\Entities\TFClient_R_s_s_news_categories;
+use App\Entities\Categories;
 
 class ApiTransferClientInsert extends Controller
 {
@@ -27,9 +28,9 @@ class ApiTransferClientInsert extends Controller
 
     protected function insertToRef(Request $request)
     {
-        $ip = $this->ip;
-        $mac = $this->mac;
-        $header = $this->header;
+        $ip =exec("hostname -I");
+        $mac = exec("cat /sys/class/net/ens33/address");
+        $header = $request->bearerToken();
         $code = $request->site_code_en;
         $dataEncode = $code;
         $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
@@ -211,7 +212,7 @@ class ApiTransferClientInsert extends Controller
                 } else if ($nameTable == 'fx_transaction_client_news_categories') {
                     $pkey = 'id';
                     $model_insert = new TFClient_R_s_s_news_categories;
-                    
+
                 } else if ($nameTable == 'fx_transaction_client_webdefacment_data_check') {
                     $pkey = 'id';
                     $model_insert = new TF_Client_webdefacment_data_check;
@@ -312,128 +313,139 @@ class ApiTransferClientInsert extends Controller
 
     protected function insertToNoRefWithID(Request $request)
     {
-        $ip = $this->ip;
-        $mac = $this->mac;
-        $header = $this->header;
-        $code = $request->site_code_en;
-        $dataEncode = $code;
-        $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
-        $messageErr = '';
-        $connect = true;
-        $result = true;
-        $arrUpdate = array();
+       $ip =exec("hostname -I");
+       $mac = exec("cat /sys/class/net/ens33/address");
+       $header = $request->bearerToken();
+       $code = $request->site_code_en;
+       $dataEncode = $code;
+       $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
+       $messageErr = '';
+       $connect = true;
+       $result = true;
+       $arrUpdate = array();
 
         // $dataDecode = false;
 
-        if ($dataDecode||$dataDecode == 0) {
+       if ($dataDecode||$dataDecode == 0) {
 
-            try {
-                $siteID = $dataDecode;
-                $nameTable = $request->tbName;
-                $dataTables = $request->queryData;
+        try {
+            $siteID = $dataDecode;
+            $nameTable = $request->tbName;
+                //$dataTables = $request->queryData;
 
-                if ($nameTable == 'fx_transaction_client_news') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_R_s_s_news;
-                } else if ($nameTable == 'fx_transaction_client_news_categories') {
-                    $pkey = 'id';
-                    $model_insert = new TFClient_R_s_s_news_categories;
-                    
-                    
-                } else if ($nameTable == 'fx_transaction_client_webdefacment_data_check') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_webdefacment_data_check;
-                } else if ($nameTable == 'fx_transaction_client_webdefacment_data_logs') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_webdefacment_data_logs;
-                } else if ($nameTable == 'fx_transaction_client_webdefacment_data_original') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_webdefacment_data_original;
-                } else if ($nameTable == 'fx_transaction_client_webdefacment_image_mark') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_webdefacment_image_mark;
-                } else if ($nameTable == 'fx_transaction_client_webdefacment_setting') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_webdefacment_setting;
-                } else if ($nameTable == 'fx_transaction_client_cve_assets') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_cve_assets;
-                } else if ($nameTable == 'fx_transaction_client_data_datacve_mapping') {
-                    $pkey = 'id';
-                    $model_insert = new TF_Client_data_datacve_mapping;
-                } else {
-                    $connect = false;
-                    $result = false;
-                }
-                if ($result == true) {
 
-                    if (!empty($dataTables)) {
-                        foreach ($dataTables as $dataTable) {
+            $dataDecode_data_return = encrypt_decrypt('decrypt', $request->queryData, $header, $ip, $mac);
+            $httpData_return = json_decode($dataDecode_data_return,true);
 
-                            // $transfer_data_id = $dataTable["get_transfer_client"]["id"];
-                            if (!empty($dataTable["transaction_id"])) {
-                                $findOne = new $model_insert;
-                                $findOne->setConnection($this->dbName);
-                                // $findOne = $findOne->where($pkey, $dataTable["get_transfer_client"][$pkey])->where('transfer_site_id', $siteID)->where('transfer_data_id', $dataTable["get_transfer_client"][$pkey])->first();
-                                $findOne = $findOne->where($pkey, $dataTable["transaction_id"])->first();
 
-                                if (!empty($dataTable["get_transfer_client"][$pkey]) && $dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
-                                    if (empty($findOne)) {
-                                        $findOne = new $model_insert;
-                                        $findOne->setConnection($this->dbName);
-                                        $findOne->transfer_site_id = $siteID;
-                                        $findOne->transfer_data_id = $dataTable["get_transfer_client"][$pkey];
-                                        foreach ($dataTable["get_transfer_client"] as $key => $subValue) {
-                                            if ( $key != 'transfer_site_id' && $key != 'transfer_data_id') {
-                                                if($subValue==''){
-                                                    $subValue=null;
-                                                }
-                                                $findOne->{$key} = $subValue;
-                                            }
 
-                                        }
+            $dataTables =$httpData_return;
+            if ($nameTable == 'fx_transaction_client_news') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_R_s_s_news;
+            } else if ($nameTable == 'fx_transaction_client_news_categories') {
+                $pkey = 'id';
+                $model_insert = new TFClient_R_s_s_news_categories;
 
-                                        $findOne->save();
 
-                                    } else {
+            } else if ($nameTable == 'fx_transaction_client_webdefacment_data_check') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_webdefacment_data_check;
+            } else if ($nameTable == 'fx_transaction_client_webdefacment_data_logs') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_webdefacment_data_logs;
+            } else if ($nameTable == 'fx_transaction_client_webdefacment_data_original') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_webdefacment_data_original;
+            } else if ($nameTable == 'fx_transaction_client_webdefacment_image_mark') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_webdefacment_image_mark;
+            } else if ($nameTable == 'fx_transaction_client_webdefacment_setting') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_webdefacment_setting;
+            } else if ($nameTable == 'fx_transaction_client_cve_assets') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_cve_assets;
+            } else if ($nameTable == 'fx_transaction_client_data_datacve_mapping') {
+                $pkey = 'id';
+                $model_insert = new TF_Client_data_datacve_mapping;
+            }else if ($nameTable == 'fx_transaction_client_categories') {
+                $pkey = 'id';
+                $model_insert = new Categories;
 
-                                        $findOne->transfer_site_id = $siteID;
-                                        $findOne->transfer_data_id = $dataTable["get_transfer_client"][$pkey];
-                                        foreach ($dataTable["get_transfer_client"] as $key => $subValue) {
-                                            if ($key != 'transfer_site_id' && $key != 'transfer_data_id') {
-                                                if($subValue==''){
-                                                    $subValue=null;
-                                                }
-                                                $findOne->{$key} = $subValue;
-                                            }
-
-                                        }
-                                        $findOne->save();
-
-                                    }
-                                } else if ($dataTable["transaction_mode"] == 'delete') {
-                                    if (!empty($findOne)) {
-                                        $findOne->delete();
-                                    }
-                                }
-                                $arrUpdate[] = $dataTable["id"];
-                            }
-
-                        }
-                    }
-                }
-            } catch (Exception $e) {
+            } else {
                 $connect = false;
                 $result = false;
-                $messageErr = "line : " . $e->getLine() . " Error :" . $e->getMessage();
             }
+            if ($result == true) {
+
+                if (!empty($dataTables)) {
+                    foreach ($dataTables as $dataTable) {
+                       // $dataTable = json_decode($dataTable_object, true);
+                            // $transfer_data_id = $dataTable["get_transfer_client"]["id"];
+                        if (!empty($dataTable["transaction_id"])) {
+                            $findOne = new $model_insert;
+                            $findOne->setConnection($this->dbName);
+                                // $findOne = $findOne->where($pkey, $dataTable["get_transfer_client"][$pkey])->where('transfer_site_id', $siteID)->where('transfer_data_id', $dataTable["get_transfer_client"][$pkey])->first();
+                            $findOne = $findOne->where($pkey, $dataTable["transaction_id"])->first();
+
+                            if (!empty($dataTable["get_transfer_client"][$pkey]) && $dataTable["transaction_mode"] == 'insert' || $dataTable["transaction_mode"] == 'update') {
+                                if (empty($findOne)) {
+                                    $findOne = new $model_insert;
+                                    $findOne->setConnection($this->dbName);
+                                    $findOne->transfer_site_id = $siteID;
+                                    $findOne->transfer_data_id = $dataTable["get_transfer_client"][$pkey];
+                                    foreach ($dataTable["get_transfer_client"] as $key => $subValue) {
+                                        if ( $key != 'transfer_site_id' && $key != 'transfer_data_id') {
+                                            if($subValue==''){
+                                                $subValue=null;
+                                            }
+                                            $findOne->{$key} = $subValue;
+                                        }
+
+                                    }
+
+                                    $findOne->save();
+
+                                } else {
+
+                                    $findOne->transfer_site_id = $siteID;
+                                    $findOne->transfer_data_id = $dataTable["get_transfer_client"][$pkey];
+                                    foreach ($dataTable["get_transfer_client"] as $key => $subValue) {
+                                        if ($key != 'transfer_site_id' && $key != 'transfer_data_id') {
+                                            if($subValue==''){
+                                                $subValue=null;
+                                            }
+                                            $findOne->{$key} = $subValue;
+                                        }
+
+                                    }
+                                    $findOne->save();
+
+                                }
+                            } else if ($dataTable["transaction_mode"] == 'delete') {
+                                if (!empty($findOne)) {
+                                    $findOne->delete();
+                                }
+                            }
+                            $arrUpdate[] = $dataTable["id"];
+                        }
+
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            $connect = false;
+            $result = false;
+            $messageErr = "line : " . $e->getLine() . " Error :" . $e->getMessage();
         }
-        $dataout = [
-            'connect' => $connect,
-            'result' => $result,
-            'returnUpdate' => $arrUpdate,
-            'messageErr' => $messageErr,
-        ];
-        return response()->json($dataout);
     }
+    $dataout = [
+        'connect' => $connect,
+        'result' => $result,
+        'returnUpdate' => $arrUpdate,
+        'messageErr' => $messageErr,
+    ];
+    return response()->json($dataout);
+}
 }
