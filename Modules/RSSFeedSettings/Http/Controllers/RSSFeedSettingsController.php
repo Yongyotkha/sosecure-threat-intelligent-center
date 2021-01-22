@@ -6,6 +6,7 @@ use App\Entities\fx_transaction_client_news_categories;
 use App\Mail\NewsMail;
 use App\siteNewsRelated;
 use App\Topic;
+use App\transaction_client_rss;
 use App\TransactionClientNews;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
@@ -1777,6 +1778,22 @@ class RSSFeedSettingsController extends Controller
         $RSSData->status = $request->status_rss ? 1 : 0;
         $RSSData->created_by = @Auth::user()->id;
         $RSSData->save();
+
+        $transaction_client_rss = transaction_client_rss::where('transaction_id', $RSSData -> id)->first();
+        if($transaction_client_rss){
+            $transaction_client_rss -> transaction_mode = 'insert';
+            $transaction_client_rss -> transaction_data_status = 1;
+            $transaction_client_rss -> status = 1;
+            $transaction_client_rss -> save();
+        }else{
+            $transaction_client_rss = new transaction_client_rss();
+            $transaction_client_rss -> transaction_id = $RSSData -> id;
+            $transaction_client_rss -> transaction_mode = 'insert';
+            $transaction_client_rss -> transaction_data_status = 1;
+            $transaction_client_rss -> status = 1;
+            $transaction_client_rss -> save();
+        }
+
 
 
         return ajaxResponse(
