@@ -27,7 +27,7 @@
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
                         style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                    <div class="bc-head">Settings > Data Leak Data </div>
+                    <div class="bc-head">Settings > Data Leak Feed </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
                     data-rel="tooltip" title="@langapp('export') CSV">
                     @icon('solid/download') CSV
@@ -115,7 +115,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Compromise Data
+                                    <i class="fas fa-table"></i> Table Dataleak Feed
                                 </div>
                             </div>
                         </header>

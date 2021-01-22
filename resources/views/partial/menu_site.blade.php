@@ -118,7 +118,7 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Social Datas' || $page == 'Data Leak Feed' || $page == 'Data Leack Data' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Social Datas' || $page == 'Data Leak Feed' || $page == 'Data Leak Data' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Data Leak

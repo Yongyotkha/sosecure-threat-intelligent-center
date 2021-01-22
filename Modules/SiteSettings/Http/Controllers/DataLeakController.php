@@ -105,7 +105,7 @@ class DataLeakController extends Controller
     {
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
-        $data['page'] = 'Data Leak Feed';
+        $data['page'] = 'Data Leak Data';
         $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
         return view('sitesettings::social-datas')->with($data);
     }
