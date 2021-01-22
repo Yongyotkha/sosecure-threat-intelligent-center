@@ -592,8 +592,12 @@ class SiteSettingsController extends Controller
             // dd($request->id);
                 
                 foreach($request->id as $id_change ){
+
+                    $SiteSettings = SiteSettings::wher('code', $id_change)->first();
     
                     SiteSettings::where("code", $id_change )->delete();
+
+                    $SiteCategory = SiteCategory::where('site_id',$SiteSettings->id)->delete();
     
                 }
 
