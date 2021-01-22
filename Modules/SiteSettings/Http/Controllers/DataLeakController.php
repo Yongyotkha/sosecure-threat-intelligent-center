@@ -1304,7 +1304,7 @@ class DataLeakController extends Controller
                 'source',
                 function (DataLeakFeedTemp $model) {
                     if ($model->source_name) {
-                        return $model->source_name;
+                        return get_word_leak_compromise($model->feel_type,'data_leak');
                     } else {
                         return '-';
                     }
@@ -1522,7 +1522,7 @@ class DataLeakController extends Controller
                 'content',
                 function ($model) {
                     if ($model->get_data_leak_feed_temp_one) {
-                        return '<div class="text-elip">' . $model->get_data_leak_feed_temp_one->feedcontent . '</div>';
+                        return $model->get_data_leak_feed_temp_one->feedcontent;
                     } else {
                         return '-';
                     }
