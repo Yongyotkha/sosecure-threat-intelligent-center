@@ -1500,7 +1500,7 @@ class DataLeakController extends Controller
                 'content',
                 function ($model) {
                     if ($model->get_data_leak_feed_temp_one) {
-                        return '<div class="text-elip">' . $model->get_data_leak_feed_temp_one->feedcontent . '</div>';
+                        return $model->get_data_leak_feed_temp_one->feedcontent;
                     } else {
                         return '-';
                     }
