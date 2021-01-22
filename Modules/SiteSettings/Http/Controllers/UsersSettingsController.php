@@ -8,6 +8,10 @@ use Carbon\Carbon;
 use Auth;
 use DataTables;
 use App\Roles;
+use App\transaction_client_profiles;
+use App\transaction_client_role_permissions;
+use App\transaction_client_user_site;
+use App\transaction_client_users;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use Modules\SiteSettings\Http\Requests\UserRequest;
@@ -173,14 +177,46 @@ class UsersSettingsController extends Controller
                     $User->site_add_user_token = generator_uuid();
                     $User->save();
 
+                    $transaction_client_users = new transaction_client_users();
+                    $transaction_client_users -> site_id = $SiteSettings->id;
+                    $transaction_client_users -> transaction_id = $User->id;
+                    $transaction_client_users -> transaction_mode = 'insert';
+                    $transaction_client_users -> transaction_data_status = 1;
+                    $transaction_client_users -> status = 1;
+                    $transaction_client_users -> save();
+
                     $UserSite = new UserSite;
                     $UserSite->user_id = $User->id;
                     $UserSite->site_id = $User->site_id;
                     $UserSite->created_by = @Auth::user()->id;
                     $UserSite->save();
+
+                    $transaction_client_user_site = new transaction_client_user_site();
+                    $transaction_client_user_site -> site_id = $SiteSettings->id;
+                    $transaction_client_user_site -> transaction_id = $UserSite->id;
+                    $transaction_client_user_site -> transaction_mode = 'insert';
+                    $transaction_client_user_site -> transaction_data_status = 1;
+                    $transaction_client_user_site -> status = 1;
+                    $transaction_client_user_site -> save();
+
+                    $transaction_client_profiles = new transaction_client_profiles();
+                    $transaction_client_profiles -> site_id = $SiteSettings->id;
+                    $transaction_client_profiles -> transaction_id = $User->id;
+                    $transaction_client_profiles -> transaction_mode = 'insert';
+                    $transaction_client_profiles -> transaction_data_status = 1;
+                    $transaction_client_profiles -> status = 1;
+                    $transaction_client_profiles -> save();
             
                     if($role) {
                         $User->syncRoles($role);
+
+                        $transaction_client_role_permissions = new transaction_client_role_permissions();
+                        $transaction_client_role_permissions -> site_id = $SiteSettings->id;
+                        $transaction_client_role_permissions -> transaction_id = $User->id;
+                        $transaction_client_role_permissions -> transaction_mode = 'insert';
+                        $transaction_client_role_permissions -> transaction_data_status = 1;
+                        $transaction_client_role_permissions -> status = 1;
+                        $transaction_client_role_permissions -> save();
                     }
             
             
@@ -238,23 +274,20 @@ class UsersSettingsController extends Controller
     }
 
 
-    public function update(UserRequest $request, $id = null)
+    public function update(Request $request, $id = null)
     {
 
         $password = $request->password;
         $password_re = $request->password_re;
         $role_id = $request->role_id;
         $site_role_id = null;
-        if($role_id == 1) {
+        if($role_id == 1 || $role_id == 4) {
             $role = 'admin';
             // $site_role_id = 99;
-        } else if($role_id == 2) {
-            $role = 'client';
+        } else {
+            $role = 'admin';//client_site
             // $site_role_id = $role_id;
-        } else if($role_id == 3) {
-            $role = 'client';
-            // $site_role_id = $role_id;
-        }
+        } 
         // dd($password);
         // exit();
         $pass = '';
@@ -304,9 +337,43 @@ class UsersSettingsController extends Controller
         $user->site_role_id = $role_id;
         $user->save();
 
+        $transaction_client_users = transaction_client_users::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+        if($transaction_client_users){
+            $transaction_client_users -> transaction_mode = 'update';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }else{
+            $transaction_client_users = new transaction_client_users();
+            $transaction_client_users -> site_id = $user->site_id;
+            $transaction_client_users -> transaction_id = $user->id;
+            $transaction_client_users -> transaction_mode = 'update';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }
+        
+
+
         // $user->profile->update($request->all());
         if($role) {
             $user->syncRoles($role);
+            $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+            if($transaction_client_role_permissions){
+                $transaction_client_role_permissions -> transaction_mode = 'update';
+                $transaction_client_role_permissions -> transaction_data_status = 1;
+                $transaction_client_role_permissions -> status = 1;
+                $transaction_client_role_permissions -> save();
+            }else{
+                $transaction_client_role_permissions = new transaction_client_role_permissions();
+                $transaction_client_role_permissions -> site_id = $user->site_id;
+                $transaction_client_role_permissions -> transaction_id = $user->id;
+                $transaction_client_role_permissions -> transaction_mode = 'update';
+                $transaction_client_role_permissions -> transaction_data_status = 1;
+                $transaction_client_role_permissions -> status = 1;
+                $transaction_client_role_permissions -> save();
+            }
+         
         }
         
 
@@ -382,7 +449,76 @@ class UsersSettingsController extends Controller
         // $data['user'] = User::where('code', $id)->first();
         // $model = $this->user->find($id);
         $model = $this->user->where('code',$id)->first();
-        // dd($model);
+
+        $transaction_client_users = transaction_client_users::where('site_id', $model->site_id)->where('transaction_id', $model->id)->first();
+        if($transaction_client_users){
+            $transaction_client_users -> transaction_mode = 'delete';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }else{
+            $transaction_client_users = new transaction_client_users();
+            $transaction_client_users -> site_id = $model->site_id;
+            $transaction_client_users -> transaction_id = $model->id;
+            $transaction_client_users -> transaction_mode = 'delete';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }
+        
+
+        $user_site = UserSite::select('id')->where('site_id', $model->site_id)->where('user_id', $model->id)->first();
+        $transaction_client_user_site = transaction_client_user_site::where('site_id', $model->site_id)->where('transaction_id', $user_site->id)->first();
+        if($transaction_client_user_site){
+            $transaction_client_user_site -> transaction_mode = 'delete';
+            $transaction_client_user_site -> transaction_data_status = 1;
+            $transaction_client_user_site -> status = 1;
+            $transaction_client_user_site -> save();
+        }else{
+            $transaction_client_user_site = new transaction_client_user_site();
+            $transaction_client_user_site -> site_id = $model->site_id;
+            $transaction_client_user_site -> transaction_id = $user_site->id;
+            $transaction_client_user_site -> transaction_mode = 'delete';
+            $transaction_client_user_site -> transaction_data_status = 1;
+            $transaction_client_user_site -> status = 1;
+            $transaction_client_user_site -> save();
+        }
+        
+
+        $transaction_client_profiles = transaction_client_profiles::where('site_id', $model->site_id)->where('transaction_id', $model->id)->first();
+        if($transaction_client_profiles){
+            $transaction_client_profiles -> transaction_mode = 'delete';
+            $transaction_client_profiles -> transaction_data_status = 1;
+            $transaction_client_profiles -> status = 1;
+            $transaction_client_profiles -> save();
+    
+        }else{
+            $transaction_client_profiles = new transaction_client_profiles();
+            $transaction_client_profiles -> site_id = $model->site_id;
+            $transaction_client_profiles -> transaction_id = $model->id;
+            $transaction_client_profiles -> transaction_mode = 'delete';
+            $transaction_client_profiles -> transaction_data_status = 1;
+            $transaction_client_profiles -> status = 1;
+            $transaction_client_profiles -> save();
+        }
+        
+        $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $model->site_id)->where('transaction_id', $model->id)->first();
+        if($transaction_client_role_permissions){
+            $transaction_client_role_permissions -> transaction_mode = 'delete';
+            $transaction_client_role_permissions -> transaction_data_status = 1;
+            $transaction_client_role_permissions -> status = 1;
+            $transaction_client_role_permissions -> save();
+        }else{
+            $transaction_client_role_permissions = new transaction_client_role_permissions();
+            $transaction_client_role_permissions -> site_id = $model->site_id;
+            $transaction_client_role_permissions -> transaction_id = $model->id;
+            $transaction_client_role_permissions -> transaction_mode = 'delete';
+            $transaction_client_role_permissions -> transaction_data_status = 1;
+            $transaction_client_role_permissions -> status = 1;
+            $transaction_client_role_permissions -> save();
+        }
+        
+        
         $model->delete();
 
         $site_code = $this->siteSettings->find_code($model->site_id);
@@ -403,6 +539,22 @@ class UsersSettingsController extends Controller
         $user = User::where('code', $request->code)->first();
         $user->active = $request->active;
         $user->save();
+
+        $transaction_client_users = transaction_client_users::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+        if($transaction_client_users){
+            $transaction_client_users -> transaction_mode = 'update';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }else{
+            $transaction_client_users = new transaction_client_users();
+            $transaction_client_users -> site_id = $user->site_id;
+            $transaction_client_users -> transaction_id = $user->id;
+            $transaction_client_users -> transaction_mode = 'update';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }
 
         $site_code = $this->siteSettings->find_code($user->site_id);
 
