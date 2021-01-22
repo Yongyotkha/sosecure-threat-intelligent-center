@@ -694,7 +694,7 @@ function confirm_approve(){
         success:function(response) {
             loading('stop_load');
             toastr.success(response.message, '@langapp('response_status')');
-            {{--window.location.href = response.redirect;--}}
+            window.location.href = response.redirect;
         },
         error: function (error){
             loading('stop_load');
