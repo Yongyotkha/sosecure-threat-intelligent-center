@@ -27,6 +27,7 @@ use Modules\SiteSettings\Entities\Tags;
 use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\RSSFeedSettings\Entities\TransactionRssData;
+use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\DataTables;
 
 class RSSFeedSettingsController extends Controller
@@ -1779,19 +1780,23 @@ class RSSFeedSettingsController extends Controller
         $RSSData->created_by = @Auth::user()->id;
         $RSSData->save();
 
-        $transaction_client_rss = transaction_client_rss::where('transaction_id', $RSSData -> id)->first();
-        if($transaction_client_rss){
-            $transaction_client_rss -> transaction_mode = 'insert';
-            $transaction_client_rss -> transaction_data_status = 1;
-            $transaction_client_rss -> status = 1;
-            $transaction_client_rss -> save();
-        }else{
-            $transaction_client_rss = new transaction_client_rss();
-            $transaction_client_rss -> transaction_id = $RSSData -> id;
-            $transaction_client_rss -> transaction_mode = 'insert';
-            $transaction_client_rss -> transaction_data_status = 1;
-            $transaction_client_rss -> status = 1;
-            $transaction_client_rss -> save();
+        $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();
+        foreach($settings as $setting){
+            $transaction_client_rss = transaction_client_rss::where('site_id', $setting -> id)->where('transaction_id', $RSSData -> id)->first();
+            if($transaction_client_rss){
+                $transaction_client_rss -> transaction_mode = 'insert';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }else{
+                $transaction_client_rss = new transaction_client_rss();
+                $transaction_client_rss -> site_id = $setting -> id;
+                $transaction_client_rss -> transaction_id = $RSSData -> id;
+                $transaction_client_rss -> transaction_mode = 'insert';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }
         }
 
 
@@ -1848,6 +1853,25 @@ class RSSFeedSettingsController extends Controller
         $RSSData->status = $request->active ? 1 : 0;
         $RSSData->save();
 
+        $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();
+        foreach($settings as $setting){
+            $transaction_client_rss = transaction_client_rss::where('site_id', $setting -> id)->where('transaction_id', $RSSData -> id)->first();
+            if($transaction_client_rss){
+                $transaction_client_rss -> transaction_mode = 'update';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }else{
+                $transaction_client_rss = new transaction_client_rss();
+                $transaction_client_rss -> site_id = $setting -> id;
+                $transaction_client_rss -> transaction_id = $RSSData -> id;
+                $transaction_client_rss -> transaction_mode = 'update';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }
+        }
+
         // if ($request->hasFile('logo')) {
         //     $this->uploadLogo($request, $client);
         // }
@@ -1884,6 +1908,25 @@ class RSSFeedSettingsController extends Controller
         // $CategorySettings->name = $request->name;
         $rss->status = $rss->status == 1 ? 0 : 1;
         $rss->save();
+
+        $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();
+        foreach($settings as $setting){
+            $transaction_client_rss = transaction_client_rss::where('site_id', $setting -> id)->where('transaction_id', $rss -> id)->first();
+            if($transaction_client_rss){
+                $transaction_client_rss -> transaction_mode = 'update';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }else{
+                $transaction_client_rss = new transaction_client_rss();
+                $transaction_client_rss -> site_id = $setting -> id;
+                $transaction_client_rss -> transaction_id = $rss -> id;
+                $transaction_client_rss -> transaction_mode = 'update';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }
+        }
 
         // if ($request->hasFile('logo')) {
         //     $this->uploadLogo($request, $client);
@@ -1924,8 +1967,26 @@ class RSSFeedSettingsController extends Controller
 
     public function delete_process($id = null)
     {
-        $model = RSSData::where("code",$id);
+        $model = RSSData::where("code",$id)->first();
         // dd($model);
+        $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();
+        foreach($settings as $setting){
+            $transaction_client_rss = transaction_client_rss::where('site_id', $setting -> id)->where('transaction_id', $model -> id)->first();
+            if($transaction_client_rss){
+                $transaction_client_rss -> transaction_mode = 'delete';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }else{
+                $transaction_client_rss = new transaction_client_rss();
+                $transaction_client_rss -> site_id = $setting -> id;
+                $transaction_client_rss -> transaction_id = $model -> id;
+                $transaction_client_rss -> transaction_mode = 'delete';
+                $transaction_client_rss -> transaction_data_status = 1;
+                $transaction_client_rss -> status = 1;
+                $transaction_client_rss -> save();
+            }
+        }
         $model->delete();
         return ajaxResponse(
             [
