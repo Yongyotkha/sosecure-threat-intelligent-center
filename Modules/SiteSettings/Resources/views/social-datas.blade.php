@@ -52,6 +52,14 @@
                                         <div class="col-sm-9 col-xs-12">
                                             <select id="source" class="select2-option form-control">
                                                 <option value="1" selected>All</option>
+                                                @if ($source)
+
+                                                @foreach ($source as $source)
+                                                <option value="{{$source->id}}">{{$source->source}}
+                                                </option>
+                                                @endforeach
+
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -65,7 +73,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="table_social_data()">
+                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive" onclick="table_social_data(1)">
                                         <i class="fas fa-search"></i>
                                         @langapp('apply')
                                     </button>
@@ -222,12 +230,42 @@
 @include('stacks.js.fullscreen')
 <script>
 
-$(function() {
-    table_social_data();
+    
+$(function() { 
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+    function cb(start, end) {
+        $('#social_datas_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
+    $('#social_datas_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    cb(start, end);
 });
 
-function table_social_data(){
+$(function() {
+    table_social_data(0);
+});
+
+function table_social_data(search_val){
     let search = $('#search').val();
+    let keywords = $('#keyword').val();
+    let source = $('#source option:selected').val();
+    let startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+    let endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
     $('#table_social_datas').DataTable({
         processing: true,
         serverSide: true,
@@ -236,7 +274,12 @@ function table_social_data(){
             url: '{!! route('socialdatas.socialdatas_datatables') !!}',
             data: {
                 "site_code":'{{ Request::segment(3) }}',
+                "search_val" : search_val,
                 "search" : search,
+                "keywords" : keywords,
+                "source" : source,
+                "start_date" : startDate,
+                "end_date" : endDate,
             },
             type: "POST",
         },
@@ -297,31 +340,6 @@ function table_social_data(){
         ]
     });
 }
-
-$(function() { 
-    var start = moment().startOf('hour');
-    var end = moment().startOf('hour').add(32, 'hour');
-    function cb(start, end) {
-        $('#social_datas_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-    $('#social_datas_date').daterangepicker({
-        timePicker: true,
-        startDate: start,
-        endDate: end,
-        locale: {
-            format: 'M/DD hh:mm A'
-        },
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, cb);
-    cb(start, end);
-});
 
 function change_status(code) {
     let checkState = $("#status_" + code).is(":checked") ? 1 : 0;

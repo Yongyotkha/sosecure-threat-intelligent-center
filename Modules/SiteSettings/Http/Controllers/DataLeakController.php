@@ -106,6 +106,7 @@ class DataLeakController extends Controller
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
         $data['page'] = 'Data Leak Feed';
+        $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
         return view('sitesettings::social-datas')->with($data);
     }
 
@@ -517,7 +518,7 @@ class DataLeakController extends Controller
     {
         $site = $this->siteSettings->get_data($request->site_code);
         $model = DataLeakSocialRef::where('site_id', 'LIKE', '%' . $site->id . '%')->where('deleted_at', null)->with('get_data_leak_feed')->orderBy('id', 'desc');
-        if ($request->search) {
+        if($request->search_val == 1){
             if ($request->search) {
                 $search = $request->search;
                 $model = $model->whereHas('get_data_leak_feed', function ($query) use ($search) {
@@ -525,8 +526,29 @@ class DataLeakController extends Controller
                     $query->orwhere('tag', 'LIKE', '%' . $search . '%');
                 });
             }
+            
+            if ($request->start_date) {
+                $date_start = $request->start_date;
+                $date_end = $request->end_date;
+
+                $date_start_explode = explode(" ", $date_start);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+
+                $date_end_explode = explode(" ", $date_end);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+
+                $model = $model->whereBetween('created_at', array($date_start_date_format, $date_end_date_format));
+            }
+
+            $source = $request->source;
+            $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
+                $query->where('sourceid', 'LIKE', '%' . $source . '%');
+            });
+
             $model = $model->get();
-        } else {
+        }else {
             $model = $model->get();
         }
         return DataTables::of($model)
