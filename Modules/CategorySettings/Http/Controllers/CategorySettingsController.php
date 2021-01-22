@@ -2,6 +2,7 @@
 
 namespace Modules\CategorySettings\Http\Controllers;
 
+use App\transaction_client_categories;
 use Auth;
 use DataTables;
 use Modules\CategorySettings\Entities\CategorySettings;
@@ -114,6 +115,21 @@ class CategorySettingsController extends Controller
          $CategorySettings->active = $request->active ? 1 : 0;
          $CategorySettings->save();
 
+        $transaction_client_categories = transaction_client_categories::where('transaction_id', $CategorySettings -> id)->first();
+        if($transaction_client_categories){
+            $transaction_client_categories -> transaction_mode = 'update';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }else{
+            $transaction_client_categories = new transaction_client_categories();
+            $transaction_client_categories -> transaction_id = $CategorySettings -> id;
+            $transaction_client_categories -> transaction_mode = 'update';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }
+
          // if ($request->hasFile('logo')) {
          //     $this->uploadLogo($request, $client);
          // }
@@ -139,6 +155,20 @@ class CategorySettingsController extends Controller
     public function delete_process($id = null)
     {
         $model = $this->categorySettings->find($id);
+        $transaction_client_categories = transaction_client_categories::where('transaction_id', $model -> id)->first();
+        if($transaction_client_categories){
+            $transaction_client_categories -> transaction_mode = 'delete';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }else{
+            $transaction_client_categories = new transaction_client_categories();
+            $transaction_client_categories -> transaction_id = $model -> id;
+            $transaction_client_categories -> transaction_mode = 'delete';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }
         // dd($model);
         $model->delete();
         return ajaxResponse(
@@ -217,6 +247,21 @@ class CategorySettingsController extends Controller
         // $CategorySettings->name = $request->name;
         $CategorySettings->active = $CategorySettings->active == 1 ? 0 : 1;
         $CategorySettings->save();
+
+        $transaction_client_categories = transaction_client_categories::where('transaction_id', $CategorySettings -> id)->first();
+        if($transaction_client_categories){
+            $transaction_client_categories -> transaction_mode = 'update';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }else{
+            $transaction_client_categories = new transaction_client_categories();
+            $transaction_client_categories -> transaction_id = $CategorySettings -> id;
+            $transaction_client_categories -> transaction_mode = 'update';
+            $transaction_client_categories -> transaction_data_status = 1;
+            $transaction_client_categories -> status = 1;
+            $transaction_client_categories -> save();
+        }
 
         // if ($request->hasFile('logo')) {
         //     $this->uploadLogo($request, $client);
@@ -370,7 +415,22 @@ class CategorySettingsController extends Controller
     {
 
         foreach($request->id as $categorySettings_id){
-        $data = CategorySettings::where('id', $categorySettings_id)->delete();
+            
+            $transaction_client_categories = transaction_client_categories::where('transaction_id', $categorySettings_id)->first();
+            if($transaction_client_categories){
+                $transaction_client_categories -> transaction_mode = 'delete';
+                $transaction_client_categories -> transaction_data_status = 1;
+                $transaction_client_categories -> status = 1;
+                $transaction_client_categories -> save();
+            }else{
+                $transaction_client_categories = new transaction_client_categories();
+                $transaction_client_categories -> transaction_id = $categorySettings_id;
+                $transaction_client_categories -> transaction_mode = 'delete';
+                $transaction_client_categories -> transaction_data_status = 1;
+                $transaction_client_categories -> status = 1;
+                $transaction_client_categories -> save();
+            }
+            $data = CategorySettings::where('id', $categorySettings_id)->delete();
 
         }
 
