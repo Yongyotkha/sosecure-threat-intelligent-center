@@ -11,7 +11,7 @@ class SiteCategory extends Model {
     protected $table = "site_category";
     public $timestamps = true;
     protected $fillable = [
-        'id', 'code', 'site_id', 'category_id',
+        'id', 'code', 'site_id', 'category_id', 'active',
     ];
     protected $dates = ['created_at', 'updated_at'];
 

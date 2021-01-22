@@ -2726,7 +2726,7 @@ class DataLeakController extends Controller
 
         if ($request->search_val == 1) {
 
-            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social');
+            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public']);
             // $model->whereHas('get_socail_ref_temp', function ($query) use ($request) {
 
             //     $query->where('site_id', 'LIKE', '%' . $request->site . '%');

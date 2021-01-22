@@ -358,6 +358,17 @@ class SiteSettingsController extends Controller
         $SiteSettings->active = $request->active;
         $SiteSettings->save();
 
+        $SiteCategory = SiteCategory::where('site_id',$SiteSettings->id)->get();
+        // dd($SiteCategory);
+        if($SiteCategory) {
+            foreach($SiteCategory as $SiteCategory_key => $SiteCategory_val) {
+                $SiteCategory_val->active = $request->active;
+                $SiteCategory_val->save();
+            }
+        }
+        // $SiteCategory->active = $request->active;
+        // $SiteCategory->save();
+
         return ajaxResponse(
             [
                 'id' => $SiteSettings->id,
