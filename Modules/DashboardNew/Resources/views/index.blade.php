@@ -166,6 +166,11 @@
                         <div class="col-md-6">
                             <i class="fas fa-table"></i> Table Activities
                         </div>
+                        <div id="date-rang"
+                            style="color:#333;background: #efefef; cursor: pointer; padding: 7px 10px; border: 1px solid #ddd; display:inline-block;margin-right: 5px;margin-bottom:0;">
+                            <i class="fa fa-calendar"></i>&nbsp;
+                            <span></span> <i class="fa fa-caret-down"></i>
+                        </div>
                         <div class="col-md-6 text-right">
                             <button id="togglecollapsetable" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#table-container','#togglecollapsetable')">
                                 <i class="fas fa-minus-square"></i>Collapse
@@ -177,12 +182,13 @@
                     <div class="row">
                         <div class="col-md-12 text-right">
                             <div class="button-group">
-                                <button class="btn btn-xs btn-default">News</button>
-                                <button class="btn btn-xs btn-default">Vulnerability</button>
-                                <button class="btn btn-xs btn-default">Indicators</button>
-                                <button class="btn btn-xs btn-default">Compromised</button>
-                                <button class="btn btn-xs btn-default">Data Leak</button>
-                                <button class="btn btn-xs btn-default">WebDefacement</button>
+                                <button class="btn btn-xs btn-default" onclick="select_pagename('News')">News</button>
+                                <button class="btn btn-xs btn-default" onclick="select_pagename('Vulnerability')">Vulnerability</button>
+                                <button class="btn btn-xs btn-default" onclick="select_pagename('Indicators')">Indicators</button>
+                                <button class="btn btn-xs btn-default" onclick="select_pagename('Compromised')">Compromised</button>
+                                <button class="btn btn-xs btn-default" onclick="select_pagename('Data Leak')">Data Leak</button>
+                                <button class="btn btn-xs btn-default" onclick="select_pagename('Web Defacement')">WebDefacement</button>
+                                <button class="btn btn-xs btn-default" onclick="clearValue()">Clear</button>
                             </div>
                         </div>
                     </div>
@@ -319,13 +325,10 @@
 @include('stacks.js.highchart')
 
 <script>
-    var isDateSearch = 0;
-    var isSearch = 0;
     var startDate =  '';
     var endDate = '';
-    var Keywords = '';
-    var select = '';
-    var sitecode = '';
+    var pagename = '';
+    var site = 0;
 
     var today_date = new Date();
     var dd = String(today_date.getDate()).padStart(2, '0');
@@ -336,6 +339,24 @@
         processing: true,
     });--}}
 
+    var start = moment().subtract(2, 'days');
+    var end = moment();
+
+    $('#date-rang').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        minDate: start,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment()],
+        }
+    }, cb);
+
+
     function collpase_chart(id,text){
         $(id).slideToggle();
         if($(text).text() == 'Expanded'){
@@ -345,28 +366,51 @@
         }
     }
 
-    var site = 0;
+    
     function changeSite(value) {
         site = value;
-        count_asset();
+        data_table();
+
+        {{--count_asset();
         count_vulnerability();
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
         load_chart();
-        cve_assets();
+        cve_assets();--}}
+        
+    }
+
+    function clearValue(value) {
+        
+
+        start = moment().subtract(2, 'days');
+        end = moment();
+        cb(start, end);
+        pagename = '';
+        data_table();
+        {{--$('#type').val('').trigger('change');$('#keyword').val('');--}}
+
+
+          
+    }
+
+    function select_pagename(value) {
+        pagename = value;
+        data_table();     
     }
 
     $( document ).ready(function() {
         data_table();
-        count_asset();
+
+        {{--count_asset();
         count_vulnerability();
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
         load_chart();
         chart_indicators();
-        cve_assets();
+        cve_assets();--}}
 
 
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
@@ -374,40 +418,57 @@
 
         $('[data-toggle="tooltip"]').tooltip(); 
 
-        if (typeof myTable !== 'undefined' && myTable.data().length != 0) {
-            myTable.on( 'draw.dt', function () {
-            myTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-                    cell.innerHTML = i+1;
-                } );
-            } ).draw();
-        }
+
+        
+
+
+
+        
+
+
+        $('#date-rang').on('apply.daterangepicker', function(ev, picker) {
+            
+            data_table();
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+            }
+        });
+
+        cb(start, end);
+
+        
 
 
     });
 
+    function cb(start, end) {
+        $('#date-rang span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        startDate = start;
+        endDate = end;
+    }
+
+    var t;
     function data_table(){
-        var myTable = $('#table-dashboard').DataTable({
+        startDate =  $("#date-rang").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        endDate =  $("#date-rang").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        console.log(startDate);
+        t = $('#table-dashboard').DataTable({
             searching: true,
             ordering: true,
+            pagination: true,
             pageLength: 25,
             processing: true,
             serverSide: false,
-            order: [[ 4, "desc" ]],
+            destroy: true,
             dom: 'Blfrtip',
             ajax: {
                 type: "POST",
                 url: '{!! route('dashboardnew.table_dashboard')!!}',
-                dataSrc: function ( json ) {
-                    return json.data;
-                },
                 data:function(d){
-                    d.isSearch = isSearch;
-                    d.isDateSearch = isDateSearch;
                     d.startDate = startDate;
                     d.endDate = endDate;
-                    d.Keywords = Keywords;
-                    d.select = select;
-                    d.sitecode = sitecode;
+                    d.pagename = pagename;
+                    d.sitecode = site;
                 }
             },
             initComplete : function( settings, json){
@@ -415,15 +476,35 @@
             },
             columns: [
                 {
-                    data: 'id', 
-                    defaultContent: ''
-                }
+                    data: 'id_id', defaultContent:''
+                },
+                {
+                    data: 'sitename', 
+                },
+                {
+                    data: 'pagename', 
+                },
+                {
+                    data: 'content', 
+                },
+                {
+                    data: 'datetime', 
+                },
+                {
+                    data: 'link', 
+                },
             ],
             columnDefs: [
                 {
+                    
+                    targets: 0,
                     searchable: false,
                     orderable: false,
-                    targets: 0
+                    width: '10px',
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                   
                 },
                 {
                     targets: 1,
@@ -465,20 +546,12 @@
                     targets: 5,
                     width: '10px',
                     render: function (data, type, full, meta) {
-                        
-                        return full.link;
-                            
+                        return '<a href="'+full.link+'" class="btn btn-info btn-xs"><i class="fas fa-eye"></i> View</a>';
                     },
                 }
             ]
 
         });
-    
-        myTable.on( 'order.dt search.dt', function () {
-            myTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-                cell.innerHTML = i+1;
-            } );
-        } ).draw();
     }
 
     function count_asset(){
