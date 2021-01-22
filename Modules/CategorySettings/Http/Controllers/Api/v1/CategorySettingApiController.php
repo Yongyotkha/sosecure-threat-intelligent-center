@@ -8,6 +8,8 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\CategorySettings\Http\Requests\CategorySettingsRequest;
+use Modules\SiteSettings\Entities\SiteSettings;
+
 // use Modules\Clients\Transformers\ClientResource;
 // use Modules\Clients\Transformers\ClientsResource;
 // use Modules\Contacts\Transformers\ContactsResource;
@@ -84,21 +86,25 @@ class CategorySettingApiController extends Controller
         $CategorySettings->active = $request->active ? 1 : 0;
         $CategorySettings->save();
 
-        $transaction_client_categories = transaction_client_categories::where('transaction_id', $CategorySettings -> id)->first();
-        if($transaction_client_categories){
-            $transaction_client_categories -> transaction_mode = 'insert';
-            $transaction_client_categories -> transaction_data_status = 1;
-            $transaction_client_categories -> status = 1;
-            $transaction_client_categories -> save();
-        }else{
-            $transaction_client_categories = new transaction_client_categories();
-            $transaction_client_categories -> transaction_id = $CategorySettings -> id;
-            $transaction_client_categories -> transaction_mode = 'insert';
-            $transaction_client_categories -> transaction_data_status = 1;
-            $transaction_client_categories -> status = 1;
-            $transaction_client_categories -> save();
+        $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();
+        foreach($settings as $setting){
+            $transaction_client_categories = transaction_client_categories::where('site_id', $setting -> id)->where('transaction_id', $CategorySettings -> id)->first();
+            if($transaction_client_categories){
+                $transaction_client_categories -> transaction_mode = 'insert';
+                $transaction_client_categories -> transaction_data_status = 1;
+                $transaction_client_categories -> status = 1;
+                $transaction_client_categories -> save();
+            }else{
+                $transaction_client_categories = new transaction_client_categories();
+                $transaction_client_categories -> site_id = $setting -> id;
+                $transaction_client_categories -> transaction_id = $CategorySettings -> id;
+                $transaction_client_categories -> transaction_mode = 'insert';
+                $transaction_client_categories -> transaction_data_status = 1;
+                $transaction_client_categories -> status = 1;
+                $transaction_client_categories -> save();
+            }
         }
-
+        
         // if (!empty($request->contact_email)) {
         //     $user = User::create(
         //         [
