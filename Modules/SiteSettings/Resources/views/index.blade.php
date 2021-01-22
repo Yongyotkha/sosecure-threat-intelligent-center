@@ -215,7 +215,7 @@
                 code: code,
             }).then(function (response) {
                 toastr.success(response.data.message, '@langapp('response_status')');
-                window.location.href = response.data.redirect;
+                {{--window.location.href = response.data.redirect;--}}
             }).catch(function (error) {
                 var errors = error.errors;
                 var errorsHtml = "";

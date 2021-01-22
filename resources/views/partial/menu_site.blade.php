@@ -126,13 +126,13 @@
        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
             <li style="padding-left:2rem">
                 <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
-                    Data Leak Feed
+                    Data Leak Data
                 </a>
             </li>
 
             <li style="padding-left:2rem">
                 <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
-                    Data Leak Data
+                    Data Leak Feed
                 </a>
             </li>
         </ul>
