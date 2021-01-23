@@ -166,12 +166,12 @@
                         <div class="col-md-6">
                             <i class="fas fa-table"></i> Table Activities
                         </div>
-                        <div id="date-rang"
-                            style="color:#333;background: #efefef; cursor: pointer; padding: 7px 10px; border: 1px solid #ddd; display:inline-block;margin-right: 5px;margin-bottom:0;">
-                            <i class="fa fa-calendar"></i>&nbsp;
-                            <span></span> <i class="fa fa-caret-down"></i>
-                        </div>
                         <div class="col-md-6 text-right">
+                            <div id="date-rang"
+                                style="color:#333;background: #efefef; cursor: pointer; padding: 1px 10px; border: 1px solid #ddd; display:inline-block;margin-right: 5px;margin-bottom:0;">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down"></i>
+                            </div>
                             <button id="togglecollapsetable" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#table-container','#togglecollapsetable')">
                                 <i class="fas fa-minus-square"></i>Collapse
                             </button>
