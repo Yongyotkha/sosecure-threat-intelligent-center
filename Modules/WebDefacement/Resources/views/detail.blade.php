@@ -4,7 +4,7 @@
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-        <div class="bc-head" style="margin-top: 10px;max-width: 265px !important;">
+        <div class="bc-head" style="margin-top: 10px;">
             <a href="{{route('webdefacement.index')}}"
                 class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                 @icon('solid/arrow-left')
