@@ -93,7 +93,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
-                                {!! Form::open(['route' => ['indisetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                                {!! Form::open(['route' => ['indisetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm_custom1 validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                                 <section class="panel panel-default">
                                     <header class="panel-heading accordion">
                                         Log Format
@@ -193,7 +193,7 @@
                                                 Save
                                             </button> --}}
 
-                                            <button type="submit" class="btn btn-info submit btn-rounded" id="btn-submitB" value="2"><i
+                                            <button type="submit" class="btn btn-info submit btn-rounded formSaving1" id="btn-submitB" value="2"><i
                                                 class="fas fa-paper-plane"></i>
                                             Save
                                         </button>
@@ -209,7 +209,8 @@
         
                     <div class="row">
                         <div class="col-lg-12">
-                            <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal">
+                            {!! Form::open(['route' => ['indisetting.indicator_log', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm_custom2 validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {{-- <form method="PUT" action="" accept-charset="UTF-8" class="ajaxifyForm_custom2 bs-example form-horizontal"> --}}
                                 <section class="panel panel-default">
                                     <header class="panel-heading accordion">
                                         Send Log
@@ -221,8 +222,8 @@
                                                     <div class="form-group">
                                                         <label for="">Start Date <span class="text-danger">*</span></label>
                                                         <div class="input-group date">
-                                                            <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
+                                                            <input id="start_date" type="text" class="form-control datetimepicker-input"
+                                                            value="{{  timePickerFormat(now()->addHours(-1)) }}" name="start_date"
                                                             data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
                                                             <div class="input-group-addon">
                                                                 @icon('solid/calendar-alt', 'text-muted')
@@ -234,8 +235,8 @@
                                                     <div class="form-group">
                                                         <label for="">End Date <span class="text-danger">*</span></label>
                                                         <div class="input-group date">
-                                                            <input id="send_date" type="text" class="form-control datetimepicker-input"
-                                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="start_date"
+                                                            <input id="end_date" type="text" class="form-control datetimepicker-input"
+                                                            value="{{  timePickerFormat(now()->addHours(1)) }}" name="end_date"
                                                             data-date-format="DD-MM-YYYY hh:mm A" data-date-start-date="moment()" required>
                                                             <div class="input-group-addon">
                                                                 @icon('solid/calendar-alt', 'text-muted')
@@ -252,7 +253,7 @@
                                                 Send Log
                                             </button>  --}}
 
-                                            <button type="submit" class="btn btn-info submit btn-rounded" id="btn-submitC"><i
+                                            <button type="submit" class="btn btn-info submit btn-rounded formSaving2" id="btn-submitC"><i
                                                 class="fas fa-paper-plane"></i>
                                                 Send Log
                                             </button> 
@@ -287,7 +288,7 @@
 @push('pagescript')
 @include('stacks.js.form')
 @include('stacks.js.fullscreen')
-@include('partial.ajaxify')
+{{-- @include('partial.ajaxify') --}}
 @endpush
 
 <script>
@@ -343,6 +344,75 @@ $(document).ready(function() {
     });
 
 
+});
+
+
+$('.ajaxifyForm_custom1').submit(function (event) {
+    let form_save = '.formSaving1';
+    event.preventDefault();
+    $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+    var data = new FormData(this);
+    if(form_save == '.formSavingAndRun'){
+        data.append('formsubmit', 'formSavingAndRun');
+    }else if(form_save == '.formPreview'){
+        data.append('formsubmit', 'formPreview');
+    }else if(form_save == '.formDraft'){
+        data.append('formsubmit', 'formDraft');
+    }
+    axios.post($(this).attr("action"), data)
+        .then(function (response) {
+                toastr.success(response.data.message, '@langapp('response_status') ');
+                $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                window.location.href = response.data.redirect;
+    })
+    .catch(function (error) {
+        if(error.response.data.exception){
+            toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+            $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+        }else{
+            var errors = error.response.data.errors;
+            var errorsHtml= '';
+            $.each( errors, function( key, value ) {
+                errorsHtml += '<li>' + value[0] + '</li>'; 
+            });
+            toastr.error( errorsHtml , '@langapp('response_status') ');
+            $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+        }
+    }); 
+});
+
+$('.ajaxifyForm_custom2').submit(function (event) {
+    let form_save = '.formSaving2';
+    event.preventDefault();
+    $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+    var data = new FormData(this);
+    if(form_save == '.formSavingAndRun'){
+        data.append('formsubmit', 'formSavingAndRun');
+    }else if(form_save == '.formPreview'){
+        data.append('formsubmit', 'formPreview');
+    }else if(form_save == '.formDraft'){
+        data.append('formsubmit', 'formDraft');
+    }
+    axios.post($(this).attr("action"), data)
+        .then(function (response) {
+                toastr.success(response.data.message, '@langapp('response_status') ');
+                $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                {{--window.location.href = response.data.redirect;--}}
+    })
+    .catch(function (error) {
+        if(error.response.data.exception){
+            toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+            $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+        }else{
+            var errors = error.response.data.errors;
+            var errorsHtml= '';
+            $.each( errors, function( key, value ) {
+                errorsHtml += '<li>' + value[0] + '</li>'; 
+            });
+            toastr.error( errorsHtml , '@langapp('response_status') ');
+            $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+        }
+    }); 
 });
 
 

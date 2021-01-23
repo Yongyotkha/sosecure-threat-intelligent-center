@@ -81,6 +81,7 @@ Route::group(
    
         Route::put('/vulnerability_logs/upsert/{id}', 'VulnerabilityController@upsert_VulnerabilityLogs')->name('vulsetting.upsert')->middleware('can:menu_items');
         Route::put('/vulnerability_logs/upsertSysFormat/{id}', 'VulnerabilityController@upsert_VulnerabilitySysFormat')->name('vulsetting.upsertSys')->middleware('can:menu_items');
+        Route::put('/vulnerability_logs/cve_sent_log/{id}', 'VulnerabilityController@cve_sent_log')->name('vulsetting.cve_sent_log')->middleware('can:menu_items');
         Route::get('/vulnerability_logs/{id}', 'VulnerabilityController@index')->name('vulsetting.vul_logs')->middleware('can:menu_items');
         Route::post('/vulnerability_logs/vendor/change_status', 'VulnerabilityController@change_status')->name('vulsetting.change_status')->middleware(['can:menu_items']);
 
@@ -88,6 +89,7 @@ Route::group(
         Route::get('/indicators_logs/{id}', 'IndicatorsSettingController@index')->name('indisetting.indi_logs')->middleware('can:menu_items');
         Route::put('/indicators_logs/upsert/{id}', 'IndicatorsSettingController@upsert_IndicatorsLogs')->name('indisetting.upsert')->middleware('can:menu_items');
         Route::put('/indicators_logs/upsertSysFormat/{id}', 'IndicatorsSettingController@upsert_IndicatorsSysFormat')->name('indisetting.upsertSys')->middleware('can:menu_items');
+        Route::put('/indicators_logs/indicator_log/{id}', 'IndicatorsSettingController@indicator_log')->name('indisetting.indicator_log')->middleware('can:menu_items');
 
 
 
