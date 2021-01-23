@@ -829,9 +829,9 @@ class NewsController extends Controller
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             if($check_read_news){
-                $html .= '<div class="list-news" style="background-color:#ececec">';
-            }else{
                 $html .= '<div class="list-news">';
+            }else{
+                $html .= '<div class="list-news" style="background-color:#ececec">';
             }
             $html .= '
                 <!--<div class="checkbox-news-select">
@@ -945,9 +945,9 @@ class NewsController extends Controller
         foreach($Bookmark as $data){
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
             if($check_read_news){
-                $html .= '<div class="list-news" style="background-color:#ececec">';
-            }else{
                 $html .= '<div class="list-news">';
+            }else{
+                $html .= '<div class="list-news" style="background-color:#ececec">';
             }
             $html .= '
             <!--<div class="checkbox-news-select">
