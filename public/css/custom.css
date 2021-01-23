@@ -91,10 +91,13 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
 
 .nav-primary ul.nav>li>a{
     border-top: unset !important;
+    font-size: 12px !important;
 }
 .nav-primary li {
     line-height: 1.9;
 }
+
+
 
 .header-badge{
     background: #eee;
