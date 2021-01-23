@@ -21,6 +21,7 @@ use Modules\Users\Entities\UserSite;
 use App\CredentialsController;
 use App\transaction_client_profiles;
 use App\transaction_client_site;
+use App\transaction_client_site_category;
 use App\transaction_client_user_site;
 use App\transaction_client_users;
 
@@ -146,6 +147,22 @@ class SiteSettingsController extends Controller
                 $SiteCategory->site_id = $SiteSettings->id;
                 $SiteCategory->category_id = $category;
                 $SiteCategory->save();
+
+                $transaction_client_site_category = transaction_client_site_category::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteCategory->id)->first();
+                if($transaction_client_site_category){
+                    $transaction_client_site_category -> transaction_mode = 'update';
+                    $transaction_client_site_category -> transaction_data_status = 1;
+                    $transaction_client_site_category -> status = 1;
+                    $transaction_client_site_category -> save();
+                }else{
+                    $transaction_client_site_category = new transaction_client_site_category();
+                    $transaction_client_site_category -> site_id = $SiteSettings->id;
+                    $transaction_client_site_category -> transaction_id = $SiteCategory->id;
+                    $transaction_client_site_category -> transaction_mode = 'update';
+                    $transaction_client_site_category -> transaction_data_status = 1;
+                    $transaction_client_site_category -> status = 1;
+                    $transaction_client_site_category -> save();
+                }
             }
         }
 
@@ -306,6 +323,22 @@ class SiteSettingsController extends Controller
                     $SiteCategory->site_id = $SiteSettings->id;
                     $SiteCategory->category_id = $category;
                     $SiteCategory->save();
+
+                    $transaction_client_site_category = transaction_client_site_category::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteCategory->id)->first();
+                    if($transaction_client_site_category){
+                        $transaction_client_site_category -> transaction_mode = 'update';
+                        $transaction_client_site_category -> transaction_data_status = 1;
+                        $transaction_client_site_category -> status = 1;
+                        $transaction_client_site_category -> save();
+                    }else{
+                        $transaction_client_site_category = new transaction_client_site_category();
+                        $transaction_client_site_category -> site_id = $SiteSettings->id;
+                        $transaction_client_site_category -> transaction_id = $SiteCategory->id;
+                        $transaction_client_site_category -> transaction_mode = 'update';
+                        $transaction_client_site_category -> transaction_data_status = 1;
+                        $transaction_client_site_category -> status = 1;
+                        $transaction_client_site_category -> save();
+                    }
                 }
 
             }
@@ -432,6 +465,21 @@ class SiteSettingsController extends Controller
         if($SiteCategory) {
             foreach($SiteCategory as $SiteCategory_key => $SiteCategory_val) {
                 $SiteCategory_val->active = $request->active;
+                $transaction_client_site_category = transaction_client_site_category::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteCategory_val->id)->first();
+                if($transaction_client_site_category){
+                    $transaction_client_site_category -> transaction_mode = 'update';
+                    $transaction_client_site_category -> transaction_data_status = 1;
+                    $transaction_client_site_category -> status = 1;
+                    $transaction_client_site_category -> save();
+                }else{
+                    $transaction_client_site_category = new transaction_client_site_category();
+                    $transaction_client_site_category -> site_id = $SiteSettings->id;
+                    $transaction_client_site_category -> transaction_id = $SiteCategory_val->id;
+                    $transaction_client_site_category -> transaction_mode = 'update';
+                    $transaction_client_site_category -> transaction_data_status = 1;
+                    $transaction_client_site_category -> status = 1;
+                    $transaction_client_site_category -> save();
+                }
                 $SiteCategory_val->save();
             }
         }
@@ -679,7 +727,23 @@ class SiteSettingsController extends Controller
                     }
                     SiteSettings::where("code", $id_change )->delete();
 
-                    $SiteCategory = SiteCategory::where('site_id',$SiteSettings->id)->delete();
+                    $SiteCategory = SiteCategory::where('site_id',$model->id)->first();
+                    $transaction_client_site_category = transaction_client_site_category::where('site_id', $model->id)->where('transaction_id', $SiteCategory->id)->first();
+                    if($transaction_client_site_category){
+                        $transaction_client_site_category -> transaction_mode = 'delete';
+                        $transaction_client_site_category -> transaction_data_status = 1;
+                        $transaction_client_site_category -> status = 1;
+                        $transaction_client_site_category -> save();
+                    }else{
+                        $transaction_client_site_category = new transaction_client_site_category();
+                        $transaction_client_site_category -> site_id = $model->id;
+                        $transaction_client_site_category -> transaction_id = $SiteCategory->id;
+                        $transaction_client_site_category -> transaction_mode = 'delete';
+                        $transaction_client_site_category -> transaction_data_status = 1;
+                        $transaction_client_site_category -> status = 1;
+                        $transaction_client_site_category -> save();
+                    }
+                    $SiteCategory -> delete();
     
                 }
 
