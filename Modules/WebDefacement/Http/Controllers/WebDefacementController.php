@@ -277,8 +277,8 @@ class WebDefacementController extends Controller
                 <div class="wdfm-card">
                     <div class="wdfm-header">
                         <div class="wdfm-img">
-                            <a href="'.$key->image_last.'" data-lightbox="name-img-2" >
-                                <img src="'.@$key->image_last.'" onerror="setDefaultPic(this)"/>
+                            <a href="'.config('app.URL_CENTER').@$key->image_last.'" data-lightbox="name-img-2" >
+                                <img src="'.config('app.URL_CENTER').@$key->image_last.'" onerror="setDefaultPic(this)"/>
                             </a>
                         </div>
                     </div>
