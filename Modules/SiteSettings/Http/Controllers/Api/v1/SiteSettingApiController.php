@@ -12,7 +12,7 @@ use Modules\SiteSettings\Entities\SiteConnectSystem;
 use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
 use Auth;
 use App\Classes\Fn_api;
-
+use App\transaction_client_site;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 // use Modules\Clients\Transformers\ClientResource;
@@ -220,6 +220,21 @@ class SiteSettingApiController extends Controller
     {
         $model = $this->SiteSettings->find($id);
         // dd($model);
+        $transaction_client_site = transaction_client_site::where('site_id', $model->id)->where('transaction_id', $model->id)->first();
+        if($transaction_client_site){
+            $transaction_client_site -> transaction_mode = 'delete';
+            $transaction_client_site -> transaction_data_status = 1;
+            $transaction_client_site -> status = 1;
+            $transaction_client_site -> save();
+        }else{
+            $transaction_client_site = new transaction_client_site();
+            $transaction_client_site -> site_id = $model->id;
+            $transaction_client_site -> transaction_id = $model->id;
+            $transaction_client_site -> transaction_mode = 'delete';
+            $transaction_client_site -> transaction_data_status = 1;
+            $transaction_client_site -> status = 1;
+            $transaction_client_site -> save();
+        }
         $model->delete();
 
         $SiteCategory = SiteCategory::where('site_id',$id)->delete();

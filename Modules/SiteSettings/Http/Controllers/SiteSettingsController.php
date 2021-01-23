@@ -19,7 +19,10 @@ use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use App\CredentialsController;
-
+use App\transaction_client_profiles;
+use App\transaction_client_site;
+use App\transaction_client_user_site;
+use App\transaction_client_users;
 
 class SiteSettingsController extends Controller
 {
@@ -129,6 +132,14 @@ class SiteSettingsController extends Controller
         $SiteSettings->mongo_password = str_random(15);
         $SiteSettings->save();
 
+        $transaction_client_site = new transaction_client_site();
+        $transaction_client_site -> site_id = $SiteSettings->id;
+        $transaction_client_site -> transaction_id = $SiteSettings->id;
+        $transaction_client_site -> transaction_mode = 'insert';
+        $transaction_client_site -> transaction_data_status = 1;
+        $transaction_client_site -> status = 1;
+        $transaction_client_site -> save();
+
         if ($request->category) {
             foreach ($request->category as $category) {
                 $SiteCategory = new SiteCategory;
@@ -169,6 +180,31 @@ class SiteSettingsController extends Controller
         $UserSite->created_by = @Auth::user()->id;
         $UserSite->save();
         //----end------gen user_support----------------//
+
+        $transaction_client_users = new transaction_client_users();
+        $transaction_client_users -> site_id = $SiteSettings->id;
+        $transaction_client_users -> transaction_id = $user->id;
+        $transaction_client_users -> transaction_mode = 'insert';
+        $transaction_client_users -> transaction_data_status = 1;
+        $transaction_client_users -> status = 1;
+        $transaction_client_users -> save();
+
+        $transaction_client_user_site = new transaction_client_user_site();
+        $transaction_client_user_site -> site_id = $SiteSettings->id;
+        $transaction_client_user_site -> transaction_id = $UserSite->id;
+        $transaction_client_user_site -> transaction_mode = 'insert';
+        $transaction_client_user_site -> transaction_data_status = 1;
+        $transaction_client_user_site -> status = 1;
+        $transaction_client_user_site -> save();
+
+        $transaction_client_profiles = new transaction_client_profiles();
+        $transaction_client_profiles -> site_id = $SiteSettings->id;
+        $transaction_client_profiles -> transaction_id = $user->id;
+        $transaction_client_profiles -> transaction_mode = 'insert';
+        $transaction_client_profiles -> transaction_data_status = 1;
+        $transaction_client_profiles -> status = 1;
+        $transaction_client_profiles -> save();
+            
 
         return ajaxResponse(
             [
@@ -242,6 +278,23 @@ class SiteSettingsController extends Controller
             $SiteSettings->system_key = $this->encrypt_decrypt('encrypt', $id . '&' . $request->ip_key . '&' . $request->mac_address_key, $request->ip_key, $request->mac_address_key);
         }
         $SiteSettings->save();
+
+        $transaction_client_site = transaction_client_site::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteSettings->id)->first();
+        if($transaction_client_site){
+            $transaction_client_site -> transaction_mode = 'update';
+            $transaction_client_site -> transaction_data_status = 1;
+            $transaction_client_site -> status = 1;
+            $transaction_client_site -> save();
+        }else{
+            $transaction_client_site = new transaction_client_site();
+            $transaction_client_site -> site_id = $SiteSettings->id;
+            $transaction_client_site -> transaction_id = $SiteSettings->id;
+            $transaction_client_site -> transaction_mode = 'update';
+            $transaction_client_site -> transaction_data_status = 1;
+            $transaction_client_site -> status = 1;
+            $transaction_client_site -> save();
+        }
+
         if ($request->page_setting == 'site_settings') {
             SiteCategory::where('site_id', $SiteSettings->id)->delete();
             foreach ($request->category as $category) {
@@ -357,6 +410,22 @@ class SiteSettingsController extends Controller
         $SiteSettings = SiteSettings::where('code', $request->code)->first();
         $SiteSettings->active = $request->active;
         $SiteSettings->save();
+
+        $transaction_client_site = transaction_client_site::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteSettings->id)->first();
+        if($transaction_client_site){
+            $transaction_client_site -> transaction_mode = 'update';
+            $transaction_client_site -> transaction_data_status = 1;
+            $transaction_client_site -> status = 1;
+            $transaction_client_site -> save();
+        }else{
+            $transaction_client_site = new transaction_client_site();
+            $transaction_client_site -> site_id = $SiteSettings->id;
+            $transaction_client_site -> transaction_id = $SiteSettings->id;
+            $transaction_client_site -> transaction_mode = 'update';
+            $transaction_client_site -> transaction_data_status = 1;
+            $transaction_client_site -> status = 1;
+            $transaction_client_site -> save();
+        }
 
         $SiteCategory = SiteCategory::where('site_id',$SiteSettings->id)->get();
         // dd($SiteCategory);
@@ -592,9 +661,22 @@ class SiteSettingsController extends Controller
             // dd($request->id);
                 
                 foreach($request->id as $id_change ){
-
-                    $SiteSettings = SiteSettings::wher('code', $id_change)->first();
-    
+                    $model = SiteSettings::select('id')->where("code", $id_change )->first();
+                    $transaction_client_site = transaction_client_site::where('site_id', $model->id)->where('transaction_id', $model->id)->first();
+                    if($transaction_client_site){
+                        $transaction_client_site -> transaction_mode = 'delete';
+                        $transaction_client_site -> transaction_data_status = 1;
+                        $transaction_client_site -> status = 1;
+                        $transaction_client_site -> save();
+                    }else{
+                        $transaction_client_site = new transaction_client_site();
+                        $transaction_client_site -> site_id = $model->id;
+                        $transaction_client_site -> transaction_id = $model->id;
+                        $transaction_client_site -> transaction_mode = 'delete';
+                        $transaction_client_site -> transaction_data_status = 1;
+                        $transaction_client_site -> status = 1;
+                        $transaction_client_site -> save();
+                    }
                     SiteSettings::where("code", $id_change )->delete();
 
                     $SiteCategory = SiteCategory::where('site_id',$SiteSettings->id)->delete();
