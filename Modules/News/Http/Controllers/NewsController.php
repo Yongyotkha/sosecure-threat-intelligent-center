@@ -830,8 +830,10 @@ class NewsController extends Controller
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             if($check_read_news){
                 $html .= '<div class="list-news">';
+                $font_weight = 'font-weight: bold !important;';
             }else{
                 $html .= '<div class="list-news" style="background-color:#ececec">';
+                $font_weight = '';
             }
             $html .= '
                 <!--<div class="checkbox-news-select">
@@ -842,7 +844,7 @@ class NewsController extends Controller
                 </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <span class="head-news-text">'.$icon_related.' '.$n_title.'</span>
+                        <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                     </a>
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
