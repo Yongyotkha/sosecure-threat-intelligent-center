@@ -15,7 +15,9 @@ return [
     'name'            => env('APP_NAME', 'WorkiceCRM'),
     'mode' => env('APP_MODE', 'site_offline'),
     'site_code' => env('SITE_CODE', 'null'),
-
+    'PATH_CENTER' => env('PATH_CENTER', 'null'),
+    'PATH_CLIENT' => env('PATH_CLIENT', 'null'),
+    'URL_CENTER' => env('URL_CENTER', 'null'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment
