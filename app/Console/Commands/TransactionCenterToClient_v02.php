@@ -105,10 +105,7 @@ class TransactionCenterToClient_v02 extends Command
 
 
 
-     
-
-
-
+   
 
         foreach ($data_methed_funciton_list   as $key => $value) {
 
@@ -128,8 +125,8 @@ class TransactionCenterToClient_v02 extends Command
 
 
          $httpData = $this->reconnnect($value['PATH_CENTER_IP_TF_getTranferData'], $passBody_send, $this->urlLimit);
-        // print_r($httpData);
-
+         
+           print_r($httpData);
 
 
          if ($httpData["success"]) {
@@ -150,7 +147,7 @@ class TransactionCenterToClient_v02 extends Command
             ];
             //print_r($passBody);
             $httpDataRecon = $this->reconnnect($value['PATH_CLIENT_IP_TF_insertdata'], $passBody, $this->urlLimit);
-          //  print_r($httpDataRecon);
+            print_r($httpDataRecon);
          // echo json_encode($httpData);
             if ($httpDataRecon["success"]) {
                 if($httpDataRecon["result"]["connect"]){
