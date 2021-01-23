@@ -108,9 +108,9 @@
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
                                     <div class="img-icon-card ice">
-                                        <img src="{{asset('images/ip.png')}}" alt="">
+                                        <img src="{{asset('images/database.png')}}" alt="">
                                     </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets All</h3>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
                                     <span class="number-card warning">0</span>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                                     <div class="img-icon-card ice">
                                         <img src="{{asset('images/windows.png')}}" alt="">
                                     </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper">Windows All</h3>
+                                    <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
                                     <span class="number-card info">0</span>
                                 </div>
                             </div>
@@ -132,7 +132,7 @@
                                     <div class="img-icon-card ice">
                                         <img src="{{asset('images/linux.png')}}" alt="">
                                     </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper ">Linux All</h3>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
                                     <span class="number-card green">0</span>
                                 </div>
                             </div>

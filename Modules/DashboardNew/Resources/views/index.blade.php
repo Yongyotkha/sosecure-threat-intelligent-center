@@ -37,7 +37,7 @@
                                                             <div class="img-icon-card">
                                                                 <img src="{{asset('images/database.png')}}" alt="">
                                                             </div>
-                                                            <h3 class="name-dash-text text-dark text-upper ">Asset</h3>
+                                                            <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
                                                             <span class="number-card info number_asset"></span>
                                                         </div>
                                                     </div>
