@@ -22,11 +22,11 @@
                     <div class="col-md-12">
                         <div class="form-group m-b-md">
                             <label for="" class="d-block">&nbsp;</label>
-                            <button class="btn btn-info">
+                            <button class="btn btn-info btn-fz-13">
                                 <i class="fas fa-search"></i>
                                 <span> @langapp('apply') </span>
                             </button>
-                            <button class="btn btn-default">
+                            <button class="btn btn-default btn-fz-13">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>

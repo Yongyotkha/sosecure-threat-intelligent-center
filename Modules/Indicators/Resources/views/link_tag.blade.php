@@ -48,10 +48,10 @@
                         </div>
                         <div class="col-md-12 text-right">
                             <button class="btn btn-info" id="btn_search_data">
-                                <i class="fas fa-search"></i>
+                                <i class="fas fa-search btn-fz-13"></i>
                                 <span> @langapp('apply') </span>
                             </button>
-                            <button class="btn btn-default" id="btn_reset">
+                            <button class="btn btn-default btn-fz-13" id="btn_reset">
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
                             </button> 

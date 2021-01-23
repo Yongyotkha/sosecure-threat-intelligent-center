@@ -4,8 +4,8 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
             <div class="bc-head">Summary Dashboard</div>
-            <div style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;"
+            <div style="margin-top: 8px; width: 270px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;"
                     onchange="changeSite(value)">
                     <option value="0" selected>All Site</option>
                     @if ($site_settings)

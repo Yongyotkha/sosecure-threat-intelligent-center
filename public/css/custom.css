@@ -745,6 +745,7 @@ ul.item-list-dash li:not(:last-child){
     white-space: nowrap;
     color: #fff;
     padding: .5rem 1rem;
+    display: inline-block;
 }
 .badeg-news{
     background: #e0206f;
@@ -3445,4 +3446,8 @@ input.input-login:focus {
 } */
 .max-w-fit{
     width: max-content;
+}
+
+.btn-fz-13{
+    font-size: 13px !important;
 }

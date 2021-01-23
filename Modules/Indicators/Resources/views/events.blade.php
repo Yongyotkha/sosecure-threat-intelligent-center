@@ -14,8 +14,8 @@
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
             {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-            <div class="pull-right" style="margin-top: 8px;max-width: 120px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="max-width: 120px;">
+            <div class="pull-right" style="margin-top: 8px;min-width: 270px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
                     <option value="">All Site</option>
                     @if($SiteSettings)
                     @foreach($SiteSettings as $SiteSettings_val)
@@ -70,10 +70,10 @@
                         </div>
                         <div class="col-md-12 text-right">
                             <button class="btn btn-info" id="btn_search_data">
-                                <i class="fas fa-search"></i>
+                                <i class="fas fa-search btn-fz-13"></i>
                                 <span> @langapp('apply') </span>
                             </button>
-                            <button class="btn btn-default" id="btn_reset">
+                            <button class="btn btn-default btn-fz-13" id="btn_reset">
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>

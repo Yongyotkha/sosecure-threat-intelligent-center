@@ -51,24 +51,24 @@
                         <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
                     </button> --}}
 
-                    <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
-                        <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
-                    </a>
-
                     <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs"
                         value="bulk-delete" disabled>
                         <span>@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
 
-                    <a id="btn_client_view" href="{{site_url('/news_client')}}"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
-                        <span><i class="fas fa-eye"></i> Client view</span>
-                    </a>
-
                     <a id="advance-search" href="#area-advance-search"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                    </a>
+
+                    <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
+                        <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
+                    </a>
+
+                    <a id="btn_client_view" href="{{site_url('/news_client')}}"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
+                        <span><i class="fas fa-eye"></i> Client view</span>
                     </a>
 
 
@@ -111,36 +111,18 @@
                     <section class="panel panel-default" id="area-advance-search" style="display: none;">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
                                     <label for="">Title</label>
                                     <input type="text" class="form-control" name="keywords" id="keywords">
                                 </div>
-                                <div class="col-lg-6">
-                                    <label for="">Select Date</label>
-                                    <div id="date_srange"
-                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <label for="">Status</label>
-                                    <select id="status_news" class="select2-option form-control">
-                                        <option value="">All</option>
-                                        <option value="1">Public</option>
-                                        <option value="2">Darft</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
                                     <label for="">Source</label>
                                     <select name="news_source[]" id="news_source" class="select2-option form-control"
                                         multiple="multiple">
 
                                     </select>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
                                     <label for="">Category</label>
                                     <select name="news_category[]" id="news_category"
                                         class="select2-option form-control" multiple="multiple">
@@ -153,12 +135,31 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="">Select Date</label>
+                                    <div id="date_srange" class="text-center"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+            
+                                <div class="col-lg-4">
+                                    <label for="">Status</label>
+                                    <select id="status_news" class="select2-option form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Public</option>
+                                        <option value="2">Darft</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-12 text-right">
-                                    <button type="button" class="btn btn-info btn-responsive" onclick="search()">
+                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
                                         <i class="fas fa-search"></i>
                                         @langapp('apply')
                                     </button>
-                                    <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive"
+                                    <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
                                         style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
@@ -190,10 +191,10 @@
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th width="20px">Source name</th>
+                                                <th width="20px">Source Name</th>
                                                 <th width="20%">Title</th>
                                                 <th>Category</th>
-                                                <th width="20px">Data Satatus</th>
+                                                <th width="20px">Data Status</th>
                                                 <th width="30px">Public Date</th>
                                                 <th>View Count</th>
                                                 <th width="40px">Link</th>

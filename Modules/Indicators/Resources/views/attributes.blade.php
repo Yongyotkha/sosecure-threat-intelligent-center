@@ -86,11 +86,11 @@
                         </div>
                         <div class="col-md-4">
                             <label for="" class="d-block">&nbsp;</label>
-                            <button class="btn btn-info" id="search_data">
+                            <button class="btn btn-info btn-fz-13" id="search_data">
                                 <i class="fas fa-search"></i>
                                 <span> @langapp('apply') </span>
                             </button>
-                            <button class="btn btn-default" id="clear_data">
+                            <button class="btn btn-default btn-fz-13" id="clear_data">
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>

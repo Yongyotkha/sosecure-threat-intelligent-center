@@ -57,22 +57,11 @@
 
                         <div class="mobi-d-block">
                             <span
-                                class="text-date">{{--August 4th, 2020--}}{{@date("F d",strtotime($RSSNews->public_date))}}th{{@date(", Y",strtotime($RSSNews->public_date))}}</span>
+                                class="text-date">{{--August 4th, 2020--}}{{@date("F d",strtotime($RSSNews->public_date))}}th{{@date(", Y",strtotime($RSSNews->public_date))}}
+                            </span>
                             {{-- @php(dd($RSSNews)) --}}
                             {{-- @$RSSNews->get_topic->topic->name --}}
-                            @if(@$RSSNews->get_cate)
-                            @foreach(@$RSSNews->get_cate as $cate)
-                            {{-- 1 --}}
-                            {{-- {{@var_dump($cate)}} --}}
-                            {{-- {{@$cate->cate->name}} --}}
-                            <span class="badeg-news"><i class="fas fa-newspaper"></i>
-                                {{@$cate->get_cate_name->name}}</span>&nbsp;
-                            @endforeach
-
-                            @endif
-                            {{-- <span class="badeg-news"><i class="fas fa-newspaper"></i> NEWS</span> --}}
-                            <span class="badeg-view"><i class="fas fa-eye"></i> Views
-                                {{@$RSSNews->view ? $RSSNews->view : 0}}</span>
+                            
                         </div>
                     </div>
                     <div class="headding-primary-text" id="topic_news">
@@ -109,6 +98,21 @@
         <div class="container-fluid" style="background: #fff;">
             <div class="row">
                 <div class="col-md-8">
+                    <div class="m-t-10">
+                        @if(@$RSSNews->get_cate)
+                        @foreach(@$RSSNews->get_cate as $cate)
+                            {{-- 1 --}}
+                            {{-- {{@var_dump($cate)}} --}}
+                            {{-- {{@$cate->cate->name}} --}}
+                            <span class="badeg-news"><i class="fas fa-newspaper"></i> {{@$cate->get_cate_name->name}}</span>&nbsp;
+                        @endforeach
+
+                        @endif
+                        {{-- <span class="badeg-news"><i class="fas fa-newspaper"></i> NEWS</span> --}}
+                        <span class="badeg-view">
+                            <i class="fas fa-eye"></i> Views {{@$RSSNews->view ? $RSSNews->view : 0}}
+                        </span>
+                    </div>
                     <div class="show-content-news" id="content_news">
                         {!!@$RSSNews->detail_th!!}
 

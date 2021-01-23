@@ -85,12 +85,12 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive"
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
                                 onclick="search()">
                                 <i class="fas fa-search"></i>
                                 @langapp('apply')
                             </button>
-                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive"
+                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
                                 style="white-space: nowrap" onclick="clear_search()">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>

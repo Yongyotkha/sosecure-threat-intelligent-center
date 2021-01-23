@@ -8,8 +8,8 @@
                      Setting > Assets
                 </div>
 
-                <div class="pull-right">
-                    <select name="" id="select-site" class="select2-option form-control" style="min-width: 100px">
+                <div class="pull-right" style="min-width: 270px;">
+                    <select name="" id="select-site" class="select2-option form-control" style="min-width: 270px">
                         <option value="allsite">All Site</option>
                     </select>
                 </div>
@@ -20,8 +20,9 @@
                     </div>
 
                     <div class="btn-group">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"><i class="fas fa-filter"></i> Filter</button>
+                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
                     </div>
+
                     <div class="btn-group">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
                             <span class="caret"></span>
@@ -89,50 +90,48 @@
                             </li>
                         </ul>
                     </div>
-
-                 
+            
                     <div class="btn-group">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
+                        <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                        </a>
                     </div>
+
                 </div>
             </header>
 
             <section class="scrollable wrapper">
-                <div class="hide-fillter" style="margin-bottom: 1rem;display:none;background:#fff;padding:1rem;">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group m-b-md">
-                                <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="keyword" placeholder="Search">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group m-b-md">
-                                <label for="" class="">Referent</label>
-                                <input type="text" class="form-control" name="keyword" placeholder="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
 
-                        <div class="col-md-12">
-                            <div class="form-group m-b-md pull-right">
-                                <button class="btn btn-info">
+                <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                    <div class="container-fluid" style="padding: 2rem;">
+                        <div class="row m-b-md">
+                            <div class="col-md-8">
+                                <div class="form-group m-b-md">
+                                    <label for="" class="">Keyword</label>
+                                    <input type="text" class="form-control" name="keyword" placeholder="Search">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group m-b-md">
+                                    <label for="" class="">Referent</label>
+                                    <input type="text" class="form-control" name="keyword" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
                                     <i class="fas fa-search"></i>
-                                    <span> @langapp('apply') </span>
+                                    @langapp('apply')
                                 </button>
-                                <button class="btn btn-default">
+                                <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
                             </div>
-        
                         </div>
                     </div>
-                    <div class="row">
-                       
-                    </div>
-                </div>
+                </section>
 
                 <section class="panel panel-default">
                     <header class="panel-heading font-bold panel-header-blue">
@@ -224,6 +223,13 @@
 @include('stacks.js.fullscreen')
 
 <script>
+
+    $('#area-advance-search').hide();
+    $('#advance-search').click(function(){
+        $('#area-advance-search').toggle();
+    });
+    
+
     $(document).ready(function () {
         $('#source').select2();
         $('#select-site').select2();

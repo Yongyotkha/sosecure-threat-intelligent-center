@@ -153,8 +153,8 @@
                         <div class="form-group row">
                             <div class="col-lg-6">
                             <div class="row">
-                                <label class="col-lg-4 control-label">Public Date </label>
-                                <div class="col-lg-8">
+                                <label class="col-lg-2 control-label"> <span style="margin-top: 8px; display: inline-block;"> Public Date </span></label>
+                                <div class="col-lg-10">
                                     <div class="input-group date">
                                         <input id="send_date" type="text" class="form-control datetimepicker-input"
                                         @php
@@ -176,9 +176,9 @@
                             </div>
                             <div class="col-lg-6">
                             <div class="row">
-                                <label class="col-lg-4 control-label">Status </label>
-                                <div class="col-lg-8">
-                                    <label class="switch">
+                                <label class="col-lg-1 control-label" style="margin-top: 8px; display: inline-block;">Status </label>
+                                <div class="col-lg-11">
+                                    <label class="switch" style="margin-top: 8px; display: inline-block;">
                                         @php
                                         $checked_val = '';
                                             if(@$RSSNews -> status == 1) {

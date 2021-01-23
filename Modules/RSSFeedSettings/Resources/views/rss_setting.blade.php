@@ -66,11 +66,11 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12 text-right">
-                        <button class="btn btn-info btn-responsive">
+                        <button class="btn btn-info btn-responsive btn-fz-13">
                             <i class="fas fa-search"></i>
                             @langapp('apply')
                         </button>
-                        <button class="btn btn-default btn-responsive" style="white-space: nowrap">
+                        <button class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                             <i class="fas fa-broom"></i>
                             <span> Clear </span>
                         </button>

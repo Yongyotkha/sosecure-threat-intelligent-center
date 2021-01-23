@@ -14,8 +14,8 @@
                  <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                 </a>
-                 <div class="pull-right" style="margin-top: 8px; width: 120px;">
-                    <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 120px">
+                 <div class="pull-right" style="margin-top: 8px; width: 270px;">
+                    <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
                         <option value="">All Site</option>
                         @if($SiteSettings)
                             @foreach($SiteSettings as $SiteSettings_val)
@@ -93,11 +93,11 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-12 text-right mt-2">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
                                     <i class="fas fa-search"></i>
                                     @langapp('apply')
                                 </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>

@@ -57,14 +57,15 @@
                         title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
+                    
+                    <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                    </a>
+                    
                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
                             @langapp('delete')</span>
                     </button>
-
-                    <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </a>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         data-target="#rss_modal">
                         @icon('solid/plus') @langapp('create')
@@ -75,7 +76,7 @@
                     <section class="panel panel-default" id="area-advance-search" style="display: none;">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
                                     <label for="">Keywords</label>
                                    <input type="text" class="form-control" name="keywords" id="keywords">
                                 </div>
@@ -89,14 +90,14 @@
                                         </div>
                                     </div>
                                 </div> --}}
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <label for="">Select Date</label>
-                                    <div id="date_srange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                    <div id="date_srange" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-4">
                                     <label for="">Status</label>
                                     <select id="status" class="select2-option form-control">
                                         <option value="">All</option>
@@ -123,11 +124,11 @@
                             <br>
                             <div class="row">
                                 <div class="col-lg-12 text-right">
-                                    <button type="button" class="btn btn-info btn-responsive" onclick="search()">
+                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
                                         <i class="fas fa-search"></i>
                                         @langapp('apply')
                                     </button>
-                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive" style="white-space: nowrap">
+                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
                                     </button>
