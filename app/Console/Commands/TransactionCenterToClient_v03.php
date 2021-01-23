@@ -13,8 +13,8 @@ class TransactionCenterToClient_v03 extends Command
      *
      * @var string
      */
-    protected $signature = 'app:TransactionCenterToClient_v01';
-    protected $description = 'TransactionCenterToClient_v01';
+    protected $signature = 'app:TransactionCenterToClient_v03';
+    protected $description = 'TransactionCenterToClient_v03';
 
     /**
      * The console command description.
@@ -66,26 +66,78 @@ class TransactionCenterToClient_v03 extends Command
 
         $data_methed_funciton_list = [];
 
+
+
         $data_methed_funciton= array();
         $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
         $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
         $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
-        $data_methed_funciton['insertToTB'] ='fx_transaction_center_data_leak_feed';
+        $data_methed_funciton['insertToTB'] ='fx_transaction_client_users';
         array_push($data_methed_funciton_list, $data_methed_funciton);
 
         $data_methed_funciton= array();
         $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
         $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
         $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
-        $data_methed_funciton['insertToTB'] ='fx_transaction_center_data_leak_feed_temp';
+        $data_methed_funciton['insertToTB'] ='fx_transaction_client_users_site';
         array_push($data_methed_funciton_list, $data_methed_funciton);
 
 
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_roles';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
 
 
-      
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_permissions';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
+
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_role_permissions';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
 
 
+
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_profiles';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
+
+
+
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_model_has_roles';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
+
+
+
+
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_site';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
+        // $data_methed_funciton= array();
+        // $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        // $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        // $data_methed_funciton['insertToTB'] ='fx_transaction_client_site_category';
+        // array_push($data_methed_funciton_list, $data_methed_funciton);
 
         foreach ($data_methed_funciton_list   as $key => $value) {
 
@@ -100,41 +152,41 @@ class TransactionCenterToClient_v03 extends Command
 
 
             $passBody_send = [
-             'data' =>$dataEncode
-         ];
+               'data' =>$dataEncode
+           ];
 
 
-         $httpData = $this->reconnnect($value['PATH_CENTER_IP_TF_getTranferData'], $passBody_send, $this->urlLimit);
-         print_r($httpData);
+           $httpData = $this->reconnnect($value['PATH_CENTER_IP_TF_getTranferData'], $passBody_send, $this->urlLimit);
+
+        //   print_r($httpData);
 
 
-
-         if ($httpData["success"]) {
+           if ($httpData["success"]) {
+            $body_data = $httpData["result"]["queryData"];
             $dataDecode_data_return = encrypt_decrypt('decrypt', $httpData["result"]["queryData"], $header, $ip, $mac);
             $httpData_return = json_decode($dataDecode_data_return);
             $httpData["result"]["queryData"] =  $httpData_return;
-            print_r($httpData_return);
+
             if (!empty($httpData["result"]["queryData"])) {
+               $tableData = $body_data;
+               $dataEncode = encrypt_decrypt('encrypt', $httpData["result"]["site_code_en"], $header, $ip, $mac);
 
-
-
-             $tableData = $httpData["result"]["queryData"];
-             $dataEncode = encrypt_decrypt('encrypt', $httpData["result"]["site_code_en"], $header, $ip, $mac);
-             $passBody = [
+               $dataEncode_queryData = encrypt_decrypt('encrypt', json_encode($httpData["result"]["queryData"]), $header, $ip, $mac);
+               $passBody = [
                 'site_code_en' => $dataEncode,
-                'queryData' => $tableData,
-                'tbName' => $this->insertToTB,
+                'queryData' => $dataEncode_queryData,
+                'tbName' =>$value['insertToTB'],
             ];
-
+            //print_r($passBody);
             $httpDataRecon = $this->reconnnect($value['PATH_CLIENT_IP_TF_insertdata'], $passBody, $this->urlLimit);
             print_r($httpDataRecon);
-                // echo json_encode($httpData);
+         // echo json_encode($httpData);
             if ($httpDataRecon["success"]) {
                 if($httpDataRecon["result"]["connect"]){
                     $passBody = [
                         'modeFor' => 'done',
-                        'modeInsert' => 'fx_transaction_client_news_categories',
-                        'nameBJ' => 'Transaction Client client_news - everyMinute()  Or Request',
+                        'modeInsert' => $value['insertToTB'],
+                        'nameBJ' => 'Transaction Client  - everyMinute()  Or Request',
                         'sitecode' => config('app.site_code'),
                     ];
                     $httpDataUpdate = $this->reconnnect($value['PATH_CENTER_IP_TF_updateTFBatchJob'], $passBody, $this->urlLimit);

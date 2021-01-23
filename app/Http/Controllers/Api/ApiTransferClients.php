@@ -24,9 +24,17 @@ use App\Entities\Transaction_client_data_datacve_mapping;
 use App\Entities\Transaction_client_cve_assets;
 use App\Entities\TFClient_R_s_s_news_categories;
 use App\Entities\fx_transaction_client_news_categories;
-use App\Entities\Sites;
+use App\Entities\Transaction_site;
+use App\Entities\Transaction_site_category;
 use App\Entities\Transaction_client_categories;
-
+use App\Entities\Transaction_users;
+use App\Entities\Transaction_user_site;
+use App\Entities\Transaction_roles;
+use App\Entities\Transaction_permissions;
+use App\Entities\Transaction_role_permissions;
+use App\Entities\Transaction_model_has_roles;
+use App\Entities\Transaction_profiles;
+use App\Entities\Sites;
 class ApiTransferClients extends Controller
 {
 
@@ -139,7 +147,48 @@ if($dataDecode){
             $modeInsert = 'fx_transaction_client_categories';
             $nameBJ = 'Transaction Client categories - everyMinute()  Or Request';
             
-        } else {
+        }else if ($nameTable == 'fx_transaction_client_users') {
+            $model_getData = new Transaction_users;
+            $modeInsert = 'fx_transaction_client_users';
+            $nameBJ = 'Transaction Client users - everyMinute()  Or Request';
+            
+        }else if ($nameTable == 'fx_transaction_client_users_site') {
+            $model_getData = new Transaction_user_site;
+            $modeInsert = 'fx_transaction_client_users_site';
+            $nameBJ = 'Transaction Client users_site - everyMinute()  Or Request';
+            
+        }else if ($nameTable == 'fx_transaction_client_roles') {
+            $model_getData = new Transaction_roles;
+            $modeInsert = 'fx_transaction_client_roles';
+            $nameBJ = 'Transaction Client roles - everyMinute()  Or Request';
+            
+        } else if ($nameTable == 'fx_transaction_client_permissions') {
+            $model_getData = new Transaction_permissions;
+            $modeInsert = 'fx_transaction_client_permissions';
+            $nameBJ = 'Transaction Client permissions - everyMinute()  Or Request';
+            
+        }else if ($nameTable == 'fx_transaction_client_role_permissions') {
+            $model_getData = new Transaction_role_permissions;
+            $modeInsert = 'fx_transaction_client_role_permissions';
+            $nameBJ = 'Transaction Client role_permissions - everyMinute()  Or Request';
+            
+        }else if ($nameTable == 'fx_transaction_client_model_has_roles') {
+            $model_getData = new Transaction_model_has_roles;
+            $modeInsert = 'fx_transaction_client_model_has_roles';
+            $nameBJ = 'Transaction Client model_has_roles - everyMinute()  Or Request';
+            
+        }else if ($nameTable == 'fx_transaction_c
+            lient_site') {
+            $model_getData = new Transaction_site;
+            $modeInsert = 'fx_transaction_client_site';
+            $nameBJ = 'Transaction Client site - everyMinute()  Or Request';
+            
+        }else if ($nameTable == 'fx_transaction_client_site_category') {
+            $model_getData = new Transaction_site_category;
+            $modeInsert = 'fx_transaction_client_site_category';
+            $nameBJ = 'Transaction Client site_category - everyMinute()  Or Request';
+            
+        }else {
             $connect = false;
             $result = false;
         }
