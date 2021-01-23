@@ -23,7 +23,7 @@
             </div>
         </header>
 
-        <section id="scrollable_news" class="scrollable wrapper bg-white" >
+        <section id="scrollable_news" class="scrollable wrapper" >
             <section class="panel panel-default" id="hide-advance-search" style="display: none">
                 <div class="container-fluid" style="padding: 2rem;">
                     <div class="row m-b-md">
@@ -77,7 +77,6 @@
                 </div>
             </section>
 
-        <section class="scrollable wrapper">
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
@@ -260,6 +259,7 @@ function data_table(){
                 },
                 {
                     data: 'site_id',
+                    className : 'nowrap'
                 },
             ],
             columnDefs: [

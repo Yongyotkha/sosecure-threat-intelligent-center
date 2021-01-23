@@ -94,4 +94,11 @@ class AssetsController extends Controller
     {
         //
     }
+
+
+    public function assets_add_cpe()
+    {
+        return view('assets::modal.add_cpe');
+    }
+
 }

@@ -190,11 +190,10 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th>Site Name</th>
-                                        <th>Asset</th>
-                                        <th>Asset</th>
-                                        <th>OS</th>
-                                        <th>Remark</th>
+                                        <th>Domain</th>
+                                        <th>IP</th>
+                                        <th>OS Type</th>
+                                        <th>CPE</th>
                                         <th style="width: 20px" class="text-center">Status</th>
                                         <th style="width: 20px" class="text-center">Action</th>
                                     </tr>
@@ -316,12 +315,8 @@
                     name: 'referent',
                 }, 
                 {
-                    data: 'os',
-                    name: 'os',
-                }, 
-                {
-                    data: 'remark',
-                    name: 'remark',
+                    data: 'cpe',
+                    name: 'cpe',
                 }, 
                 {
                     data: 'status',
