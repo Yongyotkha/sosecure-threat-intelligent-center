@@ -4,6 +4,8 @@ namespace Modules\Scans\Http\Controllers;
 
 use App\DataScans;
 use App\DataTypes;
+use App\transaction_client_asset;
+use App\transaction_client_asset_data;
 use App\TransactionScans;
 use App\TransactionTimeStampScans;
 use Auth;
@@ -97,6 +99,22 @@ class ScansController extends Controller
                 $Assets->status = 1;
                 $Assets->raw_data = $data['raw_data'];
                 $Assets->save();
+
+                $transaction_client_asset = transaction_client_asset::where('site_id', $data['site_id'])->where('transaction_id', $Assets->id)->first();
+                if($transaction_client_asset){
+                    $transaction_client_asset -> transaction_mode = 'insert';
+                    $transaction_client_asset -> transaction_data_status = 1;
+                    $transaction_client_asset -> status = 1;
+                    $transaction_client_asset -> save();
+                }else{
+                    $transaction_client_asset = new transaction_client_asset();
+                    $transaction_client_asset -> site_id = $data['site_id'];
+                    $transaction_client_asset -> transaction_id = $Assets->id;
+                    $transaction_client_asset -> transaction_mode = 'insert';
+                    $transaction_client_asset -> transaction_data_status = 1;
+                    $transaction_client_asset -> status = 1;
+                    $transaction_client_asset -> save();
+                }
             }
             foreach ($request->assets_data as $item) {
                 $AssetsData = AssetsData::where('site_id', $data['site_id'])
@@ -116,6 +134,22 @@ class ScansController extends Controller
                         $AssetsData->data_type_id = $item['data_type'];
                         $AssetsData->asset_id = $Assets->id;
                         $AssetsData->save();
+
+                        $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
+                        if($transaction_client_asset_data){
+                            $transaction_client_asset_data -> transaction_mode = 'insert';
+                            $transaction_client_asset_data -> transaction_data_status = 1;
+                            $transaction_client_asset_data -> status = 1;
+                            $transaction_client_asset_data -> save();
+                        }else{
+                            $transaction_client_asset_data = new transaction_client_asset_data();
+                            $transaction_client_asset_data -> site_id = $data['site_id'];
+                            $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                            $transaction_client_asset_data -> transaction_mode = 'insert';
+                            $transaction_client_asset_data -> transaction_data_status = 1;
+                            $transaction_client_asset_data -> status = 1;
+                            $transaction_client_asset_data -> save();
+                        }
 
                         $TransactionScans = TransactionScans::where('site_id', $data['site_id'])
                             ->where('domain_id', $data['domain_id'])
@@ -146,6 +180,22 @@ class ScansController extends Controller
                 $Assets->status = 1;
                 $Assets->raw_data = $data['raw_data'];
                 $Assets->save();
+
+                $transaction_client_asset = transaction_client_asset::where('site_id', $data['site_id'])->where('transaction_id', $Assets->id)->first();
+                if($transaction_client_asset){
+                    $transaction_client_asset -> transaction_mode = 'insert';
+                    $transaction_client_asset -> transaction_data_status = 1;
+                    $transaction_client_asset -> status = 1;
+                    $transaction_client_asset -> save();
+                }else{
+                    $transaction_client_asset = new transaction_client_asset();
+                    $transaction_client_asset -> site_id = $data['site_id'];
+                    $transaction_client_asset -> transaction_id = $Assets->id;
+                    $transaction_client_asset -> transaction_mode = 'insert';
+                    $transaction_client_asset -> transaction_data_status = 1;
+                    $transaction_client_asset -> status = 1;
+                    $transaction_client_asset -> save();
+                }
             }
             foreach ($request->assets_data as $item) {
                 $AssetsData = AssetsData::where('site_id', $data['site_id'])
@@ -165,6 +215,22 @@ class ScansController extends Controller
                         $AssetsData->data_type_id = $item['data_type'];
                         $AssetsData->asset_id = $Assets->id;
                         $AssetsData->save();
+
+                        $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
+                        if($transaction_client_asset_data){
+                            $transaction_client_asset_data -> transaction_mode = 'insert';
+                            $transaction_client_asset_data -> transaction_data_status = 1;
+                            $transaction_client_asset_data -> status = 1;
+                            $transaction_client_asset_data -> save();
+                        }else{
+                            $transaction_client_asset_data = new transaction_client_asset_data();
+                            $transaction_client_asset_data -> site_id = $data['site_id'];
+                            $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                            $transaction_client_asset_data -> transaction_mode = 'insert';
+                            $transaction_client_asset_data -> transaction_data_status = 1;
+                            $transaction_client_asset_data -> status = 1;
+                            $transaction_client_asset_data -> save();
+                        }
                     }
                 }
             }
@@ -525,9 +591,39 @@ class ScansController extends Controller
     public function f_scans_assets_delete($id = null, $code, $page)
     {
         $Assets = Assets::find($id);
+        $transaction_client_asset = transaction_client_asset::where('site_id', $Assets -> site_id)->where('transaction_id', $Assets->id)->first();
+        if($transaction_client_asset){
+            $transaction_client_asset -> transaction_mode = 'delete';
+            $transaction_client_asset -> transaction_data_status = 1;
+            $transaction_client_asset -> status = 1;
+            $transaction_client_asset -> save();
+        }else{
+            $transaction_client_asset = new transaction_client_asset();
+            $transaction_client_asset -> site_id = $Assets -> site_id;
+            $transaction_client_asset -> transaction_id = $Assets->id;
+            $transaction_client_asset -> transaction_mode = 'delete';
+            $transaction_client_asset -> transaction_data_status = 1;
+            $transaction_client_asset -> status = 1;
+            $transaction_client_asset -> save();
+        }
         $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first()->code;
         $AssetsData = AssetsData::where('asset_id', $id)->get();
         foreach ($AssetsData as $data) {
+            $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data->site_id)->where('transaction_id', $data->id)->first();
+            if($transaction_client_asset_data){
+                $transaction_client_asset_data -> transaction_mode = 'delete';
+                $transaction_client_asset_data -> transaction_data_status = 1;
+                $transaction_client_asset_data -> status = 1;
+                $transaction_client_asset_data -> save();
+            }else{
+                $transaction_client_asset_data = new transaction_client_asset_data();
+                $transaction_client_asset_data -> site_id = $data->site_id;
+                $transaction_client_asset_data -> transaction_id = $data->id;
+                $transaction_client_asset_data -> transaction_mode = 'delete';
+                $transaction_client_asset_data -> transaction_data_status = 1;
+                $transaction_client_asset_data -> status = 1;
+                $transaction_client_asset_data -> save();
+            }
             $TransactionScans = TransactionScans::where('site_id', $data->site_id)->where('domain_id', $data->domain_id)->where('raw_data', $data->value)
                 ->where('data_type', $data->get_data_type->value)->first();
             if ($TransactionScans) {
@@ -564,11 +660,41 @@ class ScansController extends Controller
         $SiteSettings = null;
         foreach($request -> asset_id as $key => $id){
             $Assets = Assets::where('code', $id)->first();
+            $transaction_client_asset = transaction_client_asset::where('site_id', $Assets -> site_id)->where('transaction_id', $Assets->id)->first();
+            if($transaction_client_asset){
+                $transaction_client_asset -> transaction_mode = 'delete';
+                $transaction_client_asset -> transaction_data_status = 1;
+                $transaction_client_asset -> status = 1;
+                $transaction_client_asset -> save();
+            }else{
+                $transaction_client_asset = new transaction_client_asset();
+                $transaction_client_asset -> site_id = $Assets -> site_id;
+                $transaction_client_asset -> transaction_id = $Assets->id;
+                $transaction_client_asset -> transaction_mode = 'delete';
+                $transaction_client_asset -> transaction_data_status = 1;
+                $transaction_client_asset -> status = 1;
+                $transaction_client_asset -> save();
+            }
             if($key == 0){
                 $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first();
             }
             $AssetsData = AssetsData::where('asset_id', $Assets -> id)->get();
             foreach ($AssetsData as $key_2 => $data) {
+                $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data->site_id)->where('transaction_id', $data->id)->first();
+                if($transaction_client_asset_data){
+                    $transaction_client_asset_data -> transaction_mode = 'delete';
+                    $transaction_client_asset_data -> transaction_data_status = 1;
+                    $transaction_client_asset_data -> status = 1;
+                    $transaction_client_asset_data -> save();
+                }else{
+                    $transaction_client_asset_data = new transaction_client_asset_data();
+                    $transaction_client_asset_data -> site_id = $data->site_id;
+                    $transaction_client_asset_data -> transaction_id = $data->id;
+                    $transaction_client_asset_data -> transaction_mode = 'delete';
+                    $transaction_client_asset_data -> transaction_data_status = 1;
+                    $transaction_client_asset_data -> status = 1;
+                    $transaction_client_asset_data -> save();
+                }
                 if($key_2 == 0){
                     $SiteSettings = TransactionTimeStampScans::select('code')->where('site_id', $data->site_id)->where('domain_id', $data->domain_id)->first();
                 }
@@ -657,7 +783,22 @@ class ScansController extends Controller
                 $AssetsData = AssetsData::where('id', $myArray[1])->first();
                 $AssetsData->value = $data['raw_data'];
                 $AssetsData->data_type_id = $myArray[0];
-
+                $AssetsData->save();
+                $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
+                if($transaction_client_asset_data){
+                    $transaction_client_asset_data -> transaction_mode = 'update';
+                    $transaction_client_asset_data -> transaction_data_status = 1;
+                    $transaction_client_asset_data -> status = 1;
+                    $transaction_client_asset_data -> save();
+                }else{
+                    $transaction_client_asset_data = new transaction_client_asset_data();
+                    $transaction_client_asset_data -> site_id = $AssetsData->site_id;
+                    $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                    $transaction_client_asset_data -> transaction_mode = 'update';
+                    $transaction_client_asset_data -> transaction_data_status = 1;
+                    $transaction_client_asset_data -> status = 1;
+                    $transaction_client_asset_data -> save();
+                }
             } else {
                 $AssetsData = new AssetsData;
                 $AssetsData->code = generator_uuid();
@@ -668,19 +809,48 @@ class ScansController extends Controller
                 $AssetsData->value = $data['raw_data'];
                 $AssetsData->data_type_id = $myArray[0];
                 $AssetsData->asset_id = $Assets_id;
-                
-
+                $AssetsData->save();
+                $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
+                if($transaction_client_asset_data){
+                    $transaction_client_asset_data -> transaction_mode = 'insert';
+                    $transaction_client_asset_data -> transaction_data_status = 1;
+                    $transaction_client_asset_data -> status = 1;
+                    $transaction_client_asset_data -> save();
+                }else{
+                    $transaction_client_asset_data = new transaction_client_asset_data();
+                    $transaction_client_asset_data -> site_id = $AssetsData->site_id;
+                    $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                    $transaction_client_asset_data -> transaction_mode = 'insert';
+                    $transaction_client_asset_data -> transaction_data_status = 1;
+                    $transaction_client_asset_data -> status = 1;
+                    $transaction_client_asset_data -> save();
+                }
             }
-            
-
-            $AssetsData->save();
-
             array_push($arr, $AssetsData->id);
         }
 
         
         
-        AssetsData::where('asset_id', $Assets_id)->whereNotIn('id',$arr)->delete();
+        $AssetsDataIsNot = AssetsData::where('asset_id', $Assets_id)->whereNotIn('id',$arr)->get();
+
+        foreach($AssetsDataIsNot as $AssetsData){
+            $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
+            if($transaction_client_asset_data){
+                $transaction_client_asset_data -> transaction_mode = 'delete';
+                $transaction_client_asset_data -> transaction_data_status = 1;
+                $transaction_client_asset_data -> status = 1;
+                $transaction_client_asset_data -> save();
+            }else{
+                $transaction_client_asset_data = new transaction_client_asset_data();
+                $transaction_client_asset_data -> site_id = $AssetsData->site_id;
+                $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                $transaction_client_asset_data -> transaction_mode = 'delete';
+                $transaction_client_asset_data -> transaction_data_status = 1;
+                $transaction_client_asset_data -> status = 1;
+                $transaction_client_asset_data -> save();
+            }
+            $AssetsData -> delete();
+        }
         
         if($request -> page == 'site'){
             return ajaxResponse(
