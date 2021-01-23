@@ -229,14 +229,14 @@
                             <span style="color:red;"><small id="check_u_p"></small></span>
                         </div>
                         &nbsp;<button type="button" data-toggle="collapse" href="#demo"
-                            class="btn btn-{{ get_option('theme_color')  }}"><i class="fas fa-plus"></i>&nbsp; Add User</button>
+                            class="btn btn-{{ get_option('theme_color')  }}"><i class="fas fa-plus"></i>&nbsp; Add New</button>
                     </div>
 
                     <div id="demo" class="collapse box">
 
                         <fieldset class="collapsible">
 
-                            <legend>Add User</legend>
+                            <legend>Add Profile</legend>
                             <div class="form-group row">
                                 <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
                                         class="text-danger">*</span> </label>
