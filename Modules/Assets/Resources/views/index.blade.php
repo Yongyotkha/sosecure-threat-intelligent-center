@@ -121,7 +121,7 @@
                                     <div class="img-icon-card ice">
                                         <img src="{{asset('images/windows.png')}}" alt="">
                                     </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper">Windows All 3</h3>
+                                    <h3 class="name-dash-text-compro text-dark text-upper">Windows All</h3>
                                     <span class="number-card info">0</span>
                                 </div>
                             </div>
