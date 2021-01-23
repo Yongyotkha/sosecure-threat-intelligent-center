@@ -95,7 +95,7 @@ class DashboardNewController extends Controller
             }
         }
 
-        $data['site_settings'] = $SiteSettings;
+        $data['site_settings'] = @$SiteSettings;
             
         
 
