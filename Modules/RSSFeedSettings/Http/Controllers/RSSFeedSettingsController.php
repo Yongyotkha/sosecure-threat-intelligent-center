@@ -829,7 +829,7 @@ class RSSFeedSettingsController extends Controller
         }
 
 
-        $SiteCategory = SiteCategory::whereIn("category_id",$request -> category_news)->get();
+        $SiteCategory = SiteCategory::whereIn("category_id",$request -> category_news)->where('active',1)->get();
         // dd($SiteCategory[0]->site_email_alert);
 
         $email_site_alert = [];
@@ -1315,7 +1315,7 @@ class RSSFeedSettingsController extends Controller
         // dd($request);
         // return $_POST['detail_th'];
         // return '4444 '.$request -> detail_th;
-        $SiteCategory = SiteCategory::whereIn("category_id",$request -> category_news)->get();
+        $SiteCategory = SiteCategory::whereIn("category_id",$request -> category_news)->where('active',1)->get();
         // dd($SiteCategory[0]->site_email_alert);
         $site_news = [];
         $email_site_alert = [];
