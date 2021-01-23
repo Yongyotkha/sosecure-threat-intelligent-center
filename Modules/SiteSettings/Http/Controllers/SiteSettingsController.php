@@ -150,7 +150,7 @@ class SiteSettingsController extends Controller
 
                 $transaction_client_site_category = transaction_client_site_category::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteCategory->id)->first();
                 if($transaction_client_site_category){
-                    $transaction_client_site_category -> transaction_mode = 'update';
+                    $transaction_client_site_category -> transaction_mode = 'insert';
                     $transaction_client_site_category -> transaction_data_status = 1;
                     $transaction_client_site_category -> status = 1;
                     $transaction_client_site_category -> save();
@@ -158,7 +158,7 @@ class SiteSettingsController extends Controller
                     $transaction_client_site_category = new transaction_client_site_category();
                     $transaction_client_site_category -> site_id = $SiteSettings->id;
                     $transaction_client_site_category -> transaction_id = $SiteCategory->id;
-                    $transaction_client_site_category -> transaction_mode = 'update';
+                    $transaction_client_site_category -> transaction_mode = 'insert';
                     $transaction_client_site_category -> transaction_data_status = 1;
                     $transaction_client_site_category -> status = 1;
                     $transaction_client_site_category -> save();
