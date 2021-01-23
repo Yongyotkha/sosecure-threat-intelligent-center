@@ -13,6 +13,7 @@ use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
 use Auth;
 use App\Classes\Fn_api;
 use App\transaction_client_site;
+use App\transaction_client_site_category;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 // use Modules\Clients\Transformers\ClientResource;
@@ -237,7 +238,25 @@ class SiteSettingApiController extends Controller
         }
         $model->delete();
 
-        $SiteCategory = SiteCategory::where('site_id',$id)->delete();
+        $SiteCategory = SiteCategory::where('site_id',$model -> id)->get();
+        foreach($SiteCategory as $data){
+            $transaction_client_site_category = transaction_client_site_category::where('site_id', $model->id)->where('transaction_id', $data->id)->first();
+            if($transaction_client_site_category){
+                $transaction_client_site_category -> transaction_mode = 'delete';
+                $transaction_client_site_category -> transaction_data_status = 1;
+                $transaction_client_site_category -> status = 1;
+                $transaction_client_site_category -> save();
+            }else{
+                $transaction_client_site_category = new transaction_client_site_category();
+                $transaction_client_site_category -> site_id = $model->id;
+                $transaction_client_site_category -> transaction_id = $data->id;
+                $transaction_client_site_category -> transaction_mode = 'delete';
+                $transaction_client_site_category -> transaction_data_status = 1;
+                $transaction_client_site_category -> status = 1;
+                $transaction_client_site_category -> save();
+            }
+            $data -> delete();
+        }
         // dd($SiteCategory);
         // if($SiteCategory) {
         //     foreach($SiteCategory as $SiteCategory_key => $SiteCategory_val) {
