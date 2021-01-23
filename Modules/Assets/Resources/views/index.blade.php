@@ -102,6 +102,44 @@
 
             <section class="scrollable wrapper">
 
+                <div class="container-fluid" style="margin-bottom:10px;">
+                    <div class="row">
+                        <div class="col-md-4 nopadding">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/ip.png')}}" alt="">
+                                    </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets All</h3>
+                                    <span class="number-card warning">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/windows.png')}}" alt="">
+                                    </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper">Windows All 3</h3>
+                                    <span class="number-card info">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/linux.png')}}" alt="">
+                                    </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Linux All</h3>
+                                    <span class="number-card green">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <section class="panel panel-default" id="area-advance-search" style="display: none;">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
@@ -142,23 +180,27 @@
                         </div>
                     </header>
                     <div class="panel-body">
-                        <table class="table table-striped table-bordered" id="table-assets-template">
-                            <thead>
-                                <tr>
-                                    <th class="no-sort">
-                                        <label>
-                                            <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </th>
-                                    <th>Site Name</th>
-                                    <th>Asset</th>
-                                    <th>Referent</th>
-                                    <th style="width: 20px" class="text-center">Status</th>
-                                    <th style="width: 20px" class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="table-assets-template">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th>Site Name</th>
+                                        <th>Asset</th>
+                                        <th>Asset</th>
+                                        <th>OS</th>
+                                        <th>Remark</th>
+                                        <th style="width: 20px" class="text-center">Status</th>
+                                        <th style="width: 20px" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
                     </div>
                 </section>
 
@@ -272,6 +314,14 @@
                 {
                     data: 'referent',
                     name: 'referent',
+                }, 
+                {
+                    data: 'os',
+                    name: 'os',
+                }, 
+                {
+                    data: 'remark',
+                    name: 'remark',
                 }, 
                 {
                     data: 'status',
