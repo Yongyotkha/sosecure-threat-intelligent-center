@@ -19,11 +19,11 @@
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">@icon('solid/plus') Add</button>
                     </div>
 
-                    <div class="btn-group">
+                    <div class="btn-group d-none">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
                     </div>
 
-                    <div class="btn-group">
+                    <div class="btn-group d-none">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
                             <span class="caret"></span>
                         </button>
