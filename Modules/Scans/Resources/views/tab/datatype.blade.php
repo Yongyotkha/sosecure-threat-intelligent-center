@@ -71,7 +71,7 @@
                                 </label>
                             </th>
                             <th>Data Type</th>
-                            <th>Raw Data</th>
+                            <th>Asset</th>
                             <th>Referent</th>
                             <th class="text-center">Last Update</th>
                             <th class="text-center">Status</th>
@@ -301,9 +301,9 @@
                                             <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                                            <!--<button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
                                                 <span>@icon('solid/play')
-                                            </button>
+                                            </button>-->
                                             <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
                                                 <span>@icon('solid/trash-alt')
                                             </button>
@@ -430,9 +430,9 @@
                 <input type="text" name="raw_data[]" class="form-control" data-raw_data="${raw_data}">
             </td>
             <td>
-                <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                <!--<button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
                     <span>@icon('solid/play')
-                </button>
+                </button>-->
                 <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_tr(${number_rows})">
                     <span>@icon('solid/trash-alt')
                 </button>

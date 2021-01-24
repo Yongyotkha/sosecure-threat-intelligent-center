@@ -76,7 +76,7 @@ class ScansController extends Controller
                 ->orwhere('raw_data', $data['raw_data'])
                 ->get();
         }
-        $DataTypes = DataTypes::all();
+        $DataTypes = DataTypes::where('status', 1)->get();
         return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $TransactionScans, 'data_type' => $DataTypes]);
     }
 
