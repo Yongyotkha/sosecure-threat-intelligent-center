@@ -948,8 +948,10 @@ class NewsController extends Controller
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
             if($check_read_news){
                 $html .= '<div class="list-news">';
+                $font_weight = 'font-weight: bold !important;';
             }else{
                 $html .= '<div class="list-news" style="background-color:#ececec">';
+                $font_weight = '';
             }
             $html .= '
             <!--<div class="checkbox-news-select">
@@ -960,7 +962,7 @@ class NewsController extends Controller
                 </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <span class="head-news-text">'.$data -> news -> title_th.'</span>
+                        <span class="head-news-text" style="'.@$font_weight.'">'.$data -> news -> title_th.'</span>
                     </a>
                     <div class="entry-meta">
                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
