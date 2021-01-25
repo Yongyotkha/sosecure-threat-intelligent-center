@@ -41,7 +41,7 @@
                     @icon('solid/download') CSV
                     </a> --}}
 
-                    <div class="text-right">
+                    <div class="text-right overflow-action">
                      
                         <div class="text-left" style="margin-top: 8px; max-width: 120px;display:inline-block;">
                             <select name="site" id="site" class="text-left select2-option form-control select-site"
