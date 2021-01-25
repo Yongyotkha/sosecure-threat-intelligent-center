@@ -2093,8 +2093,10 @@ ul.topics-news-list li a:hover{
 
 .panel-header-blue{
     color:#fff !important;
-    background-color: #0077b6 !important;
-    border-color: #0077b6 !important;
+    background-color: #3869d4  !important;
+    border-color: #3869d4  !important;
+    /* background-color: #0077b6 !important;
+    border-color: #0077b6 !important; */
 }
 
 .text-blue{
@@ -3452,6 +3454,11 @@ input.input-login:focus {
 .max-w-fit{
     width: max-content;
 }
+
+.nav-primary li>a>i {
+    line-height: 49px !important;
+}
+
 
 .btn-fz-13{
     font-size: 13px !important;
