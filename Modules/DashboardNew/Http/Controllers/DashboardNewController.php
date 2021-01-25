@@ -19,6 +19,7 @@ use Modules\Users\Entities\UserSite;
 use Yajra\DataTables\DataTables;
 use App\Entities\TransactionBatchjob;
 
+use MongoDB\BSON\UTCDateTime;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
@@ -497,6 +498,7 @@ class DashboardNewController extends Controller
         $dataR_s_s_news = array();
         $DataLeakFeed_social = array();
         $DataLeakFeed_compromised = array();
+        $data_fx_otx_events = array();
         if (!$request->pagename||$request->pagename=='Vulnerabilities') {
             $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
             if(isset($SiteSettings->id)){
@@ -613,7 +615,42 @@ class DashboardNewController extends Controller
             }
         }
 
-            $model = array_merge($dataCVEMapping,$dataR_s_s_news,$DataLeakFeed_social,$DataLeakFeed_compromised);
+        if (!$request->pagename||$request->pagename=='Indicators') {
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+
+            $options = [
+                'allowDiskUse' => TRUE
+            ];
+
+            $pipeline = [
+                [
+                    '$match' => [
+                        'created_at'  => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)],
+                    ]
+                ],
+                [
+                    '$project' => [
+                        '_id' => 0,
+                        'sitename' => 'All Site',
+                        'content' => '$name',
+                        'datetime' => ['$dateToString'=>['format'=>'%Y-%m-%d %H:%M:%S','date'=>'$created_at','timezone'=>'Asia/Bangkok']],
+                        'pagename' => 'Indicators',
+                        'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                    ]
+                ]
+            ];
+
+            // dd($pipeline);
+            $data_fx_otx_events = $col_fx_otx_events->aggregate($pipeline,$options);
+           
+            $data_fx_otx_events = $data_fx_otx_events->toArray();
+        
+        }
+
+
+            $model = array_merge($dataCVEMapping,$dataR_s_s_news,$DataLeakFeed_social,$DataLeakFeed_compromised,$data_fx_otx_events);
             $dataOut = array();
             usort($model, function($a, $b) {
                 $t1 = strtotime($a['datetime']);

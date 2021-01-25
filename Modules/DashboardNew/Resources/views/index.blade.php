@@ -339,14 +339,14 @@
         processing: true,
     });--}}
 
-    var start = moment().subtract(2, 'days');
+    var start = moment().startOf('day');
     var end = moment();
 
     $('#date-rang').daterangepicker({
         timePicker: true,
         startDate: start,
         endDate: end,
-        minDate: start,
+
         locale: {
             format: 'M/DD hh:mm A'
         },
