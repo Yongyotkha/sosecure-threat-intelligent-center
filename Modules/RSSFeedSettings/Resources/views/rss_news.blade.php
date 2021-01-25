@@ -169,7 +169,7 @@
                                                 <span> All </span>
                                             </button>
                                             <button class="btn btn-grey">
-                                                <span> Actice </span>
+                                                <span> Active </span>
                                             </button>
                                             <button class="btn btn-grey">
                                                 <span> Inactive </span>
