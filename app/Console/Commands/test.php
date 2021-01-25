@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Exception;
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Console\Command;
 use Modules\Scans\Entities\Assets;
 use Modules\Scans\Entities\AssetsData;
@@ -19,26 +18,7 @@ class test extends Command
     protected $signature = 'app:test';
     protected $description = 'test';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
 
-    private $urlLimit = 3;
-    private $urlCenterData = PATH_CENTER_IP_TF.'/api/v1/client-transfer/getTranferData'; //center ip path
-    // private $url = 'http://127.0.0.2/api/v1/clientinto-transfer/insertToNoRef'; //my ip path
-    private $url = PATH_MY_IP_TF.'/api/v1/clientinto-transfer/insertToNoRefWithID'; //my ip path
-    private $ip = '127.0.0.1';
-    private $mac = 'abcd';
-    private $header = '';
-    private $site_code = '';
-    private $site_mode = '';
-    private $insertToTB = 'fx_transaction_client_news_categories';
-    private $urlUpdateBatchJob = PATH_CENTER_IP_TF.'/api/v1/centerinto-transfer/updateTFBatchJob';
-    /**
-     * Create a new command instance.
-     */
     
     public function __construct()
     {
@@ -87,7 +67,7 @@ class test extends Command
             array_push($CPE_List, $CPE_Datavalue->result);
         }
         if (count($CPE_List) > 0) {
-            $CPR_string = $this->array_implode($CPE_List);
+            $CPR_string = implode(' | ', (array) $CPE_List);
         }
 
         if (count($Domain_list) == 0) {
@@ -130,8 +110,6 @@ class test extends Command
 print_r($Assets_list);
 
 }
-function array_implode($a) {
-    return implode(' | ', (array) $a);
-}
+
 
 }
