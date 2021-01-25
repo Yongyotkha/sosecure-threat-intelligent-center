@@ -8,7 +8,7 @@ use App\Entities\Profiles;
 
 class Transaction_profiles extends Model
 {
-    protected $table = 'transaction_profiles';
+    protected $table = 'transaction_client_profiles';
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $dates   = ['created_at', 'updated_at'];

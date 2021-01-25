@@ -8,7 +8,7 @@ use App\Entities\Roles;
 
 class Transaction_roles extends Model
 {
-    protected $table = 'transaction_roles';
+    protected $table = 'transaction_client_roles';
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $dates   = ['created_at', 'updated_at'];

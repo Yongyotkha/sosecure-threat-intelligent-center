@@ -353,7 +353,7 @@ class ApiTransferCenterInsert extends Controller
                 $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
                 
                 if($modeFor=='wait'){
-                    $TF_Center_transaction_batchjob->progress = 0;
+                    $TF_Center_transaction_batchjob->progress = 1;
                     $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
                 }else if($modeFor=='done'){
                     $TF_Center_transaction_batchjob->progress = 1;
