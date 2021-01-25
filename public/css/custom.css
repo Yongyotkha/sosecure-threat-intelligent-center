@@ -3481,6 +3481,13 @@ input.input-login:focus {
     }
 }
 
+
+
+.btn-grey{
+    background-color: #dcdcdc;
+    border-color: #dcdcdc;
+}
+
 .btn-grey.active{
     background-color: #3869d4;
     border-color: #3869d4;
