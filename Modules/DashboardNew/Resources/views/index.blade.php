@@ -11,7 +11,7 @@
                     @if ($site_settings)
 
                     @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
                     </option>
                     @endforeach
 
