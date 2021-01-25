@@ -371,13 +371,13 @@
         site = value;
         data_table();
 
-        {{--count_asset();
+        count_asset();
         count_vulnerability();
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
         load_chart();
-        cve_assets();--}}
+        cve_assets();
         
     }
 
@@ -403,14 +403,14 @@
     $( document ).ready(function() {
         data_table();
 
-        {{--count_asset();
+        count_asset();
         count_vulnerability();
         count_compromised();
         count_data_leak();
         count_vulnerability_host();
         load_chart();
         chart_indicators();
-        cve_assets();--}}
+        cve_assets();
 
 
         {{--document.getElementById('current-date').innerHTML = today_date;--}}

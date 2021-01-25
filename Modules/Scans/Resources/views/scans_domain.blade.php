@@ -14,7 +14,7 @@
                     <div class="button-control pull-right">
                         
                         <div class="btn-group">
-                            <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset To Use</button>
+                            <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset</button>
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
@@ -29,7 +29,7 @@
                                         Internet Name
                                     </a>
                                 </li>   
-                                <li>
+                                {{-- <li>
                                     <a href="#">
                                         Affiliate - Internet Name
                                     </a>
@@ -38,7 +38,7 @@
                                     <a href="#">
                                         Affiliate - Domain Name
                                     </a>
-                                </li>   
+                                </li>    --}}
                                 <li>
                                     <a href="#">
                                         Domain Name
@@ -54,7 +54,7 @@
                                         IPv6 Address
                                     </a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a href="#">
                                         Malicious Internet Name
                                     </a>
@@ -83,7 +83,7 @@
                                     <a href="#">
                                         Phone Number
                                     </a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </div>
                     </div>

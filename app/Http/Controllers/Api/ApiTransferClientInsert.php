@@ -18,6 +18,16 @@ use App\Entities\TF_Client_cve_assets;
 use App\Entities\TF_Client_data_datacve_mapping;
 use App\Entities\TFClient_R_s_s_news_categories;
 use App\Entities\Categories;
+use App\Entities\Sites;
+use App\Entities\Site_category;
+use App\Entities\Users;
+use App\Entities\User_site;
+use App\Entities\Roles;
+use App\Entities\Permissions;
+use App\Entities\Role_permissions;
+use App\Entities\Model_has_roles;
+use App\Entities\Profiles;
+
 
 class ApiTransferClientInsert extends Controller
 {
@@ -373,10 +383,49 @@ class ApiTransferClientInsert extends Controller
                 $pkey = 'id';
                 $model_insert = new Categories;
 
-            } else {
+            }else if ($nameTable == 'fx_transaction_client_users') {
+                $pkey = 'id';
+                $model_insert = new Users;
+
+            }else if ($nameTable == 'fx_transaction_client_users_site') {
+                $pkey = 'id';
+                $model_insert = new User_site;
+
+            }else if ($nameTable == 'fx_transaction_client_roles') {
+                $pkey = 'id';
+                $model_insert = new Roles;
+
+            }else if ($nameTable == 'fx_transaction_client_permissions') {
+                $pkey = 'id';
+                $model_insert = new Permissions;
+
+            }else if ($nameTable == 'fx_transaction_client_role_permissions') {
+                $pkey = 'id';
+                $model_insert = new Role_permissions;
+
+            }else if ($nameTable == 'fx_transaction_client_profiles') {
+                $pkey = 'id';
+                $model_insert = new Profiles;
+
+            }else if ($nameTable == 'fx_transaction_client_model_has_roles') {
+                $pkey = 'id';
+                $model_insert = new Model_has_roles;
+
+            }else if ($nameTable == 'fx_transaction_client_site') {
+                $pkey = 'id';
+                $model_insert = new Sites;
+
+            }else if ($nameTable == 'fx_transaction_client_site_category') {
+                $pkey = 'id';
+                $model_insert = new Site_category;
+
+            }  else {
                 $connect = false;
                 $result = false;
             }
+
+
+
             if ($result == true) {
 
                 if (!empty($dataTables)) {
