@@ -51,6 +51,7 @@
                         <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
                     </button> --}}
 
+                    
                     <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs"
                         value="bulk-delete" disabled>
                         <span>@icon('solid/trash-alt') @langapp('delete')</span>
