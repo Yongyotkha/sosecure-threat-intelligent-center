@@ -292,6 +292,7 @@
     });
     var site_id = 0;
     $(function () {
+
         $('#table-assets-template').DataTable({
             processing: true,
             serverSide: true,
@@ -340,7 +341,91 @@
                 },    
             ],
         });
+        {{--data_table();--}}
+
     });
+
+
+
+    var t;
+    function data_table(){
+        t = $('#table-assets-template').DataTable({
+            searching: true,
+            ordering: true,
+            pagination: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: false,
+            destroy: true,
+            dom: 'Blfrtip',
+            order: [[ 1, "asc" ]],
+            ajax: {
+                type: "POST",
+                url: '{!! route('assets.table_asset')!!}',
+                data:function(d){
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                    name: 'chk',
+                },
+                {
+                    data: 'domain',
+                    name: 'domain',
+                },
+                {
+                    data: 'ip',
+                    name: 'ip',
+                },
+                {
+                    data: 'CPE',
+                    name: 'CPE',
+                }, 
+                {
+                    data: 'cpe',
+                    name: 'cpe',
+                }, 
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-10 text-center'
+                },  
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap'
+                },
+            ],
+            columnDefs: [
+                {
+                    
+                    targets: 0,
+                    searchable: false,
+                    orderable: false,
+                    width: '10px',
+                    render: function (data, type, row, meta) {
+                        return '<label><input type="checkbox" name="checked" class="select-chk asset_id" value="' + row.code + '"><span class="label-text"></span></label>';
+                    }
+                   
+                },
+                {
+                    targets: 5,
+                    width: '10px',
+                    render: function (data, type, row, meta) {
+                        if(row.status==1){
+                            return '<span class="badge badge-success">Active</span>';
+                        }else{
+                            return '<span class="badge badge-danger">Inactive</span>';
+                        }
+                        
+                    }
+                   
+                },
+            ]
+
+        });
+    }
 </script>
 @endpush
 
