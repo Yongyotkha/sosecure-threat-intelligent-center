@@ -7,7 +7,7 @@ use GuzzleHttp\Client as HttpClient;
 use Illuminate\Console\Command;
 use Modules\Scans\Entities\Assets;
 use Modules\Scans\Entities\AssetsData;
-
+use Modules\Scans\Entities\CPE;
 
 class test extends Command
 {
@@ -42,14 +42,14 @@ class test extends Command
     
     public function __construct()
     {
-       parent::__construct();
+     parent::__construct();
         // $this->site_code = config('app.site_code');
         // $this->site_mode = config('app.mode');
         // $this->header = config('app.site_key');
         // $this->urlCenterData = $this->urlCenterData.'?code='.$this->site_code;
         // $this->ip =exec("hostname -I");
         // $this->mac = exec("cat /sys/class/net/ens33/address");
-   }
+ }
 
     /**
      * Execute the console command.
@@ -61,25 +61,35 @@ class test extends Command
         $Assets_list = [];
         $Assets_data = Assets::where('status',1)->get();
         foreach ($Assets_data as $key => $value) {
-         $AssetsData_data = AssetsData::where('site_id',$value->site_id)->where('asset_id',$value->id)->where('status',1)->get();
-         $Domain_list = [];
-         $IP_List =[];
-         foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
+           $AssetsData_data = AssetsData::where('site_id',$value->site_id)->where('asset_id',$value->id)->where('status',1)->get();
+           $Domain_list = [];
+           $IP_List =[];
+           foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
             if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
                 //Domain
                 array_push($Domain_list, $AssetsData_datavalue);
 
             }elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
                 //IP Asset
-             array_push($IP_List, $AssetsData_datavalue);
+               array_push($IP_List, $AssetsData_datavalue);
 
-         }else{
+           }else{
 
-         }
-     }
+           }
+       }
 
 
-     foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+       foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+           $CPR_string ="";
+           $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+           $CPE_List = array();
+           foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+            array_push($CPE_List, $CPE_Datavalue->result);
+        }
+        if (count($CPE_List) > 0) {
+            $CPR_string = $this->array_implode($CPE_List);
+        }
+
         if (count($Domain_list) == 0) {
           $Assets_data_list = array();
           $Assets_data_list['id'] = $IP_Listvalue->id;
@@ -90,11 +100,13 @@ class test extends Command
           $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
           $Assets_data_list['domain'] = "";
           $Assets_data_list['ip'] = $IP_Listvalue->value;
+          $Assets_data_list['CPE'] = $CPR_string;
+
           array_push($Assets_list, $Assets_data_list);
 
       }else{
 
-         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+       foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
           $Assets_data_list = array();
           $Assets_data_list['id'] = $IP_Listvalue->id;
           $Assets_data_list['code'] = $IP_Listvalue->code;
@@ -104,6 +116,7 @@ class test extends Command
           $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
           $Assets_data_list['domain'] = $Domain_listvalue->value;
           $Assets_data_list['ip'] = $IP_Listvalue->value;
+          $Assets_data_list['CPE'] = $CPR_string;
           array_push($Assets_list, $Assets_data_list);
 
       }
@@ -117,43 +130,8 @@ class test extends Command
 print_r($Assets_list);
 
 }
-
-public function reconnnect($url, $passBody, $limit)
-{
-    $_OTX_KEY = env("OTX_KEY", "");
-    $_clientHttp = new HttpClient;
-    $_reconnect = 0;
-    $_otxReconnect = true;
-    $_dataOut["result"] = null;
-    $_dataOut["success"] = false;
-    $_sleeptime = rand(0, 2000);
-    while ($_otxReconnect && $_reconnect < $limit) {
-        try {
-            $_bodyData = $_clientHttp->request(
-                'POST',
-                $url,
-                [
-                    'headers' => [
-                        'Accept' => 'application/json',
-                        'Content-type' => 'application/json',
-                        'Authorization' => 'Bearer '.$this->header,
-                    ],
-                        'delay' => $_sleeptime, //millisec == ms
-                        'timeout' => 59, //sec == 100sec
-                        'verify' => false,
-                        'body' => json_encode($passBody),
-                    ]
-                )->getBody();
-            $_dataOut["result"] = json_decode($_bodyData, true);
-            $_dataOut["success"] = true;
-            $_otxReconnect = false;
-                //echo "  Pass : " . $_reconnect;
-        } catch (Exception $e) {
-            echo "  Fail : " . $e->getMessage();
-        }
-        $_reconnect++;
-    }
-    return $_dataOut;
+function array_implode($a) {
+    return implode(' | ', (array) $a);
 }
 
 }
