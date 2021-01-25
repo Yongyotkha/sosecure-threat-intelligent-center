@@ -23,7 +23,14 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('save_deploy_system', 'Api\RegisterSiteController@save_deploy_system');
     Route::post('test_get', 'Api\ExampleApiController@test_get');
     Route::post('tranferTransactionUpdateCode', 'Api\ApiTransactionUpdateCodeController@tranfer_transaction_update_code');
+    Route::post('tranferUser', 'Api\RegisterSiteController@tranferUser');
     Route::post('tranferUserSite', 'Api\RegisterSiteController@tranferUserSite');
+    Route::post('tranferSite', 'Api\RegisterSiteController@tranferSite');
+    Route::post('tranferProfile', 'Api\RegisterSiteController@tranferProfile');
+    Route::post('tranferModelHasRoles', 'Api\RegisterSiteController@tranferModelHasRoles');
+    Route::post('tranferPermissions', 'Api\RegisterSiteController@tranferPermissions');
+    Route::post('tranferRoles', 'Api\RegisterSiteController@tranferRoles');
+    Route::post('tranferRolePermissions', 'Api\RegisterSiteController@tranferRolePermissions');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {

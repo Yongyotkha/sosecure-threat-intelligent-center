@@ -9,8 +9,14 @@ use App\Http\Controllers\Controller\Api;
 use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
 use App\file_version;
-use App\Entities\Users;
+use Modules\Users\Entities\User;
+use Modules\Users\Entities\Profile;
 use Modules\SiteSettings\Entities\Domain;
+use Modules\Users\Entities\UserSite;
+use App\Entities\Model_has_roles;
+use App\Entities\Permissions;
+use App\Entities\Role_permissions;
+use App\Entities\Roles;
 
 class RegisterSiteController extends ApiController
 {
@@ -169,23 +175,147 @@ class RegisterSiteController extends ApiController
         }
     } 
 
+    public function tranferUser(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = User::where('site_id', $data['data']['id'])->get();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
     public function tranferUserSite(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = UserSite::where('site_id', $data['data']['id'])->get();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function tranferSite(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = SiteSettings::where('id', $data['data']['id'])->get();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function tranferProfile(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = Profile::where('id', $data['data']['id'])->get();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function tranferModelHasRoles(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $UserSites = UserSite::where('site_id', $data['data']['id'])->get();
+            $user_ids = [];
+            foreach($UserSites as $UserSite){
+                $user_ids[] = $UserSite -> user_id;
+            }
+            $find_datas = Model_has_roles::whereIn('model_id', $user_ids)->get();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function tranferPermissions(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = Permissions::all();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function tranferRoles(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = Roles::where('id', $data['data']['id'])->get();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function tranferRolePermissions(Request $request){
+        $header = $request->bearerToken();
+        $mode = $request->mode;
+        $data_request = $request -> data;
+        $data = $this -> dataFalse($header, $mode, $data_request);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $find_datas = Role_permissions::all();
+            $data_users = json_encode($find_datas);
+            $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    private function dataFalse($bearerToken, $mode, $data){
         try {
-            $header = $request->bearerToken();
-            $site = $this->AuthorizationRegister($header, $request->mode);
+            $header = $bearerToken;
+            $site = $this->AuthorizationRegister($header, $mode);
             if($site['status_code'] !== '200'){
-                return $this->AuthorizationRegister($header, $request->mode);
+                return $this->AuthorizationRegister($header, $mode);
             }
-            $value = $request -> data;
+            $value = $data;
             $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+
             if($data === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+                return $data;
             }else{
-                $user = Users::where('site_id', $site['data']['id'])->get();
-                $data_users = json_encode($user, true);
-                $users = encrypt_decrypt('encrypt', $data_users, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $users]);
+                return $site;
             }
+           
         } catch (\Exception $e) {
             $response = array(
                 'status' => 0,
