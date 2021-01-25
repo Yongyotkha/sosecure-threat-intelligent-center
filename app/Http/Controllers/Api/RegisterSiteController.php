@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller\Api;
 use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
 use App\file_version;
+use App\Entities\Users;
 use Modules\SiteSettings\Entities\Domain;
 
 class RegisterSiteController extends ApiController
@@ -167,4 +168,30 @@ class RegisterSiteController extends ApiController
             
         }
     } 
+
+    public function tranferUserSite(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $site = $this->AuthorizationRegister($header, $request->mode);
+            if($site['status_code'] !== '200'){
+                return $this->AuthorizationRegister($header, $request->mode);
+            }
+            $value = $request -> data;
+            $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{
+                $user = Users::where('site_id', $site['data']['id'])->get();
+                $data_users = json_encode($user, true);
+                $users = encrypt_decrypt('encrypt', $data_users, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $users]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => 0,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
 }
