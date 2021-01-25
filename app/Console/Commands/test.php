@@ -59,51 +59,52 @@ class test extends Command
        }
 
 
-       foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
-           $CPR_string ="";
-           $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
-           $CPE_List = array();
-           foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-            array_push($CPE_List, $CPE_Datavalue->result);
+    foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+            $CPR_string ="";
+            $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+            $CPE_List = array();
+            foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                array_push($CPE_List, $CPE_Datavalue->result .' : '.$CPE_Datavalue->os_type);
+                
+            }
+            if (count($CPE_List) > 0) {
+                $CPR_string = implode(' | ', (array) $CPE_List);
+            }
+
+            if (count($Domain_list) == 0) {
+            $Assets_data_list = array();
+            $Assets_data_list['id'] = $IP_Listvalue->id;
+            $Assets_data_list['code'] = $IP_Listvalue->code;
+            $Assets_data_list['site_id'] = $IP_Listvalue->site_id;
+            $Assets_data_list['status'] = $IP_Listvalue->status;
+            $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
+            $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
+            $Assets_data_list['domain'] = "";
+            $Assets_data_list['ip'] = $IP_Listvalue->value;
+            $Assets_data_list['CPE'] = $CPR_string;
+
+            array_push($Assets_list, $Assets_data_list);
+
+        }else{
+
+            foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+                $Assets_data_list = array();
+                $Assets_data_list['id'] = $IP_Listvalue->id;
+                $Assets_data_list['code'] = $IP_Listvalue->code;
+                $Assets_data_list['site_id'] = $IP_Listvalue->site_id;
+                $Assets_data_list['status'] = $IP_Listvalue->status;
+                $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
+                $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
+                $Assets_data_list['domain'] = $Domain_listvalue->value;
+                $Assets_data_list['ip'] = $IP_Listvalue->value;
+                $Assets_data_list['CPE'] = $CPR_string;
+                array_push($Assets_list, $Assets_data_list);
+
+            }
         }
-        if (count($CPE_List) > 0) {
-            $CPR_string = implode(' | ', (array) $CPE_List);
-        }
-
-        if (count($Domain_list) == 0) {
-          $Assets_data_list = array();
-          $Assets_data_list['id'] = $IP_Listvalue->id;
-          $Assets_data_list['code'] = $IP_Listvalue->code;
-          $Assets_data_list['site_id'] = $IP_Listvalue->site_id;
-          $Assets_data_list['status'] = $IP_Listvalue->status;
-          $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
-          $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
-          $Assets_data_list['domain'] = "";
-          $Assets_data_list['ip'] = $IP_Listvalue->value;
-          $Assets_data_list['CPE'] = $CPR_string;
-
-          array_push($Assets_list, $Assets_data_list);
-
-      }else{
-
-       foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
-          $Assets_data_list = array();
-          $Assets_data_list['id'] = $IP_Listvalue->id;
-          $Assets_data_list['code'] = $IP_Listvalue->code;
-          $Assets_data_list['site_id'] = $IP_Listvalue->site_id;
-          $Assets_data_list['status'] = $IP_Listvalue->status;
-          $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
-          $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
-          $Assets_data_list['domain'] = $Domain_listvalue->value;
-          $Assets_data_list['ip'] = $IP_Listvalue->value;
-          $Assets_data_list['CPE'] = $CPR_string;
-          array_push($Assets_list, $Assets_data_list);
-
-      }
-  }
 
 
-}
+    }
 
 
 }

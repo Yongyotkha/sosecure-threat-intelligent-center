@@ -45,7 +45,7 @@ function get_role_custom() {
                 } else { //if notAdmin
                     // dd(888);
                     if(@Auth::user()->site_role_id && $site_id_arr) {
-                        if(@Auth::user()->site_role_id == 5) {//support and admin
+                        if(@Auth::user()->site_role_id == 6) {//support and admin
                             // dd(99);
                             $site_support = 1;
                             // $model = $model->whereIn('site_id', $site_id_arr);
