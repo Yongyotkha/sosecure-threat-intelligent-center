@@ -39,62 +39,70 @@
         <section class="scrollable wrapper">
             {{-- Search --}}
             <section class="panel panel-default" id="area-advance-search" style="display: none">
-                <div class="container-fluid" style="padding: 2rem;">
-                    <div class="row m-b-md">
-                        <div class="col-lg-12">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
-                                <div class="col-sm-11 col-xs-12">
-                                    <input type="text" id="keywords" class="form-control">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <i class="fas fa-filter"></i> Filter
+                        </div>
+                </header>
+                <div class="panel-body" style="padding: 0 !important">
+                    <div class="container-fluid" style="padding: 2rem;">
+                        <div class="row m-b-md">
+                            <div class="col-lg-12">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
+                                    <div class="col-sm-11 col-xs-12">
+                                        <input type="text" id="keywords" class="form-control">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        {{-- <div class="col-lg-4">
-                            <div class="form-group">
-                                <div class="row d-flex align-items-center">
+                        <div class="row">
+                            {{-- <div class="col-lg-4">
+                                <div class="form-group">
+                                    <div class="row d-flex align-items-center">
+                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
+                                        <div class="col-sm-9 col-xs-12">
+                                            <select id="status" class="select2-option form-control"  multiple="multiple">
+                                                <option value="critical">Critical</option>
+                                                <option value="high">High</option>
+                                                <option value="meduim">Meduim</option>
+                                                <option value="normal">Normal</option>
+                                                <option value="none">None</option>
+                                            </select>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> --}}
+                            <div class="col-lg-4">
+                                <div class="form-group row">
                                     <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                     <div class="col-sm-9 col-xs-12">
-                                        <select id="status" class="select2-option form-control"  multiple="multiple">
-                                            <option value="critical">Critical</option>
-                                            <option value="high">High</option>
-                                            <option value="meduim">Meduim</option>
-                                            <option value="normal">Normal</option>
-                                            <option value="none">None</option>
-                                        </select>
+                                        <select name="" id="datatype" class="select2-option form-control"
+                                            multiple="multiple">
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Normal">Normal</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                        </div> --}}
-                        <div class="col-lg-4">
-                            <div class="form-group row">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
-                                <div class="col-sm-9 col-xs-12">
-                                    <select name="" id="datatype" class="select2-option form-control"
-                                        multiple="multiple">
-                                        <option value="High">High</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="Normal">Normal</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
 
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
-                                onclick="search()">
-                                <i class="fas fa-search"></i>
-                                @langapp('apply')
-                            </button>
-                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                style="white-space: nowrap" onclick="clear_search()">
-                                <i class="fas fa-broom"></i>
-                                <span> Clear </span>
-                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 text-right mt-2">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                    onclick="search()">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap" onclick="clear_search()">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -65,66 +65,74 @@
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none;">
-                        <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
-                                <div class="col-lg-12">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                        <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="search" class="form-control">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fas fa-filter"></i> Filter
+                                </div>
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
+                            <div class="container-fluid" style="padding: 2rem;">
+                                <div class="row m-b-md">
+                                    <div class="col-lg-12">
+                                        <div class="row d-flex align-items-center">
+                                            <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
+                                            <div class="col-sm-11 col-xs-12">
+                                                <input type="text" id="search" class="form-control">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="source_select" class="form-control">
-                                                <option value="">All</option>
-                                                @if($DataLeakSocial)
-                                                    @foreach($DataLeakSocial as $DataLeakSocial_val)
-                                                        <option value="{{$DataLeakSocial_val->id}}">{{$DataLeakSocial_val->source}}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="row d-flex align-items-center">
+                                            <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <select id="source_select" class="form-control">
+                                                    <option value="">All</option>
+                                                    @if($DataLeakSocial)
+                                                        @foreach($DataLeakSocial as $DataLeakSocial_val)
+                                                            <option value="{{$DataLeakSocial_val->id}}">{{$DataLeakSocial_val->source}}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 text-center">
+                                        <div id="datafeed_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            <i class="fa fa-calendar"></i>&nbsp;
+                                            <span></span> <i class="fa fa-caret-down"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 text-center">
+                                        <div style="margin-top: 8px;">
+                                            <label class="mr-3">
+                                                <input type="checkbox" name="check_all" id="check_all" value="TRUE">
+                                                <span class="label-text" style="font-size: 16px;">All</span>
+                                            </label>
+                                            <label class="mr-3">
+                                                <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
+                                                <span class="label-text" style="font-size: 16px;">Panding</span>
+                                            </label>
+                                            <label class="mr-3">
+                                                <input type="checkbox" name="check_approved" id="check_approved" value="TRUE">
+                                                <span class="label-text" style="font-size: 16px;">Approved</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 text-center">
-                                    <div id="datafeed_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
+                                <div class="row">
+                                    <div class="col-lg-12 text-right mt-2">
+                                        <button type="button" id="btn_darkweb_feed_search" class="btn btn-info btn-responsive btn-fz-13">
+                                            <i class="fas fa-search"></i>
+                                            @langapp('apply')
+                                        </button>
+                                        <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                            <i class="fas fa-broom"></i>
+                                            <span> Clear </span>
+                                        </button>
                                     </div>
-                                </div>
-                                <div class="col-lg-4 text-center">
-                                    <div style="margin-top: 8px;">
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_all" id="check_all" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">All</span>
-                                        </label>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Panding</span>
-                                        </label>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_approved" id="check_approved" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Approved</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_darkweb_feed_search" class="btn btn-info btn-responsive btn-fz-13">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
                                 </div>
                             </div>
                         </div>

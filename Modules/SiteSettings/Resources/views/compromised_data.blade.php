@@ -34,54 +34,62 @@
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                        <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
-                                <div class="col-lg-12">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                        <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="keyword" class="form-control">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fas fa-filter"></i> Filter
+                                </div>
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
+                            <div class="container-fluid" style="padding: 2rem;">
+                                <div class="row m-b-md">
+                                    <div class="col-lg-12">
+                                        <div class="row d-flex align-items-center">
+                                            <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
+                                            <div class="col-sm-11 col-xs-12">
+                                                <input type="text" id="keyword" class="form-control">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
+                                <div class="row">
 
-                                <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="source" class="select2-option form-control">
-                                                <option value="" selected>All</option>
-                                                @if ($source)
+                                    <div class="col-lg-4">
+                                        <div class="row d-flex align-items-center">
+                                            <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <select id="source" class="select2-option form-control">
+                                                    <option value="" selected>All</option>
+                                                    @if ($source)
 
-                                                @foreach ($source as $source)
-                                                <option value="{{$source->id}}">{{$source->source}}
-                                                </option>
-                                                @endforeach
-                
-                                                @endif
-                                            </select>
+                                                    @foreach ($source as $source)
+                                                    <option value="{{$source->id}}">{{$source->source}}
+                                                    </option>
+                                                    @endforeach
+                    
+                                                    @endif
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 text-center">
+                                        <div id="social_datas_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            <i class="fa fa-calendar"></i>&nbsp;
+                                            <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 text-center">
-                                    <div id="social_datas_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
+                                <div class="row">
+                                    <div class="col-lg-12 text-right mt-2">
+                                        <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                            <i class="fas fa-search"></i>
+                                            @langapp('apply')
+                                        </button>
+                                        <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                            <i class="fas fa-broom"></i>
+                                            <span> Clear </span>
+                                        </button>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
                                 </div>
                             </div>
                         </div>
