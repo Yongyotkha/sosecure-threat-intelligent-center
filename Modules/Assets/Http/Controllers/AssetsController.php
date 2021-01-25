@@ -6,9 +6,14 @@ use Modules\Scans\Entities\Assets;
 use Modules\Scans\Entities\AssetsData;
 use Modules\Scans\Entities\CPE;
 
+use App\Credentials;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Assets\Entities\CPEData;
+use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\Assets\Entities\OSType;
+
 
 class AssetsController extends Controller
 {
@@ -128,10 +133,53 @@ class AssetsController extends Controller
         //
     }
 
-
     public function assets_add_cpe()
     {
-        return view('assets::modal.add_cpe');
+
+        $data['cpe'] = CPEData::where('status', 1)->get();
+        $data['Credentials'] = Credentials::where('status', 1)->get();
+        $data['SiteSettings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+        $data['os'] = OSType::get();
+
+        return view('assets::modal.add_cpe')->with($data);
+    }
+
+    public function web_server_add_user(Request $request)
+    {
+
+        $data_search = Credentials::where("name", $request->name)->first();
+        if (!$data_search) {
+            $data = new Credentials;
+            $data->code = generator_uuid();
+            $data->site_id = $request->site;
+            $data->name = $request->name;
+            $data->user = $request->user;
+            $data->password = $request->password;
+            $data->status = 1;
+            $data->save();
+            $message = langapp('changes_saved_successful');
+            return ajaxResponse(
+                [
+                    'message' => $message,
+                    'id' => $data->id,
+                    'name' => $data->name,
+
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        } else {
+
+            $message = '';
+            return ajaxResponse(
+                [
+                    'message' => $message,
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }
+
     }
 
 }

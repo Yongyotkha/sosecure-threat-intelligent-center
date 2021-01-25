@@ -17,5 +17,6 @@ Route::group(
 
         // Modal
         Route::get('assets_add_cpe', 'AssetsController@assets_add_cpe')->name('assets.assets_add_cpe');
+        Route::post('assets_add_user', 'AssetsController@web_server_add_user')->name('assets.assets_add_user');
     }
 );
