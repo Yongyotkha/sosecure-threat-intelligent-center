@@ -31,7 +31,18 @@
                                     <div class="col-xl-2 col-lg-2 col-md-12 padding-small-5px mb-2">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
-                                                <a href="#" data-toggle="modal" data-target="#modal_asset">
+                                                {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
+                                                    <div class="card-dash">
+                                                        <div class="left-card">
+                                                            <div class="img-icon-card">
+                                                                <img src="{{asset('images/database.png')}}" alt="">
+                                                            </div>
+                                                            <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
+                                                            <span class="number-card info number_asset"></span>
+                                                        </div>
+                                                    </div>
+                                                </a> --}}
+                                                <a href="{{route('assets.index')}}" target="_blank" data-toggle="modal" data-target="#modal_asset">
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
@@ -42,6 +53,7 @@
                                                         </div>
                                                     </div>
                                                 </a>
+        
                                             </div>
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
                                                 <div class="card-dash">
