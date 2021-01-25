@@ -2,6 +2,10 @@
 
 namespace Modules\Assets\Http\Controllers;
 
+use Modules\Scans\Entities\Assets;
+use Modules\Scans\Entities\AssetsData;
+use Modules\Scans\Entities\CPE;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;

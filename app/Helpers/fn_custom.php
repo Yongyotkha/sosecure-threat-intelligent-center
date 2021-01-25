@@ -33,6 +33,7 @@ define("PATH_CENTER_IP_TF", 'http://127.0.0.2');
             
 function get_role_custom() {
     $superadmin = 0;
+    $site_support = 0;
     $site_admin = 0;
             if(Auth::check()) {
 
@@ -43,14 +44,15 @@ function get_role_custom() {
 
                 } else { //if notAdmin
                     // dd(888);
-                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                    if(@Auth::user()->site_role_id && $site_id_arr) {
+                        if(@Auth::user()->site_role_id == 5) {//support and admin
                             // dd(99);
-                            $site_admin = 1;
+                            $site_support = 1;
                             // $model = $model->whereIn('site_id', $site_id_arr);
                             // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
 
-                        } else {//not support and admin
+                        } else if(@Auth::user()->site_role_id == 4) {//not support and admin
+                            $site_admin = 1;
                             // $model = $model->whereIn('site_id', $site_id_arr);
                             // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                         }
