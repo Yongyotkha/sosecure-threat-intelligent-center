@@ -7,9 +7,9 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('data_leak')</div>   
             
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <a href="hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-             </button>
+             </a>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
@@ -29,64 +29,72 @@
         {{-- Tab Content --}}
         <section id="scrollable_news" class="scrollable wrapper bg-white">
             <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                <div class="container-fluid" style="padding: 2rem;">
-                    <div class="row m-b-md">
-                        <div class="col-lg-12">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
-                                <div class="col-sm-11 col-xs-12">
-                                    <input type="text" id="Keywords" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
-                        <div class="col-lg-4">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Data Leak</label>
-                                <div class="col-sm-9 col-xs-12">
-                                    <select id="social" class="select2-option form-control">
-                                        <option value="" >All</option>
-                                        @foreach(@$Data_leak_social as $Data_leak_social_val)
-                                            <option value="{{$Data_leak_social_val->id}}" >{{$Data_leak_social_val->source}}</option>
-                                        @endforeach
-                                        {{-- <option value="1" selected>All</option> --}}
-                                    </select>
+                        <div class="col-md-12">
+                            <i class="fas fa-filter"></i> Filter
+                        </div>
+                </header>
+                <div class="panel-body" style="padding: 0 !important">
+                    <div class="container-fluid" style="padding: 2rem;">
+                        <div class="row m-b-md">
+                            <div class="col-lg-12">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
+                                    <div class="col-sm-11 col-xs-12">
+                                        <input type="text" id="Keywords" class="form-control">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="col-lg-4">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Sources</label>
-                                <div class="col-sm-9 col-xs-12">
-                                    <section id="sources_select" class="select2-option form-control">
-                                        <option value="1" selected>All</option>
-                                    </section>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Data Leak</label>
+                                    <div class="col-sm-9 col-xs-12">
+                                        <select id="social" class="select2-option form-control">
+                                            <option value="" >All</option>
+                                            @foreach(@$Data_leak_social as $Data_leak_social_val)
+                                                <option value="{{$Data_leak_social_val->id}}" >{{$Data_leak_social_val->source}}</option>
+                                            @endforeach
+                                            {{-- <option value="1" selected>All</option> --}}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                        </div> --}}
-                        <div class="col-lg-4 text-center">
-                            <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                <i class="fa fa-calendar"></i>&nbsp;
-                                <span></span> <i class="fa fa-caret-down"></i>
+                            {{-- <div class="col-lg-4">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Sources</label>
+                                    <div class="col-sm-9 col-xs-12">
+                                        <section id="sources_select" class="select2-option form-control">
+                                            <option value="1" selected>All</option>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div> --}}
+                            <div class="col-lg-4 text-center">
+                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                    <i class="fa fa-calendar"></i>&nbsp;
+                                    <span></span> <i class="fa fa-caret-down"></i>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <div style="margin-top: 8px;">
+                                    
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 text-center">
-                            <div style="margin-top: 8px;">
-                                
+                        <div class="row">
+                            <div class="col-lg-12 text-right mt-2">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
-                                <i class="fas fa-search"></i>
-                                @langapp('apply')
-                            </button>
-                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                <i class="fas fa-broom"></i>
-                                <span> Clear </span>
-                            </button>
                         </div>
                     </div>
                 </div>
