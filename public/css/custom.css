@@ -3463,3 +3463,9 @@ input.input-login:focus {
 .btn-fz-13{
     font-size: 13px !important;
 }
+
+.btn-selector.active{
+    color: #717171!important;
+    background-color: #ededed;
+    border-color: #c6c6c6;
+}

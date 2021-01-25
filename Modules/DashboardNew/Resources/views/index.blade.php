@@ -181,14 +181,14 @@
                 <div class="panel-body" id="table-container">
                     <div class="row">
                         <div class="col-md-12 text-right">
-                            <div class="button-group">
-                                <button class="btn btn-default" onclick="select_pagename('News')">News</button>
-                                <button class="btn btn-default" onclick="select_pagename('Vulnerability')">Vulnerability</button>
-                                <button class="btn btn-default" onclick="select_pagename('Indicators')">Indicators</button>
-                                <button class="btn btn-default" onclick="select_pagename('Compromised')">Compromised</button>
-                                <button class="btn btn-default" onclick="select_pagename('Data Leak')">Data Leak</button>
-                                <button class="btn btn-default" onclick="select_pagename('Web Defacement')">WebDefacement</button>
-                                <button class="btn btn-default" onclick="clearValue()">Clear</button>
+                            <div id="fillter_click" class="button-group">
+                                <button class="btn btn-default btn-selector" onclick="select_pagename('News')">News</button>
+                                <button class="btn btn-default btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
+                                <button class="btn btn-default btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
+                                <button class="btn btn-default btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
+                                <button class="btn btn-default btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
+                                <button class="btn btn-default btn-selector" onclick="select_pagename('Web Defacement')">WebDefacement</button>
+                                <button class="btn btn-default btn-selector" onclick="clearValue()">Clear</button>
                             </div>
                         </div>
                     </div>
@@ -325,6 +325,12 @@
 @include('stacks.js.highchart')
 
 <script>
+
+    $('#fillter_click .btn-selector').on('click',function(){
+        $(this).siblings().removeClass('active');
+        $(this).addClass('active');
+    });
+
     var startDate =  '';
     var endDate = '';
     var pagename = '';
