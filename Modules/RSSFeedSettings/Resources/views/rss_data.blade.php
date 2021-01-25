@@ -74,64 +74,72 @@
 
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="area-advance-search" style="display: none;">
-                        <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
-                                <div class="col-lg-4">
-                                    <label for="">Keywords</label>
-                                   <input type="text" class="form-control" name="keywords" id="keywords">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fas fa-filter"></i> Filter
                                 </div>
-                                {{-- <div class="col-lg-8">
-                                    <label for="">Public Date</label>
-                                    <div class="input-group date">
-                                        <input id="public_date" type="text" class="form-control datetimepicker-input" name="public_date"
-                                        data-date-format="DD-MM-YYYY" data-date-start-date="moment()" required>
-                                        <div class="input-group-addon">
-                                            @icon('solid/calendar-alt', 'text-muted')
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
+                            <div class="container-fluid" style="padding: 2rem;">
+                                <div class="row m-b-md">
+                                    <div class="col-lg-4">
+                                        <label for="">Keywords</label>
+                                    <input type="text" class="form-control" name="keywords" id="keywords">
+                                    </div>
+                                    {{-- <div class="col-lg-8">
+                                        <label for="">Public Date</label>
+                                        <div class="input-group date">
+                                            <input id="public_date" type="text" class="form-control datetimepicker-input" name="public_date"
+                                            data-date-format="DD-MM-YYYY" data-date-start-date="moment()" required>
+                                            <div class="input-group-addon">
+                                                @icon('solid/calendar-alt', 'text-muted')
+                                            </div>
+                                        </div>
+                                    </div> --}}
+                                    <div class="col-lg-4">
+                                        <label for="">Select Date</label>
+                                        <div id="date_srange" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            <i class="fa fa-calendar"></i>&nbsp;
+                                            <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
-                                </div> --}}
-                                <div class="col-lg-4">
-                                    <label for="">Select Date</label>
-                                    <div id="date_srange" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    <div class="col-lg-4">
+                                        <label for="">Status</label>
+                                        <select id="status" class="select2-option form-control">
+                                            <option value="">All</option>
+                                            <option value="1">Used</option>
+                                            <option value="2">Not Used</option>
+                                        </select>
                                     </div>
+                                    
                                 </div>
-                                <div class="col-lg-4">
-                                    <label for="">Status</label>
-                                    <select id="status" class="select2-option form-control">
-                                        <option value="">All</option>
-                                        <option value="1">Used</option>
-                                        <option value="2">Not Used</option>
-                                    </select>
-                                </div>
-                                
-                            </div>
-                            {{-- <div class="row">
-                                <div class="col-lg-3">
-                                    <label for="">Source</label>
-                                    <input type="text" class="form-control" name="source" id="source">
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="">Status</label>
-                                    <select id="status" class="select2-option form-control">
-                                        <option value="1" selected>All</option>
-                                        <option value="2">Used</option>
-                                        <option value="3">Not Used</option>
-                                    </select>
-                                </div>
-                            </div> --}}
-                            <br>
-                            <div class="row">
-                                <div class="col-lg-12 text-right">
-                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
+                                {{-- <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="">Source</label>
+                                        <input type="text" class="form-control" name="source" id="source">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label for="">Status</label>
+                                        <select id="status" class="select2-option form-control">
+                                            <option value="1" selected>All</option>
+                                            <option value="2">Used</option>
+                                            <option value="3">Not Used</option>
+                                        </select>
+                                    </div>
+                                </div> --}}
+                                <br>
+                                <div class="row">
+                                    <div class="col-lg-12 text-right">
+                                        <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                            <i class="fas fa-search"></i>
+                                            @langapp('apply')
+                                        </button>
+                                        <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                            <i class="fas fa-broom"></i>
+                                            <span> Clear </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

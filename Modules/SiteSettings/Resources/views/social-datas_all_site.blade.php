@@ -37,9 +37,9 @@
 
 
 
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </button>
+                    </a>
 
                     @if(!empty(get_role_custom()))
                     {{-- // var_dump(get_role_custom()['superadmin']);
@@ -74,7 +74,44 @@
 
                 </header>
                 <section class="scrollable wrapper">
+
+                    
+                    <div class="container-fluid" style="margin-bottom:10px;">
+                        <div class="row">
+                            <div class="col-md-12 nopadding">
+                                <div class="main-card-dash-flex">
+                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                            <span class="number-card warning" id='compromise-count'>0</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                            <span class="number-card info"  id='darkweb-count'>0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                             
+                            </div>
+                        </div>
+                    </div>
+
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fas fa-filter"></i> Filter
+                                </div>
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
                                 <div class="col-lg-12">
@@ -158,37 +195,11 @@
                             </div>
                         </div>
                         </div>
+                        </div>
                     </section>
 
 
 
-                    <div class="container-fluid" style="margin-bottom:10px;">
-                        <div class="row">
-                            <div class="col-md-12 nopadding">
-                                <div class="main-card-dash-flex">
-                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
-                                        <div class="left-card">
-                                            <div class="img-icon-card ice">
-                                                <img src="{{asset('images/icebergline2.png')}}" alt="">
-                                            </div>
-                                            <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
-                                            <span class="number-card warning" id='compromise-count'>0</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
-                                        <div class="left-card">
-                                            <div class="img-icon-card ice">
-                                                <img src="{{asset('images/icebergline1.png')}}" alt="">
-                                            </div>
-                                            <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
-                                            <span class="number-card info"  id='darkweb-count'>0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                             
-                            </div>
-                        </div>
-                    </div>
 
 
 

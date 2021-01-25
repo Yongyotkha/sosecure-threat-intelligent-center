@@ -30,77 +30,85 @@
             {{-- Tab Content --}}
             <section id="scrollable_news" class="scrollable wrapper">
                 <section class="panel panel-default" id="area-advance-search" style="display: none;">
-                    <div class="container-fluid" style="padding: 2rem;">
-                        <div class="row m-b-md">
-                            <div class="col-lg-12">
-                                <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                    <div class="col-sm-11 col-xs-12">
-                                        <input type="text" id="news_title_search" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
-                            <div class="col-lg-4">
-                                <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Category</label>
-                                    <div class="col-sm-9 col-xs-12">
-                                        <select id="news_category" class="select2-option form-control">
-                                            <option value="" >All</option>
-                                            @foreach(@$Category as $cate)
-                                                <option value="{{$cate->code}}" >{{$cate->name}}</option>
-                                            @endforeach
-                                            {{-- <option value="1" selected>All</option> --}}
-                                        </select>
+                            <div class="col-md-12">
+                                <i class="fas fa-filter"></i> Filter
+                            </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid" style="padding: 2rem;">
+                            <div class="row m-b-md">
+                                <div class="col-lg-12">
+                                    <div class="row d-flex align-items-center">
+                                        <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
+                                        <div class="col-sm-11 col-xs-12">
+                                            <input type="text" id="news_title_search" class="form-control">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="col-lg-4">
-                                <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Sources</label>
-                                    <div class="col-sm-9 col-xs-12">
-                                        <section id="sources_select" class="select2-option form-control">
-                                            <option value="1" selected>All</option>
-                                        </section>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="row d-flex align-items-center">
+                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Category</label>
+                                        <div class="col-sm-9 col-xs-12">
+                                            <select id="news_category" class="select2-option form-control">
+                                                <option value="" >All</option>
+                                                @foreach(@$Category as $cate)
+                                                    <option value="{{$cate->code}}" >{{$cate->name}}</option>
+                                                @endforeach
+                                                {{-- <option value="1" selected>All</option> --}}
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                            </div> --}}
-                            <div class="col-lg-4 text-center">
-                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                    <i class="fa fa-calendar"></i>&nbsp;
-                                    <span></span> <i class="fa fa-caret-down"></i>
+                                {{-- <div class="col-lg-4">
+                                    <div class="row d-flex align-items-center">
+                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Sources</label>
+                                        <div class="col-sm-9 col-xs-12">
+                                            <section id="sources_select" class="select2-option form-control">
+                                                <option value="1" selected>All</option>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div> --}}
+                                <div class="col-lg-4 text-center">
+                                    <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-center">
+                                    <div style="margin-top: 8px;">
+                                        <label class="mr-3">
+                                            <input type="checkbox" name="related_news" id="related_news" value="TRUE">
+                                            <span class="label-text" style="font-size: 16px;">Related News</span>
+                                        </label>
+        
+                                        <label class="mr-3">
+                                            <input type="checkbox" name="lang_th" id="lang_th" value="TRUE">
+                                            <span class="label-text" style="font-size: 16px;">Thai</span>
+                                        </label>
+        
+                                        <label class="mr-3">
+                                            <input type="checkbox" name="lang_en" id="lang_en" value="TRUE">
+                                            <span class="label-text" style="font-size: 16px;">English</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 text-center">
-                                <div style="margin-top: 8px;">
-                                    <label class="mr-3">
-                                        <input type="checkbox" name="related_news" id="related_news" value="TRUE">
-                                        <span class="label-text" style="font-size: 16px;">Related News</span>
-                                    </label>
-    
-                                    <label class="mr-3">
-                                        <input type="checkbox" name="lang_th" id="lang_th" value="TRUE">
-                                        <span class="label-text" style="font-size: 16px;">Thai</span>
-                                    </label>
-    
-                                    <label class="mr-3">
-                                        <input type="checkbox" name="lang_en" id="lang_en" value="TRUE">
-                                        <span class="label-text" style="font-size: 16px;">English</span>
-                                    </label>
+                            <div class="row">
+                                <div class="col-lg-12 text-right mt-2">
+                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12 text-right mt-2">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
-                                    <i class="fas fa-search"></i>
-                                    @langapp('apply')
-                                </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
                             </div>
                         </div>
                     </div>

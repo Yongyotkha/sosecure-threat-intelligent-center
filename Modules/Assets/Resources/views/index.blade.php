@@ -5,7 +5,7 @@
         <section class="vbox">
             <header class="header bg-white b-b b-light head-d-flex-nowrap" style="white-space: nowrap;">
                 <div class="bc-head m-none" style="width:100%;">
-                     Setting > Assets
+                    Assets
                 </div>
 
                 <div class="pull-right" style="min-width: 270px;">
@@ -14,7 +14,7 @@
                     </select>
                 </div>
 
-                <div class="button-control">
+                <div class="button-control pull-right">
                     <div class="btn-group">
                         <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">@icon('solid/plus') Add</button>
                     </div>
@@ -141,31 +141,41 @@
                 </div>
 
                 <section class="panel panel-default" id="area-advance-search" style="display: none;">
-                    <div class="container-fluid" style="padding: 2rem;">
-                        <div class="row m-b-md">
-                            <div class="col-md-8">
-                                <div class="form-group m-b-md">
-                                    <label for="" class="">Keyword</label>
-                                    <input type="text" class="form-control" name="keyword" placeholder="Search">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group m-b-md">
-                                    <label for="" class="">Referent</label>
-                                    <input type="text" class="form-control" name="keyword" placeholder="">
-                                </div>
-                            </div>
-                        </div>
+                    <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
-                            <div class="col-lg-12 text-right">
-                                <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                    <i class="fas fa-search"></i>
-                                    @langapp('apply')
-                                </button>
-                                <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
+                            <div class="col-md-12">
+                                <div style="margin-top:5px;">
+                                    <i class="fas fa-filter"></i> Filter
+                                </div>
+                            </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid" style="padding: 2rem;">
+                            <div class="row m-b-md">
+                                <div class="col-md-8">
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Keyword</label>
+                                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Referent</label>
+                                        <input type="text" class="form-control" name="keyword" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

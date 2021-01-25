@@ -109,61 +109,69 @@
                 {{-- Tab Content --}}
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="area-advance-search" style="display: none;">
-                        <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
-                                <div class="col-lg-4">
-                                    <label for="">Title</label>
-                                    <input type="text" class="form-control" name="keywords" id="keywords">
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="">Source</label>
-                                    <select name="news_source[]" id="news_source" class="select2-option form-control"
-                                        multiple="multiple">
-
-                                    </select>
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="">Category</label>
-                                    <select name="news_category[]" id="news_category"
-                                        class="select2-option form-control" multiple="multiple">
-                                        {{-- <option value="" >All</option> --}}
-                                        @foreach(@$category as $cate)
-                                        <option value="{{$cate->id}}">{{$cate->name}}</option>
-                                        @endforeach
-                                        {{-- <option value="1" selected>All</option> --}}
-                                    </select>
-                                </div>
-                            </div>
+                        <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
-                                <div class="col-lg-4">
-                                    <label for="">Select Date</label>
-                                    <div id="date_srange" class="text-center"
-                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
+                                <div class="col-md-12">
+                                    <i class="fas fa-filter"></i> Filter
+                                </div>
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
+                            <div class="container-fluid" style="padding: 2rem;">
+                                <div class="row m-b-md">
+                                    <div class="col-lg-4">
+                                        <label for="">Title</label>
+                                        <input type="text" class="form-control" name="keywords" id="keywords">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label for="">Source</label>
+                                        <select name="news_source[]" id="news_source" class="select2-option form-control"
+                                            multiple="multiple">
+
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label for="">Category</label>
+                                        <select name="news_category[]" id="news_category"
+                                            class="select2-option form-control" multiple="multiple">
+                                            {{-- <option value="" >All</option> --}}
+                                            @foreach(@$category as $cate)
+                                            <option value="{{$cate->id}}">{{$cate->name}}</option>
+                                            @endforeach
+                                            {{-- <option value="1" selected>All</option> --}}
+                                        </select>
                                     </div>
                                 </div>
-            
-                                <div class="col-lg-4">
-                                    <label for="">Status</label>
-                                    <select id="status_news" class="select2-option form-control">
-                                        <option value="">All</option>
-                                        <option value="1">Public</option>
-                                        <option value="2">Darft</option>
-                                    </select>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <label for="">Select Date</label>
+                                        <div id="date_srange" class="text-center"
+                                            style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            <i class="fa fa-calendar"></i>&nbsp;
+                                            <span></span> <i class="fa fa-caret-down"></i>
+                                        </div>
+                                    </div>
+                
+                                    <div class="col-lg-4">
+                                        <label for="">Status</label>
+                                        <select id="status_news" class="select2-option form-control">
+                                            <option value="">All</option>
+                                            <option value="1">Public</option>
+                                            <option value="2">Darft</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right">
-                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                        style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
+                                <div class="row">
+                                    <div class="col-lg-12 text-right">
+                                        <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                            <i class="fas fa-search"></i>
+                                            @langapp('apply')
+                                        </button>
+                                        <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                            style="white-space: nowrap">
+                                            <i class="fas fa-broom"></i>
+                                            <span> Clear </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

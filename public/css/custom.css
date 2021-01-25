@@ -2130,7 +2130,7 @@ ul.topics-news-list li a:hover{
     color: #000;
     border: 1px solid #f3f3f3;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 2px;
     padding: .2rem 1rem;
     background: #f3f3f3;
 }
@@ -2139,25 +2139,19 @@ ul.topics-news-list li a:hover{
     color: #000;
     border: 1px solid #fff;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 2px;
     padding: .2rem 1rem;
     background: #fff;
 }
 .btn-chart.white:hover {
     color: #fff;
     border: 1px solid rgba(194, 205, 228, 0.69);
-    cursor: pointer;
-    border-radius: 5px;
-    padding: .2rem 1rem;
     background: rgba(194, 205, 228, 0.69)
 }
 
 .btn-chart:hover{
     color: #000;
     border: 1px solid rgba(194, 205, 228, 0.69);
-    cursor: pointer;
-    border-radius: 5px;
-    padding: .2rem 1rem;
     background: rgba(194, 205, 228, 0.69)
 }
 .dot.critical,.dot-sm.critical{
@@ -3090,7 +3084,7 @@ input.input-login:focus {
     white-space: nowrap;
 }
 
-@media (min-width:1200px) and (max-width:1400px){
+@media (min-width:1060px) and (max-width:1400px){
     .wdfm-inner-4{
         padding: 0 15px !important;
         max-width: 33.33333%;
@@ -3099,7 +3093,16 @@ input.input-login:focus {
     }
 }
 
-@media (min-width:768px) and (max-width:1024px){
+@media (min-width:768px) and (max-width:1060px){
+    .wdfm-inner-4{
+        padding: 0 15px !important;
+        max-width: 50%;
+        flex-basis: 50%;
+        display: flex;
+    }
+}
+
+@media (min-width:0) and (max-width:900px){
     .wdfm-inner-4{
         padding: 0 15px !important;
         max-width: 100%;
