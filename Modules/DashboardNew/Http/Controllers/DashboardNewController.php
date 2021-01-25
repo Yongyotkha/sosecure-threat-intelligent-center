@@ -30,6 +30,8 @@ use App\R_s_s_news;
 use App\DataLeakSocialRefTemp;
 use App\DataLeakFeedTemp;
 use App\leak_socail_ref_temp;
+
+
 class DashboardNewController extends Controller
 {
     /**
@@ -148,13 +150,15 @@ class DashboardNewController extends Controller
                 if($request -> site == 0){
                     $assets = Assets::where('status', 1)->get();
                 }else{
-                    $assets = Assets::where('site_id', $request -> site)->where('status', 1)->get();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $assets = Assets::where('site_id', $site_id_m->id)->where('status', 1)->get();
                 }
             } else {
                 if($request -> site == 0){
                     $assets = Assets::where('status', 1)->whereIn('site_id', $site_id_arr)->get();
                 }else{
-                    $assets = Assets::where('site_id', $request -> site)->whereIn('site_id', $site_id_arr)->where('status', 1)->get();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $assets = Assets::where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->get();
                 }
             }
         }
@@ -175,13 +179,15 @@ class DashboardNewController extends Controller
                 if($request -> site == 0){
                     $assets = Assets::select('id')->where('status', 1)->count();
                 }else{
-                    $assets = Assets::select('id')->where('site_id', $request -> site)->where('status', 1)->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $assets = Assets::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->count();
                 }
             } else {
                 if($request -> site == 0){
                     $assets = Assets::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->count();
                 }else{
-                    $assets = Assets::select('id')->where('site_id', $request -> site)->whereIn('site_id', $site_id_arr)->where('status', 1)->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $assets = Assets::select('id')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->count();
                 }
             }
         }
@@ -201,13 +207,15 @@ class DashboardNewController extends Controller
                 if($request -> site == 0){
                     $CVEMapping = CVEMapping::select('id')->count();
                 }else{
-                    $CVEMapping = CVEMapping::select('id')->where('site_id', $request -> site)->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $CVEMapping = CVEMapping::select('id')->where('site_id', $site_id_m->id)->count();
                 }
             } else {
                 if($request -> site == 0){
                     $CVEMapping = CVEMapping::select('id')->whereIn('site_id', $site_id_arr)->count();
                 }else{
-                    $CVEMapping = CVEMapping::select('id')->where('site_id', $request -> site)->whereIn('site_id', $site_id_arr)->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $CVEMapping = CVEMapping::select('id')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->count();
                 }
             }
         }
@@ -227,13 +235,15 @@ class DashboardNewController extends Controller
                 if($request -> site == 0){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                 }else{
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id',$site_id_m->id)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
                 }
             } else {
                 if($request -> site == 0){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                 }else{
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
                 }
             }
         }
@@ -254,13 +264,15 @@ class DashboardNewController extends Controller
                 if($request -> site == 0){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
                 }else{
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->where('feel_type', 'social')->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->where('feel_type', 'social')->count();
                 }
             } else {
                 if($request -> site == 0){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
                 }else{
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $request -> site)->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
                 }
             }
         }
@@ -280,13 +292,15 @@ class DashboardNewController extends Controller
                 if($request -> site == 0){
                     $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
                 }else{
-                    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $request -> site)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
                 }
             } else {
                 if($request -> site == 0){
                     $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
                 }else{
-                    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $request -> site)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
                 }
             }
         }
@@ -490,7 +504,7 @@ class DashboardNewController extends Controller
         $SiteSettings = null;
 
         if($request->sitecode){
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("id",$request->sitecode)->first();
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$request->sitecode)->first();
         }
 
         
@@ -678,11 +692,12 @@ class DashboardNewController extends Controller
                     $none = $model->where('severity', '=', 'NONE')->count();
                 }else{
                     $model->get();
-                    $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->count();
-                    $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->count();
-                    $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->count();
-                    $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->count();
-                    $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $high = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'HIGH')->count();
+                    $medium = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'MEDIUM')->count();
+                    $critical = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'CRITICAL')->count();
+                    $low = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'LOW')->count();
+                    $none = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'NONE')->count();
                 }
             } else {
                 if($request -> site == 0){
@@ -694,11 +709,12 @@ class DashboardNewController extends Controller
                     $none = $model->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
                 }else{
                     $model->get();
-                    $high = $model->where('site_id', $request -> site)->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
-                    $medium = $model->where('site_id', $request -> site)->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
-                    $critical = $model->where('site_id', $request -> site)->where('severity', '=', 'CRITICAL')->whereIn('site_id', $site_id_arr)->count();
-                    $low = $model->where('site_id', $request -> site)->where('severity', '=', 'LOW')->whereIn('site_id', $site_id_arr)->count();
-                    $none = $model->where('site_id', $request -> site)->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
+                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    $high = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
+                    $medium = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
+                    $critical = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'CRITICAL')->whereIn('site_id', $site_id_arr)->count();
+                    $low = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'LOW')->whereIn('site_id', $site_id_arr)->count();
+                    $none = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
                 }
             }
         }
