@@ -229,7 +229,7 @@
 
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
-                                            <th>remark</th>
+                                            <th>Remark</th>
                                             <th>Data Feed</th>
                                             <th>View</th>
                                             <th>Status</th>

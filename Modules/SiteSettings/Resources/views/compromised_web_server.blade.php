@@ -151,7 +151,7 @@
                                         <th>User</th>
                                         <th>Password</th>
                                         <th>Root Path</th>
-                                        <th>status</th>
+                                        <th>Status</th>
                                         <th>Last Update</th>
 
                                         <th>Action</th>

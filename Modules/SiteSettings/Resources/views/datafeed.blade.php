@@ -158,7 +158,7 @@
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
                                             <th>Data Leak Feed</th>
-                                            <th>url</th>
+                                            <th>URL</th>
                                             <th class="no-sort">@langapp('action')</th>
                                         </tr>
                                     </thead>
