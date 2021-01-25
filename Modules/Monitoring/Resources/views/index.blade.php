@@ -8,9 +8,9 @@
             </a> --}}
             <div class="bc-head">@langapp('monitoring')>Batch Job</div>
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <a href="hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-            </button>
+            </a>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
@@ -25,53 +25,61 @@
 
         <section id="scrollable_news" class="scrollable wrapper" >
             <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                <div class="container-fluid" style="padding: 2rem;">
-                    <div class="row m-b-md">
-                        <div class="col-lg-12">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
-                                <div class="col-sm-11 col-xs-12">
-                                    <input type="text" id="Keywords" class="form-control">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <i class="fas fa-filter"></i> Filter
+                        </div>
+                </header>
+                <div class="panel-body" style="padding: 0 !important">
+                    <div class="container-fluid" style="padding: 2rem;">
+                        <div class="row m-b-md">
+                            <div class="col-lg-12">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
+                                    <div class="col-sm-11 col-xs-12">
+                                        <input type="text" id="Keywords" class="form-control">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Progress</label>
-                                <div class="col-sm-9 col-xs-12">
-                                    <select id="select_val" class="select2-option form-control">
-                                        <option value="" selected>All</option>
-                                        <option value="0" >Not Working</option>
-                                        <option value="1" >Waiting</option>
-                                        <option value="2" >Progress</option>
-                                    </select>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Progress</label>
+                                    <div class="col-sm-9 col-xs-12">
+                                        <select id="select_val" class="select2-option form-control">
+                                            <option value="" selected>All</option>
+                                            <option value="0" >Not Working</option>
+                                            <option value="1" >Waiting</option>
+                                            <option value="2" >Progress</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                    <i class="fa fa-calendar"></i>&nbsp;
+                                    <span></span> <i class="fa fa-caret-down"></i>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <div style="margin-top: 8px;">
+                                    
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 text-center">
-                            <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                <i class="fa fa-calendar"></i>&nbsp;
-                                <span></span> <i class="fa fa-caret-down"></i>
+                        <div class="row">
+                            <div class="col-lg-12 text-right mt-2">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
                             </div>
-                        </div>
-                        <div class="col-lg-4 text-center">
-                            <div style="margin-top: 8px;">
-                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 text-right mt-2">
-                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
-                                <i class="fas fa-search"></i>
-                                @langapp('apply')
-                            </button>
-                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                <i class="fas fa-broom"></i>
-                                <span> Clear </span>
-                            </button>
                         </div>
                     </div>
                 </div>
