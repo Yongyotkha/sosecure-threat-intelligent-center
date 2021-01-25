@@ -3483,9 +3483,10 @@ input.input-login:focus {
 
 
 
-.btn-grey{
-    background-color: #dcdcdc;
-    border-color: #dcdcdc;
+.btn-grey {
+    background-color: #bdbdbd;
+    border-color: #bdbdbd;
+    color: #fff;
 }
 
 .btn-grey.active{
