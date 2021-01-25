@@ -3480,3 +3480,26 @@ input.input-login:focus {
         white-space: nowrap;
     }
 }
+
+.btn-grey.active{
+    background-color: #3869d4;
+    border-color: #3869d4;
+    color: #fff;
+}
+
+.btn-group.special {
+    display: flex;
+}
+
+.btn-group.special .btn{
+    width: 25%;
+}
+
+.btn-group.special button:first-child{
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 25px;
+}
+.btn-group.special button:last-child{
+    border-bottom-right-radius: 25px;
+    border-top-right-radius: 25px;
+}

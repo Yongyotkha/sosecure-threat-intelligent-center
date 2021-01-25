@@ -118,20 +118,31 @@
                         </header>
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid" style="padding: 2rem;">
+
                                 <div class="row m-b-md">
-                                    <div class="col-lg-4">
-                                        <label for="">Title</label>
+                                    <div class="col-lg-12 mb-2">
+                                        <h5 class="font-weight-bold">Title</h5>
                                         <input type="text" class="form-control" name="keywords" id="keywords">
                                     </div>
-                                    <div class="col-lg-4">
-                                        <label for="">Source</label>
+
+                                    <div class="col-lg-12 mb-2">
+                                        <h5 class="font-weight-bold">Group By</h5>
+                                        <div id="groupby-btn" class="btn-group special mb-2">
+                                            <button id="source_btn" class="btn btn-grey active">
+                                                <span> Source </span>
+                                            </button>
+                                            <button id="category_btn" class="btn btn-grey">
+                                                <span> Category </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="source_search" class="col-lg-12 mb-2">
                                         <select name="news_source[]" id="news_source" class="select2-option form-control"
                                             multiple="multiple">
-
                                         </select>
                                     </div>
-                                    <div class="col-lg-4">
-                                        <label for="">Category</label>
+
+                                    <div id="category_search" class="col-lg-12 mb-2">
                                         <select name="news_category[]" id="news_category"
                                             class="select2-option form-control" multiple="multiple">
                                             {{-- <option value="" >All</option> --}}
@@ -141,17 +152,36 @@
                                             {{-- <option value="1" selected>All</option> --}}
                                         </select>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <label for="">Select Date</label>
+
+                                    <div class="col-lg-6 mb-2">
+                                        <h5 class="font-weight-bold">Public Date</h5>
                                         <div id="date_srange" class="text-center"
-                                            style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:inline-block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
                                             <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
-                
+
+                                    <div class="col-lg-12 mb-2">
+                                        <h5 class="font-weight-bold">Status</h5>
+                                        <div id="groupby-status" class="btn-group special mb-2">
+                                            <button class="btn btn-grey active">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey">
+                                                <span> Actice </span>
+                                            </button>
+                                            <button class="btn btn-grey">
+                                                <span> Inactive </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+
+                           
+                                </div>
+                                <!-- ของเดิม
+                                <div class="row">
                                     <div class="col-lg-4">
                                         <label for="">Status</label>
                                         <select id="status_news" class="select2-option form-control">
@@ -161,6 +191,7 @@
                                         </select>
                                     </div>
                                 </div>
+                                -->
                                 <div class="row">
                                     <div class="col-lg-12 text-right">
                                         <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
@@ -265,8 +296,39 @@
 @include('stacks.js.markdown')
 @include('stacks.js.hidesettings')
 @include('stacks.js.daterangpicker')
+@include('stacks.js.activebutton')
 
 <script>
+
+    active_btn('#groupby-btn .btn-grey');
+    active_btn('#groupby-status .btn-grey');
+
+
+    $(function(){
+        if($('#source_btn').hasClass('active')){
+            $('#source_search').show();
+            $('#category_search').hide();
+        } else if($('#category_btn').hasClass('active')){
+            $('#category_search').show();
+            $('#source_search').hide();
+        }
+    });
+   
+    $('#source_btn').on('click',function(){
+        if($('#source_btn').hasClass('active')){
+            $('#source_search').show();
+            $('#category_search').hide();
+        }
+    });
+
+    $('#category_btn').on('click',function(){
+        if($('#category_btn').hasClass('active')){
+            $('#category_search').show();
+            $('#source_search').hide();
+        }
+    });
+     
+
     $('#area-advance-search').hide();
     $('#advance-search').click(function(){
         $('#area-advance-search').toggle();
