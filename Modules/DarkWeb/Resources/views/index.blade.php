@@ -7,9 +7,9 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head"> @langapp('compromised')</div>    
 
-            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <a href="hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-             </button>
+            </a>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>

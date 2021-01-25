@@ -152,16 +152,44 @@
                     <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
-                                <div class="col-md-8">
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Keyword</label>
-                                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+                                <div class="col-md-12">
+                                    <h5 class="font-weight-bold">Group By</h5>
+                                    <div id="groupby-btn" class="btn-group special mb-2">
+                                        <button class="btn btn-grey active">
+                                            <span> Domain </span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> IP </span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> OS Type </span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> CPE </span>
+                                        </button>
                                     </div>
+
+                                    <div class="form-group">
+                                        <select id="groupby-select" class="form-control">
+                                            <option value="">Domain All</option>
+                                            <option value="">DARK WEB</option> 
+                                        </select>
+                                    </div>
+
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Referent</label>
-                                        <input type="text" class="form-control" name="keyword" placeholder="">
+
+                                <div class="col-md-12">
+                                    <h5 class="font-weight-bold">Status</h5>
+                                    <div id="groupby-status" class="btn-group special mb-2">
+                                        <button class="btn btn-grey active">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> Actice </span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> Inactive </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -271,9 +299,12 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
-@include('stacks.js.fullscreen')
+@include('stacks.js.activebutton')
 
 <script>
+
+    active_btn('#groupby-btn .btn-grey');
+    active_btn('#groupby-status .btn-grey');
 
     $('#area-advance-search').hide();
     $('#advance-search').click(function(){
@@ -284,6 +315,8 @@
     $(document).ready(function () {
         $('#source').select2();
         $('#select-site').select2();
+
+        $('#groupby-select').select2();
 
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
