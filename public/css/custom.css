@@ -3484,6 +3484,10 @@ input.input-login:focus {
 .m-t-20{
     margin-top: 20px;
 }
+
+.font-weight-500{
+    font-weight: 500 !important;
+}
 .btn-grey {
     background-color: #bdbdbd;
     border-color: #bdbdbd;
