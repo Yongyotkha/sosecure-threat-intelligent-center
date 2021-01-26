@@ -9,8 +9,14 @@
                 </div>
 
                 <div class="pull-right" style="min-width: 270px;">
-                    <select name="" id="select-site" class="select2-option form-control" style="min-width: 270px">
-                        <option value="allsite">All Site</option>
+                    <select name="" id="select-site" class="select2-option form-control" style="min-width: 270px" onchange="changeSite(value)">
+                        <option value="0">All Site</option>
+                        @if ($SiteSettings)
+                        @foreach ($SiteSettings as $site_settings)
+                        <option value="{{$site_settings->code}}">{{$site_settings->name}}
+                        </option>
+                        @endforeach
+                        @endif
                     </select>
                 </div>
 
@@ -155,31 +161,37 @@
                                 <div class="col-md-6">
                                     <h5 class="font-weight-bold">Group By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">
-                                        <button class="btn btn-grey active">
+                                        <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
                                             <span> Domain </span>
                                         </button>
-                                        <button class="btn btn-grey">
+                                        <button class="btn btn-grey" onclick="selectGroupBy('ip')">
                                             <span> IP </span>
                                         </button>
-                                        <button class="btn btn-grey">
-                                            <span> OS Type </span>
-                                        </button>
-                                        <button class="btn btn-grey">
+                                        <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
                                             <span> CPE </span>
                                         </button>
+                                        <button class="btn btn-grey" onclick="selectGroupBy('os_type')">
+                                            <span> OS Type </span>
+                                        </button>
                                     </div>
+                                    <div class="form-group">
+                                        <select id="groupby-select" class="form-control">
+                                            <option value="">- SELECT -</option>
+                                        </select>
+                                    </div>
+
                                 </div>
 
                                 <div class="col-md-6">
                                     <h5 class="font-weight-bold">Status</h5>
                                     <div id="groupby-status" class="btn-group special mb-2">
-                                        <button class="btn btn-grey active">
+                                        <button class="btn btn-grey active" onclick="changeActive('')">
                                             <span> All </span>
                                         </button>
-                                        <button class="btn btn-grey">
+                                        <button class="btn btn-grey" onclick="changeActive('active')">
                                             <span> Active </span>
                                         </button>
-                                        <button class="btn btn-grey">
+                                        <button class="btn btn-grey" onclick="changeActive('inactive')">
                                             <span> Inactive </span>
                                         </button>
                                     </div>
@@ -195,11 +207,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 text-right">
-                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="searchTB()">
                                         <i class="fas fa-search"></i>
                                         @langapp('apply')
                                     </button>
-                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" onclick="clearTB()" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
                                     </button>
@@ -222,16 +234,17 @@
                             <table class="table table-striped table-bordered" id="table-assets-template">
                                 <thead>
                                     <tr>
-                                        <th class="no-sort">
+                                        {{-- <th class="no-sort">
                                             <label>
                                                 <input name="select_all" value="1" id="select-all" type="checkbox" />
                                                 <span class="label-text"></span>
                                             </label>
-                                        </th>
+                                        </th> --}}
+                                        <th>Site</th>
                                         <th>Domain</th>
                                         <th>IP</th>
-                                        <th>OS Type</th>
                                         <th>CPE</th>
+                                        <th>CPE Add</th>
                                         <th style="width: 20px" class="text-center">Status</th>
                                         <th style="width: 20px" class="text-center">Action</th>
                                     </tr>
@@ -322,10 +335,13 @@
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
+
+        data_table();
+        selectGroupByFirst();
     });
+
     var site_id = 0;
     $(function () {
-
         {{--$('#table-assets-template').DataTable({
             processing: true,
             serverSide: true,
@@ -375,13 +391,126 @@
             ],
         });--}}
 
-        data_table();
-
+        
     });
 
+    var active = '';
+    function changeActive(act){
+        active = act;
+    }
 
+    var selectedGroup = 'domain';
+    function selectGroupBy(columnGroup){
+        if(selectedGroup!=columnGroup){
+            selectedGroup = columnGroup;
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '{!! route('assets.get_selected_filter') !!}',
+                type: "get",
+                data: ({
+                    selectedGroup:selectedGroup,
+                    sitecode:site_id,
+                }),
+                datatype: "html",
+                beforeSend: function(){
+                    loading('load');
+                },
+            }).done(function(data){
+                let groupby_select = '';
+                groupby_select += '<option selected value="">- SELECT -</option>';
+                $.each(data.selected, function(key, val){
+                    groupby_select += '<option value="'+val.val_select+'">'+val.val_select+'</option>';
+                });
+                $('#groupby-select').html(groupby_select);
+                loading('stop_load');
+            }).fail(function(jqXHR, ajaxOptions, thrownError){
+                loading('stop_load');
+                console.log("No response from server");
+            });
+        }
+    }
+
+    function clearTB(){
+        $("#groupby-select").val('').trigger("change");
+        $("#select-site").val(0).trigger("change");
+        $("#groupby-status>button").removeClass("active");
+        $("#groupby-status>button:first").addClass("active");
+        active = '';
+        searchTB();
+    }
+
+    function selectGroupByFirst(){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('assets.get_selected_filter') !!}',
+            type: "get",
+            data: ({
+                selectedGroup:selectedGroup,
+                sitecode:site_id,
+            }),
+            datatype: "html",
+            beforeSend: function(){
+                loading('load');
+
+            },
+        }).done(function(data){
+            let groupby_select = '';
+            groupby_select += '<option selected value="">- SELECT -</option>';
+            $.each(data.selected, function(key, val){
+                groupby_select += '<option value="'+val.val_select+'">'+val.val_select+'</option>';
+            });
+            $('#groupby-select').html(groupby_select);
+            loading('stop_load');
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            loading('stop_load');
+            console.log("No response from server");
+        });
+    }
+
+    function searchTB(searchLinkAll='',colsearchLinkAll=''){
+        
+        let selectedValue = $('#groupby-select').children("option:selected").val();
+        let columnSearch = selectedGroup;
+        if(searchLinkAll!==''){
+            selectedValue = colsearchLinkAll;
+            selectedValue = searchLinkAll;
+        }
+        let selectedSiteName = '';
+        if($('#select-site').children("option:selected").val()!=0){
+            selectedSiteName = $('#select-site').children("option:selected").text();
+        }
+        
+        let active_tb = active;
+        
+        
+        if(columnSearch=='domain'){
+            columnSearch = 1;
+        }else if(columnSearch=='ip'){
+            columnSearch = 2;
+        }else if(columnSearch=='cpe'||columnSearch=='os_type'){
+            columnSearch = 3;
+        }else{
+            columnSearch = '';
+        }
+        t.search( '' ).columns().search( '' ).draw();
+        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(5).search(active_tb).draw();
+       
+       
+        {{--ads.column(5).search(active_tb).draw();
+        t.search( '' ).columns().search( '' ).draw();--}}
+    }
 
     var t;
+    function changeSite(val){
+        searchTB();
+        {{--site_id = val;
+        selectGroupByFirst();--}}
+    }
+
     function data_table(){
         t = $('#table-assets-template').DataTable({
             searching: true,
@@ -392,7 +521,7 @@
             serverSide: false,
             destroy: true,
             "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
-            order: [[ 1, "asc" ]],
+            order: [[ 0, "asc" ]],
             ajax: {
                 type: "POST",
                 url: '{!! route('assets.table_asset')!!}',
@@ -400,39 +529,52 @@
                 }
             },
             columns: [
-                {
+                {{--{
+                    width: '1%',
                     data: 'chk',
                     name: 'chk',
+                },--}}
+                {
+                    width: '25%',
+                    data: 'site_name',
+                    name: 'site_name',
                 },
                 {
+                    width: '20%',
                     data: 'domain',
                     name: 'domain',
                 },
                 {
+                    width: '20%',
                     data: 'ip',
                     name: 'ip',
                 },
                 {
+                    width: '25%',
                     data: 'CPE',
                     name: 'CPE',
                 }, 
                 {
+                    width: '3%',
                     data: 'cpe',
                     name: 'cpe',
+                    className: 'text-center'
                 }, 
                 {
+                    width: '3%',
                     data: 'status',
                     name: 'status',
-                    className: 'w-10 text-center'
+                    className: 'text-center'
                 },  
                 {
+                    width: '3%',
                     data: 'action',
                     name: 'action',
-                    className: 'no-wrap'
+                    className: 'text-center no-wrap'
                 },
             ],
             columnDefs: [
-                {
+                {{--{
                     
                     targets: 0,
                     searchable: false,
@@ -442,10 +584,9 @@
                         return '<label><input type="checkbox" name="checked" class="select-chk asset_id" value="' + row.code + '"><span class="label-text"></span></label>';
                     }
                    
-                },
+                },--}}
                 {
                     targets: 5,
-                    width: '10px',
                     render: function (data, type, row, meta) {
                         if(row.status==1){
                             return '<span class="badge badge-success">Active</span>';
@@ -459,6 +600,14 @@
             ]
 
         });
+
+        let check = {!!json_encode($Search_Link_All)!!};
+        console.log(check);
+        if(check===""){
+            searchTB();
+        }else{
+            searchTB(check,'domain');
+        }
     }
 </script>
 @endpush
