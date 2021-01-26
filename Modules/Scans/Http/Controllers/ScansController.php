@@ -772,9 +772,12 @@ class ScansController extends Controller
         
 
         $Assets = Assets::where('code', $request->code_assets)->first();
+        
         $Assets_id = $Assets->id;
         $arr= [];
-        $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first()->code;
+        $site = SiteSettings::select('code')->withTrashed()->where('id', $Assets -> site_id)->first();
+        // $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first();
+        $site = $site->code;
         // $Assets->raw_data = $request->assets[0]['raw_data'];
         // $Assets->save();
 
@@ -867,6 +870,15 @@ class ScansController extends Controller
                 [
                     'message' => langapp('changes_saved_successful'),
                     'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $request->code]),
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else if($request -> page == 'system'){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => route('assets.index'),
                 ],
                 true,
                 Response::HTTP_OK
