@@ -20,8 +20,8 @@
             @endif
 
 
-            <div class="pull-right" style="margin-top: 8px;" style="width: 300px">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+            <div class="pull-right" style="margin-top: 8px;min-width: 270px">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
                     <option value="">All Site</option>
                     @if ($SiteSettings)
 
