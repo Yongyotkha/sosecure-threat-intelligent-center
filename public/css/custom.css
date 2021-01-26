@@ -3468,9 +3468,9 @@ input.input-login:focus {
 }
 
 .btn-selector.active{
-    color: #717171!important;
-    background-color: #ededed;
-    border-color: #c6c6c6;
+    color: #fff!important;
+    background-color: #3869d4;
+    border-color: #3869d4;
 }
 
 @media screen and (min-width:768px) and (max-width:1024px){
@@ -3481,8 +3481,9 @@ input.input-login:focus {
     }
 }
 
-
-
+.m-t-20{
+    margin-top: 20px;
+}
 .btn-grey {
     background-color: #bdbdbd;
     border-color: #bdbdbd;

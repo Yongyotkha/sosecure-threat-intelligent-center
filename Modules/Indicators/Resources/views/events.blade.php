@@ -42,12 +42,9 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group m-b-md">
-                                    <label for="" class="">Keyword</label>
-                                    <input type="text" class="form-control" name="event_name" id="event_name"
-                                        placeholder="Search">
-                                </div>
+                            <div class="col-md-6">
+                                <h5 class="font-weight-bold">Event Name</h5>
+                                <input type="text" class="form-control" name="event_name" id="event_name"  placeholder="Search">
                             </div>
                             <!--<div class="col-md-4">
                                 <div class="form-group">
@@ -67,14 +64,29 @@
                                     </select>
                                 </div>
                             </div>-->
-                            <div class="col-md-4">
-                                <label for="" class="">Date</label>
-                                <div id="event_date" class="text-center"
+                            <div class="col-md-6">
+                                <h5 class="font-weight-bold">Date</h5>
+                                <div id="event_date" class="text-center form-control"
                                     style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;
                                     <span></span> <i class="fa fa-caret-down"></i>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="font-weight-bold">Published</h5>
+                                <div id="groupby-published" class="btn-group special">
+                                    <button class="btn btn-grey active">
+                                        <span> All Published</span>
+                                    </button>
+                                    <button class="btn btn-grey">
+                                        <span> No Published </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-12 text-right">
                                 <button class="btn btn-info" id="btn_search_data">
                                     <i class="fas fa-search btn-fz-13"></i>
@@ -86,6 +98,7 @@
                                 </button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </section>
@@ -234,7 +247,11 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.advanced_search')
 <script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
+@include('stacks.js.activebutton')
+
 <script>
+
+active_btn('#groupby-published .btn-grey');
 
 Highcharts.setOptions({
     lang: {

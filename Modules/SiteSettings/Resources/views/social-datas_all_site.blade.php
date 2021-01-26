@@ -36,9 +36,9 @@
                     </a> --}}
                     <div class="text-right overflow-action">
 
-                        <div class="text-left" style="margin-top: 8px;margin-right:5px; max-width: 120px;display:inline-block;">
+                        <div class="text-left" style="margin-top: 8px;margin-right:5px;min-width: 270px;display:inline-block;">
                             <select name="site" id="site" class="text-left select2-option form-control select-site"
-                                style="max-width: 120px">
+                                style="min-width: 270px">
                                 <option value="">All Site</option>
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
@@ -48,9 +48,7 @@
                             </select>
                         </div>
 
-                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                        </a>
+                    
 
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
@@ -60,6 +58,10 @@
                             class="btn btn-sm btn-info  m-xs"><span> Dataleak feed</span></a>
                         @endif
                         @endif
+
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                        </a>
 
                         <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  "
                             value="bulk-delete" disabled>
@@ -73,8 +75,6 @@
 
                 </header>
                 <section class="scrollable wrapper">
-
-                    
                     <div class="container-fluid" style="margin-bottom:10px;">
                         <div class="row">
                             <div class="col-md-12 nopadding">
@@ -112,13 +112,33 @@
                         </header>
                         <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
+                            <div class="row">
                                 <div class="col-lg-12">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                        <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="keyword" class="form-control">
-                                        </div>
+                                    <h5 class="font-weight-bold">Content</h5>
+                                        <input type="text" id="keyword" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <h5 class="font-weight-bold">Source</h5>
+                                    <select id="source" class="select2-option form-control">
+                                        <option value="">All</option>
+                                        @if ($source)
+        
+                                        @foreach ($source as $source)
+                                        <option value="{{$source->id}}">{{$source->source}}
+                                        </option>
+                                        @endforeach
+        
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-lg-6">
+                                    <h5 class="font-weight-bold">Date</h5>
+                                    <div id="social_datas_date" class="text-center form-control"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
                             </div>
@@ -133,69 +153,58 @@
 
                                                 @foreach ($site as $data)
                                                 <option value="{{$data->id}}">{{$data->name}}
-                                </option>
-                                @endforeach
+                                        </option>
+                                        @endforeach
 
-                                @endif
-                                </select>
-                            </div>
-                        </div>
-                        </div> --}}
-                        <div class="col-lg-4">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Type</label>
-                                <div class="col-sm-9 col-xs-12">
+                                        @endif
+                                        </select>
+                                    </div>
+                                </div>
+                                </div> --}}
+
+                                <div class="col-lg-6">
+                                    <h5 class="font-weight-bold">Type</h5>
+                                    <div id="groupby-type" class="btn-group special">
+                                        <button class="btn btn-grey active">
+                                            <span> All</span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> Public </span>
+                                        </button>
+                                        <button class="btn btn-grey">
+                                            <span> Darkweb </span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ของเดิม
+                                <div class="col-lg-4">
+                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Type</label>
                                     <select id="type" class="select2-option form-control">
                                         <option value="">All</option>
                                         <option value="social">PUBLIC</option>
                                         <option value="darkweb_public">DARK WEB</option>
                                     </select>
                                 </div>
+                                -->
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="row d-flex align-items-center">
-                                <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
-                                <div class="col-sm-9 col-xs-12">
-                                    <select id="source" class="select2-option form-control">
-                                        <option value="">All</option>
-                                        @if ($source)
-
-                                        @foreach ($source as $source)
-                                        <option value="{{$source->id}}">{{$source->source}}
-                                        </option>
-                                        @endforeach
-
-                                        @endif
-                                    </select>
+                            <div class="row">
+                                <div class="col-lg-12 text-right mt-2">
+                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                        onclick="search()">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                        style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 text-center">
-                            <div id="social_datas_date"
-                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                <i class="fa fa-calendar"></i>&nbsp;
-                                <span></span> <i class="fa fa-caret-down"></i>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12 text-right mt-2">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
-                                    onclick="search()">
-                                    <i class="fas fa-search"></i>
-                                    @langapp('apply')
-                                </button>
-                                <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                    style="white-space: nowrap">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
-                            </div>
-                        </div>
-                        </div>
-                        </div>
-                    </section>
+                    </div>
+                </section>
 
 
 
@@ -391,7 +400,12 @@
 @include('stacks.js.menusub')
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
+@include('stacks.js.activebutton')
+
 <script>
+
+active_btn('#groupby-type .btn-grey');
+
     var admin = '{{$admin}}';
         var visible_c = '';
 

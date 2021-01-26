@@ -152,7 +152,7 @@
                     <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row m-b-md">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <h5 class="font-weight-bold">Group By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">
                                         <button class="btn btn-grey active">
@@ -168,17 +168,9 @@
                                             <span> CPE </span>
                                         </button>
                                     </div>
-
-                                    <div class="form-group">
-                                        <select id="groupby-select" class="form-control">
-                                            <option value="">Domain All</option>
-                                            <option value="">DARK WEB</option> 
-                                        </select>
-                                    </div>
-
                                 </div>
 
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <h5 class="font-weight-bold">Status</h5>
                                     <div id="groupby-status" class="btn-group special mb-2">
                                         <button class="btn btn-grey active">
@@ -190,6 +182,14 @@
                                         <button class="btn btn-grey">
                                             <span> Inactive </span>
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <select id="groupby-select" class="form-control">
+                                            <option value="">Domain All</option>
+                                            <option value="">DARK WEB</option> 
+                                        </select>
                                     </div>
                                 </div>
                             </div>

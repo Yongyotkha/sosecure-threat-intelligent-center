@@ -47,17 +47,34 @@
                 </header>
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
-                        <div class="row m-b-md">
+                        <div class="row">
                             <div class="col-lg-12">
-                                <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
-                                    <div class="col-sm-11 col-xs-12">
-                                        <input type="text" id="keywords" class="form-control">
-                                    </div>
-                                </div>
+                                <h5 class="font-weight-bold">Name & URL</h5>
+                                <input type="text" id="keywords" class="form-control">
                             </div>
                         </div>
                         <div class="row">
+
+                            <div class="col-lg-12">
+                                <h5 class="font-weight-bold">Status</h5>
+                                <a href="#" id="all" class="btn-chart d-il-flex mr-3">
+                                    <span class="dot-all" style="height:8px;"></span>
+                                    All
+                                </a>
+                                <a href="#" id="high" class="btn-chart d-il-flex mr-3">
+                                    <span class="dot critical"></span>
+                                    High
+                                </a>
+                                <a href="#" id="medium" class="btn-chart d-il-flex mr-3">
+                                    <span class="dot high"></span>
+                                    Medium
+                                </a>
+                                <a href="#" id="normal" class="btn-chart d-il-flex">
+                                    <span class="dot low"></span>
+                                    Normal
+                                </a>
+                            </div>
+
                             {{-- <div class="col-lg-4">
                                 <div class="form-group">
                                     <div class="row d-flex align-items-center">
@@ -75,7 +92,9 @@
                                     </div>
                                 </div>
                             </div> --}}
-                            <div class="col-lg-4">
+
+                            <!--
+                            <div class="col-lg-12">
                                 <div class="form-group row">
                                     <label for="" class="col-sm-3 col-xs-12 col-form-label">Status</label>
                                     <div class="col-sm-9 col-xs-12">
@@ -88,6 +107,7 @@
                                     </div>
                                 </div>
                             </div>
+                            -->
 
                         </div>
                         <div class="row">
@@ -111,26 +131,8 @@
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
-                        <div class="col-lg-2 col-sm-3">
+                        <div class="col-lg-12 col-sm-12">
                             <i class="fas fa-table"></i> Website
-                        </div>
-                        <div class="col-lg-10 col-sm-9 text-right">
-                            <a href="#" id="all" class="btn-chart white d-il-flex mr-3">
-                                <span class="dot-all" style="height:8px;"></span>
-                                All
-                            </a>
-                            <a href="#" id="high" class="btn-chart white d-il-flex mr-3">
-                                <span class="dot critical"></span>
-                                High
-                            </a>
-                            <a href="#" id="medium" class="btn-chart white d-il-flex mr-3">
-                                <span class="dot high"></span>
-                                Medium
-                            </a>
-                            <a href="#" id="normal" class="btn-chart white d-il-flex">
-                                <span class="dot low"></span>
-                                Normal
-                            </a>
                         </div>
                     </div>
                 </header>
@@ -343,6 +345,7 @@
 @include('stacks.js.lightbox')
 
 <script>
+
     var keywords = null;
     var site = null;
     var datatype = null;

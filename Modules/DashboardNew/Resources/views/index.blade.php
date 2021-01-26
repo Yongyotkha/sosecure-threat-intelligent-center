@@ -194,13 +194,13 @@
                     <div class="row">
                         <div class="col-md-12 text-right">
                             <div id="fillter_click" class="button-group">
-                                <button class="btn btn-default btn-selector" onclick="select_pagename('News')">News</button>
-                                <button class="btn btn-default btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
-                                <button class="btn btn-default btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
-                                <button class="btn btn-default btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
-                                <button class="btn btn-default btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
-                                <button class="btn btn-default btn-selector" onclick="select_pagename('Web Defacement')">WebDefacement</button>
-                                <button class="btn btn-default btn-selector" onclick="clearValue()">Clear</button>
+                                <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">WebDefacement</button>
+                                <button class="btn btn-selector" onclick="clearValue()">Clear</button>
                             </div>
                         </div>
                     </div>
@@ -1036,7 +1036,7 @@
                             data: low,
                             color: '#88ce4f '
                         }, {
-                            name: 'infomation',
+                            name: 'Infomation',
                             data: infomation,
                             color: '#d3d3d3'
                         }]
