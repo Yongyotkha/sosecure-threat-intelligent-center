@@ -151,7 +151,7 @@
                     </header>
                     <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
+                            <div class="row">
                                 <div class="col-md-6">
                                     <h5 class="font-weight-bold">Group By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">

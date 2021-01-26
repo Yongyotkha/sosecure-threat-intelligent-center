@@ -119,13 +119,13 @@
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid" style="padding: 2rem;">
 
-                                <div class="row m-b-md">
-                                    <div class="col-lg-6 mb-2">
+                                <div class="row">
+                                    <div class="col-lg-6 ">
                                         <h5 class="font-weight-bold">Title</h5>
                                         <input type="text" class="form-control" name="keywords" id="keywords">
                                     </div>
 
-                                    <div class="col-lg-6 mb-2">
+                                    <div class="col-lg-6 ">
                                         <h5 class="font-weight-bold">Public Date</h5>
                                         <div id="date_srange" class="text-center form-control"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -134,7 +134,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6 mb-2">
+                                    <div class="col-lg-6 ">
                                         <h5 class="font-weight-bold">Group By</h5>
                                         <div id="groupby-btn" class="btn-group special">
                                             <button id="source_btn" class="btn btn-grey active">
@@ -146,7 +146,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6 mb-2">
+                                    <div class="col-lg-6 ">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey active">
@@ -162,14 +162,12 @@
                                     </div>
 
 
-                               
-
-                                    <div id="source_search" class="col-lg-6 mb-2">
+                                    <div id="source_search" class="col-lg-6 m-t-10">
                                         <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
                                         </select>
                                     </div>
 
-                                    <div id="category_search" class="col-lg-6 mb-2">
+                                    <div id="category_search" class="col-lg-6 m-t-10">
                                         <select name="news_category[]" id="news_category"
                                             class="select2-option form-control" multiple="multiple">
                                             {{-- <option value="" >All</option> --}}
