@@ -19,55 +19,54 @@
         </aside>
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
-                        style="margin-top: 0;">@icon('solid/bars')</a>
-                    @endif
+                <header class="header panel-heading bg-white b-b b-light" style="display: flex;justify-content:space-between;">
+                   
 
-                    <div class="bc-head">Data Leak Datas </div>
+                    <div class="bc-head">
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
+                            style="margin-top: 0;">@icon('solid/bars')</a>
+                        @endif
+                        Data Leak Datas
+                    </div>
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
                     data-rel="tooltip" title="@langapp('export') CSV">
                     @icon('solid/download') CSV
 
                     </a> --}}
+                    <div class="text-right overflow-action">
 
+                        <div class="text-left" style="margin-top: 8px;margin-right:5px; max-width: 120px;display:inline-block;">
+                            <select name="site" id="site" class="text-left select2-option form-control select-site"
+                                style="max-width: 120px">
+                                <option value="">All Site</option>
+                                @if($SiteSettings)
+                                @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+                        </div>
 
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                        </a>
 
+                        @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                            // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}"
+                            class="btn btn-sm btn-info  m-xs"><span> Dataleak feed</span></a>
+                        @endif
+                        @endif
 
-
-
-                    <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </a>
-
-                    @if(!empty(get_role_custom()))
-                    {{-- // var_dump(get_role_custom()['superadmin']);
-                        // var_dump(get_role_custom()['site_admin']); --}}
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                    <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}"
-                        class="btn btn-sm btn-info pull-right m-xs"><span> Dataleak feed</span></a>
-                    @endif
-                    @endif
-
-                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right"
-                        value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                            @langapp('delete')</span>
-                    </button>
-
-                    <div class="pull-right" style="margin-top: 8px; max-width: 120px;">
-                        <select name="site" id="site" class="select2-option form-control select-site"
-                            style="max-width: 120px">
-                            <option value="">All Site</option>
-                            @if($SiteSettings)
-                            @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                            @endforeach
-                            @endif
-                        </select>
+                        <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  "
+                            value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
+                                @langapp('delete')</span>
+                        </button>
                     </div>
-
 
 
 
