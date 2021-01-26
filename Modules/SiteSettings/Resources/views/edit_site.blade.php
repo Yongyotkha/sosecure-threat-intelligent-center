@@ -181,17 +181,17 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
-@include('stacks.js.select2checkbox')
 @include('partial.ajaxify')
 @include('stacks.js.menusub')
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.fullscreen')
 @include('stacks.js.cropple')
-{{-- var cropper_logo;
+<script>
+    var cropper_logo;
     var imgs_logo = null;
     window.addEventListener('DOMContentLoaded', function () {
         var image = document.getElementById('crop-img-logo');
-        var input_logo = $('#file-input');
+        var input_logo = $('#file-input-demo');
         var cropBoxData;
         var canvasData;
         var $modal = $('#upload_image_logo_modal');
@@ -247,7 +247,9 @@
             html = '<img src="' + imgs_logo + '" />';
             $("#preview_cer_img").html(html);
             $("#preview-image_logo").html("");
-        }); --}}
+        }); 
+</script>
+
 <script>
 
     $(document).ready(function(){
@@ -255,7 +257,7 @@
         tags: true
         });
     });
-     </script>
+</script>
 @endpush
 
 @endsection
