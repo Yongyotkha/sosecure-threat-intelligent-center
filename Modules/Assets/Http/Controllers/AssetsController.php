@@ -15,6 +15,7 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Assets\Entities\OSType;
 use Auth;
 use Modules\Users\Entities\UserSite;
+use App\TransactionTimeStampScans;
 class AssetsController extends Controller
 {
     /**
@@ -67,6 +68,12 @@ class AssetsController extends Controller
                     }
                 }
             }
+        }
+
+        if(isset($this->request->Search_Link_All)){
+            $data['Search_Link_All'] = $this->request->Search_Link_All;
+        }else{
+            $data['Search_Link_All'] = "";
         }
         
         $data['SiteSettings'] = $SiteSettings;
@@ -182,12 +189,47 @@ class AssetsController extends Controller
 
     }
 
+    public function get_selected_filter(Request $request)
+    {
+        $selectedGroup = $request->selectedGroup;
+        $site = null;
+        if($request->sitecode){
+            $site = SiteSettings::select('id')->where("code",$request->sitecode)->first();
+        }
+        $returnData = null;
+        if($selectedGroup=='domain'){
+            if($site){
+                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+            }else{
+                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->distinct()->get();
+            }
+        }else if($selectedGroup=='ip'){
+            if($site){
+                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [5,6])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+            }else{
+                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [5,6])->where('status', 1)->distinct()->get();
+            }
+        }else if($selectedGroup=='cpe'){
+            $returnData = CPE::select('result AS val_select')->where('result','!=', null)->distinct()->get();
+        }else if($selectedGroup=='os_type'){
+            $returnData = OSType::select('name AS val_select')->distinct()->get();
+        }
+        if ($request->ajax()) {
+            $data = [
+                "selected" => $returnData,
+            ];
+            return response()->json($data);
+        }
+
+    }
     
     public function table_asset()
     {
         $Assets_list = [];
         $Assets_data = Assets::where('status', 1)->get();
         $OsType = OSType::get()->keyBy('id')->toArray();
+        $SiteSettings = SiteSettings::withTrashed()->get()->keyBy('id')->toArray();
+        $menu = 'system';
         foreach ($Assets_data as $key => $value) {
             $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->where('status', 1)->get();
             $Domain_list = [];
@@ -211,26 +253,28 @@ class AssetsController extends Controller
                 $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
                 $CPE_List = array();
                 foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-                    array_push($CPE_List, $CPE_Datavalue->result.":".isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"");
+                    array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
                 }
                 if (count($CPE_List) > 0) {
-                    $CPR_string = implode(' | ', (array) $CPE_List);
+                    $CPR_string = implode(' <br> ', (array) $CPE_List);
                 }
 
-                $menu = 'site';
+                $menu = 'system';
+                $TTSS = TransactionTimeStampScans::select('code')->where('site_id', $value->site_id)->where('domain_id', $value->domain_id)->first();
                 if (count($Domain_list) == 0) {
                     $Assets_data_list = array();
                     $Assets_data_list['chk'] = "";
                     $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe").'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
-                    $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+                    $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                     <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
-                        </a>
-                        <a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => $value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
-                            <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
-                        </a>';
+                    </a>';
+                    //<a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
+                    // <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
+                    // </a>
                     $Assets_data_list['id'] = $IP_Listvalue->id;
                     $Assets_data_list['code'] = $IP_Listvalue->code;
-                    $Assets_data_list['site_id'] = $IP_Listvalue->site_id;
+                    $Assets_data_list['site_code'] = @$SiteSettings[$IP_Listvalue->site_id]["code"];
+                    $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
                     $Assets_data_list['status'] = $IP_Listvalue->status;
                     $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                     $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
@@ -247,14 +291,15 @@ class AssetsController extends Controller
                         $Assets_data_list['chk'] = "";
                         $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe").'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
-                        </a>
-                        <a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => $value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
-                            <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
+                        <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                         </a>';
+                        //<a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
+                        // <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
+                        // </a>
                         $Assets_data_list['id'] = $IP_Listvalue->id;
                         $Assets_data_list['code'] = $IP_Listvalue->code;
-                        $Assets_data_list['site_id'] = $IP_Listvalue->site_id;
+                        $Assets_data_list['site_code'] = @$SiteSettings[$IP_Listvalue->site_id]["code"];
+                        $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
                         $Assets_data_list['status'] = $IP_Listvalue->status;
                         $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                         $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;

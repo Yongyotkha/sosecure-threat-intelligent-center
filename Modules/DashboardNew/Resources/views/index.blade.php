@@ -729,6 +729,7 @@
                         const data = result.data[i];
                         let raw_data;
                         let referent;
+                        let linkto;
                         if(data.raw_data){
                             raw_data = data.raw_data;
                         }else{
@@ -740,6 +741,11 @@
                             referent = 'No data';
                         }
 
+                        if(data.link){
+                            linkto = data.link;
+                        }else{
+                            linkto = '/assets';
+                        }
                         html += `
                         <tr>
                             <td>
@@ -749,7 +755,7 @@
                                 <span>${referent}</span>
                             </td>
                             <td>
-                                <a href="#" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                <a href="${linkto}" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
                             </td>
                         </tr>
                         `;
