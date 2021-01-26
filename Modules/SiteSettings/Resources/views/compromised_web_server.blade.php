@@ -205,10 +205,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">Port <span
-                                class="text-danger">*</span> </label>
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">Port</label>
                         <div class="col-lg-8">
-                            <input type="text" id="port" class="form-control check_test" required>
+                            <input type="text" id="port" class="form-control check_test" >
                         </div>
                     </div>
 
@@ -296,13 +295,20 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">Type<span
+                        <label style="padding-top: 7px" class="col-lg-3 control-label">Type Extension<span
                                 class="text-danger">*</span></label>
                         <div class="col-lg-8">
                             <select class="select2-option form-control " id="type1" multiple="multiple" required>
                                 <option value=".php">.PHP</option>
                                 <option value=".js">.JS</option>
-                                \<option value=".asp">.ASP</option>
+                                <option value=".asp">.ASP</option>
+                                <option value=".exe">.EXE</option>
+                                <option value=".dll">.DLL</option>
+                                <option value=".cs">.CS</option>
+                                <option value=".cshtml">.CSHTML</option>
+                                <option value=".config">.CONFIG</option>
+                                <option value=".htaccess">.HTACCESS</option>
+                                <option value=".xml">.XML</option>
                             </select>
                         </div>
                     </div>
@@ -512,7 +518,7 @@
             if($('#os').val()=='Linux'){
                 $("#port").val('22');
             }else{
-                $("#port").val('445');
+                $("#port").val('');
             }
             
             $('#button_save').prop("disabled", true);
