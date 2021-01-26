@@ -11,6 +11,9 @@ use App\DataLeakSocialRefTemp;
 use App\Entities\CompromisedServer;
 use App\leak_socail_ref_temp;
 use App\Mail\CompromisedMail;
+use App\transaction_client_asset;
+use App\transaction_client_asset_data;
+use App\transaction_client_compromised_server;
 use App\transaction_client_leak_feed;
 use App\transaction_client_leak_social_ref;
 use App\transcation_jobs_clients;
@@ -2478,12 +2481,40 @@ class DataLeakController extends Controller
         if ($request->id_chang) {
 
             foreach ($request->id_chang as $id_chang) {
-
+                $transaction_client_compromised_server = transaction_client_compromised_server::where('site_id', $request->site)->where('transaction_id', $id_chang)->first();
+                if($transaction_client_compromised_server){
+                    $transaction_client_compromised_server -> transaction_mode = 'delete';
+                    $transaction_client_compromised_server -> transaction_data_status = 1;
+                    $transaction_client_compromised_server -> status = 1;
+                    $transaction_client_compromised_server -> save();
+                }else{
+                    $transaction_client_compromised_server = new transaction_client_compromised_server();
+                    $transaction_client_compromised_server -> site_id = $request->site;
+                    $transaction_client_compromised_server -> transaction_id = $id_chang;
+                    $transaction_client_compromised_server -> transaction_mode = 'delete';
+                    $transaction_client_compromised_server -> transaction_data_status = 1;
+                    $transaction_client_compromised_server -> status = 1;
+                    $transaction_client_compromised_server -> save();
+                }
                 $data = CompromisedServer::where("id", $id_chang)->delete();
 
             }
         } else {
-
+            $transaction_client_compromised_server = transaction_client_compromised_server::where('site_id', $request->site)->where('transaction_id', $request->id)->first();
+            if($transaction_client_compromised_server){
+                $transaction_client_compromised_server -> transaction_mode = 'delete';
+                $transaction_client_compromised_server -> transaction_data_status = 1;
+                $transaction_client_compromised_server -> status = 1;
+                $transaction_client_compromised_server -> save();
+            }else{
+                $transaction_client_compromised_server = new transaction_client_compromised_server();
+                $transaction_client_compromised_server -> site_id = $request->site;
+                $transaction_client_compromised_server -> transaction_id = $request->id;
+                $transaction_client_compromised_server -> transaction_mode = 'delete';
+                $transaction_client_compromised_server -> transaction_data_status = 1;
+                $transaction_client_compromised_server -> status = 1;
+                $transaction_client_compromised_server -> save();
+            }
             CompromisedServer::where("id", $request->id)->delete();
 
         }
@@ -2525,6 +2556,21 @@ class DataLeakController extends Controller
         }
 
         $code_site = SiteSettings::where("id", '=', $request->site)->first();
+        $transaction_client_compromised_server = transaction_client_compromised_server::where('site_id', $request->site)->where('transaction_id', $request->id)->first();
+        if($transaction_client_compromised_server){
+            $transaction_client_compromised_server -> transaction_mode = 'update';
+            $transaction_client_compromised_server -> transaction_data_status = 1;
+            $transaction_client_compromised_server -> status = 1;
+            $transaction_client_compromised_server -> save();
+        }else{
+            $transaction_client_compromised_server = new transaction_client_compromised_server();
+            $transaction_client_compromised_server -> site_id = $request->site;
+            $transaction_client_compromised_server -> transaction_id = $request->id;
+            $transaction_client_compromised_server -> transaction_mode = 'update';
+            $transaction_client_compromised_server -> transaction_data_status = 1;
+            $transaction_client_compromised_server -> status = 1;
+            $transaction_client_compromised_server -> save();
+        }
 
         return ajaxResponse(
             [
@@ -2567,6 +2613,14 @@ class DataLeakController extends Controller
 
             $data->save();
 
+            $transaction_client_compromised_server = new transaction_client_compromised_server();
+            $transaction_client_compromised_server -> site_id = $request->site;
+            $transaction_client_compromised_server -> transaction_id = $data->id;
+            $transaction_client_compromised_server -> transaction_mode = 'insert';
+            $transaction_client_compromised_server -> transaction_data_status = 1;
+            $transaction_client_compromised_server -> status = 1;
+            $transaction_client_compromised_server -> save();
+
             $Assets = Assets::where('raw_data', $request->ip)->first();
             $Domain = Domain::where('site_id', $request->site)->where('domain_default', 1)->first();
 
@@ -2582,6 +2636,14 @@ class DataLeakController extends Controller
                 $Assets->domain_id = $Domain->id;
 
                 $Assets->save();
+
+                $transaction_client_asset = transaction_client_asset::where('site_id', $request->site)->where('transaction_id', $Assets->id)->first();
+                if($transaction_client_asset){
+                    $transaction_client_asset -> transaction_mode = 'insert';
+                    $transaction_client_asset -> transaction_data_status = 1;
+                    $transaction_client_asset -> status = 1;
+                    $transaction_client_asset -> save();
+                }
 
             } else {
                 $Assets_new = new Assets;
@@ -2599,6 +2661,14 @@ class DataLeakController extends Controller
 
                 $Assets_new->save();
 
+                $transaction_client_asset = new transaction_client_asset();
+                $transaction_client_asset -> site_id = $request->site;
+                $transaction_client_asset -> transaction_id = $Assets_new->id;
+                $transaction_client_asset -> transaction_mode = 'insert';
+                $transaction_client_asset -> transaction_data_status = 1;
+                $transaction_client_asset -> status = 1;
+                $transaction_client_asset -> save();
+
                 $AssetsData = new AssetsData;
                 $AssetsData->code = generator_uuid();
                 $AssetsData->site_id = $request->site;
@@ -2610,6 +2680,14 @@ class DataLeakController extends Controller
                 $AssetsData->asset_id = $Assets_new->id;
 
                 $AssetsData->save();
+
+                $transaction_client_asset_data = new transaction_client_asset_data();
+                $transaction_client_asset_data -> site_id = $request->site;
+                $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                $transaction_client_asset_data -> transaction_mode = 'insert';
+                $transaction_client_asset_data -> transaction_data_status = 1;
+                $transaction_client_asset_data -> status = 1;
+                $transaction_client_asset_data -> save();
 
             }
             $message = langapp('changes_saved_successful');
