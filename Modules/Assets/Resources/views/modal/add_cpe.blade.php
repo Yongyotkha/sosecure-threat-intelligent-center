@@ -468,8 +468,7 @@
     function add_row_command() {
         
 
-        var os_type = $("#os_type").val();
-        var u_p = $("#u_p").val();
+        var os_type = $("#os_type").val();        
         var remark_com = $("#remark_com").val();
         var result = $("#result").val();
 
@@ -503,9 +502,12 @@
     };
 
     function run_command(){
-        var ip = $("#ip").val();    
+        var ip = $("#ip").val();  
+        var u_p = $("#u_p").val();  
         if(ip==''){
             $('#check_ip').html('Please fill out.');
+        }else if(u_p==''){
+            $('#check_user').html('Please select user.');
         }
     }
 
