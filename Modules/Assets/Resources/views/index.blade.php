@@ -391,7 +391,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            dom: 'Blfrtip',
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             order: [[ 1, "asc" ]],
             ajax: {
                 type: "POST",

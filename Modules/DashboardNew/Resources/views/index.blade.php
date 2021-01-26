@@ -478,7 +478,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            dom: 'Blfrtip',
+            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('dashboardnew.table_dashboard')!!}',
