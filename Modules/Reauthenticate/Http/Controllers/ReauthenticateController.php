@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Auth;
 use App\Roles;
+use App\transaction_client_role_permissions;
+use App\transaction_client_users;
 use Modules\Users\Entities\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -129,8 +131,39 @@ class ReauthenticateController extends Controller
         $user->last_change_pass = Carbon::now();
         $user->save();
 
+        $transaction_client_users = transaction_client_users::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+        if($transaction_client_users){
+            $transaction_client_users -> transaction_mode = 'update';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }else{
+            $transaction_client_users = new transaction_client_users();
+            $transaction_client_users -> site_id = $user->site_id;
+            $transaction_client_users -> transaction_id = $user->id;
+            $transaction_client_users -> transaction_mode = 'update';
+            $transaction_client_users -> transaction_data_status = 1;
+            $transaction_client_users -> status = 1;
+            $transaction_client_users -> save();
+        }
+
         if($role) {
             $user->syncRoles($role->name);
+            $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+            if($transaction_client_role_permissions){
+                $transaction_client_role_permissions -> transaction_mode = 'update';
+                $transaction_client_role_permissions -> transaction_data_status = 1;
+                $transaction_client_role_permissions -> status = 1;
+                $transaction_client_role_permissions -> save();
+            }else{
+                $transaction_client_role_permissions = new transaction_client_role_permissions();
+                $transaction_client_role_permissions -> site_id = $user->site_id;
+                $transaction_client_role_permissions -> transaction_id = $user->id;
+                $transaction_client_role_permissions -> transaction_mode = 'update';
+                $transaction_client_role_permissions -> transaction_data_status = 1;
+                $transaction_client_role_permissions -> status = 1;
+                $transaction_client_role_permissions -> save();
+            }
         }
 
         // $site_code = $this->siteSettings->find_code($user->site_id);
