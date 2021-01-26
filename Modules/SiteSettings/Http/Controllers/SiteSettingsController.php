@@ -146,6 +146,36 @@ class SiteSettingsController extends Controller
      * @param Request $request
      * @return Response
      */
+    private function randPass($length, $strength=8) {
+        $vowels = 'aeuy';
+        $consonants = 'bdghjmnpqrstvz';
+        if ($strength >= 1) {
+            $consonants .= 'BDGHJLMNPQRSTVWXZ';
+        }
+        if ($strength >= 2) {
+            $vowels .= "AEUY";
+        }
+        if ($strength >= 4) {
+            $consonants .= '0123456789012345678901234567890123456789';
+        }
+        if ($strength >= 8) {
+            $consonants .= '@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%@#$%';
+        }
+    
+        $password = '';
+        $alt = time() % 2;
+        for ($i = 0; $i < $length; $i++) {
+            if ($alt == 1) {
+                $password .= $consonants[(rand() % strlen($consonants))];
+                $alt = 0;
+            } else {
+                $password .= $vowels[(rand() % strlen($vowels))];
+                $alt = 1;
+            }
+        }
+        return $password;
+    }
+
     public function store(Request $request)
     {
         $dt = Carbon::now();
@@ -166,7 +196,7 @@ class SiteSettingsController extends Controller
         // $SiteSettings->system_key = generator_uuid();
         $SiteSettings->public_key = str_random(135);
         $SiteSettings->mysql_user = str_random(10);
-        $SiteSettings->mysql_password = str_random(15);
+        $SiteSettings->mysql_password = $this->randPass(15);
         $SiteSettings->mongo_user = str_random(10);
         $SiteSettings->mongo_password = str_random(15);
         $SiteSettings->save();
