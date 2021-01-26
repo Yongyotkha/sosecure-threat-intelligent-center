@@ -32,7 +32,7 @@ Route::group(
         Route::post('sitesettings/change_status', 'SiteSettingsController@change_status')->name('sitesettings.change_status.settings')->middleware('can:sitesettings_update');
         Route::post('sitesettings/sitesettings_delete', 'SiteSettingsController@sitesettings_delete')->name('sitesettings.sitesettings_delete');
         // Route::get('/test', 'SiteSettingsController@test')->name('sitesettings.test')->middleware('can:menu_items');
-
+        Route::post('sitesettings/artisan_call', 'SiteSettingsController@artisan_call')->name('sitesettings.artisan_call')->middleware('can:menu_items');
         Route::get('/systemsetting/{id}', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
 
         Route::get('/data-setting/{id}', 'DataSettingsController@datasetting')->name('datasettings.index')->middleware('can:menu_items');
@@ -156,7 +156,7 @@ Route::post('/compromised_web_server/web_server_change_status', 'DataLeakControl
 
 Route::post('/compromised_web_server_ip/checkwebserverIP', 'DataLeakController@checkWebserverIP')->name('compromised_web_server.checkWebserverIP')->middleware('can:menu_items');
 Route::post('/compromised_web_server/web_server_add_user', 'DataLeakController@web_server_add_user')->name('compromised_web_server.web_server_add_user')->middleware('can:menu_items');
-
+Route::post('/compromised_web_server_ip/load_data_connection', 'DataLeakController@load_data_connection')->name('compromised_web_server.load_data_connection')->middleware('can:menu_items');
 
 Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
 Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');

@@ -13,6 +13,7 @@ use App\leak_socail_ref_temp;
 use App\Mail\CompromisedMail;
 use App\transaction_client_leak_feed;
 use App\transaction_client_leak_social_ref;
+use App\transcation_jobs_clients;
 use Auth;
 use Exception;
 use Illuminate\Http\Request;
@@ -2680,34 +2681,103 @@ class DataLeakController extends Controller
         $os = @$request->os;
         $checkConnect = null;
         $message = '';
+        $dataCredentials = [
+            'ip' => $ip,
+            'port' => $port,
+            'user' => $user,
+            'pass' => $pass,
+            'os' => $os,
+        ];
+        $encodedDataCredentials = json_encode($dataCredentials);
         try {
-            if ($os == "Linux") {
-                $ssh = new SSH2($ip, $port);
-                $ssh->setTimeout(60);
+            $transcation_jobs_clients_check = transcation_jobs_clients::where('site_id', $data->site_id)->where('mode', 'compromised_webserver_test_connection')->orderBy('created_at', 'desc')->first();
+            if(empty($transcation_jobs_clients_check)){
+                $transcation_jobs_clients_check = new transcation_jobs_clients();
+                $transcation_jobs_clients_check  -> site_id = $data->site_id;
+                $transcation_jobs_clients_check  -> job_key = str_random(24);
+                $transcation_jobs_clients_check  -> mode = 'compromised_webserver_test_connection';
+                $transcation_jobs_clients_check  -> status = 1;
+                $transcation_jobs_clients_check  -> transaction_data_status = 1;
+                $transcation_jobs_clients_check  -> data = $encodedDataCredentials;
+                $transcation_jobs_clients_check  -> save();
 
-                if (!$ssh->login($user, $pass)) {
-                    $checkConnect = false;
-                    $message = 'Connect Error';
-                } else {
-                    $checkConnect = true;
-                    $message = 'Connect Success';
-                }
-            } else if ($os == "Windows") {
-                $checkConnect = false;
-                $message = 'Connect Error';
-            } else {
-                $checkConnect = false;
-                $message = 'Connect Error';
+                $status = true;
+                $job_key = $transcation_jobs_clients_check -> job_key;
+                $message = '';
+            }else if($transcation_jobs_clients_check -> transaction_data_status === 3){
+                $transcation_jobs_clients_check = new transcation_jobs_clients();
+                $transcation_jobs_clients_check  -> site_id = $data->site_id;
+                $transcation_jobs_clients_check  -> job_key = str_random(24);
+                $transcation_jobs_clients_check  -> mode = 'compromised_webserver_test_connection';
+                $transcation_jobs_clients_check  -> status = 1;
+                $transcation_jobs_clients_check  -> transaction_data_status = 1;
+                $transcation_jobs_clients_check  -> data = $encodedDataCredentials;
+                $transcation_jobs_clients_check  -> save();
+
+                $status = true;
+                $job_key = $transcation_jobs_clients_check -> job_key;
+                $message = '';
+            }else{
+                $status = false;
+                $message = 'There is transaction information in the system, please wait a moment.';
+                $job_key = null;
             }
+            // if ($os == "Linux") {
+            //     $ssh = new SSH2($ip, $port);
+            //     $ssh->setTimeout(60);
+
+            //     if (!$ssh->login($user, $pass)) {
+            //         $checkConnect = false;
+            //         $message = 'Connect Error';
+            //     } else {
+            //         $checkConnect = true;
+            //         $message = 'Connect Success';
+            //     }
+            // } else if ($os == "Windows") {
+            //     $checkConnect = false;
+            //     $message = 'Connect Error';
+            // } else {
+            //     $checkConnect = false;
+            //     $message = 'Connect Error';
+            // }
         } catch (Exception $e) {
-            $checkConnect = false;
+            $status = false;
             $message = $e->getMessage();
         }
 
         $dataout = [
-            'webserverConnect' => $checkConnect,
+            'status' => $status,
+            'data' => $job_key,
             'message' => $message,
         ];
+        return response()->json($dataout);
+    }
+
+    public function load_data_connection(Request $request){
+        $transcation_jobs_clients_check = transcation_jobs_clients::where('transaction_data_status', 3)->where('job_key', $request->key)->first();
+        if($transcation_jobs_clients_check){
+            $encodedDataCredentials = json_decode($transcation_jobs_clients_check -> return_data, true);
+            if($encodedDataCredentials['checkConnect'] === true){
+                $dataout = [
+                    'status' => 'complete',
+                    'webserverConnect' => true,
+                    'message' => $encodedDataCredentials['message'],
+                    'data' => $transcation_jobs_clients_check -> job_key,
+                ];
+            }else{
+                $dataout = [
+                    'status' => 'complete',
+                    'webserverConnect' => false,
+                    'message' => $encodedDataCredentials['message'],
+                    'data' => $transcation_jobs_clients_check -> job_key,
+                ];
+            }
+        }else{
+            $dataout = [
+                'status' => 'waiting',
+                'message' => '',
+            ];
+        }
         return response()->json($dataout);
     }
 

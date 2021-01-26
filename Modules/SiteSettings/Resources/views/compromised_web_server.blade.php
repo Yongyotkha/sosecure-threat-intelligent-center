@@ -733,7 +733,7 @@
      
        
    }
-   
+   var set_timeInterval;
    function test_data(){
         ip = $('#ip').val();
         port = $('#port').val();
@@ -761,15 +761,14 @@
                     loading('load');
                 },
                 success:function(response) {
-                    loading('stop_load');
-                    if(response.webserverConnect==true){
-                        toastr.success(response.message, '@langapp('response_status')');
-                        $('#button_save').prop("disabled", false);
-                    
+                    if(response.status === true){
+                        set_timeInterval = setInterval(function(){ 
+                            load_data_connection(response.data); 
+                        }, 3000);
                     }else{
+                        loading('stop_load');
                         toastr.error(response.message, '@langapp('response_status')');
-                        
-                    }
+                    } 
                 },
                 error: function (error){
                     loading('stop_load');
@@ -784,6 +783,37 @@
             });
 
         }
+    }
+
+    function load_data_connection(key){ 
+        $.ajax({
+            type:"POST",
+            url:"{{ route('compromised_web_server.load_data_connection') }}",
+            data:{
+                key:key,
+            },
+            success:function(response) {
+                if(response.status == 'complete'){
+                    clearInterval(set_timeInterval);
+                    loading('stop_load');
+                    if(response.webserverConnect==true){
+                        toastr.success(response.message, '@langapp('response_status')');
+                        $('#button_save').prop("disabled", false);
+                    }else{
+                        toastr.error(response.message, '@langapp('response_status')');
+                    }
+                }
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
     }
 
       
