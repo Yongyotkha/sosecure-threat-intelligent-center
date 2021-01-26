@@ -15,6 +15,8 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Assets\Entities\OSType;
 use Auth;
 use Modules\Users\Entities\UserSite;
+
+
 class AssetsController extends Controller
 {
     /**
@@ -133,13 +135,15 @@ class AssetsController extends Controller
         //
     }
 
-    public function assets_add_cpe()
+    public function assets_add_cpe($id)
     {
-
+        
         $data['cpe'] = CPEData::where('status', 1)->get();
         $data['Credentials'] = Credentials::where('status', 1)->get();
         $data['SiteSettings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
         $data['os'] = OSType::get();
+        $data['assets'] = Assets::where('code', $id)->first();
+
 
         return view('assets::modal.add_cpe')->with($data);
     }
@@ -221,7 +225,7 @@ class AssetsController extends Controller
                 if (count($Domain_list) == 0) {
                     $Assets_data_list = array();
                     $Assets_data_list['chk'] = "";
-                    $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe").'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+                    $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
                     $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                     <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                         </a>
@@ -245,7 +249,7 @@ class AssetsController extends Controller
                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                         $Assets_data_list = array();
                         $Assets_data_list['chk'] = "";
-                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe").'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                     <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                         </a>
@@ -272,5 +276,52 @@ class AssetsController extends Controller
 
         $dataOut["data"] =  $Assets_list;
         return response()->json($dataOut);
+    }
+    public function assets_add_data(Request $request)
+    {
+        $assets = $request->assets;
+
+        // if($request->data[0][4]=='Delete'){
+        //     dd($request->data[0][0]);
+        // }else{
+        //     dd(55);
+        // }
+        
+
+        foreach($request->data as $data){
+            $model = new CPE();
+            if($data[4]=='Delete'){
+                $model->code = generator_uuid();
+                $model->os_type = $data[2];
+                $model->select = 'add';
+                $model->cpe_data_id = $data[3];
+                $model->remark = $data[1];
+                $model->asset_id = $assets['id'];
+                
+
+            }else if($data[3]=='Delete'){
+                
+                $model->code = generator_uuid();
+                $model->os_type = $data[2];
+                $model->select = 'command';
+                // $model->cpe_data_id = $data[3];
+                $model->remark = $data[1];
+                $model->asset_id = $assets['id'];
+                $model->credentials_id = $data[4];
+                $model->result = $data[0];
+
+            }
+
+            $model->save();
+        }
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => route('assets.index'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 }

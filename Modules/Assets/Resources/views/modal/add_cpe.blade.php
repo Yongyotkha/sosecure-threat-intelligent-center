@@ -21,6 +21,8 @@
 
                         @endif
                     </select>
+
+                    <span style="color:red;"><small id="check_os"></small></span>
                 </div>
             </div>
 
@@ -55,6 +57,8 @@
                             @endif
 
                         </select>
+
+                        <span style="color:red;"><small id="check_cpe"></small></span>
                     </div>
                 </div>
 
@@ -62,17 +66,25 @@
                     <label class="col-lg-3 control-label">Remark <span class="text-danger">*</span> </label>
                     <div class="col-lg-9">
                         <input type="text" name="add_remark[]" id="add_remark" class="form-control">
+                        <span style="color:red;"><small id="check_remark"></small></span>
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <div class="col-lg-12 text-center">
-                        <button class="btn btn-info"  onclick="add_row()">Add</button>
+                        <button class="btn btn-info" onclick="add_row()">Add</button>
                     </div>
                 </div>
             </div>
 
             <div id="chk-command" style="d-none">
+                <div class="form-group row">
+                    <label class="col-lg-3 control-label">IP <span class="text-danger">*</span> </label>
+                    <div class="col-lg-9">
+                        <input type="text" name="name" id="ip" class="form-control">
+                        <span style="color:red;"><small id="check_ip"></small></span>
+                    </div>
+                </div>
                 <div class="form-group row">
                     <label class="col-lg-3 control-label">Select Profile <span class="text-danger">*</span> </label>
                     <div class="col-lg-9">
@@ -86,10 +98,11 @@
                                     @endforeach
                                     @endif
                                 </select>
+                                <span style="color:red;"><small id="check_user"></small></span>
                             </div>
                             <div class="col-lg-4">
                                 <button class="btn btn-info" data-toggle="collapse" href="#demo"><i class="fas fa-plus"
-                                        onclick="add_new()"></i>Add New</button>
+                                        onclick="add_new()"></i>&nbsp; Add New</button>
                             </div>
 
 
@@ -135,91 +148,89 @@
                                     @if($SiteSettings)
                                     @foreach ($SiteSettings as $item)
                                     <option value="{{@$item->id}}">{{@$item->name}}</option>
-                                    @endforeach
-                                    @endif
-                                </select>
-                                <span style="color:red;"><small id="check_site"></small></span>
-                            </div>
-                        </div> --}}
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger btn-rounded" data-toggle="collapse"
-                                data-target="#demo" onclick="clear_data()">
-                                <i class="fas fa-times"></i>
-                                Close
-                            </button>
-                            <button type="button" onclick="new_credentials()" class="btn btn-info btn-rounded">
-                                <i class="fas fa-paper-plane"></i>
-                                Save
-                            </button>
-                        </div>
-                        <hr>
-                    </fieldset>
+                        @endforeach
+                        @endif
+                        </select>
+                        <span style="color:red;"><small id="check_site"></small></span>
                 </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 control-label"></label>
-                    <div class="col-lg-9">
-                        <button class="btn btn-success btn-block"><i class="fas fa-play"></i>&nbsp; Run</button>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 control-label">IP <span class="text-danger">*</span> </label>
-                    <div class="col-lg-9">
-                        <input type="text" name="name" class="form-control">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 control-label">Remark <span class="text-danger">*</span> </label>
-                    <div class="col-lg-9">
-                        <input type="text" name="name" class="form-control">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 control-label">Result <span class="text-danger">*</span> </label>
-                    <div class="col-lg-9">
-                        <textarea name="" id="" cols="30" rows="2" class="form-control"></textarea>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-lg-12 text-center">
-                        <button class="btn btn-info" onclick="add_row()">Add</button>
-                    </div>
-                </div>
+            </div> --}}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-rounded" data-toggle="collapse" data-target="#demo"
+                    onclick="clear_data()">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+                <button type="button" onclick="new_credentials()" class="btn btn-info btn-rounded">
+                    <i class="fas fa-paper-plane"></i>
+                    Save
+                </button>
             </div>
+            <hr>
+            </fieldset>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 control-label"></label>
+            <div class="col-lg-9">
+                <button class="btn btn-success btn-block" onclick="run_command()"><i class="fas fa-play"></i>&nbsp; Run</button>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 control-label">Result <span class="text-danger">*</span> </label>
+            <div class="col-lg-9">
+                <textarea name="" id="result" cols="30" rows="2" class="form-control"></textarea>
+                <span style="color:red;"><small id="check_result"></small></span>
+            </div>
+        </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="table">
-                    <thead>
-                        <tr>
-                            <th>CPE</th>
-                            <th>Remark</th>
-                            <th colspan="2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id ="get_tr">
-                        {{-- <tr>
+        <div class="form-group row">
+            <label class="col-lg-3 control-label">Remark <span class="text-danger">*</span> </label>
+            <div class="col-lg-9">
+                <input type="text" name="name" id="remark_com" class="form-control">
+                <span style="color:red;"><small id="check_remark_com"></small></span>
+            </div>
+        </div>
+
+
+        <div class="form-group row">
+            <div class="col-lg-12 text-center">
+                <button class="btn btn-info" onclick="add_row_command()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="table">
+            <thead>
+                <tr>
+                    <th>CPE</th>
+                    <th>Remark</th>
+                    <th colspan="2">Action</th>
+                </tr>
+            </thead>
+            <tbody id="get_tr">
+                {{-- <tr>
                             <td>Lorem ipsum dolor sit amet.</td>
                             <td>-</td>
                             <td>
                                 <button class="btn btn-xs btn-danger">Delete</button>
                             </td>
                         </tr> --}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-
-
-
-        <div class="modal-footer">
-            <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i>
-                Close</a>
-            <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit" onclick="save_value()"><i
-                    class="fas fa-paper-plane" ></i> OK</button>
-        </div>
-
+            </tbody>
+        </table>
     </div>
+</div>
+
+
+
+
+<div class="modal-footer">
+    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i>
+        Close</a>
+    <button type="button" class="btn btn-info submit btn-rounded value_submit" onclick="save_value()"><i
+            class="fas fa-paper-plane"></i> OK</button>
+</div>
+
+</div>
 </div>
 
 
@@ -279,17 +290,47 @@
 
         });
 
-        {{--$("#ip").keypress(function() {
+        $("#ip").keypress(function() {
 
-            $('#check_i').html('');
+            $('#check_ip').html('');
 
             $("#u_p").change(function() {
 
-                $('#check_u_p').html('');
+                $('#check_user').html('');
 
             });
 
-        });--}}
+        });
+
+        $("#os_type").change(function() {
+
+            $('#check_os').html('');
+
+        });
+
+        $("#cpe").change(function() {
+
+            $('#check_cpe').html('');
+
+        });
+
+        $("#add_remark").keypress(function() {
+
+            $('#check_remark').html('');
+
+        });
+
+        $("#remark_com").keypress(function() {
+
+            $('#check_remark_com').html('');
+
+        });
+
+        $("#result").keypress(function() {
+
+            $('#check_result').html('');
+
+        });
 
     });
     function add_new() {
@@ -345,7 +386,7 @@
                     name:name_new,
                     password:password_new,
                     user:user_new,
-                    site:site,
+                    site:@json($assets->site_id),
                     
                 },
                 beforeSend: function(){
@@ -390,6 +431,7 @@
         }
     }
     var convertedIntoArray = [];
+
     function add_row() {
         
 
@@ -398,25 +440,74 @@
         var res = cpe.split(",");
         var add_remark = $("#add_remark").val();
 
-        html=``;
-        html+=`<tr>
-        <td>${res[1]}</td><td>${add_remark}</td>
-        <td><button class="btn btn-xs btn-danger" onclick="del_row(this)">Delete</button></td>
-        <td style="display:none;">${os_type}</td>
-        <td style="display:none;">${res[0]}</td>
-        </tr>`;
+        if(os_type==''){
+            $('#check_os').html('Please select os type.');
+        }else if(res.length==1){           
+            $('#check_cpe').html('Please select cpe.');
+        }else if(add_remark==''){
+            $('#check_remark').html('Please fill out.');
+        }else{
+            html=``;
+            html+=`<tr>
+            <td>${res[1]}</td>
+            <td>${add_remark}</td>
+            <td style="display:none;">${os_type}</td>
+            <td style="display:none;">${res[0]}</td>
+            <td><button class="btn btn-xs btn-danger" onclick="del_row(this)">Delete</button></td>
+            </tr>`;
 
-        $('#get_tr').append(html);
+            $('#get_tr').append(html);
 
-
-        $('#cpe').val('').trigger('change');
-        $('#os_type').val('').trigger('change');
-        $("#add_remark").val('');
-
-
-        
+            $('#cpe').val('').trigger('change');
+            $('#os_type').val('').trigger('change');
+            $("#add_remark").val('');
+        }      
        
     };
+
+    function add_row_command() {
+        
+
+        var os_type = $("#os_type").val();
+        var u_p = $("#u_p").val();
+        var remark_com = $("#remark_com").val();
+        var result = $("#result").val();
+
+        if(os_type==''){
+            $('#check_os').html('Please select os type.');
+        }else if(u_p==''){           
+            $('#check_user').html('Please select user');
+        }else if(result==''){
+            $('#check_result').html('Please fill out.');
+        }else if(remark_com==''){
+            $('#check_remark_com').html('Please fill out.');
+        }else{
+            html=``;
+            html+=`<tr>
+            <td>${result}</td>
+            <td>${remark_com}</td>
+            <td style="display:none;">${os_type}</td>
+            <td><button class="btn btn-xs btn-danger" onclick="del_row(this)">Delete</button></td>
+            <td style="display:none;">${u_p}</td>
+            </tr>`;
+
+            $('#get_tr').append(html);
+
+            $('#u_p').val('').trigger('change');
+            $('#os_type').val('').trigger('change');
+            $("#remark_com").val('');
+            $("#result").val('');
+            $("#ip").val('');
+        }      
+       
+    };
+
+    function run_command(){
+        var ip = $("#ip").val();    
+        if(ip==''){
+            $('#check_ip').html('Please fill out.');
+        }
+    }
 
     function del_row(ctl) {
         $(ctl).parents("tr").remove();
@@ -434,7 +525,41 @@
             }
         });
 
-        console.log(convertedIntoArray);
+        var x = document.getElementById("table").rows.length;
+
+        if(x==1){
+            toastr.error('No Data', '@langapp('response_status') ');
+        }else{
+            $.ajax({
+                type:"POST",
+                url:"{{ route('assets.assets_add_data') }}",
+                data:{
+                    data:convertedIntoArray,
+                    assets:@json($assets),
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) {
+                    loading('stop_load');
+                    $('.value_submit').attr('disabled',true);
+                    toastr.success(response.message, '@langapp('response_status') ');
+                    window.location.href = response.redirect;
+                },
+                error: function (error){
+                    loading('stop_load');
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                }
+
+            });
+        }
+        
+        
     }
 
 
