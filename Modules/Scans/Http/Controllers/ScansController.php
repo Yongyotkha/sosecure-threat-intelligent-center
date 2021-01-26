@@ -555,7 +555,7 @@ class ScansController extends Controller
         })
         ->addColumn('cpe', function (Assets $data) {
             $res = '';
-            $res .= '<a href="'.route("assets.assets_add_cpe").'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+            $res .= '<a href="'.route("assets.assets_add_cpe",['id'=>$data->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
             return $res;
         })
         ->addColumn('status', function (Assets $data) {
