@@ -251,7 +251,7 @@ abstract class UsersController extends Controller
 
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('id','email','created_at','name')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
                 $model = User::where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
