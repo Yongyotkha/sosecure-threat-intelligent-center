@@ -384,7 +384,7 @@
                 $.ajax({
                     type:"POST",
                     url:"{{ route('webdefacement.change_status') }}",
-                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    data:{id: {!!json_encode(@$webdefacement->id)!!}},
                     beforeSend: function(){
                         $('#load_status').loading('start');
                     },
@@ -431,7 +431,7 @@
                 $.ajax({
                     type:"POST",
                     url:"{{ route('webdefacement.deface_now') }}",
-                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    data:{id: {!!json_encode(@$webdefacement->id)!!}},
                     beforeSend: function(){
                         $('#updateO').loading('start');
                         
@@ -440,7 +440,7 @@
                         $.ajax({
                             type:"POST",
                             url:"{{ route('webdefacement.deface_now_detail') }}",
-                            data:{id: {!!json_encode($webdefacement->id)!!}},
+                            data:{id: {!!json_encode(@$webdefacement->id)!!}},
                             beforeSend: function(){
                                 
                             },
@@ -503,7 +503,7 @@
                 $.ajax({
                     type:"POST",
                     url:"{{ route('webdefacement.update_original') }}",
-                    data:{id: {!!json_encode($webdefacement->id)!!}},
+                    data:{id: {!!json_encode(@$webdefacement->id)!!}},
                     beforeSend: function(){
                         $('#updateO').loading('start');
                         
@@ -512,7 +512,7 @@
                         $.ajax({
                             type:"POST",
                             url:"{{ route('webdefacement.update_original_detail') }}",
-                            data:{id: {!!json_encode($webdefacement->id)!!}},
+                            data:{id: {!!json_encode(@$webdefacement->id)!!}},
                             beforeSend: function(){
                                 
                             },
@@ -585,7 +585,7 @@
              $.ajax({
                  type:"POST",
                  url:"{{ route('webdefacement.update_image') }}",
-                 data:{id: {!!json_encode($webdefacement->id)!!}},
+                 data:{id: {!!json_encode(@$webdefacement->id)!!}},
                  beforeSend: function(){
                     $('#Defacement').loading('start');
                  },
