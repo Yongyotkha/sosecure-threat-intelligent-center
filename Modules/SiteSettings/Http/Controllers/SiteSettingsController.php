@@ -371,6 +371,9 @@ class SiteSettingsController extends Controller
             // }
 
             if ($request->logo) {
+                $request->validate([
+                    'logo' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
+                ]);
                 $image_path = $SiteSettings->logo;
                 if (File::exists($image_path)) {
                     File::delete($image_path);
@@ -381,6 +384,7 @@ class SiteSettingsController extends Controller
                 $image->move($destinationPath, $imagename);
                 $SiteSettings->logo = 'images/logo_site/' . $imagename;
                 $SiteSettings->save();
+                
             }
         }
         if ($request->page_setting == 'site_settings') {
