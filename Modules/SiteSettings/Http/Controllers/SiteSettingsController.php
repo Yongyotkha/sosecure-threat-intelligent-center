@@ -24,6 +24,7 @@ use App\transaction_client_site;
 use App\transaction_client_site_category;
 use App\transaction_client_user_site;
 use App\transaction_client_users;
+use App\transcation_jobs_clients;
 
 class SiteSettingsController extends Controller
 {
@@ -81,6 +82,43 @@ class SiteSettingsController extends Controller
         $mongo_client = new MongoDBDriverManager();
         var_dump($mongo_client);
         //    return view('sitesettings::index')->with($data);
+    }
+
+    public function artisan_call(Request $request){
+        $transcation_jobs_clients_check = transcation_jobs_clients::where('site_id', $request->site_id)->where('mode', $request -> mode)->orderBy('created_at', 'desc')->first();
+        if(empty($transcation_jobs_clients_check)){
+            $transcation_jobs_clients_check = new transcation_jobs_clients();
+            $transcation_jobs_clients_check  -> site_id = $request->site_id;
+            $transcation_jobs_clients_check  -> mode = $request -> mode;
+            $transcation_jobs_clients_check  -> status = 1;
+            $transcation_jobs_clients_check  -> transaction_data_status = 1;
+            $transcation_jobs_clients_check  -> save();
+
+            $status = true;
+            $job_key = null;
+            $message = 'Success';
+        }else if($transcation_jobs_clients_check -> transaction_data_status == 3){
+            $transcation_jobs_clients_check = new transcation_jobs_clients();
+            $transcation_jobs_clients_check  -> site_id = $request->site_id;
+            $transcation_jobs_clients_check  -> mode = $request -> mode;
+            $transcation_jobs_clients_check  -> status = 1;
+            $transcation_jobs_clients_check  -> transaction_data_status = 1;
+            $transcation_jobs_clients_check  -> save();
+
+            $status = true;
+            $job_key = null;
+            $message = 'Success';
+        }else{
+            $status = false;
+            $message = 'There is transaction information in the system, please wait a moment.';
+            $job_key = null;
+        }
+        $dataout = [
+            'status' => $status,
+            'data' => $job_key,
+            'message' => $message,
+        ];
+        return response()->json($dataout);
     }
 
     public function phpinfo()
