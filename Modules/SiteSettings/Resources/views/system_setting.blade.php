@@ -278,9 +278,9 @@
                                     <div class="col-lg-12" style="background: #f3f6f9;">
                                         <div class="m-xs">
                                             <span class="text-dark">Laravel Version</span>: <span class="text-muted">{{ $siteSettings -> laravel_version == null ? 'ไม่มีข้อมูล' : $siteSettings -> laravel_version }}</span>
-                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
-                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
-                                            <a style="display: none;" href="#" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
+                                            <a href="#" onclick="cache_clear();" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
+                                            <a href="#" onclick="config_cache();" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
+                                            <a href="#" onclick="config_clear();" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
@@ -361,6 +361,91 @@ $(document).ready(function(){
         }
     });
 });
+
+function cache_clear(){
+    $.ajax({
+        type:"POST",
+        url:"{{ route('sitesettings.artisan_call') }}",
+        data:{
+            mode:'cache_clear',
+            site_id: '{{ $siteSettings -> id }}'
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status === true){
+                toastr.success(response.message, '@langapp('response_status')');
+            }else{
+                toastr.error(response.message, '@langapp('response_status')');
+            }
+            
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+}
+
+function config_cache(){
+    $.ajax({
+        type:"POST",
+        url:"{{ route('sitesettings.artisan_call') }}",
+        data:{
+            mode:'config_cache',
+            site_id: '{{ $siteSettings -> id }}'
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status === true){
+                toastr.success(response.message, '@langapp('response_status')');
+            }else{
+                toastr.error(response.message, '@langapp('response_status')');
+            }
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+}
+
+function config_clear(){
+    $.ajax({
+        type:"POST",
+        url:"{{ route('sitesettings.artisan_call') }}",
+        data:{
+            mode:'config_clear',
+            site_id: '{{ $siteSettings -> id }}'
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status === true){
+                toastr.success(response.message, '@langapp('response_status')');
+            }else{
+                toastr.error(response.message, '@langapp('response_status')');
+            }
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+}
 
 function genarate_system_key(){
     let system_key = uuidv4();
