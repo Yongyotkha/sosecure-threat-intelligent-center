@@ -560,7 +560,7 @@ $(function() {
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[ 5, "desc" ]]
+            order: [[ 5, "desc" ]],
             ajax: {
                 {{--contentType: "application/json",
                 dataType: 'JSON',--}}
