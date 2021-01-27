@@ -3,7 +3,7 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            <div class="bc-head">Events</div>
+            <div class="bc-head">Events cvbdfb</div>
 
             {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
             <span>@langapp('Search_Advance')</span>
@@ -77,10 +77,13 @@
                             <div class="col-md-6 mb-1">
                                 <h5 class="font-weight-bold">Published</h5>
                                 <div id="groupby-published" class="btn-group special">
-                                    <button class="btn btn-grey active">
-                                        <span> All Published</span>
+                                    <button class="btn btn-grey check_published active" value="">
+                                        <span>All</span>
                                     </button>
-                                    <button class="btn btn-grey">
+                                    <button class="btn btn-grey check_published" value="1">
+                                        <span>Published</span>
+                                    </button>
+                                    <button class="btn btn-grey check_published" value="2">
                                         <span> No Published </span>
                                     </button>
                                 </div>
@@ -276,6 +279,12 @@ Highcharts.setOptions({
     var count_page = -1;
     var isDateSearch = 0;
     var datatable = [];
+    var check_published = null;
+
+    $(".check_published").click(function() {
+        check_published = $(this).val();
+   
+    });
 
   $(function() {
     var chart = new Highcharts.chart('chart-pack', {
@@ -348,6 +357,8 @@ Highcharts.setOptions({
             start_date = startDate;
             end_date = endDate;
             event_name = $("#event_name").val();
+            
+      
             search_table(1);
         });
 
@@ -527,6 +538,7 @@ Highcharts.setOptions({
                     d.f_search = f_search;
                     d.keywords = event_name;
                     d.isDateSearch = isDateSearch;
+                    d.check_published = check_published;
                 }
             },
             initComplete : function( settings, json){

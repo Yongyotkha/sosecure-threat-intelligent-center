@@ -1579,7 +1579,7 @@ class IndicatorsController extends Controller
     //         ];
 
         
-        if($request->keywords||$request->isDateSearch||$request->start_date||$request->end_date)
+        if($request->keywords||$request->isDateSearch||$request->start_date||$request->end_date||$request->check_published)
        {
            
             if ($request->keywords) {
@@ -1599,6 +1599,14 @@ class IndicatorsController extends Controller
                 }else if($request->endDate){
                     $query['modified'] = ['$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
                     // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                }
+            }
+
+            if ($request->check_published) {
+                if($request->check_published==1){
+                    $query['public'] = 1;
+                }else if($request->check_published==2){
+                    $query['public'] = 0;
                 }
             }
             $cursor = $col_fx_otx_events->find($query,$options);

@@ -267,6 +267,12 @@ class RSSFeedSettingsController extends Controller
 
 
     public function tableNews(Request $request){
+
+        // if($request->status_news){
+        //     dd($request->status_news);
+        // }else{
+            
+        // }
         // if($request -> keywords || $request -> public_date || $request -> status !== "null" || $request -> source){
         //     $model = TransactionRssData::where('status', 1);
         //     if($request -> keywords){
@@ -299,7 +305,7 @@ class RSSFeedSettingsController extends Controller
         //     $model = TransactionRssData::all();
         // }
 
-        if(($request -> keywords || $request -> startDate || $request -> endDate || $request -> status_news || $request -> news_source || $request -> news_category) && $request -> search_val == true){
+        if(($request -> keywords || $request -> startDate || $request -> endDate || $request -> status_news || $request -> news_source || $request -> news_category) && $request -> search_val == 1){
             $model = RSSNews::where('status', 1);
             if($request -> keywords){
                 $model_where = RSSNews::where('status', 1)->where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
@@ -318,7 +324,7 @@ class RSSFeedSettingsController extends Controller
             //     $model -> whereBetween('created_at',array($start_date,$end_date));
             // }
 
-            if($request -> startDate){
+            if($request -> isDateSearch == 1){
                 $date_start = $request->startDate;
                 $date_end = $request->endDate;
 
@@ -364,6 +370,7 @@ class RSSFeedSettingsController extends Controller
                 // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
                 $model -> whereIn('source', $request -> news_source);
             }
+
             if($request -> news_category){
                 $news_cate_id = $request -> news_category;
                 // CategorySettings::where("code",)->first();
@@ -383,6 +390,7 @@ class RSSFeedSettingsController extends Controller
             }
             $model -> get();
         }else{
+            // dd($request->search_val);
             $model = RSSNews::all();
         }
 

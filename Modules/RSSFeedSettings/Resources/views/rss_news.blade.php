@@ -137,10 +137,10 @@
                                     <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Group By</h5>
                                         <div id="groupby-btn" class="btn-group special">
-                                            <button id="source_btn" class="btn btn-grey active">
+                                            <button id="source_btn" class="btn btn-grey check_group_by active">
                                                 <span> Source </span>
                                             </button>
-                                            <button id="category_btn" class="btn btn-grey">
+                                            <button id="category_btn" class="btn btn-grey check_group_by">
                                                 <span> Category </span>
                                             </button>
                                         </div>
@@ -149,13 +149,13 @@
                                     <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
-                                            <button class="btn btn-grey active">
+                                            <button class="btn btn-grey check_status active" id="all" value="">
                                                 <span> All </span>
                                             </button>
-                                            <button class="btn btn-grey">
+                                            <button class="btn btn-grey check_status" value="1">
                                                 <span> Active </span>
                                             </button>
-                                            <button class="btn btn-grey">
+                                            <button class="btn btn-grey check_status" value="2">
                                                 <span> Inactive </span>
                                             </button>
                                         </div>
@@ -317,31 +317,45 @@
 
     $(function(){
         if($('#source_btn').hasClass('active')){
+            
             $('#source_search').show();
             $('#category_search').hide();
+            
         } else if($('#category_btn').hasClass('active')){
+            
             $('#category_search').show();
             $('#source_search').hide();
+            
         }
     });
    
     $('#source_btn').on('click',function(){
+  
         if($('#source_btn').hasClass('active')){
             $('#source_search').show();
             $('#category_search').hide();
+            $("#news_category").val('').trigger("change");
         }
+        
     });
 
     $('#category_btn').on('click',function(){
+
         if($('#category_btn').hasClass('active')){
             $('#category_search').show();
             $('#source_search').hide();
+            $("#news_source").val('').trigger("change");
         }
+    });
+
+    $(".check_status").click(function() {
+        status_news = $(this).val();
+   
     });
      
 
 
-    var search_val = false;
+    var search_val = 0;
     var keywords = null;
     var start_date = null;
     var end_date = null;
@@ -350,33 +364,88 @@
     var news_category = null;
     var startDate = null;
     var endDate = null;
+    var isDateSearch = null;
     function search(){
-        search_val = true;
+        search_val = 1;
         keywords = $('#keywords').val();
         start_date = $('#start_date').val();
         end_date = $('#end_date').val();
-        status_news = $('#status_news').val();
+   
         news_source = $('#news_source').val();
         news_category = $('#news_category').val();
         startDate =  $("#date_srange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#date_srange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        console.log(start_date);
+        {{--console.log(startDate);
         console.log(status_news);
         console.log(news_source);
         console.log(news_category);
+        console.log(keywords);--}}
         datatable();
     }
 
-        $("#btn_rss_news_reset").click(function() {
-            search_val = false;
+    $(function() {
+    
+    var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
+    var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
+
+    function cb(start, end) {
+        $('#date_srange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+
+    }
+
+    $('#date_srange').daterangepicker({
+        timePicker: true,
+        {{--timePicker24Hour: true,--}}
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'{{--format: 'M/DD HH:mm A'--}}
+        },
+        ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+    $('#date_srange').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+            
+        }
+    });
+
+    cb(start, end);
+
+    $("#btn_rss_news_reset").click(function() {
+            
+            search_val = 0;
+            status_news = null;
             $("#keywords").val('');
             $("#start_date").val('');
             $("#end_date").val('');
-            $("#status_news").val('').trigger("change");
-            $("#news_source").val('');
-            $("#news_category").val('');
+            $("#news_source").val('').trigger("change");
+            $("#news_category").val('').trigger("change");
+            $('.check_group_by').removeClass('active');
+            $('#source_btn').addClass('active');
+            $('.check_status').removeClass('active');
+            $('#all').addClass('active');
+            $('#source_search').show();
+            $('#category_search').hide();
+            start = moment();
+            end = moment();
+            cb(start, end);
+            isDateSearch = null;
+            
             datatable();
         });
+
+});
+
+        
 
 
     function change_news_active(code) {
@@ -491,6 +560,7 @@ $(function() {
             processing: true,
             serverSide: true,
             destroy: true,
+            order: [[ 5, "desc" ]]
             ajax: {
                 {{--contentType: "application/json",
                 dataType: 'JSON',--}}
@@ -498,14 +568,13 @@ $(function() {
                 url: '{!! route('rssfeedsettings.rss_news_table') !!}',
                 data: function ( d ) {
                     d.keywords = keywords;
-                    d.start_date = start_date;
-                    d.end_date = end_date;
                     d.status_news = status_news;
                     d.news_source = news_source;
                     d.news_category = news_category;
                     d.search_val = search_val;
                     d.startDate = startDate;
                     d.endDate = endDate;
+                    d.isDateSearch = isDateSearch;
                     {{--return JSON.stringify( d );--}}
                     return d;
 
@@ -605,7 +674,7 @@ $(document).ready(function(){
         });
 
         $('#news_source').select2({
-            allowClear: true,
+            allowClear: false,
             tags: true,
             width: '100%',
             ajax: {
@@ -628,7 +697,7 @@ $(document).ready(function(){
                             return {
                                 text: item.name,
                                 id: item.name,
-                                value: item.name
+                                value: item.id
                             }
                         })
                     };
@@ -753,37 +822,7 @@ $(document).ready(function(){
     }
 
 
-    $(function() {
-    
-        var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
-        var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
 
-        function cb(start, end) {
-            $('#date_srange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            console.log(start.format('YYYY-MM-DD hh:mm A'));
-        }
-
-        $('#date_srange').daterangepicker({
-            timePicker: true,
-            {{--timePicker24Hour: true,--}}
-            startDate: start,
-            endDate: end,
-            locale: {
-                format: 'M/DD hh:mm A'{{--format: 'M/DD HH:mm A'--}}
-            },
-            ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        }, cb);
-
-        cb(start, end);
-
-    });
 </script>
 @endpush
 @endsection
