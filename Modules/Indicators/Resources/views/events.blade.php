@@ -14,7 +14,7 @@
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
             {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-            <div class="pull-right" style="margin-top: 8px;min-width: 270px;">
+            <div class="pull-right" style="margin-top: 9px;min-width: 270px;">
                 <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
                     <option value="">All Site</option>
                     @if($SiteSettings)
@@ -42,7 +42,7 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-1">
                                 <h5 class="font-weight-bold">Event Name</h5>
                                 <input type="text" class="form-control" name="event_name" id="event_name"  placeholder="Search">
                             </div>
@@ -64,7 +64,7 @@
                                     </select>
                                 </div>
                             </div>-->
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-1">
                                 <h5 class="font-weight-bold">Date</h5>
                                 <div id="event_date" class="text-center form-control"
                                     style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -74,7 +74,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-1">
                                 <h5 class="font-weight-bold">Published</h5>
                                 <div id="groupby-published" class="btn-group special">
                                     <button class="btn btn-grey check_published active" value="">
@@ -89,23 +89,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <button class="btn btn-info" id="btn_search_data">
-                                    <i class="fas fa-search btn-fz-13"></i>
-                                    <span> @langapp('apply') </span>
-                                </button>
-                                <button class="btn btn-default btn-fz-13" id="btn_reset">
-                                    <i class=" fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
-                                <button class="btn btn-default btn-fz-13" id="close_filter">
-                                    <i class=" fas fa-times"></i>
-                                    <span> Close </span>
-                                </button>
-                            </div>
-                        </div>
 
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button class="btn btn-info" id="btn_search_data">
+                                <i class="fas fa-search btn-fz-13"></i>
+                                <span> @langapp('apply') </span>
+                            </button>
+                            <button class="btn btn-default btn-fz-13" id="btn_reset">
+                                <i class=" fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                            <button class="btn btn-default btn-fz-13" id="close_filter">
+                                <i class=" fas fa-times"></i>
+                                <span> Close </span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>

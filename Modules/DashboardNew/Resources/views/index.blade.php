@@ -42,7 +42,7 @@
                                                         </div>
                                                     </div>
                                                 </a> --}}
-                                                <a href="{{route('assets.index')}}" target="_blank" data-toggle="modal" data-target="#modal_asset">
+                                                <a href="{{route('assets.index')}}" target="_blank">
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
@@ -478,7 +478,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('dashboardnew.table_dashboard')!!}',

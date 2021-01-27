@@ -64,13 +64,13 @@
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid" style="padding: 2rem;">
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-12 mb-1">
                                         <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="search" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Type</h5>
                                         <select id="type" class="form-control">
                                             <option value="">All</option>
@@ -93,7 +93,7 @@
                                             </div>
                                         </div>
                                     </div> --}}
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="datafeed_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-12 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <label class="mr-3">
                                             <input type="checkbox" name="check_all" id="check_all" value="TRUE">
@@ -118,21 +118,23 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-12 text-right mt-2">
-                                        <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive btn-fz-13" <!--onclick="table_social_data();-->">
-                                            <i class="fas fa-search"></i>
-                                            @langapp('apply')
-                                        </button>
-                                        <button type="button" id="btn_data_leak_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                            <i class="fas fa-broom"></i>
-                                            <span> Clear </span>
-                                        </button>
-                                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                            <i class="fas fa-times"></i>
-                                            <span> Close </span>
-                                        </button>
-                                    </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive btn-fz-13" <!--onclick="table_social_data();-->">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_data_leak_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -407,7 +409,7 @@ function table_social_data(){
         processing: true,
         serverSide: true,
         destroy: true,
-        "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
+        "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
         ajax: {
             url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
             data: {

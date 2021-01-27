@@ -215,7 +215,7 @@
 
     $(function () {
         $('#table_credentials').DataTable({
-            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
         });
 
         table_credentials();

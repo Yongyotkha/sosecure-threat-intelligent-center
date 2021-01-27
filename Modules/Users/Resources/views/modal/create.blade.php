@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-dialog-aside">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">@langapp('create')  </h4>
+            <div class="modal-header bg-blue">
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-white">@langapp('create')  </h4>
             </div>
     
     
@@ -21,7 +21,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>@langapp('username')  @required</label>
-                                <input type="text" name="username" class="form-control" placeholder="johndoe" required>
+                                <input type="text" name="username" class="form-control" placeholder="Username" required>
                             </div>
                             <div class="col-md-6">
                                 <label>@langapp('password')  </label>

@@ -379,7 +379,7 @@
             serverSide: true,
             destroy: true,
             order: [[ 4, "desc" ]],
-            "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('socialdatas.dark_web_datatables') !!}',
                 data: {
