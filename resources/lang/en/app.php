@@ -2,7 +2,7 @@
 
 return [
 
-    'Search_Advance'                            => 'Fillter',
+    'Search_Advance'                            => 'Filter',
     'Create_User'                               => 'Create User',
     'account_details'                            => 'Account Details',
     'activities'                                 => 'Activity Feed',
