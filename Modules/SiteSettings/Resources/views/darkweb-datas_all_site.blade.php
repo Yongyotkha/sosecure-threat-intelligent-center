@@ -61,7 +61,7 @@
                         @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
                         <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
                             class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                feed</span></a>
+                                Feed</span></a>
                         @endif
                         @endif
 
@@ -133,10 +133,7 @@
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid" style="padding: 2rem;">
                                 <div class="row">
-                                    <div class="col-lg-12 mb-1">
-                                        <h5 class="font-weight-bold">Content</h5>
-                                        <input type="text" id="keyword" class="form-control">
-                                    </div>
+
                                     {{-- <div class="col-md-4 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source" class="select2-option form-control">
@@ -147,6 +144,10 @@
                                             <option value="server">Server</option>
                                         </select>
                                     </div> --}}
+                                    <div class="col-lg-4 mb-1">
+                                        <h5 class="font-weight-bold">Content</h5>
+                                        <input type="text" id="keyword" class="form-control">
+                                    </div>
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="social_datas_date" class="form-control text-center"

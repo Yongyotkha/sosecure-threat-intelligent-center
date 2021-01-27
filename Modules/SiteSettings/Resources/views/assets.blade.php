@@ -32,7 +32,7 @@
                     @icon('solid/arrow-left')
                     </a> --}}
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                    <div class="bc-head">Site Setting &gt; > @langapp('assets')</div>
+                    <div class="bc-head">Site Setting &gt; @langapp('assets')</div>
 
                     <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
@@ -50,79 +50,84 @@
 
                 <section class="scrollable wrapper">
 
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div id="hide-advance-search" class="panel panel-default container-fluid" style="padding: 2rem;display:none;">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <div class="form-group m-b-md">
-                                            <label for="" class="">Keyword</label>
-                                            <input type="text" class="form-control" name="keyword" placeholder="Search">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="" class="">Datatype Type</label>
-                                            <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                                                <option value="1">All</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fas fa-filter"></i> Filter
                                 </div>
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
+                            <div class="container-fluid">
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group m-b-md">
-                                            <label for="" class="">Referent</label>
-                                            <input type="text" class="form-control" name="keyword" placeholder="">
-                                        </div>
+                                    <div class="col-md-4 mb-1">
+                                        <h5 class="font-weight-bold">Keyword</h5>
+                                        <input type="text" class="form-control" name="keyword" placeholder="Search">
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group m-b-md">
-                                            <label for="" class="d-block">&nbsp;</label>
-                                            <button class="btn btn-info btn-fz-13">
-                                                <i class="fas fa-search"></i>
-                                                <span> @langapp('apply') </span>
-                                            </button>
-                                            <button class="btn btn-default btn-fz-13">
-                                                <i class="fas fa-broom"></i>
-                                                <span> Clear </span>
-                                            </button>
-                                        </div>
+                                    <div class="col-md-4 mb-1">
+                                        <h5 class="font-weight-bold">Data Type</h5>
+                                        <select name="" id="datatype" class="form-control" multiple="multiple">
+                                            <option value="1">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-1">
+                                        <h5 class="font-weight-bold">Referent</h5>
+                                        <input type="text" class="form-control" name="keyword">
                                     </div>
                                 </div>
                             </div>
-
-                            <section class="panel panel-default">
-                                <header class="panel-heading font-bold panel-header-blue">
-                                    <div class="row">
-                                        <div class="col-xs-12">
-                                            <i class="fas fa-table"></i> Table Assets
-                                        </div>
-                                    </div>
-                                </header>
-                                <div class="panel-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped" id="table-assets-data">
-                                            <thead>
-                                                <tr>
-                                                    <th class="no-sort" style="width: 12px">
-                                                        <label>
-                                                            <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
-                                                            <span class="label-text"></span>
-                                                        </label>
-                                                    </th>                                      
-                                                    <th>Asset</th>
-                                                    <th>Referent</th>
-                                                    <th style="width: 20px" class="text-center">Status</th>
-                                                    <th style="width: 20px" class="text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                </div>
-                            </section>
                         </div>
-                    </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                        onclick="search()">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                        style="white-space: nowrap" onclick="clear_search()">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="panel panel-default">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Assets
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="table-assets-data">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort" style="width: 12px">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>                                      
+                                            <th>Asset</th>
+                                            <th>Referent</th>
+                                            <th style="width: 20px" class="text-center">Status</th>
+                                            <th style="width: 20px" class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
                 </section>
             </section>
         </aside>
@@ -273,12 +278,6 @@
         $('#datatype').select2();
         $('#source').select2();
 
-        $('.select2').select2();
-
-        $('.hide-fillter').hide();
-        $('#fillter-advance').click(function(){
-            $('.hide-fillter').toggle();
-        });
     });
 
     $(function () {

@@ -120,7 +120,7 @@
                             <div class="container-fluid" style="padding: 2rem;">
 
                                 <div class="row">
-                                    <div class="col-lg-12 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Title</h5>
                                         <input type="text" class="form-control" name="keywords" id="keywords">
                                     </div>
@@ -135,12 +135,24 @@
                                     </div>
 
                                     <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Group By</h5>
-                                        <div id="groupby-btn" class="btn-group special">
-                                            <button id="source_all" class="btn btn-grey active">
+                                        <h5 class="font-weight-bold">Status</h5>
+                                        <div id="groupby-status" class="btn-group special">
+                                            <button class="btn btn-grey check_status active" id="all" value="">
                                                 <span> All </span>
                                             </button>
-                                            <button id="source_btn" class="btn btn-grey check_group_by">
+                                            <button class="btn btn-grey check_status" value="1">
+                                                <span> Active </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="2">
+                                                <span> Inactive </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-4 mb-1">
+                                        <h5 class="font-weight-bold">Filter By</h5>
+                                        <div id="groupby-btn" class="btn-group special">
+                                            <button id="source_btn" class="btn btn-grey check_group_by active">
                                                 <span> Source </span>
                                             </button>
                                             <button id="category_btn" class="btn btn-grey check_group_by">
@@ -165,20 +177,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Status</h5>
-                                        <div id="groupby-status" class="btn-group special">
-                                            <button class="btn btn-grey check_status active" id="all" value="">
-                                                <span> All </span>
-                                            </button>
-                                            <button class="btn btn-grey check_status" value="1">
-                                                <span> Active </span>
-                                            </button>
-                                            <button class="btn btn-grey check_status" value="2">
-                                                <span> Inactive </span>
-                                            </button>
-                                        </div>
-                                    </div>
+
 
                                 </div>
                                 <!-- ของเดิม
@@ -345,17 +344,6 @@
         }
     });
 
-    $('#source_all').on('click',function(){
-
-    if($('#source_all').hasClass('active')){
-            $('#category_search').hide();
-            $('#source_search').hide();
-            $("#news_source").val('').trigger("change");
-            $("#news_category").val('').trigger("change");
-        }
-    });
-
-
     $(".check_status").click(function() {
         status_news = $(this).val();
    
@@ -438,11 +426,10 @@
             $("#news_source").val('').trigger("change");
             $("#news_category").val('').trigger("change");
             $('.check_group_by').removeClass('active');
-            $('#source_all').addClass('active');
-            $('#source_btn').removeClass('active');
+            $('#source_btn').addClass('active');
             $('.check_status').removeClass('active');
             $('#all').addClass('active');
-            $('#source_search').hide();
+            $('#source_search').show();
             $('#category_search').hide();
             start = moment();
             end = moment();

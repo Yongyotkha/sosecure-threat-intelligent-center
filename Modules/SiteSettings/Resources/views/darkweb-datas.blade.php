@@ -49,42 +49,46 @@
                                 </div>
                         </header>
                         <div class="panel-body" style="padding: 0 !important">
-                            <div class="container-fluid" style="padding: 2rem;">
+                            <div class="container-fluid">
                                 <div class="row m-b-md">
-                                    <div class="col-lg-12">
-                                        <div class="row d-flex align-items-center">
-                                            <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                            <div class="col-sm-11 col-xs-12">
-                                                <input type="text" id="search" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-lg-4">
-                                        <div class="row d-flex align-items-center">
-                                            <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
-                                            <div class="col-sm-9 col-xs-12">
-                                                <select id="source_select" class="form-control">
-                                                    <option value="">All</option>
-                                                    @if($DataLeakSocial)
-                                                    @foreach($DataLeakSocial as $DataLeakSocial_val)
-                                                    <option value="{{$DataLeakSocial_val->id}}">
-                                                        {{$DataLeakSocial_val->source}}</option>
-                                                    @endforeach
-                                                    @endif
-                                                </select>
-                                            </div>
-                                        </div>
+                                        <h5 class="font-weight-bold">Search</h5>
+                                        <input type="text" id="search" class="form-control">
                                     </div>
-                                    <div class="col-lg-4 text-center">
-                                        <div id="social_datas_date"
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Source</h5>
+                                        <select id="source_select" class="form-control">
+                                            <option value="">All</option>
+                                            @if($DataLeakSocial)
+                                            @foreach($DataLeakSocial as $DataLeakSocial_val)
+                                            <option value="{{$DataLeakSocial_val->id}}">
+                                                {{$DataLeakSocial_val->source}}</option>
+                                            @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Date</h5>
+                                        <div id="social_datas_date" class="text-center"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
                                             <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
-                                    <div class="col-lg-4 text-center">
+                                    <div class="col-lg-4 mb-1">
+                                        <h5 class="font-weight-bold">Status</h5>
+                                        <div id="groupby-status" class="btn-group special">
+                                            <button class="btn btn-grey check_status active" id="all" value="">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="1">
+                                                <span> Panding </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="2">
+                                                <span> Approved </span>
+                                            </button>
+                                        </div>
+                                        <!--
                                         <div style="margin-top: 8px;">
                                             <label class="mr-3">
                                                 <input type="checkbox" name="check_all" id="check_all" value="TRUE">
@@ -100,21 +104,29 @@
                                                 <span class="label-text" style="font-size: 16px;">Approved</span>
                                             </label>
                                         </div>
+                                        -->
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-12 text-right mt-2">
-                                        <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive btn-fz-13"
-                                            <!--onclick="table_social_data();-->">
-                                            <i class="fas fa-search"></i>
-                                            @langapp('apply')
-                                        </button>
-                                        <button type="button" id="btn_data_leak_reset"
-                                            class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                            <i class="fas fa-broom"></i>
-                                            <span> Clear </span>
-                                        </button>
-                                    </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" id="btn_data_leak_search" class="btn btn-info btn-responsive btn-fz-13"
+                                        <!--onclick="table_social_data();-->">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_data_leak_reset"
+                                        class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter"
+                                        class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -123,7 +135,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Dataleak Feed
+                                    <i class="fas fa-table"></i> Table Data Leak Feed
                                 </div>
                             </div>
                         </header>
@@ -332,7 +344,11 @@
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
+@include('stacks.js.activebutton')
+
 <script>
+
+active_btn('#groupby-status .btn-grey');
 
     var search_val = 0;
     var start_date = '';

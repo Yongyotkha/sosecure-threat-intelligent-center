@@ -35,7 +35,7 @@
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
                         style="margin-top: 0;display: none">@icon('solid/bars')</a>
-                    <div class="bc-head">Web Server </div>
+                    <div class="bc-head">Site Settings > Web Server </div>
 
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right"
                         value="bulk-delete" disabled>

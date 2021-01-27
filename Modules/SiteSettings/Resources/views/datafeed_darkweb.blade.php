@@ -37,7 +37,7 @@
                         {{-- // var_dump(get_role_custom()['superadmin']);
                         // var_dump(get_role_custom()['site_admin']); --}}
                         @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise data</span></a>
+                            <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise Data</span></a>
                         @endif
                     @endif
 
@@ -70,16 +70,15 @@
                                 <div class="col-md-12">
                                     <i class="fas fa-filter"></i> Filter
                                 </div>
+                            </div>
                         </header>
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid" style="padding: 2rem;">
                                 <div class="row">
-                                    <div class="col-lg-12 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="search" class="form-control">
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source_select" class="form-control">
@@ -98,6 +97,7 @@
                                             <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
+                                    <!--
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <label class="mr-3">
@@ -113,6 +113,21 @@
                                             <span class="label-text" style="font-size: 16px;">Approved</span>
                                         </label>
                                     </div>
+                                     -->
+                                    <div class="col-lg-4 mb-1">
+                                        <h5 class="font-weight-bold">Status</h5>
+                                        <div id="groupby-status" class="btn-group special">
+                                            <button class="btn btn-grey check_status active" id="all" value="">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="1">
+                                                <span> Panding </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="2">
+                                                <span> Approved </span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-12 text-right mt-2">
@@ -123,6 +138,10 @@
                                         <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                             <i class="fas fa-broom"></i>
                                             <span> Clear </span>
+                                        </button>
+                                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                            <i class="fas fa-times"></i>
+                                            <span> Close </span>
                                         </button>
                                     </div>
                                 </div>
@@ -337,7 +356,11 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
 @include('scripts.summernote')
+@include('stacks.js.activebutton')
+
 <script>
+
+active_btn('#groupby-status .btn-grey');
 
 var search_val = 0;
     var keywords = null;

@@ -8,15 +8,15 @@
         {!! Form::open(['route' => ['keyword.save',$code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => false]) !!}
         <div class="modal-body">
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
-                <div class="col-lg-8">
+                <label class="col-lg-2 control-label">Name <span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
                     <input type="text" name="name" class="form-control">
                 </div>
             </div>
 
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Type <span class="text-danger">*</span> </label>
-                <div class="col-lg-8">
+                <label class="col-lg-2 control-label">Type <span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
                     <select name="type[]" id="type" class="select2-option form-control "  multiple="multiple" style="min-width: 300px;">
                         <option  value="social">Social</option>
                         <option  value="darkweb">Dark Web</option>
@@ -26,8 +26,8 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Status </label>
-                <div class="col-lg-8">
+                <label class="col-lg-2 control-label">Status </label>
+                <div class="col-lg-10">
                     <label class="switch">
                         <input type="checkbox" name="status" checked value="TRUE">
                         <span></span>

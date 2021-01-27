@@ -34,45 +34,47 @@
                 </header>
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                        <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
-                                <div class="col-lg-12">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                        <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="search" class="form-control">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-filter"></i> Filter
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="container-fluid">
+                                <div class="row m-b-md">
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Search</h5>
+                                        <input type="text" id="search" class="form-control">
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Source</h5>
+                                        <select id="source" class="select2-option form-control">
+                                            <option value="1" selected>All</option>
+                                            @if ($source)
+
+                                            @foreach ($source as $source)
+                                            <option value="{{$source->id}}">{{$source->source}}
+                                            </option>
+                                            @endforeach
+
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Date</h5>
+                                        <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            <i class="fa fa-calendar"></i>&nbsp;
+                                            <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="panel-footer">
                             <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Source</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="source" class="select2-option form-control">
-                                                <option value="1" selected>All</option>
-                                                @if ($source)
-
-                                                @foreach ($source as $source)
-                                                <option value="{{$source->id}}">{{$source->source}}
-                                                </option>
-                                                @endforeach
-
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 text-center">
-                                    <div id="social_datas_date" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right mt-2">
+                                <div class="col-lg-12 text-right">
                                     <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="table_social_data(1)">
                                         <i class="fas fa-search"></i>
                                         @langapp('apply')
@@ -81,6 +83,10 @@
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
                                     </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -88,63 +94,72 @@
 
                     
                     <section class="panel panel-default">
-                        <div class="table-responsive">
-                            <table  class="table table-striped" id="table_social_datas">
-                                <thead>
-                                    <tr>
-                                        <th class="no-sort w-10">
-                                            <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </th>
-                                        <th width="15%">Keyword Ref</th>
-                                        <th>Content</th>
-                                        <th width="10%">Feed Type</th>
-                                        <th width="10%">Data Feed</th>
-                                        <th width="3%">View</th>
-                                        <th width="5%">Status</th>
-                                        <th class="no-sort" width="5%">@langapp('action')</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- <tr>
-                                        <td>
-                                            <label>
-                                                <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                <span class="label-text"></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            Pantip
-                                        </td>
-                                        <td>
-                                            Fibre
-                                        </td>
-                                        <td>
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                        </td>
-                                        <td class="no-wrap">
-                                            2020-12-2020 12:12
-                                        </td>
-                                        <td>
-                                            1
-                                        </td>
-                                        <td>
-                                            <label class="switch">
-                                                <input type="hidden" value="FALSE" name="">
-                                                <input type="checkbox" name="status" checked value="TRUE">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                        <td class="no-wrap text-center">
-                                            <button class="btn btn-danger btn-xs">
-                                                @icon('solid/trash-alt')
-                                            </button>
-                                        </td>
-                                    </tr> --}}
-                                </tbody>
-                            </table>
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Data Leak Data
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table  class="table table-striped" id="table_social_datas">
+                                    <thead>
+                                        <tr>
+                                            <th class="no-sort w-10">
+                                                <label>
+                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </th>
+                                            <th width="15%">Keyword Ref</th>
+                                            <th>Content</th>
+                                            <th width="10%">Feed Type</th>
+                                            <th width="10%">Data Feed</th>
+                                            <th width="3%">View</th>
+                                            <th width="5%">Status</th>
+                                            <th class="no-sort" width="5%">@langapp('action')</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{-- <tr>
+                                            <td>
+                                                <label>
+                                                    <input name="select_all" value="1" type="checkbox" class="select-chk"/>
+                                                    <span class="label-text"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                Pantip
+                                            </td>
+                                            <td>
+                                                Fibre
+                                            </td>
+                                            <td>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
+                                            </td>
+                                            <td class="no-wrap">
+                                                2020-12-2020 12:12
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                <label class="switch">
+                                                    <input type="hidden" value="FALSE" name="">
+                                                    <input type="checkbox" name="status" checked value="TRUE">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                            <td class="no-wrap text-center">
+                                                <button class="btn btn-danger btn-xs">
+                                                    @icon('solid/trash-alt')
+                                                </button>
+                                            </td>
+                                        </tr> --}}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </section>
