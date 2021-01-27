@@ -3,7 +3,7 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            <div class="bc-head">Events cvbdfb</div>
+            <div class="bc-head">Events</div>
 
             {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
             <span>@langapp('Search_Advance')</span>
