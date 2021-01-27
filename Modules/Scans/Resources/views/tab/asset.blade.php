@@ -18,7 +18,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row pull-right" >
+                <div class="row pull-right">
                     <div class="col-md-12">
                         <div class="form-group m-b-md">
                             <label for="" class="d-block">&nbsp;</label>
@@ -43,10 +43,11 @@
                         <tr>
                             <th class="no-sort" style="width: 12px">
                                 <label>
-                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                    <input name="select_all" value="1" id="select-all" type="checkbox"
+                                        class="select-chk" />
                                     <span class="label-text"></span>
                                 </label>
-                            </th>  
+                            </th>
                             <th>Asset</th>
                             <th>Referent</th>
                             <th style="width: 20px" class="text-center">Status</th>
@@ -106,6 +107,29 @@
         </div>
     </div>
 
+    <div class="modal" id="delete_asset" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
+        style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning') </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                            class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit"
+                        onclick="delete_asset_save()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </header>
 
 @push('pagestyle')
@@ -131,53 +155,46 @@
         }
     });
 
+    var del_val = [];
     $("#btn_del_select").click(function() {
-        let del_val = [];
+        
+        $('#delete_asset').modal('show');
         $('.asset_id:checked').each(function () {
             del_val.push(this.value);
         });
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('scans.delete_assets') }}",
-                    data:{
-                        asset_id: del_val,
-                        page: 'scan'
-                    },
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                    success:function(response) {
-                        loading('stop_load');
-                        toastr.success(response.message, '@langapp('response_status')');
-                        window.location.href = response.redirect;
-                    },
-                    error: function (error){
-                        loading('stop_load');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-                
-                });
-
-            }
-        })
     });
+
+    function delete_asset_save(){
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('scans.delete_assets') }}",
+            data:{
+                asset_id: del_val,
+                page: 'scan'
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        
+        });
+      
+    }
+
     $(function () {
         $('#table-scans-data-assets').DataTable({
             processing: true,
@@ -220,6 +237,7 @@
             ],
         });
     });
+
     var number_rows = 0; 
     var number_add_rows = 0;
     var number_tbody_rows = 0;
