@@ -13,6 +13,7 @@
 Route::group(
     ['middleware' => 'web', 'prefix' => 'assets'],
     function () {
+        Route::get('all', 'AssetsController@index_all_asset')->name('assets.index_setting')->middleware('can:menu_items');
         Route::get('/', 'AssetsController@index')->name('assets.index')->middleware('can:menu_items');
         Route::post('table_asset', 'AssetsController@table_asset')->name('assets.table_asset')->middleware('can:menu_items');
         // Modal
