@@ -162,7 +162,7 @@
                                     <h5 class="font-weight-bold">Group By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">
                                         <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
-                                            <span> Domain </span>
+                                            <span> Host </span>
                                         </button>
                                         <button class="btn btn-grey" onclick="selectGroupBy('ip')">
                                             <span> IP </span>
@@ -265,77 +265,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                   
-                                    <!-- ปล. เมื่อมีการเพิ่ม ให้ rowspan ++ -->
-                                    <tr>
-                                        <td rowspan="4">บริษัท เมจิก</td>
-                                        <td rowspan="4">mtsc.co.th</td>
-                                        <td rowspan="4">104.24.14.205</td>
-                                        <td>Microsoft</td>
-                                        <td>Windows_10</td>
-                                        <td>r2</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
-                                        </td>
-                                        <td><span class="badge badge-success">Active</span></td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <!-- ตัวอย่างเวลา rowspan แถวต่อไป ไม่ต้องเอาค่า 3 อันแรกมาแสดง ถ้าเพิ่มใน rowspan ทำแบบนี้ไปเรื่อยๆ แล้วให้ rowspan ด้านบน ++ -->    
-                                        <td>Microsoft</td>
-                                        <td>Windows_10</td>
-                                        <td>r2</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
-                                        </td>
-                                        <td><span class="badge badge-success">Active</span></td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <!-- ตัวอย่างเวลา rowspan แถวต่อไป ไม่ต้องเอาค่า 3 อันแรกมาแสดง ถ้าเพิ่มใน rowspan ทำแบบนี้ไปเรื่อยๆ แล้วให้ rowspan ด้านบน ++ -->    
-                                        <td>Microsoft</td>
-                                        <td>Windows_10</td>
-                                        <td>r2</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
-                                        </td>
-                                        <td><span class="badge badge-success">Active</span></td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <!-- ตัวอย่างเวลา rowspan แถวต่อไป ไม่ต้องเอาค่า 3 อันแรกมาแสดง ถ้าเพิ่มใน rowspan ทำแบบนี้ไปเรื่อยๆ แล้วให้ rowspan ด้านบน ++ -->    
-                                        <td>Microsoft</td>
-                                        <td>Windows_10</td>
-                                        <td>r2</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
-                                        </td>
-                                        <td><span class="badge badge-success">Active</span></td>
-                                        <td>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
-                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
-                                        </td>
-                                    </tr>
-
-                                    <!-- ถ้าคนล่ะ Site ก็เพิ่มเหมือนเดิมแล้ว rowspan ++ เหมือนเดิมครับ -->
                                     <tr>
                                         <td rowspan="2">บริษัท เมจิก</td>
                                         <td rowspan="2">mtsc.co.th</td>
@@ -355,6 +284,45 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td class="d-none">บริษัท เมจิก</td>
+                                        <td class="d-none">mtsc.co.th</td>
+                                        <td class="d-none">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">บริษัท เมจิก</td>
+                                        <td rowspan="2">mtsc.co.th</td>
+                                        <td rowspan="2">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="d-none">บริษัท เมจิก</td>
+                                        <td class="d-none">mtsc.co.th</td>
+                                        <td class="d-none">104.24.14.205</td>
                                         <td>Microsoft</td>
                                         <td>Windows_10</td>
                                         <td>r2</td>
@@ -644,6 +612,7 @@
                 type: "POST",
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
+                    d.menu = "{{$menu}}"
                 }
             },
             initComplete : function( settings, json){
