@@ -16,6 +16,7 @@ use Modules\Assets\Entities\OSType;
 use Auth;
 use Modules\Users\Entities\UserSite;
 use App\TransactionTimeStampScans;
+
 class AssetsController extends Controller
 {
     /**
@@ -76,6 +77,8 @@ class AssetsController extends Controller
             $data['Search_Link_All'] = "";
         }
         
+
+
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('assets');
         return view('assets::index')->with($data);
@@ -151,6 +154,37 @@ class AssetsController extends Controller
 
 
         return view('assets::modal.add_cpe')->with($data);
+    }
+
+    public function assets_redirect_add(Request $request)
+    {
+        if(Auth::check()) {
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+        $data['SiteSettings'] = $SiteSettings;
+        return view('assets::modal.redirect_add')->with($data);
     }
 
     public function web_server_add_user(Request $request)
@@ -316,8 +350,10 @@ class AssetsController extends Controller
             }
 
         }
-
         $dataOut["data"] =  $Assets_list;
+        $dataOut["countAssets"] = AssetsData::where('data_type_id', 5)->orWhere('data_type_id', 6)->where('status', 1)->count();
+        $dataOut["countWindows"] = CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
+        $dataOut["countLinux"] = CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
         return response()->json($dataOut);
     }
     public function assets_add_data(Request $request)
