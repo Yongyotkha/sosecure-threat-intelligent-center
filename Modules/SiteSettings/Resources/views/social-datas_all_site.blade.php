@@ -144,13 +144,13 @@
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Type</h5>
                                     <div id="groupby-type" class="btn-group special">
-                                        <button class="btn btn-grey active">
+                                        <button class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey">
+                                        <button class="btn btn-grey" value="social">
                                             <span> Public </span>
                                         </button>
-                                        <button class="btn btn-grey">
+                                        <button class="btn btn-grey" value="darkweb_public">
                                             <span> Darkweb </span>
                                         </button>
                                     </div>
@@ -464,6 +464,11 @@ active_btn('#groupby-type .btn-grey');
         get_count();
     });
 
+    $(".btn-grey").click(function() {
+        check_type = $(this).val();
+   
+    });
+
     function search(){
         search_val = 1;
         keywords = $('#keyword').val();
@@ -472,7 +477,7 @@ active_btn('#groupby-type .btn-grey');
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-
+      
         table_social_data();
         get_count();
     }
@@ -498,6 +503,7 @@ active_btn('#groupby-type .btn-grey');
                         d.startDate = startDate;
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
+                        d.check_type = check_type;
 
                         return d;
                 },
@@ -792,7 +798,9 @@ active_btn('#groupby-type .btn-grey');
                 search_val : search_val,
                 startDate : startDate,
                 endDate : endDate,
-                isDateSearch : isDateSearch
+                isDateSearch : isDateSearch,
+                check_type : check_type,
+                
             }),
             beforeSend: function(){
                 loading('load');

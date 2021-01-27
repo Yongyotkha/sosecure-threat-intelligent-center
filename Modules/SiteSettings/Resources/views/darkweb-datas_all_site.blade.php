@@ -158,16 +158,16 @@
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Type</h5>
                                         <div id="groupby-type" class="btn-group special">
-                                            <button class="btn btn-grey active">
+                                            <button class="btn btn-grey active" value="">
                                                 <span> All</span>
                                             </button>
-                                            <button class="btn btn-grey">
+                                            <button class="btn btn-grey" value="public">
                                                 <span> Public </span>
                                             </button>
-                                            <button class="btn btn-grey">
+                                            <button class="btn btn-grey" value="darkweb">
                                                 <span> Darkweb </span>
                                             </button>
-                                            <button class="btn btn-grey">
+                                            <button class="btn btn-grey" value="webserver">
                                                 <span> Web Server </span>
                                             </button>
                                         </div>
@@ -399,6 +399,7 @@ active_btn('#groupby-type .btn-grey');
     var isDateSearch = null;
     var val_id = [];
     var f_search = 0;
+    check_type = null;
 
     $('#table_social_datas').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
@@ -433,6 +434,11 @@ active_btn('#groupby-type .btn-grey');
         get_count();
     });
 
+    $(".btn-grey").click(function() {
+        check_type = $(this).val();
+   
+    });
+
     function search(){
         search_val = true;
         keywords = $('#keyword').val();
@@ -440,7 +446,7 @@ active_btn('#groupby-type .btn-grey');
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        
+
         table_social_data();
         get_count();
     }
@@ -464,7 +470,8 @@ active_btn('#groupby-type .btn-grey');
                 startDate : startDate,
                 endDate : endDate,
                 isDateSearch : isDateSearch,
-                f_search : f_search
+                f_search : f_search,
+                check_type : check_type,
             }),
             beforeSend: function(){
                 loading('load');
@@ -510,6 +517,7 @@ active_btn('#groupby-type .btn-grey');
                         d.startDate = startDate;
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
+                        d.check_type = check_type;
 
                         return d;
                     },
