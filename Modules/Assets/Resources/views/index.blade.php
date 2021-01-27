@@ -22,7 +22,7 @@
 
                 <div class="button-control pull-right">
                     <div class="btn-group">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">@icon('solid/plus') Add</button>
+                        <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
                     </div>
 
                     <div class="btn-group d-none">
@@ -117,7 +117,7 @@
                                         <img src="{{asset('images/database.png')}}" alt="">
                                     </div>
                                     <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
-                                    <span class="number-card warning">0</span>
+                                    <span class="number-card warning" id="count_assets">0</span>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
                                         <img src="{{asset('images/windows.png')}}" alt="">
                                     </div>
                                     <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
-                                    <span class="number-card info">0</span>
+                                    <span class="number-card info" id="count_windows">0</span>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
                                         <img src="{{asset('images/linux.png')}}" alt="">
                                     </div>
                                     <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
-                                    <span class="number-card green">0</span>
+                                    <span class="number-card green" id="count_linux">0</span>
                                 </div>
                             </div>
                         </div>
@@ -326,20 +326,20 @@
     active_btn('#groupby-status .btn-grey');
 
     
-
+    
     $(document).ready(function () {
+        selectGroupByFirst();
+
         $('#source').select2();
         $('#select-site').select2();
-
         $('#groupby-select').select2();
-
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
 
         data_table();
-        selectGroupByFirst();
+        
     });
 
     var site_id = 0;
@@ -529,6 +529,11 @@
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
                 }
+            },
+            initComplete : function( settings, json){
+                $('#count_assets').html(json.countAssets+"");
+                $('#count_windows').html(json.countWindows+"");
+                $('#count_linux').html(json.countLinux+"");
             },
             columns: [
                 {{--{
