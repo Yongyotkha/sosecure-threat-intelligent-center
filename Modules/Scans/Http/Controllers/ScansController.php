@@ -770,7 +770,7 @@ class ScansController extends Controller
     public function scans_assets_edit(Request $request)
     {
         
-
+   
         $Assets = Assets::where('code', $request->code_assets)->first();
         
         $Assets_id = $Assets->id;
@@ -778,8 +778,8 @@ class ScansController extends Controller
         $site = SiteSettings::select('code')->withTrashed()->where('id', $Assets -> site_id)->first();
         // $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first();
         $site = $site->code;
-        // $Assets->raw_data = $request->assets[0]['raw_data'];
-        // $Assets->save();
+        $Assets->raw_data = $request->assets[0]['raw_data'];
+        $Assets->save();
 
         foreach ($request->assets_data as $data) {
             $myArray = explode(',', $data['data_type']);
