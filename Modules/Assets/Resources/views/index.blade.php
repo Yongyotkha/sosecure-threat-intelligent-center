@@ -248,6 +248,8 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th> --}}
+
+                                        <!-- ปล. เมื่อมีการเพิ่ม ให้ rowspan ++ -->
                                         <th rowspan="2" class="align-middle">Site</th>
                                         <th rowspan="2" class="align-middle">Domain</th>
                                         <th rowspan="2" class="align-middle">IP</th>
@@ -265,6 +267,44 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                   
+                                    <tr>
+                                        <td rowspan="2">บริษัท เมจิก</td>
+                                        <td rowspan="2">mtsc.co.th</td>
+                                        <td rowspan="2">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <!-- ตัวอย่างเวลา rowspan แถวต่อไป ไม่ต้องเอาค่า 3 อันแรกมาแสดง ถ้าเพิ่มใน rowspan ทำแบบนี้ไปเรื่อยๆ แล้วให้ rowspan ด้านบน ++ -->    
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
+
+                                    <!-- ถ้าคนล่ะ Site ก็เพิ่มเหมือนเดิมแล้ว rowspan ++ เหมือนเดิมครับ -->
                                     <tr>
                                         <td rowspan="2">บริษัท เมจิก</td>
                                         <td rowspan="2">mtsc.co.th</td>
