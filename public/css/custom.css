@@ -3543,3 +3543,19 @@ input.input-login:focus {
 div.dataTables_filter input{
     width: 75px !important;
 }
+
+.logo-site-tb{
+    width: 150px; height: 100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-site-tb img{
+    object-fit: contain;
+    width: 100%;
+    height: 100%
+}
+
+.dataTables_filter, .dataTables_length {
+    padding: 8px 0px 0 !important;
+}

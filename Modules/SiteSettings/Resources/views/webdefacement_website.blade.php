@@ -23,7 +23,7 @@
     
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                    <div class="bc-head">Webdefacement > Website </div>
+                    <div class="bc-head">Site Setting &gt; Web Defacement </div>
                     <a href="#" id="btn_md_create" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#wdfm_website">
                         @icon('solid/plus') @langapp('add')
                     </a>

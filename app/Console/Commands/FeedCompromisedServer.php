@@ -101,6 +101,13 @@ class FeedCompromisedServer extends Command
                     
                             $this->FileSaveDetail($server,$ssh,$return_value);
                         }
+                    }else{
+
+
+
+
+
+
                     }
 
                 } catch (Exception $e) {
