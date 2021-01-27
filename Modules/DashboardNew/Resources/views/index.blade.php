@@ -42,7 +42,7 @@
                                                         </div>
                                                     </div>
                                                 </a> --}}
-                                                <a href="{{route('assets.index')}}" target="_blank" data-toggle="modal" data-target="#modal_asset">
+                                                <a href="{{route('assets.index')}}" target="_blank">
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
