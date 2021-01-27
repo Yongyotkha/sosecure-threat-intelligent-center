@@ -105,6 +105,15 @@ class TransactionCenterToClient_v01 extends Command
 
 
 
+        $data_methed_funciton= array();
+        $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;
+        $data_methed_funciton['PATH_CLIENT_IP_TF_insertdata'] = $this->PATH_CLIENT.'/api/v1/clientinto-transfer/insertToNoRefWithID'.'?code='.$this->site_code;
+        $data_methed_funciton['PATH_CENTER_IP_TF_updateTFBatchJob'] = $this->PATH_CENTER.'/api/v1/centerinto-transfer/updateTFBatchJob'.'?code='.$this->site_code;
+        $data_methed_funciton['insertToTB'] ='fx_transaction_client_compromised_server';
+        array_push($data_methed_funciton_list, $data_methed_funciton);
+
+
+
         foreach ($data_methed_funciton_list   as $key => $value) {
 
 
@@ -118,27 +127,27 @@ class TransactionCenterToClient_v01 extends Command
 
 
             $passBody_send = [
-             'data' =>$dataEncode
-         ];
+               'data' =>$dataEncode
+           ];
 
 
-         $httpData = $this->reconnnect($value['PATH_CENTER_IP_TF_getTranferData'], $passBody_send, $this->urlLimit);
-         
+           $httpData = $this->reconnnect($value['PATH_CENTER_IP_TF_getTranferData'], $passBody_send, $this->urlLimit);
+           
          //  print_r($httpData);
 
 
-         if ($httpData["success"]) {
+           if ($httpData["success"]) {
             $body_data = $httpData["result"]["queryData"];
             $dataDecode_data_return = encrypt_decrypt('decrypt', $httpData["result"]["queryData"], $header, $ip, $mac);
             $httpData_return = json_decode($dataDecode_data_return);
             $httpData["result"]["queryData"] =  $httpData_return;
 
             if (!empty($httpData["result"]["queryData"])) {
-             $tableData = $body_data;
-             $dataEncode = encrypt_decrypt('encrypt', $httpData["result"]["site_code_en"], $header, $ip, $mac);
+               $tableData = $body_data;
+               $dataEncode = encrypt_decrypt('encrypt', $httpData["result"]["site_code_en"], $header, $ip, $mac);
 
-             $dataEncode_queryData = encrypt_decrypt('encrypt', json_encode($httpData["result"]["queryData"]), $header, $ip, $mac);
-             $passBody = [
+               $dataEncode_queryData = encrypt_decrypt('encrypt', json_encode($httpData["result"]["queryData"]), $header, $ip, $mac);
+               $passBody = [
                 'site_code_en' => $dataEncode,
                 'queryData' => $dataEncode_queryData,
                 'tbName' =>$value['insertToTB'],
