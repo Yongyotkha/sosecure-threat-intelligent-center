@@ -619,13 +619,23 @@ class SiteSettingsController extends Controller
             ->editColumn('start_active', function ($model) {
                 $html = '';
                 $html.= '<strong>Start Active:</strong> '.@$model->start_active.'<br>';
-                $html.= '<strong>Start Active Key:</strong> '.@$model->start_active_key.'';
+                if($model->start_active_key) {
+                    $end_active_key = $model->end_active_key;
+                } else {
+                    $end_active_key = 'Lifetime';
+                }
+                $html.= '<strong>Start Active Key:</strong> '.$end_active_key;
                 return $html;
             })
             ->editColumn('end_active', function ($model) {
                 $html = '';
                 $html.= '<strong>End Active:</strong> '.@$model->end_active.'<br>';
-                $html.= '<strong>End Active Key:</strong> '.@$model->end_active_key.'';
+                if($model->end_active_key) {
+                    $end_active_key = $model->end_active_key;
+                } else {
+                    $end_active_key = 'Lifetime';
+                }
+                $html.= '<strong>End Active Key:</strong> '.$end_active_key;
                 return $html;
             })
             ->editColumn('status', function ($model) {
