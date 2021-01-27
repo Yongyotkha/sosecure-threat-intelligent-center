@@ -120,12 +120,12 @@
                             <div class="container-fluid" style="padding: 2rem;">
 
                                 <div class="row">
-                                    <div class="col-lg-6 ">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Title</h5>
                                         <input type="text" class="form-control" name="keywords" id="keywords">
                                     </div>
 
-                                    <div class="col-lg-6 ">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Public Date</h5>
                                         <div id="date_srange" class="text-center form-control"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -134,7 +134,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6 ">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Group By</h5>
                                         <div id="groupby-btn" class="btn-group special">
                                             <button id="source_btn" class="btn btn-grey active">
@@ -146,7 +146,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6 ">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey active">
@@ -196,22 +196,24 @@
                                     </div>
                                 </div>
                                 -->
-                                <div class="row">
-                                    <div class="col-lg-12 text-right">
-                                        <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                            <i class="fas fa-search"></i>
-                                            @langapp('apply')
-                                        </button>
-                                        <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                            style="white-space: nowrap">
-                                            <i class="fas fa-broom"></i>
-                                            <span> Clear </span>
-                                        </button>
-                                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                            <i class="fas fa-times"></i>
-                                            <span> Close </span>
-                                        </button>
-                                    </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                        style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

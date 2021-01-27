@@ -48,14 +48,14 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row">
-                            <div class="col-lg-12">
+                            <div class="col-lg-12 mb-1">
                                 <h5 class="font-weight-bold">Name & URL</h5>
                                 <input type="text" id="keywords" class="form-control">
                             </div>
                         </div>
                         <div class="row">
 
-                            <div id="btngroup_status" class="col-lg-12">
+                            <div id="btngroup_status" class="col-lg-12 mb-1">
                                 <h5 class="font-weight-bold">Status</h5>
                                 <a href="#" id="all" class="btn-chart d-il-flex mr-3">
                                     <span class="dot-all" style="height:8px;"></span>
@@ -110,23 +110,25 @@
                             -->
 
                         </div>
-                        <div class="row">
-                            <div class="col-lg-12 text-right mt-2">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
-                                    onclick="search()">
-                                    <i class="fas fa-search"></i>
-                                    @langapp('apply')
-                                </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                    style="white-space: nowrap" onclick="clear_search()">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
-                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                    <i class="fas fa-times"></i>
-                                    <span> Close </span>
-                                </button>
-                            </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                onclick="search()">
+                                <i class="fas fa-search"></i>
+                                @langapp('apply')
+                            </button>
+                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                style="white-space: nowrap" onclick="clear_search()">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                            <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <i class="fas fa-times"></i>
+                                <span> Close </span>
+                            </button>
                         </div>
                     </div>
                 </div>
