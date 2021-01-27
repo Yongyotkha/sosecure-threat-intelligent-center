@@ -280,6 +280,7 @@
                                         <td><span class="badge badge-success">Active</span></td>
                                         <td>
                                             <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
                                         </td>
                                     </tr>
                                     <tr>
@@ -294,6 +295,7 @@
                                         <td><span class="badge badge-success">Active</span></td>
                                         <td>
                                             <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
                                         </td>
                                     </tr>
                                 </tbody>
