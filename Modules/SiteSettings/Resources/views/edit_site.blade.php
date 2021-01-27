@@ -40,7 +40,10 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Logo </label>
                                     <div class="col-lg-6">
-                                        <div class="">
+                                        <div class="pull-left mr15">
+                                            <div style="width:150px; height:150px;">
+                                                <img id="site-logo-preview_tab_login" src="{{$siteSettings->logo ? asset($siteSettings->logo) : asset('images/default-placeholder.png') }}" style="width:100%;height:100%; object-fit:contain;" alt="..." />
+                                            </div>
                                             <input id="file-input-demo" type="file" class="form-control" name="logo">
                                             <span>Remark Upload File Extension (.png .jpg) <span class="text-danger">Max Size 2MB</span></span>
                                         </div>
@@ -49,6 +52,10 @@
                                         <div id="preview-image-logo"></div>
                                     </div>
                                 </div>
+
+
+
+
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Site Name <span class="text-danger">*</span> </label>
                                     <div class="col-lg-6">
@@ -149,7 +156,7 @@
                 <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title text-white">
                     <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                    ปรับขนาดโลโก้
+                    Edit Logo
                 </h4>
             </div>
             <div class="modal-body">
@@ -160,7 +167,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12 mx-auto" style="padding:5%;">
-                        <h1 class="text-center">ตัวอย่างโลโก้</h1>
+                        <h1 class="text-center">Preview</h1>
                         <div class="preview_logo" style="width:200px;height:150px;overflow:hidden;margin:0 auto;border:1px solid #eee"></div>
                     </div>
                 </div>
