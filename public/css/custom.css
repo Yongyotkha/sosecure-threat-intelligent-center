@@ -3559,3 +3559,7 @@ div.dataTables_filter input{
 .dataTables_filter, .dataTables_length {
     padding: 8px 0px 0 !important;
 }
+
+.align-middle{
+    vertical-align: middle !important;
+}

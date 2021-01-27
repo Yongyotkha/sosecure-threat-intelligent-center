@@ -237,7 +237,9 @@
                     </header>
                     <div class="panel-body">
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered" id="table-assets-template">
+
+                            <!-- id table อันเดิม table-assets-template ส่วนปัจจุบันเป็นแค่หน้าบ้านแสดงตัวอย่าง ถ้าเปลี่ยนแล้วอย่างลืม ลบ script ด้านล่างออกด้วยนะครับ-->
+                            <table class="table table-striped table-bordered" id="table-assets-template-test">
                                 <thead>
                                     <tr>
                                         {{-- <th class="no-sort">
@@ -246,14 +248,55 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th> --}}
-                                        <th>Site</th>
-                                        <th>Domain</th>
-                                        <th>IP</th>
-                                        <th>CPE</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
+                                        <th rowspan="2" class="align-middle">Site</th>
+                                        <th rowspan="2" class="align-middle">Domain</th>
+                                        <th rowspan="2" class="align-middle">IP</th>
+                                        <th colspan="6" class="text-center">CPE</th>
+                                        <th rowspan="2" class="align-middle">Status</th>
+                                        <th rowspan="2" class="align-middle">Action</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Vendor</th>
+                                        <th>Title</th>
+                                        <th>Versions</th>
+                                        <th>Edition</th>
+                                        <th>Remark</th>
+                                        <th>Delete CPE</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2">บริษัท เมจิก</td>
+                                        <td rowspan="2">mtsc.co.th</td>
+                                        <td rowspan="2">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -325,7 +368,7 @@
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
 
-    
+    $('#table-assets-template-test').DataTable();
     
     $(document).ready(function () {
         selectGroupByFirst();
@@ -587,7 +630,7 @@
                    
                 },--}}
                 {
-                    targets: 3,
+                    targets: 5,
                     render: function (data, type, row, meta) {
                         return row.CPE+"<br>"+row.cpe;
                         
