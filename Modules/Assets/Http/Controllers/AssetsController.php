@@ -83,6 +83,49 @@ class AssetsController extends Controller
         $data['page'] = langapp('assets');
         return view('assets::index')->with($data);
     }
+
+    public function index_all_asset()
+    {
+
+        if(Auth::check()) {
+
+            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            if(Auth::user()->hasRole('admin')) {//if admin
+                // dd(777);
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+            } else { //if notAdmin
+                // dd(888);
+                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+                        // dd(99);
+
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+             
+
+                    } else {//not support and admin
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }
+            }
+        }
+
+        if(isset($this->request->Search_Link_All)){
+            $data['Search_Link_All'] = $this->request->Search_Link_All;
+        }else{
+            $data['Search_Link_All'] = "";
+        }
+        
+
+
+        $data['SiteSettings'] = $SiteSettings;
+        $data['page'] = langapp('assets_setting');
+        return view('assets::index')->with($data);
+    }
     /**
      * Show the form for creating a new resource.
      * @return Response
