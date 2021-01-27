@@ -12,15 +12,15 @@
         <div class="modal-body">
            
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label">Name <span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
                     <input type="text" name="name" class="form-control">
                 </div>
             </div>
 
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Domain <span class="text-danger">*</span> </label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label">Domain <span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
                     <input type="text" name="domain" class="form-control">
 
                     <!-- Example Domain -->
@@ -34,8 +34,8 @@
 
 
             <div class="form-group row" style="display: none;">
-                <label class="col-lg-3 control-label">Open Scan </label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label">Open Scan </label>
+                <div class="col-lg-10">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
                         <input type="checkbox" name="open_scan" value="TRUE">
@@ -45,8 +45,8 @@
             </div>
 
             <div class="form-group row" style="display: none;">
-                <label class="col-lg-3 control-label"></label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label"></label>
+                <div class="col-lg-10">
                     <ul class="role-group">
                         <li>
                             <div class="role-main">
@@ -215,8 +215,8 @@
 
 
             <div class="form-group row" style="display: none;">
-                <label class="col-lg-3 control-label">Scan Interval <span class="text-danger">*</span> </label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label">Scan Interval <span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
                     <select name="" id="scan_interval" class="select2-option form-control" multiple>
                         <option value="1">15</option>
                         <option value="2">30</option>
@@ -226,8 +226,8 @@
             </div>
             
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Default </label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label">Default </label>
+                <div class="col-lg-10">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
                         
@@ -239,8 +239,8 @@
             </div>
             
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Status </label>
-                <div class="col-lg-9">
+                <label class="col-lg-2 control-label">Status </label>
+                <div class="col-lg-10">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
                         <input type="checkbox" name="status" value="TRUE" checked>
