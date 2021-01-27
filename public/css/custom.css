@@ -1556,13 +1556,14 @@ ul.role-group li ul.role-group-sub li{
 }
 
  .select2-container .select2-selection--single {
-    height: 32px !important;
+    height: 30px !important;
 }
  .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #444;
     line-height: 31px !important;
     font-size: 13px;
 }
+
 
 .justify-content-between{
     justify-content: space-between;
@@ -1768,6 +1769,10 @@ ul.role-group li ul.role-group-sub li{
 }
 .mr-3{
     margin-right: 2.5rem;
+}
+
+.select2-hidden-accessible{
+    height: 30px !important;
 }
 
 /* topics-news-list */
@@ -3526,4 +3531,8 @@ input.input-login:focus {
 .btn-group.special button:last-child{
     border-bottom-right-radius: 8px;
     border-top-right-radius: 8px;
+}
+
+div.dataTables_filter input{
+    width: 75px !important;
 }

@@ -69,7 +69,7 @@
 
                     <a id="btn_client_view" href="{{site_url('/news_client')}}"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
-                        <span><i class="fas fa-eye"></i> Client view</span>
+                        <span><i class="fas fa-eye"></i> Client View</span>
                     </a>
 
 
