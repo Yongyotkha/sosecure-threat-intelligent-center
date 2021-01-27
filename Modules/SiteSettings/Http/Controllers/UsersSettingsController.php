@@ -58,6 +58,9 @@ class UsersSettingsController extends Controller
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
         $data['page'] = 'Users';
+        $data['code'] = $id;
+        
+
         return view('sitesettings::users')->with($data);
     }
 
@@ -633,7 +636,7 @@ class UsersSettingsController extends Controller
                     } else {
                         $disabled = '';
                     } 
-                    return '<label><input type="checkbox" '.$disabled.' name="checked" value="' . $user->id . '"><span class="label-text"></span></label>';
+                    return '<label><input class="user_id" type="checkbox" '.$disabled.' name="checked" value="' . $user->id . '"><span class="label-text"></span></label>';
                 }
             )
             ->editColumn(
@@ -780,4 +783,102 @@ class UsersSettingsController extends Controller
         // $data['user'] = $id;
         return view('sitesettings::modal.delete_user')->with($data);
     }
+
+    public function delete_process_change(Request $request)
+    {
+        
+        if($request->id_change){
+            foreach($request->id_change as $id_change){
+                $model = $this->user->where('id',$id_change)->first();
+    
+                $transaction_client_users = transaction_client_users::where('site_id', $model->site_id)->where('transaction_id', $model->id)->first();
+                if($transaction_client_users){
+                    $transaction_client_users -> transaction_mode = 'delete';
+                    $transaction_client_users -> transaction_data_status = 1;
+                    $transaction_client_users -> status = 1;
+                    $transaction_client_users -> save();
+                }else{
+                    $transaction_client_users = new transaction_client_users();
+                    $transaction_client_users -> site_id = $model->site_id;
+                    $transaction_client_users -> transaction_id = $model->id;
+                    $transaction_client_users -> transaction_mode = 'delete';
+                    $transaction_client_users -> transaction_data_status = 1;
+                    $transaction_client_users -> status = 1;
+                    $transaction_client_users -> save();
+                }
+                
+        
+                $user_site = UserSite::select('id')->where('site_id', $model->site_id)->where('user_id', $model->id)->first();
+                $transaction_client_user_site = transaction_client_user_site::where('site_id', $model->site_id)->where('transaction_id', $user_site->id)->first();
+                if($transaction_client_user_site){
+                    $transaction_client_user_site -> transaction_mode = 'delete';
+                    $transaction_client_user_site -> transaction_data_status = 1;
+                    $transaction_client_user_site -> status = 1;
+                    $transaction_client_user_site -> save();
+                }else{
+                    $transaction_client_user_site = new transaction_client_user_site();
+                    $transaction_client_user_site -> site_id = $model->site_id;
+                    $transaction_client_user_site -> transaction_id = $user_site->id;
+                    $transaction_client_user_site -> transaction_mode = 'delete';
+                    $transaction_client_user_site -> transaction_data_status = 1;
+                    $transaction_client_user_site -> status = 1;
+                    $transaction_client_user_site -> save();
+                }
+                
+        
+                $transaction_client_profiles = transaction_client_profiles::where('site_id', $model->site_id)->where('transaction_id', $model->id)->first();
+                if($transaction_client_profiles){
+                    $transaction_client_profiles -> transaction_mode = 'delete';
+                    $transaction_client_profiles -> transaction_data_status = 1;
+                    $transaction_client_profiles -> status = 1;
+                    $transaction_client_profiles -> save();
+        
+                }else{
+                    $transaction_client_profiles = new transaction_client_profiles();
+                    $transaction_client_profiles -> site_id = $model->site_id;
+                    $transaction_client_profiles -> transaction_id = $model->id;
+                    $transaction_client_profiles -> transaction_mode = 'delete';
+                    $transaction_client_profiles -> transaction_data_status = 1;
+                    $transaction_client_profiles -> status = 1;
+                    $transaction_client_profiles -> save();
+                }
+                
+                $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $model->site_id)->where('transaction_id', $model->id)->first();
+                if($transaction_client_role_permissions){
+                    $transaction_client_role_permissions -> transaction_mode = 'delete';
+                    $transaction_client_role_permissions -> transaction_data_status = 1;
+                    $transaction_client_role_permissions -> status = 1;
+                    $transaction_client_role_permissions -> save();
+                }else{
+                    $transaction_client_role_permissions = new transaction_client_role_permissions();
+                    $transaction_client_role_permissions -> site_id = $model->site_id;
+                    $transaction_client_role_permissions -> transaction_id = $model->id;
+                    $transaction_client_role_permissions -> transaction_mode = 'delete';
+                    $transaction_client_role_permissions -> transaction_data_status = 1;
+                    $transaction_client_role_permissions -> status = 1;
+                    $transaction_client_role_permissions -> save();
+                }
+                
+                
+                $model->delete();
+                
+            }
+        }
+        
+
+
+        
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('userssettings.index',['id' => $request->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
 }
+
+
+

@@ -161,6 +161,8 @@ class RegisterSiteController extends ApiController
                 $site->server_time = $data_key['server_time']['date'];
                 $site->php_version = $data_key['php_version'];
                 $site->code_version = $data_key['code_version'];
+                $site->time_zone = $data_key['timezone'];
+                $site->your_app_name = $data_key['app_name'];
                 $site->save();
                 
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'code' => $site->code, 'key' => $site->public_key]);

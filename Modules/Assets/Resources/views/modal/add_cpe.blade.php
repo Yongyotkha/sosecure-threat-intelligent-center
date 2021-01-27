@@ -453,7 +453,7 @@
             <td>${add_remark}</td>
             <td style="display:none;">${os_type}</td>
             <td style="display:none;">${res[0]}</td>
-            <td><button class="btn btn-xs btn-danger" onclick="del_row(this)">Delete</button></td>
+            <td><button class="btn btn-xs btn-danger" onclick="del_row(this)"><i class="fas fa-trash"></i></button></td>
             </tr>`;
 
             $('#get_tr').append(html);
@@ -486,7 +486,7 @@
             <td>${result}</td>
             <td>${remark_com}</td>
             <td style="display:none;">${os_type}</td>
-            <td><button class="btn btn-xs btn-danger" onclick="del_row(this)">Delete</button></td>
+            <td><button class="btn btn-xs btn-danger" onclick="del_row(this)"><i class="fas fa-trash"></i></button></td>
             <td style="display:none;">${u_p}</td>
             </tr>`;
 

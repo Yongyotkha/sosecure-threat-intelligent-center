@@ -451,7 +451,7 @@ class DarkWebController extends Controller
     }
 
     public function count_val(Request $request){
-        dd($request ->check_type);
+
 
         $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
         $where = ['deleted_at' => null];
