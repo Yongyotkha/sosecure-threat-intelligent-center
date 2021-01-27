@@ -417,33 +417,64 @@ class AssetsController extends Controller
         //     dd(55);
         // }
         
-
-        foreach($request->data as $data){
-            $model = new CPE();
-            if($data[4]=='Delete'){
-                $model->code = generator_uuid();
-                $model->os_type = $data[2];
-                $model->select = 'add';
-                $model->cpe_data_id = $data[3];
-                $model->remark = $data[1];
-                $model->asset_id = $idip->id;
-                $model->result = $data[0];
-
-            }else if($data[3]=='Delete'){
-                
-                $model->code = generator_uuid();
-                $model->os_type = $data[2];
-                $model->select = 'command';
-                // $model->cpe_data_id = $data[3];
-                $model->remark = $data[1];
-                $model->asset_id = $idip->id;
-                $model->credentials_id = $data[4];
-                $model->result = $data[0];
-
+            if($request->data){
+                foreach($request->data as $data){
+                    $model = new CPE();
+                    if($data[4]=='Delete'){
+                        $vendor_text = @$data[0];
+                        $vender_split = explode(":", $vendor_text);
+                        $product_name = @$vender_split[4];
+                        $vendor_name = @$vender_split[3];
+                        $product_version = @$vender_split[5];
+                        $product_edition = @$vender_split[6];
+                        if ($product_edition == "*") {
+                            $product_edition = "-";
+                        }    
+        
+                        $model->code = generator_uuid();
+                        $model->os_type = $data[2];
+                        $model->select = 'add';
+                        $model->cpe_data_id = $data[3];
+                        $model->remark = $data[1];
+                        $model->asset_id = $idip->id;
+                        $model->result = $data[0];
+                        $model->vendor = $vendor_name;
+                        $model->title = $product_name;
+                        $model->version = $product_version;
+                        $model->edition = $product_edition;
+        
+                    }else if($data[3]=='Delete'){
+        
+                        // $vendor_text = @$data[0];
+                        // $vender_split = explode(":", $vendor_text);
+                        // $product_name = @$vender_split[4];
+                        // $vendor_name = @$vender_split[3];
+                        // $product_version = @$vender_split[5];
+                        // $product_edition = @$vender_split[6];
+                        // if ($product_edition == "*") {
+                        //     $product_edition = "-";
+                        // }    
+        
+                        
+                        $model->code = generator_uuid();
+                        $model->os_type = $data[2];
+                        $model->select = 'command';
+                        // $model->cpe_data_id = $data[3];
+                        $model->remark = $data[1];
+                        $model->asset_id = $idip->id;
+                        $model->credentials_id = $data[4];
+                        $model->result = $data[0];
+                        // $model->vendor = $vendor_name;
+                        // $model->title = $product_name;
+                        // $model->version = $product_version;
+                        // $model->edition = $product_edition;
+        
+                    }
+        
+                    $model->save();
+                }
             }
-
-            $model->save();
-        }
+       
 
         if($request -> page == 'site'){
             return ajaxResponse(
