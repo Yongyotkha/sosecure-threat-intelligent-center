@@ -98,7 +98,7 @@
                     </div>
             
                     <div class="btn-group">
-                        <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                             <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                         </a>
                     </div>
@@ -146,7 +146,7 @@
                     </div>
                 </div>
 
-                <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                     <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
                             <div class="col-md-12">
@@ -214,6 +214,10 @@
                                     <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" onclick="clearTB()" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
                                     </button>
                                 </div>
                             </div>
@@ -313,16 +317,13 @@
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.activebutton')
+@include('stacks.js.advanced_search')
 
 <script>
 
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
 
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
     
 
     $(document).ready(function () {

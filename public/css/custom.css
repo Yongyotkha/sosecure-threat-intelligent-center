@@ -2134,6 +2134,14 @@ ul.topics-news-list li a:hover{
     padding: .2rem 1rem;
     background: #f3f3f3;
 }
+.btn-chart.active{
+    color: #fff;
+    border: 1px solid #3869d4;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: .2rem 1rem;
+    background: #3869d4;
+}
 
 .btn-chart.white {
     color: #000;
@@ -3500,13 +3508,13 @@ input.input-login:focus {
     color: #fff;
 }
 
-.btn-group.special {
+/* .btn-group.special {
     display: flex;
 }
 
 .btn-group.special .btn{
     width: 25%;
-}
+} */
 
 .btn-group.special button:first-child{
     border-bottom-left-radius: 8px;

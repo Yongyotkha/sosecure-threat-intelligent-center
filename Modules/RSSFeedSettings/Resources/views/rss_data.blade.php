@@ -58,7 +58,7 @@
                         @icon('solid/download') CSV
                     </a> --}}
                     
-                    <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
                     
@@ -73,7 +73,7 @@
                 </header>
 
                 <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                    <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-md-12">
@@ -138,6 +138,10 @@
                                         <button type="button" id="btn_rss_data_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                             <i class="fas fa-broom"></i>
                                             <span> Clear </span>
+                                        </button>
+                                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                            <i class="fas fa-times"></i>
+                                            <span> Close </span>
                                         </button>
                                     </div>
                                 </div>
@@ -225,17 +229,11 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.hidesettings')
+@include('stacks.js.advanced_search')
 
 <script>
 
 
-
-
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
-    
 
     $('#table-rss-data').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {

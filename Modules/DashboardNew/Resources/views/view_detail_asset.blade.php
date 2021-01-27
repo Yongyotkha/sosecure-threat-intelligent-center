@@ -169,10 +169,6 @@
         }
     }
 
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
 
     $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
 

@@ -2,7 +2,7 @@
     <div class="panel-body">
 
 
-        <section class="panel panel-default hide-fillter" id="area-advance-search" style="display: none;">
+        <section class="panel panel-default hide-fillter" id="advance-search" style="display: none;">
             <div class="container-fluid" style="padding: 2rem;">
                 <div class="row">
                     <div class="col-md-6">

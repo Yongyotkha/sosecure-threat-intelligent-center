@@ -6,7 +6,7 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head"> @langapp('webdefacement')</div>
 
-            <button id="advance-search" style="margin-top: 8px;" href="#area-advance-search"
+            <button id="advance-search" style="margin-top: 8px;" href="#hide-advance-search"
                 class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </button>
@@ -38,7 +38,7 @@
 
         <section class="scrollable wrapper">
             {{-- Search --}}
-            <section class="panel panel-default" id="area-advance-search" style="display: none">
+            <section class="panel panel-default" id="hide-advance-search" style="display: none">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-md-12">
@@ -55,7 +55,7 @@
                         </div>
                         <div class="row">
 
-                            <div class="col-lg-12">
+                            <div id="btngroup_status" class="col-lg-12">
                                 <h5 class="font-weight-bold">Status</h5>
                                 <a href="#" id="all" class="btn-chart d-il-flex mr-3">
                                     <span class="dot-all" style="height:8px;"></span>
@@ -120,6 +120,10 @@
                                 <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
                                     style="white-space: nowrap" onclick="clear_search()">
                                     <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
                                     <span> Clear </span>
                                 </button>
                             </div>
@@ -343,8 +347,12 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.lightbox')
+@include('stacks.js.advanced_search')
+@include('stacks.js.activebutton')
 
 <script>
+
+    active_btn('#btngroup_status .btn-chart');
 
     var keywords = null;
     var site = null;
@@ -356,34 +364,25 @@
 
 
     $('#example-blacklist').hide();
-        $('input[type="checkbox"]').on('change',function(){
-            if($('#blacklist').prop('checked')){
-                $('#example-blacklist').show();
-            }else{
-                $('#example-blacklist').hide();
-            }
-        });
+    $('input[type="checkbox"]').on('change',function(){
+        if($('#blacklist').prop('checked')){
+            $('#example-blacklist').show();
+        }else{
+            $('#example-blacklist').hide();
+        }
+    });
 
-        $('#delay_screen_shot_val_div').hide();
-        $('input[type="checkbox"]').on('change',function(){
-            if($('#delay_screen_shot').prop('checked')){
-                $('#delay_screen_shot_val_div').show();
-                $('.review_image_screenshot').css("display","block");
-            }else{
-                $('#delay_screen_shot_val_div').hide();
-                $('.review_image_screenshot').css("display","none");
-                $(".review-image-capture").html("");
-                $("#link_edit_image_screenshot").html("");
-            }
-        });
-        
-        $(document).ready(function(){
-            $('.wdfm-card').hover(function(){
-                $(this).find('.wdfm-header').addClass('wdfm-header-upper');
-            }); 
-            $('.wdfm-card').mouseleave(function(){
-                $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
-            }); 
+    $('#delay_screen_shot_val_div').hide();
+    $('input[type="checkbox"]').on('change',function(){
+        if($('#delay_screen_shot').prop('checked')){
+            $('#delay_screen_shot_val_div').show();
+            $('.review_image_screenshot').css("display","block");
+        }else{
+            $('#delay_screen_shot_val_div').hide();
+            $('.review_image_screenshot').css("display","none");
+            $(".review-image-capture").html("");
+            $("#link_edit_image_screenshot").html("");
+        }
         });
 
     $(document).ready(function(){
@@ -395,10 +394,6 @@
         }); 
     });
 
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
 
 
     $(function () {

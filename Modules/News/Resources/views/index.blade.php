@@ -11,7 +11,7 @@
                 {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span>@langapp('Search_Advance')</span>
                  </button> --}}
-                 <a id="advance-search" href="#area-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                 <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                     <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                 </a>
                  <div class="pull-right" style="margin-top: 8px; width: 270px;">
@@ -29,7 +29,7 @@
             {{-- Search --}}
             {{-- Tab Content --}}
             <section id="scrollable_news" class="scrollable wrapper">
-                <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                     <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
                             <div class="col-md-12">
@@ -107,6 +107,10 @@
                                     <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
                                     </button>
                                 </div>
                             </div>
@@ -196,11 +200,6 @@
 @include('stacks.js.advanced_search')
 
 <script>
-
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
 
 
     var f_search = 0;

@@ -768,24 +768,6 @@
 
     $('#table-assets-modal').DataTable();
 
-    
-    
-    
-
-    function collpase_chart(id,text){
-        $(id).slideToggle();
-        if($(text).text() == 'Expanded'){
-            $(text).html('<i class="fas fa-minus-square"></i>Collapse');
-        }else{
-            $(text).html('<i class="fas fa-plus-square"></i>Expanded');
-        }
-    }
-
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
-
 </script>
 
 <script type="text/javascript">

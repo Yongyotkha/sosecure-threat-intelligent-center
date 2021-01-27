@@ -57,7 +57,7 @@
                         <span>@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
 
-                    <a id="advance-search" href="#area-advance-search"
+                    <a id="advance-search" href="#hide-advance-search"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
@@ -109,7 +109,7 @@
                 {{-- Search --}}
                 {{-- Tab Content --}}
                 <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="area-advance-search" style="display: none;">
+                    <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-md-12">
@@ -207,6 +207,10 @@
                                             <i class="fas fa-broom"></i>
                                             <span> Clear </span>
                                         </button>
+                                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                            <i class="fas fa-times"></i>
+                                            <span> Close </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -301,6 +305,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.activebutton')
+@include('stacks.js.advanced_search')
 
 <script>
 
@@ -333,10 +338,6 @@
     });
      
 
-    $('#area-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#area-advance-search').toggle();
-    });
 
     var search_val = false;
     var keywords = null;
