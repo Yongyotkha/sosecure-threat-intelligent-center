@@ -3573,3 +3573,7 @@ div.dataTables_filter input{
     line-height: 1.5;
     padding: 1rem;
 }
+
+.input-group-btn .btn{
+    line-height: 1.2 !important;
+}
