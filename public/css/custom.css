@@ -1560,10 +1560,13 @@ ul.role-group li ul.role-group-sub li{
 }
  .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #444;
-    line-height: 31px !important;
+    line-height: 30px !important;
     font-size: 13px;
 }
 
+.select2-hidden-accessible {
+    height: 30px !important;
+}
 
 .justify-content-between{
     justify-content: space-between;
