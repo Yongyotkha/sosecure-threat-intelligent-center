@@ -27,8 +27,8 @@
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; Users </div>
              
-                    <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                    <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
+                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <!-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#create-new-user">
                         @icon('solid/plus') @langapp('add')
@@ -52,7 +52,7 @@
                                                 {{-- <th class="hide"></th> --}}
                                                 <th class="no-sort">
                                                     <label>
-                                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
                                                         <span class="label-text"></span>
                                                     </label>
                                                 </th>
@@ -217,6 +217,29 @@
         </div>
     </div>
 
+    <div class="modal" id="delete_user" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
+    style="left: unset">
+    <div class="modal-dialog modal-dialog-aside" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">@langapp('delete')</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <p class="text-danger">@langapp('delete_warning') </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                        class="fas fa-times text-muted"></i> Close</a>
+                <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit"
+                    onclick="delete_user_save()"><i class="fas fa-paper-plane"></i> OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </section>
 
 
@@ -310,9 +333,39 @@
             ]
         });
 
+
+    });
+
+    $('#table-users-template').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-users-template').on('click', '.user_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.user_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.user_id').filter(':checked').length < 1){
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });  
+
         let del_val = [];
         $("#btn_del_select").click(function(){
-            del_val = [];
+            $('#delete_user').modal('show');
             $("input[type='checkbox'][name='checked']").each(function(){
                 
                 if($(this).is(":checked")) {
@@ -320,15 +373,38 @@
                     /* alert(3);*/
                 }
             });
-            console.log(del_val);
-
-            if(del_val.length > 0) {
-                del_cate_select(del_val);
-            } else {
-                toastr.warning('Please select atleast 1', '@langapp('response_status')');
-            }
         });
-    });
+
+    function delete_user_save(){
+        $.ajax({
+            type:"POST",
+            url:"{{ route('user.delete_process_change') }}",
+            data:{
+                id_change:del_val,
+                code:@json($code),
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+                
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+                
+        });
+
+    }     
 
 
     function del_cate_select(id) {
@@ -365,6 +441,7 @@
             toastr.error(errorsHtml, '@langapp('response_status')');
         });
     }
+
 </script>
 
 

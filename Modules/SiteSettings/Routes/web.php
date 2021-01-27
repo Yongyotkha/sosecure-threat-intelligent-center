@@ -78,6 +78,7 @@ Route::group(
         Route::get('/user-setting/user/delete/{id}', 'UsersSettingsController@delete')->name('user.delete2')->middleware('can:categorysettings_delete');
         Route::put('/user-setting/user/update/{id}', 'UsersSettingsController@update')->name('user.update')->middleware('can:sitesettings_update');
         Route::delete('/user-setting/user/delete_process/{id}', 'UsersSettingsController@delete_process')->name('user.delete_process')->middleware('can:categorysettings_delete');
+        Route::post('/user-setting/user/delete_process_change', 'UsersSettingsController@delete_process_change')->name('user.delete_process_change');
    
         Route::put('/vulnerability_logs/upsert/{id}', 'VulnerabilityController@upsert_VulnerabilityLogs')->name('vulsetting.upsert')->middleware('can:menu_items');
         Route::put('/vulnerability_logs/upsertSysFormat/{id}', 'VulnerabilityController@upsert_VulnerabilitySysFormat')->name('vulsetting.upsertSys')->middleware('can:menu_items');
