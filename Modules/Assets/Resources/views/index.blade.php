@@ -265,8 +265,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                   
-                       
                                     <tr>
                                         <td rowspan="2">บริษัท เมจิก</td>
                                         <td rowspan="2">mtsc.co.th</td>
@@ -285,7 +283,60 @@
                                             <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
                                         </td>
                                     </tr>
-
+                                    <tr>
+                                        <td class="d-none">บริษัท เมจิก</td>
+                                        <td class="d-none">mtsc.co.th</td>
+                                        <td class="d-none">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td rowspan="2">บริษัท เมจิก</td>
+                                        <td rowspan="2">mtsc.co.th</td>
+                                        <td rowspan="2">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="d-none">บริษัท เมจิก</td>
+                                        <td class="d-none">mtsc.co.th</td>
+                                        <td class="d-none">104.24.14.205</td>
+                                        <td>Microsoft</td>
+                                        <td>Windows_10</td>
+                                        <td>r2</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
