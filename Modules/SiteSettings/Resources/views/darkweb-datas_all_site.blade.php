@@ -137,7 +137,7 @@
                                         <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="keyword" class="form-control">
                                     </div>
-                                    <div class="col-md-4 mb-1">
+                                    {{-- <div class="col-md-4 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source" class="select2-option form-control">
                                             <option value="">All</option>
@@ -146,7 +146,7 @@
                                             <option value="webserver">Webserver</option>
                                             <option value="server">Server</option>
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="social_datas_date" class="form-control text-center"
@@ -158,7 +158,7 @@
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Type</h5>
                                         <div id="groupby-type" class="btn-group special">
-                                            <button class="btn btn-grey active" value="">
+                                            <button id="all" class="btn btn-grey active" value="">
                                                 <span> All</span>
                                             </button>
                                             <button class="btn btn-grey" value="public">
@@ -755,6 +755,8 @@ active_btn('#groupby-type .btn-grey');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 cb(start, end);
+                $('.btn-grey').removeClass('active');
+                $('#all').addClass('active');
                 
                 table_social_data();
             });

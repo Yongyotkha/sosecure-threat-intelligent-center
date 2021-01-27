@@ -144,7 +144,7 @@
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Type</h5>
                                     <div id="groupby-type" class="btn-group special">
-                                        <button class="btn btn-grey active" value="">
+                                        <button id="all" class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
                                         <button class="btn btn-grey" value="social">
@@ -432,6 +432,8 @@ active_btn('#groupby-type .btn-grey');
     var endDate = null;
     var isDateSearch = null;
     var social_id = [];
+    var check_type = null;
+    
 
     $('#table_social_datas').on('click', '.select-chk', function () {
     if ($(this).is(':checked')) {
@@ -738,6 +740,8 @@ active_btn('#groupby-type .btn-grey');
                 cb(start, end);
                 $("#site").val('').trigger("change");
                 $("#source").val('').trigger("change");
+                $('.btn-grey').removeClass('active');
+                $('#all').addClass('active');
                 table_social_data();
             
 
