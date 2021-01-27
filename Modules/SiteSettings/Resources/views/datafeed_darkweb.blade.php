@@ -571,7 +571,7 @@ function table_social_data(){
         processing: true,
         serverSide: true,
         destroy: true,
-        "dom": '<"d-flex d-inline-flex justify-content-between"Bf><"top"l>rt<"bottom"ip><"clear">',
+        "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
         ajax: {
             url: '{!! route('datafeed.darkweb_datatables') !!}',
             data: {
