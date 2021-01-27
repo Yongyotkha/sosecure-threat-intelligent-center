@@ -198,7 +198,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <select id="groupby-select" class="form-control">
+                                        <select id="groupby-select2" style="display: none;" class="form-control">
                                             <option value="">Domain All</option>
                                             <option value="">DARK WEB</option> 
                                         </select>
@@ -248,9 +248,8 @@
                                         <th>Domain</th>
                                         <th>IP</th>
                                         <th>CPE</th>
-                                        <th>CPE Add</th>
-                                        <th style="width: 20px" class="text-center">Status</th>
-                                        <th style="width: 20px" class="text-center">Action</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -498,7 +497,7 @@
             columnSearch = '';
         }
         t.search( '' ).columns().search( '' ).draw();
-        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(5).search(active_tb).draw();
+        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(4).search(active_tb).draw();
        
        
         {{--ads.column(5).search(active_tb).draw();
@@ -551,15 +550,9 @@
                     name: 'ip',
                 },
                 {
-                    width: '25%',
+                    width: '29%',
                     data: 'CPE',
                     name: 'CPE',
-                }, 
-                {
-                    width: '3%',
-                    data: 'cpe',
-                    name: 'cpe',
-                    className: 'text-center'
                 }, 
                 {
                     width: '3%',
@@ -587,7 +580,15 @@
                    
                 },--}}
                 {
-                    targets: 5,
+                    targets: 3,
+                    render: function (data, type, row, meta) {
+                        return row.CPE+"<br>"+row.cpe;
+                        
+                    }
+                   
+                },
+                {
+                    targets: 4,
                     render: function (data, type, row, meta) {
                         if(row.status==1){
                             return '<span class="badge badge-success">Active</span>';
