@@ -952,7 +952,7 @@ return [
     'assets_setting_vulnerability'               => 'Assets Setting',
     'assets_setting_vulnerabilitys'              => 'Assets Setting',
     'assets'                                     => 'Assets',
-    'assets_setting'                             => 'Assets',
+    'assets_setting'                             => 'Assets Setting',
     'update_code'                                => 'Update Code',
     'api_integration'                            => 'API Integration',
     'vm_client_settings'                         => 'VM Client Settings',
