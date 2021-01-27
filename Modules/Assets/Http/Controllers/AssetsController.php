@@ -351,9 +351,9 @@ class AssetsController extends Controller
 
         }
         $dataOut["data"] =  $Assets_list;
-        $dataOut["countAssets"] = AssetsData::where('data_type_id', 5)->orWhere('data_type_id', 6)->where('status', 1)->count();
-        $dataOut["countWindows"] = CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
-        $dataOut["countLinux"] = CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
+        $dataOut["countAssets"] = @AssetsData::where('data_type_id', 5)->orWhere('data_type_id', 6)->where('status', 1)->count();
+        $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
+        $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
         return response()->json($dataOut);
     }
     public function assets_add_data(Request $request)
