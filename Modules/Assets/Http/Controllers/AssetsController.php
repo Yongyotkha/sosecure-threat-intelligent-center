@@ -81,6 +81,7 @@ class AssetsController extends Controller
 
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('assets');
+        $data['menu'] = 'system';
         return view('assets::index')->with($data);
     }
 
@@ -124,6 +125,7 @@ class AssetsController extends Controller
 
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('assets_setting');
+        $data['menu'] = 'setting';
         return view('assets::index')->with($data);
     }
     /**
@@ -186,16 +188,16 @@ class AssetsController extends Controller
         //
     }
 
-    public function assets_add_cpe($id)
+    public function assets_add_cpe(Request $request)
     {
         
         $data['cpe'] = CPEData::where('status', 1)->get();
         $data['Credentials'] = Credentials::where('status', 1)->get();
         $data['SiteSettings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
         $data['os'] = OSType::get();
-        $data['assets'] = Assets::where('code', $id)->first();
-
-
+        $data['assets'] = Assets::where('code',$request -> id)->first();
+        $data['menu'] = $request->menu;
+        $data['idip'] = $request->idip;
         return view('assets::modal.add_cpe')->with($data);
     }
 
@@ -302,13 +304,13 @@ class AssetsController extends Controller
 
     }
     
-    public function table_asset()
+    public function table_asset(Request $request)
     {
+        $menu = $request->menu;
         $Assets_list = [];
         $Assets_data = Assets::where('status', 1)->get();
         $OsType = OSType::get()->keyBy('id')->toArray();
         $SiteSettings = SiteSettings::withTrashed()->get()->keyBy('id')->toArray();
-        $menu = 'system';
         foreach ($Assets_data as $key => $value) {
             $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->where('status', 1)->get();
             $Domain_list = [];
@@ -338,12 +340,12 @@ class AssetsController extends Controller
                     $CPR_string = implode(' <br> ', (array) $CPE_List);
                 }
 
-                $menu = 'system';
+               
                 $TTSS = TransactionTimeStampScans::select('code')->where('site_id', $value->site_id)->where('domain_id', $value->domain_id)->first();
                 if (count($Domain_list) == 0) {
                     $Assets_data_list = array();
                     $Assets_data_list['chk'] = "";
-                    $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+                    $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
                     if(isset($TTSS->code)){
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                         <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
@@ -374,7 +376,7 @@ class AssetsController extends Controller
                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                         $Assets_data_list = array();
                         $Assets_data_list['chk'] = "";
-                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->id]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                         <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                         </a>';
@@ -408,7 +410,7 @@ class AssetsController extends Controller
     public function assets_add_data(Request $request)
     {
         $assets = $request->assets;
-
+        $idip = AssetsData::where('code', $request->idip)->first();
         // if($request->data[0][4]=='Delete'){
         //     dd($request->data[0][0]);
         // }else{
@@ -424,8 +426,8 @@ class AssetsController extends Controller
                 $model->select = 'add';
                 $model->cpe_data_id = $data[3];
                 $model->remark = $data[1];
-                $model->asset_id = $assets['id'];
-                
+                $model->asset_id = $idip->id;
+                $model->result = $data[0];
 
             }else if($data[3]=='Delete'){
                 
@@ -434,7 +436,7 @@ class AssetsController extends Controller
                 $model->select = 'command';
                 // $model->cpe_data_id = $data[3];
                 $model->remark = $data[1];
-                $model->asset_id = $assets['id'];
+                $model->asset_id = $idip->id;
                 $model->credentials_id = $data[4];
                 $model->result = $data[0];
 
@@ -443,13 +445,44 @@ class AssetsController extends Controller
             $model->save();
         }
 
-        return ajaxResponse(
-            [
-                'message' => langapp('changes_saved_successful'),
-                'redirect' => route('assets.index'),
-            ],
-            true,
-            Response::HTTP_OK
-        );
+        if($request -> page == 'site'){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => route('assetssite.index', ['id' => $site]),
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else if($request -> page == 'scan'){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $request->code]),
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else if($request -> page == 'system'){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => route('assets.index'),
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else if($request -> page == 'setting'){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => route('assets.index_setting'),
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }
+        
+        
     }
 }

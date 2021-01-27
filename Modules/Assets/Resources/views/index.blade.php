@@ -162,7 +162,7 @@
                                     <h5 class="font-weight-bold">Group By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">
                                         <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
-                                            <span> Domain </span>
+                                            <span> Host </span>
                                         </button>
                                         <button class="btn btn-grey" onclick="selectGroupBy('ip')">
                                             <span> IP </span>
@@ -644,6 +644,7 @@
                 type: "POST",
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
+                    d.menu = "{{$menu}}"
                 }
             },
             initComplete : function( settings, json){
