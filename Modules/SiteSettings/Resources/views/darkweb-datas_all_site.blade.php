@@ -137,9 +137,7 @@
                                         <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="keyword" class="form-control">
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-1">
+                                    <div class="col-md-4 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source" class="select2-option form-control">
                                             <option value="">All</option>
@@ -149,12 +147,29 @@
                                             <option value="server">Server</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-6 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="social_datas_date" class="form-control text-center"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
                                             <span></span> <i class="fa fa-caret-down"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 mb-1">
+                                        <h5 class="font-weight-bold">Type</h5>
+                                        <div id="groupby-type" class="btn-group special">
+                                            <button class="btn btn-grey active">
+                                                <span> All</span>
+                                            </button>
+                                            <button class="btn btn-grey">
+                                                <span> Public </span>
+                                            </button>
+                                            <button class="btn btn-grey">
+                                                <span> Darkweb </span>
+                                            </button>
+                                            <button class="btn btn-grey">
+                                                <span> Web Server </span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -177,23 +192,6 @@
                                         </div>
                                         </div>
                                     </div> --}}
-                                    <div class="col-lg-6 mb-1">
-                                        <h5 class="font-weight-bold">Type</h5>
-                                        <div id="groupby-type" class="btn-group special">
-                                            <button class="btn btn-grey active">
-                                                <span> All</span>
-                                            </button>
-                                            <button class="btn btn-grey">
-                                                <span> Public </span>
-                                            </button>
-                                            <button class="btn btn-grey">
-                                                <span> Darkweb </span>
-                                            </button>
-                                            <button class="btn btn-grey">
-                                                <span> Web Server </span>
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

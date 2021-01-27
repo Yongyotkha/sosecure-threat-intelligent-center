@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">@icon('solid/plus') @langapp('create')  </h4>
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white">@icon('solid/plus') @langapp('create')  </h4>
         </div>
 
 

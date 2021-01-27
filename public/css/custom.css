@@ -807,7 +807,8 @@ ul.news_related li a:hover{
     line-height: 150%;
 }
 .entry-view{
-    margin-left: 1rem;
+    /* margin-left: 1rem; */
+    margin-right: 1rem;
 }
 
 .shared-news{
@@ -816,6 +817,9 @@ ul.news_related li a:hover{
     top: 8%;
 }
 
+.form-control{
+    height: 30px !important;
+}
 .pos-rlt{
     position: relative;
 }
