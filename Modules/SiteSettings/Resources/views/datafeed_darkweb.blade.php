@@ -80,7 +80,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-6 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source_select" class="form-control">
                                             <option value="">All</option>
@@ -91,17 +91,14 @@
                                             @endif
                                         </select>
                                     </div>
-                                    <div class="col-lg-6 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="datafeed_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
                                             <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
-
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-12 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <label class="mr-3">
                                             <input type="checkbox" name="check_all" id="check_all" value="TRUE">

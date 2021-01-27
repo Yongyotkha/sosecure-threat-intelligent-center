@@ -847,9 +847,9 @@ class NewsController extends Controller
                         <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                     </a>
                     <div class="entry-meta">
-                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
-                        <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
-                        <span><p>&nbsp;'.strip_tags($n_detail).'</p></span>
+                    <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
+                    <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
+                    <span><p>&nbsp;'.strip_tags($n_detail).'</p></span>
                     </div>
                 </div>
                 <div class="content-news-image">

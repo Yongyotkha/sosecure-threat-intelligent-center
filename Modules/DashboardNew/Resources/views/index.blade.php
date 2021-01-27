@@ -212,7 +212,7 @@
                                     <th>Site</th>
                                     <th>Page</th>
                                     <th>Content</th>
-                                    <th>DateTime</th>
+                                    <th>Date Time</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>

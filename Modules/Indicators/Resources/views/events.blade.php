@@ -42,7 +42,7 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row">
-                            <div class="col-md-6 mb-1">
+                            <div class="col-lg-4 mb-1">
                                 <h5 class="font-weight-bold">Event Name</h5>
                                 <input type="text" class="form-control" name="event_name" id="event_name"  placeholder="Search">
                             </div>
@@ -64,7 +64,7 @@
                                     </select>
                                 </div>
                             </div>-->
-                            <div class="col-md-6 mb-1">
+                            <div class="col-lg-4 mb-1">
                                 <h5 class="font-weight-bold">Date</h5>
                                 <div id="event_date" class="text-center form-control"
                                     style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -72,9 +72,7 @@
                                     <span></span> <i class="fa fa-caret-down"></i>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-1">
+                            <div class="col-lg-4 mb-1">
                                 <h5 class="font-weight-bold">Published</h5>
                                 <div id="groupby-published" class="btn-group special">
                                     <button class="btn btn-grey check_published active" value="">
@@ -89,7 +87,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div class="panel-footer">
