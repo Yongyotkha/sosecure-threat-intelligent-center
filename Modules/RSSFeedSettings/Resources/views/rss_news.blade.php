@@ -120,12 +120,12 @@
                             <div class="container-fluid" style="padding: 2rem;">
 
                                 <div class="row">
-                                    <div class="col-lg-3 mb-1">
+                                    <div class="col-lg-12 mb-1">
                                         <h5 class="font-weight-bold">Title</h5>
                                         <input type="text" class="form-control" name="keywords" id="keywords">
                                     </div>
 
-                                    <div class="col-lg-3 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Public Date</h5>
                                         <div id="date_srange" class="text-center form-control"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -134,19 +134,38 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-3 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Group By</h5>
                                         <div id="groupby-btn" class="btn-group special">
-                                            <button id="source_btn" class="btn btn-grey check_group_by active">
+                                            <button id="source_all" class="btn btn-grey active">
+                                                <span> All </span>
+                                            </button>
+                                            <button id="source_btn" class="btn btn-grey check_group_by">
                                                 <span> Source </span>
                                             </button>
                                             <button id="category_btn" class="btn btn-grey check_group_by">
                                                 <span> Category </span>
                                             </button>
                                         </div>
+
+                                        <div id="source_search" class="m-t-10">
+                                            <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
+                                            </select>
+                                        </div>
+    
+                                        <div id="category_search" class="m-t-10">
+                                            <select name="news_category[]" id="news_category"
+                                                class="select2-option form-control" multiple="multiple">
+                                                {{-- <option value="" >All</option> --}}
+                                                @foreach(@$category as $cate)
+                                                <option value="{{$cate->id}}">{{$cate->name}}</option>
+                                                @endforeach
+                                                {{-- <option value="1" selected>All</option> --}}
+                                            </select>
+                                        </div>
                                     </div>
 
-                                    <div class="col-lg-3 mb-1">
+                                    <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey check_status active" id="all" value="">
@@ -161,28 +180,6 @@
                                         </div>
                                     </div>
 
-
-                                    <div id="source_search" class="col-lg-3 m-t-10">
-                                        <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
-                                        </select>
-                                    </div>
-
-                                    <div id="category_search" class="col-lg-3 m-t-10">
-                                        <select name="news_category[]" id="news_category"
-                                            class="select2-option form-control" multiple="multiple">
-                                            {{-- <option value="" >All</option> --}}
-                                            @foreach(@$category as $cate)
-                                            <option value="{{$cate->id}}">{{$cate->name}}</option>
-                                            @endforeach
-                                            {{-- <option value="1" selected>All</option> --}}
-                                        </select>
-                                    </div>
-
-                            
-
-                          
-
-                           
                                 </div>
                                 <!-- ของเดิม
                                 <div class="row">
@@ -317,15 +314,15 @@
 
     $(function(){
         if($('#source_btn').hasClass('active')){
-            
             $('#source_search').show();
             $('#category_search').hide();
             
         } else if($('#category_btn').hasClass('active')){
-            
             $('#category_search').show();
             $('#source_search').hide();
-            
+        }else if($('#source_all').hasClass('active')){
+            $('#source_search').hide();
+            $('#category_search').hide();
         }
     });
    
@@ -347,6 +344,17 @@
             $("#news_source").val('').trigger("change");
         }
     });
+
+    $('#source_all').on('click',function(){
+
+    if($('#source_all').hasClass('active')){
+            $('#category_search').hide();
+            $('#source_search').hide();
+            $("#news_source").val('').trigger("change");
+            $("#news_category").val('').trigger("change");
+        }
+    });
+
 
     $(".check_status").click(function() {
         status_news = $(this).val();
@@ -430,10 +438,11 @@
             $("#news_source").val('').trigger("change");
             $("#news_category").val('').trigger("change");
             $('.check_group_by').removeClass('active');
-            $('#source_btn').addClass('active');
+            $('#source_all').addClass('active');
+            $('#source_btn').removeClass('active');
             $('.check_status').removeClass('active');
             $('#all').addClass('active');
-            $('#source_search').show();
+            $('#source_search').hide();
             $('#category_search').hide();
             start = moment();
             end = moment();
