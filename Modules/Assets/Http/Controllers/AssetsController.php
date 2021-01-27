@@ -342,24 +342,24 @@ class AssetsController extends Controller
                 $CPE_Del = array();
                 foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
                     array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
-                    array_push($CPE_Vendor, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
-                    array_push($CPE_Title, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->title.'</span>');
-                    array_push($CPE_Version, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->version.'</span>');
-                    array_push($CPE_Edition, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->edition.'</span>');
-                    array_push($CPE_Remark, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->remark.'</span>');
-                    array_push($CPE_Del, '<span class="text-wrap">&nbsp;'.'<a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>'.'</span>');
-                    array_push($CPE_Ostype, '<span class="text-wrap">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
+                    array_push($CPE_Vendor, '<span class="il-block">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
+                    array_push($CPE_Title, '<span class="il-block">&nbsp;'.$CPE_Datavalue->title.'</span>');
+                    array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
+                    array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
+                    array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
+                    array_push($CPE_Del, '<span class="il-block">&nbsp;'.'<a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>'.'</span>');
+                    array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
                 }
 
                 if (count($CPE_List) > 0) {
                     $CPR_string = implode(' <br> ', (array) $CPE_List);
-                    $CPE_Vendor = implode('<hr style="border: 1px solid black;">', (array) $CPE_Vendor);
-                    $CPE_Title = implode('<hr style="border: 1px solid black;">', (array) $CPE_Title);
-                    $CPE_Version = implode('<hr style="border: 1px solid black;">', (array) $CPE_Version);
-                    $CPE_Edition = implode('<hr style="border: 1px solid black;">', (array) $CPE_Edition);
-                    $CPE_Remark = implode('<hr style="border: 1px solid black;">', (array) $CPE_Remark);
-                    $CPE_Ostype = implode('<hr style="border: 1px solid black;">', (array) $CPE_Ostype);
-                    $CPE_Del = implode('<hr style="border: 1px solid black;">', (array) $CPE_Del);
+                    $CPE_Vendor = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Vendor);
+                    $CPE_Title = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Title);
+                    $CPE_Version = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Version);
+                    $CPE_Edition = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Edition);
+                    $CPE_Remark = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Remark);
+                    $CPE_Ostype = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Ostype);
+                    $CPE_Del = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Del);
                 }
 
                

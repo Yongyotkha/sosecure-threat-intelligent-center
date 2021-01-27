@@ -3563,3 +3563,13 @@ div.dataTables_filter input{
 .align-middle{
     vertical-align: middle !important;
 }
+
+.panel .table td.padingtablezero{
+    padding: .5rem 0 !important;
+}
+
+.il-block{
+    display: inline-block;
+    line-height: 1.5;
+    padding: 1rem;
+}
