@@ -624,6 +624,8 @@ class SocialController extends Controller
 
     public function count_val(Request $request){
 
+        // dd($request->check_type);
+
         $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
         $where = ['deleted_at' => null];
         $orwhere = ['deleted_at' => null, 'feel_type' => 'compromise'];
@@ -669,7 +671,7 @@ class SocialController extends Controller
 
         
 
-        if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id) ){
+        if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request->check_type) ){
 
             $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
@@ -693,6 +695,11 @@ class SocialController extends Controller
                 // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
                 // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
                 $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
+            }
+
+            if($request -> check_type) {
+                $model = $model-> where('feel_type', '=' ,$request -> check_type);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
             }
 
             

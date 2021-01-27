@@ -725,6 +725,15 @@ class DataLeakController extends Controller
 
             }
 
+            if ($request->check_type) {
+              
+                $type = $request->check_type;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
+                    $query->where('feel_type', 'LIKE', '%' . $type . '%');
+                });
+
+            }
+
             if ($request->source) {
 
                 $source = $request->source;
@@ -1111,6 +1120,13 @@ class DataLeakController extends Controller
                 $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
             }
 
+            if($request ->check_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> check_type);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
+
+            }
+
             if (Auth::check()) {
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
@@ -1171,6 +1187,8 @@ class DataLeakController extends Controller
                     $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
                 });
             }
+
+
 
             // $model->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere, $orwhere2, $orwhere3) {
             //     $q->where($where1);
