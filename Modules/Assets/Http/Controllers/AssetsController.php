@@ -333,11 +333,33 @@ class AssetsController extends Controller
                 $CPR_string = "";
                 $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
                 $CPE_List = array();
+                $CPE_Vendor = array();
+                $CPE_Title = array();
+                $CPE_Version = array();
+                $CPE_Edition = array();
+                $CPE_Remark = array();
+                $CPE_Ostype = array();
+                $CPE_Del = array();
                 foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
                     array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
+                    array_push($CPE_Vendor, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
+                    array_push($CPE_Title, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->title.'</span>');
+                    array_push($CPE_Version, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->version.'</span>');
+                    array_push($CPE_Edition, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->edition.'</span>');
+                    array_push($CPE_Remark, '<span class="text-wrap">&nbsp;'.$CPE_Datavalue->remark.'</span>');
+                    array_push($CPE_Del, '<span class="text-wrap">&nbsp;'.'<a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>'.'</span>');
+                    array_push($CPE_Ostype, '<span class="text-wrap">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
                 }
+
                 if (count($CPE_List) > 0) {
                     $CPR_string = implode(' <br> ', (array) $CPE_List);
+                    $CPE_Vendor = implode('<hr style="border: 1px solid black;">', (array) $CPE_Vendor);
+                    $CPE_Title = implode('<hr style="border: 1px solid black;">', (array) $CPE_Title);
+                    $CPE_Version = implode('<hr style="border: 1px solid black;">', (array) $CPE_Version);
+                    $CPE_Edition = implode('<hr style="border: 1px solid black;">', (array) $CPE_Edition);
+                    $CPE_Remark = implode('<hr style="border: 1px solid black;">', (array) $CPE_Remark);
+                    $CPE_Ostype = implode('<hr style="border: 1px solid black;">', (array) $CPE_Ostype);
+                    $CPE_Del = implode('<hr style="border: 1px solid black;">', (array) $CPE_Del);
                 }
 
                
@@ -345,7 +367,7 @@ class AssetsController extends Controller
                 if (count($Domain_list) == 0) {
                     $Assets_data_list = array();
                     $Assets_data_list['chk'] = "";
-                    $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+                    $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i>Add </a>';
                     if(isset($TTSS->code)){
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                         <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
@@ -370,13 +392,21 @@ class AssetsController extends Controller
                     $Assets_data_list['ip'] = $IP_Listvalue->value;
                     $Assets_data_list['CPE'] = $CPR_string;
 
+                    $Assets_data_list['CPE_Vendor'] = $CPE_Vendor;
+                    $Assets_data_list['CPE_Title'] = $CPE_Title;
+                    $Assets_data_list['CPE_Version'] = $CPE_Version;
+                    $Assets_data_list['CPE_Edition'] = $CPE_Edition;
+                    $Assets_data_list['CPE_Remark'] = $CPE_Remark;
+                    $Assets_data_list['CPE_Ostype'] = $CPE_Ostype;
+                    $Assets_data_list['CPE_Del'] = $CPE_Del;
+                    
                     array_push($Assets_list, $Assets_data_list);
 
                 } else {
                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                         $Assets_data_list = array();
                         $Assets_data_list['chk'] = "";
-                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->id]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
+                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->id]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i>Add </a>';
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                         <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                         </a>';
@@ -393,6 +423,14 @@ class AssetsController extends Controller
                         $Assets_data_list['domain'] = $Domain_listvalue->value;
                         $Assets_data_list['ip'] = $IP_Listvalue->value;
                         $Assets_data_list['CPE'] = $CPR_string;
+
+                        $Assets_data_list['CPE_Vendor'] = $CPE_Vendor;
+                        $Assets_data_list['CPE_Title'] = $CPE_Title;
+                        $Assets_data_list['CPE_Version'] = $CPE_Version;
+                        $Assets_data_list['CPE_Edition'] = $CPE_Edition;
+                        $Assets_data_list['CPE_Remark'] = $CPE_Remark;
+                        $Assets_data_list['CPE_Ostype'] = $CPE_Ostype;
+                        $Assets_data_list['CPE_Del'] = $CPE_Del;
                         array_push($Assets_list, $Assets_data_list);
 
                     }

@@ -238,8 +238,8 @@
                     <div class="panel-body">
                         <div class="table-responsive">
 
-                            <!-- id table อันเดิม table-assets-template ส่วนปัจจุบันเป็นแค่หน้าบ้านแสดงตัวอย่าง ถ้าเปลี่ยน id กลับแล้ว อย่าลืม ลบ script ด้านล่างออกด้วยนะครับ-->
-                            <table class="table table-striped table-bordered" id="table-assets-template-test">
+                            <!-- id table อันเดิม table-assets-template table-assets-template-test ส่วนปัจจุบันเป็นแค่หน้าบ้านแสดงตัวอย่าง ถ้าเปลี่ยน id กลับแล้ว อย่าลืม ลบ script ด้านล่างออกด้วยนะครับ-->
+                            <table class="table table-striped table-bordered" id="table-assets-template" style="padding: 0px !important;" border="0" cellspacing="0" cellpadding="0">
                                 <thead>
                                     <tr>
                                         {{-- <th class="no-sort">
@@ -251,9 +251,10 @@
                                         <th rowspan="2" class="align-middle">Site</th>
                                         <th rowspan="2" class="align-middle">Domain</th>
                                         <th rowspan="2" class="align-middle">IP</th>
-                                        <th colspan="6" class="text-center">CPE</th>
+                                        <th colspan="7" class="text-center">CPE</th>
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
+                                        <th rowspan="2" class="align-middle">CPESTRING</th>
                                     </tr>
                                     <tr>
                                         <th>Vendor</th>
@@ -261,11 +262,12 @@
                                         <th>Versions</th>
                                         <th>Edition</th>
                                         <th>Remark</th>
+                                        <th>Os Type</th>
                                         <th>Delete CPE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    {{-- <tr>
                                         <td rowspan="2">บริษัท เมจิก</td>
                                         <td rowspan="2">mtsc.co.th</td>
                                         <td rowspan="2">104.24.14.205</td>
@@ -336,7 +338,7 @@
                                             <a href="#" class="btn btn-xs btn-info"><i class="fas fa-edit"></i></a>
                                             <a href="#" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add</a>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
                             </table>
                         </div>
@@ -577,13 +579,16 @@
             columnSearch = 1;
         }else if(columnSearch=='ip'){
             columnSearch = 2;
-        }else if(columnSearch=='cpe'||columnSearch=='os_type'){
-            columnSearch = 3;
+        }else if(columnSearch=='cpe'){
+            {{--columnSearch = [3, 4,5,6,7,12];--}}
+            columnSearch = 12;
+        }else if(columnSearch=='os_type'){
+            columnSearch = 8;
         }else{
             columnSearch = '';
         }
         t.search( '' ).columns().search( '' ).draw();
-        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(4).search(active_tb).draw();
+        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
        
        
         {{--ads.column(5).search(active_tb).draw();
@@ -612,7 +617,7 @@
                 type: "POST",
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
-                    d.menu = "{{$menu}}"
+                    d.menu = "{{$menu}}";
                 }
             },
             initComplete : function( settings, json){
@@ -642,10 +647,40 @@
                     name: 'ip',
                 },
                 {
-                    width: '29%',
-                    data: 'CPE',
-                    name: 'CPE',
-                }, 
+                    data: 'CPE_Vendor',
+                    name: 'CPE_Vendor',
+                    className: 'padingtablezero text-center text-wrap'
+                },
+                {
+                    data: 'CPE_Title',
+                    name: 'CPE_Title',
+                    className: 'padingtablezero text-center text-wrap'
+                },
+                {
+                    data: 'CPE_Version',
+                    name: 'CPE_Version',
+                    className: 'padingtablezero text-center text-wrap'
+                },
+                {
+                    data: 'CPE_Edition',
+                    name: 'CPE_Edition',
+                    className: 'padingtablezero text-center text-wrap'
+                },
+                {
+                    data: 'CPE_Remark',
+                    name: 'CPE_Remark',
+                    className: 'padingtablezero text-center text-wrap'
+                },
+                {
+                    data: 'CPE_Ostype',
+                    name: 'CPE_Ostype',
+                    className: 'padingtablezero text-center text-wrap'
+                },
+                {
+                    data: 'CPE_Del',
+                    name: 'CPE_Del',
+                    className: 'padingtablezero text-center text-wrap'
+                },
                 {
                     width: '3%',
                     data: 'status',
@@ -657,6 +692,12 @@
                     data: 'action',
                     name: 'action',
                     className: 'text-center no-wrap'
+                },
+                {
+                    data: 'CPE',
+                    name: 'CPE',
+                    visible:false
+
                 },
             ],
             columnDefs: [
@@ -672,15 +713,15 @@
                    
                 },--}}
                 {
-                    targets: 5,
+                    targets: 11,
                     render: function (data, type, row, meta) {
-                        return row.CPE+"<br>"+row.cpe;
+                        return row.cpe+row.action;
                         
                     }
                    
                 },
                 {
-                    targets: 4,
+                    targets: 10,
                     render: function (data, type, row, meta) {
                         if(row.status==1){
                             return '<span class="badge badge-success">Active</span>';
@@ -691,7 +732,10 @@
                     }
                    
                 },
-            ]
+            ],
+            createdRow: function(row, data, dataIndex){
+                console.log(data);
+            }
 
         });
 
