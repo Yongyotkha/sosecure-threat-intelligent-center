@@ -39,7 +39,7 @@ class AssetsSiteController extends Controller
     {
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
-        $data['page'] = 'Assets';
+        $data['page'] = 'Assets settings tab';
         return view('sitesettings::assets')->with($data);
     }
 

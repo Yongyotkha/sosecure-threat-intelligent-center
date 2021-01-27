@@ -538,6 +538,8 @@
                 data:{
                     data:convertedIntoArray,
                     assets:@json($assets),
+                    page:"{{$menu}}",
+                    idip:"{{$idip}}",
                 },
                 beforeSend: function(){
                     loading('load');

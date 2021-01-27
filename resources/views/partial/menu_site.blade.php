@@ -40,7 +40,7 @@
     </li>
 
     
-    <li class="{{ $page === 'Assets' ? 'active' : '' }}">
+    <li class="{{ $page === 'Assets settings tab' ? 'active' : '' }}">
         <a href="{{route('assetssite.index', ['id' => $siteSettings->code])}}">
             Assets
         </a>
