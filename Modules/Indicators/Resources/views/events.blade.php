@@ -3,7 +3,7 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
-            <div class="bc-head">Events</div>
+            <div class="bc-head">Events cvbdfb</div>
 
             {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
             <span>@langapp('Search_Advance')</span>
@@ -77,10 +77,13 @@
                             <div class="col-md-6">
                                 <h5 class="font-weight-bold">Published</h5>
                                 <div id="groupby-published" class="btn-group special">
-                                    <button class="btn btn-grey active">
-                                        <span> All Published</span>
+                                    <button class="btn btn-grey check_published active" value="">
+                                        <span> All</span>
                                     </button>
-                                    <button class="btn btn-grey">
+                                    <button class="btn btn-grey check_published active" value="1">
+                                        <span>Published</span>
+                                    </button>
+                                    <button class="btn btn-grey check_published" value="2">
                                         <span> No Published </span>
                                     </button>
                                 </div>
