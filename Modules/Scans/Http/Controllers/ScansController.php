@@ -883,6 +883,15 @@ class ScansController extends Controller
                 true,
                 Response::HTTP_OK
             );
+        }else if($request -> page == 'setting'){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => route('assets.index_setting'),
+                ],
+                true,
+                Response::HTTP_OK
+            );
         }
     }
 
