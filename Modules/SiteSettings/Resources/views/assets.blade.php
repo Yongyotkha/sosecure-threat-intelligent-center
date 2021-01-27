@@ -32,7 +32,7 @@
                     @icon('solid/arrow-left')
                     </a> --}}
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                    <div class="bc-head">@langapp('settings') > @langapp('assets')</div>
+                    <div class="bc-head">Site Setting &gt; > @langapp('assets')</div>
 
                     <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>

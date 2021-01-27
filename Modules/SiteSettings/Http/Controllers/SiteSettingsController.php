@@ -599,7 +599,7 @@ class SiteSettingsController extends Controller
                 } else {
                     $site_logo = '';
                 }
-                $logo = '<div style="width: 150px; height: 50px;"><img src="' . $site_logo . '" style="object-fit: cover; width: 100%; height: 100%;" onerror="setDefaultPic(this)"></div>';
+                $logo = '<div class="logo-site-tb"><img src="' . $site_logo . '" onerror="setDefaultPic(this)"></div>';
                 return $logo;
             })
             ->editColumn('name', function ($model) {
