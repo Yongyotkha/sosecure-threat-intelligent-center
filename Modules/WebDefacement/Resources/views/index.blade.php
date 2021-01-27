@@ -124,7 +124,7 @@
                                 </button>
                                 <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                     <i class="fas fa-times"></i>
-                                    <span> Clear </span>
+                                    <span> Close </span>
                                 </button>
                             </div>
                         </div>

@@ -96,6 +96,10 @@
                                     <i class=" fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
+                                <button class="btn btn-default btn-fz-13" id="close_filter">
+                                    <i class=" fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
                             </div>
                         </div>
 

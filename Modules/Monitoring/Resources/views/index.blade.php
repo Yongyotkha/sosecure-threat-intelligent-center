@@ -6,9 +6,9 @@
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a> --}}
-            <div class="bc-head">@langapp('monitoring')>Batch Job</div>
+            <div class="bc-head">@langapp('monitoring')>Batch</div>
 
-            <a href="hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <a href="#hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
@@ -79,6 +79,10 @@
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -129,6 +133,7 @@
 @include('stacks.js.datatables')
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
+@include('stacks.js.advanced_search')
 
 
 <script>
@@ -143,10 +148,7 @@ $(function () {
     
     
     data_table();
-    $('#hide-advance-search').hide();
-    $('#advance-search').click(function(){
-        $('#hide-advance-search').toggle();
-    });
+
     var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
     var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
     
