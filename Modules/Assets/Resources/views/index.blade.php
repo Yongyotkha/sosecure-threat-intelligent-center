@@ -238,7 +238,7 @@
                     <div class="panel-body">
                         <div class="table-responsive">
 
-                            <!-- id table อันเดิม table-assets-template ส่วนปัจจุบันเป็นแค่หน้าบ้านแสดงตัวอย่าง ถ้าเปลี่ยนแล้วอย่างลืม ลบ script ด้านล่างออกด้วยนะครับ-->
+                            <!-- id table อันเดิม table-assets-template ส่วนปัจจุบันเป็นแค่หน้าบ้านแสดงตัวอย่าง ถ้าเปลี่ยน id กลับแล้ว อย่าลืม ลบ script ด้านล่างออกด้วยนะครับ-->
                             <table class="table table-striped table-bordered" id="table-assets-template-test">
                                 <thead>
                                     <tr>
