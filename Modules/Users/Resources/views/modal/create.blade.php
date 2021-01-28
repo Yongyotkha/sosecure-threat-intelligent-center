@@ -187,8 +187,8 @@
                 <div class="col-md-12">
 
                             <label class="display-block">@langapp('roles')</label>
-                            <select name="roles[]" class="select2-option form-control" multiple="multiple">
-                                @foreach (Role::all() as $role)
+                            <select name="roles[]" class="select2-option form-control" ><!--multiple="multiple"-->
+                                @foreach (Role::whereNotIn('id', [3])->get() as $role)
                                     <option value="{{ $role->name }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                                 @endforeach
                             </select>
