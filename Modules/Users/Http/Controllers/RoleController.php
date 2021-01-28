@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\role_permissions;
+use Modules\Users\Entities\permissions;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -80,13 +82,40 @@ class RoleController extends Controller
 
     public function changePermission(Request $request, Role $role)
     {
+        // dd($request);
         $request->validate(['role_id' => 'required']);
         $permissions = [];
+        $permissions_id = [];
         if ($request->has('perm')) {
             foreach ($request->perm as $key => $value) {
                 $permissions[] = $key;
+                $permissions_id_where = permissions::select('id')->where('name', $key)->first();
+                $permissions_id[] = $permissions_id_where->id;
             }
-            $role->syncPermissions($permissions);
+
+            
+            $role_permissions_del = role_permissions::where('role_id', $request->role_id)->delete();
+            if(count($permissions_id) > 0) {
+                foreach($permissions_id as $permissions_id_val) {
+                    $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
+                    if($role_permissions_last) {
+                        $role_permissions_last = $role_permissions_last->id+1;
+                    } else {
+                        $role_permissions_last = 1;
+                    }
+
+                    $role_permissions = new role_permissions;
+                    $role_permissions->permission_id = $permissions_id_val;
+                    $role_permissions->role_id = $request->role_id;
+               
+                    $role_permissions->id = $role_permissions_last;
+                    $role_permissions->save();
+                }
+            }
+            
+
+
+            // $role->syncPermissions($permissions);
         }
         $data['message']  = langapp('changes_saved_successful');
         $data['redirect'] = url()->previous();
