@@ -7,93 +7,101 @@
 
         <section class="vbox">
 
-            <header class="header panel-heading bg-white b-b b-light">
-                @admin
-                {{-- <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}
-                pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                @icon('solid/download') CSV
-                </a> --}}
-                @endadmin
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow m-t-10">
+                    <div>
+                        @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                            // var_dump(get_role_custom()['site_admin']); --}}
+                            @if(@get_role_custom()['superadmin'] == 1)
+                            
+                                <div class="btn-group" style="padding-right: 2px;width: 120px;">
+                                    <select name="role" id="role" class="select2-option form-control select-site"
+                                        style="min-width: 120px">
+                                        <option value="">All Role</option>
+                                        <option value="99">Admin Support</option>
+                                        @foreach (Role::get() as $role)
+                                        <option value="{{@$role->id}}">{{@$role->name}}
+                                        </option>
+                                        @endforeach
+                
+                                    </select>
+                                </div>
 
-                @if(!empty(get_role_custom()))
-                {{-- // var_dump(get_role_custom()['superadmin']);
-                    // var_dump(get_role_custom()['site_admin']); --}}
-                    @if(@get_role_custom()['superadmin'] == 1)
-
-                        @can('users_delete')
-                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger pull-right" value="bulk-delete"
-                            data-rel="tooltip" title="Are you sure?" data-placement="bottom" disabled>
-                            @icon('solid/trash-alt') @langapp('delete')
-                        </button>
-                        @endcan
-        
-        
-        
-                        @if(isAdmin() || can('announcements_create'))
-                        <a href="{{ route('announcements.index') }}" style="display: none"
-                            class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-rel="tooltip"
-                            title="@langapp('announcements')" data-placement="bottom">
-                            @icon('solid/bullhorn') @langapp('announcements')
-                        </a>
+                                @can('roles_view_all')
+                                <a href="{{  route('users.roles')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                    @icon('solid/user-secret') @langapp('roles') </a>
+                
+                                <a href="{{  route('users.perm')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                    @icon('solid/shield-alt') @langapp('permissions')</a>
+                
+                                @endcan
+                            @endif
                         @endif
-        
-                        @can('users_create')
-                        <a href="{{ route('users.create') }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
-                            data-toggle="ajaxModal">
-                            @icon('solid/plus') @langapp('create')
-                        </a>
-                        @endcan
 
-                        <div class="btn-group" style="padding-right: 2px;width: 120px;">
-                            <select name="role" id="role" class="select2-option form-control select-site"
-                                style="min-width: 120px">
-                                <option value="">All Role</option>
-                                <option value="99">Admin Support</option>
-                                @foreach (Role::get() as $role)
-                                <option value="{{@$role->id}}">{{@$role->name}}
+                    </div>
+    
+                    <div class="ml-2 text-right">
+                        <div class="text-left" style="width: 270px;display:inline-block">
+                            <select name="site" id="site" class="select2-option form-control select-site"
+                                style="min-width: 270px">
+                                <option value="">All Site</option>
+                                @if ($SiteSettings)
+
+                                @foreach ($SiteSettings as $SiteSettings)
+                                <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}}
                                 </option>
                                 @endforeach
-        
+
+                                @endif
                             </select>
                         </div>
 
-                    @endif
-                @endif
+                        @admin
+                        {{-- <a href="{{  route('users.export')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}
+                        pull-right" data-rel="tooltip" title="@langapp('export') CSV">
+                        @icon('solid/download') CSV
+                        </a> --}}
+                        @endadmin
+
+                        @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                            // var_dump(get_role_custom()['site_admin']); --}}
+                            @if(@get_role_custom()['superadmin'] == 1)
+
+                            @can('users_create')
+                            <a href="{{ route('users.create') }}" class=" m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}"
+                                data-toggle="ajaxModal">
+                                @icon('solid/plus') @langapp('create')
+                            </a>
+                            @endcan
+                        
+                            @can('users_delete')
+                            <button type="submit" id="btn_del_select" class="m-l-xs btn btn-sm btn-danger" value="bulk-delete"
+                                data-rel="tooltip" title="Are you sure?" data-placement="bottom" disabled>
+                                @icon('solid/trash-alt') @langapp('delete')
+                            </button>
+                            @endcan
+            
+            
+            
+                            @if(isAdmin() || can('announcements_create'))
+                            <a href="{{ route('announcements.index') }}" style="display: none"
+                                class="btn btn-sm btn-{{ get_option('theme_color') }}" data-rel="tooltip"
+                                title="@langapp('announcements')" data-placement="bottom">
+                                @icon('solid/bullhorn') @langapp('announcements')
+                            </a>
+                            @endif
+                
+                               
 
 
-
-                <div class="pull-right" style="padding-top: 10px; width: 120px;">
-                    <select name="site" id="site" class="select2-option form-control select-site"
-                        style="min-width: 120px">
-                        <option value="">All Site</option>
-                        @if ($SiteSettings)
-
-                        @foreach ($SiteSettings as $SiteSettings)
-                        <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}}
-                        </option>
-                        @endforeach
-
+                            @endif
                         @endif
-                    </select>
+                        
+                    </div>
                 </div>
-
-                @if(!empty(get_role_custom()))
-                {{-- // var_dump(get_role_custom()['superadmin']);
-                    // var_dump(get_role_custom()['site_admin']); --}}
-                    @if(@get_role_custom()['superadmin'] == 1)
-                        @can('roles_view_all')
-                        <a href="{{  route('users.roles')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                            @icon('solid/user-secret') @langapp('roles') </a>
-        
-                        <a href="{{  route('users.perm')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                            @icon('solid/shield-alt') @langapp('permissions')</a>
-        
-                        @endcan
-                    @endif
-                @endif
             </header>
-
-
 
             <section class="scrollable wrapper">
 
