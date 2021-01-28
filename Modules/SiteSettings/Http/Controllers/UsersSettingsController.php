@@ -14,6 +14,7 @@ use App\transaction_client_user_site;
 use App\transaction_client_users;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use Modules\Users\Entities\model_has_roles;
 use Modules\SiteSettings\Http\Requests\UserRequest;
 
 use Mail;
@@ -150,14 +151,7 @@ class UsersSettingsController extends Controller
 
 
                     $role_id = $request->role_id;
-                    $site_role_id = null;
-                    if($role_id == 1 || $role_id == 4) {
-                        $role = 'admin';
-                        // $site_role_id = 99;
-                    } else {
-                        $role = 'admin';//client_site
-                        // $site_role_id = $role_id;
-                    } 
+
             
             
             
@@ -190,7 +184,7 @@ class UsersSettingsController extends Controller
 
                     $UserSite = new UserSite;
                     $UserSite->user_id = $User->id;
-                    $UserSite->site_id = $User->site_id;
+                    $UserSite->site_id = $SiteSettings->id;
                     $UserSite->created_by = @Auth::user()->id;
                     $UserSite->save();
 
@@ -210,8 +204,39 @@ class UsersSettingsController extends Controller
                     $transaction_client_profiles -> status = 1;
                     $transaction_client_profiles -> save();
             
-                    if($role) {
-                        $User->syncRoles($role);
+                    if($role_id) {
+                        $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
+                        if($model_has_roles) {
+                            $model_has_roles->role_id = $role_id;
+                            $model_has_roles->model_type = 'Modules\Users\Entities\User';
+                            // $model_has_roles->model_id = $User->id;
+                            $model_has_roles->save();
+                        } else {
+                            $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
+                            if($model_has_roles_q) {
+                                $id_last = $model_has_roles_q->id+1;
+                            } else {
+                                $id_last = 1;
+                            }
+                            
+                            $model_has_roles = new model_has_roles;
+                            $model_has_roles->role_id = $role_id;
+                            $model_has_roles->model_type = 'Modules\Users\Entities\User';
+                            $model_has_roles->model_id = $User->id;
+                            $model_has_roles->id = $id_last;
+                            $model_has_roles->save();
+                        }
+
+                        // $site_role_id = null;
+                        // if($role_id == 1 || $role_id == 4) {
+                        //     $role = 'admin';
+                        //     // $site_role_id = 99;
+                        // } else {
+                        //     $role = 'admin';//client_site
+                        //     // $site_role_id = $role_id;
+                        // } 
+
+                        // $User->syncRoles($role);
 
                         $transaction_client_role_permissions = new transaction_client_role_permissions();
                         $transaction_client_role_permissions -> site_id = $SiteSettings->id;
