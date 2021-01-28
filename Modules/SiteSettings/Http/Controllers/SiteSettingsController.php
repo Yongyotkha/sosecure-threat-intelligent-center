@@ -438,22 +438,75 @@ class SiteSettingsController extends Controller
             //     $Tags_site->save();
             // }
 
-            if ($request->logo) {
-                $request->validate([
-                    'logo' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
-                ]);
-                $image_path = $SiteSettings->logo;
-                if (File::exists($image_path)) {
-                    File::delete($image_path);
+            if($request->input_img_logo_base64) {
+                // dd($request->input_img_logo_base64);
+
+                //---start----save----img_base64-------------------------//
+                $img_base64_site_logo_login = $request->input_img_logo_base64;
+                if($img_base64_site_logo_login) {
+                        $data = $img_base64_site_logo_login;
+                        list($type, $data) = explode(';', $data);
+                        list(, $data)= explode(',', $data);
+                        $data = base64_decode($data);
+                    //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        // $image_name= time().$k.'.png';
+                        $image_name = 'logo'.time().'.png';
+    
+                        $target_dir = "images/logo_site/";
+                        if (!is_dir($target_dir)) {
+                            mkdir($target_dir, 0777, TRUE);
+                        }
+    
+                        $target_file = $target_dir . $image_name;
+                    //อัพโหลดภาพไปยัง public
+                        // $path = public_path('images/file_editor') .'/'. $image_name;
+                    //ทำการอัพโหลดภาพ
+                        // file_put_contents($path, $data);
+                        $image_path = $SiteSettings->logo;
+    
+                        if (file_put_contents($target_file, $data)) {
+                            $SiteSettings->logo = $target_file;
+                            $SiteSettings->save();
+                                
+                                if (File::exists($image_path)) {
+                                    File::delete($image_path);
+                                }
+                                // $data = $this->Clients_model->get_clients($client_id);
+                                // $data = $this->Login_setting_model->get_by_id_clients($client_id);
+                                // if($data) {
+                                //     if($data->site_logo) {
+                                //                         // echo ($data[0]->site_logo);
+                                //                         // exit();
+                                //         if(file_exists($data->site_logo)) {
+                                //             unlink($data->site_logo);
+                                //         }
+                                //     }
+                                // }
+                                // $this->Login_setting_model->edit_login_setting($save_id_arr,'site_logo',$target_file);//save_db
+                        } else {
+                            // echo json_encode(array("success" => false, 'message' => 'Sorry, there was an error uploading your file.'));
+                            // exit();
+                        }
                 }
-                $image = $request->file('logo');
-                $imagename = time() . '.' . $image->getClientOriginalExtension();
-                $destinationPath = public_path('images/logo_site');
-                $image->move($destinationPath, $imagename);
-                $SiteSettings->logo = 'images/logo_site/' . $imagename;
-                $SiteSettings->save();
-                
+                //---stop----save----img_base64-------------------------//
             }
+
+            // if ($request->logo) {
+            //     $request->validate([
+            //         'logo' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
+            //     ]);
+            //     $image_path = $SiteSettings->logo;
+            //     if (File::exists($image_path)) {
+            //         File::delete($image_path);
+            //     }
+            //     $image = $request->file('logo');
+            //     $imagename = time() . '.' . $image->getClientOriginalExtension();
+            //     $destinationPath = public_path('images/logo_site');
+            //     $image->move($destinationPath, $imagename);
+            //     $SiteSettings->logo = 'images/logo_site/' . $imagename;
+            //     $SiteSettings->save();
+                
+            // }
         }
         if ($request->page_setting == 'site_settings') {
             return ajaxResponse(

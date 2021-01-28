@@ -817,7 +817,7 @@ ul.news_related li a:hover{
     top: 8%;
 }
 
-.form-control{
+.form-control:not(textarea.form-control){
     height: 30px !important;
 }
 .pos-rlt{
@@ -3576,4 +3576,8 @@ div.dataTables_filter input{
 
 .input-group-btn .btn{
     line-height: 1.2 !important;
+}
+
+textarea.form-control{
+    height: auto !important;
 }
