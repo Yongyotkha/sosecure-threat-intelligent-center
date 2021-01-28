@@ -31,7 +31,7 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm_custom validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             <section class="panel panel-default">
                                 
                             <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') Site Details  </header>
@@ -41,8 +41,10 @@
                                     <label class="col-lg-3 control-label">Logo </label>
                                     <div class="col-lg-6">
                                         <div class="pull-left mr15">
-                                            <div style="width:150px; height:150px;">
-                                                <img id="site-logo-preview_tab_login" src="{{$siteSettings->logo ? asset($siteSettings->logo) : asset('images/default-placeholder.png') }}" style="width:100%;height:100%; object-fit:contain;" alt="..." />
+                                            <div id="area_preview_logo" style="width:150px; height:150px;">
+                                                {{-- <div id="preview-image_logo"></div> --}}
+                                                <img id="preview-image_logo" src="{{$siteSettings->logo ? asset($siteSettings->logo) : asset('images/default-placeholder.png') }}" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..." />
+                                                <input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" value="">
                                             </div>
                                             <input id="file-input-demo" type="file" class="form-control" name="logo">
                                             <span>Remark Upload File Extension (.png .jpg) <span class="text-danger">Max Size 2MB</span></span>
@@ -188,11 +190,13 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
-@include('partial.ajaxify')
+{{-- @include('partial.ajaxify') --}}
 @include('stacks.js.menusub')
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.fullscreen')
 @include('stacks.js.cropple')
+@include('stacks.js.defaultpic')
+
 <script>
     var cropper_logo;
     var imgs_logo = null;
@@ -206,13 +210,24 @@
 
             input_logo.change(function(event) {
                 var files = event.target.files;
-                var done = function(url){
-                    image.src = url;
-                    $modal.modal('show');
-                };
+                
 
                 if (files && files.length > 0)
                 {
+                    
+                    var fileTypes = ["image/jpeg", "image/png", "image/gif"];
+                    if (fileTypes.indexOf(files[0].type) === -1) {
+                        
+                        toastr.error( '<li>invalid_file_type</li>' , '@langapp('response_status') ');
+                        
+                        return false;
+                    } else if (files[0].size / 1024 > 3072) {
+                        
+                        toastr.error( '<li>max_file_size_3mb_message</li>' , '@langapp('response_status') ');
+                        
+                        return false;
+                    }
+
                     reader = new FileReader();
                     reader.onload = function(event)
                     {
@@ -220,6 +235,11 @@
                     };
                     reader.readAsDataURL(files[0]);
                 }
+
+                var done = function(url){
+                    image.src = url;
+                    $modal.modal('show');
+                };
             });
 
             $modal.on('shown.bs.modal', function () {
@@ -247,14 +267,54 @@
 
         $('.upload-image-logo').on('click', function (ev) {
             canvas = cropper_logo.getCroppedCanvas({
-                width: 200,
-                height: 150,
+                width: 400,
+                height: 300,
             }).toDataURL();
             imgs_logo = canvas;
-            html = '<img src="' + imgs_logo + '" />';
-            $("#preview_cer_img").html(html);
-            $("#preview-image_logo").html("");
+            html = '<img id="preview-image_logo" src="' + imgs_logo + '" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..." />';
+            html += '<input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" value="' +imgs_logo+'">';
+            $("#area_preview_logo").html(html);
+            {{--console.log(html);--}}
         }); 
+
+
+
+        var form_save = '.formSaving';
+        $('.ajaxifyForm_custom').submit(function (event) {
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            event.preventDefault();
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+
+            {{--data.append('logo_base64', $("#preview-image_logo").attr("src"));--}}
+
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                        toastr.success(response.data.message, '@langapp('response_status') ');
+                        $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                        {{--window.location.href = response.data.redirect;--}}
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+            });   
+        });
 </script>
 
 <script>
