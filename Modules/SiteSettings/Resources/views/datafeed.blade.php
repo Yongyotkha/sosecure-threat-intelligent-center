@@ -104,18 +104,17 @@
                                 <div class="row">
                                     <div class="col-lg-12 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_all" id="check_all" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">All</span>
-                                        </label>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_pending" id="check_pending" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Pending</span>
-                                        </label>
-                                        <label class="mr-3">
-                                            <input type="checkbox" name="check_approved" id="check_approved" value="TRUE">
-                                            <span class="label-text" style="font-size: 16px;">Approved</span>
-                                        </label>
+                                        <div id="groupby-status" class="btn-group special">
+                                            <button class="btn btn-grey check_status active" id="all" value="">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="1">
+                                                <span> Panding </span>
+                                            </button>
+                                            <button class="btn btn-grey check_status" value="2">
+                                                <span> Approved </span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -320,272 +319,260 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
+@include('stacks.js.activebutton')
 <script>
+    active_btn('#groupby-status .btn-grey');
     var search_val = 0;
     var start_date = '';
     var end_date = '';
-    var check_all = false;
-    var check_pending = false;
-    var check_approved = false;
-
-$(function() {
-    table_social_data();
-});
+    var check_type = null;
 
 
-$(function() { 
-    var start = moment().startOf('hour');
-    var end = moment().startOf('hour').add(32, 'hour');
-    function cb(start, end) {
-        $('#datafeed_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-    $('#datafeed_date').daterangepicker({
-        timePicker: true,
-        startDate: start,
-        endDate: end,
-        locale: {
-            format: 'M/DD hh:mm A'
-        },
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    $(function() {
+        table_social_data();
+    });
+
+
+    $(function() { 
+        var start = moment().startOf('hour');
+        var end = moment().startOf('hour').add(32, 'hour');
+        function cb(start, end) {
+            $('#datafeed_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         }
-    }, cb);
-    cb(start, end);
+        $('#datafeed_date').daterangepicker({
+            timePicker: true,
+            startDate: start,
+            endDate: end,
+            locale: {
+                format: 'M/DD hh:mm A'
+            },
+            ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+        cb(start, end);
 
-    $("#btn_data_leak_reset").click(function() {
-        search_val = 0;
-        $("#search").val('');
-        $("#source_select").val('').trigger('change');
-        $("#check_all").prop("checked",false);
-        $("#check_pending").prop("checked",false);
-        $("#check_approved").prop("checked",false);
+        $("#btn_data_leak_reset").click(function() {
+            search_val = 0;
+            $("#search").val('');
+            $("#source_select").val('').trigger('change');
+            $(".btn-grey").removeClass("active");
+            $("#all").addClass ( "active" );
+            check_type = null;
 
-        cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
+            cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
+
+            table_social_data();
+        });
+
+    });
+
+    $(".btn-grey").click(function() {
+        check_type = $(this).val();
+   
+    });
+
+
+
+    $("#btn_data_leak_search").click(function() {
+        search_val = 1;
+
+        start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+        end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
 
         table_social_data();
     });
 
-});
 
 
-
-$("#btn_data_leak_search").click(function() {
-    search_val = 1;
-
-    
-    if ($('#check_all').is(":checked")) {
-        check_all = true;
-    } else {
-        check_all = false;
-    }
-    if ($('#check_pending').is(":checked")) {
-        check_pending = true;
-    } else {
-        check_pending = false;
-    }
-    if ($('#check_approved').is(":checked")) {
-        check_approved = true;
-    } else {
-        check_approved = false;
-    }
-    start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-    end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-
-    table_social_data();
-});
-
-
-
-function table_social_data(){
-    let search = $('#search').val();
-    let site = $('#site').val();
-    let type = $('#type').val();
-    $('#table_data_feed').DataTable({
-        processing: true,
-        serverSide: true,
-        destroy: true,
-        "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
-        ajax: {
-            url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
-            data: {
-                "search_val" : search_val,
-                "search" : search,
-                "type" : type,
-                "start_date" : start_date,
-                "end_date" : end_date,
-                "check_all" : check_all,
-                "check_pending" : check_pending,
-                "check_approved" : check_approved,
-                "site" : site,
-            },
-            type: "POST",
-        },
-        order: [
-            [0, "desc"]
-        ],
-        columns: [
-            {
-                data: 'chk',
-                orderable: false,
-                searchable: false,
-                sortable: false,
-                className: 'w-10'
-            },  
-            {
-                data: 'site',
-                name: 'site'
-            },
-            {
-                data: 'source',
-                name: 'source'
-            },
-            {
-                data: 'keyword',
-                name: 'keyword'
-            },
-            {
-                data: 'content',
-                name: 'content'
-            },
-            {
-                data: 'data_feed',
-                name: 'data_feed',
-                className: 'no-wrap'
-            },
-            {
-                data: 'url',
-                name: 'url',
-            },
-            {
-                data: 'action',
-                name: 'action'
-            },
-        ],
-        columnDefs: [
-            {
-                targets: 4,
-                render: function (data, type, full, meta) {
-                    var feedcontent = full.feedcontent;
-                    var res = full.keyword.split(",");
-                    let content = '';
-                    for(let i in res){
-                        const data = res[i];
-                        content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
-                    }
-                    return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+    function table_social_data(){
+        let search = $('#search').val();
+        let site = $('#site').val();
+        let type = $('#type').val();
+        $('#table_data_feed').DataTable({
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            ajax: {
+                url: '{!! route('socialdatas.datafeedsocial_datatables') !!}',
+                data: {
+                    "search_val" : search_val,
+                    "search" : search,
+                    "type" : type,
+                    "start_date" : start_date,
+                    "end_date" : end_date,
+                    "check_type" : check_type,
+                    "site" : site,
                 },
+                type: "POST",
             },
-        ]
-    });
-}
+            order: [
+                [0, "desc"]
+            ],
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10'
+                },  
+                {
+                    data: 'site',
+                    name: 'site'
+                },
+                {
+                    data: 'source',
+                    name: 'source'
+                },
+                {
+                    data: 'keyword',
+                    name: 'keyword'
+                },
+                {
+                    data: 'content',
+                    name: 'content'
+                },
+                {
+                    data: 'data_feed',
+                    name: 'data_feed',
+                    className: 'no-wrap'
+                },
+                {
+                    data: 'url',
+                    name: 'url',
+                },
+                {
+                    data: 'action',
+                    name: 'action'
+                },
+            ],
+            columnDefs: [
+                {
+                    targets: 4,
+                    render: function (data, type, full, meta) {
+                        var feedcontent = full.feedcontent;
+                        var res = full.keyword.split(",");
+                        let content = '';
+                        for(let i in res){
+                            const data = res[i];
+                            content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
+                        }
+                        return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                    },
+                },
+            ]
+        });
+    }
 
-$('#source_select').select2();
-var data_feed_id = [];
-$('#table_data_feed').on('click', '.data_feed_id', function () {
-    if ($(this).is(':checked')) {
-        $('#btn-change-status').prop("disabled", false);
-    } else {
-        if ($('.data_feed_id').filter(':checked').length < 1){
-            $('#btn-change-status').attr('disabled',true);
+    $('#source_select').select2();
+    var data_feed_id = [];
+    $('#table_data_feed').on('click', '.data_feed_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn-change-status').prop("disabled", false);
+        } else {
+            if ($('.data_feed_id').filter(':checked').length < 1){
+                $('#btn-change-status').attr('disabled',true);
+            }
+        }
+    });
+
+
+
+    function approve_dataFeed(id){
+        data_feed_id = [];
+        data_feed_id.push(id);
+    }
+
+    function cancle_dataFeed(id){
+        data_feed_id = [];
+        data_feed_id.push(id);
+    }
+
+    function confirm_approve(mode){
+        $('.data_feed_id:checked').each(function () {
+            data_feed_id.push(this.value);
+        });
+        let sent_mail = 0;
+        if(mode == 'one'){
+            if ($(".sent_mail").is(':checked')) {
+                sent_mail = 1;
+            }
+        }else{
+            if ($("#sent_mail").is(':checked')) {
+                sent_mail = 1;
+            }
+        }
+        
+        $.ajax({
+            type:"POST",
+            url:"{{ route('socialdatas.approve_data_feed') }}",
+            data:{
+                id: data_feed_id,
+                sent_mail: sent_mail
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
+    function confirm_cancle(){
+        $('.data_feed_id:checked').each(function () {
+            data_feed_id.push(this.value);
+        });
+        $.ajax({
+            type:"POST",
+            url:"{{ route('socialdatas.cancle_data_feed') }}",
+            data:{id: data_feed_id},
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
+    function change_status(){
+        let status_action = $('#status_action :selected').val();
+        if(status_action == 1){
+            confirm_approve('many');
+        }else{
+            confirm_cancle();
         }
     }
-});
-
-
-
-function approve_dataFeed(id){
-    data_feed_id = [];
-    data_feed_id.push(id);
-}
-
-function cancle_dataFeed(id){
-    data_feed_id = [];
-    data_feed_id.push(id);
-}
-
-function confirm_approve(mode){
-    $('.data_feed_id:checked').each(function () {
-        data_feed_id.push(this.value);
-    });
-    let sent_mail = 0;
-    if(mode == 'one'){
-        if ($(".sent_mail").is(':checked')) {
-            sent_mail = 1;
-        }
-    }else{
-        if ($("#sent_mail").is(':checked')) {
-            sent_mail = 1;
-        }
-    }
-    
-    $.ajax({
-        type:"POST",
-        url:"{{ route('socialdatas.approve_data_feed') }}",
-        data:{
-            id: data_feed_id,
-            sent_mail: sent_mail
-        },
-        beforeSend: function(){
-            loading('load');
-        },
-        success:function(response) {
-            loading('stop_load');
-            toastr.success(response.message, '@langapp('response_status')');
-            window.location.href = response.redirect;
-        },
-        error: function (error){
-            loading('stop_load');
-            var errors = error.response.data.errors;
-            var errorsHtml = '';
-            $.each(errors, function (key, value) {
-                errorsHtml += '<li>' + value[0] + '</li>';
-            });
-            toastr.error(errorsHtml, '@langapp('response_status') ');
-        }
-    });
-}
-
-function confirm_cancle(){
-    $('.data_feed_id:checked').each(function () {
-        data_feed_id.push(this.value);
-    });
-    $.ajax({
-        type:"POST",
-        url:"{{ route('socialdatas.cancle_data_feed') }}",
-        data:{id: data_feed_id},
-        beforeSend: function(){
-            loading('load');
-        },
-        success:function(response) {
-            loading('stop_load');
-            toastr.success(response.message, '@langapp('response_status')');
-            window.location.href = response.redirect;
-        },
-        error: function (error){
-            loading('stop_load');
-            var errors = error.response.data.errors;
-            var errorsHtml = '';
-            $.each(errors, function (key, value) {
-                errorsHtml += '<li>' + value[0] + '</li>';
-            });
-            toastr.error(errorsHtml, '@langapp('response_status') ');
-        }
-    });
-}
-
-function change_status(){
-    let status_action = $('#status_action :selected').val();
-    if(status_action == 1){
-        confirm_approve('many');
-    }else{
-        confirm_cancle();
-    }
-}
 
 </script>
 @endpush

@@ -352,9 +352,7 @@ active_btn('#groupby-status .btn-grey');
     var start_date = null;
     var end_date = null;
     var isDateSearch = null;
-    var check_all = false;
-    var check_pending = false;
-    var check_approved = false;
+    var check_type = null;
     var val_id = [];
 
     $('#table_darkweb_feed').on('click', '.select-chk', function () {
@@ -375,6 +373,11 @@ active_btn('#groupby-status .btn-grey');
                 $('#btn_del_select').attr('disabled',true);
             }
         }
+    });
+
+    $(".btn-grey").click(function() {
+        check_type = $(this).val();
+   
     });
 
 
@@ -410,9 +413,9 @@ $(function() {
         search_val = 0;
         $("#search").val('');
         $("#source_select").val('').trigger('change');
-        $("#check_all").prop("checked",false);
-        $("#check_pending").prop("checked",false);
-        $("#check_approved").prop("checked",false);
+        $(".btn-grey").removeClass("active");
+        $("#all").addClass ( "active" );
+        check_type = null;
 
         cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
 
@@ -423,21 +426,6 @@ $(function() {
 
 $("#btn_darkweb_feed_search").click(function() {
     search_val = 1;
-    if ($('#check_all').is(":checked")) {
-        check_all = true;
-    } else {
-        check_all = false;
-    }
-    if ($('#check_pending').is(":checked")) {
-        check_pending = true;
-    } else {
-        check_pending = false;
-    }
-    if ($('#check_approved').is(":checked")) {
-        check_approved = true;
-    } else {
-        check_approved = false;
-    }
     start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
     end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
 
@@ -461,9 +449,7 @@ function table_social_data(){
                 "source_select" : source_select,
                 "start_date" : start_date,
                 "end_date" : end_date,
-                "check_all" : check_all,
-                "check_pending" : check_pending,
-                "check_approved" : check_approved,
+                "check_type" : check_type,
                 "site_id" : '{!!json_encode($siteID)!!}',
             },
             type: "POST",

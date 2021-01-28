@@ -75,7 +75,7 @@
                             <div class="col-lg-4 mb-1">
                                 <h5 class="font-weight-bold">Published</h5>
                                 <div id="groupby-published" class="btn-group special">
-                                    <button class="btn btn-grey check_published active" value="">
+                                    <button class="btn btn-grey check_published  active" id="all" value="">
                                         <span>All</span>
                                     </button>
                                     <button class="btn btn-grey check_published" value="1">
@@ -362,7 +362,9 @@ Highcharts.setOptions({
 
         $("#btn_reset").click(function() {
             $("#event_name").val('');
-      
+            check_published=null;
+            $(".btn-grey").removeClass("active");
+            $("#all").addClass ( "active" );
             start = moment();
             end = moment();
             cb(start, end);

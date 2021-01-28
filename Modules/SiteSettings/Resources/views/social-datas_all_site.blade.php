@@ -740,6 +740,7 @@ active_btn('#groupby-type .btn-grey');
                 $("#source").val('').trigger("change");
                 $('.btn-grey').removeClass('active');
                 $('#all').addClass('active');
+                check_type = null;
                 table_social_data();
             
 

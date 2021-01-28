@@ -758,7 +758,7 @@ active_btn('#groupby-type .btn-grey');
                 cb(start, end);
                 $('.btn-grey').removeClass('active');
                 $('#all').addClass('active');
-                
+                check_type = null;
                 table_social_data();
             });
 

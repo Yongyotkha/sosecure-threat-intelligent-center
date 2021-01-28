@@ -1272,16 +1272,24 @@ class DataLeakController extends Controller
             // if ($request->source_select) {
             //     $model = $model->where('sourceid', $request->source_select);
             // }
-            if ($request->check_all == 'true') {
+            // if ($request->check_all == 'true') {
 
-            } else {
-                if ($request->check_pending == 'true') {
+            // } else {
+            //     if ($request->check_pending == 'true') {
+            //         $model = $model->where('approve', '0');
+            //     }
+            //     if ($request->check_approved == 'true') {
+            //         $model = $model->where('approve', '1');
+            //     }
+            // }
+            if ($request->check_type) {
+                if($request->check_type==1){
                     $model = $model->where('approve', '0');
-                }
-                if ($request->check_approved == 'true') {
+                }else if($request->check_type==2){
                     $model = $model->where('approve', '1');
                 }
             }
+
 
             if ($request->start_date) {
                 $date_start = $request->start_date;
@@ -1325,13 +1333,23 @@ class DataLeakController extends Controller
             ->editColumn(
                 'site',
                 function (DataLeakFeedTemp $model) {
-                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id', $model->id)->where('keyword', '!=', 'scanner')->first();
-                    $site = SiteSettings::select('name')->whereIn('id', [$leak_socail_ref_temps->site_id])->get();
                     $name_site = '';
-                    foreach ($site as $data) {
-                        $name_site .= $data->name . ' ,';
+                    $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('data_leak_feed_id', $model->id)->where('keyword', '!=', 'scanner')->first();
+                    if($leak_socail_ref_temps){
+                        $site = SiteSettings::select('name')->whereIn('id', [$leak_socail_ref_temps->site_id])->get();
+                        if($site){
+                            foreach ($site as $data) {
+                                $name_site .= $data->name . ' ,';
+                            }
+                            return rtrim($name_site, ", ");
+                        }else{
+                            return '-';
+                        }
+                    }else{
+                        return '-';
                     }
-                    return rtrim($name_site, ", ");
+
+
                 }
             )
             ->editColumn(
@@ -1438,17 +1456,25 @@ class DataLeakController extends Controller
                     $qq->where('sourceid', $request->source_select);
                 }
 
-                if ($request->check_all == 'true') {
 
-                } else {
-                    if ($request->check_pending == 'true' && $request->check_approved == 'true') {
-
-                    } else if ($request->check_pending == 'true') {
+                if ($request->check_type) {
+                    if($request->check_type==1){
                         $qq->where('approve', '0');
-                    } else if ($request->check_approved == 'true') {
+                    }else if($request->check_type==2){
                         $qq->where('approve', '1');
                     }
                 }
+                // if ($request->check_all == 'true') {
+
+                // } else {
+                //     if ($request->check_pending == 'true' && $request->check_approved == 'true') {
+
+                //     } else if ($request->check_pending == 'true') {
+                //         $qq->where('approve', '0');
+                //     } else if ($request->check_approved == 'true') {
+                //         $qq->where('approve', '1');
+                //     }
+                // }
 
                 if ($request->start_date) {
                     $date_start = $request->start_date;
@@ -1895,17 +1921,26 @@ class DataLeakController extends Controller
                 if ($request->source_select) {
                     $q->where('sourceid', $request->source_select);
                 }
-                if ($request->check_all == 'true') {
 
-                } else {
-                    if ($request->check_pending == 'true' && $request->check_approved == 'true') {
-
-                    } else if ($request->check_pending == 'true') {
+                if ($request->check_type) {
+                    if($request->check_type==1){
                         $q->where('approve', '0');
-                    } else if ($request->check_approved == 'true') {
+                    }else if($request->check_type==2){
                         $q->where('approve', '1');
                     }
                 }
+
+                // if ($request->check_all == 'true') {
+
+                // } else {
+                //     if ($request->check_pending == 'true' && $request->check_approved == 'true') {
+
+                //     } else if ($request->check_pending == 'true') {
+                //         $q->where('approve', '0');
+                //     } else if ($request->check_approved == 'true') {
+                //         $q->where('approve', '1');
+                //     }
+                // }
 
                 if ($request->start_date) {
                     $date_start = $request->start_date;
@@ -1953,17 +1988,25 @@ class DataLeakController extends Controller
                 if ($request->source_select) {
                     $q->where('sourceid', $request->source_select);
                 }
-                if ($request->check_all == 'true') {
 
-                } else {
-                    if ($request->check_pending == 'true' && $request->check_approved == 'true') {
-
-                    } else if ($request->check_pending == 'true') {
+                if ($request->check_type) {
+                    if($request->check_type==1){
                         $q->where('approve', '0');
-                    } else if ($request->check_approved == 'true') {
+                    }else if($request->check_type==2){
                         $q->where('approve', '1');
                     }
                 }
+                // if ($request->check_all == 'true') {
+
+                // } else {
+                //     if ($request->check_pending == 'true' && $request->check_approved == 'true') {
+
+                //     } else if ($request->check_pending == 'true') {
+                //         $q->where('approve', '0');
+                //     } else if ($request->check_approved == 'true') {
+                //         $q->where('approve', '1');
+                //     }
+                // }
 
                 if ($request->start_date) {
                     $date_start = $request->start_date;
@@ -2935,16 +2978,24 @@ class DataLeakController extends Controller
             if ($request->source_select) {
                 $model = $model->where('sourceid', $request->source_select);
             }
-            if ($request->check_all == 'true') {
 
-            } else {
-                if ($request->check_pending == 'true') {
+            if ($request->check_type) {
+                if($request->check_type==1){
                     $model = $model->where('approve', '0');
-                }
-                if ($request->check_approved == 'true') {
+                }else if($request->check_type==2){
                     $model = $model->where('approve', '1');
                 }
             }
+            // if ($request->check_all == 'true') {
+
+            // } else {
+            //     if ($request->check_pending == 'true') {
+            //         $model = $model->where('approve', '0');
+            //     }
+            //     if ($request->check_approved == 'true') {
+            //         $model = $model->where('approve', '1');
+            //     }
+            // }
 
             if ($request->start_date) {
                 $date_start = $request->start_date;
