@@ -195,10 +195,10 @@
                                         <button class="btn btn-grey active" onclick="changeActive('')">
                                             <span> All </span>
                                         </button>
-                                        <button class="btn btn-grey" onclick="changeActive('active')">
+                                        <button class="btn btn-grey" onclick="changeActive('Active')">
                                             <span> Active </span>
                                         </button>
-                                        <button class="btn btn-grey" onclick="changeActive('inactive')">
+                                        <button class="btn btn-grey" onclick="changeActive('Inactive')">
                                             <span> Inactive </span>
                                         </button>
                                     </div>
@@ -256,7 +256,7 @@
                                             </label>
                                         </th> --}}
                                         <th rowspan="2" class="align-middle">Site</th>
-                                        <th rowspan="2" class="align-middle">Domain</th>
+                                        <th rowspan="2" class="align-middle">Host</th>
                                         <th rowspan="2" class="align-middle">IP</th>
                                         <th colspan="7" class="text-center">CPE</th>
                                         <th rowspan="2" class="align-middle">Status</th>
@@ -418,14 +418,14 @@
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
 
-    $('#table-assets-template-test').DataTable();
+    {{--$('#table-assets-template-test').DataTable();--}}
     
     $(document).ready(function () {
         selectGroupByFirst();
 
         $('#source').select2();
         $('#select-site').select2();
-        $('#groupby-select').select2();
+        
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
@@ -519,6 +519,7 @@
                     groupby_select += '<option value="'+val.val_select+'">'+val.val_select+'</option>';
                 });
                 $('#groupby-select').html(groupby_select);
+                $('#groupby-select').select2();
                 loading('stop_load');
             }).fail(function(jqXHR, ajaxOptions, thrownError){
                 loading('stop_load');
@@ -559,6 +560,7 @@
                 groupby_select += '<option value="'+val.val_select+'">'+val.val_select+'</option>';
             });
             $('#groupby-select').html(groupby_select);
+            $('#groupby-select').select2();
             loading('stop_load');
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             loading('stop_load');
@@ -642,6 +644,7 @@
                     width: '25%',
                     data: 'site_name',
                     name: 'site_name',
+                    className: 'no-wrap'
                 },
                 {
                     width: '20%',
@@ -656,45 +659,48 @@
                 {
                     data: 'CPE_Vendor',
                     name: 'CPE_Vendor',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
                     data: 'CPE_Title',
                     name: 'CPE_Title',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
                     data: 'CPE_Version',
                     name: 'CPE_Version',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
                     data: 'CPE_Edition',
                     name: 'CPE_Edition',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
                     data: 'CPE_Remark',
                     name: 'CPE_Remark',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
                     data: 'CPE_Ostype',
                     name: 'CPE_Ostype',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
                     data: 'CPE_Del',
                     name: 'CPE_Del',
-                    className: 'padingtablezero text-center text-wrap'
+                    className: 'padingtablezero text-center no-wrap'
                 },
                 {
+                    searchable: false,
+                    orderable: false,
                     width: '3%',
                     data: 'status',
                     name: 'status',
                     className: 'text-center'
                 },  
                 {
+                    orderable: false,
                     width: '3%',
                     data: 'action',
                     name: 'action',
@@ -740,14 +746,10 @@
                    
                 },
             ],
-            createdRow: function(row, data, dataIndex){
-                console.log(data);
-            }
 
         });
 
         let check = {!!json_encode($Search_Link_All)!!};
-        console.log(check);
         if(check===""){
             searchTB();
         }else{

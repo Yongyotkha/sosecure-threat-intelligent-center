@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Modules\Scans\Entities\Assets;
 use Modules\Scans\Entities\AssetsData;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\SiteSettings\Entities\Domain;
 
 class ScansController extends Controller
 {
@@ -61,7 +62,11 @@ class ScansController extends Controller
             $DataScans = DataScans::where('site_id', $SiteSettings->site_id)->where('domain_id', $SiteSettings->domain_id)->orderBy('total', 'desc')->take(5)->get();
             $data['DataScans'] = $DataScans;
         }
-
+        $DomainFor = Domain::select('code')->withTrashed()->where('id',$SiteSettings->domain_id)->first();
+        $SiteSettingsfor = SiteSettings::select('code')->withTrashed()->where('id', $SiteSettings->site_id)->first();
+        $data['menu'] = 'scan';
+        $data['sitecode'] = $SiteSettingsfor->code;
+        $data['domaincode'] = $DomainFor->code;
         return view('scans::scans_domain')->with($data);
     }
 
@@ -866,10 +871,11 @@ class ScansController extends Controller
                 Response::HTTP_OK
             );
         }else if($request -> page == 'scan'){
+            $TransactionTimeStampScansfor = TransactionTimeStampScans::where('domain_id',  $Assets->domain_id)->first();
             return ajaxResponse(
                 [
                     'message' => langapp('changes_saved_successful'),
-                    'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $request->code]),
+                    'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $TransactionTimeStampScansfor->code]),
                 ],
                 true,
                 Response::HTTP_OK
