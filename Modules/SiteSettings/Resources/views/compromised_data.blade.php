@@ -44,10 +44,10 @@
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-lg-3 mb-1">
-                                        <h5 class="font-weight-bold">Search</h5>
+                                        <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="keyword" class="form-control">
                                     </div>
-                                    <div class="col-lg-3 mb-1">
+                                    {{-- <div class="col-lg-3 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source" class="select2-option form-control">
                                             <option value="" selected>All</option>
@@ -60,30 +60,33 @@
             
                                             @endif
                                         </select>
-                                    </div>
-                                    <div class="col-lg-6 mb-1">
+                                    </div> --}}
+                                    <div class="col-lg-5 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
                                             <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
-                                    <!--
-                                    <div class="col-lg-6 mb-1">
-                                        <h5 class="font-weight-bold">Status</h5>
-                                        <div id="groupby-status" class="btn-group special">
-                                            <button class="btn btn-grey check_status active" id="all" value="">
-                                                <span> All </span>
+
+                                    <div class="col-lg-4 mb-1">
+                                        <h5 class="font-weight-bold">Type</h5>
+                                        <div id="groupby-type" class="btn-group special">
+                                            <button id="all" class="btn btn-grey active" value="">
+                                                <span> All</span>
                                             </button>
-                                            <button class="btn btn-grey check_status" value="1">
-                                                <span> Panding </span>
+                                            <button class="btn btn-grey" value="public">
+                                                <span> Public </span>
                                             </button>
-                                            <button class="btn btn-grey check_status" value="2">
-                                                <span> Approved </span>
+                                            <button class="btn btn-grey" value="darkweb">
+                                                <span> Darkweb </span>
+                                            </button>
+                                            <button class="btn btn-grey" value="webserver">
+                                                <span> Web Server </span>
                                             </button>
                                         </div>
                                     </div>
-                                 -->
+
                                 </div>
                             </div>
                         </div>
@@ -123,9 +126,10 @@
                                                 </label>
                                             </th>
                                             <th>Site</th>
-                                            <th>Source</th>
+                                            <th>Type</th>
                                             <th>Keyword Ref</th>
                                             <th>Content</th>
+                                            <th>Remark</th>
                                             <th>Data Feed</th>
                                             <th>View</th>
                                             <th>Status</th>
@@ -223,7 +227,7 @@
 
 <script>
 
-active_btn('#groupby-status .btn-grey');
+active_btn('#groupby-type .btn-grey');
 
     var search_val = false;
     var keywords = null;
@@ -233,6 +237,8 @@ active_btn('#groupby-status .btn-grey');
     var endDate = null;
     var isDateSearch = null;
     var val_id = [];
+    var check_type = null;
+
 
     $('#table_social_datas').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
@@ -260,7 +266,10 @@ active_btn('#groupby-status .btn-grey');
         }
     });
 
-
+    $(".btn-grey").click(function() {
+        check_type = $(this).val();
+   
+    });
 
     $(function() {
         table_social_data();
@@ -301,6 +310,7 @@ active_btn('#groupby-status .btn-grey');
                         d.startDate = startDate;
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
+                        d.check_type =check_type;
                         d.site_id = {!!json_encode($siteID)!!};
 
                         return d;
@@ -332,6 +342,7 @@ active_btn('#groupby-status .btn-grey');
                     {
                         targets: 1,
                         width: '10px',
+                        className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full;
                             if(val) {
@@ -351,16 +362,12 @@ active_btn('#groupby-status .btn-grey');
                         targets: 2,
                         width: '60px',
                         render: function (data, type, full, meta) {
-                            let val = full.get_data_leak_feed_one;
+                            let val = full.feel_type;
                             if(val) {
-                                val = full.get_data_leak_feed_one;
-                                if(val) {
-                                    val = full.get_data_leak_feed_one.source_name;
-                                }
+                                val = get_word_leak_compromise(full.feel_type,'compromise');
                             }
         
                             return val;
-
                         },
                     
                     },
@@ -382,18 +389,42 @@ active_btn('#groupby-status .btn-grey');
                         width: '10px',
                         render: function (data, type, full, meta) {
                             let val = '';
+                            let content = '';
                             val = full.get_data_leak_feed_one;
                             if(val) {
-                                    val = full.get_data_leak_feed_one.feedcontent;
+                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var res = full.keyword.split(",");
+                                for(let i in res){
+                                    var data = res[i];
+                                    content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
+                                }
                                 
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" title="'+val+'">'+val+'</div>';
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+feedcontent+'">'+content+'</div>';
 
                         },
                     },
                     {
                         targets: 5,
+                        width: '60px',
+                        render: function (data, type, full, meta) {
+                            let val = full.get_data_leak_feed_one;
+                            if(val) {
+                                val = full.get_data_leak_feed_one;
+                                if(val) {
+                                    val = full.get_data_leak_feed_one.source_name;
+                                }
+                            }
+        
+                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+val+'">'+val+'</div>';
+
+
+                        },
+                    
+                    },
+                    {
+                        targets: 6,
                         width: '80px',
                         render: function (data, type, full, meta) {
                             let val = '';
@@ -406,7 +437,7 @@ active_btn('#groupby-status .btn-grey');
                         },
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
                 
@@ -416,7 +447,7 @@ active_btn('#groupby-status .btn-grey');
                         },
                     },
                     {
-                        targets: 7,
+                        targets: 8,
                         width: '10px',
                         render: function (data, type, full, meta) {
 
@@ -433,12 +464,12 @@ active_btn('#groupby-status .btn-grey');
 
                     },
                     {
-                        targets: 8,
+                        targets: 9,
                         width: '10px',
                         render: function (data, type, full, meta) {
                 
 
-                            return `<a href="${base_url}/compromised_feed/delete_compromised_feed_modal/${full.code}" class="btn btn-{{get_option("theme_color")}} btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                            return `<a href="${base_url}/compromised_feed/delete_compromised_feed_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                             
                         },
                     },
@@ -517,6 +548,10 @@ active_btn('#groupby-status .btn-grey');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 cb(start, end);
+
+                check_type = null;
+                $('.btn-grey').removeClass('active');
+                $('#all').addClass('active');
                 
                 table_social_data();
             });

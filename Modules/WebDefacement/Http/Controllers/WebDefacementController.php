@@ -83,9 +83,9 @@ class WebDefacementController extends Controller
         return view('webdefacement::index')->with($data);
     }
 
-    public function detail($code)
+    public function detail($code,Request $request)
     {
-
+       
         $WebdefacmentSetting = WebdefacmentSetting::where("code",$code)->where('deleted_at', null)->where('active', 1)->with('get_webdefacment_data_original_detail')->with('get_webdefacment_data_check_detail')->with('get_webdefacment_data_log_detail');
         
         if(Auth::check()) {
@@ -137,6 +137,7 @@ class WebDefacementController extends Controller
         $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original_detail[0];
         $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check_detail[0];
         $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log_detail;
+        $data['site_code']=@$request->site_code;
 
             // dd( $data['webdefacement']->blacklist_keyword_content);
         
@@ -480,4 +481,20 @@ class WebDefacementController extends Controller
             Artisan::call($command, $params);
             $result = Artisan::output();
     }  
+
+    function get_code_site(Request $request){
+        
+        $SiteSettings = SiteSettings::where("id",$request->id)->first();
+
+        return ajaxResponse(
+            [
+                'site_code'  => $SiteSettings->code,
+
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
+
+    }
 }

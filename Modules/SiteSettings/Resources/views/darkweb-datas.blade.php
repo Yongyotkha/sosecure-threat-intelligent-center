@@ -353,9 +353,8 @@ active_btn('#groupby-status .btn-grey');
     var search_val = 0;
     var start_date = '';
     var end_date = '';
-    var check_all = false;
-    var check_pending = false;
-    var check_approved = false;
+    var check_type = null;
+
 
     $(function() {
     table_social_data();

@@ -51,7 +51,7 @@
                                     <div class="col-lg-4">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source" class="select2-option form-control">
-                                            <option value="1" selected>All</option>
+                                            <option value="" selected>All</option>
                                             @if ($source)
 
                                             @foreach ($source as $source)
@@ -67,6 +67,23 @@
                                         <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
                                             <span></span> <i class="fa fa-caret-down"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Type</h5>
+                                        <div id="groupby-type" class="btn-group special">
+                                            <button id="all" class="btn btn-grey active" value="">
+                                                <span> All</span>
+                                            </button>
+                                            <button class="btn btn-grey" value="social">
+                                                <span> Public </span>
+                                            </button>
+                                            <button class="btn btn-grey" value="darkweb_public">
+                                                <span> Darkweb </span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -112,12 +129,14 @@
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
-                                            <th width="15%">Keyword Ref</th>
+                                            <th>Site</th>
+                                            <th>Type</th>
+                                            <th>Source</th>
+                                            <th>Keyword Ref</th>
                                             <th>Content</th>
-                                            <th width="10%">Feed Type</th>
-                                            <th width="10%">Data Feed</th>
-                                            <th width="3%">View</th>
-                                            <th width="5%">Status</th>
+                                            <th>Data Feed</th>
+                                            <th>View</th>
+                                            <th>Status</th>
                                             <th class="no-sort" width="5%">@langapp('action')</th>
                                         </tr>
                                     </thead>
@@ -243,8 +262,10 @@
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.fullscreen')
+@include('stacks.js.activebutton')
 <script>
-
+    var check_type = null;
+    active_btn('#groupby-type .btn-grey');
     
 $(function() { 
     var start = moment().startOf('hour');
@@ -269,13 +290,38 @@ $(function() {
         }
     }, cb);
     cb(start, end);
+
+    
+    $("#btn_news_reset").click(function() {
+                
+
+                search_val = 0;
+                $("#search").val('');
+                start = moment().subtract(1, 'month').startOf('month');
+                end = moment();
+                cb(start, end);
+                $("#source").val('').trigger("change");
+                $('.btn-grey').removeClass('active');
+                $('#all').addClass('active');
+                check_type = null;
+                table_social_data(0);
+            
+
+    });
 });
+
 
 $(function() {
     table_social_data(0);
 });
 
+$(".btn-grey").click(function() {
+        check_type = $(this).val();
+   
+    });
+
 function table_social_data(search_val){
+
     let search = $('#search').val();
     let keywords = $('#keyword').val();
     let source = $('#source option:selected').val();
@@ -295,6 +341,7 @@ function table_social_data(search_val){
                 "source" : source,
                 "start_date" : startDate,
                 "end_date" : endDate,
+                "check_type" : check_type,
             },
             type: "POST",
         },
@@ -308,6 +355,19 @@ function table_social_data(search_val){
                 searchable: false,
                 sortable: false,
                 className: 'w-10'
+            },
+            {
+                data: 'site',
+                name: 'site',
+                className: 'nowrap',
+            },  
+            {
+                data: 'type',
+                name: 'type'
+            },  
+            {
+                data: 'source',
+                name: 'source'
             },  
             {
                 data: 'keyword',
@@ -318,12 +378,9 @@ function table_social_data(search_val){
                 name: 'content'
             },
             {
-                data: 'source',
-                name: 'source'
-            },
-            {
                 data: 'data_feed',
-                name: 'data_feed'
+                name: 'data_feed',
+                className: 'nowrap',
             },
             {
                 data: 'view_count',
@@ -340,20 +397,21 @@ function table_social_data(search_val){
         ],
         columnDefs: [
             {
-                targets: 2,
+                targets: 5,
                 render: function (data, type, full, meta) {
-                    var feedcontent = '';
-                    if(full.get_data_leak_feed){
-                        var feedcontent = full.get_data_leak_feed.feedcontent;
+                    if(full.get_data_leak_feed_one){
+                        var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                        var res = full.keyword.split(",");
+                        let content = '';
+                        for(let i in res){
+                            const data2 = res[i];
+                            console.log(data2);
+                            content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
+                        }
+                        return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                    }else{
+                        return '';
                     }
-                    
-                    var res = full.keyword.split(",");
-                    let content = '';
-                    for(let i in res){
-                        const data = res[i];
-                        content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
-                    }
-                    return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                 },
             },
         ]
