@@ -309,15 +309,18 @@ class UsersSettingsController extends Controller
         $password_re = $request->password_re;
         $role_id = $request->role_id;
         $site_role_id = null;
-        if($role_id == 1 || $role_id == 4) {
-            $role = 'admin';
-            // $site_role_id = 99;
-        } else {
-            $role = 'admin';//client_site
-            // $site_role_id = $role_id;
-        } 
+
+
+        // if($role_id == 1 || $role_id == 4) {
+        //     $role = 'admin';
+        //     // $site_role_id = 99;
+        // } else {
+        //     $role = 'admin';//client_site
+        //     // $site_role_id = $role_id;
+        // } 
         // dd($password);
         // exit();
+
         $pass = '';
         if($password) {
             if($password_re) {
@@ -385,7 +388,31 @@ class UsersSettingsController extends Controller
 
         // $user->profile->update($request->all());
         if($role) {
-            $user->syncRoles($role);
+            $model_has_roles = model_has_roles::where('model_id',$user->id)->first();
+            if($model_has_roles) {
+                $model_has_roles->role_id = $role_id;
+                $model_has_roles->model_type = 'Modules\Users\Entities\User';
+                // $model_has_roles->model_id = $User->id;
+                $model_has_roles->save();
+            } else {
+                $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
+                if($model_has_roles_q) {
+                    $id_last = $model_has_roles_q->id+1;
+                } else {
+                    $id_last = 1;
+                }
+                
+                $model_has_roles = new model_has_roles;
+                $model_has_roles->role_id = $role_id;
+                $model_has_roles->model_type = 'Modules\Users\Entities\User';
+                $model_has_roles->model_id = $user->id;
+                $model_has_roles->id = $id_last;
+                $model_has_roles->save();
+            }
+
+            // $user->syncRoles($role);
+
+            
             $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
             if($transaction_client_role_permissions){
                 $transaction_client_role_permissions -> transaction_mode = 'update';
