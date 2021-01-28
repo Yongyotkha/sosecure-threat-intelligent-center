@@ -16,6 +16,7 @@ use Modules\Assets\Entities\OSType;
 use Auth;
 use Modules\Users\Entities\UserSite;
 use App\TransactionTimeStampScans;
+use Modules\SiteSettings\Entities\Domain;
 
 class AssetsController extends Controller
 {
@@ -201,6 +202,65 @@ class AssetsController extends Controller
         return view('assets::modal.add_cpe')->with($data);
     }
 
+
+    public function assets_delete_cpe(Request $request)
+    {
+        $data['cpe'] = CPE::select('id','result')->where('code', $request->cpecode)->first();
+        $data['menu'] = $request->menu;
+        return view('assets::modal.delete_cpe')->with($data);
+    }
+
+    public function methot_delete_cpe(Request $request)
+    {
+        $CPE = CPE::where('id', $request->cpecode)->first();
+        if($CPE){
+            $CPE_Asset_id = $CPE->asset_id;
+            $CPE->delete();
+            if($request -> page == 'site'){
+                $Assetsfor = AssetsData::where('id',$CPE_Asset_id)->first();
+                $SiteSettingsfor = SiteSettings::withTrashed()->where('id', $Assetsfor->site_id)->first();
+                return ajaxResponse(
+                    [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => route('assetssite.index', ['id' => $SiteSettingsfor->code]),
+                    ],
+                    true,
+                    Response::HTTP_OK
+                );
+            }else if($request -> page == 'scan'){
+                $Assetsfor = AssetsData::where('id',$CPE_Asset_id)->first();
+                $TransactionTimeStampScansfor = TransactionTimeStampScans::where('domain_id', $Assetsfor->domain_id)->first();
+                return ajaxResponse(
+                    [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $TransactionTimeStampScansfor->code]),
+                    ],
+                    true,
+                    Response::HTTP_OK
+                );
+            }else if($request -> page == 'system'){
+                return ajaxResponse(
+                    [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => route('assets.index'),
+                    ],
+                    true,
+                    Response::HTTP_OK
+                );
+            }else if($request -> page == 'setting'){
+                return ajaxResponse(
+                    [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => route('assets.index_setting'),
+                    ],
+                    true,
+                    Response::HTTP_OK
+                );
+            }
+        }
+
+        
+    }
     public function assets_redirect_add(Request $request)
     {
         if(Auth::check()) {
@@ -280,18 +340,33 @@ class AssetsController extends Controller
         $returnData = null;
         if($selectedGroup=='domain'){
             if($site){
-                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+                if(isset($request->domaincode)){
+                    $DomainFor = Domain::withTrashed()->where('code',$request->domaincode)->first();
+                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->where('site_id', $site->id)->where('domain_id', $DomainFor->id)->distinct()->get();
+                }else{
+                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+                }
             }else{
                 $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->distinct()->get();
             }
         }else if($selectedGroup=='ip'){
             if($site){
-                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [5,6])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+                if(isset($request->domaincode)){
+                    $DomainFor = Domain::withTrashed()->where('code',$request->domaincode)->first();
+                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [5,6])->where('status', 1)->where('site_id', $site->id)->where('domain_id', $DomainFor->id)->distinct()->get();
+                }else{
+                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [5,6])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+                }
             }else{
                 $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [5,6])->where('status', 1)->distinct()->get();
             }
         }else if($selectedGroup=='cpe'){
-            $returnData = CPE::select('result AS val_select')->where('result','!=', null)->distinct()->get();
+            if($site){
+                $returnData = CPE::select('cpe.result AS val_select')->leftjoin('assets_datas', 'cpe.asset_id', '=', 'assets_datas.id')->where('result','!=', null)->where('site_id', $site->id)->distinct()->get();
+            }else{
+                $returnData = CPE::select('result AS val_select')->where('result','!=', null)->distinct()->get();
+            }
+            
         }else if($selectedGroup=='os_type'){
             $returnData = OSType::select('name AS val_select')->distinct()->get();
         }
@@ -308,7 +383,19 @@ class AssetsController extends Controller
     {
         $menu = $request->menu;
         $Assets_list = [];
-        $Assets_data = Assets::where('status', 1)->get();
+        if($menu=='site'){
+            $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
+            $Assets_data = Assets::where('status', 1)->where('site_id', $SiteSettingsfor->id)->get();
+        }else if($menu=='scan'){
+            $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
+            $DomainFor = Domain::withTrashed()->where('code',$request->domaincode)->first();
+            if($SiteSettingsfor&&$DomainFor){
+                $Assets_data = Assets::where('status', 1)->where('site_id', $SiteSettingsfor->id)->where('domain_id', $DomainFor->id)->get();
+            }
+
+        }else{
+            $Assets_data = Assets::where('status', 1)->get();
+        }
         $OsType = OSType::get()->keyBy('id')->toArray();
         $SiteSettings = SiteSettings::withTrashed()->get()->keyBy('id')->toArray();
         foreach ($Assets_data as $key => $value) {
@@ -347,7 +434,7 @@ class AssetsController extends Controller
                     array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
                     array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
                     array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
-                    array_push($CPE_Del, '<span class="il-block">&nbsp;'.'<a href="#" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></a>'.'</span>');
+                    array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
                     array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
                 }
 
@@ -406,7 +493,7 @@ class AssetsController extends Controller
                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                         $Assets_data_list = array();
                         $Assets_data_list['chk'] = "";
-                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->id]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i>Add </a>';
+                        $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i>Add </a>';
                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                         <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                         </a>';
@@ -458,16 +545,14 @@ class AssetsController extends Controller
             if($request->data){
                 foreach($request->data as $data){
                     $model = new CPE();
-                    if($data[4]=='Delete'){
+
+                    if($data[4]==''){
                         $vendor_text = @$data[0];
                         $vender_split = explode(":", $vendor_text);
                         $product_name = @$vender_split[4];
                         $vendor_name = @$vender_split[3];
                         $product_version = @$vender_split[5];
                         $product_edition = @$vender_split[6];
-                        if ($product_edition == "*") {
-                            $product_edition = "-";
-                        }    
         
                         $model->code = generator_uuid();
                         $model->os_type = $data[2];
@@ -481,7 +566,7 @@ class AssetsController extends Controller
                         $model->version = $product_version;
                         $model->edition = $product_edition;
         
-                    }else if($data[3]=='Delete'){
+                    }else if($data[3]==''){
         
                         // $vendor_text = @$data[0];
                         // $vender_split = explode(":", $vendor_text);
@@ -515,19 +600,22 @@ class AssetsController extends Controller
        
 
         if($request -> page == 'site'){
+            $SiteSettingsfor = SiteSettings::withTrashed()->where('id', $idip->site_id)->first();
             return ajaxResponse(
                 [
                     'message' => langapp('changes_saved_successful'),
-                    'redirect' => route('assetssite.index', ['id' => $site]),
+                    'redirect' => route('assetssite.index', ['id' => $SiteSettingsfor->code]),
                 ],
                 true,
                 Response::HTTP_OK
             );
         }else if($request -> page == 'scan'){
+
+            $TransactionTimeStampScansfor = TransactionTimeStampScans::where('domain_id', $idip->domain_id)->first();
             return ajaxResponse(
                 [
                     'message' => langapp('changes_saved_successful'),
-                    'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $request->code]),
+                    'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $TransactionTimeStampScansfor->code]),
                 ],
                 true,
                 Response::HTTP_OK

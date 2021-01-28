@@ -1,10 +1,108 @@
 <header class="header b-b clearfix">
     <div class="panel-body">
-
-
-        <section class="panel panel-default hide-fillter" id="advance-search" style="display: none;">
-            <div class="container-fluid" style="padding: 2rem;">
+        <section class="panel panel-default hide-fillter" id="advance-search" style="display: none">
+            <header class="panel-heading font-bold panel-header-blue">
                 <div class="row">
+                    <div class="col-md-12">
+                        <i class="fas fa-filter"></i> Filter
+                    </div>
+            </header>
+            <div class="panel-body" style="padding: 0 !important">
+                <div class="container-fluid">
+                    <div class="row" style="display: none;">
+                        <div class="col-md-4 mb-1">
+                            <h5 class="font-weight-bold">Keyword</h5>
+                            <input type="text" class="form-control" name="keyword" placeholder="Search">
+                        </div>
+                        <div class="col-md-4 mb-1">
+                            <h5 class="font-weight-bold">Data Type</h5>
+                            <select name="" id="datatype" class="form-control" multiple="multiple">
+                                <option value="1">All</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-1">
+                            <h5 class="font-weight-bold">Referent</h5>
+                            <input type="text" class="form-control" name="keyword">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Group By</h5>
+                            <div id="groupby-btn" class="btn-group special mb-2">
+                                <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
+                                    <span> Host </span>
+                                </button>
+                                <button class="btn btn-grey" onclick="selectGroupBy('ip')">
+                                    <span> IP </span>
+                                </button>
+                                <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
+                                    <span> CPE </span>
+                                </button>
+                                <button class="btn btn-grey" onclick="selectGroupBy('os_type')">
+                                    <span> OS Type </span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <select id="groupby-select" class="form-control">
+                                    <option value="">- SELECT -</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Status</h5>
+                            <div id="groupby-status" class="btn-group special mb-2">
+                                <button class="btn btn-grey active" onclick="changeActive('')">
+                                    <span> All </span>
+                                </button>
+                                <button class="btn btn-grey" onclick="changeActive('Active')">
+                                    <span> Active </span>
+                                </button>
+                                <button class="btn btn-grey" onclick="changeActive('Inactive')">
+                                    <span> Inactive </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <select id="groupby-select2" style="display: none;" class="form-control">
+                                    <option value="">Domain All</option>
+                                    <option value="">DARK WEB</option> 
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-lg-12 text-right">
+                        <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                            onclick="searchTB()">
+                            <i class="fas fa-search"></i>
+                            @langapp('apply')
+                        </button>
+                        <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                            style="white-space: nowrap" onclick="clearTB()">
+                            <i class="fas fa-broom"></i>
+                            <span> Clear </span>
+                        </button>
+                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                            <i class="fas fa-times"></i>
+                            <span> Close </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- <section class="panel panel-default hide-fillter" id="advance-search" style="display: none;">
+            <div class="container-fluid" style="padding: 2rem;">
+                <div class="row" style="display: none;">
                     <div class="col-md-6">
                         <div class="form-group m-b-md">
                             <label for="" class="">Keyword</label>
@@ -18,27 +116,112 @@
                         </div>
                     </div>
                 </div>
-                <div class="row pull-right">
-                    <div class="col-md-12">
-                        <div class="form-group m-b-md">
-                            <label for="" class="d-block">&nbsp;</label>
-                            <button class="btn btn-info btn-fz-13">
-                                <i class="fas fa-search"></i>
-                                <span> @langapp('apply') </span>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5 class="font-weight-bold">Group By</h5>
+                        <div id="groupby-btn" class="btn-group special mb-2">
+                            <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
+                                <span> Host </span>
                             </button>
-                            <button class="btn btn-default btn-fz-13">
-                                <i class="fas fa-broom"></i>
-                                <span> Clear </span>
+                            <button class="btn btn-grey" onclick="selectGroupBy('ip')">
+                                <span> IP </span>
+                            </button>
+                            <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
+                                <span> CPE </span>
+                            </button>
+                            <button class="btn btn-grey" onclick="selectGroupBy('os_type')">
+                                <span> OS Type </span>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <select id="groupby-select" class="form-control">
+                                <option value="">- SELECT -</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5 class="font-weight-bold">Status</h5>
+                        <div id="groupby-status" class="btn-group special mb-2">
+                            <button class="btn btn-grey active" onclick="changeActive('')">
+                                <span> All </span>
+                            </button>
+                            <button class="btn btn-grey" onclick="changeActive('active')">
+                                <span> Active </span>
+                            </button>
+                            <button class="btn btn-grey" onclick="changeActive('inactive')">
+                                <span> Inactive </span>
                             </button>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <select id="groupby-select2" style="display: none;" class="form-control">
+                                <option value="">Domain All</option>
+                                <option value="">DARK WEB</option> 
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                    <div class="row pull-right">
+                        <div class="col-md-12">
+                            <div class="form-group m-b-md">
+                                <label for="" class="d-block">&nbsp;</label>
+                                <button class="btn btn-info btn-fz-13">
+                                    <i class="fas fa-search"></i>
+                                    <span> @langapp('apply') </span>
+                                </button>
+                                <button class="btn btn-default btn-fz-13">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
                 </div>
             </div>
-        </section>
+        </section> --}}
 
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered" id="table-scans-data-assets">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="table-assets-template">
+                        <thead>
+                            <tr>
+                                {{-- <th class="no-sort">
+                                    <label>
+                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </th>  --}}
+                                <th rowspan="2" class="align-middle">Site</th>
+                                <th rowspan="2" class="align-middle">Host</th>
+                                <th rowspan="2" class="align-middle">IP</th>
+                                <th colspan="7" class="text-center">CPE</th>
+                                <th rowspan="2" class="align-middle">Status</th>
+                                <th rowspan="2" class="align-middle">Action</th>
+                                <th rowspan="2" class="align-middle">CPESTRING</th>
+                            </tr>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Title</th>
+                                <th>Versions</th>
+                                <th>Edition</th>
+                                <th>Remark</th>
+                                <th>Os Type</th>
+                                <th>Delete CPE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                {{-- <table class="table table-striped table-bordered" id="table-scans-data-assets">
                     <thead>
                         <tr>
                             <th class="no-sort" style="width: 12px">
@@ -101,8 +284,8 @@
                                 </button>
                             </td>
                         </tr>
-                    </tbody> --}}
-                </table>
+                    </tbody> 
+                </table>--}}
             </div>
         </div>
     </div>
@@ -140,8 +323,102 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
+@include('stacks.js.activebutton')
 
 <script>
+    active_btn('#groupby-btn .btn-grey');
+    active_btn('#groupby-status .btn-grey');
+
+    var site_id = "{{$sitecode}}";
+    var domaincode = "{{$domaincode}}";
+    var active = '';
+
+    function changeActive(act){
+        active = act;
+    }
+
+    function clearTB(){
+        $("#groupby-select").val('').trigger("change");
+        $("#select-site").val(0).trigger("change");
+        $("#groupby-status>button").removeClass("active");
+        $("#groupby-status>button:first").addClass("active");
+        active = '';
+        searchTB();
+    }
+
+    function searchTB(searchLinkAll='',colsearchLinkAll=''){
+        
+        let selectedValue = $('#groupby-select').children("option:selected").val();
+        let columnSearch = selectedGroup;
+        if(searchLinkAll!==''){
+            selectedValue = colsearchLinkAll;
+            selectedValue = searchLinkAll;
+        }
+        let selectedSiteName = '';
+        if($('#select-site').children("option:selected").val()!=0){
+            selectedSiteName = $('#select-site').children("option:selected").text();
+        }
+        
+        let active_tb = active;
+        
+        
+        if(columnSearch=='domain'){
+            columnSearch = 1;
+        }else if(columnSearch=='ip'){
+            columnSearch = 2;
+        }else if(columnSearch=='cpe'){
+            {{--columnSearch = [3, 4,5,6,7,12];--}}
+            columnSearch = 12;
+        }else if(columnSearch=='os_type'){
+            columnSearch = 8;
+        }else{
+            columnSearch = '';
+        }
+        t.search( '' ).columns().search( '' ).draw();
+        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
+       console.log(columnSearch);
+       console.log(selectedSiteName);
+       console.log(selectedValue);
+       console.log(active_tb);
+        {{--ads.column(5).search(active_tb).draw();
+        t.search( '' ).columns().search( '' ).draw();--}}
+    }
+
+    var selectedGroup = '';
+    function selectGroupBy(columnGroup){
+        if(selectedGroup!=columnGroup){
+            selectedGroup = columnGroup;
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '{!! route('assets.get_selected_filter') !!}',
+                type: "get",
+                data: ({
+                    selectedGroup:selectedGroup,
+                    sitecode:site_id,
+                    domaincode:domaincode,
+                }),
+                datatype: "html",
+                beforeSend: function(){
+                    loading('load');
+                },
+            }).done(function(data){
+                let groupby_select = '';
+                groupby_select += '<option selected value="">- SELECT -</option>';
+                $.each(data.selected, function(key, val){
+                    groupby_select += '<option value="'+val.val_select+'">'+val.val_select+'</option>';
+                });
+                $('#groupby-select').html(groupby_select);
+                $('#groupby-select').select2();
+                loading('stop_load');
+            }).fail(function(jqXHR, ajaxOptions, thrownError){
+                loading('stop_load');
+                console.log("No response from server");
+            });
+        }
+    }
+
     $('#table-scans-data-assets').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
 
@@ -196,7 +473,10 @@
     }
 
     $(function () {
-        $('#table-scans-data-assets').DataTable({
+
+
+
+        {{--$('#table-scans-data-assets').DataTable({
             processing: true,
             serverSide: true,
             destroy: true,
@@ -235,7 +515,7 @@
                     className: 'no-wrap'
                 },    
             ],
-        });
+        });--}}
     });
 
     var number_rows = 0; 
@@ -244,7 +524,12 @@
     var number_table_rows = 1;
     var number_new_rows_assets = 0;
     var base_datatype = []; 
+    
     $(document).ready(function () {
+        selectGroupBy('domain');
+
+       
+        data_table();
         $('#datatype').select2();
         $('#source').select2();
 
@@ -252,8 +537,13 @@
 
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
-            $('.hide-fillter').toggle();
+            $('.hide-fillter').slideToggle();
         });
+        $('#close_filter').click(function(){
+            $('.hide-fillter').slideToggle();
+        });
+        
+
 
         $("#asset-to-use-manual").click(function(){
             loading('load');
@@ -409,11 +699,12 @@
             assets: values,
             assets_data: res,
         }).then(function (response) {
-            loading('stop_load');
-            $('#table-scans-data-assets').DataTable().ajax.reload();
+            $('#table-assets-template').DataTable().ajax.reload();
+            {{--$('#table-scans-data-assets').DataTable().ajax.reload();--}}
             $('#asset-to-use').prop("disabled", true);
             $('#show_asets_manual').html("");
             $('#asset_to_use_manual').modal('hide');
+            loading('stop_load');
         }).catch(function (error) {
             loading('stop_load');
             var errors = error;
@@ -427,6 +718,144 @@
          $('#rows_manual_' + c).remove();
     }
 
+    var t;
+    function data_table(){
+        t = $('#table-assets-template').DataTable({
+            searching: true,
+            ordering: true,
+            pagination: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: false,
+            destroy: true,
+            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            order: [[ 0, "asc" ]],
+            ajax: {
+                type: "POST",
+                url: '{!! route('assets.table_asset')!!}',
+                data:function(d){
+                    d.menu = "{{$menu}}";
+                    d.site = "{{$sitecode}}";
+                    d.domaincode = "{{$domaincode}}";
+                }
+            },
+            initComplete : function( settings, json){
+            },
+            columns: [
+                {{--{
+                    width: '1%',
+                    data: 'chk',
+                    name: 'chk',
+                },--}}
+                {
+                    width: '25%',
+                    data: 'site_name',
+                    name: 'site_name',
+                    className: 'no-wrap'
+                },
+                {
+                    width: '20%',
+                    data: 'domain',
+                    name: 'domain',
+                },
+                {
+                    width: '20%',
+                    data: 'ip',
+                    name: 'ip',
+                },
+                {
+                    data: 'CPE_Vendor',
+                    name: 'CPE_Vendor',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    data: 'CPE_Title',
+                    name: 'CPE_Title',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    data: 'CPE_Version',
+                    name: 'CPE_Version',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    data: 'CPE_Edition',
+                    name: 'CPE_Edition',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    data: 'CPE_Remark',
+                    name: 'CPE_Remark',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    data: 'CPE_Ostype',
+                    name: 'CPE_Ostype',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    data: 'CPE_Del',
+                    name: 'CPE_Del',
+                    className: 'padingtablezero text-center no-wrap'
+                },
+                {
+                    orderable: false,
+                    width: '3%',
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center'
+                },  
+                {
+                    searchable: false,
+                    orderable: false,
+                    width: '3%',
+                    data: 'action',
+                    name: 'action',
+                    className: 'text-center no-wrap'
+                },
+                {
+                    data: 'CPE',
+                    name: 'CPE',
+                    visible:false
+
+                },
+            ],
+            columnDefs: [
+                {{--{
+                    
+                    targets: 0,
+                    searchable: false,
+                    orderable: false,
+                    width: '10px',
+                    render: function (data, type, row, meta) {
+                        return '<label><input type="checkbox" name="checked" class="select-chk asset_id" value="' + row.code + '"><span class="label-text"></span></label>';
+                    }
+                   
+                },--}}
+                {
+                    targets: 11,
+                    render: function (data, type, row, meta) {
+                        return row.cpe+row.action;
+                        
+                    }
+                   
+                },
+                {
+                    targets: 10,
+                    render: function (data, type, row, meta) {
+                        if(row.status==1){
+                            return '<span class="badge badge-success">Active</span>';
+                        }else{
+                            return '<span class="badge badge-danger">Inactive</span>';
+                        }
+                        
+                    }
+                   
+                },
+            ],
+
+        });
+    }
 </script>
 
 
