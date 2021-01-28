@@ -3,38 +3,44 @@
 <section id="content" class="bg">
     <section class="vbox">
         {{-- Head --}}
-        <header class="header panel-heading bg-white b-b b-light">
-            <div class="bc-head"> @langapp('webdefacement')</div>
 
-            <button id="advance-search" style="margin-top: 8px;" href="#hide-advance-search"
-                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-            </button>
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                    <span>
+                        @langapp('webdefacement')
+                    </span>
+                </div>
 
-            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-            <a href="#" id="btn_md_create" style="margin-top: 8px;"
-                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
-                data-target="#wdfm_website">
-                @icon('solid/plus') @langapp('add')
-            </a>
-            @endif
+                <div class="ml-2 text-right">
+                    <div class="text-left" style="min-width:270px;display:inline-block;">
+                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
+                            <option value="">All Site</option>
+                            @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
+                            <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
 
+                    <button id="advance-search" href="#hide-advance-search"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                    </button>
 
-            <div class="pull-right" style="margin-top: 8px;min-width: 270px">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
-                    <option value="">All Site</option>
-                    @if ($SiteSettings)
-
-                    @foreach ($SiteSettings as $SiteSettings)
-                    <option value="{{@$SiteSettings->id}}">{{@$SiteSettings->name}}
-                    </option>
-                    @endforeach
-
+                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                    <a href="#" id="btn_md_create"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                        data-target="#wdfm_website">
+                        @icon('solid/plus') @langapp('add')
+                    </a>
                     @endif
-                </select>
+                </div>
             </div>
-
         </header>
+
+
 
         <section class="scrollable wrapper">
             {{-- Search --}}

@@ -21,38 +21,47 @@
 
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
-                    <a href="{{ url('/socialdatas') }}" class="btn btn-info btn-sm btn-responsive m-r-5" style="margin-top: 0;"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"></path></svg></a>
-                    <div class="bc-head">Data Leak Feed</div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a> --}}
-                    <button type="button" id="button" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled style="display: none;">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
 
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
-                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
-                        Change Status
-                    </button>
-                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px;">
-                            <option value="">All Site</option>
-                            @if (@$site_settings)
-        
-                            @foreach ($site_settings as $site_settings)
-                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
-                            </option>
-                            @endforeach
-        
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow m-t-10">
+                        <div class="fwb-16">
+                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</a>
+                            <a href="{{ url('/socialdatas') }}" class="btn btn-info btn-sm btn-responsive m-r-5"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"></path></svg></a>
                             @endif
-                        </select>
+                            <span>
+                                Data Leak Feed
+                            </span>
+                        </div>
+
+                        <div class="ml-2 text-right">
+                            <div class="text-left" style="margin-right:5px;min-width: 270px;display:inline-block;">
+                                <select name="site" id="site" class="text-left select2-option form-control select-site"
+                                    style="min-width: 270px">
+                                    <option value="">All Site</option>
+                                    @if($SiteSettings)
+                                    @foreach($SiteSettings as $SiteSettings_val)
+                                    <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
+    
+                            <button type="button" id="button" class="btn btn-sm btn-danger m-xs " value="bulk-delete" disabled style="display: none;">
+                                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                            </button>
+        
+                            <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }}" data-toggle="modal" data-target="#change_status" disabled>
+                                Change Status
+                            </button>
+
+                            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                             </button>
+                        </div>
                     </div>
-                    
                 </header>
+
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                         <header class="panel-heading font-bold panel-header-blue">

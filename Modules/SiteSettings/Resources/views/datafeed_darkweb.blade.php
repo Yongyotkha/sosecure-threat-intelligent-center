@@ -23,7 +23,7 @@
             <section class="vbox">
 
                 <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow">
+                    <div class="header-flex-overflow m-t-5">
                         <div class="fwb-16">
                             <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</a>
                             <span>

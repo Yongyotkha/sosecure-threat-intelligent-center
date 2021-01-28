@@ -3,108 +3,115 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         <section class="vbox">
-            <header class="header bg-white b-b b-light head-d-flex-nowrap" style="white-space: nowrap;">
-                <div class="bc-head m-none" style="width:100%;">
-                    Assets
-                </div>
 
-                <div class="pull-right" style="min-width: 270px;">
-                    <select name="" id="select-site" class="select2-option form-control" style="min-width: 270px" onchange="changeSite(value)">
-                        <option value="0">All Site</option>
-                        @if ($SiteSettings)
-                        @foreach ($SiteSettings as $site_settings)
-                        <option value="{{$site_settings->code}}">{{$site_settings->name}}
-                        </option>
-                        @endforeach
-                        @endif
-                    </select>
-                </div>
-
-                <div class="button-control pull-right">
-                    <div class="btn-group">
-                        <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow m-t-10">
+                    <div class="fwb-16">
+                        <span>
+                            @langapp('assets')
+                        </span>
                     </div>
+    
+                    <div class="ml-2 text-right">
+                        <div class="text-left" style="min-width:270px;display:inline-block;">
+                            <select name="" id="select-site" class="select2-option form-control select-site" style="min-width: 270px" onchange="changeSite(value)">
+                                <option value="">All Site</option>
+                                @if($SiteSettings)
+                                @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+                        </div>
+    
+                        <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
 
-                    <div class="btn-group d-none">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
-                    </div>
-
-                    <div class="btn-group d-none">
-                        <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-left">
-                            <li>
-                                <a href="#">
-                                    Internet Name
-                                </a>
-                            </li>   
-                            <li>
-                                <a href="#">
-                                    Affiliate - Internet Name
-                                </a>
-                            </li>   
-                            <li>
-                                <a href="#">
-                                    Affiliate - Domain Name
-                                </a>
-                            </li>   
-                            <li>
-                                <a href="#">
-                                    Domain Name
-                                </a>
-                            </li>  
-                            <li>
-                                <a href="#">
-                                    IP Address
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    IPv6 Address
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Malicious Internet Name
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Human Name
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Internet Name
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Email Address
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Domain Name (Parent)
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Phone Number
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-            
-                    <div class="btn-group">
-                        <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                             <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                         </a>
-                    </div>
 
+                        <div class="button-control d-none">
+
+        
+                            <div class="btn-group d-none">
+                                <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
+                            </div>
+        
+                            <div class="btn-group d-none">
+                                <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-left">
+                                    <li>
+                                        <a href="#">
+                                            Internet Name
+                                        </a>
+                                    </li>   
+                                    <li>
+                                        <a href="#">
+                                            Affiliate - Internet Name
+                                        </a>
+                                    </li>   
+                                    <li>
+                                        <a href="#">
+                                            Affiliate - Domain Name
+                                        </a>
+                                    </li>   
+                                    <li>
+                                        <a href="#">
+                                            Domain Name
+                                        </a>
+                                    </li>  
+                                    <li>
+                                        <a href="#">
+                                            IP Address
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            IPv6 Address
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            Malicious Internet Name
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            Human Name
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            Internet Name
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            Email Address
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            Domain Name (Parent)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            Phone Number
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+
+                    </div>
                 </div>
             </header>
+
 
             <section class="scrollable wrapper">
 
