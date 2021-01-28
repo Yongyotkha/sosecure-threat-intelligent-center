@@ -23,5 +23,8 @@ Route::group(
 
         Route::post('/detail/deface_now', 'WebDefacementController@deface_now')->name('webdefacement.deface_now')->middleware('can:menu_items');
         Route::post('/detail/deface_now_detail', 'WebDefacementController@deface_now_detail')->name('webdefacement.deface_now_detail')->middleware('can:menu_items');
+
+        Route::post('webdefacement.get_code_site', 'WebDefacementController@get_code_site')->name('webdefacement.get_code_site')->middleware('can:menu_items');
     }
+
 );

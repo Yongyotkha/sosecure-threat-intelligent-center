@@ -169,7 +169,7 @@
                     <div id="site_id_show" class="form-group row">
                         <label class="col-lg-3 control-label"> Site <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
-                            <select name="site_id" id="site_id" class="select2-option form-control">
+                            <select name="site_id" id="site_id" class="select2-option form-control" onchange="get_site(this)">
                                 <option value="">Select</option>
                                 @foreach ($SiteSettings_add as $SiteSetting)
                                 <option value="{{$SiteSetting->id}}">{{$SiteSetting->name}} </option>
@@ -284,7 +284,7 @@
                         </div>
                     </div>
 
-
+                    <input type="hidden" name="site" id="site">
 
                 </div>
                 <div class="modal-footer">
@@ -330,6 +330,7 @@
 </section>
 <input type="hidden" id="url_id">
 <input type="hidden" id="webdefacment_setting_id">
+
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.form')
@@ -392,6 +393,35 @@
             $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
         }); 
     });
+
+    var codeSite = null;
+    function get_site(selectObject) {
+        $.ajax({
+            type:"POST",
+            url:"{{ route('webdefacement.get_code_site') }}",
+            data:{
+                id: selectObject.value,
+
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                
+                codeSite = response.site_code;
+   
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
 
 
 
@@ -686,7 +716,7 @@
 
                                             webdefacment_setting_id = $("#webdefacment_setting_id").val();
                                             link_edit_image_screenshot_html = `
-                                                    <a href="${base_url}/edit-image/${site_code}/${webdefacment_setting_id}" target="_blank">
+                                                    <a href="${base_url}/edit-image/`+codeSite+`/${webdefacment_setting_id}" target="_blank">
                                                         Edit Image
                                                     </a>`;
 
@@ -753,6 +783,7 @@
                 .then(function (response) {
                         toastr.success(response.data.message, '@langapp('response_status') ');
                         $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                        console.log(response.data.redirect);
                         window.location.href = response.data.redirect;
             })
             .catch(function (error) {
@@ -794,8 +825,8 @@
                     loading('load');
                 },
             }).done(function(obj){
-                loading('stop_load');
-                console.log(obj);
+                    loading('stop_load');
+                    console.log(obj);
 
                     if(obj.status_code == 200) {
                         console.log(200);
@@ -838,6 +869,8 @@
                 $('#site_id_show').hide();
                 $('#title_head').text(" Edit Website");
                 $("#webdefacment_setting_id").val(response.data.id);
+                
+                $("input[name='site']").val(site_id);
                 $('#mode').val('update');
                 $("#btn_save").prop("disabled",false);
                 $('#name_web').val(response.data.name);
@@ -919,6 +952,7 @@
         $(".review-image-capture").html("");
         $("#link_edit_image_screenshot").html("");
         $('.review_image_screenshot').css("display","none");
+        loading('stop_load');
     }
 
     function btn_click_del_webdefacement(id) {
