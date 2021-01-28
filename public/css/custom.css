@@ -161,6 +161,20 @@ ul.list-indicators li:not(:last-child){
     display: inline-block;
     font-weight: 700;
 }
+
+.fwb-16{
+    font-size: 16px;
+    color: #333;
+    display: inline-block;
+    font-weight: 700;
+}
+
+.header-flex-overflow{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+}
 .p-l-r-0{
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -3454,9 +3468,9 @@ input.input-login:focus {
 }
 
 @media screen and (min-width:768px) and (max-width:1024px){
-    .show-setting{
+    /* .show-setting{
         margin-top: -15px !important;
-    }
+    } */
     .btn-chart:not(:last-child) {
         margin-right: 2px;
     }
@@ -3580,4 +3594,13 @@ div.dataTables_filter input{
 
 textarea.form-control{
     height: auto !important;
+}
+
+.vbox {
+    display: block !important;
+}
+
+.bar-header-overflow{
+    overflow-x: auto;
+    white-space: nowrap;
 }

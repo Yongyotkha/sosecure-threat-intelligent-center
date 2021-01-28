@@ -21,48 +21,59 @@
 
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
-                    <div class="bc-head">Compromise Feed  </div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a> --}}
-                    
 
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow">
+                        <div class="fwb-16">
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</a>
+                            <span>
+                                Compromise Feed
+                            </span>
+                        </div>
 
-                     @if(!empty(get_role_custom()))
-                        {{-- // var_dump(get_role_custom()['superadmin']);
-                        // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info pull-right m-xs"><span> Compromise Data</span></a>
-                        @endif
-                    @endif
+                        <div class="ml-2 text-right">
+                            <div class="text-left" style="margin-top: 8px; min-width:270px;display:inline-block;">
+                                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
+                                    <option value="">All Site</option>
+                                    @if($SiteSettings)
+                                    @foreach($SiteSettings as $SiteSettings_val)
+                                    <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
 
-                     <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" onclick="change_status_compromised_feed()" disabled>
-                        Change Status
-                    </button>
+                            <button id="btn-change-status" class="m-xs btn btn-sm btn-{{ get_option('theme_color')  }}" onclick="change_status_compromised_feed()" disabled>
+                                Change Status
+                            </button>
 
-                    <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
-                            <option value="">All Site</option>
-                            @if($SiteSettings)
-                            @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
-                            @endforeach
+                             @if(!empty(get_role_custom()))
+                                {{-- // var_dump(get_role_custom()['superadmin']);
+                                // var_dump(get_role_custom()['site_admin']); --}}
+                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                                    <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info m-xs"><span> Compromise Data</span></a>
+                                @endif
                             @endif
-                        </select>
+        
+
+                            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                             </button>
+        
+        
+                    
+        
+        
+                            {{-- <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
+                            </button> --}}
+                        </div>
+
+                        
                     </div>
 
-
-                    {{-- <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button> --}}
-                    
-                    
                 </header>
+
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none;">
                         <header class="panel-heading font-bold panel-header-blue">
