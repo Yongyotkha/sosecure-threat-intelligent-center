@@ -119,15 +119,15 @@ class WebDefacementController extends Controller
         $WebdefacmentSetting = WebdefacmentSetting::select('site_id','id','name','url','port','hash','filesize','element','blacklist_keyword','image_check','blacklist_keyword_content','delay_screen_shot_val')->where('code', $request -> id)->first();
         $site = SiteSettings::find($WebdefacmentSetting -> site_id);
         $webdefacment_data_original = WebdefacmentDataOriginal::where('webdefacment_setting_id',$WebdefacmentSetting -> id)->orderBy('id','desc')->first();
-        $WebdefacmentSetting -> site_code = $site -> code;
-        $WebdefacmentSetting -> image = $webdefacment_data_original -> image;
-        $WebdefacmentSetting -> part_image = $webdefacment_data_original -> part_image;
+        $WebdefacmentSetting -> site_code = @$site -> code;
+        $WebdefacmentSetting -> image = @$webdefacment_data_original -> image;
+        $WebdefacmentSetting -> part_image = @$webdefacment_data_original -> part_image;
         if($WebdefacmentSetting){
             $response = [
                 'message' => 'Successful', 
                 'error' => '', 
                 'status_code' => '200', 
-                'data' => $WebdefacmentSetting
+                'data' => @$WebdefacmentSetting
             ];
         }else{
             $response = [
