@@ -159,7 +159,7 @@
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <h5 class="font-weight-bold">Group By</h5>
+                                    <h5 class="font-weight-bold">Filter By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">
                                         <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
                                             <span> Host </span>

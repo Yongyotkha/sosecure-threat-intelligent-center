@@ -22,15 +22,14 @@
                     <span style="color:red;"><small id="check_os"></small></span>
                 </div>
             </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i>
+                    Close</a>
+                <button type="button" class="btn btn-info submit btn-rounded value_submit" onclick="redirect_to_add_assets();">
+                    <i class="fas fa-paper-plane"></i> Continue
+                </button>
+            </div>
         </div>
-        <div class="modal-footer">
-            <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i>
-                Close</a>
-            <button type="button" class="btn btn-info submit btn-rounded value_submit" onclick="redirect_to_add_assets();">
-                <i class="fas fa-paper-plane"></i> Continue
-            </button>
-        </div>
-
     </div>
 
 </div>
