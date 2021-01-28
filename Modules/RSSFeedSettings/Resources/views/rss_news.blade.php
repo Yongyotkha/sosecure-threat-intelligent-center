@@ -40,71 +40,66 @@
         <aside>
             <section class="vbox">
 
-                <header class="header panel-heading bg-white b-b b-light">
-                    <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</button>
-                    <div class="bc-head">News</div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
-                    data-rel="tooltip" title="@langapp('export') CSV">
-                    @icon('solid/download') CSV
-                    </a> --}}
-                    {{-- <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                        <span>@icon('solid/trash-alt') @langapp('delete_all')</span>
-                    </button> --}}
-
-                    
-                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger pull-right m-xs"
-                        value="bulk-delete" disabled>
-                        <span>@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-
-                    <a id="advance-search" href="#hide-advance-search"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </a>
-
-                    <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
-                        <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
-                    </a>
-
-                    <a id="btn_client_view" href="{{site_url('/news_client')}}"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right m-xs">
-                        <span><i class="fas fa-eye"></i> Client View</span>
-                    </a>
-
-
-                    <div class="btn-group pull-right" role="group" aria-label="Button group with nested dropdown">
-                        {{-- <button type="button" class="btn btn-secondary">1</button>
-                        <button type="button" class="btn btn-secondary">2</button> --}}
-
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle"
-                                data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-left">
-                                <li>
-                                    <a href="{{route('rssfeedsettings.rss_news_create_news')}}" data-toggle='ajaxModal'>
-                                        Create News
-                                    </a>
-                                    <a href="{{route('rssfeedsettings.rss_data')}}" id="">
-                                        RSS Feed
-                                    </a>
-
-                                </li>
-                            </ul>
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow m-t-10">
+                        <div class="fwb-16">
+                            <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</button>
+                            <span>
+                                @langapp('news')
+                            </span>
                         </div>
+        
+                        <div class="ml-2 text-right">
+                            
+                            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                                {{-- <button type="button" class="btn btn-secondary">1</button>
+                                <button type="button" class="btn btn-secondary">2</button> --}}
+        
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle"
+                                        data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-left">
+                                        <li>
+                                            <a href="{{route('rssfeedsettings.rss_news_create_news')}}" data-toggle='ajaxModal'>
+                                                Create News
+                                            </a>
+                                            <a href="{{route('rssfeedsettings.rss_data')}}" id="">
+                                                RSS Feed
+                                            </a>
+        
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
 
+                            <a id="btn_client_view" href="{{site_url('/news_client')}}"
+                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-eye"></i> Client View</span>
+                            </a>
 
+                            <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
+                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
+                            </a>
+        
+        
+                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"
+                                value="bulk-delete" disabled>
+                                <span>@icon('solid/trash-alt') @langapp('delete')</span>
+                            </button>
+        
+                            <a id="advance-search" href="#hide-advance-search"
+                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            </a>
+    
+                        </div>
                     </div>
-
-
-                    {{-- <a href="{{route('rssfeedsettings.rss_news_create_news')}}" class="btn btn-sm
-                    btn-{{ get_option('theme_color')  }} pull-right" data-toggle='ajaxModal'>
-                    @icon('solid/plus') @langapp('add')
-                    </a> --}}
-
                 </header>
+
+       
 
                 {{-- Search --}}
                 {{-- Tab Content --}}

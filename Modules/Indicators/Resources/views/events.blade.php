@@ -2,30 +2,37 @@
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header bg-white b-b b-light">
-            <div class="bc-head">Events</div>
 
-            {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-            <span>@langapp('Search_Advance')</span>
-            </button> --}}
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                    <span>
+                        Events
+                    </span>
+                </div>
 
-            <a id="advance-search" href="#area_search"
-                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-            </a>
-            {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-            <div class="pull-right" style="margin-top: 9px;min-width: 270px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
-                    <option value="">All Site</option>
-                    @if($SiteSettings)
-                    @foreach($SiteSettings as $SiteSettings_val)
-                    <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                    @endforeach
-                    @endif
-                </select>
+                <div class="ml-2 text-right">
+                     {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
+                    <div class="text-left" style="min-width: 270px;display:inline-block">
+                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
+                            <option value="">All Site</option>
+                            @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
+                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    <a id="advance-search" href="#area_search"
+                        class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                    </a>
+               
+                </div>
             </div>
-
         </header>
+
         <section class="scrollable wrapper">
             <section id="hide-advance-search" class="panel panel-default" style="display: none;">
                 {{-- <div class="panel-heading">
