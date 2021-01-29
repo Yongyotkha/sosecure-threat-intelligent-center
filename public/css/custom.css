@@ -3607,3 +3607,10 @@ textarea.form-control{
     overflow-x: auto;
     white-space: nowrap;
 }
+
+.btn.btn-c-xs {
+    padding: 3px 5px !important;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}

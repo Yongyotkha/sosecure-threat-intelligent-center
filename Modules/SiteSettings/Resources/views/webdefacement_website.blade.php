@@ -795,7 +795,7 @@
         }).done(function(response){
             loading('stop_load');
             if(response.status_code == 200) {
-                $('#title_head').text("Edit Website");
+                $('#title_head').text(" Edit Website");
                 $("#webdefacment_setting_id").val(response.data.id);
                 $('#mode').val('update');
                 $("#btn_save").prop("disabled",false);

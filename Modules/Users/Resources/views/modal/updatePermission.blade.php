@@ -12,7 +12,7 @@
         <input type="hidden" name="id" value="{{ $permission->id }}">
 
         <div class="form-group">
-                <label class="col-lg-3 text-white control-label">@langapp('name')   <span
+                <label class="col-lg-3 text-left control-label">@langapp('name')   <span
                 class="text-danger">*</span></label>
                 <div class="col-lg-9">
                     <input type="text" class="form-control" value="{{ $permission->name }}" name="name">
@@ -20,7 +20,7 @@
         </div>
 
         <div class="form-group">
-                <label class="col-lg-3 text-white control-label">@langapp('description')   <span
+                <label class="col-lg-3 text-left control-label">@langapp('description')   <span
                 class="text-danger">*</span></label>
                 <div class="col-lg-9">
                     <input type="text" class="form-control" value="{{ $permission->description }}" name="description">
