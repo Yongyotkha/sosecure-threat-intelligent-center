@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $rssfeedsettings->name }}</h4>
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $rssfeedsettings->name }}</h4>
         </div>
         {!! Form::open(['route' => ['rssfeedsettings.update', 'id' => $rssfeedsettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => false]) !!}
 
