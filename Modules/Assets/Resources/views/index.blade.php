@@ -262,6 +262,7 @@
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
                                         <th rowspan="2" class="align-middle">CPESTRING</th>
+                                        <th rowspan="2" class="align-middle">asset_id</th>
                                     </tr>
                                     <tr>
                                         <th>Vendor</th>
@@ -572,8 +573,8 @@
         
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
-        if(searchLinkAll!==''){
-            selectedValue = colsearchLinkAll;
+        if(colsearchLinkAll!==''){
+            columnSearch = colsearchLinkAll;
             selectedValue = searchLinkAll;
         }
         let selectedSiteName = '';
@@ -582,8 +583,6 @@
         }
         
         let active_tb = active;
-        
-        
         if(columnSearch=='domain'){
             columnSearch = 1;
         }else if(columnSearch=='ip'){
@@ -597,7 +596,14 @@
             columnSearch = '';
         }
         t.search( '' ).columns().search( '' ).draw();
-        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
+        if(columnSearch=='ip_asset_id'){
+            selectedValue = '^' + selectedValue +'$';
+            columnSearch = 13;
+            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
+        }else{
+            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
+        }
+       
        
        
         {{--ads.column(5).search(active_tb).draw();
@@ -692,7 +698,6 @@
                     className: 'padingtablezero text-center no-wrap'
                 },
                 {
-                    searchable: false,
                     orderable: false,
                     width: '3%',
                     data: 'status',
@@ -710,7 +715,11 @@
                     data: 'CPE',
                     name: 'CPE',
                     visible:false
-
+                },
+                {
+                    data: 'ip_asset_id',
+                    name: 'ip_asset_id',
+                    visible:false
                 },
             ],
             columnDefs: [
@@ -753,7 +762,7 @@
         if(check===""){
             searchTB();
         }else{
-            searchTB(check,'domain');
+            searchTB(check,'ip_asset_id');
         }
     }
 </script>

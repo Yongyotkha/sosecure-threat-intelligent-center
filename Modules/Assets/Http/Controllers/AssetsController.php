@@ -470,6 +470,7 @@ class AssetsController extends Controller
                     // </a>
                     $Assets_data_list['id'] = $IP_Listvalue->id;
                     $Assets_data_list['code'] = $IP_Listvalue->code;
+                    $Assets_data_list['ip_asset_id'] = $IP_Listvalue->asset_id;
                     $Assets_data_list['site_code'] = @$SiteSettings[$IP_Listvalue->site_id]["code"];
                     $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
                     $Assets_data_list['status'] = $IP_Listvalue->status;
@@ -502,6 +503,7 @@ class AssetsController extends Controller
                         // </a>
                         $Assets_data_list['id'] = $IP_Listvalue->id;
                         $Assets_data_list['code'] = $IP_Listvalue->code;
+                        $Assets_data_list['ip_asset_id'] = $IP_Listvalue->asset_id;
                         $Assets_data_list['site_code'] = @$SiteSettings[$IP_Listvalue->site_id]["code"];
                         $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
                         $Assets_data_list['status'] = $IP_Listvalue->status;
