@@ -10,6 +10,7 @@ use Modules\SiteSettings\Entities\Site_keywords;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\Users\Entities\UserSite;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\transcation_jobs_clients;
 
 class SiteSettings extends Model{
     use SoftDeletes;
@@ -67,5 +68,21 @@ class SiteSettings extends Model{
     public function get_user_site($id){
         $user_site = UserSite::where('user_id',$id)->get();
         return $user_site;
+    }
+
+    public function get_cache_clear(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'cache_clear')->orderBy('updated_at', 'desc');
+    }
+
+    public function get_config_cache(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'config_cache')->orderBy('updated_at', 'desc');
+    }
+
+    public function get_config_clear(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'config_clear')->orderBy('updated_at', 'desc');
+    }
+
+    public function get_set_permission(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'set_permission')->orderBy('updated_at', 'desc');
     }
 }

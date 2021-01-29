@@ -278,9 +278,36 @@
                                     <div class="col-lg-12" style="background: #f3f6f9;">
                                         <div class="m-xs">
                                             <span class="text-dark">Laravel Version</span>: <span class="text-muted">{{ $siteSettings -> laravel_version == null ? 'ไม่มีข้อมูล' : $siteSettings -> laravel_version }}</span>
-                                            <a href="#" onclick="cache_clear();" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Cache">cache:clear</a>
-                                            <a href="#" onclick="config_cache();" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Config Cache">config:cache</a>
-                                            <a href="#" onclick="config_clear();" class="btn btn-xs btn-{{ get_option('theme_color') }} ml-2" data-rel="tooltip" title="Clear Config">cache:clear</a>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th style="text-align:center;width:50px;">
+                                                            <a href="#" onclick="cache_clear();" class="btn btn-xs btn-{{ get_option('theme_color') }}" data-rel="tooltip" title="Clear Cache">cache:clear</a>
+                                                        </th>
+                                                        <th style="text-align:center;width:50px;">
+                                                            <a href="#" onclick="config_cache();" class="btn btn-xs btn-{{ get_option('theme_color') }}" data-rel="tooltip" title="Config Cache">config:cache</a>
+                                                        </th>
+                                                        <th style="text-align:center;width:50px;">
+                                                            <a href="#" onclick="config_clear();" class="btn btn-xs btn-{{ get_option('theme_color') }}" data-rel="tooltip" title="Clear Config">cache:clear</a>
+                                                        </th>
+                                                        <th style="text-align:center;width:50px;">
+                                                            <a href="#" onclick="set_permission();" class="btn btn-xs btn-{{ get_option('theme_color') }}" data-rel="tooltip" title="Set Permission">set permission</a>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><center>{{ @$siteSettings -> get_cache_clear -> updated_at}}</center></td>
+                                                        <td><center>{{ @$siteSettings -> get_config_cache -> updated_at}}</center></td>
+                                                        <td><center>{{ @$siteSettings -> get_config_clear -> updated_at}}</center></td>
+                                                        <td><center>{{ @$siteSettings -> get_set_permission -> updated_at}}</center></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            
+                                           
+                                            
+                                            
                                         </div>
                                         <div class="line"></div>
                                         <div class="m-xs">
@@ -309,10 +336,10 @@
                                             <span class="text-dark">Timezone</span>: <span class="text-muted">{{ $siteSettings -> time_zone == null ? 'ไม่มีข้อมูล' : $siteSettings -> time_zone }}</span>
                                         </div>
                                         <div class="line"></div>
-                                        <div class="m-xs">
+                                        {{-- <div class="m-xs">
                                             <span class="text-dark">Key System</span>: <span class="text-muted">{{ $siteSettings -> key_system == null ? 'ไม่มีข้อมูล' : $siteSettings -> key_system }}</span>
                                         </div>
-                                        <div class="line"></div>
+                                        <div class="line"></div> --}}
                                     </div>
                                 </div>
 
@@ -425,6 +452,34 @@ function config_clear(){
         url:"{{ route('sitesettings.artisan_call') }}",
         data:{
             mode:'config_clear',
+            site_id: '{{ $siteSettings -> id }}'
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status === true){
+                toastr.success(response.message, '@langapp('response_status')');
+            }else{
+                toastr.error(response.message, '@langapp('response_status')');
+            }
+        },
+        error: function (error){
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+}
+
+function set_permission(){
+    $.ajax({
+        type:"POST",
+        url:"{{ route('sitesettings.artisan_call') }}",
+        data:{
+            mode:'set_permission',
             site_id: '{{ $siteSettings -> id }}'
         },
         success:function(response) {
