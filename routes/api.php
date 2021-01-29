@@ -31,6 +31,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('tranferPermissions', 'Api\RegisterSiteController@tranferPermissions');
     Route::post('tranferRoles', 'Api\RegisterSiteController@tranferRoles');
     Route::post('tranferRolePermissions', 'Api\RegisterSiteController@tranferRolePermissions');
+
+    Route::post('check/transaction_job_clients/wait', 'Api\TransactionJobClients@transaction_job_clients');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
