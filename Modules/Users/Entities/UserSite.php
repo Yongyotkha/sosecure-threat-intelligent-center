@@ -11,6 +11,6 @@ class UserSite extends Model
     protected $fillable = [];
 
     public function get_site(){
-        return $this->hasOne(SiteSettings::class, 'id', 'site_id');
+        return $this->hasOne(SiteSettings::class, 'id', 'site_id')->select(['code','id','name']);
     }
 }

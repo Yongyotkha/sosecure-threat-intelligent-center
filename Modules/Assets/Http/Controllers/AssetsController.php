@@ -17,6 +17,7 @@ use Auth;
 use Modules\Users\Entities\UserSite;
 use App\TransactionTimeStampScans;
 use Modules\SiteSettings\Entities\Domain;
+use App\transaction_client_cpe;
 
 class AssetsController extends Controller
 {
@@ -90,7 +91,6 @@ class AssetsController extends Controller
     {
 
         if(Auth::check()) {
-
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(Auth::user()->hasRole('admin')) {//if admin
                 // dd(777);
@@ -215,9 +215,28 @@ class AssetsController extends Controller
         $CPE = CPE::where('id', $request->cpecode)->first();
         if($CPE){
             $CPE_Asset_id = $CPE->asset_id;
+            $CPE_id = $CPE->id;
+            $Assetsfor = AssetsData::where('id',$CPE_Asset_id)->first();
+            $transaction_client_cpe = transaction_client_cpe::where('site_id', $Assetsfor->site_id)->where('transaction_id', $CPE_id)->first();
+            if($transaction_client_cpe){
+                $transaction_client_cpe -> transaction_mode = 'delete';
+                $transaction_client_cpe -> transaction_data_status = 1;
+                $transaction_client_cpe -> status = 1;
+                $transaction_client_cpe -> save();
+            }else{
+                $transaction_client_cpe = new transaction_client_cpe();
+                $transaction_client_cpe -> site_id = $Assetsfor->site_id;
+                $transaction_client_cpe -> transaction_id = $CPE_id;
+                $transaction_client_cpe -> transaction_mode = 'delete';
+                $transaction_client_cpe -> transaction_data_status = 1;
+                $transaction_client_cpe -> status = 1;
+                $transaction_client_cpe -> save();
+            }
+
+
             $CPE->delete();
             if($request -> page == 'site'){
-                $Assetsfor = AssetsData::where('id',$CPE_Asset_id)->first();
+
                 $SiteSettingsfor = SiteSettings::withTrashed()->where('id', $Assetsfor->site_id)->first();
                 return ajaxResponse(
                     [
@@ -228,7 +247,7 @@ class AssetsController extends Controller
                     Response::HTTP_OK
                 );
             }else if($request -> page == 'scan'){
-                $Assetsfor = AssetsData::where('id',$CPE_Asset_id)->first();
+
                 $TransactionTimeStampScansfor = TransactionTimeStampScans::where('domain_id', $Assetsfor->domain_id)->first();
                 return ajaxResponse(
                     [
@@ -399,7 +418,7 @@ class AssetsController extends Controller
         $OsType = OSType::get()->keyBy('id')->toArray();
         $SiteSettings = SiteSettings::withTrashed()->get()->keyBy('id')->toArray();
         foreach ($Assets_data as $key => $value) {
-            $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->where('status', 1)->get();
+            $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->get();
             $Domain_list = [];
             $IP_List = [];
             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -434,7 +453,7 @@ class AssetsController extends Controller
                     array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
                     array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
                     array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
-                    array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
+                    array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
                     array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
                 }
 
@@ -570,15 +589,15 @@ class AssetsController extends Controller
         
                     }else if($data[3]==''){
         
-                        // $vendor_text = @$data[0];
-                        // $vender_split = explode(":", $vendor_text);
-                        // $product_name = @$vender_split[4];
-                        // $vendor_name = @$vender_split[3];
-                        // $product_version = @$vender_split[5];
-                        // $product_edition = @$vender_split[6];
-                        // if ($product_edition == "*") {
-                        //     $product_edition = "-";
-                        // }    
+                        $vendor_text = @$data[0];
+                        $vender_split = explode(":", $vendor_text);
+                        $product_name = @$vender_split[4];
+                        $vendor_name = @$vender_split[3];
+                        $product_version = @$vender_split[5];
+                        $product_edition = @$vender_split[6];
+                        if ($product_edition == "*") {
+                            $product_edition = "-";
+                        }    
         
                         
                         $model->code = generator_uuid();
@@ -589,14 +608,31 @@ class AssetsController extends Controller
                         $model->asset_id = $idip->id;
                         $model->credentials_id = $data[4];
                         $model->result = $data[0];
-                        // $model->vendor = $vendor_name;
-                        // $model->title = $product_name;
-                        // $model->version = $product_version;
-                        // $model->edition = $product_edition;
+                        $model->vendor = $vendor_name;
+                        $model->title = $product_name;
+                        $model->version = $product_version;
+                        $model->edition = $product_edition;
         
                     }
         
                     $model->save();
+
+
+                    $transaction_client_cpe = transaction_client_cpe::where('site_id', $idip->site_id)->where('transaction_id', $model->id)->first();
+                    if($transaction_client_cpe){
+                        $transaction_client_cpe -> transaction_mode = 'insert';
+                        $transaction_client_cpe -> transaction_data_status = 1;
+                        $transaction_client_cpe -> status = 1;
+                        $transaction_client_cpe -> save();
+                    }else{
+                        $transaction_client_cpe = new transaction_client_cpe();
+                        $transaction_client_cpe -> site_id = $idip->site_id;
+                        $transaction_client_cpe -> transaction_id = $model->id;
+                        $transaction_client_cpe -> transaction_mode = 'insert';
+                        $transaction_client_cpe -> transaction_data_status = 1;
+                        $transaction_client_cpe -> status = 1;
+                        $transaction_client_cpe -> save();
+                    }
                 }
             }
        

@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"> <span class="thumb-xs avatar lobilist-check">
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white"> <span class="thumb-xs avatar lobilist-check">
                                     <img src="{{ $user->profile->photo }}" class="img-circle">
                                 </span> {{ $user->name }}</h4>
         </div>

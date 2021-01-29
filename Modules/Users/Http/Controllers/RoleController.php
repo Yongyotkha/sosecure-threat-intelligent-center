@@ -9,6 +9,7 @@ use Modules\Users\Entities\User;
 use Modules\Users\Entities\role_permissions;
 use Modules\Users\Entities\permissions;
 use Spatie\Permission\Models\Role;
+use Modules\SiteSettings\Entities\SiteSettings;
 
 class RoleController extends Controller
 {
@@ -93,9 +94,28 @@ class RoleController extends Controller
                 $permissions_id[] = $permissions_id_where->id;
             }
 
-            
+            $role_permissions_get = role_permissions::select('id')->where('role_id', $request->role_id)->get();
             $role_permissions_del = role_permissions::where('role_id', $request->role_id)->delete();
             if(count($permissions_id) > 0) {
+                $SiteSettings = SiteSettings::select('id')->where('deleted_at',null)->get();
+
+                if($SiteSettings) {
+                    foreach($SiteSettings as $SiteSettings_val) {
+                        if($role_permissions_get) {
+                            foreach($role_permissions_get as $role_permissions_get_val) {
+                                $transaction_client_role_permissions = new transaction_client_role_permissions();
+                                $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
+                                $transaction_client_role_permissions -> transaction_id = $role_permissions_get_val->id;
+                                $transaction_client_role_permissions -> transaction_mode = 'delete';
+                                $transaction_client_role_permissions -> transaction_data_status = 1;
+                                $transaction_client_role_permissions -> status = 1;
+                                $transaction_client_role_permissions -> save();
+                            }
+                        }
+                    }
+                }
+
+
                 foreach($permissions_id as $permissions_id_val) {
                     $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
                     if($role_permissions_last) {
@@ -110,6 +130,23 @@ class RoleController extends Controller
                
                     $role_permissions->id = $role_permissions_last;
                     $role_permissions->save();
+
+                    
+                    if($SiteSettings) {
+
+                        foreach($SiteSettings as $SiteSettings_val) {
+
+                            $transaction_client_role_permissions = new transaction_client_role_permissions();
+                            $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
+                            $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                            $transaction_client_role_permissions -> transaction_mode = 'insert';
+                            $transaction_client_role_permissions -> transaction_data_status = 1;
+                            $transaction_client_role_permissions -> status = 1;
+                            $transaction_client_role_permissions -> save();
+                        }
+                    }
+
+                    
                 }
             }
             
