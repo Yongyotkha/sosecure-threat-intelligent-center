@@ -489,7 +489,7 @@ class WebDefacementController extends Controller
 
         return ajaxResponse(
             [
-                'site_code'  => $SiteSettings->code,
+                'site_code'  => @$SiteSettings->code,
 
             ],
             true,
