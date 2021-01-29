@@ -522,8 +522,14 @@ class DashboardNewController extends Controller
         }
 
         if (!$request->pagename||$request->pagename=='News') {
-            $dataR_s_s_news_th = R_s_s_news::select('title_th as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/th") AS link , "News" AS pagename'))->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
-            $dataR_s_s_news_en = R_s_s_news::select('title_en as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/en") AS link , "News" AS pagename'))->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+            $dataR_s_s_news_th = R_s_s_news::select('title_th as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/th") AS link , "News" AS pagename'))->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
+            ->where(function ($query) {
+                $query->whereNotNull('title_th')->orWhere('title_th', '!=', '');
+            })->get()->toArray();
+            $dataR_s_s_news_en = R_s_s_news::select('title_en as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/en") AS link , "News" AS pagename'))->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
+            ->where(function ($query) {
+                $query->whereNotNull('title_en')->orWhere('title_en', '!=', '');
+            })->get()->toArray();
             $dataR_s_s_news = array_merge($dataR_s_s_news_th,$dataR_s_s_news_en);
         }
 
