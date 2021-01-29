@@ -378,14 +378,12 @@ class RSSFeedSettingsController extends Controller
 
                 // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
                 // $model -> whereIn('source', $request -> news_source);
-                foreach($news_cate_id as $news_cate_id_val) {
+       
                     // dd($news_cate_id_val);
-                    $model -> whereHas('get_cate', function ($query) use ($news_cate_id_val) {
-                        $query->where('news_category_id', $news_cate_id_val);
+                    $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                        $query->whereIn('news_category_id', $news_cate_id);
                     });
-                }
-
-
+        
 
             }
             $model -> get();
