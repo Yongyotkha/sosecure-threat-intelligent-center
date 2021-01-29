@@ -234,10 +234,6 @@ class WebDefacementController extends Controller
 
         if ($request->search_ == 1) {
     
-            if ($request->site != "") {
-                $modal = $modal->where('site_id', '=', $request->site);
-                
-            }
 
             if ($request->keywords) {
                 $modal = $modal->where('name', 'LIKE', '%' . $request->keywords . '%')
@@ -251,6 +247,11 @@ class WebDefacementController extends Controller
                 // dd($modal);
             }
             
+            
+        }
+
+        if ($request->site) {
+            $modal = $modal->where('site_id', '=', $request->site);
             
         }
 
