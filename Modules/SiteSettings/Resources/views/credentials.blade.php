@@ -94,26 +94,26 @@
                 <form id='add_credentials_click' method="POST">
                     <div class="modal-body">
                         <div class="form-group row">
-                            <label class="col-lg-2 control-label">Name <span class="text-danger">*</span> </label>
-                            <div class="col-lg-10">
+                            <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
                                 <input type="text" name="name" id="name" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-lg-2 control-label">User <span class="text-danger">*</span> </label>
-                            <div class="col-lg-10">
+                            <label class="col-lg-3 control-label">User <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
                                 <input type="text" name="" id="user" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-lg-2 control-label">Password <span class="text-danger">*</span> </label>
-                            <div class="col-lg-10">
+                            <label class="col-lg-3 control-label">Password <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
                                 <input type="password" name="" id="password" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-lg-2 control-label">Status </label>
-                            <div class="col-lg-10">
+                            <label class="col-lg-3 control-label">Status </label>
+                            <div class="col-lg-9">
                                 <label class="switch">
                                     <input type="checkbox" id="status" name="status" checked value="1">
                                     <span></span>
