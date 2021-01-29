@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Users\Entities\User;
+use App\transaction_client_role_permissions;
 use Modules\Users\Entities\role_permissions;
 use Modules\Users\Entities\permissions;
 use Spatie\Permission\Models\Role;
@@ -103,6 +104,7 @@ class RoleController extends Controller
                     foreach($SiteSettings as $SiteSettings_val) {
                         if($role_permissions_get) {
                             foreach($role_permissions_get as $role_permissions_get_val) {
+                                dd($request);
                                 $transaction_client_role_permissions = new transaction_client_role_permissions();
                                 $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
                                 $transaction_client_role_permissions -> transaction_id = $role_permissions_get_val->id;
