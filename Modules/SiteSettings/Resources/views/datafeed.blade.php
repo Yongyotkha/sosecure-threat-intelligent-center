@@ -335,6 +335,9 @@
     var start_date = '';
     var end_date = '';
     var check_type = null;
+    var search = null;
+    var site = null;
+    var type = null;
 
 
     $(function() {
@@ -369,10 +372,15 @@
         $("#btn_data_leak_reset").click(function() {
             search_val = 0;
             $("#search").val('');
+            $("#site").val('').trigger('change');
             $("#source_select").val('').trigger('change');
             $(".btn-grey").removeClass("active");
             $("#all").addClass ( "active" );
             check_type = null;
+            search = null;
+            type = null;
+            start_date = null;
+            end_date = null;
 
             cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
 
@@ -386,11 +394,18 @@
    
     });
 
+    $("#site").change(function() {
+        site = this.value;     
+        table_social_data();
+
+    });
+
 
 
     $("#btn_data_leak_search").click(function() {
         search_val = 1;
-
+        search = $('#search').val();
+        type = $('#type').val();
         start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
 
@@ -400,9 +415,7 @@
 
 
     function table_social_data(){
-        let search = $('#search').val();
-        let site = $('#site').val();
-        let type = $('#type').val();
+
         $('#table_data_feed').DataTable({
             processing: true,
             serverSide: true,

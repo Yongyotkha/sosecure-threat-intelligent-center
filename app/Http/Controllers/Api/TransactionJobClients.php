@@ -26,9 +26,12 @@ class TransactionJobClients extends ApiController
                         }
                         $data_transcation_jobs_clients = json_encode($transcation_jobs_clients);
                     }else if($data['data']['mode'] == 'complete'){
-                        $transcation_jobs_clients = transcation_jobs_clients::where('id', $data['data']['id'])->first();
-                        $transcation_jobs_clients -> transaction_data_status = 3;
-                        $transcation_jobs_clients -> save();
+                        $transcation_jobs_client = transcation_jobs_clients::where('id', $data['data']['id'])->first();
+                        $transcation_jobs_client -> transaction_data_status = 3;
+                        if($data['data']['return_data']){
+                            $transcation_jobs_client -> return_data = $data['data']['return_data'];
+                        }
+                        $transcation_jobs_client -> save();
                         $data_transcation_jobs_clients = json_encode([]);
                     }
                     $datas = encrypt_decrypt('encrypt', $data_transcation_jobs_clients, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);

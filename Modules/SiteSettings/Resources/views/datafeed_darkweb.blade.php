@@ -87,7 +87,7 @@
                             <div class="container-fluid" style="padding: 2rem;">
                                 <div class="row">
                                     <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Content</h5>
+                                        <h5 class="font-weight-bold">Keyword</h5>
                                         <input type="text" id="search" class="form-control">
                                     </div>
                                     <div class="col-lg-4 mb-1">
@@ -528,6 +528,10 @@ $(function() {
     table_social_data();
 });
 
+    var site = null;
+    var search = null;
+    var source_select = null;
+
 $(function() { 
     var start = moment().startOf('hour');
     var end = moment().startOf('hour').add(32, 'hour');
@@ -556,12 +560,17 @@ $(function() {
         search_val = 0;
         $("#search").val('');
         $("#source_select").val('').trigger('change');
+        $("#site").val('').trigger('change');
         $("#check_all").prop("checked",false);
         $("#check_pending").prop("checked",false);
         $("#check_approved").prop("checked",false);
         $(".btn-grey").removeClass("active");
         $("#all").addClass ( "active" );
         check_type = null;
+        site = null;
+        source_select = null;
+        start_date = null;
+        end_date = null;
         cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
 
         table_social_data();
@@ -572,21 +581,26 @@ $(function() {
         check_type = $(this).val();
    
     });
+    $("#site").change(function() {
+        site = this.value;        
+        table_social_data();
+        });
+
+
 
 $("#btn_darkweb_feed_search").click(function() {
     search_val = 1;
 
     start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
     end_date = $("#datafeed_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+    search = $('#search').val();
+    source_select = $('#source_select').val();
 
     table_social_data();
 });
 
-
 function table_social_data(){
-    let site = $('#site').val();
-    let search = $('#search').val();
-    let source_select = $('#source_select').val();
+
 
     $('#table_darkweb_feed').DataTable({
         processing: true,

@@ -227,6 +227,14 @@
     load_more_search(page);
     load_more_book_mark(page);
     var ck = 1;
+    var site = null;
+    var startDate = null;
+    var endDate = null;
+    var lang_en = null;
+    var lang_th = null;
+    var related_news = null;
+    var news_category = null;
+    var news_title_search = null;
     $('#scrollable_news').scroll(function(event) {
             let scrolltop = $('#scrollable_news').scrollTop();
             let tab_height = $('#scrollable_news').height();
@@ -316,34 +324,6 @@
         if(page == 1) {
             $("#list_news").html('');   
         }
-
-        {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-            let startDate = '';
-            let endDate = '';
-            if(f_search == 1) {
-                startDate =  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-                endDate =  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-            }
-            console.log(startDate);
-            console.log(endDate);
-
-            let news_title_search = $("#news_title_search").val();
-            let news_category = $("#news_category").val();
-            let related_news = false;
-            if($("#related_news").is(":checked")) {
-                related_news = true;
-            }
-            let lang_th = false;
-            if($("#lang_th").is(":checked")) {
-                lang_th = true;
-            }
-            let lang_en = false;
-            if($("#lang_en").is(":checked")) {
-                lang_en = true;
-            }
-            let site_id = $("#site").val();
-
-
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -359,7 +339,7 @@
                 date_start:startDate,
                 date_end:endDate,
                 f_search:f_search,
-                site_id:site_id
+                site_id:site
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
@@ -497,22 +477,21 @@
         cb(start, end);
 
         $("#btn_news_search").click(function() {
-            {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-            let startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-            let endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-            console.log(startDate);
-            console.log(endDate);
-            let news_title_search = $("#news_title_search").val();
-            let news_category = $("#news_category").val();
-            let related_news = false;
+
+            startDate=  $("#newsrange").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+            endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+
+            news_title_search = $("#news_title_search").val();
+            news_category = $("#news_category").val();
+            related_news = false;
             if($("#related_news").is(":checked")) {
                 related_news = true;
             }
-            let lang_th = false;
+            lang_th = false;
             if($("#lang_th").is(":checked")) {
                 lang_th = true;
             }
-            let lang_en = false;
+            lang_en = false;
             if($("#lang_en").is(":checked")) {
                 lang_en = true;
             }
@@ -534,10 +513,17 @@
             $("#related_news").prop("checked",false);
             $("#lang_th").prop("checked",false);
             $("#lang_en").prop("checked",false);
+            $("#select-site").val('').trigger("change");
             start = moment();
             end = moment();
             cb(start, end);
-
+            startDate = null;
+            endDate = null;
+            lang_en = null;
+            lang_th = null;
+            related_news = null;
+            news_category = null;
+            news_title_search = null;
             f_search = 0;
             page = 1;
             $('#count_news').text(0);
@@ -547,6 +533,17 @@
         });
     
     });
+
+
+
+    function changeSite(value){
+
+    site = value;
+    page = 1;
+    $('#count_news').text(0);
+    page_stop = true;
+    load_more_search(page,f_search);
+    }
 
 
 

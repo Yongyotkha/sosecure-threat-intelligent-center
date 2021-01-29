@@ -142,86 +142,74 @@
                 }
             }
         });
-        $(function () {
-
-
-
-
-            var table = $('#table-category-template').DataTable({
-                pageLength: 50,
-                processing: true,
-                serverSide: true,
-                destroy: true,
-                "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
-                ajax: {
-                    url: '{!! route('categorysettings.data') !!}',
-                    data: ({
-                        
-                    }),
-                    type: "POST",
+    $(function () {
+        var table = $('#table-category-template').DataTable({
+            pageLength: 50,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            ajax: {
+                url: '{!! route('categorysettings.data') !!}',
+                data: ({
+                    
+                }),
+                type: "POST",
+            },
+            order: [
+                [0, "desc"]
+            ],
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: "w-10",
                 },
-                order: [
-                    [0, "desc"]
-                ],
-                columns: [
-                    {
-                        data: 'chk',
-                        orderable: false,
-                        searchable: false,
-                        sortable: false,
-                        className: "w-10",
+                {
+                    data: 'id',
+                    className: "w-15",
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
                     },
-                    {
-                        data: 'id',
-                        className: "w-15",
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        },
-                    },
-                    {
-                        data: 'name',
-                        name: 'name',
-                        className:'w-100',
-                    },
-                    {
-                        data: 'status',
-                        name: 'active',
-                        className:'w-25',
-                    },
-                    {
-                        data: 'action',
-                        orderable: false,
-                        searchable: false,
-                        sortable: false,
-                        className:'w-80 no-wrap',
-                    }
-                ]
-            });
-
-
-
-
-
-
-
-
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                    className:'w-100',
+                },
+                {
+                    data: 'status',
+                    name: 'active',
+                    className:'w-25',
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className:'w-80 no-wrap',
+                }
+            ]
         });
+    });
 
-        function del_cate_select(cate_id) {
-            axios.post('{{ route('categorysettings.bulk.delete') }}', {checked: cate_id})
-                .then(function (response) {
-                    toastr.warning(response.data.message, '@langapp('response_status')');
-                    window.location.href = response.data.redirect;
-                })
-                .catch(function (error) {
-                    var errors = error.response.data.errors;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += '<li>' + value[0] + '</li>';
-                    });
-                    toastr.error(errorsHtml, '@langapp('response_status') ');
+    function del_cate_select(cate_id) {
+        axios.post('{{ route('categorysettings.bulk.delete') }}', {checked: cate_id})
+            .then(function (response) {
+                toastr.warning(response.data.message, '@langapp('response_status')');
+                window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
                 });
-        }
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            });
+    }
 
     $( "#btn-change-status" ).click(function() {
         categorySettings_id = [];
@@ -266,31 +254,32 @@
 
 
 
-        function change_category_active (category_id) {
+    function change_category_active (category_id) {
+    
 
-      			$.ajax({
-      				type:"POST",
-                url:"{{ route('categorysettings.change_status') }}",
-                data:{category_id:category_id},
-                beforeSend: function(){
-                },
-        				success:function(response) {
-                            console.log(response);
+      $.ajax({
+            type:"POST",
+            url:"{{ route('categorysettings.change_status') }}",
+            data:{category_id:category_id},
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
 
-                            toastr.warning(response.data.message, '@langapp('response_status')');
-                            window.location.href = response.data.redirect;
-
-                        },
-                error: function (error){
-                    var errors = error.response.data.errors;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += '<li>' + value[0] + '</li>';
-                    });
-                    toastr.error(errorsHtml, '@langapp('response_status') ');
-                }
-            });
-        }
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
 </script>
 @endpush
 @endsection
