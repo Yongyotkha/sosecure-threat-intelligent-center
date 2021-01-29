@@ -36,12 +36,12 @@
                     </label>
                 </div>
             </div>
+        </div>
         <div class="modal-footer">
             {!! closeModalButton() !!}
             {!! renderAjaxButton() !!}
         </div>
         {!! Form::close() !!}
-    </div>
 </div>
 
 @push('pagestyle')
