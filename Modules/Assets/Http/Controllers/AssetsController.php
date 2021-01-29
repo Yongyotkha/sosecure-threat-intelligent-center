@@ -90,7 +90,6 @@ class AssetsController extends Controller
     {
 
         if(Auth::check()) {
-
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(Auth::user()->hasRole('admin')) {//if admin
                 // dd(777);
@@ -399,7 +398,7 @@ class AssetsController extends Controller
         $OsType = OSType::get()->keyBy('id')->toArray();
         $SiteSettings = SiteSettings::withTrashed()->get()->keyBy('id')->toArray();
         foreach ($Assets_data as $key => $value) {
-            $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->where('status', 1)->get();
+            $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->get();
             $Domain_list = [];
             $IP_List = [];
             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {

@@ -315,7 +315,12 @@
         }
         let selectedSiteName = '';
         
-        let active_tb = active;
+        let active_tb;
+        if(active==""){
+            active_tb = active;
+        }else{
+            active_tb = '^'+active+'$';
+        }
         
         
         if(columnSearch=='domain'){
@@ -331,7 +336,7 @@
             columnSearch = '';
         }
         t.search( '' ).columns().search( '' ).draw();
-        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
+        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
        
        
         {{--ads.column(5).search(active_tb).draw();
@@ -781,7 +786,8 @@
                 {
                     data: 'CPE_Del',
                     name: 'CPE_Del',
-                    className: 'padingtablezero text-center no-wrap'
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
                 },
                 {
                     orderable: false,
@@ -796,7 +802,8 @@
                     width: '3%',
                     data: 'action',
                     name: 'action',
-                    className: 'text-center no-wrap'
+                    className: 'text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
                 },
                 {
                     data: 'CPE',

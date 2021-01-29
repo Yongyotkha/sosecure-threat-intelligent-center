@@ -531,7 +531,7 @@
 
     function clearTB(){
         $("#groupby-select").val('').trigger("change");
-        $("#select-site").val(0).trigger("change");
+        $("#select-site").val("").trigger("change");
         $("#groupby-status>button").removeClass("active");
         $("#groupby-status>button:first").addClass("active");
         active = '';
@@ -581,8 +581,13 @@
         if($('#select-site').children("option:selected").val()!=0){
             selectedSiteName = $('#select-site').children("option:selected").text();
         }
+        let active_tb;
+        if(active==""){
+            active_tb = active;
+        }else{
+            active_tb = '^'+active+'$';
+        }
         
-        let active_tb = active;
         if(columnSearch=='domain'){
             columnSearch = 1;
         }else if(columnSearch=='ip'){
@@ -592,6 +597,8 @@
             columnSearch = 12;
         }else if(columnSearch=='os_type'){
             columnSearch = 8;
+        }else if(columnSearch=='ip_asset_id'){
+ 
         }else{
             columnSearch = '';
         }
@@ -599,9 +606,11 @@
         if(columnSearch=='ip_asset_id'){
             selectedValue = '^' + selectedValue +'$';
             columnSearch = 13;
+            console.log(selectedValue);
+            console.log(columnSearch);
             t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
         }else{
-            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
+            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
         }
        
        
@@ -695,7 +704,8 @@
                 {
                     data: 'CPE_Del',
                     name: 'CPE_Del',
-                    className: 'padingtablezero text-center no-wrap'
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
                 },
                 {
                     orderable: false,
@@ -709,7 +719,8 @@
                     width: '3%',
                     data: 'action',
                     name: 'action',
-                    className: 'text-center no-wrap'
+                    className: 'text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
                 },
                 {
                     data: 'CPE',
