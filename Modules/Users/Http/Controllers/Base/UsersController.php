@@ -251,10 +251,10 @@ abstract class UsersController extends Controller
 
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::select('id','email','created_at','name')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
-                $model = User::where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
                 $model2 = UserSite::select('site_id')->where('user_id',@Auth::user()->id)->get()->toArray();
                 
                 $model = $model->whereHas('get_UserSite', function ($query) use ($model2) {
@@ -263,7 +263,7 @@ abstract class UsersController extends Controller
 
             }else{
 
-                $model = User::where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }
         
 
@@ -292,7 +292,7 @@ abstract class UsersController extends Controller
             ->editColumn(
                 'chk',
                 function ($model) {
-                    if ($model->site_role_id == 99 || $model->site_role_id == null) {
+                    if ($model->site_role_id == 99 || $model->site_role_id == 6 || $model->site_role_id == null) {
                         return '<label><input type="checkbox" disabled  name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
                     } else {
                         return '<label><input type="checkbox"   name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
