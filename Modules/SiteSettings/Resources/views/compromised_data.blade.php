@@ -43,7 +43,7 @@
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid">
                                 <div class="row">
-                                    <div class="col-lg-3 mb-1">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="keyword" class="form-control">
                                     </div>
@@ -61,7 +61,7 @@
                                             @endif
                                         </select>
                                     </div> --}}
-                                    <div class="col-lg-5 mb-1">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
@@ -69,7 +69,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-12 mb-1">
                                         <h5 class="font-weight-bold">Type</h5>
                                         <div id="groupby-type" class="btn-group special">
                                             <button id="all" class="btn btn-grey active" value="">
@@ -100,6 +100,10 @@
                                     <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
                                     </button>
                                 </div>
                             </div>
