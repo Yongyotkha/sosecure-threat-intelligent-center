@@ -788,7 +788,7 @@ class ScansController extends Controller
 
         foreach ($request->assets_data as $data) {
             $myArray = explode(',', $data['data_type']);
-            if ($myArray[1]) {
+            if (isset($myArray[1])) {
                 $AssetsData = AssetsData::where('id', $myArray[1])->first();
                 $AssetsData->value = $data['raw_data'];
                 $AssetsData->data_type_id = $myArray[0];
