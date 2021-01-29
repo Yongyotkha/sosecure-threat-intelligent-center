@@ -137,7 +137,7 @@
                             <div class="container-fluid" style="padding: 2rem;">
                                 <div class="row">
 
-                                    {{-- <div class="col-md-4 mb-1">
+                                   {{-- <div class="col-md-4 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source" class="select2-option form-control">
                                             <option value="">All</option>
@@ -147,6 +147,7 @@
                                             <option value="server">Server</option>
                                         </select>
                                     </div> --}}
+
                                     <div class="col-lg-4 mb-1">
                                         <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="keyword" class="form-control">
