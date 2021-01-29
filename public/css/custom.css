@@ -3539,11 +3539,12 @@ input.input-login:focus {
     color: #fff;
 }
 
-/* .btn-group.special {
+.btn-group.special {
     display: flex;
+    white-space: nowrap;
 }
 
-.btn-group.special .btn{
+/* .btn-group.special .btn{
     width: 25%;
 } */
 

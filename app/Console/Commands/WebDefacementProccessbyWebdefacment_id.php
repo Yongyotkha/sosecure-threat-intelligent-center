@@ -358,7 +358,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
           $pointAlert = $this->calculatePoint2($result, $totalConfig);
           $status = 'Normal';
           if($pointAlert >=50 && $pointAlert < 74){
-            $status = 'Meduim';
+            $status = 'Medium';
           }else if($pointAlert >= 75){
             $status = 'High';
           }
@@ -402,7 +402,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
           if ($status=="High") {
            $color="#e64732 !important";
          }
-         if ($status=="Meduim") {
+         if ($status=="Medium") {
            $color="#fcc838 !important";
          }
 
@@ -414,10 +414,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
          </div>';
 
 
-         if ($status == 'Normal' || $status == 'Meduim') {
+         if ($status == 'Normal' || $status == 'Medium') {
           $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
-          if ($status == 'Meduim') {
+          if ($status == 'Medium') {
            $WebdefacmentDataLog_save = new WebdefacmentDataLog;
            $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
            $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;

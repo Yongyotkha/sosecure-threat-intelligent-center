@@ -166,7 +166,7 @@ function get_webdefacment_status($status_id,$color='') {
         } else if(strtolower($status_id) == strtolower("high")) {
             $html = '<span class="dot " style="background: #e64732 !important;"></span> High';
         } else if(strtolower($status_id) == strtolower("meduim")) {
-            $html = '<span class="dot " style="background: #fcc838 !important;"></span> Meduim';
+            $html = '<span class="dot " style="background: #fcc838 !important;"></span> Medium';
         } else if(strtolower($status_id) == strtolower("normal")) {
             $html = '<span class="dot low"></span> Normal';
         } else if(strtolower($status_id) == strtolower("none")) {

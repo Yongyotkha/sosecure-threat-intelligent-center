@@ -296,7 +296,7 @@ class WebDefacementController extends Controller
                         <div class="wdfm-ft-left flex">
                             <div>Site : '.@$key->get_site->name.'</div>
                             <div class="status-flex mr-2">Status : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
-                            <div class="text-sm-date">Last online: '.@$key->last_online.'</div>
+                            <div class="text-sm-date">Last Online: '.@$key->last_online.'</div>
                             <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
                         </div>
                     </div>

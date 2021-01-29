@@ -29,12 +29,12 @@
         <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow">
+                    <div class="header-flex-overflow" style="height: 47px;">
                         <div class="fwb-16">
                             @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
                             <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
                             @endif 
-                            <span>
+                            <span style="margin-top: 2px">
                                 Compromise Data
                             </span>
                         </div>

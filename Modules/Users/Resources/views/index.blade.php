@@ -42,7 +42,7 @@
                     </div>
     
                     <div class="ml-2 text-right">
-                        <div class="text-left" style="width: 270px;display:inline-block">
+                        <div class="text-left pull-left" style="width: 270px;display:inline-block">
                             <select name="site" id="site" class="select2-option select-site"
                                 style="min-width: 270px">
                                 <option value="">All Site</option>

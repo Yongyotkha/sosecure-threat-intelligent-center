@@ -56,7 +56,7 @@
                                 <i class="fas fa-search"></i>
                             </span>
                             <div class="autocomplete">
-                                <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword">
+                                <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;">
                             </div>
                         </div>
                     </div>

@@ -46,47 +46,51 @@
                     </header>
                     <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
-                            <div class="row m-b-md">
-                                <div class="col-lg-12">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-1 col-xs-12 col-form-label">Search</label>
-                                        <div class="col-sm-11 col-xs-12">
-                                            <input type="text" id="news_title_search" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Category</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="news_category" class="select2-option form-control">
-                                                <option value="" >All</option>
-                                                @foreach(@$Category as $cate)
-                                                    <option value="{{$cate->code}}" >{{$cate->name}}</option>
-                                                @endforeach
-                                                {{-- <option value="1" selected>All</option> --}}
-                                            </select>
-                                        </div>
-                                    </div>
+
+                                <div class="col-lg-12 mb-1">
+                                    <h5 class="font-weight-bold">Search</h5>
+                                    <input type="text" id="news_title_search" class="form-control">
                                 </div>
-                                {{-- <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Sources</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <section id="sources_select" class="select2-option form-control">
-                                                <option value="1" selected>All</option>
-                                            </section>
-                                        </div>
-                                    </div>
-                                </div> --}}
-                                <div class="col-lg-4 text-center">
-                                    <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Category</h5>
+                                    <select id="news_category" class="select2-option form-control">
+                                        <option value="" >All</option>
+                                        @foreach(@$Category as $cate)
+                                            <option value="{{$cate->code}}" >{{$cate->name}}</option>
+                                        @endforeach
+                                        {{-- <option value="1" selected>All</option> --}}
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Date</h5>
+                                    <div id="newsrange" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
+                           
+
+                                
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Filter By</h5>
+                                    <div id="groupby-btn" class="btn-group special">
+                                        <button id="source_btn" class="btn btn-grey check_group_by active">
+                                            <span> Related News </span>
+                                        </button>
+                                        <button id="category_btn" class="btn btn-grey check_group_by">
+                                            <span> Thai </span>
+                                        </button>
+                                        <button id="category_btn" class="btn btn-grey check_group_by">
+                                            <span> English </span>
+                                        </button>
+                                    </div>      
+                                </div>
+                            </div>
+                            <!--
+                            <div class="row">
                                 <div class="col-lg-4 text-center">
                                     <div style="margin-top: 8px;">
                                         <label class="mr-3">
@@ -106,21 +110,24 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-12 text-right mt-2">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-times"></i>
-                                        <span> Close </span>
-                                    </button>
-                                </div>
+                            -->
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -206,8 +213,11 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.form')
 @include('stacks.js.advanced_search')
+@include('stacks.js.activebutton')
 
 <script>
+
+    active_btn('#groupby-btn .btn-grey');
 
 
     var f_search = 0;
@@ -254,6 +264,7 @@
             datatype: "html",
             beforeSend: function(){
                 $('.ajax-loading').show();
+                $('#count_news_bookmark').text(0);
             },
         }).done(function(data){
             if(data.html.length == 0){
@@ -281,6 +292,7 @@
             datatype: "html",
             beforeSend: function(){
                 $('.ajax-loading').show();
+                $('#count_news').text(0);
             },
         }).done(function(data){
             if(data.html.length == 0){
@@ -354,6 +366,7 @@
                 $('.ajax-loading').show();
                 {{--loading('load');--}}
                 {{--f_loading(1);--}}
+                $('#count_news').text(0);
             },
         }).done(function(data){
             if(data.html.length == 0){
@@ -392,6 +405,7 @@
             datatype: "html",
             beforeSend: function(){
                 $('.ajax-loading').show();
+                $('#count_news').text(0);
             },
         }).done(function(data){
             if(data.html.length == 0){

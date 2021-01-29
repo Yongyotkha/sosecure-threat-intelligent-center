@@ -1025,7 +1025,7 @@
                             data: low,
                             color: '#88ce4f '
                         }, {
-                            name: 'Infomation',
+                            name: 'Information',
                             data: infomation,
                             color: '#d3d3d3'
                         }]

@@ -54,7 +54,7 @@
                             @endif
                             @endif
     
-                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <a href="#" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                             </a>
     

@@ -40,8 +40,8 @@
         <aside>
             <section class="vbox">
 
-                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow m-t-10">
+                <header class="header panel-heading bg-white b-b b-light">
+                    <div class="header-flex-overflow" style="height: 46px;">
                         <div class="fwb-16">
                             <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</button>
                             <span>
@@ -115,12 +115,12 @@
                             <div class="container-fluid" style="padding: 2rem;">
 
                                 <div class="row">
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Title</h5>
                                         <input type="text" class="form-control" name="keywords" id="keywords">
                                     </div>
 
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Public Date</h5>
                                         <div id="date_srange" class="text-center form-control"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -129,7 +129,39 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4 mb-1">
+                                    
+                                    <div class="col-lg-2 col-md-3 mb-1">
+                                        <h5 class="font-weight-bold">Filter By</h5>
+                                        <div id="groupby-btn" class="btn-group special">
+                                            <button id="source_btn" class="btn btn-grey check_group_by active">
+                                                <span> Source </span>
+                                            </button>
+                                            <button id="category_btn" class="btn btn-grey check_group_by">
+                                                <span> Category </span>
+                                            </button>
+                                        </div>      
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-3 mb-1">
+                                        <h5 class="font-weight-bold">&nbsp;</h5>
+                                        <div id="source_search" class="m-t-10">
+                                            <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
+                                            </select>
+                                        </div>
+
+                                        <div id="category_search" class="m-t-10">
+                                            <select name="news_category[]" id="news_category"
+                                                class="select2-option form-control" multiple="multiple">
+                                                {{-- <option value="" >All</option> --}}
+                                                @foreach(@$category as $cate)
+                                                <option value="{{$cate->id}}">{{$cate->name}}</option>
+                                                @endforeach
+                                                {{-- <option value="1" selected>All</option> --}}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey check_status active" id="all" value="">
@@ -144,34 +176,6 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Filter By</h5>
-                                        <div id="groupby-btn" class="btn-group special">
-                                            <button id="source_btn" class="btn btn-grey check_group_by active">
-                                                <span> Source </span>
-                                            </button>
-                                            <button id="category_btn" class="btn btn-grey check_group_by">
-                                                <span> Category </span>
-                                            </button>
-                                        </div>
-
-                                        <div id="source_search" class="m-t-10">
-                                            <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
-                                            </select>
-                                        </div>
-    
-                                        <div id="category_search" class="m-t-10">
-                                            <select name="news_category[]" id="news_category"
-                                                class="select2-option form-control" multiple="multiple">
-                                                {{-- <option value="" >All</option> --}}
-                                                @foreach(@$category as $cate)
-                                                <option value="{{$cate->id}}">{{$cate->name}}</option>
-                                                @endforeach
-                                                {{-- <option value="1" selected>All</option> --}}
-                                            </select>
-                                        </div>
-                                    </div>
-
 
 
                                 </div>
