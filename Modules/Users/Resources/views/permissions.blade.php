@@ -17,35 +17,44 @@
             </header>
             <section class="scrollable wrapper">
                 <section class="panel panel-default">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="permissions-table">
-                            <thead>
-                                <tr>
-                                    <th class="">@langapp('name')  </th>
-                                    <th class="">@langapp('description')  </th>
-                                    <th class=""></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (Spatie\Permission\Models\Permission::getPermissions([]) as $key => $permission)
-                                <tr>
-                                    <td>{{ humanize($permission->name) }}</td>
-                                    <td class="text-muted">{{ $permission->description }}</td>
-                                    <td>
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row d-flex-center">
+                            <div class="col-md-12">
+                                <i class="fas fa-table"></i> Table Permission
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body" id="table-container">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="permissions-table">
+                                <thead>
+                                    <tr>
+                                        <th class="">@langapp('name')  </th>
+                                        <th class="">@langapp('description')  </th>
+                                        <th class="">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (Spatie\Permission\Models\Permission::getPermissions([]) as $key => $permission)
+                                    <tr>
+                                        <td>{{ humanize($permission->name) }}</td>
+                                        <td class="text-muted">{{ $permission->description }}</td>
+                                        <td>
+                                            
+                                            <a href="{{ route('users.perm.edit', ['id' => $permission->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                                @icon('solid/pencil-alt')
+                                            </a>
+                                            <a href="{{ route('users.perm.delete', ['id' => $permission->id]) }}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                                                @icon('solid/trash-alt')
+                                            </a>
+                                            
+                                        </td>
                                         
-                                        <a href="{{ route('users.perm.edit', ['id' => $permission->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
-                                            @icon('solid/pencil-alt')
-                                        </a>
-                                        <a href="{{ route('users.perm.delete', ['id' => $permission->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
-                                            @icon('solid/trash-alt')
-                                        </a>
-                                        
-                                    </td>
-                                    
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     
                 </section>
