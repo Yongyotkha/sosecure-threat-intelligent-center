@@ -252,12 +252,12 @@
                                                     class="fas fa-paper-plane"></i>
                                                 Send Log
                                             </button>  --}}
-
-                                            <button type="submit" class="btn btn-info submit btn-rounded formSaving2" id="btn-submitC"><i
-                                                class="fas fa-paper-plane"></i>
-                                                Send Log
-                                            </button> 
-
+                                            <span id="tooltip_span" data-rel="tooltip" {!!$LogsSentBTN!==1?' title="'.$LogsSentMessage.'"':'title=""'!!}>
+                                                <button type="submit" class="btn btn-info submit btn-rounded formSaving2" id="btn-submitC" {!!$LogsSentBTN!==1?'disabled style="pointer-events: none;"':''!!}><i
+                                                    class="fas fa-paper-plane"></i>
+                                                    Send Log
+                                                </button> 
+                                            </span>
                                         </div>
                                     </div>
                                 </section>
@@ -292,7 +292,7 @@
 @endpush
 
 <script>
-
+$('[data-toggle="tooltip"]').tooltip();
 function copy_btn(id){
     var copyText = document.getElementById(id);
     copyText.select();
@@ -395,8 +395,12 @@ $('.ajaxifyForm_custom2').submit(function (event) {
     }
     axios.post($(this).attr("action"), data)
         .then(function (response) {
+                $('#btn-submitC').prop('disabled', true);
+                $('#tooltip_span').attr('data-original-title', '{{$LogsSentMessage}}');
+                $("#btn-submitC").css("pointer-events","none");
                 toastr.success(response.data.message, '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+
                 {{--window.location.href = response.data.redirect;--}}
     })
     .catch(function (error) {

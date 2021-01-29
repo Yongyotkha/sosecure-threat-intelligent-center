@@ -53,7 +53,17 @@ class IndicatorsSettingController extends Controller
        }else{
         $content=null;
        }
+
+       $LogsSent = LogsSent::where('mode', 'indicator')->first();
+       if( $LogsSent && ($LogsSent -> status_progrss == 3)){
+            $data['LogsSentBTN'] = 1;
+            $data['LogsSentMessage'] = "Send log waiting for operation!!";
+       }else{
+            $data['LogsSentBTN'] = 2;
+            $data['LogsSentMessage'] = "Send log waiting for operation!!";
+       }
        
+
        $data['content'] = $content;
        $data['siteSettings'] = $get_data;
        $data['LogsSetting'] = $get_Logdata;
@@ -165,14 +175,10 @@ class IndicatorsSettingController extends Controller
         // dd($request->text_protocal_format);
         $get_data = $this->siteSettings->get_data($id);
         $LogsSetting = LogsSent::where('mode', 'indicator')->first();
-
-        if($LogsSetting->status_progrss != 3) {
-            return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
-        }
-        
-
-
         if($LogsSetting){
+            if($LogsSetting->status_progrss != 3) {
+                return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
+            }
             // $LogsSetting->mode = 'indicator';
             $LogsSetting->start = $date_start_datetime_format;
             $LogsSetting->end = $date_end_datetime_format;
@@ -185,7 +191,9 @@ class IndicatorsSettingController extends Controller
             $LogsSetting->end = $date_end_datetime_format;
             $LogsSetting->status_progrss = 1;
             $LogsSetting->save();
-            
+            if($LogsSetting->status_progrss != 3) {
+                return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
+            }
         }
         return ajaxResponse(
             [
