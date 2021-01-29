@@ -43,7 +43,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/user') Users</header>
+                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/user') Table Users</header>
                             <div class="panel-body">
                                 <div class="table-responsive">
                                     <table  class="table table-striped" id="table-users-template">
