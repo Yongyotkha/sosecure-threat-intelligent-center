@@ -148,17 +148,17 @@ class DashboardNewController extends Controller
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
                 if($request -> site == 0){
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",raw_data) AS link'))->where('status', 1)->get();
+                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",id) AS link'))->where('status', 1)->get();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",raw_data) AS link'))->where('site_id', $site_id_m->id)->where('status', 1)->get();
+                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",id) AS link'))->where('site_id', $site_id_m->id)->where('status', 1)->get();
                 }
             } else {
                 if($request -> site == 0){
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",raw_data) AS link'))->where('status', 1)->whereIn('site_id', $site_id_arr)->get();
+                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",id) AS link'))->where('status', 1)->whereIn('site_id', $site_id_arr)->get();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",raw_data) AS link'))->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->get();
+                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/assets?Search_Link_All=",id) AS link'))->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->get();
                 }
             }
         }

@@ -24,11 +24,17 @@
                             </select>
                         </div>
     
-                        <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
-
-                        <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                        </a>
+                        @if(TYPE_WEB=='center')
+                            <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
+                            <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            </a>
+                        @else
+                            <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            </a>
+                        @endif
+                        
 
                         <div class="button-control d-none">
 
@@ -262,6 +268,7 @@
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
                                         <th rowspan="2" class="align-middle">CPESTRING</th>
+                                        <th rowspan="2" class="align-middle">asset_id</th>
                                     </tr>
                                     <tr>
                                         <th>Vendor</th>
@@ -530,7 +537,7 @@
 
     function clearTB(){
         $("#groupby-select").val('').trigger("change");
-        $("#select-site").val(0).trigger("change");
+        $("#select-site").val("").trigger("change");
         $("#groupby-status>button").removeClass("active");
         $("#groupby-status>button:first").addClass("active");
         active = '';
@@ -572,17 +579,20 @@
         
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
-        if(searchLinkAll!==''){
-            selectedValue = colsearchLinkAll;
+        if(colsearchLinkAll!==''){
+            columnSearch = colsearchLinkAll;
             selectedValue = searchLinkAll;
         }
         let selectedSiteName = '';
         if($('#select-site').children("option:selected").val()!=0){
             selectedSiteName = $('#select-site').children("option:selected").text();
         }
-        
-        let active_tb = active;
-        
+        let active_tb;
+        if(active==""){
+            active_tb = active;
+        }else{
+            active_tb = '^'+active+'$';
+        }
         
         if(columnSearch=='domain'){
             columnSearch = 1;
@@ -593,11 +603,22 @@
             columnSearch = 12;
         }else if(columnSearch=='os_type'){
             columnSearch = 8;
+        }else if(columnSearch=='ip_asset_id'){
+ 
         }else{
             columnSearch = '';
         }
         t.search( '' ).columns().search( '' ).draw();
-        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb).draw();
+        if(columnSearch=='ip_asset_id'){
+            selectedValue = '^' + selectedValue +'$';
+            columnSearch = 13;
+            console.log(selectedValue);
+            console.log(columnSearch);
+            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
+        }else{
+            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+        }
+       
        
        
         {{--ads.column(5).search(active_tb).draw();
@@ -689,10 +710,10 @@
                 {
                     data: 'CPE_Del',
                     name: 'CPE_Del',
-                    className: 'padingtablezero text-center no-wrap'
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
                 },
                 {
-                    searchable: false,
                     orderable: false,
                     width: '3%',
                     data: 'status',
@@ -704,13 +725,18 @@
                     width: '3%',
                     data: 'action',
                     name: 'action',
-                    className: 'text-center no-wrap'
+                    className: 'text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
                 },
                 {
                     data: 'CPE',
                     name: 'CPE',
                     visible:false
-
+                },
+                {
+                    data: 'ip_asset_id',
+                    name: 'ip_asset_id',
+                    visible:false
                 },
             ],
             columnDefs: [
@@ -753,7 +779,7 @@
         if(check===""){
             searchTB();
         }else{
-            searchTB(check,'domain');
+            searchTB(check,'ip_asset_id');
         }
     }
 </script>
