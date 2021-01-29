@@ -18,47 +18,55 @@
             </header>
             <section class="scrollable wrapper">
                 <section class="panel panel-default">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="roles-table">
-                            <thead>
-                                <tr>
-                                    <th class="hide">ID</th>
-                                    <th class="">@langapp('name')</th>
-                                    <th class="">Guard</th>
-                                    <th class=""></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (Role::get() as $key => $role)
-                                <tr>
-                                    <td>{{ $role->id }}</td>
-                                    <td>{{ ucfirst($role->name) }}</td>
-                                    
-                                    <td class="">
-                                        {{ $role->guard_name }}
-                                    </td>
-                                    <td>
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row d-flex-center">
+                            <div class="col-md-12">
+                                <i class="fas fa-table"></i> Table Role
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body" id="table-container">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="roles-table">
+                                <thead>
+                                    <tr>
+                                        <th class="hide">ID</th>
+                                        <th class="">@langapp('name')</th>
+                                        <th class="">Guard</th>
+                                        <th style="width: 120px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (Role::get() as $key => $role)
+                                    <tr>
+                                        <td>{{ $role->id }}</td>
+                                        <td>{{ ucfirst($role->name) }}</td>
                                         
-                                        <a href="{{ route('users.roles.permission', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
-                                            @icon('solid/shield-alt')
-                                        </a>
+                                        <td class="">
+                                            {{ $role->guard_name }}
+                                        </td>
+                                        <td class="nowrap">
+                                            
+                                            <a href="{{ route('users.roles.permission', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                                @icon('solid/shield-alt')
+                                            </a>
+                                            
+                                            <a href="{{ route('users.roles.edit', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                                @icon('solid/pencil-alt')
+                                            </a>
+                                            <a href="{{ route('users.roles.delete', ['id' => $role->id]) }}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                                                @icon('solid/trash-alt')
+                                            </a>
+                                            
+                                            
+                                        </td>
                                         
-                                        <a href="{{ route('users.roles.edit', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
-                                            @icon('solid/pencil-alt')
-                                        </a>
-                                        <a href="{{ route('users.roles.delete', ['id' => $role->id]) }}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
-                                            @icon('solid/trash-alt')
-                                        </a>
-                                        
-                                        
-                                    </td>
-                                    
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    
                 </section>
             </section>
         </section>

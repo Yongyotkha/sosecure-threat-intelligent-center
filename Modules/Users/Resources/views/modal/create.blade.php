@@ -2,7 +2,7 @@
         <div class="modal-content">
             <div class="modal-header bg-blue">
                 <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title text-white">@langapp('create')  </h4>
+                <h4 class="modal-title text-white">@icon('solid/plus') @langapp('create')  </h4>
             </div>
     
     
