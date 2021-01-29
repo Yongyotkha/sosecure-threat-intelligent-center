@@ -685,7 +685,10 @@ class NewsController extends Controller
 
         if(($request -> title || $request -> cate || $request -> related_news || $request -> lang_th || $request -> lang_en || $request -> date_start || $request -> date_end) && $request -> f_search == 1){
 
-            $news = RSSNews::where('save_draft', 0)->orwhere('save_draft',null)->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+            $news = RSSNews::where(function ($query) {
+                $query->where('save_draft',  0)
+                    ->orWhere('save_draft',  null);
+            })->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
             if($request -> title){
                 $news = $news -> where('title_th', 'LIKE' ,'%'.$request -> title.'%');
             }
@@ -706,16 +709,22 @@ class NewsController extends Controller
                 }
                 
             }
+          
+            if($request ->site_id) {
+
+                $site_id = @$request ->site_id;
+                $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
+                    $q->where('site_id', $site_id)->where('deleted_at', null);
+                });
+            }
+
+
 
             if($related_news == 'true') {
-                if($site_code) {
-                    $site_id_m = SiteSettings::where('code',$site_code)->first();
-                    $site_id = @$site_id_m->id;
-
-                    $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
-                        $q->where('site_id', $site_id)->where('deleted_at', null);
-                    });
-                }
+                $site_id = @$request ->site_id;
+                $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
+                    $q->where('site_id', $site_id)->where('deleted_at', null);
+                });
 
             }
 
@@ -758,7 +767,20 @@ class NewsController extends Controller
             $news_all = $news->count();
             $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
         }else{
-            $news = RSSNews::where('save_draft', 0)->orwhere('save_draft',null)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc')->paginate(PAGINATE_NUM);//->get()
+            $news = RSSNews::where(function ($query) {
+                $query->where('save_draft',  0)
+                    ->orWhere('save_draft',  null);
+            })->where('status', 1)->where('public_date', '<=', Carbon::now());//->get()
+
+            if($request ->site_id) {
+
+                $site_id = @$request ->site_id;
+                $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
+                    $q->where('site_id', $site_id)->where('deleted_at', null);
+                });
+            }
+            $news_all = $news->count();
+            $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
         }
 
         // dd($news);

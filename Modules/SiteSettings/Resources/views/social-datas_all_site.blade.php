@@ -464,10 +464,15 @@ active_btn('#groupby-type .btn-grey');
    
     });
 
+    $("#site").change(function() {
+        site = this.value;   
+        table_social_data();
+        get_count();
+        });
+
     function search(){
         search_val = 1;
         keywords = $('#keyword').val();
-        site = $('#site option:selected').val();
         type = $('#type option:selected').val();
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
@@ -725,7 +730,12 @@ active_btn('#groupby-type .btn-grey');
 
             $("#social_reset").click(function() {
                 
-
+                keywords = null;
+                type = null;
+                source = null;
+                startDate =  null;
+                endDate =  null;
+                site = null;
                 search_val = 0;
                 $("#keyword").val('');
                 start = moment().subtract(1, 'month').startOf('month');
@@ -737,6 +747,7 @@ active_btn('#groupby-type .btn-grey');
                 $('#all').addClass('active');
                 check_type = null;
                 table_social_data();
+                get_count();
             
 
             });

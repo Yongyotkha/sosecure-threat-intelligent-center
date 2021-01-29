@@ -338,28 +338,28 @@ class CategorySettingsController extends Controller
                         $checked_val = '';
                     }
                     $html = '';
-                    $html .= '<script>
-                    function change_category_active (category_id) {
-                        axios.post("'. route('categorysettings.change_status') .'", {
-                            // params: {
-                                category_id: category_id
-                            // }
-                          })
-                        .then(function (response) {
-                            toastr.warning(response.message, '.@langapp("response_status").');
-                            window.location.href = response.redirect;
-                        })
-                        .catch(function (error) {
-                            var errors = error.errors;
-                            var errorsHtml = "";
-                            $.each(errors, function (key, value) {
-                                errorsHtml += "<li>" + value[0] + "</li>";
-                            });
-                            toastr.error(errorsHtml, '.@langapp("response_status"). ');
-                        });
+                    // $html .= '<script>
+                    // function change_category_active (category_id) {
+                    //     axios.post("'. route('categorysettings.change_status') .'", {
+                    //         // params: {
+                    //             category_id: category_id
+                    //         // }
+                    //       })
+                    //     .then(function (response) {
+                    //         toastr.warning(response.message, '.@langapp("response_status").');
+                    //         window.location.href = response.redirect;
+                    //     })
+                    //     .catch(function (error) {
+                    //         var errors = error.errors;
+                    //         var errorsHtml = "";
+                    //         $.each(errors, function (key, value) {
+                    //             errorsHtml += "<li>" + value[0] + "</li>";
+                    //         });
+                    //         toastr.error(errorsHtml, '.@langapp("response_status"). ');
+                    //     });
 
-                    }
-                    </script>';
+                    // }
+                    // </script>';
 
                     // $html = '';
                     $html .= '<label class="switch">

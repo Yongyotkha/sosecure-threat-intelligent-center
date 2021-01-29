@@ -44,7 +44,7 @@
                             <div class="text-left" style="margin-top: 8px; min-width:270px;display:inline-block;">
                                 <select name="site" id="site" class="text-left select2-option form-control select-site"
                                     style="min-width:270px">
-                                    <option value="">All Site</option>
+                                    <option value="" selected="selected">All Site</option>
                                     @if($SiteSettings)
                                     @foreach($SiteSettings as $SiteSettings_val)
                                     <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
@@ -207,7 +207,7 @@
                                         <i class="fas fa-search"></i>
                                         @langapp('apply')
                                     </button>
-                                    <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                    <button type="button" id="social_reset2" class="btn btn-default btn-responsive btn-fz-13"
                                         style="white-space: nowrap">
                                         <i class="fas fa-broom"></i>
                                         <span> Clear </span>
@@ -443,10 +443,16 @@ active_btn('#groupby-type .btn-grey');
    
     });
 
+    $("#site").change(function() {
+        site = this.value;        
+        table_social_data();
+        get_count();
+        });
+
     function search(){
         search_val = true;
         keywords = $('#keyword').val();
-        site = $('#site option:selected').val();
+        {{--site = $('#site option:selected').val();--}}
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
@@ -500,9 +506,8 @@ active_btn('#groupby-type .btn-grey');
     }
 
 
-
+    
     function table_social_data(){
-
 
         $('#table_social_datas').DataTable({
                 pageLength: 50,
@@ -748,13 +753,17 @@ active_btn('#groupby-type .btn-grey');
 
     cb(start, end);
 
-            $("#social_reset").click(function() {
+            $("#social_reset2").click(function() {
                 search_val = false;
+
                 $('#keyword').val('');
+
                 $('#site').val('').trigger('change');
                 $('#source').val('').trigger('change');
                 startDate =  null;
                 endDate =  null;
+                keywords =  null;
+                site =  null;
 
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
@@ -762,6 +771,7 @@ active_btn('#groupby-type .btn-grey');
                 $('.btn-grey').removeClass('active');
                 $('#all').addClass('active');
                 check_type = null;
+                get_count();
                 table_social_data();
             });
 
@@ -801,9 +811,6 @@ active_btn('#groupby-type .btn-grey');
                 });
         });
     });
-
-
-
 
 
 </script>

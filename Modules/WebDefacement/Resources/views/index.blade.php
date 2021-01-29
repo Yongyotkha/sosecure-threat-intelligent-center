@@ -477,12 +477,17 @@
         });
     }
 
+    $("#site").change(function() {
+        site = this.value;        
+        load_card(search_);
+
+    });
+
     function search (level_=null) {
 
         search_ = 1;
         keywords = $('#keywords').val();
         datatype = $('#datatype').val(); 
-        site = $('#site').val();
         level = level_;
        
         
@@ -497,12 +502,10 @@
     site = null;
     keywords = null;
     level = null;
-
+    site = null;
     $('#keywords').val('');
     $('#datatype').val('').trigger('change');
     $('#site').val('').trigger('change');
-    site = $('#site').val();
-
 
 
     load_card(search_);
