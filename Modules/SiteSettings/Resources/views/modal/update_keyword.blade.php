@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $Site_keywords->name }}</h4>
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $Site_keywords->name }}</h4>
         </div>
         
         {!! Form::open(['route' => ['keyword.update', 'id' => $Site_keywords->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
@@ -11,16 +11,16 @@
 
         <div class="modal-body">
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
-                <div class="col-lg-8">
+                <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <input type="text" name="name" class="form-control" value="<?=@$Site_keywords->name?>">
                 </div>
             </div>
 
            
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Type <span class="text-danger">*</span> </label>
-                <div class="col-lg-8">
+                <label class="col-lg-3 control-label">Type <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <select name="type" id="type" class="select2-option form-control select-site" style="min-width: 300px;">
                         <option  value="social" {{ $Site_keywords->type=='social'  ? 'selected="selected"' : "" }}>Social</option>
                         <option  value="darkweb" {{$Site_keywords->type=='darkweb'  ? 'selected="selected"' : "" }}>Dark Web</option>
@@ -29,8 +29,8 @@
             </div>
  
             <div class="form-group row">
-                <label class="col-lg-4 control-label">Status </label>
-                <div class="col-lg-8">
+                <label class="col-lg-3 control-label">Status </label>
+                <div class="col-lg-9">
                     <label class="switch">
                         <input type="checkbox" name="status" checked value="1" {{$Site_keywords->status == 1 ? 'checked' : ''}}>
                         <span></span>
