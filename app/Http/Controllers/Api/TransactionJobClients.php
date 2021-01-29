@@ -17,10 +17,18 @@ class TransactionJobClients extends Controller
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{
-                $transcation_jobs_clients = transcation_jobs_clients::where('site_id', $data['data']['id'])->where('status' , 1)->where('transaction_data_status' , 1)->get();
-                $data_users = json_encode($transcation_jobs_clients);
-                $datas = encrypt_decrypt('encrypt', $data_users, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                try {
+                    $transcation_jobs_clients = transcation_jobs_clients::where('site_id', $data['data']['id'])->where('status' , 1)->where('transaction_data_status' , 1)->get();
+                    $data_transcation_jobs_clients = json_encode($transcation_jobs_clients);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation_jobs_clients, $header, $data['data']['ip_key'],  $data['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                } catch (\Exception $e) {
+                    $response = array(
+                        'status' => 0,
+                        'message' => $e -> getMessage(),
+                    );
+                    return response()->json($response);
+                }
             }
         } catch (\Exception $e) {
             $response = array(
