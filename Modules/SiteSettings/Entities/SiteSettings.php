@@ -85,4 +85,8 @@ class SiteSettings extends Model{
     public function get_set_permission(){
         return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'set_permission')->orderBy('updated_at', 'desc');
     }
+
+    public function get_update_code(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'update_code')->orderBy('updated_at', 'desc');
+    }
 }
