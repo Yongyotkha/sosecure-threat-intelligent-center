@@ -2,7 +2,7 @@
         <div class="modal-content">
             <div class="modal-header bg-blue">
                 <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title text-white">@icon('solid/plus') @langapp('create')  </h4>
+                <h4 class="modal-title text-white">@langapp('create')  </h4>
             </div>
     
     
@@ -17,7 +17,7 @@
                     <input class="display-none" type="hidden" name="password"/>
     
     
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>@langapp('username')  @required</label>
@@ -29,26 +29,31 @@
                             </div>
                             
                         </div>
-                    </div> --}}
+                    </div>
     
     
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-12">
-                                <label>Name @required</label>
+                            <div class="col-md-6">
+                                <label>@langapp('fullname') @required</label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
+                            <div class="col-md-6">
+                                <label>@langapp('job_title')  </label>
+                                <input type="text" name="job_title" class="form-control" placeholder="Sales Manager">
+                            </div>
+    
                         </div>
                     </div>
     
     
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label>@langapp('email') @required</label>
                                 <input type="email" name="email" class="form-control" placeholder="you@domain.com" required>
                             </div>
-                            {{-- <div class="col-md-6">
+                            <div class="col-md-6">
                                 <label>@langapp('company')</label>
     
                                 <select class="select2-option width100" name="company">
@@ -60,12 +65,12 @@
     
                                 </select>
     
-                            </div> --}}
+                            </div>
                         </div>
                     </div>
     
     
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>@langapp('address')  </label>
@@ -81,9 +86,9 @@
                                 </select>
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
     
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-md-4">
                                 <label>@langapp('city')</label>
@@ -98,10 +103,10 @@
                                 <input type="text" name="zip_code" class="form-control">
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
     
     
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>@langapp('phone')</label>
@@ -112,10 +117,10 @@
                                 <input type="text" name="mobile" class="form-control">
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
     
     
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>@langapp('website')  </label>
@@ -126,10 +131,10 @@
                                 <input type="text" name="twitter" class="form-control">
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
     
     
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
                                 <label>@langapp('hourly_rate')  </label>
@@ -152,88 +157,45 @@
     
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
     
     
-                    {{-- <div class="form-group">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label>@langapp('locale')  {{ get_option('locale') }}</label>
-                                    <select class="select2-option form-control" name="locale">
-                                        @foreach (locales() as $loc)
-                                            <option value="{{ $loc['code']  }}" {{ get_option('locale') == $loc['code'] ? 'selected' : ''  }}>
-                                                {{  ucfirst($loc['language'])  }} - {{ $loc['code'] }}</option>
-                                        @endforeach
-                                    </select>
+                    <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>@langapp('locale')  {{ get_option('locale') }}</label>
+                            <select class="select2-option form-control" name="locale">
+                                @foreach (locales() as $loc)
+                                    <option value="{{ $loc['code']  }}" {{ get_option('locale') == $loc['code'] ? 'selected' : ''  }}>
+                                        {{  ucfirst($loc['language'])  }} - {{ $loc['code'] }}</option>
+                                @endforeach
+                            </select>
 
-                                </div>
+                        </div>
 
-                                <div class="col-md-6">
-                                    <label>Skype</label>
-                                    <input type="text" placeholder="john.doe" name="skype" class="form-control">
+                        <div class="col-md-6">
+                            <label>Skype</label>
+                            <input type="text" placeholder="john.doe" name="skype" class="form-control">
 
-                                </div>
-                            </div>
-                        </div> --}}
+                        </div>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <div class="row">
 
-                        <div class="col-md-12">
+                <div class="col-md-12">
 
                             <label class="display-block">@langapp('roles')</label>
-                            <select name="role_id" class="select2-option form-control" ><!--multiple="multiple"-->
+                            <select name="roles[]" class="select2-option form-control" ><!--multiple="multiple"-->
                                 @foreach (Role::whereNotIn('id', [3])->get() as $role)
-                                    <option value="{{ $role->id }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
-                                @endforeach
-                            </select>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="row">
-
-                        <div class="col-md-12">
-
-                            <label class="display-block">Site</label>
-                            {{-- <select name="site[]" class="select2-option form-control" multiple="multiple"><!--multiple="multiple"-->
-                                @foreach (Modules\SiteSettings\Entities\SiteSettings::select()->get() as $role)
                                     <option value="{{ $role->name }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                                 @endforeach
-                            </select> --}}
-
-
-                            <select name="site[]" id="select-site" class="select2-option form-control select-site" multiple="multiple">
-                                <option value="">Select Site</option>
-                                @if($SiteSettings)
-                                @foreach($SiteSettings as $SiteSettings_val)
-                                <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
-                                @endforeach
-                                @endif
                             </select>
 
                         </div>
-                    </div>
                 </div>
-
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label class="display-block">Status </label>
-                            <div class="col-lg-12">
-                                <label class="switch">
-                                    <input type="checkbox" name="active" value="TRUE" checked>
-                                    <span></span>
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-               
+            </div>
 
                     @include('partial.privacy_consent')
     
@@ -264,9 +226,6 @@
     @push('pagescript')
     @include('stacks.js.form')
     @include('partial/ajaxify')
-
-
-    
     @endpush
     
     @stack('pagestyle')

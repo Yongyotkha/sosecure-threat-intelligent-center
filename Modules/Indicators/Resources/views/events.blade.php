@@ -13,7 +13,7 @@
 
                 <div class="ml-2 text-right">
                      {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-                    <div class="text-left" style="min-width: 270px;display:inline-block">
+                    {{-- <div class="text-left" style="min-width: 270px;display:inline-block">
                         <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
                             <option value="">All Site</option>
                             @if($SiteSettings)
@@ -22,7 +22,7 @@
                             @endforeach
                             @endif
                         </select>
-                    </div>
+                    </div> --}}
 
                     <a id="advance-search" href="#area_search"
                         class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">

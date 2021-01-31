@@ -11,14 +11,14 @@
             </a>
             {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
             <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                <!--<select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
                     <option value="">All Site</option>
                     {{-- @if($SiteSettings)
                     @foreach($SiteSettings as $SiteSettings_val)
                     <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                     @endforeach
                     @endif --}}
-                </select>
+                </select>-->
             </div>
 
         </header>
@@ -26,8 +26,8 @@
             <section id="area_search" class="panel panel-default">
                 <div class="panel-heading">
                     <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
-                    |
-                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
+                    {{-- |
+                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a> --}}
                 </div>
                 <div id="hide-advance-search" class="container-fluid" style="padding: 2rem; display: none;">
                     <div class="row">

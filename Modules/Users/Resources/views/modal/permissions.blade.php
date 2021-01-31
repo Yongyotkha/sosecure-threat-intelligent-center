@@ -27,7 +27,7 @@
     
                 <div class="line line-dashed line-lg pull-in"></div>
     
-                @endforeach
+            @endforeach
 
            
 

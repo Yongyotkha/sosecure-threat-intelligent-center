@@ -22,6 +22,7 @@ use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 use Modules\Users\Entities\UserSite;
+use Modules\Users\Entities\model_has_roles;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -33,36 +34,51 @@ define("PATH_CENTER_IP_TF", 'http://127.0.0.2');
             
 function get_role_custom() {
     $superadmin = 0;
+    $client = 0;
     $site_support = 0;
     $site_admin = 0;
+    $site_client = 0;
             if(Auth::check()) {
+                $model_has_roles = model_has_roles::where('model_id',@Auth::user()->id)->first();
+                $role_id = @$model_has_roles->role_id;
+                // dd($role_id);
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if(Auth::user()->hasRole('admin')) {//if admin
+                if(@$role_id == 1) {//if admin  | Auth::user()->hasRole('admin')
                     // dd(777);
                     $superadmin = 1;
 
                 } else { //if notAdmin
                     // dd(888);
                     if(@Auth::user()->site_role_id && $site_id_arr) {
-                        if(@Auth::user()->site_role_id == 6) {//support and admin
+                        if(@$role_id == 6) {//support and admin
                             // dd(99);
                             $site_support = 1;
                             // $model = $model->whereIn('site_id', $site_id_arr);
                             // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
 
-                        } else if(@Auth::user()->site_role_id == 4) {//not support and admin
+                        } else if(@$role_id == 4) {//not support and admin
                             $site_admin = 1;
                             // $model = $model->whereIn('site_id', $site_id_arr);
                             // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+                        } else if(@$role_id == 5) {//not support and admin
+                            $site_client = 1;
+                           
                         }
                     }
+
+                    $client = 1;
+
                 }
             }
             
                 $data = [
-                    "superadmin" => $superadmin,
-                    "site_admin" => $site_admin
+                    "superadmin" => $superadmin,//center
+                    "client" => $client,//center
+                    "site_support" => $site_support,//site
+                    "site_admin" => $site_admin,//site
+                    "site_client" => $site_client,//site
+                    "site_id_arr" => $site_id_arr//center,site
                 ];
                 return $data; 
             
