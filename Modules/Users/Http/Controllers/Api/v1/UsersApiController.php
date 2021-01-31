@@ -84,6 +84,14 @@ class UsersApiController extends Controller
         // $User->site_add_user_token = generator_uuid();
         // $User->save();
 
+        $email = $request->email;
+        if($email) {
+            $User_check_email = User::where('email',$email)->where('deleted_at',null)->get()->count();
+            if($User_check_email > 0) {
+                return response()->json(['message' => 'this email address already exist', 'errors' => ['missing' => ["this email address already exist "]]], 500);
+            }
+        }
+
 
 
         $userColumns = ['email', 'name'];
