@@ -17,7 +17,25 @@
             {{-- <form class="panel-body wrapper-lg" method="POST" action=""> --}}
             {!! Form::open(['route' => ['reauth.verify_update_pass', 'id' => $User->code], 'class' => 'panel-body wrapper-lg ajaxifyForm_custom validator', 'novalidate' => '', 'method' => 'PUT', 'files' => false]) !!}
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label><b>Welcome Site: </b>{{$User->get_SiteSettings->name}}</label>
+                    @php
+                    // dd($granted_access);
+                        $get_user_site = '';
+                        if(@$User->get_user_site(@$User->id)) {
+                            foreach($User->get_user_site(@$User->id) as $get_user_site_val) {
+                                if(@$get_user_site_val->get_site->name) {
+                                    $get_user_site .= $get_user_site_val->get_site->name . ',';
+                                }
+                            }
+                            $get_user_site_all = rtrim($get_user_site,",");
+
+                            if($granted_access_val) {
+                                $get_user_site_all = $granted_access_val;
+                            } else {
+
+                            }
+                        }
+                    @endphp
+                    <label><b>{{$granted_access}} </b>{{@$get_user_site_all}}</label>
                 </div>
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                     <label><b>Username</b></label><br>

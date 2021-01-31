@@ -10,7 +10,7 @@
     
                 <div class="panel-body">
     
-                {!! Form::open(['route' => 'users.api.save', 'class' => 'bs-example form-horizontal ajaxifyForm']) !!}
+                {!! Form::open(['route' => 'users.api.save', 'class' => 'bs-example form-horizontal ajaxifyForm_custom']) !!}
                    
     
                     <input class="display-none" type="hidden" name="username"/>
@@ -182,7 +182,7 @@
                         <div class="col-md-12">
 
                             <label class="display-block">@langapp('roles')</label>
-                            <select name="role_id" class="select2-option form-control" ><!--multiple="multiple"-->
+                            <select name="role_id" class="select2-option form-control" onchange="check_role(value)" ><!--multiple="multiple"-->
                                 @foreach (Role::whereNotIn('id', [3])->get() as $role)
                                     <option value="{{ $role->id }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                                 @endforeach
@@ -192,7 +192,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="area_select_site">
                     <div class="row">
 
                         <div class="col-md-12">
@@ -206,7 +206,7 @@
 
 
                             <select name="site[]" id="select-site" class="select2-option form-control select-site" multiple="multiple">
-                                <option value="">Select Site</option>
+                                {{-- <option value="">Select Site</option> --}}
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
                                 <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
@@ -263,7 +263,72 @@
     @endpush
     @push('pagescript')
     @include('stacks.js.form')
-    @include('partial/ajaxify')
+    {{-- @include('partial/ajaxify') --}}
+
+    <script>
+
+        $(document).ready(function () {
+            $('#role').select2();
+        });
+
+
+   
+        var form_save = '.formSaving';
+        $('.ajaxifyForm_custom').submit(function (event) {
+            event.preventDefault();
+    
+                $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+                
+                var data = new FormData(this);
+                if(form_save == '.formSavingAndRun'){
+                    data.append('formsubmit', 'formSavingAndRun');
+                }else if(form_save == '.formPreview'){
+                    data.append('formsubmit', 'formPreview');
+                }else if(form_save == '.formDraft'){
+                    data.append('formsubmit', 'formDraft');
+                }
+                axios.post($(this).attr("action"), data)
+                    .then(function (response) {
+                            toastr.success(response.data.message, '@langapp('response_status') ');
+                            $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                            window.location.href = response.data.redirect;
+                })
+                .catch(function (error) {
+                    if(error.response.data.exception){
+                        toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                        $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                    }else{
+                        var errors = error.response.data.errors;
+                        var errorsHtml= '';
+                        $.each( errors, function( key, value ) {
+                            errorsHtml += '<li>' + value[0] + '</li>'; 
+                        });
+                        toastr.error( errorsHtml , '@langapp('response_status') ');
+                        $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                    }
+                    
+                    
+                }); 
+           
+         
+             
+        });
+
+
+        function check_role(val) {
+            console.log(val);
+            if(val == 1) {
+                $("#select-site").prop("disabled",true);
+                $("#area_select_site").css("display","none");
+            } else {
+                $("#select-site").prop("disabled",false);
+                $("#area_select_site").css("display","block");
+            }
+        }
+
+
+
+    </script>
 
 
     

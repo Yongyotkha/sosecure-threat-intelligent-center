@@ -70,7 +70,7 @@ class UsersApiController extends Controller
     public function save(UserRequest $request)
     {
         // $this->checkPassword($request);
-
+        // dd($request->site);
 
         // $User = new User;
         // $User->code = generator_uuid();
@@ -133,7 +133,7 @@ class UsersApiController extends Controller
 
         if($request->role_id == 4 || $request->role_id == 5 || $request->role_id == 6) {
             if(!empty($request->site)) {
-                foreach($$request->site as $site_val) {
+                foreach($request->site as $site_val) {
                     $UserSite = new UserSite;
                     $UserSite->user_id = $user->id;
                     $UserSite->site_id = $site_val;
@@ -176,7 +176,7 @@ class UsersApiController extends Controller
             }
         } else {
             if(!empty($request->site)) {
-                foreach($$request->site as $site_val) {
+                foreach($request->site as $site_val) {
                     $UserSite = new UserSite;
                     $UserSite->user_id = $user->id;
                     $UserSite->site_id = $site_val;

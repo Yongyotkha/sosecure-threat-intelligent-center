@@ -14,6 +14,7 @@ use Modules\Users\Entities\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Users\Entities\model_has_roles;
 
 class ReauthenticateController extends Controller
 {
@@ -29,13 +30,34 @@ class ReauthenticateController extends Controller
     public function verify_site_user($token)
     {
         $User = User::where('site_add_user_token',$token)->first();
-        $verify = $User->verify;
-        $last_change_pass = $User->last_change_pass;
-        if($verify == 0 && $last_change_pass == null) {
-            return view('reauthenticate::index',compact('User'));
+
+        $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
+        if(@$model_has_roles) {
+            if(@$model_has_roles->role_id == 4 || @$model_has_roles->role_id == 5 || @$model_has_roles->role_id == 6) {
+                $granted_access = 'Welcome Site:';
+                $granted_access_val = '';
+            } else if($model_has_roles->role_id == 1) {
+                $granted_access = 'Granted access Site:';
+                $granted_access_val = 'All site';
+            } else {
+                $granted_access = 'Granted access Site:';
+                $granted_access_val = '';
+            }
+        }
+        
+  
+        if($User) {
+            $verify = $User->verify;
+            $last_change_pass = $User->last_change_pass;
+            if($verify == 0 && $last_change_pass == null) {
+                return view('reauthenticate::index',compact('User','granted_access','granted_access_val'));
+            } else {
+                return redirect()->route('index');
+            }
         } else {
             return redirect()->route('index');
         }
+ 
     }
 
     /**
@@ -111,8 +133,22 @@ class ReauthenticateController extends Controller
         // $user = $this->user->where('code',$id)->first();
         $user = User::where('code',$id)->first();
 
+        $model_has_roles = model_has_roles::where('model_id',$user->id)->first();
+        if($model_has_roles) {
+            if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
+                $url_redirect = route('reauth.verify_success');
+            } else {
+                $url_redirect = route('index');
+            }
+        }
 
-        $role = Roles::where('id',$user->site_role_id)->first();
+        // $role = Roles::where('id',$user->site_role_id)->first();
+        // if($role) {
+        //     if($role != 1 && $role != 4 && $role != 5 && $role != 6) {
+        //         $role = 2;
+        //     }
+        // }
+
         // dd($user);
         // exit();
         // $user->update($request->all());
@@ -147,24 +183,24 @@ class ReauthenticateController extends Controller
             $transaction_client_users -> save();
         }
 
-        if($role) {
-            $user->syncRoles($role->name);
-            $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
-            if($transaction_client_role_permissions){
-                $transaction_client_role_permissions -> transaction_mode = 'update';
-                $transaction_client_role_permissions -> transaction_data_status = 1;
-                $transaction_client_role_permissions -> status = 1;
-                $transaction_client_role_permissions -> save();
-            }else{
-                $transaction_client_role_permissions = new transaction_client_role_permissions();
-                $transaction_client_role_permissions -> site_id = $user->site_id;
-                $transaction_client_role_permissions -> transaction_id = $user->id;
-                $transaction_client_role_permissions -> transaction_mode = 'update';
-                $transaction_client_role_permissions -> transaction_data_status = 1;
-                $transaction_client_role_permissions -> status = 1;
-                $transaction_client_role_permissions -> save();
-            }
-        }
+        // if($role) {
+        //     $user->syncRoles($role->name);
+        //     $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+        //     if($transaction_client_role_permissions){
+        //         $transaction_client_role_permissions -> transaction_mode = 'update';
+        //         $transaction_client_role_permissions -> transaction_data_status = 1;
+        //         $transaction_client_role_permissions -> status = 1;
+        //         $transaction_client_role_permissions -> save();
+        //     }else{
+        //         $transaction_client_role_permissions = new transaction_client_role_permissions();
+        //         $transaction_client_role_permissions -> site_id = $user->site_id;
+        //         $transaction_client_role_permissions -> transaction_id = $user->id;
+        //         $transaction_client_role_permissions -> transaction_mode = 'update';
+        //         $transaction_client_role_permissions -> transaction_data_status = 1;
+        //         $transaction_client_role_permissions -> status = 1;
+        //         $transaction_client_role_permissions -> save();
+        //     }
+        // }
 
         // $site_code = $this->siteSettings->find_code($user->site_id);
 
@@ -175,7 +211,7 @@ class ReauthenticateController extends Controller
             [
                 'id'       => $user->id,
                 'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('reauth.verify_success'),
+                'redirect' => @$url_redirect,
             ],
             true,
             Response::HTTP_OK
