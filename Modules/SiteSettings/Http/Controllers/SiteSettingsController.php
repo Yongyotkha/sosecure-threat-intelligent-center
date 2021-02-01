@@ -250,7 +250,7 @@ class SiteSettingsController extends Controller
         // $user->calendar_token = generator_uuid();
         // $user->access_token = generator_uuid();
         $user->site_id = $SiteSettings->id;
-        $user->site_role_id = 99;
+        $user->site_role_id = 6;
         $user->password_time_expire = Carbon::now();
         // dd($user);
         // exit();
@@ -263,6 +263,7 @@ class SiteSettingsController extends Controller
         $UserSite->user_id = $user->id;
         $UserSite->site_id = $user->site_id;
         $UserSite->created_by = @Auth::user()->id;
+        $UserSite->active = 1;
         $UserSite->save();
         //----end------gen user_support----------------//
 
@@ -289,6 +290,60 @@ class SiteSettingsController extends Controller
         $transaction_client_profiles -> transaction_data_status = 1;
         $transaction_client_profiles -> status = 1;
         $transaction_client_profiles -> save();
+
+
+        if($user) {
+            $model_has_roles = model_has_roles::where('model_id',$user->id)->first();
+            if($model_has_roles) {
+                $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
+                if($model_has_roles_q) {
+                    $id_last = $model_has_roles_q->id+1;
+                } else {
+                    $id_last = 1;
+                }
+
+                $model_has_roles->role_id = $role_id;
+                $model_has_roles->model_type = 'Modules\Users\Entities\User';
+                // $model_has_roles->model_id = $User->id;
+                $model_has_roles->id = $id_last;
+                $model_has_roles->save();
+            } else {
+                $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
+                if($model_has_roles_q) {
+                    $id_last = $model_has_roles_q->id+1;
+                } else {
+                    $id_last = 1;
+                }
+                
+                $model_has_roles = new model_has_roles;
+                $model_has_roles->role_id = $role_id;
+                $model_has_roles->model_type = 'Modules\Users\Entities\User';
+                $model_has_roles->model_id = $User->id;
+                $model_has_roles->id = $id_last;
+                $model_has_roles->save();
+            }
+
+            // $site_role_id = null;
+            // if($role_id == 1 || $role_id == 4) {
+            //     $role = 'admin';
+            //     // $site_role_id = 99;
+            // } else {
+            //     $role = 'admin';//client_site
+            //     // $site_role_id = $role_id;
+            // } 
+
+            // $User->syncRoles($role);
+
+            $transaction_client_model_has_roles = new transaction_client_model_has_roles();
+            $transaction_client_model_has_roles -> site_id = $SiteSettings->id;
+            $transaction_client_model_has_roles -> transaction_id = $model_has_roles->id;
+            $transaction_client_model_has_roles -> transaction_mode = 'insert';
+            $transaction_client_model_has_roles -> transaction_data_status = 1;
+            $transaction_client_model_has_roles -> status = 1;
+            $transaction_client_model_has_roles -> save();
+        }
+
+        
             
 
         return ajaxResponse(
