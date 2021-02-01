@@ -5,13 +5,13 @@
             <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> New Site </h4>
         </div>
        
-        {!! Form::open(['route' => 'sitesettings.save', 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'files' => true]) !!}
+        {!! Form::open(['route' => 'sitesettings.save', 'class' => 'ajaxifyForm_custom', 'files' => true]) !!}
         <div class="modal-body">
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <div class="">
-                        <input type="text" class="form-control" name="name" value="">       
+                        <input type="text" class="form-control" name="name" value="" required>       
                     </div>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                 <label for="" class="col-lg-3 control-label">Category</label>
                 <div class="col-lg-9">
                     {{-- {{dd($category)}} --}}
-                    <select name="category[]" id="categorys" class="select2-option form-control" multiple="multiple">
+                    <select name="category[]" id="categorys" class="select2-option form-control" multiple="multiple" >
                         @foreach (Modules\CategorySettings\Entities\CategorySettings::where([['active',1],['deleted_at','=',null]])->get() as $CategorySetting)
                             <option value="{{ $CategorySetting->id  }}" >
                                 {{ $CategorySetting->name }}
@@ -84,7 +84,7 @@
         
         <div class="modal-footer">
             {!! closeModalButton() !!}
-            {!! renderAjaxButton() !!}
+            <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
         </div>
         {!! Form::close() !!}
     </div>
@@ -232,6 +232,50 @@
             var $modal = $('#modal_crop_logo');
             $modal.modal('hide');
         }
+
+        var form_save = '.formSaving';
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            $('.formSaving').attr('disabled',true);
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                        toastr.success(response.data.message, '@langapp('response_status') ');
+                        $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
+                        window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    $('.formSaving').attr('disabled',false);
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            }); 
+       
+     
+         
+    });
 
     </script>
 @endpush

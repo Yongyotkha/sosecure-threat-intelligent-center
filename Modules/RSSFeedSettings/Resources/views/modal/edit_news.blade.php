@@ -4,7 +4,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">News</h4>
         </div>
-            {!! Form::open(['route' => ['rssfeedsettings.rss_data_store_news_create'], 'class' => 'ajaxifyFormCreate ajaxifyForm_custom', 'method' => 'POST', 'files' => true]) !!}
+            {!! Form::open(['route' => ['rssfeedsettings.rss_data_store_news_create'], 'class' => 'ajaxifyFormCreate', 'method' => 'POST', 'files' => true]) !!}
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
@@ -25,7 +25,7 @@
                         <div class="row">
                             <label for="" class="col-md-12 control-label" id="label_category">Category <span class="text-danger">*</span></label>
                             <div class="col-md-12">
-                            <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple">
+                            <select name="category_news[]" id="category" class="select2-option form-control" multiple="multiple" required>
                                 @foreach ($category as $item)
                                     <option value="{{ $item -> id }}"
                                         @if($RSSNews)
@@ -46,7 +46,7 @@
                         <div class="form-group row">
                         <label for="" class="col-lg-12 control-label" id="label_source">Source <span class="text-danger">*</span></label>
                         <div class="col-lg-12">
-                            <select name="source" id="source_create" class="select2-option form-control">
+                            <select name="source" id="source_create" class="select2-option form-control" required>
                                 <option value="">Select Source</option>
                                 @if(@$get_source)
                                     
@@ -106,7 +106,7 @@
                                                 <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH) <span class="text-danger">*</span></label>
                                                 <div class="col-lg-12">
                                           
-                                                    <input type="text" class="form-control" name="title_th" id="title_th" value="{{@$RSSNews->title_th}}">
+                                                    <input type="text" class="form-control" name="title_th" id="title_th" value="{{@$RSSNews->title_th}}" required>
                                                 </div>
                                             </div>
         
@@ -247,64 +247,7 @@ var form_save = '.formSaving';
     $('.ajaxifyFormCreate').submit(function (event) {
         number++;
         if(number == 1){
-            let category = $('#category option:selected').val();
-            {{--let topic = $('#topic option:selected').val();--}}
-            let title_th = $('#title_th').val();
-            let detail_th = $('#detail_th').val();
-            let source = $('#source_create').val();
-            if(form_save == '.formSaving'){
-                if(category == undefined){
-                    $('#label_category').css('color', '#a94442');
-                    $('#category').css('border-color', '#a94442');
-                }else{
-                    $('#label_category').css('color', '#656d78');
-                    $('#category').css('border-color', '#656d78');
-                }
-                if(source == undefined){
-                    $('#label_source').css('color', '#a94442');
-                    $('#source_create').css('border-color', '#a94442');
-                }else{
-                    $('#label_source').css('color', '#656d78');
-                    $('#source_create').css('border-color', '#656d78');
-                }
-               
-                if(title_th == ''){
-                    $('#label_title_th').css('color', '#a94442');
-                    $('#title_th').css('border-color', '#a94442');
-                }else{
-                    $('#label_title_th').css('color', '#656d78');
-                    $('#title_th').css('border-color', '#656d78');
-                }
-                if(detail_th == ''){
-                    $('#label_detail_th').css('color', '#a94442');
-                    $('#detail_th').css('border-color', '#a94442');
-                }else{
-                    $('#label_detail_th').css('color', '#656d78');
-                    $('#detail_th').css('border-color', '#656d78');
-                }
-
-                if(category == undefined || title_th == '' || detail_th == '' || source == undefined){
-                    return false;
-                }
-            }else if(form_save == '.formDraft'){
-                if(title_th == ''){
-                    $('#label_title_th').css('color', '#a94442');
-                    $('#title_th').css('border-color', '#a94442');
-                }else{
-                    $('#label_title_th').css('color', '#656d78');
-                    $('#title_th').css('border-color', '#656d78');
-                }
-                if(detail_th == ''){
-                    $('#label_detail_th').css('color', '#a94442');
-                    $('#detail_th').css('border-color', '#a94442');
-                }else{
-                    $('#label_detail_th').css('color', '#656d78');
-                    $('#detail_th').css('border-color', '#656d78');
-                }
-                if(title_th == '' || detail_th == ''){
-                    return false;
-                }
-            }
+  
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
             event.preventDefault();
             var data = new FormData(this);
@@ -377,48 +320,6 @@ var form_save = '.formSaving';
         document.execCommand("copy");
         document.body.removeChild(tempInput);
     }
-
-
-    var form_save = '.formSaving';
-   $('.ajaxifyForm_custom').submit(function (event) {
-       event.preventDefault();
-
-           $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-           
-           var data = new FormData(this);
-           if(form_save == '.formSavingAndRun'){
-               data.append('formsubmit', 'formSavingAndRun');
-           }else if(form_save == '.formPreview'){
-               data.append('formsubmit', 'formPreview');
-           }else if(form_save == '.formDraft'){
-               data.append('formsubmit', 'formDraft');
-           }
-           axios.post($(this).attr("action"), data)
-               .then(function (response) {
-                       toastr.success(response.data.message, '@langapp('response_status') ');
-                       $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                       window.location.href = response.data.redirect;
-           })
-           .catch(function (error) {
-               if(error.response.data.exception){
-                   toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
-                   $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-               }else{
-                   var errors = error.response.data.errors;
-                   var errorsHtml= '';
-                   $.each( errors, function( key, value ) {
-                       errorsHtml += '<li>' + value[0] + '</li>'; 
-                   });
-                   toastr.error( errorsHtml , '@langapp('response_status') ');
-                   $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-               }
-
-           }); 
-      
-    
-        
-   });
-
 </script>
 @endpush
  

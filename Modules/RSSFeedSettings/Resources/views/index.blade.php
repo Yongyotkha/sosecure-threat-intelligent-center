@@ -136,14 +136,13 @@
                     RSS Feed
                 </h4>
             </div>
-            {!! Form::open(['route' => ['rssfeedsettings.save'], 'class' => 'ajaxifyForm validator', 'novalidate' => '',
-            'files' => false]) !!}
+            {!! Form::open(['route' => ['rssfeedsettings.save'], 'class' => 'ajaxifyForm_custom','files' => false]) !!}
             {{-- <form action=""> --}}
             <div class="modal-body">
                 <div class="form-group row">
                     <label class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
                     <div class="col-lg-9">
-                        <input type="text" id="name_rss" name="name_rss" class="form-control">
+                        <input type="text" id="name_rss" name="name_rss" class="form-control" required>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -154,7 +153,7 @@
                     </label>
                     <div class="col-lg-9">
 
-                        <input type="url" class="form-control" id="url_rss" name="url_rss" value="">
+                        <input type="url" class="form-control" id="url_rss" name="url_rss" value="" required>
                         {{-- <span  class="input-group-btn">
                                                 <button type="submit" class="btn btn-info">Copy</button>
                                             </span> --}}
@@ -230,7 +229,7 @@
     <div class="col-lg-6">
         <label class="switch">
             {{-- <input type="hidden" value="FALSE" name=""> --}}
-            <input type="checkbox" name="status_rss" value="TRUE">
+            <input type="checkbox" name="status_rss" value="TRUE" checked>
             <span></span>
         </label>
     </div>
@@ -242,7 +241,8 @@
         <i class="fas fa-times"></i>
         Close
     </button>
-    <button type="submit" class="btn btn-info btn-rounded">
+
+    <button type="submit" class="btn btn-info formSaving btn-rounded">
         <i class="fas fa-paper-plane"></i>
         Save
     </button>
@@ -411,16 +411,17 @@
     var rss_id_delete_chang =[];
 
     $( "#btn_del_select" ).click(function() {
-    rss_id_delete_chang = [];
-    $('#delete_rss_modal').modal('show');
+        rss_id_delete_chang =[];
+        $('#delete_rss_modal').modal('show');
     });
     
     function delete_rss_select_confirm(){
 
-        $('.rss_id_delete_chang:checked').each(function () {
+        $('.rss_id:checked').each(function () {
                 rss_id_delete_chang.push(this.value);
                 
         });
+
         $.ajax({
             type:"POST",
             url:"{{ route('rssfeedsettings.rss_feed_seting_delete') }}",
@@ -447,6 +448,52 @@
         });
 
     }
+
+    var form_save = '.formSaving';
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            $('.formSaving').attr('disabled',true);
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                        toastr.success(response.data.message, '@langapp('response_status') ');
+                        $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
+                        window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    $('.formSaving').attr('disabled',false);
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            }); 
+       
+     
+         
+    });
+
+
 
 
 

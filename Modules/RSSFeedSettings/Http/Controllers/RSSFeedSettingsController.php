@@ -670,7 +670,7 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_feed_seting_delete(Request $request)
     {
-   
+     
         foreach($request->id_chang as $id ){
 
             RSSData::where("code",$id)->delete();
@@ -1309,7 +1309,7 @@ class RSSFeedSettingsController extends Controller
             [
                 // 'cate' => $SiteCategory,
                 // 'test' => $email_site_alert,
-                'message'  => "Successfully",
+                'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.news'),
             ],
             true,
