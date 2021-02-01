@@ -46,6 +46,7 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Users\Observers\UserObserver;
 use Spatie\Permission\Traits\HasRoles;
 use Modules\Users\Entities\UserSite;
+use Modules\Users\Entities\model_has_roles;
 
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 // class User extends Authenticatable implements JWTSubject, HasLocalePreference, MustVerifyEmail
@@ -530,6 +531,15 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function get_user_site($id){
         $user_site = UserSite::select('site_id')->where('user_id',$id)->get();
         return $user_site;
+    }
+
+    public function get_user_site_many(){
+        return $this->hasMany(UserSite::class,'user_id','id');
+    }
+
+    public function get_model_has_roles()
+    {
+        return $this->hasOne(model_has_roles::class,'model_id','id');
     }
 
     // public function getJWTIdentifier()

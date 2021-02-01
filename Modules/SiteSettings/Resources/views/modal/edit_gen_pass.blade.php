@@ -7,6 +7,7 @@
         {!! Form::open(['route' => ['user.update', 'id' => $user->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
 
         <input type="hidden" name="id" value="{{  $user->id  }}">
+        <input type="hidden" name="site_code" value="{{  @$site_code  }}">
 
         <div class="modal-body">
 
@@ -88,6 +89,7 @@
                 test: '',
                 user_code: user_code,
                 pass: uuid,
+                site_code: '{{@$site_code}}',
             }).then(function (response) {
                 $("#btn_gen_pass").prop("disabled",false);
                 toastr.success(response.data.message, '@langapp('response_status')');
