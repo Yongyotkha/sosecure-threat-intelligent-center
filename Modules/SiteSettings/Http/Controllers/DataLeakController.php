@@ -360,7 +360,7 @@ class DataLeakController extends Controller
         $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
         $data['DataLeakSocial'] = $DataLeakSocial;
         $data['siteID'] = $siteID->id;
-        $data['page'] = 'Compromised Feed';
+        $data['page'] = 'Compromised_Feed_in_site';
         // dd($DataLeakSocial);
         return view('sitesettings::compromised_feed')->with($data);
     }
@@ -375,7 +375,7 @@ class DataLeakController extends Controller
         $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
 
         $data['siteID'] = $siteID->id;
-        $data['page'] = 'Compromised Data';
+        $data['page'] = 'Compromised_Data_in_site';
         $data['siteSettings'] = $get_data;
         return view('sitesettings::compromised_data')->with($data);
     }

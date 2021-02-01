@@ -93,7 +93,7 @@
         </ul>
     </li>
 
-    <li class="{{ $page === 'Compromised' || $page == 'Web Server' || $page == 'Compromised Feed' || $page == 'Compromised Data' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Compromised' || $page == 'Web Server' || $page == 'Compromised_Feed_in_site' || $page == 'Compromised_Data_in_site' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Compromised
