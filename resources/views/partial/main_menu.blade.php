@@ -1,6 +1,23 @@
 @php
 use App\Menu;
+use Modules\Users\Entities\role_menu_permission;
+use Modules\Users\Entities\role_menu_sub_permission;
+use Modules\Users\Entities\model_has_roles;
 $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+// dd(123);
+if(@Auth::check()) {
+    $user_id = @Auth::user()->id;
+}
+$model_has_roles = model_has_roles::where('model_id',@$user_id)->first();
+$role_menu_permission_arr = '';
+$role_menu_sub_permission_arr = '';
+if($model_has_roles) {
+    $role_id = $model_has_roles->role_id;
+    $role_menu_permission_arr = role_menu_permission::select('menu_id')->where('role_id',$model_has_roles->role_id)->where('deleted_at',null)->get()->pluck('menu_id')->toArray();
+    $role_menu_sub_permission_arr = role_menu_sub_permission::select('menu_sub_id')->where('role_id',$model_has_roles->role_id)->where('deleted_at',null)->get()->pluck('menu_sub_id')->toArray();
+    // dd($role_menu_permission_arr);
+}
+
 // dd($menu);
 // dd($menu);
 @endphp
@@ -116,222 +133,234 @@ $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc'
                             $check_menu_active_sub_arr = '';
                             if($menu) {
                                 foreach($menu as $menu_val) {
-                                    $active = '';
-                                    $url = '#';
-                                    $check_menu_active = '';
-                                    $name_val = '';
-                                    
-                                    if($menu_val->url) {// url
-                                        if($menu_val->type_url == 'site_url') {
-                                            // dd(TYPE_WEB);
-                                            if(TYPE_WEB == 'center') {
-                                                $url = site_url($menu_val->url);
-                                            } else {
-                                                $url = site_url($menu_val->url_client);
-                                            }
-                                            // $url = site_url($menu_val->url);
-                                        } else if ($menu_val->type_url == 'route') {
-                                            // $url = route($menu_val->url);
-                                            if(TYPE_WEB == 'center') {
-                                                $url = route($menu_val->url);
-                                            } else {
-                                                $url = route($menu_val->url_client);
-                                            }
-                                        }
-                                    }
 
-                                    $check_menu_active_langapp_valval = '';
-                                    $check_menu_active_langapp_val_last = '';
-                                    if($menu_val->check_menu_active) {// check active
-                                        if($menu_val->type_check_menu_active == 'langapp') {
-                                            if($menu_val->check_menu_active) {
-                                                $check_menu_active_langapp_arr = explode(",",$menu_val->check_menu_active);
-                                                if(!empty($check_menu_active_langapp_arr)) {
-                                                    foreach($check_menu_active_langapp_arr as $check_menu_active_langapp_val) {
-                                                        $check_menu_active_langapp_valval .= langapp($check_menu_active_langapp_val).',';
-                                                    }
-                                                    // dd($check_menu_active_langapp_arr);
-                                                    $check_menu_active_langapp_val_last = rtrim($check_menu_active_langapp_valval,",");
-                                                }
-                                            }
-                                            
-                                            // dd($check_menu_active_langapp_val_last);
-                                            $check_menu_active = $check_menu_active_langapp_val_last;
-                                            if($check_menu_active) {
-                                                $check_menu_active_arr = explode(",",$check_menu_active);
-                                                // if(count($check_menu_active_arr) > 0) {
-                                                //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
-                                                //         $check_menu_active_arr_val
-                                                //     }
-                                                // }
-                                            }
+                           
+                                    if(!empty($role_menu_permission_arr) || @$role_id == 1) {
+                                        if (in_array($menu_val['id'], $role_menu_permission_arr) || @$role_id == 1) {
 
-                                        } else if ($menu_val->type_check_menu_active == '') {
-                                            if($menu_val->check_menu_active) {
-                                                $check_menu_active_arr = explode(",",$menu_val->check_menu_active);
-                                            //     if(count($check_menu_active_arr) > 0) {
-                                            //         foreach($check_menu_active_arr as $check_menu_active_arr_val) {
-                                            //             $check_menu_active_arr_val
-                                            //         }
-                                            //     }
-                                            }
-                                            // $check_menu_active = $menu_val->check_menu_active;
-                                        }
-                                    }
-
-                                    // dd($check_menu_active_arr);
-
-                                    if($check_menu_active_arr) {
-                                        foreach($check_menu_active_arr as $check_menu_active_val) {
-                                            // dd($check_menu_active_val);
-                                            if($page == $check_menu_active_val) {
-                                                // dd($check_menu_active_val);
-                                                $active = 'active';
-                                            }
-                                        }
-                                    }
-
-                                    
-
-                                    if($menu_val->langapp) {//ชื่อเมนู
-                                        $name_val = langapp($menu_val->langapp);
-                                    }
-
-                                    if(@$menu_val->get_menu_sub) {
-
-                                        
-                                        $menu_sub_html = '';
-                                        foreach($menu_val->get_menu_sub as $menu_sub_val) {
-                                            if($menu_sub_val->name == 'Batch Job') {
-                                                // dd($menu_sub_val);
-                                            }
-                                            
-
-                                            $active_sub = '';
-                                            $url_sub = '#';
-                                            $check_menu_active_sub = '';
-                                            $name_val_sub = '';
-                                            
-
-                                            if($menu_sub_val->url) {// url
-                                                if($menu_sub_val->type_url == 'site_url') {
-                                                    $url_sub = site_url($menu_sub_val->url);
-                                                    if(TYPE_WEB == 'center') {
-                                                        $url_sub = site_url($menu_sub_val->url);
-                                                    } else {
-                                                        $url_sub = site_url($menu_sub_val->url_client);
-                                                    }
-                                                } else if ($menu_sub_val->type_url == 'route') {
-                                                    // $url_sub = route($menu_sub_val->url);
-                                                    if(TYPE_WEB == 'center') {
-                                                        $url_sub = route($menu_sub_val->url);
-                                                    } else {
-                                                        $url_sub = route($menu_sub_val->url_client);
+                                                $active = '';
+                                                $url = '#';
+                                                $check_menu_active = '';
+                                                $name_val = '';
+                                                
+                                                if($menu_val->url) {// url
+                                                    if($menu_val->type_url == 'site_url') {
+                                                        // dd(TYPE_WEB);
+                                                        if(TYPE_WEB == 'center') {
+                                                            $url = site_url($menu_val->url);
+                                                        } else {
+                                                            $url = site_url($menu_val->url_client);
+                                                        }
+                                                        // $url = site_url($menu_val->url);
+                                                    } else if ($menu_val->type_url == 'route') {
+                                                        // $url = route($menu_val->url);
+                                                        if(TYPE_WEB == 'center') {
+                                                            $url = route($menu_val->url);
+                                                        } else {
+                                                            $url = route($menu_val->url_client);
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            if($menu_sub_val->check_menu_active) {// check active
-
-                                                $check_menu_active_langapp_arr_sub ='';
-                                                $check_menu_active_langapp_valval_sub = '';
-                                                if($menu_sub_val->type_check_menu_active == 'langapp') {
-
-
-                                                    if($menu_val->check_menu_active) {
-                                                        $check_menu_active_langapp_arr_sub = explode(",",$menu_sub_val->check_menu_active);
-                                                        if(!empty($check_menu_active_langapp_arr_sub)) {
-                                                            foreach($check_menu_active_langapp_arr_sub as $check_menu_active_langapp_val_sub) {
-                                                                $check_menu_active_langapp_valval_sub .= langapp($check_menu_active_langapp_val_sub).',';
+                                                $check_menu_active_langapp_valval = '';
+                                                $check_menu_active_langapp_val_last = '';
+                                                if($menu_val->check_menu_active) {// check active
+                                                    if($menu_val->type_check_menu_active == 'langapp') {
+                                                        if($menu_val->check_menu_active) {
+                                                            $check_menu_active_langapp_arr = explode(",",$menu_val->check_menu_active);
+                                                            if(!empty($check_menu_active_langapp_arr)) {
+                                                                foreach($check_menu_active_langapp_arr as $check_menu_active_langapp_val) {
+                                                                    $check_menu_active_langapp_valval .= langapp($check_menu_active_langapp_val).',';
+                                                                }
+                                                                // dd($check_menu_active_langapp_arr);
+                                                                $check_menu_active_langapp_val_last = rtrim($check_menu_active_langapp_valval,",");
                                                             }
-                                                            // dd($check_menu_active_langapp_arr_sub);
-                                                            $check_menu_active_langapp_val_last_sub = rtrim($check_menu_active_langapp_valval_sub,",");
+                                                        }
+                                                        
+                                                        // dd($check_menu_active_langapp_val_last);
+                                                        $check_menu_active = $check_menu_active_langapp_val_last;
+                                                        if($check_menu_active) {
+                                                            $check_menu_active_arr = explode(",",$check_menu_active);
+                                                            // if(count($check_menu_active_arr) > 0) {
+                                                            //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                            //         $check_menu_active_arr_val
+                                                            //     }
+                                                            // }
+                                                        }
+
+                                                    } else if ($menu_val->type_check_menu_active == '') {
+                                                        if($menu_val->check_menu_active) {
+                                                            $check_menu_active_arr = explode(",",$menu_val->check_menu_active);
+                                                        //     if(count($check_menu_active_arr) > 0) {
+                                                        //         foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                        //             $check_menu_active_arr_val
+                                                        //         }
+                                                        //     }
+                                                        }
+                                                        // $check_menu_active = $menu_val->check_menu_active;
+                                                    }
+                                                }
+
+                                                // dd($check_menu_active_arr);
+
+                                                if($check_menu_active_arr) {
+                                                    foreach($check_menu_active_arr as $check_menu_active_val) {
+                                                        // dd($check_menu_active_val);
+                                                        if($page == $check_menu_active_val) {
+                                                            // dd($check_menu_active_val);
+                                                            $active = 'active';
+                                                        }
+                                                    }
+                                                }
+
+                                                
+
+                                                if($menu_val->langapp) {//ชื่อเมนู
+                                                    $name_val = langapp($menu_val->langapp);
+                                                }
+
+                                                if(@$menu_val->get_menu_sub) {
+
+                                                    
+                                                    $menu_sub_html = '';
+                                                    foreach($menu_val->get_menu_sub as $menu_sub_val) {
+                                                        // if($menu_sub_val->name == 'Batch Job') {
+                                                        //     // dd($menu_sub_val);
+                                                        // }
+
+                                                        if(!empty($role_menu_sub_permission_arr) || @$role_id == 1) {
+                                                            if (in_array($menu_sub_val['id'], $role_menu_sub_permission_arr) || @$role_id == 1) {
+                                                        
+
+                                                                    $active_sub = '';
+                                                                    $url_sub = '#';
+                                                                    $check_menu_active_sub = '';
+                                                                    $name_val_sub = '';
+                                                                    
+
+                                                                    if($menu_sub_val->url) {// url
+                                                                        if($menu_sub_val->type_url == 'site_url') {
+                                                                            $url_sub = site_url($menu_sub_val->url);
+                                                                            if(TYPE_WEB == 'center') {
+                                                                                $url_sub = site_url($menu_sub_val->url);
+                                                                            } else {
+                                                                                $url_sub = site_url($menu_sub_val->url_client);
+                                                                            }
+                                                                        } else if ($menu_sub_val->type_url == 'route') {
+                                                                            // $url_sub = route($menu_sub_val->url);
+                                                                            if(TYPE_WEB == 'center') {
+                                                                                $url_sub = route($menu_sub_val->url);
+                                                                            } else {
+                                                                                $url_sub = route($menu_sub_val->url_client);
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if($menu_sub_val->check_menu_active) {// check active
+
+                                                                        $check_menu_active_langapp_arr_sub ='';
+                                                                        $check_menu_active_langapp_valval_sub = '';
+                                                                        if($menu_sub_val->type_check_menu_active == 'langapp') {
+
+
+                                                                            if($menu_val->check_menu_active) {
+                                                                                $check_menu_active_langapp_arr_sub = explode(",",$menu_sub_val->check_menu_active);
+                                                                                if(!empty($check_menu_active_langapp_arr_sub)) {
+                                                                                    foreach($check_menu_active_langapp_arr_sub as $check_menu_active_langapp_val_sub) {
+                                                                                        $check_menu_active_langapp_valval_sub .= langapp($check_menu_active_langapp_val_sub).',';
+                                                                                    }
+                                                                                    // dd($check_menu_active_langapp_arr_sub);
+                                                                                    $check_menu_active_langapp_val_last_sub = rtrim($check_menu_active_langapp_valval_sub,",");
+                                                                                }
+                                                                            }
+
+
+
+                                                                            $check_menu_active_sub = $check_menu_active_langapp_val_last_sub;
+                                                                            if($check_menu_active_sub) {
+                                                                                $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
+                                                                                // if(count($check_menu_active_arr) > 0) {
+                                                                                //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                                                //         $check_menu_active_arr_val
+                                                                                //     }
+                                                                                // }
+                                                                            }
+
+
+                                                                            
+
+                                                                        } else if ($menu_sub_val->type_check_menu_active == '') {
+                                                                            $check_menu_active_sub = $menu_sub_val->check_menu_active;
+                                                                            if($check_menu_active_sub) {
+                                                                                $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
+                                                                                // if(count($check_menu_active_arr) > 0) {
+                                                                                //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
+                                                                                //         $check_menu_active_arr_val
+                                                                                //     }
+                                                                                // }
+                                                                            }
+
+                                                                        }
+                                                                    }
+
+                                                                    if($check_menu_active_sub_arr) {
+                                                                        foreach($check_menu_active_sub_arr as $check_menu_active_sub_val) {
+                                                                            // dd($check_menu_active_sub_val);
+                                                                            if($page == $check_menu_active_sub_val) {
+                                                                                // dd($check_menu_active_sub_val);
+                                                                                $active_sub = 'active';
+                                                                            }
+                                                                        }
+                                                                    }
+
+
+
+
+                                                                    if($menu_sub_val->langapp) {//ชื่อเมนู
+                                                                        $name_val_sub = langapp($menu_sub_val->langapp);
+                                                                    }
+
+
+
+
+                                                                    $menu_sub_html .= '<li class="'. $active_sub .'">
+                                                                                            <a href="'. $url_sub .'">
+                                                                                                <i class="'.$menu_sub_val->icon.'"><b class="bg-info"></b></i>
+                                                                                                <span>'.$name_val_sub.'</span>
+                                                                                            </a>
+                                                                                        </li>';
+
+                                                            }
                                                         }
                                                     }
 
-
-
-                                                    $check_menu_active_sub = $check_menu_active_langapp_val_last_sub;
-                                                    if($check_menu_active_sub) {
-                                                        $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
-                                                        // if(count($check_menu_active_arr) > 0) {
-                                                        //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
-                                                        //         $check_menu_active_arr_val
-                                                        //     }
-                                                        // }
-                                                    }
-
-
-                                                    
-
-                                                } else if ($menu_sub_val->type_check_menu_active == '') {
-                                                    $check_menu_active_sub = $menu_sub_val->check_menu_active;
-                                                    if($check_menu_active_sub) {
-                                                        $check_menu_active_sub_arr = explode(",",$check_menu_active_sub);
-                                                        // if(count($check_menu_active_arr) > 0) {
-                                                        //     foreach($check_menu_active_arr as $check_menu_active_arr_val) {
-                                                        //         $check_menu_active_arr_val
-                                                        //     }
-                                                        // }
-                                                    }
-
                                                 }
-                                            }
-
-                                            if($check_menu_active_sub_arr) {
-                                                foreach($check_menu_active_sub_arr as $check_menu_active_sub_val) {
-                                                    // dd($check_menu_active_sub_val);
-                                                    if($page == $check_menu_active_sub_val) {
-                                                        // dd($check_menu_active_sub_val);
-                                                        $active_sub = 'active';
+                                                    if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
+                                                        $is_have_sub = '<a href="'. $url .'" class="'. @$active_sub .'">
+                                                                            <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                                            <span class="pull-right"><i class="fas fa-angle-down text"></i>
+                                                                            <i class="fas fa-angle-up text-active"></i></span>
+                                                                            <span> '.$name_val.' </span>
+                                                                        </a>
+                                                                    <ul class="nav lt">'.$menu_sub_html.'</ul>
+                                                                    ';
+                                                    } else {
+                                                        $is_have_sub = '<a href="'. $url .'" class="'. $active .'">
+                                                                            <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
+                                                                                
+                                                                            <span> '.$name_val.' </span>
+                                                                        </a>';
                                                     }
-                                                }
-                                            }
+                                                        
 
+                                                
+                                    
 
-
-
-                                            if($menu_sub_val->langapp) {//ชื่อเมนู
-                                                $name_val_sub = langapp($menu_sub_val->langapp);
-                                            }
-
-
-
-
-                                            $menu_sub_html .= '<li class="'. $active_sub .'">
-                                                                    <a href="'. $url_sub .'">
-                                                                        <i class="'.$menu_sub_val->icon.'"><b class="bg-info"></b></i>
-                                                                        <span>'.$name_val_sub.'</span>
-                                                                    </a>
+                                                $menu_html .=    '<li class="'. $active .'">
+                                                                    '.$is_have_sub.'
                                                                 </li>';
                                         }
-
                                     }
-                                        if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
-                                            $is_have_sub = '<a href="'. $url .'" class="'. @$active_sub .'">
-                                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
-                                                                <span class="pull-right"><i class="fas fa-angle-down text"></i>
-                                                                <i class="fas fa-angle-up text-active"></i></span>
-                                                                <span> '.$name_val.' </span>
-                                                            </a>
-                                                        <ul class="nav lt">'.$menu_sub_html.'</ul>
-                                                        ';
-                                        } else {
-                                            $is_have_sub = '<a href="'. $url .'" class="'. $active .'">
-                                                                <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
-                                                                    
-                                                                <span> '.$name_val.' </span>
-                                                            </a>';
-                                        }
-                                            
-
-                                    
-                           
-
-                                    $menu_html .=    '<li class="'. $active .'">
-                                                        '.$is_have_sub.'
-                                                      </li>';
-
                                 }
 
                                 echo $menu_html;

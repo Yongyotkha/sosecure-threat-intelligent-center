@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Users\Entities\User;
+use App\Menu;
+use App\Menu_sub;
 use Modules\Users\Entities\role_menu_permission;
 use Modules\Users\Entities\role_menu_sub_permission;
 use App\transaction_client_role_permissions;
@@ -14,7 +16,6 @@ use Modules\Users\Entities\permissions;
 use Spatie\Permission\Models\Role;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
-use Modules\SiteSettings\Entities\Menu;
 class RoleController extends Controller
 {
     /**
@@ -238,73 +239,73 @@ class RoleController extends Controller
         
         $permissions = [];
         $permissions_id = [];
-        if ($request->has('perm')) {
-            foreach ($request->perm as $key => $value) {
-                $permissions[] = $key;
-                $permissions_id_where = permissions::select('id')->where('name', $key)->first();
-                $permissions_id[] = $permissions_id_where->id;
-            }
+        // if ($request->has('perm')) {
+        //     foreach ($request->perm as $key => $value) {
+        //         $permissions[] = $key;
+        //         $permissions_id_where = permissions::select('id')->where('name', $key)->first();
+        //         $permissions_id[] = $permissions_id_where->id;
+        //     }
 
-            $role_permissions_get = role_permissions::select('id')->where('role_id', $request->role_id)->get();
-            $role_permissions_del = role_permissions::where('role_id', $request->role_id)->delete();
-            if(count($permissions_id) > 0) {
-                $SiteSettings = SiteSettings::select('id')->where('deleted_at',null)->get();
+        //     $role_permissions_get = role_permissions::select('id')->where('role_id', $request->role_id)->get();
+        //     $role_permissions_del = role_permissions::where('role_id', $request->role_id)->delete();
+        //     if(count($permissions_id) > 0) {
+        //         $SiteSettings = SiteSettings::select('id')->where('deleted_at',null)->get();
 
-                if($SiteSettings) {
-                    foreach($SiteSettings as $SiteSettings_val) {
-                        if($role_permissions_get) {
-                            foreach($role_permissions_get as $role_permissions_get_val) {
-                                $transaction_client_role_permissions = new transaction_client_role_permissions();
-                                $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
-                                $transaction_client_role_permissions -> transaction_id = $role_permissions_get_val->id;
-                                $transaction_client_role_permissions -> transaction_mode = 'delete';
-                                $transaction_client_role_permissions -> transaction_data_status = 1;
-                                $transaction_client_role_permissions -> status = 1;
-                                $transaction_client_role_permissions -> save();
-                            }
-                        }
-                    }
-                }
+        //         if($SiteSettings) {
+        //             foreach($SiteSettings as $SiteSettings_val) {
+        //                 if($role_permissions_get) {
+        //                     foreach($role_permissions_get as $role_permissions_get_val) {
+        //                         $transaction_client_role_permissions = new transaction_client_role_permissions();
+        //                         $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
+        //                         $transaction_client_role_permissions -> transaction_id = $role_permissions_get_val->id;
+        //                         $transaction_client_role_permissions -> transaction_mode = 'delete';
+        //                         $transaction_client_role_permissions -> transaction_data_status = 1;
+        //                         $transaction_client_role_permissions -> status = 1;
+        //                         $transaction_client_role_permissions -> save();
+        //                     }
+        //                 }
+        //             }
+        //         }
 
 
-                foreach($permissions_id as $permissions_id_val) {
-                    $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
-                    if($role_permissions_last) {
-                        $role_permissions_last = $role_permissions_last->id+1;
-                    } else {
-                        $role_permissions_last = 1;
-                    }
+        //         foreach($permissions_id as $permissions_id_val) {
+        //             $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
+        //             if($role_permissions_last) {
+        //                 $role_permissions_last = $role_permissions_last->id+1;
+        //             } else {
+        //                 $role_permissions_last = 1;
+        //             }
 
-                    $role_permissions = new role_permissions;
-                    $role_permissions->permission_id = $permissions_id_val;
-                    $role_permissions->role_id = $request->role_id;
+        //             $role_permissions = new role_permissions;
+        //             $role_permissions->permission_id = $permissions_id_val;
+        //             $role_permissions->role_id = $request->role_id;
                
-                    $role_permissions->id = $role_permissions_last;
-                    $role_permissions->save();
+        //             $role_permissions->id = $role_permissions_last;
+        //             $role_permissions->save();
 
                     
-                    if($SiteSettings) {
+        //             if($SiteSettings) {
 
-                        foreach($SiteSettings as $SiteSettings_val) {
+        //                 foreach($SiteSettings as $SiteSettings_val) {
 
-                            $transaction_client_role_permissions = new transaction_client_role_permissions();
-                            $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
-                            $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
-                            $transaction_client_role_permissions -> transaction_mode = 'insert';
-                            $transaction_client_role_permissions -> transaction_data_status = 1;
-                            $transaction_client_role_permissions -> status = 1;
-                            $transaction_client_role_permissions -> save();
-                        }
-                    }
+        //                     $transaction_client_role_permissions = new transaction_client_role_permissions();
+        //                     $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
+        //                     $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
+        //                     $transaction_client_role_permissions -> transaction_mode = 'insert';
+        //                     $transaction_client_role_permissions -> transaction_data_status = 1;
+        //                     $transaction_client_role_permissions -> status = 1;
+        //                     $transaction_client_role_permissions -> save();
+        //                 }
+        //             }
 
                     
-                }
-            }
+        //         }
+        //     }
             
 
 
-            // $role->syncPermissions($permissions);
-        }
+        //     // $role->syncPermissions($permissions);
+        // }
         $data['message']  = langapp('changes_saved_successful');
         $data['redirect'] = url()->previous();
 
