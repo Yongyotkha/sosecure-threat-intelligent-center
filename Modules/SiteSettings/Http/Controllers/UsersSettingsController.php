@@ -399,7 +399,6 @@ class UsersSettingsController extends Controller
                 $model_has_roles->role_id = $role_id;
                 $model_has_roles->model_type = 'Modules\Users\Entities\User';
                 // $model_has_roles->model_id = $User->id;
-                $model_has_roles->id = $id_last;
                 $model_has_roles->save();
 
                 $has_roles_transaction_mode = 'update';

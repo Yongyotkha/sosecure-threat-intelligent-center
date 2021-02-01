@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\role_menu_permission;
+use Modules\Users\Entities\role_menu_sub_permission;
 use App\transaction_client_role_permissions;
 use Modules\Users\Entities\role_permissions;
 use Modules\Users\Entities\permissions;
@@ -193,67 +195,47 @@ class RoleController extends Controller
 
     public function changePermission(Request $request, Role $role)
     {
-        // if ($request->page_setting == 'site_permission_settings') {
-        //     // SiteCategory::where('site_id', $SiteSettings -> id)->delete();
-        //     // foreach($request->category AS $category) {
-        //     //     $SiteCategory = new SiteCategory;
-        //     //     $SiteCategory->site_id = $SiteSettings->id;
-        //     //     $SiteCategory->category_id = $category;
-        //     //     $SiteCategory->save();
-        //     // }
-        //     site_menu_permission::where('site_id', $SiteSettings->id)->delete();
-        //     if ($request->menu) {
-        //         if (count($request->menu) > 0) {
-        //             foreach ($request->menu as $menu) {
-        //                 $tb_menu = Menu::select("id")->where("code", $menu)->first();
-        //                 $site_menu_permission = new site_menu_permission;
-        //                 $site_menu_permission->site_id = $SiteSettings->id;
-        //                 $site_menu_permission->menu_id = $tb_menu->id;
-        //                 $site_menu_permission->menu_code = $menu;
-        //                 $site_menu_permission->save();
-        //             }
-        //         }
-        //     }
-
-        //     site_menu_sub_permission::where('site_id', $SiteSettings->id)->delete();
-        //     if ($request->menu_sub) {
-        //         if (count($request->menu_sub) > 0) {
-        //             foreach ($request->menu_sub as $menu_sub) {
-        //                 $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();
-        //                 $site_menu_sub_permission = new site_menu_sub_permission;
-        //                 $site_menu_sub_permission->site_id = $SiteSettings->id;
-        //                 $site_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
-        //                 $site_menu_sub_permission->menu_sub_code = $menu_sub;
-        //                 $site_menu_sub_permission->save();
-        //             }
-        //         }
-        //     }
-
-        //     site_config_email_alert::where('site_id', $SiteSettings->id)->delete();
-        //     if ($request->email_alert) {
-        //         if (count($request->email_alert) > 0) {
-        //             foreach ($request->email_alert as $email_alert) {
-        //                 $site_config_email_alert = new site_config_email_alert;
-        //                 $site_config_email_alert->site_id = $SiteSettings->id;
-        //                 $site_config_email_alert->email = $email_alert;
-        //                 $site_config_email_alert->save();
-        //             }
-        //         }
-        //     }
-
-        //     // Tags_site::where('site_id', $SiteSettings -> id)->delete();
-        //     // foreach($request->tag AS $tag) {
-        //     //     $Tags_site = new Tags_site;
-        //     //     $Tags_site->site_id = $SiteSettings->id;
-        //     //     $Tags_site->tag_id = $tag;
-        //     //     $Tags_site->save();
-        //     // }
-
-        // }
-
 
         // dd($request);
         $request->validate(['role_id' => 'required']);
+
+        if ($request->role_id) {
+
+            role_menu_permission::where('role_id', $request->role_id)->delete();
+            if ($request->menu) {
+                if (count($request->menu) > 0) {
+                    foreach ($request->menu as $menu) {
+                        $tb_menu = Menu::select("id")->where("code", $menu)->first();
+                        $role_menu_permission = new role_menu_permission;
+                        $role_menu_permission->role_id = $request->role_id;
+                        $role_menu_permission->menu_id = $tb_menu->id;
+                        $role_menu_permission->menu_code = $menu;
+                        $role_menu_permission->save();
+                    }
+                }
+            }
+
+            role_menu_sub_permission::where('role_id', $request->role_id)->delete();
+            if ($request->menu_sub) {
+                if (count($request->menu_sub) > 0) {
+                    foreach ($request->menu_sub as $menu_sub) {
+                        $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();
+                        $role_menu_sub_permission = new role_menu_sub_permission;
+                        $role_menu_sub_permission->role_id = $request->role_id;
+                        $role_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
+                        $role_menu_sub_permission->menu_sub_code = $menu_sub;
+                        $role_menu_sub_permission->save();
+                    }
+                }
+            }
+
+
+
+        }
+
+
+        // dd($request);
+        
         $permissions = [];
         $permissions_id = [];
         if ($request->has('perm')) {
