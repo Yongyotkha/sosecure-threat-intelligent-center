@@ -31,7 +31,7 @@
                 <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm_custom validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['sitesettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm_custom', 'method' => 'PUT', 'files' => true]) !!}
                             <section class="panel panel-default">
                                 
                             <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') Site Details  </header>
@@ -62,7 +62,7 @@
                                     <label class="col-lg-3 control-label">Site Name <span class="text-danger">*</span> </label>
                                     <div class="col-lg-6">
                                         <div class="">
-                                            <input type="text" class="form-control" name="name" value="{{$siteSettings->name}}">
+                                            <input type="text" class="form-control" name="name" value="{{$siteSettings->name}}" required>
                                             
                                         </div>
                                     </div>
@@ -136,7 +136,7 @@
                             </div>
                             <div class="panel-footer">
                                 {!! closeModalButton() !!}
-                                {!! renderAjaxButton() !!}
+                                <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
                             </div>
                             {!! Form::close() !!}
                         </div>
@@ -280,9 +280,12 @@
 
 
         var form_save = '.formSaving';
-        $('.ajaxifyForm_custom').submit(function (event) {
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-            event.preventDefault();
+            $('.formSaving').attr('disabled',true);
+            
             var data = new FormData(this);
             if(form_save == '.formSavingAndRun'){
                 data.append('formsubmit', 'formSavingAndRun');
@@ -291,20 +294,19 @@
             }else if(form_save == '.formDraft'){
                 data.append('formsubmit', 'formDraft');
             }
-
-            {{--data.append('logo_base64', $("#preview-image_logo").attr("src"));--}}
-
             axios.post($(this).attr("action"), data)
                 .then(function (response) {
                         toastr.success(response.data.message, '@langapp('response_status') ');
-                        $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                        $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                         window.location.href = response.data.redirect;
             })
             .catch(function (error) {
                 if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
                     toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                     $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
                 }else{
+                    $('.formSaving').attr('disabled',false);
                     var errors = error.response.data.errors;
                     var errorsHtml= '';
                     $.each( errors, function( key, value ) {
@@ -313,8 +315,13 @@
                     toastr.error( errorsHtml , '@langapp('response_status') ');
                     $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
                 }
-            });   
-        });
+                
+                
+            }); 
+       
+     
+         
+    });
 </script>
 
 <script>

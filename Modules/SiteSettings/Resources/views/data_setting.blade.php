@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             {{-- {!! Form::open(['class' => 'bs-example form-horizontal ajaxifyForm validator']) !!} --}}
-                            {!! Form::open(['route' => ['datasettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {!! Form::open(['route' => ['datasettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm_custom', 'method' => 'PUT', 'files' => true]) !!}
                             <input type="hidden" name="page_setting" value="site_permission_settings">
                             <section class="panel panel-default">
                             <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') Permission & Config Settings  </header>
@@ -237,7 +237,7 @@
                             </div>
                             <div class="panel-footer">
                                 {{-- {!! closeModalButton() !!} --}}
-                                {!! renderAjaxButton() !!}
+                                <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
                             </div>
                             {!! Form::close() !!}
                         </div>
@@ -327,6 +327,51 @@
         } else {
             $("input[name='asset_limit']").prop("disabled",true);
         }
+    });
+
+    var form_save = '.formSaving';
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            $('.formSaving').attr('disabled',true);
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                    
+                    toastr.success(response.data.message, '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
+                    window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    $('.formSaving').attr('disabled',false);
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            }); 
+       
+     
+         
     });
 
 </script>

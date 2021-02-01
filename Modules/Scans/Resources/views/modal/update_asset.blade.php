@@ -290,8 +290,7 @@
                 };
             }
         });
-
-
+        $('.btn').attr('disabled',true);
         axios.post('{{ route('scans_assets.scans_assets_edit') }}', {
             code_assets:'{{ $code_asset }}',
             code:'{{ $code }}',
