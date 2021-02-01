@@ -25,7 +25,7 @@
     
 
 
-    <li class="{{ $page === 'Users' ? 'active' : '' }}">
+    <li class="{{ $page === 'Users_in_site' ? 'active' : '' }}">
         <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
             Users
         </a>

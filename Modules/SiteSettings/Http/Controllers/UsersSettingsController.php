@@ -60,7 +60,7 @@ class UsersSettingsController extends Controller
     {
         $get_data = $this->siteSettings->get_data($id);
         $data['siteSettings'] = $get_data;
-        $data['page'] = 'Users';
+        $data['page'] = 'Users_in_site';
         $data['code'] = $id;
         
 
