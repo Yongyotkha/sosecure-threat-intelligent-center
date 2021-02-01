@@ -382,6 +382,7 @@
             data:{
                 id_change:del_val,
                 code:@json($code),
+                
             },
             beforeSend: function(){
                 loading('load');
@@ -429,6 +430,7 @@
         axios.post('{{route('user.change_status')}}', {
             active: checkState,
             code: code,
+            sitecode:@json($siteSettings->code),
         }).then(function (response) {
             toastr.success(response.data.message, '@langapp('response_status')');
             window.location.href = response.data.redirect;

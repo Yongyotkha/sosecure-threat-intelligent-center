@@ -388,11 +388,36 @@ class UsersSettingsController extends Controller
         }
         // $user->open_scan = $request->open_scan;
         // $user->scan_interval = $request->scan_interval;
-        $user->active = $request->active ? 1 : 0;
+
+        if(count($UserSite)==1){
+            $user->active = $request->active ? 1 : 0;
+        }
         $user->site_role_id = $role_id;
         $user->save();
 
 
+        $SiteSettings = SiteSettings::where('code',$site_code)->first();
+        $UserSite_edit = UserSite::where('user_id',$user->id)->where('site_id',$SiteSettings->id)->first();
+        if($UserSite_edit){
+            $UserSite_edit->active = $request->active ? 1 : 0;
+            $UserSite_edit->save();
+            $transaction_client_user_site = transaction_client_user_site::where('site_id',$UserSite_edit->site_id)->where('transaction_id', $UserSite_edit->id)->first();
+            if($transaction_client_user_site){
+                $transaction_client_user_site -> transaction_mode = 'update';
+                $transaction_client_user_site -> transaction_data_status = 1;
+                $transaction_client_user_site -> status = 1;
+                $transaction_client_user_site -> save();
+            }else{
+                $transaction_client_user_site = new transaction_client_user_site();
+                $transaction_client_user_site -> site_id = $UserSite_edit->site_id;
+                $transaction_client_user_site -> transaction_id = $UserSite_edit->id;
+                $transaction_client_user_site -> transaction_mode = 'update';
+                $transaction_client_user_site -> transaction_data_status = 1;
+                $transaction_client_user_site -> status = 1;
+                $transaction_client_user_site -> save();
+            }
+            
+        }
 
         // $user->profile->update($request->all());
         if($role_id) {
@@ -695,12 +720,11 @@ class UsersSettingsController extends Controller
     }
 
 
-    public function change_status(Request $request)
+    public function change_status_backup(Request $request)
     {
         $user = User::where('code', $request->code)->first();
         $user->active = $request->active;
         $user->save();
-
         $transaction_client_users = transaction_client_users::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
         if($transaction_client_users){
             $transaction_client_users -> transaction_mode = 'update';
@@ -730,7 +754,62 @@ class UsersSettingsController extends Controller
         );
     }
 
+    public function change_status(Request $request)
+    {
+        $user = User::where('code', $request->code)->first();
+        $SiteSettings = SiteSettings::where('code',$request->sitecode)->first();
+        $UserSite_count = UserSite::where('user_id',$user->id)->count();
+        $UserSite = UserSite::where('user_id',$user->id)->where('site_id',$SiteSettings->id)->first();
+        if($UserSite){
+            $UserSite->active = $request->active;
+            $UserSite->save();
+            $transaction_client_user_site = transaction_client_user_site::where('site_id',$UserSite->site_id)->where('transaction_id', $UserSite->id)->first();
+            if($transaction_client_user_site){
+                $transaction_client_user_site -> transaction_mode = 'update';
+                $transaction_client_user_site -> transaction_data_status = 1;
+                $transaction_client_user_site -> status = 1;
+                $transaction_client_user_site -> save();
+            }else{
+                $transaction_client_user_site = new transaction_client_user_site();
+                $transaction_client_user_site -> site_id = $UserSite->site_id;
+                $transaction_client_user_site -> transaction_id = $UserSite->id;
+                $transaction_client_user_site -> transaction_mode = 'update';
+                $transaction_client_user_site -> transaction_data_status = 1;
+                $transaction_client_user_site -> status = 1;
+                $transaction_client_user_site -> save();
+            }
+        }
 
+        if($UserSite_count==1){
+            $user->active = $request->active;
+            $user->save();
+            $transaction_client_users = transaction_client_users::where('site_id', $user->site_id)->where('transaction_id', $user->id)->first();
+            if($transaction_client_users){
+                $transaction_client_users -> transaction_mode = 'update';
+                $transaction_client_users -> transaction_data_status = 1;
+                $transaction_client_users -> status = 1;
+                $transaction_client_users -> save();
+            }else{
+                $transaction_client_users = new transaction_client_users();
+                $transaction_client_users -> site_id = $user->site_id;
+                $transaction_client_users -> transaction_id = $user->id;
+                $transaction_client_users -> transaction_mode = 'update';
+                $transaction_client_users -> transaction_data_status = 1;
+                $transaction_client_users -> status = 1;
+                $transaction_client_users -> save();
+            }
+        }
+        
+        return ajaxResponse(
+            [
+                'id'       => $user->id,
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('userssettings.index',['id' => $SiteSettings->code]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
 
     public function bulkDelete()
     {
@@ -764,15 +843,17 @@ class UsersSettingsController extends Controller
         // $site_code = $this->request->site_code;
         // $site_id = $this->request->site_id;
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
-        $model = User::where('deleted_at', null)->where('site_id', $site_id)->orderBy('id','ASC');
+        $model = User::where('deleted_at', null)->orderBy('id','ASC');
 
         $model->whereHas('get_model_has_roles',function($q) {
             $q->whereIn('role_id',[4,5,6]);
         });
-      
-
+        $model->whereHas('get_user_site_many', function($q) use ($site_id) {
+            $q->where('site_id', $site_id);
+        });
         $model->get();
-        
+        // dd($model->get()->toArray());
+     
         // $model = $this->user->query();
         // $test = 1;
         // $model->when(
@@ -851,8 +932,9 @@ class UsersSettingsController extends Controller
             )
             ->editColumn(
                 'status',
-                function ($user) {
-                    if($user->active == '1') {
+                function ($user) use ($site_id){
+                    $UserSite = UserSite::where('user_id',$user->id)->where('site_id',$site_id)->first();
+                    if($UserSite->active == '1') {
                         $checked_val = 'checked';
                     } else {
                         $checked_val = '';
