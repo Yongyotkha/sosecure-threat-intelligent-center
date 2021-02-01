@@ -24,6 +24,7 @@ class ReauthenticateController extends Controller
      */
     public function index()
     {
+        dd(1234);
         return view('reauthenticate::index');
     }
 
@@ -31,31 +32,32 @@ class ReauthenticateController extends Controller
     {
         $User = User::where('site_add_user_token',$token)->first();
 
-        $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
-        if(@$model_has_roles) {
-            if(@$model_has_roles->role_id == 4 || @$model_has_roles->role_id == 5 || @$model_has_roles->role_id == 6) {
-                $granted_access = 'Welcome Site:';
-                $granted_access_val = '';
-            } else if($model_has_roles->role_id == 1) {
-                $granted_access = 'Granted access Site:';
-                $granted_access_val = 'All site';
-            } else {
-                $granted_access = 'Granted access Site:';
-                $granted_access_val = '';
-            }
-        }
-        
-  
         if($User) {
+            $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
+            if(@$model_has_roles) {
+                if(@$model_has_roles->role_id == 4 || @$model_has_roles->role_id == 5 || @$model_has_roles->role_id == 6) {
+                    $granted_access = 'Welcome Site:';
+                    $granted_access_val = '';
+                } else if($model_has_roles->role_id == 1) {
+                    $granted_access = 'Granted access Site:';
+                    $granted_access_val = 'All site';
+                } else {
+                    $granted_access = 'Granted access Site:';
+                    $granted_access_val = '';
+                }
+            }
             $verify = $User->verify;
             $last_change_pass = $User->last_change_pass;
             if($verify == 0 && $last_change_pass == null) {
                 return view('reauthenticate::index',compact('User','granted_access','granted_access_val'));
             } else {
+
                 return redirect()->route('index');
             }
         } else {
+
             return redirect()->route('index');
+            
         }
  
     }

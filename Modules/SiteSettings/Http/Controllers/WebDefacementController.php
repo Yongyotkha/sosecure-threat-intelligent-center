@@ -46,6 +46,7 @@ class WebDefacementController extends Controller
     //    dd($get_data);
        $data['siteSettings'] = $get_data;
        $data['page'] = 'Webdefacement';
+
        return view('sitesettings::webdefacement_website')->with($data);
     }
 
