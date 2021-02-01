@@ -70,31 +70,44 @@ class DataLeakController extends Controller
 
     public function datafeed()
     {
-        if (Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if (Auth::user()->hasRole('admin')) { //if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+        // if (Auth::check()) {
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if (Auth::user()->hasRole('admin')) { //if admin
+        //         // dd(777);
+        //         $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
 
-            } else { //if notAdmin
-                // dd(888);
-                if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                        // dd(99);
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
+        //                 // dd(99);
 
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
+        //                 $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+        //                     ->whereIn('id', $site_id_arr) //['49', '56']
+        //                     ->get();
 
-                    } else { //not support and admin
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-                    }
-                }
-            }
+        //             } else { //not support and admin
+        //                 $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+        //                     ->whereIn('id', $site_id_arr) //['49', '56']
+        //                     ->get();
+        //             }
+        //         }
+        //     }
+        // }
+
+        $SiteSettings = @get_role_custom()['SiteSettings'];
+        $site_id_arr = @get_role_custom()['site_id_arr'];
+        if(@get_role_custom()['superadmin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_support'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_admin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
         }
-
         // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
         $data['SiteSettings'] = $SiteSettings;
 
@@ -117,31 +130,45 @@ class DataLeakController extends Controller
 
     public function datafeed_darkweb()
     {
-        if (Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if (Auth::user()->hasRole('admin')) { //if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+        // if (Auth::check()) {
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if (Auth::user()->hasRole('admin')) { //if admin
+        //         // dd(777);
+        //         $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
 
-            } else { //if notAdmin
-                // dd(888);
-                if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                        // dd(99);
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
+        //                 // dd(99);
 
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
+        //                 $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+        //                     ->whereIn('id', $site_id_arr) //['49', '56']
+        //                     ->get();
 
-                    } else { //not support and admin
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-                    }
-                }
-            }
+        //             } else { //not support and admin
+        //                 $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+        //                     ->whereIn('id', $site_id_arr) //['49', '56']
+        //                     ->get();
+        //             }
+        //         }
+        //     }
+        // }
+
+        $SiteSettings = @get_role_custom()['SiteSettings'];
+        $site_id_arr = @get_role_custom()['site_id_arr'];
+        if(@get_role_custom()['superadmin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_support'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_admin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
         }
-
+        
         // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
         $data['SiteSettings'] = $SiteSettings;
 
@@ -383,29 +410,18 @@ class DataLeakController extends Controller
     public function socialdatas_all_site()
     {
 
-        if (Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if (Auth::user()->hasRole('admin')) { //if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
-
-            } else { //if notAdmin
-                // dd(888);
-                if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                        // dd(99);
-
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-
-                    } else { //not support and admin
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-                    }
-                }
-            }
+        $SiteSettings = @get_role_custom()['SiteSettings'];
+        $site_id_arr = @get_role_custom()['site_id_arr'];
+        if(@get_role_custom()['superadmin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_support'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_admin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
         }
 
         // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
@@ -422,29 +438,18 @@ class DataLeakController extends Controller
         //    $get_data = $this->siteSettings->get_data($id);
         //    $data['siteSettings'] = $get_data;
 
-        if (Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if (Auth::user()->hasRole('admin')) { //if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
-
-            } else { //if notAdmin
-                // dd(888);
-                if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                        // dd(99);
-
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-
-                    } else { //not support and admin
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-                    }
-                }
-            }
+        $SiteSettings = @get_role_custom()['SiteSettings'];
+        $site_id_arr = @get_role_custom()['site_id_arr'];
+        if(@get_role_custom()['superadmin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_support'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_admin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }else if(@get_role_custom()['site_client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
         }
 
         // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
@@ -524,7 +529,8 @@ class DataLeakController extends Controller
     {
 
         $site = $this->siteSettings->get_data($request->site_code);
-        $model = DataLeakSocialRef::where('site_id', 'LIKE', '%' . $site->id . '%')->where('deleted_at', null)
+        //why use %...%
+        $model = DataLeakSocialRef::where('site_id', 'LIKE', '' . $site->id . '')->where('deleted_at', null)
         ->whereHas('get_data_leak_feed_one', function ($query) {
             $query->where('feel_type', '=', 'social');
         })
@@ -539,6 +545,7 @@ class DataLeakController extends Controller
                 });
             }
 
+            //<><><>
             if (Auth::check()) {
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
@@ -726,7 +733,6 @@ class DataLeakController extends Controller
 
     public function socialdatas_all_site_tb(Request $request)
     {
-
         $model = DataLeakSocialRef::where('deleted_at', null)
             ->whereHas('get_data_leak_feed_one', function ($query) {
                 $query->where('feel_type', '=', 'social');
@@ -744,30 +750,51 @@ class DataLeakController extends Controller
                 });
             }
 
-            if (Auth::check()) {
+            //<><><>
+            // if (Auth::check()) {
 
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if (Auth::user()->hasRole('admin')) { //if admin
-                    // dd(777);
+            //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            //     if (Auth::user()->hasRole('admin')) { //if admin
+            //         // dd(777);
 
-                } else { //if notAdmin
-                    // dd(888);
-                    if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                        if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                            // dd(99);
+            //     } else { //if notAdmin
+            //         // dd(888);
+            //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
+            //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
+            //                 // dd(99);
 
-                            $model = $model->whereIn('site_id', $site_id_arr);
+            //                 $model = $model->whereIn('site_id', $site_id_arr);
 
-                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
 
-                        } else { //not support and admin
-                            $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+            //             } else { //not support and admin
+            //                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
 
-                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                        }
-                    }
-                }
+            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+            //             }
+            //         }
+            //     }
+            // }
+
+            $get_role_custom_first = @get_role_custom();
+            $site_id_arr = @$get_role_custom_first['site_id_arr'];
+            if(@$get_role_custom_first['superadmin'] == 1) {
+                
+
+            }else if(@$get_role_custom_first['client'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+
+            }else if(@$get_role_custom_first['site_support'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr);
+
+            }else if(@$get_role_custom_first['site_admin'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr);
+
+            }else if(@$get_role_custom_first['site_client'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+
             }
+
 
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
@@ -841,29 +868,49 @@ class DataLeakController extends Controller
                 // });
             }
 
-            if (Auth::check()) {
+            //<><><>
+            // if (Auth::check()) {
 
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if (Auth::user()->hasRole('admin')) { //if admin
-                    // dd(777);
+            //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            //     if (Auth::user()->hasRole('admin')) { //if admin
+            //         // dd(777);
 
-                } else { //if notAdmin
-                    // dd(888);
-                    if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                        if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                            // dd(99);
+            //     } else { //if notAdmin
+            //         // dd(888);
+            //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
+            //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
+            //                 // dd(99);
 
-                            $model = $model->whereIn('site_id', $site_id_arr);
+            //                 $model = $model->whereIn('site_id', $site_id_arr);
 
-                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
 
-                        } else { //not support and admin
-                            $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+            //             } else { //not support and admin
+            //                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
 
-                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                        }
-                    }
-                }
+            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+            //             }
+            //         }
+            //     }
+            // }
+
+            $get_role_custom_first = @get_role_custom();
+            $site_id_arr = @$get_role_custom_first['site_id_arr'];
+            if(@$get_role_custom_first['superadmin'] == 1) {
+                
+
+            }else if(@$get_role_custom_first['client'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+
+            }else if(@$get_role_custom_first['site_support'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr);
+
+            }else if(@$get_role_custom_first['site_admin'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr);
+
+            }else if(@$get_role_custom_first['site_client'] == 1) {
+                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+
             }
 
             $model->get();
@@ -1199,6 +1246,8 @@ class DataLeakController extends Controller
 
             }
 
+
+            //<><><>
             if (Auth::check()) {
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
@@ -1287,6 +1336,7 @@ class DataLeakController extends Controller
                 })
                 ->with('get_site')->with('get_data_leak_feed_one');
 
+                //<><><>
             if (Auth::check()) {
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
