@@ -66,140 +66,140 @@ class UserObserver
      */
     public function deleting(User $user)
     {
-        $user->comments->each(
-            function ($comment) {
-                $comment->delete();
-            }
-        );
-        $user->feeds->each(
-            function ($activity) {
-                $activity->delete();
-            }
-        );
+        // $user->comments->each(
+        //     function ($comment) {
+        //         $comment->delete();
+        //     }
+        // );
+        // $user->feeds->each(
+        //     function ($activity) {
+        //         $activity->delete();
+        //     }
+        // );
 
-        $user->messages()->each(
-            function ($message) {
-                $message->delete();
-            }
-        );
+        // $user->messages()->each(
+        //     function ($message) {
+        //         $message->delete();
+        //     }
+        // );
 
-        $user->tickets->each(
-            function ($ticket) {
-                $ticket->delete();
-            }
-        );
+        // $user->tickets->each(
+        //     function ($ticket) {
+        //         $ticket->delete();
+        //     }
+        // );
 
-        $user->uploads->each(
-            function ($file) {
-                $file->delete();
-            }
-        );
-        $user->timesheet->each(
-            function ($tm) {
-                $tm->delete();
-            }
-        );
+        // $user->uploads->each(
+        //     function ($file) {
+        //         $file->delete();
+        //     }
+        // );
+        // $user->timesheet->each(
+        //     function ($tm) {
+        //         $tm->delete();
+        //     }
+        // );
 
-        $user->quickAccess()->each(
-            function ($qa) {
-                $qa->delete();
-            }
-        );
+        // $user->quickAccess()->each(
+        //     function ($qa) {
+        //         $qa->delete();
+        //     }
+        // );
 
-        $user->deals->each(
-            function ($deal) {
-                $deal->delete();
-            }
-        );
+        // $user->deals->each(
+        //     function ($deal) {
+        //         $deal->delete();
+        //     }
+        // );
 
-        $user->issues->each(
-            function ($issue) {
-                $issue->delete();
-            }
-        );
-        $user->assignments->each(
-            function ($assignment) {
-                $assignment->delete();
-            }
-        );
-        $user->articles->each(
-            function ($article) {
-                $article->delete();
-            }
-        );
-        $user->announcements->each(
-            function ($announcement) {
-                $announcement->delete();
-            }
-        );
-        $user->expenses->each(
-            function ($expense) {
-                $expense->delete();
-            }
-        );
-        $user->leads->each(
-            function ($lead) {
-                $lead->delete();
-            }
-        );
-        $user->todos->each(
-            function ($todo) {
-                $todo->delete();
-            }
-        );
-        $user->appointments->each(
-            function ($appointment) {
-                $appointment->delete();
-            }
-        );
-        $user->schedules->each(
-            function ($event) {
-                $event->delete();
-            }
-        );
-        $user->cannedResponses->each(
-            function ($response) {
-                $response->delete();
-            }
-        );
-        $user->links->each(
-            function ($link) {
-                $link->delete();
-            }
-        );
-        $user->signatures->each(
-            function ($signature) {
-                $signature->delete();
-            }
-        );
-        $user->feedbacks->each(
-            function ($feedback) {
-                $feedback->delete();
-            }
-        );
-        $user->vault->each(
-            function ($vault) {
-                $vault->delete();
-            }
-        );
-        $user->calls->each(
-            function ($call) {
-                $call->delete();
-            }
-        );
-        $user->departments->each(
-            function ($department) {
-                $department->delete();
-            }
-        );
+        // $user->issues->each(
+        //     function ($issue) {
+        //         $issue->delete();
+        //     }
+        // );
+        // $user->assignments->each(
+        //     function ($assignment) {
+        //         $assignment->delete();
+        //     }
+        // );
+        // $user->articles->each(
+        //     function ($article) {
+        //         $article->delete();
+        //     }
+        // );
+        // $user->announcements->each(
+        //     function ($announcement) {
+        //         $announcement->delete();
+        //     }
+        // );
+        // $user->expenses->each(
+        //     function ($expense) {
+        //         $expense->delete();
+        //     }
+        // );
+        // $user->leads->each(
+        //     function ($lead) {
+        //         $lead->delete();
+        //     }
+        // );
+        // $user->todos->each(
+        //     function ($todo) {
+        //         $todo->delete();
+        //     }
+        // );
+        // $user->appointments->each(
+        //     function ($appointment) {
+        //         $appointment->delete();
+        //     }
+        // );
+        // $user->schedules->each(
+        //     function ($event) {
+        //         $event->delete();
+        //     }
+        // );
+        // $user->cannedResponses->each(
+        //     function ($response) {
+        //         $response->delete();
+        //     }
+        // );
+        // $user->links->each(
+        //     function ($link) {
+        //         $link->delete();
+        //     }
+        // );
+        // $user->signatures->each(
+        //     function ($signature) {
+        //         $signature->delete();
+        //     }
+        // );
+        // $user->feedbacks->each(
+        //     function ($feedback) {
+        //         $feedback->delete();
+        //     }
+        // );
+        // $user->vault->each(
+        //     function ($vault) {
+        //         $vault->delete();
+        //     }
+        // );
+        // $user->calls->each(
+        //     function ($call) {
+        //         $call->delete();
+        //     }
+        // );
+        // $user->departments->each(
+        //     function ($department) {
+        //         $department->delete();
+        //     }
+        // );
 
-        if ($user->profile->avatar != 'default_avatar.png') {
-            Storage::delete(config('system.avatar_dir') . '/' . $user->profile->avatar);
-        }
+        // if ($user->profile->avatar != 'default_avatar.png') {
+        //     Storage::delete(config('system.avatar_dir') . '/' . $user->profile->avatar);
+        // }
 
-        Client::wherePrimaryContact($user->id)->update(['primary_contact' => 0]);
-        Deal::whereContactPerson($user->id)->update(['contact_person' => 0]);
+        // Client::wherePrimaryContact($user->id)->update(['primary_contact' => 0]);
+        // Deal::whereContactPerson($user->id)->update(['contact_person' => 0]);
 
-        $user->profile->delete();
+        // $user->profile->delete();
     }
 }

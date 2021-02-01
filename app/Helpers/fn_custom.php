@@ -44,31 +44,46 @@ function get_role_custom() {
                 // dd($role_id);
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                $SiteSettings = '';
                 if(@$role_id == 1) {//if admin  | Auth::user()->hasRole('admin')
                     // dd(777);
                     $superadmin = 1;
-
-                } else { //if notAdmin
-                    // dd(888);
-                    if(@Auth::user()->site_role_id && $site_id_arr) {
-                        if(@$role_id == 6) {//support and admin
-                            // dd(99);
-                            $site_support = 1;
-                            // $model = $model->whereIn('site_id', $site_id_arr);
-                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-
-                        } else if(@$role_id == 4) {//not support and admin
-                            $site_admin = 1;
-                            // $model = $model->whereIn('site_id', $site_id_arr);
-                            // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                        } else if(@$role_id == 5) {//not support and admin
-                            $site_client = 1;
-                           
-                        }
-                    }
-
+                    $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+                } else if (@$role_id == 2) { //if notAdmin  client
                     $client = 1;
-
+                    if(@$site_id_arr) {
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                } else if(@$role_id == 4) {//admin site
+                    $site_admin = 1;
+                    if(@$site_id_arr) {
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }else if(@$role_id == 5) {//client site
+                    $site_client = 1;
+                    if(@$site_id_arr) {
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                }else if(@$role_id == 6) {//support site
+                    $site_support = 1;
+                    if(@$site_id_arr) {
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
+                } else {//center client
+                    $client = 1;
+                    if(@$site_id_arr) {
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+                        ->whereIn('id', $site_id_arr)//['49', '56']
+                        ->get();
+                    }
                 }
             }
             
@@ -78,7 +93,8 @@ function get_role_custom() {
                     "site_support" => $site_support,//site
                     "site_admin" => $site_admin,//site
                     "site_client" => $site_client,//site
-                    "site_id_arr" => $site_id_arr//center,site
+                    "site_id_arr" => $site_id_arr,//center,site
+                    "SiteSettings" => $SiteSettings//center,site
                 ];
                 return $data; 
             
