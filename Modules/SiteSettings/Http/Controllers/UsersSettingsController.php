@@ -796,7 +796,8 @@ class UsersSettingsController extends Controller
             ->editColumn(
                 'chk',
                 function ($user) {
-                    if($user->site_role_id == 99) {
+                    if(@$user->get_model_has_roles->role_id == 1 || @$user->get_model_has_roles->role_id == 2 || @$user->get_model_has_roles->role_id == 6) {
+                        
                         $disabled = 'disabled';
                     } else {
                         $disabled = '';
@@ -832,16 +833,16 @@ class UsersSettingsController extends Controller
             ->editColumn(
                 'role',
                 function ($user) {
-                    $site_role_id = $user->site_role_id;
+                    $site_role_id = @$user->get_model_has_roles->role_id;
                     if($site_role_id) {
                         if($site_role_id == '99') {
-                            $site_role_id_val = 1;
+                            $site_role_id_val = 6;
                         } else {
                             $site_role_id_val = $site_role_id;
                         }
                     }
 
-                    $Roles = Roles::where('id', $site_role_id_val)->first();
+                    $Roles = Roles::where('id', @$site_role_id_val)->first();
                     $role_name = $Roles->name;
 
                     
@@ -857,7 +858,7 @@ class UsersSettingsController extends Controller
                         $checked_val = '';
                     }
 
-                    if($user->site_role_id == 99) {
+                    if($user->site_role_id == 99 || @$user->get_model_has_roles->role_id == 6) {
                         $disabled = 'disabled';
                         $bg = 'background-color: #54a56291 !important;';
                     } else {
@@ -887,7 +888,7 @@ class UsersSettingsController extends Controller
                 'action',
                 function ($user) use ($site_code) {
                     $html = '';
-                    if($user->site_role_id == 99) {
+                    if($user->site_role_id == 99 || @$user->get_model_has_roles->role_id == 6) {
                         $html .= "<a href='". route('user.edit_gen_pass', ['id' => $user->code]) ."?s=".$site_code."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                         <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
                         <span>Password</span>
