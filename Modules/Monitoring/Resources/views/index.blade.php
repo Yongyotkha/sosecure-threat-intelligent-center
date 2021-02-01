@@ -126,6 +126,7 @@
 @push('pagestyle')
     @include('stacks.css.datatables')
     @include('stacks.css.datepicker')
+    @include('stacks.css.form')
     <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
@@ -133,6 +134,7 @@
 @include('stacks.js.datatables')
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
+@include('stacks.js.form')
 @include('stacks.js.advanced_search')
 
 
