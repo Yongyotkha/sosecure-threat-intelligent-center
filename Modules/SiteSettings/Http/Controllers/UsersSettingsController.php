@@ -216,9 +216,17 @@ class UsersSettingsController extends Controller
                     if($role_id) {
                         $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
                         if($model_has_roles) {
+                            $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
+                            if($model_has_roles_q) {
+                                $id_last = $model_has_roles_q->id+1;
+                            } else {
+                                $id_last = 1;
+                            }
+
                             $model_has_roles->role_id = $role_id;
                             $model_has_roles->model_type = 'Modules\Users\Entities\User';
                             // $model_has_roles->model_id = $User->id;
+                            $model_has_roles->id = $id_last;
                             $model_has_roles->save();
                         } else {
                             $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
