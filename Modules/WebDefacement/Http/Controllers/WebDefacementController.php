@@ -42,41 +42,81 @@ class WebDefacementController extends Controller
     {
         $data['page'] = langapp('webdefacement');
         // $data['SiteSettings'] = SiteSettings::where("active",1)->where("deleted_at",null)->get();
-        if(Auth::check()) {
+        // <><><>
+        // if(Auth::check()) {
 
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
-                $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)->get();
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(Auth::user()->hasRole('admin')) {//if admin
+        //         // dd(777);
+        //         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        //         $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)->get();
 
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+        //                 // dd(99);
 
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
 
-                        $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)
-                        ->get();
+        //                 $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)
+        //                 ->get();
              
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+        //             } else {//not support and admin
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
 
-                        $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)
-                        ->get();
-                    }
-                }
-            }
+        //                 $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)
+        //                 ->get();
+        //             }
+        //         }
+        //     }
+        // }
+        $get_role_custom_first = @get_role_custom();
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)->get();
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)
+            ->get();
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)
+            ->get();
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)
+            ->get();
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)
+            ->get();
         }
+
         $data['SiteSettings'] = $SiteSettings;
         $data['SiteSettings_add'] = $SiteSettings_add;
 
@@ -88,32 +128,58 @@ class WebDefacementController extends Controller
        
         $WebdefacmentSetting = WebdefacmentSetting::where("code",$code)->where('deleted_at', null)->where('active', 1)->with('get_webdefacment_data_original_detail')->with('get_webdefacment_data_check_detail')->with('get_webdefacment_data_log_detail');
         
-        if(Auth::check()) {
 
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        
+        //<><><>
+        // if(Auth::check()) {
 
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(Auth::user()->hasRole('admin')) {//if admin
+        //         // dd(777);
+        //         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
 
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+        //                 // dd(99);
+
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
              
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-                    }
-                }
-            }
+        //             } else {//not support and admin
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
+        //             }
+        //         }
+        //     }
+        // }
+
+        $get_role_custom_first = @get_role_custom();
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+            ->whereIn('id', $site_id_arr)//['49', '56']
+            ->get();
         }
+
         if(count($site_id_arr) > 0) {
             $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id' , $site_id_arr);
         }
@@ -211,24 +277,38 @@ class WebDefacementController extends Controller
 
         $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null);
 
-        if(Auth::check()) {
+        //<><><>
+        // if(Auth::check()) {
 
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(Auth::user()->hasRole('admin')) {//if admin
+        //         // dd(777);
+        //         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
 
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
-                        $modal = $modal->whereIn('site_id' , $site_id_arr);
-                    } else {//not support and admin
-                        $modal = $modal->whereIn('site_id', $site_id_arr);
-                    }
-                }
-            }
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+        //                 // dd(99);
+        //                 $modal = $modal->whereIn('site_id' , $site_id_arr);
+        //             } else {//not support and admin
+        //                 $modal = $modal->whereIn('site_id', $site_id_arr);
+        //             }
+        //         }
+        //     }
+        // }
+        $get_role_custom_first = @get_role_custom();
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $modal = $modal->whereIn('site_id', $site_id_arr);
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $modal = $modal->whereIn('site_id', $site_id_arr);
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $modal = $modal->whereIn('site_id', $site_id_arr);
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $modal = $modal->whereIn('site_id', $site_id_arr);
         }
 
 

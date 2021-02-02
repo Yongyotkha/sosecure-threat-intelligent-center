@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Modules\Users\Entities\model_has_roles;
 
 class AuthController extends ApiController
 {
@@ -35,8 +36,27 @@ class AuthController extends ApiController
         }else{
             $data_key = json_decode($data, true);
             // 
-            $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->first();
-            if ($user != null) {
+
+            $role_status = 0;
+            $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1);
+            $user = $user->where(function($q) {
+                $q->whereNull('password_time_expire');
+                $q->orWhereDate('password_time_expire', '<=', date('Y-m-d H:i:s'));
+            });
+            $user = $user->first();
+            $model_has_roles = model_has_roles::where('role_id',@$user->get_model_has_roles->role_id)->first();
+            if($model_has_roles) {
+                if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
+                    $role_status = 1;
+                } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
+                    $role_status = 0;
+                } else {
+                    $role_status = 1;
+                }
+            }
+
+
+            if ($user != null && @$role_status == 1) {
                 $passwordHasher = new PasswordHash(8, true);
                 $passwordMatch  = $passwordHasher->CheckPassword($data_key['password'], $user->password);
                 if ($passwordMatch) {

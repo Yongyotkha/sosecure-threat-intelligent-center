@@ -470,7 +470,7 @@
     function data_table(){
         startDate =  $("#date-rang").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#date-rang").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        console.log(startDate);
+
         t = $('#table-dashboard').DataTable({
             searching: true,
             ordering: true,
