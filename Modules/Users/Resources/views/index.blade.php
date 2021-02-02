@@ -138,6 +138,7 @@
                                             <th class="">@langapp('mobile') </th>
                                             <th class="">@langapp('city') </th>
                                             <th class="col-date">@langapp('date') </th>
+                                            <th class="">Action</th>
                                         </tr>
                                     </thead>
 
@@ -251,11 +252,27 @@
                 { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
-                { data: 'job_title', name: 'profile.job_title' },
+                { data: 'job_title', name: 'profile.job_title',
+                    visible:false,
+                    searchable: false,
+                    orderable: false
+                },
                 { data: 'site_name', name: 'site_name' },
-                { data: 'mobile', name: 'profile.mobile' },
-                { data: 'city', name: 'profile.city' },
-                { data: 'created_at', name: 'created_at' }
+                { data: 'mobile', name: 'profile.mobile',
+                    visible:false,
+                    searchable: false,
+                    orderable: false
+                },
+                { data: 'city', name: 'profile.city',
+                    visible:false,
+                    searchable: false,
+                    orderable: false
+                },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'action', name: 'action',
+                    searchable: false,
+                    orderable: false,
+                    className: 'text-center no-wrap'}
             ]
         });
     }
