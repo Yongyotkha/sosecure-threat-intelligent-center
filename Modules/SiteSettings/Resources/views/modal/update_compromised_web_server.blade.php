@@ -86,10 +86,16 @@
                     <div class="col-lg-8">
                         <select class="js-example-basic-multiple"  name="type" id="type_edit" multiple="multiple"
                             required>
-
                             <option value=".php">.PHP</option>
                             <option value=".js">.JS</option>
-                            \<option value=".asp">.ASP</option>
+                            <option value=".asp">.ASP</option>
+                            <option value=".exe">.EXE</option>
+                            <option value=".dll">.DLL</option>
+                            <option value=".cs">.CS</option>
+                            <option value=".cshtml">.CSHTML</option>
+                            <option value=".config">.CONFIG</option>
+                            <option value=".htaccess">.HTACCESS</option>
+                            <option value=".xml">.XML</option>
                         </select>
                     </div>
                 </div>
