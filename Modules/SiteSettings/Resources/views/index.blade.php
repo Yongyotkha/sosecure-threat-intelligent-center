@@ -22,8 +22,8 @@
                     @langapp('delete')</span>
             </button>
             @endcan
-
-            @if(isAdmin() || can('settings'))
+            {{-- isAdmin() ||  --}}
+            @if(can('settings'))
             <a href="{{ route('sitesettings.create') }}"
                 class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-toggle="ajaxModal">
                 @icon('solid/plus') @langapp('create')

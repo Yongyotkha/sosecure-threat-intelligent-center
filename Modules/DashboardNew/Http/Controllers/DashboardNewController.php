@@ -67,22 +67,21 @@ class DashboardNewController extends Controller
         
         // dd($menu[4]->get_menu_sub);
 
-
+        $get_role_custom_first = @get_role_custom();
         $SiteSettings = '';
-        $SiteSettings = @get_role_custom()['SiteSettings'];
-        $site_id_arr = @get_role_custom()['site_id_arr'];
-        if(@get_role_custom()['superadmin'] == 1) {
-            $SiteSettings = @get_role_custom()['SiteSettings'];
-        }else if(@get_role_custom()['client'] == 1) {
-            $SiteSettings = @get_role_custom()['SiteSettings'];
-        }else if(@get_role_custom()['site_support'] == 1) {
-            $SiteSettings = @get_role_custom()['SiteSettings'];
-        }else if(@get_role_custom()['site_admin'] == 1) {
-            $SiteSettings = @get_role_custom()['SiteSettings'];
-        }else if(@get_role_custom()['site_client'] == 1) {
-            $SiteSettings = @get_role_custom()['SiteSettings'];
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
         }
-
 
 
         $data['site_settings'] = @$SiteSettings;
@@ -131,6 +130,7 @@ class DashboardNewController extends Controller
     }
 
     public function cve_assets(Request $request){
+        
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
