@@ -6,16 +6,24 @@
             </div>
             <div class="modal-body">
     
-                {!! Form::open(['route' => ['users.roles.changePerm', $role->id], 'class' => 'bs-example form-horizontal ajaxifyForm_custom']) !!}
+                {!! Form::open(['route' => ['users.roles.changePerm_custom', $role->id], 'class' => 'bs-example form-horizontal ajaxifyForm_custom']) !!}
     
     
                 <input type="hidden" name="role_id" value="{{ $role->id }}">
+                
+                <div class="">
+                    <label>
+                        <input type="checkbox" id="select_all_permission">
+                        <span class="label-text">all <span class="text-muted small">all</span></span>
+                        
+                    </label>
+                </div>
     
                 @foreach (\Spatie\Permission\Models\Permission::select('name', 'description')->orderBy('name', 'asc')->get() as $permission)
 
                     <div class="">
                         <label>
-                            <input type="checkbox" name="perm[{{ $permission->name }}]" {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
+                            <input type="checkbox" class="input_permission" name="perm[{{ $permission->name }}]" {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
                             <span class="label-text">{{ humanize($permission->name) }} - <span class="text-muted small">{{ $permission->description }}</span></span>
                         </label>
                     </div>
@@ -42,6 +50,14 @@
 
 
     <script>
+
+        $("#select_all_permission").click(function() {
+            if($(this).is(":checked")) {
+                $(".input_permission").prop("checked", true);
+            } else {
+                $(".input_permission").prop("checked", false);
+            }   
+        });
        
         var form_save = '.formSaving';
         $('.formSavingAndRun').click(function() {
@@ -69,7 +85,7 @@
                         .then(function (response) {
                                 toastr.success(response.data.message, '@langapp('response_status') ');
                                 $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                                {{--window.location.href = response.data.redirect;--}}
+                                window.location.href = response.data.redirect;
                     })
                     .catch(function (error) {
                         if(error.response.data.exception){

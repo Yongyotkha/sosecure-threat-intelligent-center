@@ -47,7 +47,7 @@
                                         </td>
                                         <td class="nowrap">
                                             
-                                            <a href="{{ route('users.roles.permission', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                            <a href="{{ route('users.roles.permission_custom', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/shield-alt')
                                             </a>
                                             

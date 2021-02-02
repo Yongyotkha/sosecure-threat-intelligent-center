@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\model_has_roles;
 
 use App\Menu;
 use App\Menu_sub;
@@ -69,9 +70,22 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        if ($this->attemptLogin($request) || $this->oldLogin($request)) {
-            // $user = $this->guard('api')->user();
-            // $user->generateToken();
+
+        $role_status = 0;
+        $User = User::where('email',$request->email)->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->first();
+        $model_has_roles = model_has_roles::where('role_id',@$User->get_model_has_roles->role_id)->first();
+        if($model_has_roles) {
+            if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
+                $role_status = 1;
+            } else {
+                $role_status = 0;
+            }
+        }
+
+
+        // if ((Auth::attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1, 'site_role_id' => 1]) ) || ($this->oldLogin($request))) {
+        if ( ($this->oldLogin($request))) {//custom login
+            // The user is active, not suspended, and exists.
 
             $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
             // session_start();
@@ -81,7 +95,24 @@ class LoginController extends Controller
             // dd(55);
             
             return $this->sendLoginResponse($request);
+
         }
+
+
+        
+        // if ($this->attemptLogin($request) || $this->oldLogin($request)) {
+        //     // $user = $this->guard('api')->user();
+        //     // $user->generateToken();
+
+        //     $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+        //     // session_start();
+        //     $_SESSION["menu"] = $menu;
+        //     // session('menu', $menu);
+           
+        //     return $this->sendLoginResponse($request);
+        // }
+
+
 
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
@@ -116,8 +147,22 @@ class LoginController extends Controller
      */
     public function oldLogin($request)
     {
+        $role_status = 0;
+        $User = User::where('email',$request->email)->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1)->first();
+        // $User = User::where('email', $request->email)->first();
+        $model_has_roles = model_has_roles::where('role_id',@$User->get_model_has_roles->role_id)->first();
+        if($model_has_roles) {
+            if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
+                $role_status = 1;
+            } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
+                $role_status = 0;
+            } else {
+                $role_status = 1;
+            }
+        }
+
         $user = User::where('email', $request->email)->first();
-        if ($user != null) {
+        if ($user != null && @$role_status == 1) {
             $passwordHasher = new PasswordHash(8, true);
             $passwordMatch  = $passwordHasher->CheckPassword($request->password, $user->password);
             if ($passwordMatch) {
