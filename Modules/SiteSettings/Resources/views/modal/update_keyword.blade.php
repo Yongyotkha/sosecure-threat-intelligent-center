@@ -5,7 +5,7 @@
             <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $Site_keywords->name }}</h4>
         </div>
         
-        {!! Form::open(['route' => ['keyword.update', 'id' => $Site_keywords->id], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+        {!! Form::open(['route' => ['keyword.update', 'id' => $Site_keywords->id], 'class' => 'ajaxifyForm_custom', 'method' => 'PUT', 'files' => true]) !!}
 
         <input type="hidden" name="id" value="{{  $Site_keywords->id  }}">
 
@@ -51,7 +51,51 @@
 @push('pagescript')
 @include('stacks.js.form')
 @include('stacks.js.fullscreen')
-@include('partial.ajaxify')
+<script>
+                $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            $('.formSaving').attr('disabled',true);
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                    
+                    toastr.success(response.data.message, '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
+                    window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    $('.formSaving').attr('disabled',false);
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            }); 
+       
+     
+         
+    });
+</script>
 @endpush
 
 @stack('pagestyle')

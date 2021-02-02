@@ -81,7 +81,7 @@
                 </div>
 
                 <div class="form-group row">
-                    <label style="padding-top: 7px" class="col-lg-3 control-label">Type<span
+                    <label style="padding-top: 7px" class="col-lg-3 control-label">Type Extension<span
                             class="text-danger">*</span></label>
                     <div class="col-lg-8">
                         <select class="js-example-basic-multiple"  name="type" id="type_edit" multiple="multiple"
@@ -201,12 +201,14 @@
                 loading('load');
             },
             success:function(response) {
+                $('#button_save_edit').prop("disabled", true);
                 loading('stop_load');
                 toastr.success(response.message, '@langapp('response_status')');
                 window.location.href = response.redirect;
             },
             error: function (error){
                 loading('stop_load');
+                $('#button_save_edit').prop("disabled", false);
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {

@@ -183,8 +183,9 @@
                     Add Asset
                 </h4>
             </div>
-            <div class="modal-body">
-                <form id='add_asset_click' method="POST">
+            <form id='add_asset_click' method="POST">
+                <div class="modal-body">
+
 
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">OS<span
@@ -207,7 +208,7 @@
                     <div class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">Port</label>
                         <div class="col-lg-8">
-                            <input type="text" id="port" class="form-control check_test" >
+                            <input type="text" id="port" class="form-control check_test">
                         </div>
                     </div>
 
@@ -228,7 +229,8 @@
                             <span style="color:red;"><small id="check_u_p"></small></span>
                         </div>
                         &nbsp;<button type="button" data-toggle="collapse" href="#demo"
-                            class="btn btn-{{ get_option('theme_color')  }}"><i class="fas fa-plus"></i>&nbsp; Add New</button>
+                            class="btn btn-{{ get_option('theme_color')  }}"><i class="fas fa-plus"></i>&nbsp; Add
+                            New</button>
                     </div>
 
                     <div id="demo" class="collapse box">
@@ -325,20 +327,20 @@
 
 
 
-            </div>
+                </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                    <i class="fas fa-times"></i>
-                    Close
-                </button>
-                <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="button_save"
-                    disabled>
-                    <i class="fas fa-paper-plane"></i>
-                    Save
-                    {{-- Yes, approve --}}
-                </button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="button_save"
+                        disabled>
+                        <i class="fas fa-paper-plane"></i>
+                        Save
+                        {{-- Yes, approve --}}
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -398,13 +400,15 @@
         </div>
     </div>
 </div> --}}
-<div class="modal" id="change_fix" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+<div class="modal" id="change_fix" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
+    style="left: unset">
     <div class="modal-dialog modal-dialog-aside" role="document">
         <div class="modal-content">
             <div class="modal-header bg-blue">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title text-white">
-                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                        title="Fullscreen" data-placement="right"></i>
                     Confirm Information
                 </h4>
             </div>
@@ -414,8 +418,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                <button type="button" class="btn btn-info submit btn-rounded change_fix_submit"><i class="fas fa-paper-plane"></i> OK</button>
+                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                        class="fas fa-times text-muted"></i> Close</a>
+                <button type="button" class="btn btn-info submit btn-rounded change_fix_submit"><i
+                        class="fas fa-paper-plane"></i> OK</button>
             </div>
         </div>
     </div>
@@ -640,7 +646,6 @@
                 },
                 success:function(response) {
                     loading('stop_load');
-                    
                     console.log(response.message);
                     
                     if(response.message!=''){   

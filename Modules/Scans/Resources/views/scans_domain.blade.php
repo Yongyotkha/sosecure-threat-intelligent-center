@@ -91,7 +91,7 @@
                 @if($tab == 'asset' )
                 <div class="button-control pull-right">
                     <div class="btn-group">
-                        <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Asset To Use</button>
+                        <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Assets To Use</button>
                     </div>
                     <div class="btn-group">
                         <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i> @langapp('Search_Advance')</a>

@@ -694,7 +694,7 @@
         event.preventDefault();
 
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-            
+            $('.formSaving').attr('disabled',true);
             var data = new FormData(this);
             data.append('site_id', site_id);
 
@@ -719,9 +719,11 @@
             })
             .catch(function (error) {
                 if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
                     toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                     $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
                 }else{
+                    $('.formSaving').attr('disabled',false);
                     var errors = error.response.data.errors;
                     var errorsHtml= '';
                     $.each( errors, function( key, value ) {
