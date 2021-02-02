@@ -240,7 +240,7 @@ class ScansController extends Controller
                 }
             }
         }
-        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => '']);
+        return response()->json(['message' => langapp('changes_saved_successful'), 'error' => '', 'status_code' => '200', 'data' => '']);
     }
 
     /**
