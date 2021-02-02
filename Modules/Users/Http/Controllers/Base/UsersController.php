@@ -13,6 +13,7 @@ use Modules\Users\Entities\UserSite;
 use Modules\Users\Exports\UsersExport;
 use Modules\Users\Jobs\BulkDeleteUsers;
 use Modules\Users\Jobs\GDPRExportData;
+use Modules\Users\Entities\model_has_roles;
 
 abstract class UsersController extends Controller
 {
@@ -46,28 +47,26 @@ abstract class UsersController extends Controller
     public function index()
     {
 
-            $SiteSettings = '';
-            $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+
+        if(@$get_role_custom_first['superadmin'] == 1) {
             $SiteSettings = @$get_role_custom_first['SiteSettings'];
-            $site_id_arr = @$get_role_custom_first['site_id_arr'];
 
-            if(@$get_role_custom_first['superadmin'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['client'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['site_support'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['site_admin'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
-
-            }else if(@$get_role_custom_first['site_client'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
-            }
-
-
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }
 
         $data['SiteSettings'] = $SiteSettings;
         $data['filter'] = $this->request->filter;
@@ -78,36 +77,95 @@ abstract class UsersController extends Controller
 
     public function create()
     {
-            $SiteSettings = '';
-            $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        
+        if(@$get_role_custom_first['superadmin'] == 1) {
             $SiteSettings = @$get_role_custom_first['SiteSettings'];
-            $site_id_arr = @$get_role_custom_first['site_id_arr'];
-            
-            if(@$get_role_custom_first['superadmin'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['client'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['site_support'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['site_admin'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            }else if(@$get_role_custom_first['site_client'] == 1) {
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
-            }
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }
 
         $data['SiteSettings'] = @$SiteSettings;
 
         return view('users::modal.create')->with($data);
     }
 
+    public function edit_new_modal(User $user)
+    {
+        $SiteSettings = '';
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }
+        $data['SiteSettings'] = @$SiteSettings;
+        $data['site_id_arr'] = array_column(@$site_id_arr->toArray(), 'site_id');
+        $data['user'] = $user;
+        $data['role_id'] = model_has_roles::where('model_id',$user->id)->first()->role_id;
+        return view('users::modal.update_user_new')->with($data);
+    }
+
+    public function update_process(){
+        // $password = $request->password;
+        // $password_re = $request->password_re;
+        // $role_id = $request->role_id;
+        // $site_role_id = null;
+        // $site_code = $request->site_code;
+        // $pass = '';
+        // if($password) {
+        //     if($password_re) {
+        //         if($password == $password_re) {
+        //             $pass = $password;
+        //         } else {
+        //             return response()->json(['message' => 'Please make sure your passwords match', 'errors' => ['missing' => ["Please make sure your passwords match"]]], 500);
+        //         }
+
+        //     }
+
+        // }
+        // $email = $request->email;
+        // if($email) {
+        //     $User_check_email = User::where('email',$email)->where('deleted_at',null)->get()->count();
+        //     if($User_check_email > 0) {
+        //         return response()->json(['message' => 'this email address already exist', 'errors' => ['missing' => ["this email address already exist "]]], 500);
+        //     }
+        // }
+
+        // $user->username = $request->email;
+        // $user->active = $request->active ? 1 : 0;
+        // $user->save();
+    }
+
+
     public function edit(User $user)
     {
         $data['user'] = $user;
-
         return view('users::modal.update')->with($data);
     }
 
@@ -365,9 +423,24 @@ abstract class UsersController extends Controller
                 function ($model) {
                     return dateFormatted($model->created_at);
                 }
-            )
-            ->rawColumns(['name', 'chk', 'job_title', 'role', 'user'])
+            )->editColumn('action', function ( $model) {
+
+                $del_button = '<span><a href="'.'#'.'" class="btn btn-xs btn-danger" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a></span>';
+                $edit_button = '<span><a href="' . route("users.edit_new_modal", ["user" => $model->id]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                </a></span>';
+                
+                return $edit_button." ".$del_button;
+                
+            })
+            ->rawColumns(['name', 'chk', 'job_title', 'role', 'user','action'])
             ->make(true);
+
+            //<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>
+            // <a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+            // <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+            // </a
+
     }
 
     protected function applyFilter()

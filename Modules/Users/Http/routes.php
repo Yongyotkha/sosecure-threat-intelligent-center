@@ -6,6 +6,7 @@ Route::group(
         Route::get('/', 'UserCustomController@index')->name('users.index')->middleware('can:menu_users');
 
         Route::get('edit/{user}', 'UserCustomController@edit')->name('users.edit')->middleware('can:users_update');
+        Route::get('edit_new_modal/{user}', 'UserCustomController@edit_new_modal')->name('users.edit_new_modal')->middleware('can:users_update');
         Route::get('permissions/{user}', 'UserCustomController@permissions')->name('users.permissions')->middleware('can:users_update');
         Route::post('permissions/{user}', 'UserCustomController@changePermission')->name('users.changePermission')->middleware('can:users_update');
 
