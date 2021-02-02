@@ -12,7 +12,7 @@
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
              <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px" onchange="changeSite()">
                     <option value="">All Site</option>
                     @if($SiteSettings)
                         @foreach($SiteSettings as $SiteSettings_val)
@@ -223,6 +223,11 @@ function cb(start, end) {
     $('#newsrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
 }
 
+function changeSite(){
+    isSearch = 1;
+    sitecode = $("#site").val();
+    data_table();
+}
 
 function data_table(){
     var myTable = $('#table-monitoring-batchjob').DataTable({

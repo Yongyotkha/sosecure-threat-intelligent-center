@@ -45,33 +45,49 @@ class AssetsController extends Controller
      */
     public function index()
     {
+        //<><><>
+        // if(Auth::check()) {
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(Auth::user()->hasRole('admin')) {//if admin
+        //         // dd(777);
+        //         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
 
-        if(Auth::check()) {
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+        //                 // dd(99);
 
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
-
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
-
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
              
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-                    }
-                }
-            }
+        //             } else {//not support and admin
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
+        //             }
+        //         }
+        //     }
+        // }
+
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
         }
+
 
         if(isset($this->request->Search_Link_All)){
             $data['Search_Link_All'] = $this->request->Search_Link_All;
@@ -89,32 +105,49 @@ class AssetsController extends Controller
 
     public function index_all_asset()
     {
+        //<><><>
+        // if(Auth::check()) {
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(Auth::user()->hasRole('admin')) {//if admin
+        //         // dd(777);
+        //         $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
 
-        if(Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+        //                 // dd(99);
 
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
-
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
              
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-                    }
-                }
-            }
+        //             } else {//not support and admin
+        //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
+        //             }
+        //         }
+        //     }
+        // }
+
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
         }
+
 
         if(isset($this->request->Search_Link_All)){
             $data['Search_Link_All'] = $this->request->Search_Link_All;
@@ -282,38 +315,55 @@ class AssetsController extends Controller
     }
     public function assets_redirect_add(Request $request)
     {
-        if(Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)->get();
+        //<><><>
+        // if(Auth::check()) {
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(Auth::user()->hasRole('admin')) {//if admin
+        //         // dd(777);
+        //         $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)->get();
 
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
+        //     } else { //if notAdmin
+        //         // dd(888);
+        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+        //                 // dd(99);
 
-                        $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
+        //                 $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
              
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-                    }
-                }
-            }
+        //             } else {//not support and admin
+        //                 $SiteSettings = SiteSettings::select('code','name')->where("active",1)->where("deleted_at",null)
+        //                 ->whereIn('id', $site_id_arr)//['49', '56']
+        //                 ->get();
+        //             }
+        //         }
+        //     }
+        // }
+
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
         }
+
         $data['SiteSettings'] = $SiteSettings;
         return view('assets::modal.redirect_add')->with($data);
     }
 
     public function web_server_add_user(Request $request)
     {
-
         $data_search = Credentials::where("name", $request->name)->first();
         if (!$data_search) {
             $data = new Credentials;
