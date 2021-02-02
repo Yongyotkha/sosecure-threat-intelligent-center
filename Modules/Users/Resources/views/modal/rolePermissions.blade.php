@@ -33,7 +33,7 @@
                             <span class="role-click" onclick="openrole(this,'role-{{$i}}')">@if(count($menu->get_menu_sub) > 0)@icon('solid/plus')@else <i class="fas fa-minus icon"></i>  @endif</span>
                             <span class="checkbox chk-inline">
                                 <label>
-                                    @if(in_array($menu->code,$site_menu_permission))
+                                    @if(in_array($menu->code,$role_menu_permission))
                                     @php $checked = 'checked'; @endphp
                                     @else
                                     @php $checked = ''; @endphp
@@ -51,7 +51,7 @@
                                     <div class="role-sub">
                                         <span class="checkbox chk-inline">
                                             <label>
-                                                @if(in_array($menu_sub->code,$site_menu_sub_permission))
+                                                @if(in_array($menu_sub->code,$role_menu_sub_permission))
                                                 @php $checked = 'checked'; @endphp
                                                 @else
                                                 @php $checked = ''; @endphp

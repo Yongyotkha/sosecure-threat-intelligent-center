@@ -99,13 +99,13 @@ class RoleController extends Controller
         foreach ($result_menu_permission as $row) {
             array_push($arr_menu_permission, $row->menu_code);
         }
-        $data['site_menu_permission'] = $arr_menu_permission;
+        $data['role_menu_permission'] = $arr_menu_permission;
 
         $arr_menu_sub_permission = array();
         foreach ($result_menu_sub_permission as $row) {
             array_push($arr_menu_sub_permission, $row->menu_sub_code);
         }
-        $data['site_menu_sub_permission'] = $arr_menu_sub_permission;
+        $data['role_menu_sub_permission'] = $arr_menu_sub_permission;
         $data['menus'] = $Menu;
         
         return view('users::modal.rolePermissions')->with($data);
