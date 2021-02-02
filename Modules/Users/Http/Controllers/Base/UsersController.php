@@ -45,32 +45,29 @@ abstract class UsersController extends Controller
      */
     public function index()
     {
-        $SiteSettings ='';
-        if (Auth::check()) {
 
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if (Auth::user()->hasRole('admin')) { //if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+            $SiteSettings = '';
+            $get_role_custom_first = @get_role_custom();
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            $site_id_arr = @$get_role_custom_first['site_id_arr'];
 
-            } else { //if notAdmin
-                // dd(888);
-                if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-                        // dd(99);
+            if(@$get_role_custom_first['superadmin'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
+            }else if(@$get_role_custom_first['client'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-                    } else { //not support and admin
-                        $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
-                            ->whereIn('id', $site_id_arr) //['49', '56']
-                            ->get();
-                    }
-                }
+            }else if(@$get_role_custom_first['site_support'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+
+            }else if(@$get_role_custom_first['site_admin'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+
+            }else if(@$get_role_custom_first['site_client'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
             }
-        }
+
+
 
         $data['SiteSettings'] = $SiteSettings;
         $data['filter'] = $this->request->filter;
@@ -81,32 +78,27 @@ abstract class UsersController extends Controller
 
     public function create()
     {
-        if(Auth::check()) {
+            $SiteSettings = '';
+            $get_role_custom_first = @get_role_custom();
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            $site_id_arr = @$get_role_custom_first['site_id_arr'];
+            
+            if(@$get_role_custom_first['superadmin'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if(Auth::user()->hasRole('admin')) {//if admin
-                // dd(777);
-                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+            }else if(@$get_role_custom_first['client'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-            } else { //if notAdmin
-                // dd(888);
-                if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                    if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                        // dd(99);
+            }else if(@$get_role_custom_first['site_support'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-             
+            }else if(@$get_role_custom_first['site_admin'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
 
-                    } else {//not support and admin
-                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-                        ->whereIn('id', $site_id_arr)//['49', '56']
-                        ->get();
-                    }
-                }
+            }else if(@$get_role_custom_first['site_client'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
             }
-        }
+
         $data['SiteSettings'] = @$SiteSettings;
 
         return view('users::modal.create')->with($data);
@@ -320,7 +312,7 @@ abstract class UsersController extends Controller
             ->editColumn(
                 'chk',
                 function ($model) {
-                    if ($model->site_role_id == 99 || $model->site_role_id == 6 || $model->site_role_id == null) {
+                    if (@$model->get_model_has_roles->role_id == 6 || @$model->get_model_has_roles->role_id == 1) {
                         return '<label><input type="checkbox" disabled  name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
                     } else {
                         return '<label><input type="checkbox"   name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
@@ -397,11 +389,14 @@ abstract class UsersController extends Controller
         foreach ($request->id as $id_chang) {
 
             $user = User::where("id", '=', $id_chang)->first();
-            if ($user->site_role_id == 99 || $user->site_role_id == null) {
-                $message = '';
-            } else {
+
+
+            
+            if (@$user->get_model_has_roles->role_id != 1 && @$user->get_model_has_roles->role_id != 6) {
                 $data = User::where("id", $id_chang)->delete();
                 $message = langapp('changes_saved_successful');
+            } else {
+                $message = '';
             }
 
         }

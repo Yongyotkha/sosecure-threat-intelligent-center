@@ -192,7 +192,7 @@
                     </div>
                 </div>
 
-                <div class="form-group" id="area_select_site">
+                <div class="form-group" id="area_select_site_multi">
                     <div class="row">
 
                         <div class="col-md-12">
@@ -205,7 +205,33 @@
                             </select> --}}
 
 
-                            <select name="site[]" id="select-site" class="select2-option form-control select-site" multiple="multiple">
+                            <select name="site_multi[]" id="select-site_multi" class="select2-option form-control select-site" multiple="multiple">
+                                {{-- <option value="">Select Site</option> --}}
+                                @if($SiteSettings)
+                                @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="area_select_site" style="display: none;">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <label class="display-block">Site</label>
+                            {{-- <select name="site[]" class="select2-option form-control" multiple="multiple"><!--multiple="multiple"-->
+                                @foreach (Modules\SiteSettings\Entities\SiteSettings::select()->get() as $role)
+                                    <option value="{{ $role->name }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                                @endforeach
+                            </select> --}}
+
+
+                            <select name="site" id="select-site" class="select2-option form-control select-site" disabled>
                                 {{-- <option value="">Select Site</option> --}}
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
@@ -318,11 +344,23 @@
         function check_role(val) {
             console.log(val);
             if(val == 1) {
-                $("#select-site").prop("disabled",true);
+                $("#select-site_multi").val('').trigger('change').prop("disabled",true);
+                $("#area_select_site_multi").css("display","none");
+                $("#select-site").val('').trigger('change').prop("disabled",true);
                 $("#area_select_site").css("display","none");
-            } else {
-                $("#select-site").prop("disabled",false);
+            } else if(val == 4 || val == 5 || val == 6) {
+            
+                $("#select-site_multi").val('').trigger('change').prop("disabled",true);
+                $("#area_select_site_multi").css("display","none");
+
+                $("#select-site").val('').trigger('change').prop("disabled",false);
                 $("#area_select_site").css("display","block");
+            } else {
+                $("#select-site_multi").val('').trigger('change').prop("disabled",false);
+                $("#area_select_site_multi").css("display","block");
+
+                $("#select-site").val('').trigger('change').prop("disabled",true);
+                $("#area_select_site").css("display","none");
             }
         }
 

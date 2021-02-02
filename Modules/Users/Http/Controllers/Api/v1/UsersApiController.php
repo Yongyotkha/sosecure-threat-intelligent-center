@@ -109,9 +109,16 @@ class UsersApiController extends Controller
         if($request->role_id) {
             $model_has_roles = model_has_roles::where('model_id',$user->id)->first();
             if($model_has_roles) {
+                $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
+                if($model_has_roles_q) {
+                    $id_last = $model_has_roles_q->id+1;
+                } else {
+                    $id_last = 1;
+                }
                 $model_has_roles->role_id = $request->role_id;
                 $model_has_roles->model_type = 'Modules\Users\Entities\User';
                 // $model_has_roles->model_id = $User->id;
+                $model_has_roles->id = $id_last;
                 $model_has_roles->save();
             } else {
                 $model_has_roles_q = model_has_roles::select('id')->orderBy('id','desc')->first();
@@ -131,9 +138,17 @@ class UsersApiController extends Controller
         }
 
 
+        $site_value = [];
+            if(!empty($request->site_multi)) {
+                $site_value = $request->site_multi;
+            } 
+            if($request->site) {
+                $site_value[] = $request->site;
+            }
         if($request->role_id == 4 || $request->role_id == 5 || $request->role_id == 6) {
-            if(!empty($request->site)) {
-                foreach($request->site as $site_val) {
+            
+            if(!empty($site_value)) {
+                foreach($site_value as $site_val) {
                     $UserSite = new UserSite;
                     $UserSite->user_id = $user->id;
                     $UserSite->site_id = $site_val;
@@ -175,8 +190,8 @@ class UsersApiController extends Controller
                 }
             }
         } else {
-            if(!empty($request->site)) {
-                foreach($request->site as $site_val) {
+            if(!empty($site_value)) {
+                foreach($site_value as $site_val) {
                     $UserSite = new UserSite;
                     $UserSite->user_id = $user->id;
                     $UserSite->site_id = $site_val;
