@@ -20,6 +20,7 @@ Route::group(
         Route::get('roles', 'RoleController@index')->name('users.roles')->middleware('can:roles_create');
         Route::get('create-role', 'RoleController@create')->name('users.roles.create')->middleware('can:roles_create');
         Route::get('edit-role/{role}', 'RoleController@edit')->name('users.roles.edit')->middleware('can:roles_update');
+        Route::get('role-permission_role/{role}', 'RoleController@permission_role')->name('users.roles.permission_role')->middleware('can:roles_update');
         Route::get('role-permission/{role}', 'RoleController@permission')->name('users.roles.permission')->middleware('can:roles_update');
         Route::post('role-permission/{role}', 'RoleController@changePermission')->name('users.roles.changePerm')->middleware(['can:roles_update', 'demo']);
         Route::get('delete-role/{role}', 'RoleController@delete')->name('users.roles.delete')->middleware('can:roles_delete');

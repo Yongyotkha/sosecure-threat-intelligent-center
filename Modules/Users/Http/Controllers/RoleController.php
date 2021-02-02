@@ -87,6 +87,30 @@ class RoleController extends Controller
     // }
 
 
+    public function permission_role(Role $role)
+    {
+        $data['role'] = $role;
+        // $Menu = Menu::where('deleted_at', null)->whereNotIn('id', [8,9,10])->where('active', 1)->orderBy('order', 'asc')->get();
+        $Menu = Menu::where('deleted_at', null)->where('active', 1)->orderBy('order', 'asc')->get();
+        $result_menu_permission = DB::table("role_menu_permission")->select('menu_code')->where("role_id", $role)->where("deleted_at", null)->get()->toArray();
+        $result_menu_sub_permission = DB::table("role_menu_sub_permission")->select('menu_sub_code')->where("role_id", $role)->where("deleted_at", null)->get()->toArray();
+        
+        $arr_menu_permission = array();
+        foreach ($result_menu_permission as $row) {
+            array_push($arr_menu_permission, $row->menu_code);
+        }
+        $data['role_menu_permission'] = $arr_menu_permission;
+
+        $arr_menu_sub_permission = array();
+        foreach ($result_menu_sub_permission as $row) {
+            array_push($arr_menu_sub_permission, $row->menu_sub_code);
+        }
+        $data['role_menu_sub_permission'] = $arr_menu_sub_permission;
+        $data['menus'] = $Menu;
+        
+        return view('users::modal.rolePermissions')->with($data);
+    }
+
     public function permission(Role $role)
     {
         $data['role'] = $role;
