@@ -16,6 +16,7 @@ use Modules\Users\Entities\permissions;
 use Spatie\Permission\Models\Role;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
+use Artisan;
 class RoleController extends Controller
 {
     /**
@@ -87,25 +88,33 @@ class RoleController extends Controller
     // }
 
 
+    public function permission_role(Role $role)
+    {
+        $data['role'] = $role;
+
+        return view('users::modal.rolePermissions_custom')->with($data);
+    }
+
     public function permission(Role $role)
     {
         $data['role'] = $role;
         // $Menu = Menu::where('deleted_at', null)->whereNotIn('id', [8,9,10])->where('active', 1)->orderBy('order', 'asc')->get();
         $Menu = Menu::where('deleted_at', null)->where('active', 1)->orderBy('order', 'asc')->get();
-        $result_menu_permission = DB::table("role_menu_permission")->select('menu_code')->where("role_id", $role)->where("deleted_at", null)->get()->toArray();
-        $result_menu_sub_permission = DB::table("role_menu_sub_permission")->select('menu_sub_code')->where("role_id", $role)->where("deleted_at", null)->get()->toArray();
+        $result_menu_permission = DB::table("role_menu_permission")->select('menu_code')->where("role_id", @$role->id)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+        $result_menu_sub_permission = DB::table("role_menu_sub_permission")->select('menu_sub_code')->where("role_id", @$role->id)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
         
-        $arr_menu_permission = array();
-        foreach ($result_menu_permission as $row) {
-            array_push($arr_menu_permission, $row->menu_code);
-        }
-        $data['role_menu_permission'] = $arr_menu_permission;
+        // $arr_menu_permission = array();
+        // foreach ($result_menu_permission as $row) {
+        //     array_push($arr_menu_permission, $row->menu_code);
+        // }
+        $data['role_menu_permission'] = $result_menu_permission;
+        // dd($result_menu_permission);
 
-        $arr_menu_sub_permission = array();
-        foreach ($result_menu_sub_permission as $row) {
-            array_push($arr_menu_sub_permission, $row->menu_sub_code);
-        }
-        $data['role_menu_sub_permission'] = $arr_menu_sub_permission;
+        // $arr_menu_sub_permission = array();
+        // foreach ($result_menu_sub_permission as $row) {
+        //     array_push($arr_menu_sub_permission, $row->menu_sub_code);
+        // }
+        $data['role_menu_sub_permission'] = $result_menu_sub_permission;
         $data['menus'] = $Menu;
         
         return view('users::modal.rolePermissions')->with($data);
@@ -191,6 +200,93 @@ class RoleController extends Controller
 
     //     return ajaxResponse($data);
     // }
+
+
+    public function changePermission_custom(Request $request, Role $role)
+    {
+
+        // dd($request);
+        $request->validate(['role_id' => 'required']);
+        $permissions = [];
+        $permissions_id = [];
+        if ($request->has('perm')) {
+            foreach ($request->perm as $key => $value) {
+                $permissions[] = $key;
+                $permissions_id_where = permissions::select('id')->where('name', $key)->first();
+                $permissions_id[] = $permissions_id_where->id;
+            }
+
+            $role_permissions_get = role_permissions::select('id')->where('role_id', $request->role_id)->get();
+            $role_permissions_del = role_permissions::where('role_id', $request->role_id)->delete();
+            if(count($permissions_id) > 0) {
+                $SiteSettings = SiteSettings::select('id')->where('deleted_at',null)->get();
+
+                if($SiteSettings) {
+                    foreach($SiteSettings as $SiteSettings_val) {
+                        if($role_permissions_get) {
+                            foreach($role_permissions_get as $role_permissions_get_val) {
+                                $transaction_client_role_permissions = new transaction_client_role_permissions();
+                                $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
+                                $transaction_client_role_permissions -> transaction_id = $role_permissions_get_val->id;
+                                $transaction_client_role_permissions -> transaction_mode = 'delete';
+                                $transaction_client_role_permissions -> transaction_data_status = 1;
+                                $transaction_client_role_permissions -> status = 1;
+                                $transaction_client_role_permissions -> save();
+                            }
+                        }
+                    }
+                }
+
+
+                foreach($permissions_id as $permissions_id_val) {
+                    $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
+                    if($role_permissions_last) {
+                        $role_permissions_last = $role_permissions_last->id+1;
+                    } else {
+                        $role_permissions_last = 1;
+                    }
+
+                    $role_permissions = new role_permissions;
+                    $role_permissions->permission_id = $permissions_id_val;
+                    $role_permissions->role_id = $request->role_id;
+               
+                    $role_permissions->id = $role_permissions_last;
+                    $role_permissions->save();
+
+                    
+                    if($SiteSettings) {
+
+                        foreach($SiteSettings as $SiteSettings_val) {
+
+                            $transaction_client_role_permissions = new transaction_client_role_permissions();
+                            $transaction_client_role_permissions -> site_id = $SiteSettings_val->id;
+                            $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
+                            $transaction_client_role_permissions -> transaction_mode = 'insert';
+                            $transaction_client_role_permissions -> transaction_data_status = 1;
+                            $transaction_client_role_permissions -> status = 1;
+                            $transaction_client_role_permissions -> save();
+                        }
+                    }
+
+                    
+                }
+            }
+            
+
+
+            // $role->syncPermissions($permissions);
+        } else {
+            $role_permissions_del = role_permissions::where('role_id', $request->role_id)->delete();
+        }
+
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+
+        $data['message']  = langapp('changes_saved_successful');
+        $data['redirect'] = url()->previous();
+
+        return ajaxResponse($data);
+    }
 
 
 

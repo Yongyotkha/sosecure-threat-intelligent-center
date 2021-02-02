@@ -6,16 +6,24 @@
             </div>
             <div class="modal-body">
     
-                {!! Form::open(['route' => ['users.roles.changePerm', $role->id], 'class' => 'bs-example form-horizontal ajaxifyForm_custom']) !!}
+                {!! Form::open(['route' => ['users.roles.changePerm_custom', $role->id], 'class' => 'bs-example form-horizontal ajaxifyForm_custom']) !!}
     
     
                 <input type="hidden" name="role_id" value="{{ $role->id }}">
+                
+                <div class="">
+                    <label>
+                        <input type="checkbox" id="select_all_permission">
+                        <span class="label-text">all <span class="text-muted small">all</span></span>
+                        
+                    </label>
+                </div>
     
-                {{-- @foreach (\Spatie\Permission\Models\Permission::select('name', 'description')->orderBy('name', 'asc')->get() as $permission)
+                @foreach (\Spatie\Permission\Models\Permission::select('name', 'description')->orderBy('name', 'asc')->get() as $permission)
 
                     <div class="">
                         <label>
-                            <input type="checkbox" name="perm[{{ $permission->name }}]" {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
+                            <input type="checkbox" class="input_permission" name="perm[{{ $permission->name }}]" {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}>
                             <span class="label-text">{{ humanize($permission->name) }} - <span class="text-muted small">{{ $permission->description }}</span></span>
                         </label>
                     </div>
@@ -23,56 +31,7 @@
     
                 <div class="line line-dashed line-lg pull-in"></div>
     
-                @endforeach --}}
-
-                <ul class="role-group">
-                    @php  $i=1;  @endphp
-                    @foreach($menus AS $menu)
-                    <li>
-                        <div class="role-main">
-                            <span class="role-click" onclick="openrole(this,'role-{{$i}}')">@if(count($menu->get_menu_sub) > 0)@icon('solid/plus')@else <i class="fas fa-minus icon"></i>  @endif</span>
-                            <span class="checkbox chk-inline">
-                                <label>
-                                    @if(in_array($menu->code,$role_menu_permission))
-                                    @php $checked = 'checked'; @endphp
-                                    @else
-                                    @php $checked = ''; @endphp
-                                    @endif
-                                    <input type="checkbox" name="menu[]" {{$checked}} {{--checked=""--}} value="{{$menu->code}}">
-                                    <span class="label-text" data-rel="tooltip" title="">{{$menu->name}}</span>
-                                </label>
-                            </span>
-                        </div>
-                        
-                        @if(count($menu->get_menu_sub) > 0)
-                            <ul id="role-{{$i}}" class="role-group-sub">
-                            @foreach($menu->get_menu_sub as $menu_sub) 
-                                <li>
-                                    <div class="role-sub">
-                                        <span class="checkbox chk-inline">
-                                            <label>
-                                                @if(in_array($menu_sub->code,$role_menu_sub_permission))
-                                                @php $checked = 'checked'; @endphp
-                                                @else
-                                                @php $checked = ''; @endphp
-                                                @endif
-                                                <input type="checkbox" name="menu_sub[]" {{$checked}} {{--checked=""--}} value="{{$menu_sub->code}}">
-                                                <span class="label-text" data-rel="tooltip" title="">{{$menu_sub->name}}</span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </li>
-                            @endforeach
-                            </ul>
-                        @endif
-                        
-
-                    </li>
-                    @php $i++; @endphp
-                    @endforeach
-                    
-                </ul>
-                
+                @endforeach
     
                 <div class="modal-footer">
                     {!! closeModalButton() !!}
@@ -91,9 +50,15 @@
 
 
     <script>
-       function openrole(onck,id){
-            $('#'+id).slideToggle(150);
-        }
+
+        $("#select_all_permission").click(function() {
+            if($(this).is(":checked")) {
+                $(".input_permission").prop("checked", true);
+            } else {
+                $(".input_permission").prop("checked", false);
+            }   
+        });
+       
         var form_save = '.formSaving';
         $('.formSavingAndRun').click(function() {
             form_save = '.formSavingAndRun';

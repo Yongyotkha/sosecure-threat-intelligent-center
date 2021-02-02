@@ -263,6 +263,9 @@ class UsersSettingsController extends Controller
                         $transaction_client_model_has_roles -> status = 1;
                         $transaction_client_model_has_roles -> save();
                     }
+
+                    Artisan::call('cache:clear');
+                    Artisan::call('config:clear');
             
             
                         $this->summary = [
@@ -512,7 +515,8 @@ class UsersSettingsController extends Controller
 
         
 
-
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
 
         
 
@@ -704,7 +708,8 @@ class UsersSettingsController extends Controller
         }
 
 
-
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
         
 
         // $site_code = $this->siteSettings->find_code($model->site_id);
@@ -1155,6 +1160,9 @@ class UsersSettingsController extends Controller
                 
             }
         }
+
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
         
         return ajaxResponse(
             [
