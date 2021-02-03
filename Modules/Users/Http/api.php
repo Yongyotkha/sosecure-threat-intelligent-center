@@ -6,7 +6,9 @@ Route::group(
         Route::get('users', 'UsersApiController@index')->name('users.api.index')->middleware('can:menu_users');
         Route::post('users/{id}/ban', 'UsersApiController@ban')->name('users.api.ban')->middleware(['can:users_update', 'demo']);
         Route::put('users/{id}', 'UsersApiController@update')->name('users.api.update')->middleware(['can:users_update', 'demo']);
+        Route::put('users_update_process/{id}', 'UsersApiController@update_process')->name('users.api.update_process')->middleware(['can:users_update', 'demo']);
         Route::delete('users/{id}', 'UsersApiController@delete')->name('users.api.delete')->middleware('can:users_delete');
+        Route::delete('users_delete_all_process/{id}', 'UsersApiController@delete_all_process')->name('users.api.delete_all_process')->middleware('can:users_delete');
         Route::post('users', 'UsersApiController@save')->name('users.api.save')->middleware('can:users_create');
 
         Route::post('announcements', 'AnnouncementsApiController@save')->name('announcements.api.save')->middleware('can:announcements_create');

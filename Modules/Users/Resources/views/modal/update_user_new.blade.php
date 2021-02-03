@@ -10,9 +10,9 @@
     
                 <div class="panel-body">
     
-                {!! Form::open(['route' => 'users.api.save', 'class' => 'bs-example form-horizontal ajaxifyForm_custom']) !!}
+                {!! Form::open(['route' => ['users.api.update_process', $user->id], 'class' => 'bs-example form-horizontal ajaxifyForm_custom', 'method' => 'PUT']) !!}
                    
-    
+                    <input class="display-none" value="{{$user->code}}" type="hidden" name="user_code"/>
                     {{-- <input class="display-none" type="hidden" name="username"/>
                     <input class="display-none" type="hidden" name="password"/> --}}
     
@@ -40,16 +40,17 @@
                     <div class="row">
                         <div class="col-md-12">
                             <label class="display-block">@langapp('roles')</label>
-                            <select name="role_id" class="select2-option form-control" onchange="check_role(value)" ><!--multiple="multiple"-->
+                            <select name="role_id" id="role_select" class="select2-option form-control" onchange="check_role(value)" ><!--multiple="multiple"-->
+                                <option value="" selected>- SELECT ROLE -</option>
                                 @foreach (Role::whereNotIn('id', [3])->get() as $role)
-                                    <option value="{{ $role->id }}" {{  $role->id == $role_id ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                                    <option value="{{ $role->id }}" {{  $role->id == @$role_id ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group" id="area_select_site_multi">
+                <div class="form-group" id="area_select_site_multi" style="display: none;">
                     <div class="row">
                         <div class="col-md-12">
                             <label class="display-block">Site</label>
@@ -64,7 +65,31 @@
                         </div>
                     </div>
                 </div>
-                
+                <div class="form-group" id="area_select_site" style="display: none;">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <label class="display-block">Site</label>
+                            {{-- <select name="site[]" class="select2-option form-control" multiple="multiple"><!--multiple="multiple"-->
+                                @foreach (Modules\SiteSettings\Entities\SiteSettings::select()->get() as $role)
+                                    <option value="{{ $role->name }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                                @endforeach
+                            </select> --}}
+
+
+                            <select name="site" id="select-site" class="select2-option form-control select-site" disabled>
+                                {{-- <option value="">Select Site</option> --}}
+                                @if($SiteSettings)
+                                @foreach($SiteSettings as $SiteSettings_val)
+                                <option {{in_array($SiteSettings_val->id, $site_id_arr) ? 'selected':''}} value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
                 <button class="btn btn-info mb-2" type="button" id="ch_pass" data-val="0" data-toggle="collapse" data-target="#collapse_ch_pass" aria-expanded="false" aria-controls="collapse_ch_pass">
                     Edit Password
                 </button>
@@ -147,6 +172,7 @@
                     $(this).data("val",0);
                 }
             });
+            check_role_first({{@json_encode(@$role_id)}});
         });
 
         
@@ -208,29 +234,56 @@
 
 
         function check_role(val) {
-            console.log(val);
-            if(val == 1) {
+
+            if(val){
+                if(val == 1) {
+                    $("#select-site_multi").val('').trigger('change').prop("disabled",true);
+                    $("#area_select_site_multi").css("display","none");
+                    $("#select-site").val('').trigger('change').prop("disabled",true);
+                    $("#area_select_site").css("display","none");
+                } else if(val == 4 || val == 5 || val == 6) {
+                    $("#select-site_multi").val('').trigger('change').prop("disabled",true);
+                    $("#area_select_site_multi").css("display","none");
+
+                    $("#select-site").val('').trigger('change').prop("disabled",false);
+                    $("#area_select_site").css("display","block");
+                } else {
+                    $("#select-site_multi").val('').trigger('change').prop("disabled",false);
+                    $("#area_select_site_multi").css("display","block");
+
+                    $("#select-site").val('').trigger('change').prop("disabled",true);
+                    $("#area_select_site").css("display","none");
+                }
+            }else{
                 $("#select-site_multi").val('').trigger('change').prop("disabled",true);
                 $("#area_select_site_multi").css("display","none");
-                $("#select-site").val('').trigger('change').prop("disabled",true);
-                $("#area_select_site").css("display","none");
-            } else if(val == 4 || val == 5 || val == 6) {
-            
-                $("#select-site_multi").val('').trigger('change').prop("disabled",true);
-                $("#area_select_site_multi").css("display","none");
-
-                $("#select-site").val('').trigger('change').prop("disabled",false);
-                $("#area_select_site").css("display","block");
-            } else {
-                $("#select-site_multi").val('').trigger('change').prop("disabled",false);
-                $("#area_select_site_multi").css("display","block");
-
                 $("#select-site").val('').trigger('change').prop("disabled",true);
                 $("#area_select_site").css("display","none");
             }
         }
 
+        function check_role_first(val) {
+            if(val){
+                if(val == 1) {
+                    $("#select-site_multi").val('').trigger('change').prop("disabled",true);
+                    $("#area_select_site_multi").css("display","none");
+                    $("#select-site").val('').trigger('change').prop("disabled",true);
+                    $("#area_select_site").css("display","none");
+                } else if(val == 4 || val == 5 || val == 6) {
+                    $("#select-site_multi").val('').trigger('change').prop("disabled",true);
+                    $("#select-site").prop("disabled",false);
+                    $("#area_select_site_multi").css("display","none");
+                    $("#area_select_site").css("display","block");
+                } else {
+                    $("#select-site").val('').trigger('change').prop("disabled",true);
+                    $("#select-site_multi").prop("disabled",false);
+                    $("#area_select_site_multi").css("display","block");
+                    $("#area_select_site").css("display","none");
+                }
+            }
+            
 
+        }
 
     </script>
 
