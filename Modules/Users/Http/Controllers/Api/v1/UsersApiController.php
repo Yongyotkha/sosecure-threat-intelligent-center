@@ -102,6 +102,9 @@ class UsersApiController extends Controller
         $user->site_role_id = $request->role_id;
         $user->active = $request->active ? 1 : 0;
         $user->site_add_user_token = generator_uuid();
+        if($request->site) {
+            $user->site_id = $request->site;
+        }
         $user->save();
         $user->profile->update($request->except(['email', 'roles', 'name', 'site', 'active']));
 

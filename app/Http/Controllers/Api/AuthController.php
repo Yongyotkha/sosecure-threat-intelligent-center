@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\ApiController;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 use App\Menu;
 use App\Menu_sub;
 use App\Menu_permission_site;
@@ -37,12 +38,19 @@ class AuthController extends ApiController
             $data_key = json_decode($data, true);
             // 
 
+            $user_check = User::where('email', $data_key['email'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1)->first();
+            $UserSite = UserSite::where('user_id',@$user_check->id)->where('active',1)->get()->pluck('site_id')->toArray();
+
             $role_status = 0;
             $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1);
             $user = $user->where(function($q) {
                 $q->whereNull('password_time_expire');
                 $q->orWhereDate('password_time_expire', '<=', date('Y-m-d H:i:s'));
             });
+            $user = $user->whereHas('get_user_site_many', function($q) use ($UserSite) {
+                $q->whereIn('site_id', $UserSite);
+            });
+
             $user = $user->first();
             $model_has_roles = model_has_roles::where('role_id',@$user->get_model_has_roles->role_id)->first();
             if($model_has_roles) {
