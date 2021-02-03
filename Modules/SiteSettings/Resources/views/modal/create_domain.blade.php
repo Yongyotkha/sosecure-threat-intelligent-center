@@ -231,7 +231,7 @@
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
                         
-                        <input type="checkbox" name="default" value="TRUE" {{$Domain ? '' : 'disabled checked'}} >
+                        <input type="checkbox" name="default" id="input_default" value="TRUE" {{$Domain ? '' : 'disabled checked'}} >
 
                         <span></span>
                     </label>
@@ -333,6 +333,8 @@
     $('.ajaxifyForm_custom').submit(function (event) {
         event.preventDefault();
 
+        $("#input_default").prop("disabled",false);
+
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
             $('.formSaving').attr('disabled',true);
             
@@ -344,6 +346,9 @@
             }else if(form_save == '.formDraft'){
                 data.append('formsubmit', 'formDraft');
             }
+
+            
+
             axios.post($(this).attr("action"), data)
                 .then(function (response) {
                     
