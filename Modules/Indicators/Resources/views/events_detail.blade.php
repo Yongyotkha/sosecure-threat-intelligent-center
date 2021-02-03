@@ -80,6 +80,14 @@
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_attributes">
                         <section class="panel panel-default">
+                            <header class="panel-heading font-bold panel-header-blue">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <i class="fas fa-table"></i> Table Attributes
+                                    </div>
+                                </div>
+                            </header>
+                            <div class="panel-body">
                             <div id="main-list" class="row m-b-md">
                                 <div class="col-md-12">
                                     <div class="table-responsive">
@@ -104,45 +112,54 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div id="showing_amount_text" class="pull-left"
-                                        style="margin-top: 5px; margin-left: 15px;"></div>
-                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom">
-                                    </div>
+                                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;"></div>
+                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
                                 </div>
+                            </div>
                         </section>
                     </div>
                     <div class="tab-pane" id="tab_related_event">
                         <section class="panel panel-default">
-                            <div class="row m-b-md">
-                                <div class="col-sm-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped" id="table-related-event">
-                                            <thead>
-                                                <tr>
-
-                                                    <th>No</th>
-                                                    <th>Event Name</th>
-                                                    <th>Group</th>
-                                                    <th>Tags</th>
-                                                    <th>Published</th>
-                                                    <th>Last Status</th>
-                                                    <th style="width: 200px;">DateTime</th>
-                                                    <th>Attribute</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div id="showing_amount_text_pulse" class="pull-left"
-                                        style="margin-top: 5px; margin-left: 15px;"></div>
-                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom_pulse">
+                            <header class="panel-heading font-bold panel-header-blue">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <i class="fas fa-table"></i> Table Related Event
                                     </div>
                                 </div>
-                        </section>
-                    </div>
+                            </header>
+                            <div class="panel-body">
+                                <div class="row m-b-md">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" id="table-related-event">
+                                                <thead>
+                                                    <tr>
+
+                                                        <th>No</th>
+                                                        <th>Event Name</th>
+                                                        <th>Group</th>
+                                                        <th>Tags</th>
+                                                        <th>Published</th>
+                                                        <th>Last Status</th>
+                                                        <th style="width: 200px;">DateTime</th>
+                                                        <th>Attribute</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="showing_amount_text_pulse" class="pull-left"
+                                            style="margin-top: 5px; margin-left: 15px;"></div>
+                                        <div class="pull-right" style="padding-right: 10px;" id="pagination_custom_pulse">
+                                        </div>
+                                    </div>
+                        
+                                </div>
+                            </div>
+                    </section>
                 </div>
             </div>
         </section>
