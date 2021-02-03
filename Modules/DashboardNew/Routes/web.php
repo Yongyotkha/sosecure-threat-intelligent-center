@@ -11,8 +11,8 @@
 |
 */
 Route::group(
-    ['middleware' => ['web', 'installed'], 'prefix' => 'dashboardnew'], function () {
-        Route::get('/', 'DashboardNewController@index')->name('dashboardnew.index')->middleware('can:menu_items');
+    ['middleware' => ['web', 'installed', 'permission:dashboard'], 'prefix' => 'dashboardnew'], function () {
+        Route::get('/', 'DashboardNewController@index')->name('dashboardnew.index')->middleware('can:menu_items');//->middleware('can:menu_items','role:admin','permission:dashboard')
         Route::post('load_chart', 'DashboardNewController@load_chart')->name('dashboardnew.load_chart')->middleware('can:menu_items');
         Route::post('count_asset', 'DashboardNewController@count_asset')->name('dashboardnew.count_asset')->middleware('can:menu_items');
         Route::post('count_vulnerability', 'DashboardNewController@count_vulnerability')->name('dashboardnew.count_vulnerability')->middleware('can:menu_items');
