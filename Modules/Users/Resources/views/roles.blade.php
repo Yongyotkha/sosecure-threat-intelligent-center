@@ -47,6 +47,8 @@
                                         </td>
                                         <td class="nowrap">
                                             
+                                            {{-- @if($role->id != 1 && $role->id != 2 && $role->id != 4 && $role->id != 5) --}}
+                                            
                                             <a href="{{ route('users.roles.permission_custom', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/shield-alt')
                                             </a>
@@ -61,7 +63,8 @@
                                             <a href="{{ route('users.roles.delete', ['id' => $role->id]) }}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/trash-alt')
                                             </a>
-                                            
+                                            {{-- @endif --}}
+                                       
                                             
                                         </td>
                                         
