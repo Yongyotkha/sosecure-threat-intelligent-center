@@ -4,7 +4,7 @@
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')  - {{ $user->name }}</h4>
         </div>
-        {!! Form::open(['route' => ['user.update', 'id' => $user->code], 'class' => 'ajaxifyForm_custom validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+        {!! Form::open(['route' => ['user.update', 'id' => $user->code], 'class' => 'ajaxifyForm_custom', 'method' => 'PUT', 'files' => true]) !!}
 
         <input type="hidden" name="id" value="{{  $user->id  }}">
         <input type="hidden" name="site_code" value="{{  @$site_code  }}">
@@ -15,13 +15,13 @@
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="email" class="form-control" name="username" value="<?=@$user->email;?>">
+                    <input type="email" class="form-control" name="username" value="<?=@$user->email;?>" required>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <input type="text" class="form-control" name="name" value="<?=@$user->name;?>">
+                    <input type="text" class="form-control" name="name" value="<?=@$user->name;?>" required>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
             <div class="form-group row">
                 <label class="col-lg-4 control-label">Role <span class="text-danger">*</span> </label>
                 <div class="col-lg-8">
-                    <select name="role_id" id="role" class="select2-option form-control">
+                    <select name="role_id" id="role" class="select2-option form-control" required>
                         {{-- <option value="1">Admin</option>
                         <option value="2">User</option>
                         <option value="3">Customer</option> --}}
@@ -131,7 +131,7 @@
             event.preventDefault();
     
                 $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-                
+                $('.formSaving').attr('disabled',true);
                 var data = new FormData(this);
                 if(form_save == '.formSavingAndRun'){
                     data.append('formsubmit', 'formSavingAndRun');
@@ -147,6 +147,7 @@
                             window.location.href = response.data.redirect;
                 })
                 .catch(function (error) {
+                    $('.formSaving').attr('disabled',false);
                     if(error.response.data.exception){
                         toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                         $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');

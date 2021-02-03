@@ -704,6 +704,7 @@
             assets: values,
             assets_data: res,
         }).then(function (response) {
+            toastr.success(response.data.message, '@langapp('response_status')');
             $('#table-assets-template').DataTable().ajax.reload();
             {{--$('#table-scans-data-assets').DataTable().ajax.reload();--}}
             $('#asset-to-use').prop("disabled", true);

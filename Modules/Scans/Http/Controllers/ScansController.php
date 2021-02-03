@@ -174,9 +174,12 @@ class ScansController extends Controller
 
     public function save_assets_new(Request $request)
     {
+        
         foreach ($request->assets as $data) {
             $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
+            
             if (!$Assets) {
+              
                 $Assets = new Assets;
                 $Assets->code = generator_uuid();
                 $Assets->created_by = Auth::user()->id;
