@@ -18,6 +18,8 @@ use Modules\SiteSettings\Entities\Tags_site;
 use Modules\SiteSettings\Jobs\BulkDeleteSiteSettings;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use Modules\Users\Entities\model_has_roles;
+use App\transaction_client_model_has_roles;
 use App\CredentialsController;
 use App\transaction_client_profiles;
 use App\transaction_client_site;
@@ -302,7 +304,7 @@ class SiteSettingsController extends Controller
                     $id_last = 1;
                 }
 
-                $model_has_roles->role_id = $role_id;
+                $model_has_roles->role_id = 6;
                 $model_has_roles->model_type = 'Modules\Users\Entities\User';
                 // $model_has_roles->model_id = $User->id;
                 $model_has_roles->id = $id_last;
@@ -316,7 +318,7 @@ class SiteSettingsController extends Controller
                 }
                 
                 $model_has_roles = new model_has_roles;
-                $model_has_roles->role_id = $role_id;
+                $model_has_roles->role_id = 6;
                 $model_has_roles->model_type = 'Modules\Users\Entities\User';
                 $model_has_roles->model_id = $User->id;
                 $model_has_roles->id = $id_last;
@@ -437,33 +439,35 @@ class SiteSettingsController extends Controller
 
         if ($request->page_setting == 'site_settings') {
             SiteCategory::where('site_id', $SiteSettings->id)->delete();
-            foreach ($request->category as $category) {
-                $SiteCategory_check = SiteCategory::where('site_id', $SiteSettings->id)->where("category_id", $category)->first();
-                if ($SiteCategory_check) {
+            if(!empty($request->category)) {
+                foreach ($request->category as $category) {
+                    $SiteCategory_check = SiteCategory::where('site_id', $SiteSettings->id)->where("category_id", $category)->first();
+                    if ($SiteCategory_check) {
 
-                } else {
-                    $SiteCategory = new SiteCategory;
-                    $SiteCategory->site_id = $SiteSettings->id;
-                    $SiteCategory->category_id = $category;
-                    $SiteCategory->save();
+                    } else {
+                        $SiteCategory = new SiteCategory;
+                        $SiteCategory->site_id = $SiteSettings->id;
+                        $SiteCategory->category_id = $category;
+                        $SiteCategory->save();
 
-                    $transaction_client_site_category = transaction_client_site_category::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteCategory->id)->first();
-                    if($transaction_client_site_category){
-                        $transaction_client_site_category -> transaction_mode = 'update';
-                        $transaction_client_site_category -> transaction_data_status = 1;
-                        $transaction_client_site_category -> status = 1;
-                        $transaction_client_site_category -> save();
-                    }else{
-                        $transaction_client_site_category = new transaction_client_site_category();
-                        $transaction_client_site_category -> site_id = $SiteSettings->id;
-                        $transaction_client_site_category -> transaction_id = $SiteCategory->id;
-                        $transaction_client_site_category -> transaction_mode = 'update';
-                        $transaction_client_site_category -> transaction_data_status = 1;
-                        $transaction_client_site_category -> status = 1;
-                        $transaction_client_site_category -> save();
+                        $transaction_client_site_category = transaction_client_site_category::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteCategory->id)->first();
+                        if($transaction_client_site_category){
+                            $transaction_client_site_category -> transaction_mode = 'update';
+                            $transaction_client_site_category -> transaction_data_status = 1;
+                            $transaction_client_site_category -> status = 1;
+                            $transaction_client_site_category -> save();
+                        }else{
+                            $transaction_client_site_category = new transaction_client_site_category();
+                            $transaction_client_site_category -> site_id = $SiteSettings->id;
+                            $transaction_client_site_category -> transaction_id = $SiteCategory->id;
+                            $transaction_client_site_category -> transaction_mode = 'update';
+                            $transaction_client_site_category -> transaction_data_status = 1;
+                            $transaction_client_site_category -> status = 1;
+                            $transaction_client_site_category -> save();
+                        }
                     }
-                }
 
+                }
             }
             Tags_site::where('site_id', $SiteSettings->id)->delete();
             if ($request->tag) {
