@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="form-group row">
-                    <div class="col-lg-12 text-center">
+                    <div class="col-lg-12">
                         <button class="btn btn-info" onclick="add_row()">Add</button>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
         <div class="form-group row">
             <label class="col-lg-3 control-label"></label>
             <div class="col-lg-9">
-                <button class="btn btn-success btn-block" onclick="run_command()"><i class="fas fa-play"></i>&nbsp; Run</button>
+                <button class="btn btn-success" onclick="run_command()"><i class="fas fa-play"></i>&nbsp; Run</button>
             </div>
         </div>
         <div class="form-group row">
@@ -192,7 +192,7 @@
 
 
         <div class="form-group row">
-            <div class="col-lg-12 text-center">
+            <div class="col-lg-12">
                 <button class="btn btn-info" onclick="add_row_command()">Add</button>
             </div>
         </div>
