@@ -772,7 +772,7 @@
         event.preventDefault();
 
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-            
+            $('.formSaving').attr('disabled',true);
             var data = new FormData(this);
             data.append('channel', 'main_webdefacement');
 
@@ -792,10 +792,10 @@
                 .then(function (response) {
                         toastr.success(response.data.message, '@langapp('response_status') ');
                         $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                        console.log(response.data.redirect);
                         window.location.href = response.data.redirect;
             })
             .catch(function (error) {
+                $('.formSaving').attr('disabled',false);
                 if(error.response.data.exception){
                     toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                     $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');

@@ -8,7 +8,7 @@
             </h4>
         </div>
        
-        {!! Form::open(['route' => ['user.save',$code], 'class' => 'ajaxifyForm_custom validator', 'novalidate' => '', 'files' => true]) !!}
+        {!! Form::open(['route' => ['user.save',$code], 'class' => 'ajaxifyForm_custom','files' => true]) !!}
         <div class="modal-body">
             {{-- <div class="form-group row">
                 <label class="col-lg-2 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
@@ -19,13 +19,13 @@
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Name <!--<span class="text-danger">*</span>--> </label>
                 <div class="col-lg-10">
-                    <input type="text" class="form-control" name="name">
+                    <input type="text" class="form-control" name="name" required>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Email <span class="text-danger">*</span> </label>
                 <div class="col-lg-10">
-                    <input type="email" class="form-control" name="email">
+                    <input type="email" class="form-control" name="email" required>
                 </div>
             </div>
             {{-- <div class="form-group row">
@@ -43,7 +43,7 @@
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Role <span class="text-danger">*</span> </label>
                 <div class="col-lg-10">
-                    <select name="role_id" id="role" class="select2-option form-control">
+                    <select name="role_id" id="role" class="select2-option form-control" required>
                         {{-- <option value="1">Admin</option>
                         <option value="2">User</option> --}}
 
@@ -151,7 +151,7 @@
             event.preventDefault();
     
                 $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-                
+                $('.formSaving').attr('disabled',true);
                 var data = new FormData(this);
                 if(form_save == '.formSavingAndRun'){
                     data.append('formsubmit', 'formSavingAndRun');
@@ -167,6 +167,7 @@
                             window.location.href = response.data.redirect;
                 })
                 .catch(function (error) {
+                    $('.formSaving').attr('disabled',false);
                     if(error.response.data.exception){
                         toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                         $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');

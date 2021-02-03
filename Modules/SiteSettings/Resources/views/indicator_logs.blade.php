@@ -351,6 +351,7 @@ $('.ajaxifyForm_custom1').submit(function (event) {
     let form_save = '.formSaving1';
     event.preventDefault();
     $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+    $('.formSaving').attr('disabled',true);
     var data = new FormData(this);
     if(form_save == '.formSavingAndRun'){
         data.append('formsubmit', 'formSavingAndRun');
@@ -366,6 +367,7 @@ $('.ajaxifyForm_custom1').submit(function (event) {
                 window.location.href = response.data.redirect;
     })
     .catch(function (error) {
+        $('.formSaving').attr('disabled',false);
         if(error.response.data.exception){
             toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
             $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
