@@ -25,6 +25,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Emails\SiteCreateUserMail;
+use Artisan;
 
 class UsersSettingsController extends Controller
 {

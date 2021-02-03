@@ -402,6 +402,10 @@ class RoleController extends Controller
 
         //     // $role->syncPermissions($permissions);
         // }
+
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        
         $data['message']  = langapp('changes_saved_successful');
         $data['redirect'] = url()->previous();
 
