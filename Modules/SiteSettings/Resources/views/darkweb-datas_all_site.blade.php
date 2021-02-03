@@ -470,9 +470,10 @@ active_btn('#groupby-type .btn-grey');
             f_search = 0;
         }
 
+
         $.ajax({
             type:"POST",
-            url:'{!! site_url('darkweb/count_val') !!}',
+            url: '{!! route('darkweb.count_val') !!}',
             data: ({
                 keywords : keywords,
                 site_id : site,

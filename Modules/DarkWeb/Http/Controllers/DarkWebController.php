@@ -498,7 +498,7 @@ class DarkWebController extends Controller
 
         
 
-        if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request ->check_type) ){
+        if(  $request -> f_search == 1 && ($request -> keywords || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request ->check_type) ){
 
             $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
@@ -512,11 +512,11 @@ class DarkWebController extends Controller
                 $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
             }
 
-            if($request -> title){
-                $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
+            if($request -> keywords){
+                $model = $model->where('keyword', 'LIKE', '%' . $request->keywords . '%');
                 // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
                 // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
+                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> keywords.'%');
             }
 
             
@@ -548,38 +548,37 @@ class DarkWebController extends Controller
 
 
 
-            if(Auth::check()) {
+            // if(Auth::check()) {
 
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if(Auth::user()->hasRole('admin')) {//if admin
-                    // dd(777);
+            //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            //     if(Auth::user()->hasRole('admin')) {//if admin
+            //         // dd(777);
                     
     
-                } else { //if notAdmin
-                    // dd(888);
-                    if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-                        if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-                            // dd(99);
+            //     } else { //if notAdmin
+            //         // dd(888);
+            //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+            //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+            //                 // dd(99);
     
-                            $model = $model->whereIn('site_id', $site_id_arr);
+            //                 $model = $model->whereIn('site_id', $site_id_arr);
             
-                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+            //                 $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                  
     
-                        } else {//not support and admin
-                            $model = $model->whereIn('site_id', $site_id_arr);
+            //             } else {//not support and admin
+            //                 $model = $model->whereIn('site_id', $site_id_arr);
             
-                            $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                        }
-                    }
-                }
-            }
+            //                 $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+            //             }
+            //         }
+            //     }
+            // }
 
 
 
             if($site_id) {
                 $model = $model->where('site_id', $site_id);
-
                 $countGroupBy = $countGroupBy->where('site_id', $site_id);
             }
 
