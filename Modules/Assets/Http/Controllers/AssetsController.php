@@ -599,8 +599,14 @@ class AssetsController extends Controller
         }
         $dataOut["data"] =  $Assets_list;
         $dataOut["countAssets"] = @AssetsData::where('data_type_id', 5)->orWhere('data_type_id', 6)->where('status', 1)->count();
-        $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
-        $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
+        // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
+        $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q){
+                                    $q->where('os_type', 1);
+                                })->count();
+        // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
+        $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
+                                    $q->where('os_type', 2);
+                                })->count();
         return response()->json($dataOut);
     }
 
