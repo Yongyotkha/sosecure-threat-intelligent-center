@@ -158,7 +158,7 @@ class RegisterSiteController extends ApiController
                 $site = SiteSettings::where('id', $site['data']['id'])->first(); 
                 $site->laravel_version = $data_key['laravel_version'];
                 $site->os = $data_key['os'];
-                $site->server_time = $data_key['server_time']['date'];
+                $site->server_time = $data_key['server_time'] ? $data_key['server_time']['date'] : '';
                 $site->php_version = $data_key['php_version'];
                 $site->code_version = $data_key['code_version'];
                 $site->time_zone = $data_key['timezone'];
