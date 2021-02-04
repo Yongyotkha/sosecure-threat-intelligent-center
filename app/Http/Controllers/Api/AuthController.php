@@ -55,11 +55,11 @@ class AuthController extends ApiController
             $model_has_roles = model_has_roles::where('role_id',@$user->get_model_has_roles->role_id)->first();
             if($model_has_roles) {
                 if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
-                    $role_status = 1;
-                } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
                     $role_status = 0;
-                } else {
+                } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
                     $role_status = 1;
+                } else {
+                    $role_status = 0;
                 }
             }
 
