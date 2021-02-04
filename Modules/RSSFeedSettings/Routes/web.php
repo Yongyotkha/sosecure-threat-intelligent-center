@@ -11,7 +11,7 @@
 |
 */
 Route::group(
-    ['middleware' => 'web', 'prefix' => 'rssfeedsettings'],
+    ['middleware' => ['web', 'permission:news'], 'prefix' => 'rssfeedsettings'],
     function () {
         Route::get('/', 'RSSFeedSettingsController@index')->name('rssfeedsettings.index')->middleware('can:menu_items');
         Route::get('/rss_logs', 'RSSFeedSettingsController@rss_logs')->name('rssfeedsettings.rss_logs')->middleware('can:menu_items');

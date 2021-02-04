@@ -493,14 +493,12 @@
 <script>
     $(document).ready(function () {
         {
-            {
-                --$('.datetimepicker-input').datetimepicker({
+            {--$('.datetimepicker-input').datetimepicker({
                     showClose: true,
                     showClear: true,
                     minDate: moment().add(-1, 'days')
                 });
-                --
-            }
+                --}
         }
         $('.datetimepicker-input').datetimepicker({
             showClose: true,
@@ -531,11 +529,9 @@
             success: function (response) {
                 loading('stop_load');
                 if (response.status === true) {
-                    toastr.success(response.message, '@langapp('
-                        response_status ')');
+                    toastr.success(response.message, '@langapp('response_status ')');
                 } else {
-                    toastr.error(response.message, '@langapp('
-                        response_status ')');
+                    toastr.error(response.message, '@langapp('response_status ')');
                 }
 
             },
@@ -546,8 +542,7 @@
                 $.each(errors, function (key, value) {
                     errorsHtml += '<li>' + value[0] + '</li>';
                 });
-                toastr.error(errorsHtml, '@langapp('
-                    response_status ') ');
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
             }
         });
     }
@@ -563,11 +558,9 @@
             success: function (response) {
                 loading('stop_load');
                 if (response.status === true) {
-                    toastr.success(response.message, '@langapp('
-                        response_status ')');
+                    toastr.success(response.message, '@langapp('response_status ')');
                 } else {
-                    toastr.error(response.message, '@langapp('
-                        response_status ')');
+                    toastr.error(response.message, '@langapp('response_status ')');
                 }
             },
             error: function (error) {
@@ -577,8 +570,7 @@
                 $.each(errors, function (key, value) {
                     errorsHtml += '<li>' + value[0] + '</li>';
                 });
-                toastr.error(errorsHtml, '@langapp('
-                    response_status ') ');
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
             }
         });
     }
@@ -594,11 +586,9 @@
             success: function (response) {
                 loading('stop_load');
                 if (response.status === true) {
-                    toastr.success(response.message, '@langapp('
-                        response_status ')');
+                    toastr.success(response.message, '@langapp('response_status ')');
                 } else {
-                    toastr.error(response.message, '@langapp('
-                        response_status ')');
+                    toastr.error(response.message, '@langapp('response_status ')');
                 }
             },
             error: function (error) {
@@ -608,8 +598,7 @@
                 $.each(errors, function (key, value) {
                     errorsHtml += '<li>' + value[0] + '</li>';
                 });
-                toastr.error(errorsHtml, '@langapp('
-                    response_status ') ');
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
             }
         });
     }
@@ -625,11 +614,9 @@
             success: function (response) {
                 loading('stop_load');
                 if (response.status === true) {
-                    toastr.success(response.message, '@langapp('
-                        response_status ')');
+                    toastr.success(response.message, '@langapp('response_status ')');
                 } else {
-                    toastr.error(response.message, '@langapp('
-                        response_status ')');
+                    toastr.error(response.message, '@langapp('response_status ')');
                 }
             },
             error: function (error) {
@@ -639,8 +626,7 @@
                 $.each(errors, function (key, value) {
                     errorsHtml += '<li>' + value[0] + '</li>';
                 });
-                toastr.error(errorsHtml, '@langapp('
-                    response_status ') ');
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
             }
         });
     }
@@ -656,11 +642,9 @@
             success: function (response) {
                 loading('stop_load');
                 if (response.status === true) {
-                    toastr.success(response.message, '@langapp('
-                        response_status ')');
+                    toastr.success(response.message, '@langapp('response_status ')');
                 } else {
-                    toastr.error(response.message, '@langapp('
-                        response_status ')');
+                    toastr.error(response.message, '@langapp('response_status ')');
                 }
             },
             error: function (error) {
@@ -670,8 +654,7 @@
                 $.each(errors, function (key, value) {
                     errorsHtml += '<li>' + value[0] + '</li>';
                 });
-                toastr.error(errorsHtml, '@langapp('
-                    response_status ') ');
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
             }
         });
     }
@@ -686,8 +669,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        toastr.success("Copied", '@langapp('
-            response_status ')');
+        toastr.success("Copied", '@langapp('response_status ')');
     }
 
     function copy_public_key() {
@@ -695,8 +677,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        toastr.success("Copied", '@langapp('
-            response_status ')');
+        toastr.success("Copied", '@langapp('response_status ')');
     }
 
     function copy_password_mysql() {
@@ -706,8 +687,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        toastr.success("Copied", '@langapp('
-            response_status ')');
+        toastr.success("Copied", '@langapp('response_status ')');
     }
 
     function copy_password_mongo() {
@@ -717,8 +697,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        toastr.success("Copied", '@langapp('
-            response_status ')');
+        toastr.success("Copied", '@langapp('response_status ')');
     }
 
     function copy_text_id(keyId) {
@@ -726,8 +705,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        toastr.success("Copied", '@langapp('
-            response_status ')');
+        toastr.success("Copied", '@langapp('response_status ')');
     }
 
     function uuidv4() {

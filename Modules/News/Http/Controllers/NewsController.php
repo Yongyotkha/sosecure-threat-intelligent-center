@@ -289,6 +289,7 @@ class NewsController extends Controller
         $data['page'] = langapp('news');
         // $data['Category'] = CategorySettings::where('active',1)->get();
         $data['category'] = CategorySettings::where('active',1)->get();
+        // abort(403, 'Unauthorized action.');
         return view('rssfeedsettings::rss_news')->with($data);
 
     }
