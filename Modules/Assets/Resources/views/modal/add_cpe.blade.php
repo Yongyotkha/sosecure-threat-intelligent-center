@@ -48,13 +48,13 @@
                     <div class="col-lg-9">
                         <select name="cpe[]" id="cpe" class="select2-option form-control " style="min-width: 300px;">
                             <option value="">Select CPE</option>
-                            @if (@$cpe)
+                            {{-- @if (@$cpe)
 
                             @foreach ($cpe as $item)
                             <option value="{{@$item->id}},{{@$item->cpe}}">{{@$item->cpe}}</option>
                             @endforeach
 
-                            @endif
+                            @endif --}}
 
                         </select>
 
@@ -94,7 +94,7 @@
                                     <option value="">Choose an User</option>
                                     @if($Credentials)
                                     @foreach ($Credentials as $item)
-                                    <option value="{{@$item->id}}">{{@$item->name}}</option>
+                                    <option value="{{@$item->code}}">{{@$item->name}}</option>
                                     @endforeach
                                     @endif
                                 </select>
@@ -172,13 +172,31 @@
             <label class="col-lg-3 control-label"></label>
             <div class="col-lg-9">
                 <button class="btn btn-success" onclick="run_command()"><i class="fas fa-play"></i>&nbsp; Run</button>
+                <div style="color:red;display: none;" id="check_run_result"><small >Error Command Please Try Later</small></div>
+                <div style="color:red;"><small id="check_result"></small></div>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-lg-3 control-label">Result <span class="text-danger">*</span> </label>
             <div class="col-lg-9">
-                <textarea name="" id="result" cols="30" rows="2" class="form-control"></textarea>
-                <span style="color:red;"><small id="check_result"></small></span>
+                <textarea name="" id="result" cols="30" rows="2" disabled class="form-control"></textarea>
+                
+            </div>
+        </div>
+
+
+        <div class="form-group row" id="cpe_mapping" style="display: none;">
+            <label class="col-lg-3 control-label">Mapping <span class="text-danger" >*</span> </label>
+            <div class="col-lg-3">
+                <input type="hidden" style="display: none;" value="" name="cpe_mode" id="cpe_mode" class="form-control">
+                <input type="text" name="os_information" placeholder="OS Information" id="os_information" class="form-control">
+                <div style="color:rgb(133, 130, 130);"><small id="ex_os_information">Ex: debian_linux</small></div>
+                <span style="color:red;"><small id="check_os_information"></small></span>
+            </div>
+            <div class="col-lg-6">
+                <input type="text" name="cpe_information" placeholder="CPE" id="cpe_information" class="form-control">
+                <div style="color:rgb(133, 130, 130);"><small id="ex_cpe_information">Ex: cpe:2.3:o:debian:debian_linux:3.0:*:*:*:*:*:*:*</small></div>
+                <span style="color:red;"><small id="check_cpe_information"></small></span>
             </div>
         </div>
 
@@ -303,10 +321,49 @@
         });
 
         $("#os_type").change(function() {
+            let os_id = this.value;
+            if(os_id){
+                $('#check_os').html('');
+                $("#result").val('');
+                $("#cpe_information").val('');
+                $("#os_information").val('');
+                $("#cpe_mode").val('');
+                $("#cpe_mapping").hide();
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '{!! route('assets.selectCPE_by') !!}',
+                    type: "get",
+                    data: ({
+                        os_id: os_id,
+                    }),
+                    datatype: "json",
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                }).done(function(data){
+                    $('#check_cpe').html('');
+                    let text_select = '';
+                    text_select += '<option selected value="">Select CPE</option>';
+                    $.each(data, function(key, val){
+                        text_select += '<option value="'+val.id+','+val.cpe+'">'+val.cpe+'</option>';
+                    });
+                    $('#cpe').html(text_select);
+                    loading('stop_load');
 
-            $('#check_os').html('');
-
+                }).fail(function(jqXHR, ajaxOptions, thrownError){
+                    loading('stop_load');
+                    console.log("No response from server");
+                });
+            }else{
+                let text_select = '';
+                text_select += '<option selected value="">Select CPE</option>';
+                $('#cpe').html(text_select);
+            }
+            
         });
+
 
         $("#cpe").change(function() {
 
@@ -395,8 +452,6 @@
                 success:function(response) {
                     loading('stop_load');
                     
-                    console.log(response.message);
-                    
                     if(response.message!=''){   
                         var data = {
                         id: response.id,
@@ -459,56 +514,109 @@
             $('#get_tr').append(html);
 
             $('#cpe').val('').trigger('change');
-            $('#os_type').val('').trigger('change');
+            {{--$('#os_type').val('').trigger('change');--}}
             $("#add_remark").val('');
         }      
        
     };
 
     function add_row_command() {
-        
-
         var os_type = $("#os_type").val();        
         var remark_com = $("#remark_com").val();
         var result = $("#result").val();
-
+        var u_p = $("#u_p").val();  
+        var os_information = $("#os_information").val();
+        var cpe_information = $("#cpe_information").val();
+        var cpe_mode = $("#cpe_mode").val();
         if(os_type==''){
             $('#check_os').html('Please select os type.');
         }else if(u_p==''){           
             $('#check_user').html('Please select user');
         }else if(result==''){
-            $('#check_result').html('Please fill out.');
+            $('#check_result').html('Please Run Command.');
+        }else if(os_information==''){
+            $('#check_os_information').html('Please fill out.');
+        }else if(cpe_information==''){
+            $('#check_cpe_information').html('Please fill out.');
         }else if(remark_com==''){
             $('#check_remark_com').html('Please fill out.');
         }else{
             html=``;
             html+=`<tr>
-            <td>${result}</td>
+            <td>${cpe_information}</td>
             <td>${remark_com}</td>
             <td style="display:none;">${os_type}</td>
             <td><button class="btn btn-xs btn-danger" onclick="del_row(this)"><i class="fas fa-trash"></i></button></td>
             <td style="display:none;">${u_p}</td>
+            <td style="display:none;">${os_information}</td>
+            <td style="display:none;">${cpe_mode}</td>
             </tr>`;
 
             $('#get_tr').append(html);
 
             $('#u_p').val('').trigger('change');
-            $('#os_type').val('').trigger('change');
+            {{--$('#os_type').val('').trigger('change');--}}
             $("#remark_com").val('');
             $("#result").val('');
             $("#ip").val('');
+            $("#cpe_information").val('');
+            $("#os_information").val('');
+            $("#cpe_mode").val('');
+            $("#cpe_mapping").hide();
         }      
        
     };
 
     function run_command(){
-        var ip = $("#ip").val();  
-        var u_p = $("#u_p").val();  
-        if(ip==''){
+        let ip = $("#ip").val();  
+        let u_p = $("#u_p").val();  
+        let os_id = $("#os_type").val();
+        if(os_id==''){
+            $('#check_os').html('Please select os type.');
+        }else if(ip==''){
             $('#check_ip').html('Please fill out.');
         }else if(u_p==''){
             $('#check_user').html('Please select user.');
+        }else{
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '{!! route('assets.run_artisan_cpe') !!}',
+                type: "post",
+                data: ({
+                    ip: ip,
+                    u_p: u_p,
+                    os_id: os_id,
+                }),
+                datatype: "json",
+                beforeSend: function(){
+                    $("#cpe_mapping").hide();
+                    loading('load');
+                },
+            }).done(function(data){
+                let data_parse = JSON.parse(data);
+                if(data_parse.Result==1){
+                    $("#result").val(data_parse.result);
+                    $("#cpe_mode").val(data_parse.mode);
+                    if(data_parse.mode==1){
+                        $("#cpe_information").val(data_parse.cpe);
+                        $("#os_information").val(data_parse.os_name);
+                    }else{
+                        $('#cpe_mapping').show();
+                    }
+                }else{
+                    $('#check_run_result').show();
+                }
+                loading('stop_load');
+            }).fail(function(jqXHR, ajaxOptions, thrownError){
+                loading('stop_load');
+                console.log("No response from server");
+            });
         }
+
+
+
     }
 
     function del_row(ctl) {
