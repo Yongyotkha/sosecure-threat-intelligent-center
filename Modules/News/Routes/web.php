@@ -12,7 +12,7 @@
 */
 
 Route::group(
-	['middleware' => 'web', 'prefix' => 'news'],
+	['middleware' => ['web', 'permission:news'], 'prefix' => 'news'],
 	function () {
 		Route::get('/', 'NewsController@index')->name('news.index')->middleware('can:menu_items');//middleware(['can:users_update']);
 		// Route::get('/client', 'NewsController@index')->name('news.index_client')->middleware('can:menu_items');
@@ -29,7 +29,7 @@ Route::group(
 );
 
 Route::group(
-	['middleware' => 'web', 'prefix' => 'news_client'],
+	['middleware' => ['web', 'permission:news'], 'prefix' => 'news_client'],
 	function () {
 		Route::get('/', 'NewsController@index_client')->name('news.index_client')->middleware('can:menu_items');
 		
