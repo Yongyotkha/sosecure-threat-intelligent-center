@@ -25,5 +25,8 @@ Route::group(
         Route::post('assets_add_user', 'AssetsController@web_server_add_user')->name('assets.assets_add_user');
         Route::post('assets_add_data', 'AssetsController@assets_add_data')->name('assets.assets_add_data');
         Route::delete('methot_delete_cpe/{cpecode}/{page}', 'AssetsController@methot_delete_cpe')->name('assets.methot_delete_cpe');
+
+        Route::get('selectCPE_by', 'AssetsController@selectCPE_by')->name('assets.selectCPE_by')->middleware('can:menu_items');
+        Route::post('run_artisan_cpe', 'AssetsController@run_artisan_cpe')->name('assets.run_artisan_cpe')->middleware('can:menu_items');
     }
 );

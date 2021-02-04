@@ -18,6 +18,7 @@ use Modules\Users\Entities\UserSite;
 use App\TransactionTimeStampScans;
 use Modules\SiteSettings\Entities\Domain;
 use App\transaction_client_cpe;
+use Artisan;
 
 class AssetsController extends Controller
 {
@@ -224,12 +225,11 @@ class AssetsController extends Controller
 
     public function assets_add_cpe(Request $request)
     {
-        
-        $data['cpe'] = CPEData::where('status', 1)->get();
-        $data['Credentials'] = Credentials::where('status', 1)->get();
-        $data['SiteSettings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+        // $data['cpe'] = CPEData::where('status', 1)->get();
+        // $data['SiteSettings'] = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
         $data['os'] = OSType::get();
         $data['assets'] = Assets::where('code',$request -> id)->first();
+        $data['Credentials'] = Credentials::select('code','name')->where('status', 1)->where('site_id', @$data['assets']->site_id)->get();
         $data['menu'] = $request->menu;
         $data['idip'] = $request->idip;
         return view('assets::modal.add_cpe')->with($data);
@@ -603,6 +603,36 @@ class AssetsController extends Controller
         $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
         return response()->json($dataOut);
     }
+
+    public function selectCPE_by(Request $request)
+    {
+        $OSType = OSType::select('name')->where('id', $request->os_id)->first();
+        $CPEData = CPEData::whereRaw('LOWER(os_type) = ?', strtolower($OSType->name))->get();
+        return response()->json($CPEData);
+    }
+
+    public function run_artisan_cpe(Request $request)
+    {
+
+
+        $command = 'app:TransactionCheckAssetMappingCPE';
+        $Credentials = Credentials::where('code', $request->u_p)->first();
+        $OSType = OSType::select('name')->where('id', $request->os_id)->first();
+        $params = [
+                'site_id' => $Credentials->site_id,
+                'OS_Type' => strtolower($OSType->name),
+                'IP' => $request->ip,
+                'UserName' => $Credentials->user,
+                'Password' => $Credentials->password,
+        ];
+        Artisan::call($command, $params);
+        $resultArtisan = Artisan::output();
+        // return response()->json($resultArtisan);
+
+    }
+    
+
+
     public function assets_add_data(Request $request)
     {
         $assets = $request->assets;
@@ -638,25 +668,31 @@ class AssetsController extends Controller
                         $model->edition = $product_edition;
         
                     }else if($data[3]==''){
-        
+                        $OSType = OSType::select('name')->where('id', $data[2])->first();
+                        $CPEData = CPEData::where('cpe',$data[0])->where('os_name',$data[5])->where('os_type',strtolower($OSType->name))->first();
+                        $Credentials = Credentials::where('code', $data[4])->first();
+                        if(!$CPEData){
+                            $CPEData = new CPEData;
+                            $CPEData->cpe = $data[0];
+                            $CPEData->os_name = $data[5];
+                            $CPEData->os_type = strtolower($OSType->name);
+                            $CPEData->status = 1;
+                            $CPEData->save();
+                        }
                         $vendor_text = @$data[0];
                         $vender_split = explode(":", $vendor_text);
                         $product_name = @$vender_split[4];
                         $vendor_name = @$vender_split[3];
                         $product_version = @$vender_split[5];
                         $product_edition = @$vender_split[6];
-                        if ($product_edition == "*") {
-                            $product_edition = "-";
-                        }    
-        
                         
                         $model->code = generator_uuid();
                         $model->os_type = $data[2];
                         $model->select = 'command';
-                        // $model->cpe_data_id = $data[3];
+                        $model->cpe_data_id = $CPEData->id;
                         $model->remark = $data[1];
                         $model->asset_id = $idip->id;
-                        $model->credentials_id = $data[4];
+                        $model->credentials_id = @$Credentials->id;
                         $model->result = $data[0];
                         $model->vendor = $vendor_name;
                         $model->title = $product_name;
@@ -666,8 +702,6 @@ class AssetsController extends Controller
                     }
         
                     $model->save();
-
-
                     $transaction_client_cpe = transaction_client_cpe::where('site_id', $idip->site_id)->where('transaction_id', $model->id)->first();
                     if($transaction_client_cpe){
                         $transaction_client_cpe -> transaction_mode = 'insert';
