@@ -492,14 +492,11 @@
 
 <script>
     $(document).ready(function () {
-        {
-            {--$('.datetimepicker-input').datetimepicker({
+        {{--$('.datetimepicker-input').datetimepicker({
                     showClose: true,
                     showClear: true,
                     minDate: moment().add(-1, 'days')
-                });
-                --}
-        }
+                });--}}
         $('.datetimepicker-input').datetimepicker({
             showClose: true,
             showClear: true
