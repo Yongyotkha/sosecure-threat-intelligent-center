@@ -19,7 +19,6 @@
                                     <select name="role" id="role" class="select2-option form-control select-site"
                                         style="min-width: 120px">
                                         <option value="">All Role</option>
-                                        <option value="99">Admin Support</option>
                                         @foreach (Role::get() as $role)
                                         <option value="{{@$role->id}}">{{@$role->name}}
                                         </option>
@@ -132,11 +131,13 @@
                                                 </label>
                                             </th>
                                             <th class="">@langapp('name') </th>
+                                            <th class="">Role</th>
                                             <th class="">@langapp('email') </th>
                                             <th class=" ">@langapp('job_title') </th>
                                             <th class=" "> Site Name </th>
                                             <th class="">@langapp('mobile') </th>
                                             <th class="">@langapp('city') </th>
+                                            
                                             <th class="col-date">@langapp('date') </th>
                                             <th class="">Action</th>
                                         </tr>
@@ -247,17 +248,22 @@
                     "role" :role,
                 }
             },
-            order: [[ 7, "desc" ]],
+            order: [[ 8, "desc" ]],
             columns: [
                 { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false },
                 { data: 'name', name: 'name' },
+                { data: 'rolename', name: 'model_role_id' },
                 { data: 'email', name: 'email' },
                 { data: 'job_title', name: 'profile.job_title',
                     visible:false,
                     searchable: false,
                     orderable: false
                 },
-                { data: 'site_name', name: 'site_name' },
+                { data: 'site_name', 
+                    name: 'site_id' ,
+                    searchable: false,
+                    orderable: false
+                },
                 { data: 'mobile', name: 'profile.mobile',
                     visible:false,
                     searchable: false,
