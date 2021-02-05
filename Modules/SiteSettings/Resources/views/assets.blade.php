@@ -229,7 +229,10 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <h3 class="text-dark">Domain</h3>
-                            <div id="select_domain"></div>
+                            <div id="select_domain">
+                                <select id="domain_id_manual" class="select2 form-control">
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -521,19 +524,21 @@
         
         $("#asset-to-use-manual").click(function(){
             loading('load');
-            $('#select_domain').html();
+            {{--$('#select_domain').html();--}}
             $('#show_asets_manual').html("");
             axios.post('/sitesettings/assets/get_domain', {
                 site_id: '{{ $siteSettings->id }}',
             }).then(function (response) {
-               let html = ``;
-               html += `<select id="domain_id_manual" class="select2 form-control">`;
+                let html = ``;
+                {{--html += `<select id="domain_id_manual" class="select2 form-control">`;--}}
                 for(let b in response.data.data){
                     const domain = response.data.data[b];
                     html += `<option value="${domain.id}">${domain.name}</option>`;
                 }
-                html += `</select>`;
-                $('#select_domain').html(html);
+                {{--html += `</select>`;--}}
+                $('#domain_id_manual').html(html);
+                $('#domain_id_manual').select2();
+                
             }).catch(function (error) {
                 loading('stop_load');
                 var errors = error;
