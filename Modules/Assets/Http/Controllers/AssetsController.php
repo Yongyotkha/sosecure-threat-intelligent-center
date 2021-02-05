@@ -650,7 +650,6 @@ class AssetsController extends Controller
                 $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
             })->count();
         }
-        
         return response()->json($dataOut);
     }
 

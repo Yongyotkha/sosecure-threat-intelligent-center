@@ -381,10 +381,7 @@
         }
         t.search( '' ).columns().search( '' ).draw();
         t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
-       console.log(columnSearch);
-       console.log(selectedSiteName);
-       console.log(selectedValue);
-       console.log(active_tb);
+
         {{--ads.column(5).search(active_tb).draw();
         t.search( '' ).columns().search( '' ).draw();--}}
     }

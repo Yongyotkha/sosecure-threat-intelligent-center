@@ -612,8 +612,6 @@
         if(columnSearch=='ip_asset_id'){
             selectedValue = '^' + selectedValue +'$';
             columnSearch = 13;
-            console.log(selectedValue);
-            console.log(columnSearch);
             t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
         }else{
             t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
