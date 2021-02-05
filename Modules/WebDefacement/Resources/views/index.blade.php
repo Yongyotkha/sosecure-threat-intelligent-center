@@ -58,8 +58,26 @@
                                 <h5 class="font-weight-bold">Name & URL</h5>
                                 <input type="text" id="keywords" class="form-control">
                             </div>
-                            <div id="btngroup_status" class="col-lg-8 mb-1">
-                                <h5 class="font-weight-bold">Status</h5>
+
+                            
+                            <div class="col-lg-8 mb-1">
+                                <h5 class="font-weight-bold">CVSS</h5>
+                                <div id="btngroup_status"  class="btn-group special mb-2">
+                                    <button class="btn btn-grey active">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn btn-grey">
+                                        <span> High </span>
+                                    </button>
+                                    <button class="btn btn-grey">
+                                        <span> Medium </span>
+                                    </button>
+                                    <button class="btn btn-grey">
+                                        <span> Normal </span>
+                                    </button>
+                                </div>
+
+                                {{-- <h5 class="font-weight-bold">Status</h5>
                                 <a href="#" id="all" class="btn-chart d-il-flex mr-3">
                                     <span class="dot-all" style="height:8px;"></span>
                                     All
@@ -75,7 +93,7 @@
                                 <a href="#" id="normal" class="btn-chart d-il-flex">
                                     <span class="dot low"></span>
                                     Normal
-                                </a>
+                                </a> --}}
                             </div>
 
                             {{-- <div class="col-lg-4">
@@ -358,7 +376,7 @@
 
 <script>
 
-    active_btn('#btngroup_status .btn-chart');
+    active_btn('#btngroup_status .btn');
 
     var keywords = null;
     var site = null;
