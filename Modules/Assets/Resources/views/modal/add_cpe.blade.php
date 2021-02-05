@@ -563,6 +563,7 @@
             $("#os_information").val('');
             $("#cpe_mode").val('');
             $("#cpe_mapping").hide();
+            $('#check_run_result').hide();
         }      
        
     };
@@ -591,6 +592,7 @@
                 }),
                 datatype: "json",
                 beforeSend: function(){
+                    $('#check_run_result').hide();
                     $("#cpe_mapping").hide();
                     loading('load');
                 },
@@ -610,6 +612,8 @@
                 }
                 loading('stop_load');
             }).fail(function(jqXHR, ajaxOptions, thrownError){
+                $('#check_run_result').show();
+                
                 loading('stop_load');
                 console.log("No response from server");
             });
