@@ -598,14 +598,18 @@ class AssetsController extends Controller
 
         }
         $dataOut["data"] =  $Assets_list;
-        $dataOut["countAssets"] = @AssetsData::where('data_type_id', 5)->orWhere('data_type_id', 6)->where('status', 1)->count();
+
+        // $dataOut["countAssets"] = @AssetsData::whereIn('data_type_id', [5,6])->where('status', 1)->count();
+        $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){
+                                    $q->whereIn('data_type_id', [5,6]);
+        })->count();
         // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
         $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                                    $q->where('os_type', 1);
+                                    $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
                                 })->count();
         // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
         $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                                    $q->where('os_type', 2);
+                                    $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
                                 })->count();
         return response()->json($dataOut);
     }
@@ -615,6 +619,39 @@ class AssetsController extends Controller
         $OSType = OSType::select('name')->where('id', $request->os_id)->first();
         $CPEData = CPEData::whereRaw('LOWER(os_type) = ?', strtolower($OSType->name))->get();
         return response()->json($CPEData);
+    }
+
+    public function countAssets(Request $request)
+    {
+        if($request->sitecode){
+            $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->sitecode)->first();
+            $dataOut["SiteSettingsfor"] = $SiteSettingsfor;
+            $dataOut["countAssets"] = @Assets::select('id')->where('site_id',$SiteSettingsfor->id)->whereHas('get_assets_data', function($q) use ($SiteSettingsfor) {
+                $q->whereIn('data_type_id', [5,6]);
+            })->count();
+            // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
+            $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
+                $q->where('os_type', 1)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
+            })->count();
+            // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
+            $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
+                $q->where('os_type', 2)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
+            })->count();
+        }else{
+            $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){
+                $q->whereIn('data_type_id', [5,6]);
+            })->count();
+            // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
+            $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q){
+                $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
+            })->count();
+            // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
+            $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
+                $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
+            })->count();
+        }
+        
+        return response()->json($dataOut);
     }
 
     public function run_artisan_cpe(Request $request)

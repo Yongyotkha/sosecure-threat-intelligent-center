@@ -28,5 +28,7 @@ Route::group(
 
         Route::get('selectCPE_by', 'AssetsController@selectCPE_by')->name('assets.selectCPE_by')->middleware('can:menu_items');
         Route::post('run_artisan_cpe', 'AssetsController@run_artisan_cpe')->name('assets.run_artisan_cpe')->middleware('can:menu_items');
+
+        Route::get('countAssets', 'AssetsController@countAssets')->name('assets.countAssets')->middleware('can:menu_items');
     }
 );

@@ -18,7 +18,7 @@
                                 <option value="">All Site</option>
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
-                                <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
+                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                                 @endforeach
                                 @endif
                             </select>
@@ -614,11 +614,11 @@
             columnSearch = 13;
             console.log(selectedValue);
             console.log(columnSearch);
-            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
+            t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
         }else{
-            t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+            t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
         }
-       
+        
        
        
         {{--ads.column(5).search(active_tb).draw();
@@ -627,6 +627,28 @@
 
     var t;
     function changeSite(val){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('assets.countAssets') !!}',
+            type: "get",
+            data: ({
+                sitecode:$('#select-site').val(),
+            }),
+            datatype: "html",
+            beforeSend: function(){
+                loading('load');
+            },
+        }).done(function(data){
+            $('#count_assets').html(data.countAssets+"");
+            $('#count_windows').html(data.countWindows+"");
+            $('#count_linux').html(data.countLinux+"");
+            loading('stop_load');
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            loading('stop_load');
+            console.log("No response from server");
+        });
         searchTB();
         {{--site_id = val;
         selectGroupByFirst();--}}

@@ -336,7 +336,7 @@
             columnSearch = '';
         }
         t.search( '' ).columns().search( '' ).draw();
-        t.column(0).search(selectedSiteName).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+        t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
        
        
         {{--ads.column(5).search(active_tb).draw();
