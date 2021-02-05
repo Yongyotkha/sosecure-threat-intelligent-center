@@ -152,15 +152,28 @@ class WebDefacementController extends Controller
         // $model->softDeletes();
 
         if($WebdefacmentSetting) {
-            $site_id = $WebdefacmentSetting->site_id;
+            $site_id = @$WebdefacmentSetting->site_id;
             $SiteSettings = SiteSettings::where('id',$site_id)->first();
             if($SiteSettings) {
                 $Transaction_client_webdefacment_setting = Transaction_client_webdefacment_setting::where('site_id', $site_id)->where('transaction_id', $WebdefacmentSetting -> id)->first();
-                $Transaction_client_webdefacment_setting -> transaction_mode = 'delete';
-                $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
-                $Transaction_client_webdefacment_setting -> status = 1;
-                $Transaction_client_webdefacment_setting -> save();
+                if($Transaction_client_webdefacment_setting){
+                    $Transaction_client_webdefacment_setting -> transaction_mode = 'delete';
+                    $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+                    $Transaction_client_webdefacment_setting -> status = 1;
+                    $Transaction_client_webdefacment_setting -> save();
+                }else{
+                    $Transaction_client_webdefacment_setting = new Transaction_client_webdefacment_setting;
+                    $Transaction_client_webdefacment_setting -> site_id = $site_id;
+                    $Transaction_client_webdefacment_setting -> transaction_id = $WebdefacmentSetting -> id;
+                    $Transaction_client_webdefacment_setting -> transaction_mode = 'delete';
+                    $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+                    $Transaction_client_webdefacment_setting -> status = 1;
+                    $Transaction_client_webdefacment_setting -> save();
+                }
+                
                 $site_code = $SiteSettings->code;
+            }else{
+                $site_code = 0;
             }
         }
 
@@ -342,12 +355,22 @@ class WebDefacementController extends Controller
                     }
                     $WebdefacmentSetting->save();
 
-                    $Transaction_client_webdefacment_setting = Transaction_client_webdefacment_setting::where('transaction_id', $WebdefacmentSetting -> id)->first();
-                    $Transaction_client_webdefacment_setting -> site_id = $site_id;
-                    $Transaction_client_webdefacment_setting -> transaction_mode = 'update';
-                    $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
-                    $Transaction_client_webdefacment_setting -> status = 1;
-                    $Transaction_client_webdefacment_setting -> save();
+                    $Transaction_client_webdefacment_setting = Transaction_client_webdefacment_setting::where('transaction_id', $WebdefacmentSetting -> id)->where('site_id', $site_id)->first();
+                    if($Transaction_client_webdefacment_setting){
+                        $Transaction_client_webdefacment_setting -> transaction_mode = 'update';
+                        $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+                        $Transaction_client_webdefacment_setting -> status = 1;
+                        $Transaction_client_webdefacment_setting -> save();
+                    }else{
+                        $Transaction_client_webdefacment_setting = new Transaction_client_webdefacment_setting;
+                        $Transaction_client_webdefacment_setting -> transaction_id = $site_id;
+                        $Transaction_client_webdefacment_setting -> site_id = $site_id;
+                        $Transaction_client_webdefacment_setting -> transaction_mode = 'update';
+                        $Transaction_client_webdefacment_setting -> transaction_data_status = 1;
+                        $Transaction_client_webdefacment_setting -> status = 1;
+                        $Transaction_client_webdefacment_setting -> save();
+                    }
+                    
                 } else {
                     // $WebdefacmentSetting = new WebdefacmentSetting;
                     // $WebdefacmentSetting->code = generator_uuid();

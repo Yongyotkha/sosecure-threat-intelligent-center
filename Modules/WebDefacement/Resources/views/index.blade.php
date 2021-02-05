@@ -508,7 +508,7 @@
     $('#site').val('').trigger('change');
 
 
-    load_card(search_);
+    {{--load_card(search_);--}}
 
 }
 
@@ -978,14 +978,19 @@
             data:{id: web_id},
             beforeSend: function(){
                 $('.delete_web_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+                $('.delete_web_submit').prop("disabled", true);
             },
             success:function(response) {
+                
                 $('.delete_web_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                $('.delete_web_submit').prop("disabled", true);
                 toastr.success(response.message, '@langapp('response_status')');
-                window.location.href = response.redirect;
+                $('#delete_web_modal').modal('hide');
+                clear_search();
+                $('.delete_web_submit').prop("disabled", false);    
+                {{--window.location.href = response.redirect;--}}
             },
             error: function (error){
+                $('.delete_web_submit').prop("disabled", false);
                 loading('stop_load');
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
