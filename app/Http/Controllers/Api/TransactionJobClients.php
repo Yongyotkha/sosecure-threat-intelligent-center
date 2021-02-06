@@ -32,7 +32,7 @@ class TransactionJobClients extends ApiController
                             $transcation_jobs_client -> return_data = $data['data']['return_data'];
                         }
                         if($data['data']['return_error']){
-                            $transcation_jobs_client -> return_data = $data['data']['return_error'];
+                            $transcation_jobs_client -> return_error = $data['data']['return_error'];
                         }
                         $transcation_jobs_client -> save();
                         $data_transcation_jobs_clients = json_encode([]);
