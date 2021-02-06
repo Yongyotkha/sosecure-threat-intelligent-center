@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\transcation_jobs_clients;
-
+use App\Entities\TF_Center_transaction_batchjob;
 class TransactionJobClients extends ApiController
 {
     public function transaction_job_clients(Request $request){
@@ -23,6 +23,31 @@ class TransactionJobClients extends ApiController
                         foreach($transcation_jobs_clients as $transcation_jobs_client){
                             $transcation_jobs_client -> transaction_data_status = 2;
                             $transcation_jobs_client -> save();
+
+
+
+
+                            $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('name', $transcation_jobs_client->mode)->where('site_id', $transcation_jobs_client->site_id)->first();
+
+                            if(!$TF_Center_transaction_batchjob){
+                                $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
+                                $TF_Center_transaction_batchjob->status = 1;
+                                $TF_Center_transaction_batchjob->code = generator_uuid();
+                                $TF_Center_transaction_batchjob->mode = $transcation_jobs_client->id;
+                                $TF_Center_transaction_batchjob->site_id = $transcation_jobs_client->site_id;
+                            }
+                            $TF_Center_transaction_batchjob->name = $transcation_jobs_client->mode;
+                            $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
+                            $TF_Center_transaction_batchjob->progress = 2;
+                            $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
+                            $TF_Center_transaction_batchjob->save();
+
+
+                            
+
+
+
+
                         }
                         $data_transcation_jobs_clients = json_encode($transcation_jobs_clients);
                     }else if($data['data']['mode'] == 'complete'){
@@ -35,11 +60,38 @@ class TransactionJobClients extends ApiController
                             $transcation_jobs_client -> return_error = $data['data']['return_error'];
                         }
                         $transcation_jobs_client -> save();
+
+
+
+
+
+
+                        $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('name', $transcation_jobs_client->mode)->where('site_id', $transcation_jobs_client->site_id)->first();
+
+                        if(!$TF_Center_transaction_batchjob){
+                            $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
+                            $TF_Center_transaction_batchjob->status = 1;
+                            $TF_Center_transaction_batchjob->code = generator_uuid();
+                            $TF_Center_transaction_batchjob->mode = $transcation_jobs_client->id;
+                            $TF_Center_transaction_batchjob->site_id = $transcation_jobs_client->site_id;
+                        }
+                        $TF_Center_transaction_batchjob->name = $transcation_jobs_client->mode;
+                        $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
+                        $TF_Center_transaction_batchjob->progress = 3;
+                        $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
+                        $TF_Center_transaction_batchjob->save();
+
+
+
+
+
+
+
                         $data_transcation_jobs_clients = json_encode([]);
                     }
                     $datas = encrypt_decrypt('encrypt', $data_transcation_jobs_clients, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-                   
+
                 } catch (\Exception $e) {
                     $response = array(
                         'status_code' => 500,
@@ -76,7 +128,7 @@ class TransactionJobClients extends ApiController
                 ];
                 return $data_return;
             }
-           
+
         } catch (\Exception $e) {
             $response = array(
                 'status' => 0,
