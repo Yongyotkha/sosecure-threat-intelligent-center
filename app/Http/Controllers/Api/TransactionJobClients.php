@@ -124,13 +124,16 @@ class TransactionJobClients extends ApiController
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{
                 try {
-                    $log = new Log;
-                    $log -> site_id = $data['site']['data']['id'];
-                    $log -> file = $data['data']['return_data'];
-                    $log -> error_summary = $data['data']['error_summary'];
-                    $log -> log_trace = $data['data']['log_trace'];
-                    $log -> save();
-                    
+                    if($data['data']){
+                        foreach($data['data'] as $logs){
+                            $log = new Log;
+                            $log -> site_id = $data['site']['data']['id'];
+                            $log -> file = $logs['return_data'];
+                            $log -> error_summary = $logs['error_summary'];
+                            $log -> log_trace = $logs['log_trace'];
+                            $log -> save();
+                        }
+                    }
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);
                 } catch (\Exception $e) {
                     $response = array(

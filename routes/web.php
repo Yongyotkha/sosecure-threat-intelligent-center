@@ -61,7 +61,10 @@ Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookControll
 
 
 Route::get('phpinfo', function () {
-    phpinfo();
+    $dss = 15;
+    if($dss = 15){
+        print_r($dd);
+    }
 });
 
 Route::get('emailtest', 'Welcome@emailtest');
