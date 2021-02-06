@@ -14,7 +14,7 @@
 Route::group(
 	['middleware' => ['web', 'permission:news'], 'prefix' => 'news'],
 	function () {
-		Route::get('/', 'NewsController@index')->name('news.index')->middleware('can:menu_items');//middleware(['can:users_update']);
+		Route::get('/', 'NewsController@index')->name('news.index')->middleware('can:menu_items','permission:role_center');//middleware(['can:users_update']);
 		// Route::get('/client', 'NewsController@index')->name('news.index_client')->middleware('can:menu_items');
 		Route::get('/detail', 'NewsController@news_detail')->name('news.news_detail')->middleware('can:menu_items');
 		Route::get('/detail/{code}', 'NewsController@news_detail_code')->name('news.news_detail_code')->middleware('can:menu_items');
