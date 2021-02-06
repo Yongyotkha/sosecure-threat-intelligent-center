@@ -836,13 +836,14 @@ class RSSFeedSettingsController extends Controller
 
 
     public function rss_data_store_news_create(Request $request){
-        $logo = asset('images/image-not-found.jpg');
+        $logo = '/images/image-not-found.jpg';
         if ($request->hasFile('logo')) {
             $image = $request->file('logo');
             $imagename = time().'.'.$image->getClientOriginalExtension();
             $destinationPath = public_path('images/logo_news');
             $image->move($destinationPath, $imagename);
-            $logo = asset('images/logo_news/'.$imagename);
+            // $logo = asset('images/logo_news/'.$imagename);
+            $logo = '/images/logo_news/'.$imagename;
         }
 
 
@@ -915,7 +916,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -957,7 +958,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -993,7 +994,9 @@ class RSSFeedSettingsController extends Controller
                     $RSSNewsCategory -> save();
                 }
             }
-            
+
+
+
             // if(!empty($request -> tags)){
             //     foreach($request -> tags as $item){
             //         $tags = Tags::where('name', $item)->first();
@@ -1137,7 +1140,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -1179,7 +1182,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -1209,7 +1212,8 @@ class RSSFeedSettingsController extends Controller
                     $RSSNewsCategory -> save();
                 }
             }
-            
+
+
             // if(!empty($request -> tags)){
             //     foreach($request -> tags as $item){
             //         $tags = Tags::where('name', $item)->first();
@@ -1360,7 +1364,8 @@ class RSSFeedSettingsController extends Controller
             );
         }else{
             $TransactionRssData = TransactionRssData::where('code', $request->rss_code)->first();
-            $logo = asset('images/image-not-found.jpg');
+            // $logo = asset('images/image-not-found.jpg');
+            $logo = '/images/image-not-found.jpg';
             
             if($TransactionRssData) {
                 if($TransactionRssData -> enclosure){
@@ -1369,7 +1374,7 @@ class RSSFeedSettingsController extends Controller
                 $RSSNews_check = RSSNews::where("transaction_rss_id",$TransactionRssData->id)->first();
                 if($RSSNews_check) {
                     $RSSNews_check-> code = generator_uuid();
-                    $RSSNews_check -> logo = $logo;
+                    $RSSNews_check -> logo_rss = $logo;
                     $RSSNews_check -> title_th = $request -> title_th;
                     $RSSNews_check -> title_en = $request -> title_en;
                     $RSSNews_check -> source = $request -> source;
@@ -1403,7 +1408,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }
@@ -1447,7 +1452,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }
@@ -1547,7 +1552,7 @@ class RSSFeedSettingsController extends Controller
 
                     $RSSNews = new RSSNews();
                     $RSSNews -> code = generator_uuid();
-                    $RSSNews -> logo = $logo;
+                    $RSSNews -> logo_rss = $logo;
                     $RSSNews -> title_th = $request -> title_th;
                     $RSSNews -> title_en = $request -> title_en;
                     $RSSNews -> source = $request -> source;
@@ -1580,7 +1585,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }
@@ -1622,7 +1627,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', url('/images/file_editor/'.$image_name));
+                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }

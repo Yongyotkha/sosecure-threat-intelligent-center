@@ -243,11 +243,8 @@ var form_save = '.formSaving';
     $('.formDraft').click(function() {
         form_save = '.formDraft';
     });
-    var number = 0;
+    
     $('.ajaxifyFormCreate').submit(function (event) {
-        number++;
-        if(number == 1){
-  
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
             $('.formSaving').attr('disabled',true);
             event.preventDefault();
@@ -276,8 +273,8 @@ var form_save = '.formSaving';
                     $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
                 }
             }); 
-        }
     });
+    
     $(document).ready(function(){
         {{--$('#source_create').select2({
             allowClear: true,

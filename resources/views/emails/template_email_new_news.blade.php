@@ -4,14 +4,18 @@ $detail_th = '';
 $title_en = '';
 $detail_en = '';
 $date_create = @$news['news']->public_date;
+$link_th = '#';
+$link_en = '#';
 $news_view = @$news['news']->view;
   if(@$news['news']->title_th) {
     $title_th = $news['news']->title_th;
     $detail_th = $news['news']->detail_th;
+    $link_th = route('news.public_detail_select', ['code' => @$news['news']->code , 'lang' => 'th']);
   }
   if(@$news['news']->title_en) {
     $title_en = $news['news']->title_en;
     $detail_en = $news['news']->detail_en;
+    $link_en = route('news.public_detail_select', ['code' => @$news['news']->code , 'lang' => 'en']);
   }
 
   $cate_html = '';
@@ -63,7 +67,7 @@ $news_view = @$news['news']->view;
                   <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
                     <br><span style="font-weight:700">{{$title_th}}</span>
                     <br><span style="font-weight:500;font-size:14px;">Date: {{$date_create}} View: {{$news_view}} 
-                      <a href="#" style="margin: 0 5px;">Link</a> 
+                      <a href="{{$link_th}}" style="margin: 0 5px;">Link</a> 
                       {!!$cate_html!!}
                     </span>
                   </div>
@@ -83,7 +87,7 @@ $news_view = @$news['news']->view;
                   <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
                     <br><span style="font-weight:700">{{$title_en}}</span>
                     <br><span style="font-weight:500;font-size:14px;">Date: {{$date_create}} View: {{$news_view}} 
-                      <a href="#" style="margin: 0 5px;">Link</a> 
+                      <a href="{{$link_en}}" style="margin: 0 5px;">Link</a> 
                       {!!$cate_html!!}
                     </span>
                   </div>
