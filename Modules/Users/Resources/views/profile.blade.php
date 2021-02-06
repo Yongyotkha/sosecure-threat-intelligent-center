@@ -13,9 +13,9 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                         <div class="col-sm-12 m-b-xs">
                             <p class="h3"><strong>{{ $user->name }}</strong>
                                 
-                                <a href="{{ route('users.gdpr.export') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
+                                {{-- <a href="{{ route('users.gdpr.export') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                                     @icon('solid/database') GDPR Data
-                                </a>
+                                </a> --}}
                                 <a href="{{ route('users.api') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                                     @icon('solid/code') API Settings
                                 </a>
@@ -37,7 +37,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                     
                     <div class="row">
                         {!! Form::open(['route' => 'users.change', 'class' => 'bs-example ajaxifyForm']) !!}
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <section class="panel panel-default">
                                 <header class="panel-heading">@langapp('information')
                                     @if($user->profile->company > 0 && $user->profile->business->primary_contact == Auth::id())
@@ -59,7 +59,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         <label>@langapp('fullname')  @required</label>
                                         <input type="text" class="form-control" name="name" value="{{ $user->name }}" required>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group d-none">
                                         <label>@langapp('hourly_rate') </label>
                                         <input type="text" class="form-control" name="profile[hourly_rate]" value="{{ $user->profile->hourly_rate }}">
                                     </div>
@@ -101,7 +101,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         <input type="text" class="form-control" name="profile[phone]" value="{{ $user->profile->phone }}">
                                     </div>
                                     
-                                    <div class="form-group">
+                                    <div class="form-group  d-none">
                                         <label>@langapp('locale')</label>
                                         <select class="select2-option form-control" name="locale">
                                             @foreach (languages() as $language)
@@ -128,7 +128,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         
                                         
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group  d-none">
                                         <span class="pull-right">
                                             <img class="" src="{{ $user->profile->sign }}" width="50" alt="">
                                         </span>
@@ -136,29 +136,29 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         <input type="file" name="signature">
                                         
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group  d-none">
                                         <label>@langapp('email_signature')</label>
                                         <textarea class="form-control markdownEditor" name="profile[email_signature]" data-hidden-buttons='["cmdHeading", "cmdQuote","cmdCode", "cmdList", "cmdList0"]'>{{ $user->profile->email_signature }}</textarea>
                                     </div>
                                 </div>
                             </section>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <section class="panel panel-default">
                             <header class="panel-heading">@langapp('authorization')</header>
                             <div class="panel-body">
-                                <div class="form-group">
+                                <div class="form-group  d-none">
                                     <label>Slack Webhook URL <span data-rel="tooltip" title="Your slack webhook url">@icon('brands/slack', 'text-danger')</span></label>
                                     <input type="text" class="form-control" name="slack_webhook_url" value="{{ $user->slack_webhook_url }}">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group  d-none">
                                     <label>Calendar Token <a href="{{ route('users.token') }}" class="btn btn-xs btn-info">
                                         @icon('solid/sync-alt')
                                     </a></label>
                                     <input type="text" class="form-control" readonly="readonly"
                                     value="{{ $user->calendar_token }}">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group  d-none">
                                     <label>@langapp('notification_channels') @required</label>
                                     <div class="form-check text-muted">
                                         <label>
@@ -203,7 +203,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     <input type="password" class="form-control" name="confirm_password"
                                     placeholder="@langapp('confirm_password') ">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group  d-none">
                                     <label class="text-danger">@icon('solid/exclamation-triangle') @langapp('danger_zone')</label>
                                     <div class="form-check text-danger">
                                         <label>

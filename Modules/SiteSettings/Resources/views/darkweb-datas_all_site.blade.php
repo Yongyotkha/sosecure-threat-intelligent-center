@@ -576,6 +576,7 @@ active_btn('#groupby-type .btn-grey');
                     {
                         targets: 2,
                         width: '60px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.feel_type;
                             if(val) {
@@ -589,7 +590,7 @@ active_btn('#groupby-type .btn-grey');
                     },
                     {
                         targets: 3,
-                        width: '10px',
+                        width: '50px',
                         render: function (data, type, full, meta) {
                 
         
