@@ -76,7 +76,18 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function tableRssData(Request $request){
-
+        // $columns = array(
+        //     0 => 'id',
+        //     1 => 'get_rss_source',
+        //     2 => 'title',
+        //     3 => 'description',
+        //     4 => 'link',
+        //     5 => 'pubDate',
+        //     6 => 'pubDate',
+        //     7 => 'code',
+        // ); 
+        // $order = $columns[$request->input('order.0.column')];
+        // $dir = $request->input('order.0.dir');
         
         if(($request -> keywords || $request -> isDateSearch || $request -> status) && $request -> search_val == true){
             $model = TransactionRssData::with('get_rss_news')->with('get_rss_source');
@@ -132,9 +143,9 @@ class RSSFeedSettingsController extends Controller
                     
             }
             
-            $model -> get();
+            // $model -> get();
         }else{
-            $model = TransactionRssData::with('get_rss_news')->with('get_rss_source')->get();
+            $model = TransactionRssData::with('get_rss_news')->with('get_rss_source');//->get()
         }
 
         return DataTables::of($model)->toJson();

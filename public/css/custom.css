@@ -783,7 +783,9 @@ ul.item-list-dash li:not(:last-child){
     margin: auto;
     padding: 2rem;
     border-top: 2px solid #e0206f;
-    background: #263042;
+    /* background: #263042; */
+    background: #848484;
+    
     /* background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.5)));
     background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);

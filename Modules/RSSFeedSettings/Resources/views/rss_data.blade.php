@@ -332,7 +332,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[ 4, "desc" ]],
+            order: [[ 5, "desc" ]],
             ajax: {
                 type: "POST",
                 url: '{!! route('rssfeedsettings.rss_data_table') !!}',
@@ -358,14 +358,13 @@
             },
 
             columnDefs: [
- 
-
                 {
                     targets: 0,
                     orderable: false,
                     searchable: false,
                     sortable: false,
                     width: '1px',
+                    name:'id',
                     render: function (data, type, full, meta) {
                         return '<label><input type="checkbox" name="rss_id" class="rss_id"  value="' + full.id + '"><span class="label-text"></span></label>';
                     },
@@ -390,6 +389,7 @@
                 {
                     targets: 2,
                     width: '10px',
+                    name:'title',
                     render: function (data, type, full, meta) {
     
                             return '<div class="text-elip" data-rel="tooltip" title="'+full.title+'">'+full.title+'</div>';
@@ -399,6 +399,7 @@
                     targets: 3,
                     width: '10px',
                     ype: 'html',
+                    name:'description',
                     render: function (data, type, full, meta) {
                        
                         return '<div class="text-elip" data-rel="tooltip" title="'+full.description+'">'+full.description+'</div>';
@@ -410,6 +411,7 @@
                     orderable: false,
                     searchable: false,
                     sortable: false,
+                    name:'link',
                     width: '10px',
                     render: function (data, type, full, meta) {
     
@@ -423,6 +425,7 @@
                 
                 {
                     targets: 5,
+                    name:'pubDate',
                     width: '60px',
                     render: function (data, type, full, meta) {
               
@@ -451,6 +454,7 @@
                     searchable: false,
                     sortable: false,
                     width: '55px',
+                    name:'code',
                     render: function (data, type, full, meta) {
                         if(full.get_rss_news!=null){
                 

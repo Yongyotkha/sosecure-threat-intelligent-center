@@ -44,9 +44,9 @@
                         </div>
                         <br>
                         <div class="form-group row">
-                        <label for="" class="col-lg-12 control-label" id="label_source">Source <span class="text-danger">*</span></label>
+                        <label for="" class="col-lg-12 control-label" id="label_source">Source {{--<span class="text-danger">*</span>--}}</label>
                         <div class="col-lg-12">
-                            <select name="source" id="source_create" class="select2-option form-control" required>
+                            <select name="source" id="source_create" class="select2-option form-control">
                                 <option value="">Select Source</option>
                                 @if(@$get_source)
                                     

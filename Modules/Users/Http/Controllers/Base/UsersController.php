@@ -14,6 +14,7 @@ use Modules\Users\Exports\UsersExport;
 use Modules\Users\Jobs\BulkDeleteUsers;
 use Modules\Users\Jobs\GDPRExportData;
 use Modules\Users\Entities\model_has_roles;
+use App\Entities\Roles;
 
 abstract class UsersController extends Controller
 {
@@ -286,13 +287,13 @@ abstract class UsersController extends Controller
         //     $model = $model->query();
 
         // }
-
+        $Roles = Roles::get()->keyBy('id')->toArray();
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
-                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
                 $model2 = UserSite::select('site_id')->where('user_id',@Auth::user()->id)->get()->toArray();
                 
                 $model = $model->whereHas('get_UserSite', function ($query) use ($model2) {
@@ -318,6 +319,7 @@ abstract class UsersController extends Controller
         }
         // $model = $model->first();
         // dd([0]->get_site->name);
+        $model = $model->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id');
         $model->get();
         
         return DataTables::of($model)
@@ -393,6 +395,9 @@ abstract class UsersController extends Controller
                 
                 return $edit_button." ".$del_button;
                 
+            })->addColumn('rolename', function ($model) use ($Roles){
+                //humanize(--str--)
+                return @$Roles[@$model->model_role_id]["name"];
             })
             ->rawColumns(['name', 'chk', 'job_title', 'role', 'user','action'])
             ->make(true);
