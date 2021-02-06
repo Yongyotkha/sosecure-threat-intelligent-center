@@ -26,6 +26,13 @@ class IndicatorsController extends Controller
      * @var \Modules\Items\Entities\Item
      */
     protected $item;
+    protected $ip;
+    protected $mac;
+    protected $header;
+    protected $client;
+    protected $urlLimit = 3;
+    protected $base_url;
+    protected $url_indicator_events_table;
     /**
      * Request instance
      *
@@ -37,6 +44,14 @@ class IndicatorsController extends Controller
     {
         $this->middleware(['auth', 'verified', '2fa']);
         $this->request = $request;
+        if(TYPE_WEB !== 'center'){
+            $this->ip = config('app.ip_ad');
+            $this->mac = config('app.mac_ad');
+            $this->header = config('app.site_key');
+            $this->client = new \GuzzleHttp\Client();
+            $this->base_url = config('app.url_center').'/api/v1/'.config('app.mode').'/'.config('app.site_code');
+            $this->url_indicator_events_table = $this->base_url.'/indicator/events_table';
+        }
     }
     /**
      * Display a listing of the resource.
@@ -1498,179 +1513,229 @@ class IndicatorsController extends Controller
    
 
     public function datatableEvent(Request $request) {
-
-        // $row = (int)$_POST['start'];
-        // $rowperpage = (int)$_POST['length'];
-        
-        $columns = array(
-            0 => 'No', // not sort 
-            1 => 'name',
-            2 => 'groups',
-            3 => 'tags',
-            4 => 'public',
-            5 => 'is_modified',
-            6 => 'modified',
-            7 => 'indicator_count',
-            8 => 'pulse_id',
-        );  
-        $draw = $_POST['draw'];
-        $row = (int)$_POST['start'];
-        $rowperpage = (int)$_POST['length'];
-        
-        $order = $columns[$request->input('order.0.column')];
-        $dir = $request->input('order.0.dir')=='asc'?1:-1;
-
-       
-
-
-        $start =  $row;
-
-
-        $reqId = $request->pulse_id;
-        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-        $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        
-        
-        $options = [
-            'projection' => [
-                '_id' => 0,
-                
-                'name' => 1,
-                'groups' => 1,
-                'tags' => 1,
-                'public' => 1,
-                'is_modified' => 1,
-                'modified' => 1,
-                'count_view' => 1,
-                'indicator_count' => 1,
-                'pulse_id' => 1,
-                
-            ],
-            'sort' => [
-                $order => $dir
-            ],
-            'skip' => $start,
-            'limit' => $rowperpage,
-        ];
-
-        $query = array( 
-            'status' => 1,
-            'deleted_at' => null,
-        );
-        
-        if($request->count_page==-1){
-            $cursor_count = $col_fx_otx_events->count($query);
-            $count_filter = $cursor_count;
-        }else{
-            $cursor_count = $request->count_page;
-            $count_filter = $cursor_count;
-        }
-
-    //    if(empty($request->input('search.value'))) //internal Search
-    //    {
-    //         $query = [];
-    //         $cursor = $col_fx_otx_events->find($query,$options);
-    //    }
-    //    else {
-    //         $search = $request->input('search.value'); 
-    //         $query = [
-    //             '$or' => [
-    //                 [
-    //                     'name' => ['$regex'=>$search ,'$options'=>'i']
-    //                 ],
-    //                 [
-    //                     'groups' => ['$regex'=>$search ,'$options'=>'i']
-    //                 ],
-    //                 [
-    //                     'tags' => ['$regex'=>$search ,'$options'=>'i']
-    //                 ],
-    //                 [
-    //                     'public' => ['$regex'=>$search ,'$options'=>'i']
-    //                 ],
-    //                 [
-    //                     'is_modified' => ['$regex'=>$search ,'$options'=>'i']
-    //                 ]
-    //             ]
-    //         ];
-
-        
-        if($request->keywords||$request->isDateSearch||$request->start_date||$request->end_date||$request->check_published)
-       {
-           
-            if ($request->keywords) {
-                $query['name'] = ['$regex'=>$request->keywords, '$options' => 'i'];
-                // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
-            } 
-
-            $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
-
-            if($isDateSearch){
-                if ($request->startDate&&$request->endDate) {
-                    $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate)*1000), '$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
-                    // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
-                }else if($request->startDate){
-                    $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate)*1000)];
-                    // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
-                }else if($request->endDate){
-                    $query['modified'] = ['$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
-                    // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
-                }
-            }
-
-            if ($request->check_published) {
-                if($request->check_published==1){
-                    $query['public'] = 1;
-                }else if($request->check_published==2){
-                    $query['public'] = 0;
-                }
-            }
-            $cursor = $col_fx_otx_events->find($query,$options);
-            $count_filter = $col_fx_otx_events->count($query);
-       } else {
-            $cursor = $col_fx_otx_events->find($query,$options);
-       }
-
-       
-       
-    $cursor = $cursor->toArray();
-
-    $data = array();
-    $order_number = $start;
-    if(!empty($cursor))
-       {
-           foreach ($cursor as $document)
-           {
+        if(TYPE_WEB == 'center'){
+            $columns = array(
+                0 => 'No', // not sort 
+                1 => 'name',
+                2 => 'groups',
+                3 => 'tags',
+                4 => 'public',
+                5 => 'is_modified',
+                6 => 'modified',
+                7 => 'indicator_count',
+                8 => 'pulse_id',
+            );  
+            $draw = $_POST['draw'];
+            $row = (int)$_POST['start'];
+            $rowperpage = (int)$_POST['length'];
+            
+            $order = $columns[$request->input('order.0.column')];
+            $dir = $request->input('order.0.dir')=='asc'?1:-1;
     
-
-                $order_number++;
-                $nestedData['No'] = $order_number;
-                $nestedData['name'] = $document["name"];
-                $nestedData['groups'] = explode_val($document["groups"],'groups');
-                $nestedData['tags'] = explode_val($document["tags"],'tags');
-                $nestedData['attr'] = '';
-                $nestedData['attrCount'] = $document["indicator_count"];
-                $nestedData['public'] = ($document["public"]);
-                $nestedData['is_modified'] = ($document["is_modified"]);
-                $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                $nestedData['count_view'] = $document["count_view"];
-                $nestedData['pulse_id'] = $document["pulse_id"];
+           
+    
+    
+            $start =  $row;
+    
+    
+            $reqId = $request->pulse_id;
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            
+            
+            $options = [
+                'projection' => [
+                    '_id' => 0,
+                    
+                    'name' => 1,
+                    'groups' => 1,
+                    'tags' => 1,
+                    'public' => 1,
+                    'is_modified' => 1,
+                    'modified' => 1,
+                    'count_view' => 1,
+                    'indicator_count' => 1,
+                    'pulse_id' => 1,
+                    
+                ],
+                'sort' => [
+                    $order => $dir
+                ],
+                'skip' => $start,
+                'limit' => $rowperpage,
+            ];
+    
+            $query = array( 
+                'status' => 1,
+                'deleted_at' => null,
+            );
+            
+            if($request->count_page==-1){
+                $cursor_count = $col_fx_otx_events->count($query);
+                $count_filter = $cursor_count;
+            }else{
+                $cursor_count = $request->count_page;
+                $count_filter = $cursor_count;
+            }
+    
+        //    if(empty($request->input('search.value'))) //internal Search
+        //    {
+        //         $query = [];
+        //         $cursor = $col_fx_otx_events->find($query,$options);
+        //    }
+        //    else {
+        //         $search = $request->input('search.value'); 
+        //         $query = [
+        //             '$or' => [
+        //                 [
+        //                     'name' => ['$regex'=>$search ,'$options'=>'i']
+        //                 ],
+        //                 [
+        //                     'groups' => ['$regex'=>$search ,'$options'=>'i']
+        //                 ],
+        //                 [
+        //                     'tags' => ['$regex'=>$search ,'$options'=>'i']
+        //                 ],
+        //                 [
+        //                     'public' => ['$regex'=>$search ,'$options'=>'i']
+        //                 ],
+        //                 [
+        //                     'is_modified' => ['$regex'=>$search ,'$options'=>'i']
+        //                 ]
+        //             ]
+        //         ];
+    
+            
+            if($request->keywords||$request->isDateSearch||$request->start_date||$request->end_date||$request->check_published)
+           {
                
-                // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
-                // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
-                
-               
-               $data[] = $nestedData;
-
+                if ($request->keywords) {
+                    $query['name'] = ['$regex'=>$request->keywords, '$options' => 'i'];
+                    // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
+                } 
+    
+                $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
+    
+                if($isDateSearch){
+                    if ($request->startDate&&$request->endDate) {
+                        $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate)*1000), '$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
+                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                    }else if($request->startDate){
+                        $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate)*1000)];
+                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
+                    }else if($request->endDate){
+                        $query['modified'] = ['$lte' => new UTCDateTime(strtotime($request->endDate)*1000)];
+                        // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                    }
+                }
+    
+                if ($request->check_published) {
+                    if($request->check_published==1){
+                        $query['public'] = 1;
+                    }else if($request->check_published==2){
+                        $query['public'] = 0;
+                    }
+                }
+                $cursor = $col_fx_otx_events->find($query,$options);
+                $count_filter = $col_fx_otx_events->count($query);
+           } else {
+                $cursor = $col_fx_otx_events->find($query,$options);
            }
-       }
-    $dataOut["draw"] = $draw;
-    $dataOut["recordsTotal"] = $cursor_count;
-    $dataOut["recordsFiltered"] = $count_filter;
-    $dataOut["data"] = $data;
-    $dataOut["cursor"] = $cursor;
-    return response()->json($dataOut);
-
+    
+           
+           
+        $cursor = $cursor->toArray();
+    
+        $data = array();
+        $order_number = $start;
+        if(!empty($cursor))
+           {
+               foreach ($cursor as $document)
+               {
+        
+    
+                    $order_number++;
+                    $nestedData['No'] = $order_number;
+                    $nestedData['name'] = $document["name"];
+                    $nestedData['groups'] = explode_val($document["groups"],'groups');
+                    $nestedData['tags'] = explode_val($document["tags"],'tags');
+                    $nestedData['attr'] = '';
+                    $nestedData['attrCount'] = $document["indicator_count"];
+                    $nestedData['public'] = ($document["public"]);
+                    $nestedData['is_modified'] = ($document["is_modified"]);
+                    $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                    $nestedData['count_view'] = $document["count_view"];
+                    $nestedData['pulse_id'] = $document["pulse_id"];
+                   
+                    // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
+                    // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                    
+                   
+                   $data[] = $nestedData;
+    
+               }
+           }
+            $dataOut["draw"] = $draw;
+            $dataOut["recordsTotal"] = $cursor_count;
+            $dataOut["recordsFiltered"] = $count_filter;
+            $dataOut["data"] = $data;
+            $dataOut["cursor"] = $cursor;
+            return response()->json($dataOut);
+        }else{
+            $ip = $this->ip;
+            $mac = $this->mac;
+            $authorization_key = $this->header;
+            $url_indicator_events_table = $this->url_indicator_events_table;
+    
+            $columns = array(
+                0 => 'No', // not sort 
+                1 => 'name',
+                2 => 'groups',
+                3 => 'tags',
+                4 => 'public',
+                5 => 'is_modified',
+                6 => 'modified',
+                7 => 'indicator_count',
+                8 => 'pulse_id',
+            );  
+            $draw = $request->draw;
+            $start = (int)$request->start;
+            $length = (int)$request->length;
+            $count_page = $request->count_page;
+            $keywords = $request->keywords;
+            $isDateSearch = $request->isDateSearch;
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+            $check_published = $request->check_published;
+            $order = $columns[$request->input('order.0.column')];
+            $dir = $request->input('order.0.dir')=='asc'?1:-1;
+    
+    
+    
+            $request_body_complete = [
+                'draw' => $draw,
+                'start' => $start,
+                'length' => $length,
+                'count_page' => $count_page,
+                'keywords' => $keywords,
+                'keywords' => $keywords,
+                'isDateSearch' => $isDateSearch,
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'check_published' => $check_published,
+                'order' => $order,
+                'dir' => $dir,
+            ];
+            $body_complete = json_encode($request_body_complete);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+            $response_complete = $this -> reconnnect($url_indicator_events_table, $form_body_complete, $authorization_key);
+            if($response_complete['status_code'] == 200){
+                return response()->json($response_complete['data']);
+            }else{
+                return response()->json($response_complete);
+            }
+        }
     }
 
 
@@ -2006,6 +2071,30 @@ class IndicatorsController extends Controller
     $dataOut["cursor"] = $cursor;
     return response()->json($dataOut);
 
+    }
+
+    private function reconnnect($url, $form_body, $authorization_key){
+        if(TYPE_WEB !== 'center'){
+            try{
+                $headers = ['Authorization' => 'Bearer ' . $authorization_key];
+                $res = $this->client->request('POST', $url,  [
+                    'headers' => $headers, 
+                    'form_params' => [
+                        'data' => $form_body
+                    ]
+                ]);
+                $response = json_decode($res->getBody()->getContents(), true);
+                if($response['status_code'] == 200){
+                    $decrypt = encrypt_decrypt('decrypt', $response['data'], $authorization_key, $this->ip, $this->mac);
+                    $response_data = ['message' => '', 'error' => '', 'status_code' => '200', 'data' => json_decode($decrypt, true)];
+                }else{
+                    $response_data = ['message' => '', 'error' => 'Not Found', 'status_code' => '404', 'data' => $response];
+                }
+                return $response_data;
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
     }
 
 }
