@@ -33,9 +33,10 @@ class TransactionJobClients extends ApiController
                                 $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
                                 $TF_Center_transaction_batchjob->status = 1;
                                 $TF_Center_transaction_batchjob->code = generator_uuid();
-                                $TF_Center_transaction_batchjob->mode = $transcation_jobs_client->id;
+
                                 $TF_Center_transaction_batchjob->site_id = $transcation_jobs_client->site_id;
                             }
+                            $TF_Center_transaction_batchjob->mode = $transcation_jobs_client->id;
                             $TF_Center_transaction_batchjob->name = $transcation_jobs_client->mode;
                             $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
                             $TF_Center_transaction_batchjob->progress = 2;
@@ -72,13 +73,15 @@ class TransactionJobClients extends ApiController
                             $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
                             $TF_Center_transaction_batchjob->status = 1;
                             $TF_Center_transaction_batchjob->code = generator_uuid();
-                            $TF_Center_transaction_batchjob->mode = $transcation_jobs_client->id;
+
                             $TF_Center_transaction_batchjob->site_id = $transcation_jobs_client->site_id;
                         }
+                        $TF_Center_transaction_batchjob->mode = $transcation_jobs_client->id;
                         $TF_Center_transaction_batchjob->name = $transcation_jobs_client->mode;
                         $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
                         $TF_Center_transaction_batchjob->progress = 3;
-                        $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
+                        $TF_Center_transaction_batchjob->transcation_date_end = date('Y-m-d H:i:s');
+                        $TF_Center_transaction_batchjob->message =$transcation_jobs_client ->return_data;
                         $TF_Center_transaction_batchjob->save();
 
 
