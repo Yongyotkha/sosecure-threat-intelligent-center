@@ -874,6 +874,16 @@ class NewsController extends Controller
                 $html .= '<div class="list-news" style="background-color:#ececec">';
                 $font_weight = '';
             }
+
+            if($data->transaction_rss_id) {
+                if(@$data->logo) {
+                    $logo_url = config('app.url_center').@$data->logo;
+                } else {
+                    $logo_url = @$data->logo_rss;
+                }
+            } else {
+                $logo_url = config('app.url_center').@$data->logo;
+            }
             $html .= '
                 <!--<div class="checkbox-news-select">
                     <label class="mr-3">
@@ -893,7 +903,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <img src="'.$data -> logo.'" alt="" onerror="setDefaultPic(this)">
+                        <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';
@@ -939,6 +949,16 @@ class NewsController extends Controller
             }else{
                 $html .= '<div class="list-news">';
             }
+
+            if($data -> news -> transaction_rss_id) {
+                if(@$data -> news -> logo) {
+                    $url_logo = config('app.url_center').@$data -> news -> logo;
+                } else {
+                    $url_logo = @$data -> news -> logo_rss;
+                }
+            } else {
+                $url_logo = config('app.url_center').@$data -> news -> logo;
+            }
             $html .= '
                 <div class="checkbox-news-select">
                     <label class="mr-3">
@@ -958,7 +978,7 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-image">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <img src="'.$data -> news -> logo.'" alt="" onerror="setDefaultPic(this)">
+                        <img src="'.$url_logo.'" alt="" onerror="setDefaultPic(this)">
                     </a>
                 </div>
                 <div class="action-bookmark">';
@@ -983,42 +1003,56 @@ class NewsController extends Controller
     public function jqueryLoadMoreNewsBookmark(Request $request){
         $html = '';
         $Bookmark = Bookmark::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();
-        foreach($Bookmark as $data){
-            $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
-            if($check_read_news){
-                $html .= '<div class="list-news">';
-                $font_weight = 'font-weight: bold !important;';
-            }else{
-                $html .= '<div class="list-news" style="background-color:#ececec">';
-                $font_weight = '';
-            }
-            $html .= '
-            <!--<div class="checkbox-news-select">
-                    <label class="mr-3">
-                        <input type="checkbox" name="" class="chk-bookmark">
-                        <span class="label-text checkbox-news-input"></span>
-                    </label>
-                </div>-->
-                <div class="content-news-text">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <span class="head-news-text" style="'.@$font_weight.'">'.$data -> news -> title_th.'</span>
-                    </a>
-                    <div class="entry-meta">
-                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
-                        <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> news -> view.'</span>
-                        <span><p></p>&nbsp;'.strip_tags($data -> news -> detail_th).'</p></span>
+        if($Bookmark) {
+            foreach($Bookmark as $data){
+                $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
+                if($check_read_news){
+                    $html .= '<div class="list-news">';
+                    $font_weight = 'font-weight: bold !important;';
+                }else{
+                    $html .= '<div class="list-news" style="background-color:#ececec">';
+                    $font_weight = '';
+                }
+
+                if($data -> news -> transaction_rss_id) {
+                    if(@$data -> news -> logo) {
+                        $url_logo = config('app.url_center').@$data -> news -> logo;
+                    } else {
+                        $url_logo = @$data -> news -> logo_rss;
+                    }
+                } else {
+                    $url_logo = config('app.url_center').@$data -> news -> logo;
+                }
+
+
+                $html .= '
+                <!--<div class="checkbox-news-select">
+                        <label class="mr-3">
+                            <input type="checkbox" name="" class="chk-bookmark">
+                            <span class="label-text checkbox-news-input"></span>
+                        </label>
+                    </div>-->
+                    <div class="content-news-text">
+                        <a href="'.route('news.news_detail_code',['code' => @$data -> news -> code]).'">
+                            <span class="head-news-text" style="'.@$font_weight.'">'.$data -> news -> title_th.'</span>
+                        </a>
+                        <div class="entry-meta">
+                            <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> news -> public_date.'</span>
+                            <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> news -> view.'</span>
+                            <span><p></p>&nbsp;'.strip_tags(@$data -> news -> detail_th).'</p></span>
+                        </div>
                     </div>
+                    <div class="content-news-image">
+                        <a href="'.route('news.news_detail_code',['code' => @$data -> news -> code]).'">
+                            <img src="'.$url_logo.'" alt="" onerror="setDefaultPic(this)">
+                        </a>
+                    </div>
+                    <div class="action-bookmark">';
+                        $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.@$data -> news -> id.'" onclick="Bookmarks(this, '.$data -> news -> id.')"></i>';
+                        $html .= '</div>
                 </div>
-                <div class="content-news-image">
-                    <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <img src="'.$data -> news -> logo.'" alt="" onerror="setDefaultPic(this)">
-                    </a>
-                </div>
-                <div class="action-bookmark">';
-                    $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$data -> news -> id.'" onclick="Bookmarks(this, '.$data -> news -> id.')"></i>';
-                    $html .= '</div>
-            </div>
-            ';
+                ';
+            }
         }
         if ($request->ajax()) {
             $data = [

@@ -18,6 +18,7 @@ return [
     'PATH_CENTER' => env('PATH_CENTER', 'null'),
     'PATH_CLIENT' => env('PATH_CLIENT', 'null'),
     'URL_CENTER' => env('URL_CENTER', 'null'),
+	'url_center' => env('URL_CENTER', 'null'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment
