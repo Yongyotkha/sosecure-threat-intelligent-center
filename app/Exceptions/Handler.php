@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Log;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -37,6 +38,19 @@ class Handler extends ExceptionHandler
         if (app()->bound('sentry') && $this->shouldReport($exception)) {
             app('sentry')->captureException($exception);
         }
+        $data = [
+            'file'    => $exception->getFile(),
+            'line'    => $exception->getLine(),
+            'message' => $exception->getMessage(),
+            'trace'   => $exception->getTraceAsString(),
+        ];
+
+        $dataArr =[
+            'file'           => $data['file'],
+            'error_summary'  => 'Line '.$data['line'].' '.$data['message'],
+            'log_trace'      => $data['trace']
+        ];
+        Log::create($dataArr);
         parent::report($exception);
     }
 
