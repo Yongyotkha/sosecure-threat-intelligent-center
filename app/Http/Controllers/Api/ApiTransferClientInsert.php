@@ -27,6 +27,7 @@ use App\Entities\Permissions;
 use App\Entities\Role_permissions;
 use App\Entities\Model_has_roles;
 use App\Entities\Profiles;
+use App\Entities\Compromised_server;
 
 
 class ApiTransferClientInsert extends Controller
@@ -323,20 +324,20 @@ class ApiTransferClientInsert extends Controller
 
     protected function insertToNoRefWithID(Request $request)
     {
-       $ip =exec("hostname -I");
-       $mac = exec("cat /sys/class/net/ens33/address");
-       $header = $request->bearerToken();
-       $code = $request->site_code_en;
-       $dataEncode = $code;
-       $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
-       $messageErr = '';
-       $connect = true;
-       $result = true;
-       $arrUpdate = array();
+     $ip =exec("hostname -I");
+     $mac = exec("cat /sys/class/net/ens33/address");
+     $header = $request->bearerToken();
+     $code = $request->site_code_en;
+     $dataEncode = $code;
+     $dataDecode = encrypt_decrypt('decrypt', $dataEncode, $header, $ip, $mac);
+     $messageErr = '';
+     $connect = true;
+     $result = true;
+     $arrUpdate = array();
 
         // $dataDecode = false;
 
-       if ($dataDecode||$dataDecode == 0) {
+     if ($dataDecode||$dataDecode == 0) {
 
         try {
             $siteID = $dataDecode;
@@ -418,6 +419,10 @@ class ApiTransferClientInsert extends Controller
             }else if ($nameTable == 'fx_transaction_client_site_category') {
                 $pkey = 'id';
                 $model_insert = new Site_category;
+
+            }else if ($nameTable == 'fx_transaction_client_compromised_server') {
+                $pkey = 'id';
+                $model_insert = new Compromised_server;
 
             }  else {
                 $connect = false;

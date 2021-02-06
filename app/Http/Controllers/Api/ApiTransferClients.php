@@ -35,6 +35,7 @@ use App\Entities\Transaction_role_permissions;
 use App\Entities\Transaction_model_has_roles;
 use App\Entities\Transaction_profiles;
 use App\Entities\Sites;
+use App\Entities\Transaction_client_compromised_server;
 class ApiTransferClients extends Controller
 {
 
@@ -55,25 +56,25 @@ class ApiTransferClients extends Controller
       $Sites_get = Sites::where('code',$code)->where('active',1)->where('system_site_online',1)->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', ">=", date("Y-m-d H:i:s"))->first();
 
       if (!$Sites_get) {
-       $dataout = [
+         $dataout = [
+            'connect' => 0,
+            'result' => 0,
+            'queryData' =>$Sites_get,
+            'site_code_en' =>$code,
+            'messageErr' => 'Your account has expired; please contact your system administrator',
+        ];
+        return response()->json($dataout); 
+    }
+
+    if ($header !=$Sites_get->public_key) {
+      $dataout = [
         'connect' => 0,
         'result' => 0,
-        'queryData' =>$Sites_get,
+        'queryData' => array(),
         'site_code_en' =>$code,
         'messageErr' => 'Your account has expired; please contact your system administrator',
     ];
     return response()->json($dataout); 
-}
-
-if ($header !=$Sites_get->public_key) {
-  $dataout = [
-    'connect' => 0,
-    'result' => 0,
-    'queryData' => array(),
-    'site_code_en' =>$code,
-    'messageErr' => 'Your account has expired; please contact your system administrator',
-];
-return response()->json($dataout); 
 }
 
 
@@ -192,6 +193,11 @@ if($dataDecode){
             $modeInsert = 'fx_transaction_client_site_category';
             $nameBJ = 'Transaction Client site_category - everyMinute()  Or Request';
 
+        }else if ($nameTable == 'fx_transaction_client_compromised_server') {
+            $model_getData = new Transaction_client_compromised_server;
+            $modeInsert = 'fx_transaction_client_compromised_server';
+            $nameBJ = 'Transaction Client compromised server - everyMinute()  Or Request';
+
         }else {
             $connect = false;
             $result = false;
@@ -208,7 +214,7 @@ if($dataDecode){
 
             if(!$TF_Center_transaction_batchjob){
                 $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
-                $TF_Center_transaction_batchjob->status = 2;
+                $TF_Center_transaction_batchjob->status = 1;
                 $TF_Center_transaction_batchjob->code = generator_uuid();
                 $TF_Center_transaction_batchjob->mode = $modeInsert;
                 $TF_Center_transaction_batchjob->site_id = $site->id;

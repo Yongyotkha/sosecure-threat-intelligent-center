@@ -17,7 +17,7 @@ use App\Entities\TF_Center_data_leak_socail_ref_temp;
 use App\Entities\TF_Center_data_datacve_mapping;
 use App\Entities\TF_Center_data_leak_feed;
 use App\Entities\TF_Center_data_leak_socail_ref;
-
+use App\Entities\Sites;
 
 class ApiTransferCenterInsert extends Controller
 {
@@ -69,7 +69,7 @@ class ApiTransferCenterInsert extends Controller
                             if(!empty($dataTable["transaction_id"])||!empty($dataTable["transaction_id_ref"])){
 
                                 $findOne_main = new $model_main;
-                               
+
                                 $findOne_main->setConnection($this->dbName);
                                 
 
@@ -87,11 +87,11 @@ class ApiTransferCenterInsert extends Controller
                                                 }
                                                 $findOne_main->{$key} = $subValue;
                                             }
-    
+
                                         }
-    
+
                                         $findOne_main->save();
-    
+
                                     } else {
                                         $findOne_main->transfer_site_id = $site->id;
                                         $findOne_main->transfer_data_id = $dataTable["get_transfer"][$pkey_main];
@@ -102,7 +102,7 @@ class ApiTransferCenterInsert extends Controller
                                                 }
                                                 $findOne_main->{$key} = $subValue;
                                             }
-    
+
                                         }
                                         $findOne_main->save();
                                     }
@@ -142,11 +142,11 @@ class ApiTransferCenterInsert extends Controller
                                                     }
                                                     $findOne_sub->{$key} = $subValue;
                                                 }
-        
+
                                             }
-        
+
                                             $findOne_sub->save();
-        
+
                                         } else {
                                             $findOne_sub->transfer_site_id = $site->id;
                                             $findOne_sub->transfer_data_id = $dataTable["get_transfer_ref"][$pkey_sub];
@@ -158,7 +158,7 @@ class ApiTransferCenterInsert extends Controller
                                                     }
                                                     $findOne_sub->{$key} = $subValue;
                                                 }
-        
+
                                             }
                                             $findOne_sub->save();
                                         }
@@ -245,11 +245,11 @@ class ApiTransferCenterInsert extends Controller
                                                 }
                                                 $findOne->{$key} = $subValue;
                                             }
-    
+
                                         }
-    
+
                                         $findOne->save();
-    
+
                                     } else {
                                         $findOne->transfer_site_id = $site->id;
                                         $findOne->transfer_data_id = $dataTable["get_transfer"][$pkey];
@@ -260,7 +260,7 @@ class ApiTransferCenterInsert extends Controller
                                                 }
                                                 $findOne->{$key} = $subValue;
                                             }
-    
+
                                         }
                                         $findOne->save();
                                     }
@@ -331,61 +331,104 @@ class ApiTransferCenterInsert extends Controller
 
     protected function updateBatchJob(Request $request)
     {
-        $modeFor = $request->modeFor;
-        $modeInsert = $request->modeInsert;
-        $nameBJ = $request->nameBJ;
 
-        $sitecode = $request->sitecode;
-        $site = SiteSettings::where('code', $sitecode)->first();
-       
-        if($site){
-            if($modeFor=='wait'||$modeFor=='done'){
-                $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('mode', $modeInsert)->where('site_id', $site->id)->first();
-                if(!$TF_Center_transaction_batchjob){
-                    $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
-                    $TF_Center_transaction_batchjob->status = 1;
-                    $TF_Center_transaction_batchjob->code = generator_uuid();
-                    $TF_Center_transaction_batchjob->mode = $modeInsert;
-                    $TF_Center_transaction_batchjob->site_id = $site->id;
-                }
-                $TF_Center_transaction_batchjob->name = $nameBJ;
-                
-                $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
-                
-                if($modeFor=='wait'){
-                    $TF_Center_transaction_batchjob->progress = 1;
-                    $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
-                }else if($modeFor=='done'){
-                    $TF_Center_transaction_batchjob->progress = 1;
-                    $TF_Center_transaction_batchjob->transcation_date_end = date('Y-m-d H:i:s');
-                }
-                $TF_Center_transaction_batchjob->save();
-            }
+
+
+
+        $ip = "";
+        $mac = "";
+        $header = $request->bearerToken();
+        $code = $request->get('code');
+        $Sites_get = Sites::where('code',$code)->where('active',1)->where('system_site_online',1)->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', ">=", date("Y-m-d H:i:s"))->first();
+
+        if (!$Sites_get) {
+         $dataout = [
+            'connect' => 0,
+            'result' => 0,
+            'queryData' =>$Sites_get,
+            'site_code_en' =>$code,
+            'messageErr' => 'Your account has expired; please contact your system administrator',
+        ];
+        return response()->json($dataout); 
+    }
+
+    if ($header !=$Sites_get->public_key) {
+      $dataout = [
+        'connect' => 0,
+        'result' => 0,
+        'queryData' => array(),
+        'site_code_en' =>$code,
+        'messageErr' => 'Your account has expired; please contact your system administrator',
+    ];
+    return response()->json($dataout); 
+}
+
+
+
+
+$ip=$Sites_get->ip_key;
+$mac=$Sites_get->mac_address_key;
+$data = $request->data;
+$dataDecode = encrypt_decrypt('decrypt', $data, $header, $ip, $mac);
+$object_dataDecode = json_decode($dataDecode, FALSE);
+
+
+$modeFor = $object_dataDecode->modeFor;
+$modeInsert = $object_dataDecode->modeInsert;
+$nameBJ = $object_dataDecode->nameBJ;
+$message_error = $object_dataDecode->message_error;
+$sitecode = $code;
+$site = $Sites_get;
+
+if($site){
+    if($modeFor=='wait'||$modeFor=='done'){
+        $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('mode', $modeInsert)->where('site_id', $site->id)->first();
+        if(!$TF_Center_transaction_batchjob){
+            $TF_Center_transaction_batchjob = new TF_Center_transaction_batchjob;
+            $TF_Center_transaction_batchjob->status = 1;
+            $TF_Center_transaction_batchjob->code = generator_uuid();
+            $TF_Center_transaction_batchjob->mode = $modeInsert;
+            $TF_Center_transaction_batchjob->site_id = $site->id;
         }
-        
-        $dataout = [
-            'connect' => true,
-        ];
+        $TF_Center_transaction_batchjob->name = $nameBJ;
 
-        return response()->json($dataout);
+        $TF_Center_transaction_batchjob->transcation_date = date('Y-m-d');
+
+        if($modeFor=='wait'){
+            $TF_Center_transaction_batchjob->progress = 1;
+            $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
+        }else if($modeFor=='done'){
+            $TF_Center_transaction_batchjob->progress = 1;
+            $TF_Center_transaction_batchjob->transcation_date_end = date('Y-m-d H:i:s');
+        }
+        $TF_Center_transaction_batchjob->message =$message_error;
+        $TF_Center_transaction_batchjob->save();
     }
+}
 
-    protected function get_encode(Request $request)
-    {
-        $ip = '127.0.0.1';
-        $mac = 'abcd';
-        $header = 'header';
-        $site = [
-            'site_id' => $request->site_id,
-        ];
-        $dataEncode = encrypt_decrypt('encrypt', json_encode($site), $header, $ip, $mac);
+$dataout = [
+    'connect' => true,
+];
+
+return response()->json($dataout);
+}
+
+protected function get_encode(Request $request)
+{
+    $ip = '127.0.0.1';
+    $mac = 'abcd';
+    $header = 'header';
+    $site = [
+        'site_id' => $request->site_id,
+    ];
+    $dataEncode = encrypt_decrypt('encrypt', json_encode($site), $header, $ip, $mac);
         // $dataEncode = encrypt_decrypt('decrypt', $dataEncode, $header,$ip,$mac);
-        $dataout = [
-            'connect' => true,
-            'result' => $dataEncode,
-        ];
+    $dataout = [
+        'connect' => true,
+        'result' => $dataEncode,
+    ];
 
-        return response()->json($dataout);
-    }
+    return response()->json($dataout);
+}
 
 }
