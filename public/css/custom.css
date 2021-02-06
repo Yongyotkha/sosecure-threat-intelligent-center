@@ -782,7 +782,7 @@ ul.item-list-dash li:not(:last-child){
     max-width: 100%;
     margin: auto;
     padding: 2rem;
-    border-top: 2px solid #e0206f;
+    border-top: 2px solid transparent;
     /* background: #263042; */
     background: #fff;
     

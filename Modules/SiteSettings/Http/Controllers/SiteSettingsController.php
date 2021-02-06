@@ -715,7 +715,9 @@ class SiteSettingsController extends Controller
                 return $logo;
             })
             ->editColumn('name', function ($model) {
-                return $model->name;
+                $html = '';
+                $html .= "<a href='" . route('sitesettings.edit', ['id' => $model->code]) . "' class='text-dark'>$model->name</a>";
+                return $html;
             })
             ->editColumn('categorys', function ($model) {
                 $return = '';

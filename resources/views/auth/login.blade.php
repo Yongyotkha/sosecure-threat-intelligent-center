@@ -121,9 +121,9 @@
             {{-- /Footer --}}
         </section>
     </div>    
-        <a class="btn btn-link d-block text-center mt-2" href="{{ route('password.request') }}">
+        {{-- <a class="btn btn-link d-block text-center mt-2" href="{{ route('password.request') }}">
             @langapp('forgot_password')
-        </a>
+        </a> --}}
     </div>
 </section>
 @endsection
