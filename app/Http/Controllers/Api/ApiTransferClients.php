@@ -36,6 +36,9 @@ use App\Entities\Transaction_model_has_roles;
 use App\Entities\Transaction_profiles;
 use App\Entities\Sites;
 use App\Entities\Transaction_client_compromised_server;
+
+use App\Entities\Transaction_client_asset;
+use App\Entities\Transaction_client_asset_data;
 class ApiTransferClients extends Controller
 {
 
@@ -197,6 +200,18 @@ if($dataDecode){
             $model_getData = new Transaction_client_compromised_server;
             $modeInsert = 'fx_transaction_client_compromised_server';
             $nameBJ = 'Transaction Client compromised server - everyMinute()  Or Request';
+
+        }
+        else if ($nameTable == 'fx_transaction_client_asset') {
+            $model_getData = new Transaction_client_asset;
+            $modeInsert = 'fx_transaction_client_asset';
+            $nameBJ = 'Transaction asset compromised server - everyMinute()  Or Request';
+
+        }
+        else if ($nameTable == 'fx_transaction_client_asset_data') {
+            $model_getData = new Transaction_client_asset_data;
+            $modeInsert = 'fx_transaction_client_asset_data';
+            $nameBJ = 'Transaction asset_data compromised server - everyMinute()  Or Request';
 
         }else {
             $connect = false;
