@@ -7,7 +7,7 @@ use App\Log;
 
 class TranferFromClient extends ApiController
 {
-    public function tranferBD(Request $request){
+    public function tranferDB(Request $request){
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
