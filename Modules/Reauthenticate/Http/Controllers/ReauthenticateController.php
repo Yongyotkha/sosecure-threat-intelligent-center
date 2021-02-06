@@ -11,6 +11,7 @@ use App\Roles;
 use App\transaction_client_role_permissions;
 use App\transaction_client_users;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -51,13 +52,10 @@ class ReauthenticateController extends Controller
             if($verify == 0 && $last_change_pass == null) {
                 return view('reauthenticate::index',compact('User','granted_access','granted_access_val'));
             } else {
-
                 return redirect()->route('index');
             }
         } else {
-
-            return redirect()->route('index');
-            
+            return redirect()->route('index');  
         }
  
     }
@@ -124,7 +122,23 @@ class ReauthenticateController extends Controller
 
     public function verify_success(Request $request)
     {
-        return view('reauthenticate::verify_success');
+        $token = $request->token;
+        $user = User::where('site_add_user_token',$token)->first();
+
+        $model_has_roles = model_has_roles::where('model_id',$user->id)->first();
+        if($model_has_roles) {
+            if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
+                $url_redirect = route('reauth.verify_success');
+                $UserSite = UserSite::select('site_id')->where('user_id',$user->id)->first();
+                $site_ip = @$UserSite->get_site->ip_key;
+            } else {
+                $url_redirect = route('index');
+            }
+        }
+        $data['site_ip'] = $site_ip;
+        // dd($site_ip);
+
+        return view('reauthenticate::verify_success')->with($data);
     }
 
     public function verify_update_pass(VerifyUserRequest $request, $id = null)
@@ -138,7 +152,8 @@ class ReauthenticateController extends Controller
         $model_has_roles = model_has_roles::where('model_id',$user->id)->first();
         if($model_has_roles) {
             if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
-                $url_redirect = route('reauth.verify_success');
+                $url_redirect = route('reauth.verify_success').'?token='.$user->site_add_user_token;
+                $UserSite = UserSite::select('site_id')->where('user_id',$user->id)->first();
             } else {
                 $url_redirect = route('index');
             }

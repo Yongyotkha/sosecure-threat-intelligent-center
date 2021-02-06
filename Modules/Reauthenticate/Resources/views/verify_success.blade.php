@@ -22,7 +22,7 @@
 
             {{-- <form class="panel-body wrapper-lg" method="POST" action=""> --}}
             <form class="panel-body wrapper-lg ajaxifyForm_custom validator">
-                <h1>Can be signed in at your domain site.</h1>
+                <h1>Can be signed in at your domain site {{@$site_ip ? ': '. @$site_ip : ''}}</h1>
             </form>  
             {{-- </form> --}}
                 @if (!settingEnabled('hide_branding')) 
