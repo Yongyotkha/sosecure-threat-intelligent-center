@@ -114,7 +114,7 @@ class TransactionJobClients extends ApiController
         }
     }
 
-    public function tranferDB(Request $request){
+    public function tranfer_db(Request $request){
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -128,7 +128,7 @@ class TransactionJobClients extends ApiController
                         foreach($data['data'] as $logs){
                             $log = new Log;
                             $log -> site_id = $data['site']['data']['id'];
-                            $log -> file = $logs['return_data'];
+                            $log -> file = $logs['file'];
                             $log -> error_summary = $logs['error_summary'];
                             $log -> log_trace = $logs['log_trace'];
                             $log -> save();
