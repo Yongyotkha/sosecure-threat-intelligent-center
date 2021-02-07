@@ -129,10 +129,29 @@
                                                     <div class="loadding-text">Loading ...</div>
                                                 </div>
                                                 <div class="box-chart-color">
-                                                    <div class="d-flex align-items-center header-chart-p">
-                                                        <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
-                                                        
-                                                        <h1 class="text-blue bold-500">Indicators</h1>
+                                                    <div class="header-chart-p">
+                                                        <div class="d-flex align-items-center ">
+                                                            <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
+                                                            <h1 class="text-blue bold-500">Indicators</h1>
+                                                        </div>
+                                                        <div class="btn-group pull-right" style="margin-top: -25px;">
+                                                            <button
+                                                                class="btn btn-xs text-dark dropdown-toggle"
+                                                                data-toggle="dropdown">View
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-left">
+                                                                <li>
+                                                                    <a href="#">
+                                                                        View Month
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" id="btn_change_fix" data-toggle="modal" data-target="#change_status">
+                                                                        View Year
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
                                                     </div>
                                                     <div class="divider-dark"></div>
                                                     <div id="chart-show-line" class="h-chart"></div>
