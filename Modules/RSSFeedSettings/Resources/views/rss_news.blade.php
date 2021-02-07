@@ -214,6 +214,45 @@
                         </div>
                     </section>
 
+                    <section class="m-b-10">
+                        <div class="panel-body" style="padding: 0 15px;" id="chart-container">
+                            <div class="row">
+                                <div class="col-xl-12 col-lg-12 col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-lg-6 mb-small-5px">
+                                            {{-- <div class="loadhost backdrop-loader">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div> --}}
+                                            <div class="box-chart-color bg-white">
+                                                <div class="d-flex align-items-center header-chart-p">
+                                                    <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                                    <h1 class="text-blue bold-500">Top Source</h1>
+                                                </div>
+                                                <div class="divider-dark"></div>
+                                                <div id="chart-top-source" class="h-chart"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 mb-small-5px">
+                                            {{-- <div class="loadvulserverity backdrop-loader">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div> --}}
+                                            <div class="box-chart-color bg-white">
+                                                <div class="d-flex align-items-center header-chart-p">
+                                                    <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
+                                                    <h1 class="text-blue bold-500">Top Category</h1>
+                                                </div>
+                                                <div class="divider-dark"></div>
+                                                <div id="chart-top-category" class="h-chart"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <section class="scrollable">
                         <section class="panel panel-default">
                             <header class="panel-heading font-bold panel-header-blue">
@@ -290,6 +329,7 @@
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
 @include('stacks.css.summernote')
+@include('stacks.css.highchart')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
@@ -303,8 +343,181 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.activebutton')
 @include('stacks.js.advanced_search')
-
+@include('stacks.js.highchart')
 <script>
+
+    const chart_top_source = Highcharts.chart('chart-top-source', {
+        chart: {
+            type: 'column',
+            scrollablePlotArea: {
+            minWidth: 1200,
+            scrollPositionX: 1
+            }
+        },
+        title: {
+            text: null
+        },
+        xAxis: {
+            categories: [
+            'Krebsansecurity',
+            'Schneler',
+            'Trendmicro',
+            'Posttoday',
+            'Thairath',
+            'Sanook',
+            'Kapook',
+            'Prochacha1',
+            ],
+            crosshair: true,
+            labels: {
+                overflow: 'justify',
+                autoRotation: false,
+            }
+       
+        },
+        yAxis: {
+            min: 0,
+            title: {
+            text: 'Values'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            series:{
+                pointWidth: 30,
+                color : '#ffc107',
+            },
+            style:{
+                background: '#fff'
+            }
+        },
+  
+        legend: {
+            enabled: false
+        },
+        series: [{
+            name: 'Krebsansecurity',
+            data: [49.9],
+        }, {
+            
+            name: 'Schneler',
+            data: [null,83.6]
+
+        }, {
+            
+            name: 'Trendmicro',
+            data: [null,null,48.9]
+
+        }, {
+            
+            name: 'Posttoday',
+            data: [null,null,null,42.4]
+
+        }, {
+            
+            name: 'Thairath',
+            data: [null,null,null,null,42.4]
+
+        }, {
+            
+            name: 'Sanook',
+            data: [null,null,null,null,null,42.4]
+        }, {
+            
+            name: 'Kapook',
+            data: [null,null,null,null,null,null,42.4]
+        }, {
+            
+            name: 'Prochacha1',
+            data: [null,null,null,null,null,null,null,42.4]
+
+        }]
+        });
+
+        const chart_top_category = Highcharts.chart('chart-top-category', {
+            chart: {
+                type: 'column',
+                scrollablePlotArea: {
+                    minWidth: 500,
+                    scrollPositionX: 1
+                }
+            },
+            title: {
+                text: null
+            },
+            xAxis: {
+                categories: [
+                'Software',
+                'Cybersecurity',
+                'Financial',
+                'Services',
+
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                text: 'Values'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                },
+                series:{
+                    pointWidth: 30,
+                    color : '#ffc107',
+                },
+                style:{
+                    background: '#fff'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                name: 'Software',
+                data: [49.9],
+            }, {
+                
+                name: 'Cybersecurity',
+                data: [null,83.6]
+
+            }, {
+                
+                name: 'Financial',
+                data: [null,null,48.9]
+
+            }, {
+                
+                name: 'Services',
+                data: [null,null,null,42.4]
+
+            }]
+        });
+
+
 
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');

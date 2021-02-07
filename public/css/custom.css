@@ -2454,6 +2454,9 @@ ul.topics-news-list li a:hover{
     /* border-radius: 25px; */
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
 }
+.box-chart-color.bg-white{
+    background-color: #fff;
+}
 .header-chart-p{
     padding: 1rem 1rem;
     background: #2e3e4e14;
