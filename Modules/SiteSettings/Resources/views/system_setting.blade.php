@@ -381,6 +381,26 @@
                                                                     data-rel="tooltip" title="Set Permission">Update
                                                                     Code</a>
                                                             </th>
+                                                            <th style="text-align:center;width:50px;">
+                                                                <a href="#" onclick="get_status_nginx();"
+                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                                    data-rel="tooltip" title="Set Permission">Get Status Nginx</a>
+                                                            </th>
+                                                            <th style="text-align:center;width:50px;">
+                                                                <a href="#" onclick="restart_nginx();"
+                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                                    data-rel="tooltip" title="Set Permission">Restart Nginx</a>
+                                                            </th>
+                                                            <th style="text-align:center;width:50px;">
+                                                                <a href="#" onclick="get_status_mongo();"
+                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                                    data-rel="tooltip" title="Set Permission">Get Status MongoDB</a>
+                                                            </th>
+                                                            <th style="text-align:center;width:50px;">
+                                                                <a href="#" onclick="restart_mongo();"
+                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                                    data-rel="tooltip" title="Set Permission">Restart MongoDB</a>
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -403,6 +423,26 @@
                                                             <td>
                                                                 <center>
                                                                     {{ @$siteSettings -> get_set_permission -> updated_at}}
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    {{ @$siteSettings -> get_update_code -> updated_at}}
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    {{ @$siteSettings -> get_update_code -> updated_at}}
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    {{ @$siteSettings -> get_update_code -> updated_at}}
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    {{ @$siteSettings -> get_update_code -> updated_at}}
                                                                 </center>
                                                             </td>
                                                             <td>
@@ -634,6 +674,118 @@
             url: "{{ route('sitesettings.artisan_call') }}",
             data: {
                 mode: 'update_code',
+                site_id: '{{ $siteSettings -> id }}'
+            },
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function get_status_nginx() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            data: {
+                mode: 'get_status_nginx',
+                site_id: '{{ $siteSettings -> id }}'
+            },
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function restart_nginx() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            data: {
+                mode: 'restart_nginx',
+                site_id: '{{ $siteSettings -> id }}'
+            },
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function get_status_mongo() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            data: {
+                mode: 'get_status_mongo',
+                site_id: '{{ $siteSettings -> id }}'
+            },
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function restart_mongo() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            data: {
+                mode: 'restart_mongo',
                 site_id: '{{ $siteSettings -> id }}'
             },
             success: function (response) {
