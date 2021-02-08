@@ -1888,10 +1888,11 @@ ul.topics-news-list li a:hover{
 
 .text-elip-message{
     white-space: nowrap; 
-    max-width: 100px; 
+    max-width: 150px; 
     overflow: hidden;
     text-overflow: ellipsis; 
     width: 100%;
+    max-height: 18px;
 }
 
 .content-news-image a img{

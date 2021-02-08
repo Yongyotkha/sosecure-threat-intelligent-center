@@ -184,7 +184,7 @@ class MonitoringController extends Controller
         return DataTables::of($model)
         ->editColumn('message', function (TransactionBatchjob $model) {
             $html = '';
-            $html .= '<div class="text-elip-message">'.$model->message.'</div>';
+            $html .= '<div class="text-elip-message" data-title='.$model->message.'>'.$model->message.'</div>';
             return  $html;
         })
         ->rawColumns(['name','mode','progress','transcation_date_start','transcation_date_end','site_id','message',])

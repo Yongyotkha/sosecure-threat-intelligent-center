@@ -281,7 +281,6 @@ function data_table(){
                 },
                 {
                     data: 'message',
-                    className : 'nowrap'
                 },
             ],
             columnDefs: [
