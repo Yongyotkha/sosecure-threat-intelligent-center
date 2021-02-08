@@ -159,8 +159,8 @@ Route::post('/compromised_web_server_ip/checkwebserverIP', 'DataLeakController@c
 Route::post('/compromised_web_server/web_server_add_user', 'DataLeakController@web_server_add_user')->name('compromised_web_server.web_server_add_user')->middleware('can:menu_items');
 Route::post('/compromised_web_server_ip/load_data_connection', 'DataLeakController@load_data_connection')->name('compromised_web_server.load_data_connection')->middleware('can:menu_items');
 
-Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware('can:menu_items');
-Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware('can:menu_items');
+Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware(['can:menu_items','permission:data_leak']);
+Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware(['can:menu_items','permission:compromised']);
 Route::post('/datafeed_darkweb/get_data_feed', 'DataLeakController@get_data_feed')->name('socialdatas.get_data_feed');
 Route::post('/datafeed_darkweb/approve_compromised_feed', 'DataLeakController@approve_compromised_feed')->name('socialdatas.approve_compromised_feed');
 
@@ -173,12 +173,12 @@ Route::post('/datafeedsocial/approve/dataFeed', 'DataLeakController@approve_data
 Route::post('/datafeedsocial/cancle/dataFeed', 'DataLeakController@cancle_data_feed')->name('socialdatas.cancle_data_feed');
 Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_details')->name('vulsetting.detail')->middleware('can:menu_items');
 
-Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware('can:menu_items');
-Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware('can:menu_items');
+Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware(['can:menu_items','permission:data_leak']);
+Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware(['can:menu_items','permission:compromised']);
 
 Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb');
 Route::get('/socialdatas/delete_dataleakdata_modal/{code}', 'DataLeakController@delete_dataleakdata_modal')->name('socialdatas.delete_dataleakdata_modall');
-Route::get('/darkweb_data/delete_darkwebdata_modal/{code}', 'DataLeakController@delete_darkwebdata_modal')->name('darkweb.delete_darkwebdata_modal');
+Route::get('/darkweb_data/delete_darkwebdata_modal/{code}', 'DataLeakController@delete_darkwebdata_modal')->middleware(['can:menu_items','permission:compromised']);
 Route::get('/socialdatas/delete_dataleakdata/{code}', 'DataLeakController@delete_dataleakdata')->name('socialdatas.delete_dataleakdata');
 Route::post('/darkweb/delete_darkwebdata_process/{code}', 'DataLeakController@delete_darkwebdata_process')->name('darkweb.delete_darkwebdata_process');
 Route::post('/socialdatas/delete_dataleakdata/{code}', 'DataLeakController@delete_dataleakdata')->name('socialdatas.delete_dataleakdata');
@@ -189,7 +189,7 @@ Route::post('/darkweb/delete_select_process', 'DataLeakController@delete_darkweb
 Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb');
 Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor')->middleware('can:menu_items');
 
-Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkweb_data_change_status')->name('DataLeakController.darkweb_data_change_status')->middleware('can:menu_items');
+Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkweb_data_change_status')->name('DataLeakController.darkweb_data_change_status')->middleware(['can:menu_items','permission:compromised']);
 
 Route::post('modal_create_credentials', 'SiteSettingsController@modal_create_credentials')->name('SiteSettingsController.modal_create_credentials')->middleware('can:menu_items');
 
