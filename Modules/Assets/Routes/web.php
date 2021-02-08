@@ -11,7 +11,7 @@
 |
 */
 Route::group(
-    ['middleware' => 'web', 'prefix' => 'assets'],
+    ['middleware' => ['web', 'permission:assets'], 'prefix' => 'assets'],
     function () {
         Route::get('all', 'AssetsController@index_all_asset')->name('assets.index_setting')->middleware('can:menu_items');
         Route::get('/', 'AssetsController@index')->name('assets.index')->middleware('can:menu_items');

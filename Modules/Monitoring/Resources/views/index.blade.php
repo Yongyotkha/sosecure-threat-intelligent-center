@@ -108,6 +108,7 @@
                                     <th>Transaction Last Start</th>
                                     <th>Transaction Last End</th>
                                     <th>Site</th>
+                                    <th>Message</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -276,6 +277,10 @@ function data_table(){
                 },
                 {
                     data: 'site_id',
+                    className : 'nowrap'
+                },
+                {
+                    data: 'message',
                     className : 'nowrap'
                 },
             ],

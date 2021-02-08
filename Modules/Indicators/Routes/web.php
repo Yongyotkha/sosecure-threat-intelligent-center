@@ -15,7 +15,7 @@
 
 
 Route::group(
-    ['middleware' => 'web', 'prefix' => 'indicators'],
+    ['middleware' => ['web', 'permission:indicators'], 'prefix' => 'indicators'],
     function () {
         Route::get('/detail', 'IndicatorsController@show_detail_indicator')->name('indicators.detail_indicator')->middleware('can:menu_items');
         Route::get('/events', 'IndicatorsController@events')->name('indicators.events')->middleware('can:menu_items');
