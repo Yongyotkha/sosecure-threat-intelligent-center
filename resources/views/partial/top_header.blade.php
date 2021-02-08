@@ -76,7 +76,7 @@
             </li>
             @endif
 
-            @include('partial.notifications')
+            {{-- @include('partial.notifications') --}}
             
 
 
