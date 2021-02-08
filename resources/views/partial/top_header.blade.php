@@ -84,7 +84,7 @@
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <span class="thumb-sm avatar pull-left">
-                        <img src="{{ avatar() }}" class="img-circle">
+                        <img src="{{ avatar() }}" class="img-circle" onerror="setDefaultPic(this)">
                     </span>
                     {{ Auth::user()->name }} <b class="caret"></b>
                 </a>
