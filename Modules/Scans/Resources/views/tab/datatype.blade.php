@@ -197,6 +197,17 @@
                 }
             }
         });
+
+        $('#table-scans-data').on('click', '#select-all', function () {
+            if ($(this).is(':checked')) {
+                $('#asset-to-use').prop("disabled", false);
+            } else {
+                if ($('#select-all').filter(':checked').length < 1){
+                    $('#asset-to-use').attr('disabled',true);
+                }
+            }
+        });
+        
     });
     var number_rows = 0; 
     var number_add_rows = 0;
@@ -268,56 +279,64 @@
                 loading('stop_load');
                 let result = response.data;
                 var html = ``;
+                let checkAssetDplicate = [];
                 for(let i in result.data){
                     const data_referent = result.data[i];
-                    const raw_data = data_referent.raw_data;
-                    const data_transaction = data_referent.data;
-                    html += `<div class="col-md-3">
-                        <h4 class="text-dark">${raw_data}</h4>
-                    </div>
-                    <div class="col-md-9">
-                        <table class="table table-bordered asset-table-${i}">
-                            <tbody>`;
-                                let count = 0;
-                                for(let c in data_transaction){
-                                    const data_transaction_val = data_transaction[c];
-                                    number_rows++;
-                                    count++;
-                                    if(count == 1){
-                                        html += `<input type="hidden" name="assets[]" class="form-control" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id}" data-site_id="${data_transaction_val.site_id}">`;
-                                    }
-                                    html += `<tr id="rows_${number_rows}">
-
-                                        <td>
-                                            <select name="data_type[]" class="select2 form-control">`;
-                                            for(let b in result.data_type){
-                                                base_datatype = result.data_type;
-                                                const data_type = result.data_type[b];
-                                                html += `<option value="${data_type.id}" ${data_type.value == data_transaction_val.data_type ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
+                    if (checkAssetDplicate.indexOf(data_referent.raw_data) == -1) {
+                        checkAssetDplicate.push(data_referent.raw_data);
+                        const raw_data = data_referent.raw_data;
+                        const data_transaction = data_referent.data;
+                        html += `<div class="col-md-3">
+                            <h4 class="text-dark">${raw_data}</h4>
+                        </div>
+                        <div class="col-md-9">
+                            <table class="table table-bordered asset-table-${i}">
+                                <tbody>`;
+                                    let count = 0;
+                                    let checkSubAssetDplicate = [];
+                                    for(let c in data_transaction){
+                                        const data_transaction_val = data_transaction[c];
+                                        if (checkSubAssetDplicate.indexOf(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`) == -1) {
+                                            checkSubAssetDplicate.push(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`);
+                                            number_rows++;
+                                            count++;
+                                            if(count == 1){
+                                                html += `<input type="hidden" name="assets[]" class="form-control" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id}" data-site_id="${data_transaction_val.site_id}">`;
                                             }
-                                            html += `</select>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
-                                        </td>
-                                        <td>
-                                            <!--<button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
-                                                <span>@icon('solid/play')
-                                            </button>-->
-                                            <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
-                                                <span>@icon('solid/trash-alt')
-                                            </button>
-                                        </td>
-                                    </tr>`;
-                                }
-                            html += `</tbody>
-                        </table>
-                        <div class="text-center">
-                                <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets('${raw_data}')">
-                                    <span>@icon('solid/plus')  Add
-                                </button>
-                            </div>
-                        </div>`;   
+                                            html += `<tr id="rows_${number_rows}">
+                                                <td>
+                                                    <select name="data_type[]" class="select2 form-control">`;
+                                                    for(let b in result.data_type){
+                                                        base_datatype = result.data_type;
+                                                        const data_type = result.data_type[b];
+                                                        html += `<option value="${data_type.id}" ${data_type.value == data_transaction_val.data_type ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
+                                                    }
+                                                    html += `</select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
+                                                </td>
+                                                <td>
+                                                    <!--<button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
+                                                        <span>@icon('solid/play')
+                                                    </button>-->
+                                                    <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
+                                                        <span>@icon('solid/trash-alt')
+                                                    </button>
+                                                </td>
+                                            </tr>`;
+                                        }
+                                    }
+                                html += `</tbody>
+                            </table>
+                            <div class="text-center">
+                                    <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets('${raw_data}','${i}')">
+                                        <span>@icon('solid/plus')  Add
+                                    </button>
+                                </div>
+                            </div>`;   
+
+                    }
                 }
                 $('#show_asets').html(html);
             }).catch(function (error) {
@@ -412,7 +431,7 @@
         $("table.asset-table-manual-"+table_row+" tbody#assets_show_" + tbody_rows).append(markup);
     }
 
-    function add_assets(raw_data){
+    function add_assets(raw_data,i){
         number_rows++;
         var markup = ``;
         markup = `
