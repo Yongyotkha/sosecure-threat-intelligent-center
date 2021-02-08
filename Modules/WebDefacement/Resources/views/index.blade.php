@@ -29,7 +29,7 @@
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </button>
 
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                     <a href="#" id="btn_md_create"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         data-target="#wdfm_website">

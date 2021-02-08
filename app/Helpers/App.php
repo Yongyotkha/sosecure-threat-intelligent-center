@@ -638,9 +638,16 @@ function avatar($id = null)
 {
     $avatarPhoto = getAsset('avatar/default_avatar.png');
     if (is_null($id)) {
-        return @\Auth::user()->profile->photo;
+    		// $link_avatar = @\Storage::get('avartars/'. @\Auth::user()->profile->avatar);
+			//$link_avatar = storage_path('app/public/avartars/'. @\Auth::user()->profile->avatar);
+			$link_avatar = asset('storage/avatars/'.@\Auth::user()->profile->avatar);
+			// dd($link_avatar);
+			//$link_avatar = getAsset('avartars').'/'.@\Auth::user()->profile->avatar;
+			$avatarPhoto = $link_avatar;
+        return $avatarPhoto;
     }
-    return @Profile::whereUserId($id)->first()->photo;
+    // return @Profile::whereUserId($id)->first()->avatar;
+    return @$avatarPhoto;
 }
 
 function getAvatarImage($name)
