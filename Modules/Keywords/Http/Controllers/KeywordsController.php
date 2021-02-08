@@ -116,7 +116,7 @@ class KeywordsController extends Controller
             $model->when(
                 $test == 1,
                 function ($q) use ($site_id) {
-                    return $q->where('site_id','=', $site_id);
+                    return $q->where('site_id','=', $site_id)->orderBy('type', 'desc')->get();
                 }
             );
         }
