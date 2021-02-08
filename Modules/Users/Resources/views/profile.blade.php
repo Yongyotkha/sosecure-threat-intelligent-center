@@ -19,9 +19,9 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                 {{-- <a href="{{ route('users.api') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                                     @icon('solid/code') API Settings
                                 </a> --}}
-                                <a href="{{ route('users.2fa') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right" data-toggle="ajaxModal">
+                                {{-- <a href="{{ route('users.2fa') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right" data-toggle="ajaxModal">
                                     @icon('solid/fingerprint') 2FAuth
-                                </a>
+                                </a> --}}
                             </p>
                         </div>
                     </div>
@@ -29,10 +29,10 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                 
                 <section class="scrollable wrapper bg">
                     @if (Auth::user()->on_holiday)
-                    <div class="alert alert-info">
+                    {{-- <div class="alert alert-info">
                         <button type="button" class="close" data-dismiss="alert">×</button>
                         <i class="fas fa-info-sign"></i>@langapp('holiday_enabled')
-                    </div>
+                    </div> --}}
                     @endif
                     
                     <div class="row">
@@ -41,14 +41,14 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                             <section class="panel panel-default">
                                 <header class="panel-heading">@langapp('information')
                                     @if($user->profile->company > 0 && $user->profile->business->primary_contact == Auth::id())
-                                    <a href="{{ route('contacts.create', Auth::user()->profile->company) }}" class="btn btn-xs btn-success pull-right" data-toggle="ajaxModal" title="Add Contact Person" data-rel="tooltip" data-placement="bottom">@icon('regular/user-circle') @langapp('contact')</a>
+                                    {{-- <a href="{{ route('contacts.create', Auth::user()->profile->company) }}" class="btn btn-xs btn-success pull-right" data-toggle="ajaxModal" title="Add Contact Person" data-rel="tooltip" data-placement="bottom">@icon('regular/user-circle') @langapp('contact')</a> --}}
                                     @endif
 
                                     @if(!Auth::user()->hasRole('client'))
                                     @if (Auth::user()->on_holiday)
-                                        <a href="{{ route('users.holiday', 'disable') }}" class="btn btn-xs btn-success pull-right" title="@langapp('disable_holiday_mode')" data-rel="tooltip" data-placement="bottom">@icon('solid/plane-arrival') @langapp('disable_holiday')</a>
+                                        {{-- <a href="{{ route('users.holiday', 'disable') }}" class="btn btn-xs btn-success pull-right" title="@langapp('disable_holiday_mode')" data-rel="tooltip" data-placement="bottom">@icon('solid/plane-arrival') @langapp('disable_holiday')</a> --}}
                                     @else
-                                        <a href="{{ route('users.holiday', 'enable') }}" class="btn btn-xs btn-danger pull-right" title="@langapp('enable_holiday_mode')" data-rel="tooltip" data-placement="bottom">@icon('solid/plane-departure') @langapp('enable_holiday')</a>
+                                        {{-- <a href="{{ route('users.holiday', 'enable') }}" class="btn btn-xs btn-danger pull-right" title="@langapp('enable_holiday_mode')" data-rel="tooltip" data-placement="bottom">@icon('solid/plane-departure') @langapp('enable_holiday')</a> --}}
                                     @endif
                                     
                                     @endif
@@ -57,7 +57,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     
                                     <div class="form-group">
                                         <label>@langapp('fullname')  @required</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $user->name }}" required>
+                                        <input type="text" class="form-control" name="name" value="{{ $user->name }}" required readonly>
                                     </div>
                                     <div class="form-group d-none">
                                         <label>@langapp('hourly_rate') </label>
@@ -98,7 +98,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     @endif
                                     <div class="form-group">
                                         <label>@langapp('phone') </label>
-                                        <input type="text" class="form-control" name="profile[phone]" value="{{ $user->profile->phone }}">
+                                        <input type="text" class="form-control" name="profile[phone]" value="{{ $user->profile->phone }}" readonly>
                                     </div>
                                     
                                     <div class="form-group  d-none">
@@ -110,17 +110,18 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         </select>
                                     </div>
                                     <input type="hidden" name="profile[use_gravatar]" value="0">
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <div class="form-check text-muted">
                                             <label>
                                                 <input type="checkbox" name="profile[use_gravatar]" {{ $user->profile->use_gravatar == 1 ? 'checked' : '' }} value="1"> <span class="label-text">Use avatar from Gravatar</span>
                                             </label>
                                         </div>
                                         
-                                    </div>
+                                    </div> --}}
                                     <div class="form-group">
                                         <span class="thumb-sm avatar pull-right">
-                                            <img src="{{ $user->profile->photo }}" width="50" class="img-circle m-sm">
+                                            {{-- <img src="{{ $user->profile->photo }}" width="50" class="img-circle m-sm"> --}}
+                                            <img src="{{ avatar() }}" class="img-circle" onerror="setDefaultPic(this)">
                                         </span>
                                         <label>@langapp('avatar') </label>
                                         <input type="file" name="avatar">
@@ -147,18 +148,18 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                             <section class="panel panel-default">
                             <header class="panel-heading">@langapp('authorization')</header>
                             <div class="panel-body">
-                                <div class="form-group  d-none">
+                                {{-- <div class="form-group  d-none">
                                     <label>Slack Webhook URL <span data-rel="tooltip" title="Your slack webhook url">@icon('brands/slack', 'text-danger')</span></label>
                                     <input type="text" class="form-control" name="slack_webhook_url" value="{{ $user->slack_webhook_url }}">
-                                </div>
-                                <div class="form-group  d-none">
+                                </div> --}}
+                                {{-- <div class="form-group  d-none">
                                     <label>Calendar Token <a href="{{ route('users.token') }}" class="btn btn-xs btn-info">
                                         @icon('solid/sync-alt')
                                     </a></label>
                                     <input type="text" class="form-control" readonly="readonly"
                                     value="{{ $user->calendar_token }}">
-                                </div>
-                                <div class="form-group  d-none">
+                                </div> --}}
+                                {{-- <div class="form-group  d-none">
                                     <label>@langapp('notification_channels') @required</label>
                                     <div class="form-check text-muted">
                                         <label>
@@ -182,18 +183,16 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         </label>
                                     </div>
                                     
-                                </div>
+                                </div> --}}
                                 <div class="form-group">
                                     <label>@langapp('email')  @required</label>
-                                    <input type="email" class="form-control" name="email"
-                                    value="{{ $user->email }}" required>
+                                    <input type="email" class="form-control" name="email" value="{{ $user->email }}" required readonly>
                                 </div>
                                 <div class="form-group">
                                     <label>@langapp('username')  @required</label>
-                                    <input type="text" class="form-control" name="username"
-                                    placeholder="@langapp('new_username') " value="{{ $user->username }}" required>
+                                    <input type="text" class="form-control" name="username" placeholder="@langapp('new_username') " value="{{ $user->username }}" required readonly>
                                 </div>
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <label>@langapp('password')</label>
                                     <input type="password" class="form-control" name="password"
                                     placeholder="@langapp('password') ">
@@ -219,7 +218,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         </label>
                                     </div>
                                     
-                                </div>
+                                </div> --}}
                                 {!! renderAjaxButton() !!}
                                 
                             </div>
