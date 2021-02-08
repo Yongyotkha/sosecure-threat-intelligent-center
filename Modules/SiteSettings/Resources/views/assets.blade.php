@@ -382,7 +382,7 @@
 
     $(function () {
         $('#table-assets-data').DataTable({
-            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
         });
     });
 
@@ -724,7 +724,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
             ajax: {
                 type: "POST",

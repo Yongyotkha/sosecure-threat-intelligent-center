@@ -383,7 +383,7 @@ active_btn('#groupby-status .btn-grey');
             serverSide: true,
             destroy: true,
             order: [[ 4, "desc" ]],
-            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('socialdatas.dark_web_datatables') !!}',
                 data: {

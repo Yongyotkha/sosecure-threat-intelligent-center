@@ -184,7 +184,7 @@
             processing: true,
             serverSide: true,
             
-            "dom": '<B><"d-flex d-inline-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('domainsettings.data') !!}',
                 data: {
