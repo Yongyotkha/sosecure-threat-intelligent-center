@@ -495,7 +495,7 @@ class NewsController extends Controller
         $RSSNews = RSSNews::where("code",$code)->first();
 
         $cate_id_all = [];
-        if($RSSNews->get_cate) {
+        if(@$RSSNews->get_cate) {
             foreach($RSSNews->get_cate as $cate) {
                 $cate->get_cate_name->id;
                 $cate_id_all[] = intval($cate->get_cate_name->id);
