@@ -126,6 +126,7 @@ class ScansController extends Controller
                     ->where('domain_id', $data['domain_id'])
                     ->where('value', $item['raw_data'])
                     ->where('data_type_id', $item['data_type'])
+                    ->where('asset_id', $Assets->id)
                     ->first();
                 if (!$AssetsData) {
                     if ($item['raw_data_base'] == $Assets->raw_data) {
