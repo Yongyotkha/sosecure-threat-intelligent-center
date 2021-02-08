@@ -12,7 +12,7 @@
             @langapp('webdefacement') > {{@$webdefacement->name}}
         </div>
 
-        <div class="pull-right" style="margin-top: 10px" id='load_status'>
+        <div class="pull-right d-none" style="margin-top: 10px" id='load_status'>
             <span>Status &nbsp;</span>
             <span id="status_val_webdefacement">
             {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}

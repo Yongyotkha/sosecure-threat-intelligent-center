@@ -23,7 +23,9 @@
                          <div class="col-md-6">
                             <p>You must set up your Google Authenticator app before continuing. </p>
                                 <p>You will be unable to login otherwise</p>
-                            <a href="{{ route('users.2fa.complete', $secret) }}" class="btn btn-primary">@icon('regular/check-circle') Complete 2FA</a>
+                        </div>
+                        <div class="col-md-12 text-center">
+                            <a href="{{ route('users.2fa.complete', $secret) }}" class="btn btn-primary">@icon('regular/check-circle') 2 Factor Authentication</a>
                             <a href="{{ route('users.2fa.disable') }}" class="btn btn-danger" data-rel="tooltip" title="Disable 2FA">@icon('regular/times-circle') Disable</a>
                         </div>
                      </div>

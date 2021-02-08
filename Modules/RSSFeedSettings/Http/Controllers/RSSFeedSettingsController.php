@@ -426,9 +426,9 @@ class RSSFeedSettingsController extends Controller
             })
             ->addColumn('title', function (RSSNews $model) {
                 if($model -> title_th){
-                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</div>';
+                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
                 }else if($model -> title_en){
-                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</div>';
+                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
                 }else{
                     return '-';
                 }

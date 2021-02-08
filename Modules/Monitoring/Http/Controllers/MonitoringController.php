@@ -172,6 +172,7 @@ class MonitoringController extends Controller
             }
 
             $model = $model->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
+          
             
         } else {
 
