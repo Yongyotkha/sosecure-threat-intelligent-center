@@ -3623,3 +3623,13 @@ textarea.form-control{
 .d-inline-flex{
     display: inline-flex;
 } 
+
+@media screen and (max-width:560px){
+    .navbar-header{
+      display: flex !important;
+      justify-content: space-between !important;
+    }
+    .navbar-brand img {
+        margin-left: 0rem !important;
+    }
+  }
