@@ -46,7 +46,7 @@
             </li>
         </ul>
         <ul class="nav navbar-nav hidden-xs navbar-center">
-            @admin
+            
             <li class="dropdown hidden-xs">
                 <form action="{{ route('search.app') }}" method="POST" role="search">
                     {!! csrf_field() !!}
@@ -62,7 +62,7 @@
                     </div>
                 </form>
             </li>
-            @endadmin
+            
         </ul>
 
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user" style="margin-top: 1rem;">
