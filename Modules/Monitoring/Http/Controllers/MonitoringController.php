@@ -60,7 +60,7 @@ class MonitoringController extends Controller
             $SiteSettings = @$get_role_custom_first['SiteSettings'];
         }
         $data['SiteSettings'] = $SiteSettings;
-        $data['page'] = langapp('batchjob');
+        $data['page'] = langapp('schedule_task');
         return view('monitoring::index')->with($data);
     }
 
