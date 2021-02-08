@@ -293,6 +293,9 @@ function data_table(){
                         }else if(row.progress == 2){
                             inner = '';
                             inner = '<span class="badge badge-success" style="background-color: #ea2e49;">Progress</span';
+                        }else if(row.progress == 3){
+                            inner = '';
+                            inner = '<span class="badge badge-success" style="background-color: #00b303;">Complete</span';
                         }else{
                             inner = '';
                             inner = '<span class="badge badge-none" style="background-color: #ea2e49;">Unknow</span';

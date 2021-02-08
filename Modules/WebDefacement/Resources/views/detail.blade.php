@@ -202,21 +202,21 @@
                                 <tr>
                                     <th>Hash</th>
                                     <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
-                                    <td id='hash_new'>{{@$webdefacment_data_check->hash_new}} (Difference {{@$webdefacment_data_check->hash_percent}}%)</td>
+                                    <td id='hash_new'><span>{{@$webdefacment_data_check->hash_new}}</span> <span class="pull-right text-info">(Difference {{@$webdefacment_data_check->hash_percent}}%)</span></td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->filesize == 1)
                                 <tr>
                                     <th>File Size</th>
                                     <td id='FileSize'>{{@formatSizeUnits($webdefacment_data_original->filesize)}}</td>
-                                    <td id='filesize_new'>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}} (Difference {{@$webdefacment_data_check->filesize_percent}}%)</td>
+                                    <td id='filesize_new'><span>{{@formatSizeUnits($webdefacment_data_check->filesize_new)}}</span> <span class="pull-right text-info">(Difference {{@$webdefacment_data_check->filesize_percent}}%)</span></td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->element == 1)
                                 <tr>
                                     <th>Element</th>
                                     <td id='Element'>{{@$webdefacment_data_original->element}}</td>
-                                    <td id='element_new'>{{@$webdefacment_data_check->element_new}} (Difference {{@$webdefacment_data_check->element_percent}}%)</td>
+                                    <td id='element_new'><span>{{@$webdefacment_data_check->element_new}}</span> <span class="pull-right text-info">(Difference {{@$webdefacment_data_check->element_percent}}%)</span></td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->blacklist_keyword_content == 1)

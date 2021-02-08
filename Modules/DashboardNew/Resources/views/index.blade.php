@@ -42,7 +42,7 @@
                                                         </div>
                                                     </div>
                                                 </a> --}}
-                                                <a href="{{route('assets.index')}}" target="_blank">
+                                                <a href="{{route('assets.index')}}">
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
@@ -56,38 +56,43 @@
         
                                             </div>
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
-                                                <div class="card-dash">
-                                                    <div class="left-card">
-                                                        <div class="img-icon-card">
-                                                            <img src="{{asset('images/antivirus.png')}}" alt="">
+                                                <a href="{{route('monitoringvulnerabilitys.index')}}">
+                                                    <div class="card-dash">
+                                                        <div class="left-card">
+                                                            <div class="img-icon-card">
+                                                                <img src="{{asset('images/antivirus.png')}}" alt="">
+                                                            </div>
+                                                            <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
+                                                            <span class="number-card green number_vulnerability"></span>
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
-                                                        <a class="number-card green number_vulnerability"></a>
                                                     </div>
-                                             
-                                                </div>
+                                                </a>
                                             </div>
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
+                                                <a href="{{route('darkweb.index_all_site')}}">
                                                 <div class="card-dash">
                                                     <div class="left-card">
                                                         <div class="img-icon-card">
                                                             <img src="{{asset('images/compromise.png')}}" alt="">
                                                         </div>
                                                         <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
-                                                        <a class="number-card warning number_compromised"></a>
+                                                        <span class="number-card warning number_compromised"></span>
                                                     </div>
                                                 </div>
+                                                </a>
                                             </div>
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
-                                                <div class="card-dash">
-                                                    <div class="left-card">
-                                                        <div class="img-icon-card">
-                                                            <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                <a href="{{route('socialdatas.index_all_site')}}">
+                                                    <div class="card-dash">
+                                                        <div class="left-card">
+                                                            <div class="img-icon-card">
+                                                                <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                            </div>
+                                                            <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
+                                                            <span class="number-card dark number_data_leak"></span>
                                                         </div>
-                                                        <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
-                                                        <a class="number-card dark number_data_leak"></a>
                                                     </div>
-                                                </div>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
