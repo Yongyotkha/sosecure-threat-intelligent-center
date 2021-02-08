@@ -13,6 +13,6 @@ class TransactionTimeStampScans extends Model
     }
 
     public function get_site(){
-        return $this->belongsTo(SiteSettings::class, 'site_id');
+        return $this->belongsTo(SiteSettings::class, 'site_id');//->withTrashed()
     }
 }
