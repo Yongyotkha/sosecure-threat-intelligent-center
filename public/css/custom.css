@@ -1886,6 +1886,14 @@ ul.topics-news-list li a:hover{
     max-width: 163px;
 }
 
+.text-elip-message{
+    white-space: nowrap; 
+    max-width: 100px; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    width: 100%;
+}
+
 .content-news-image a img{
     position: absolute;
     top: 0;
@@ -3623,6 +3631,8 @@ textarea.form-control{
 .d-inline-flex{
     display: inline-flex;
 } 
+
+
 
 @media screen and (max-width:560px){
     .navbar-header{

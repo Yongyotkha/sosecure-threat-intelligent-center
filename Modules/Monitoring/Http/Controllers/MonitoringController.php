@@ -131,8 +131,7 @@ class MonitoringController extends Controller
         $model = '';
         $html = '';
         if ($request->isSearch == 1) {
-            
-            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', 'transaction_batchjob.message')->where('status', 1);
+            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', '')->where('status', 1);
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
                 $date_start_date = @$date_start_explode[0];
@@ -183,6 +182,12 @@ class MonitoringController extends Controller
             $model = $model;
 
         return DataTables::of($model)
-            ->toJson();
+        ->editColumn('message', function (TransactionBatchjob $model) {
+            $html = '';
+            $html .= '<div class="text-elip-message">'.$model->message.'</div>';
+            return  $html;
+        })
+        ->rawColumns(['name','mode','progress','transcation_date_start','transcation_date_end','site_id','message',])
+        ->toJson();
     }
 }
