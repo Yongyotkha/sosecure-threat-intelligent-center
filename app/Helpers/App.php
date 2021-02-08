@@ -638,9 +638,9 @@ function avatar($id = null)
 {
     $avatarPhoto = getAsset('avatar/default_avatar.png');
     if (is_null($id)) {
-        return \Auth::user()->profile->photo;
+        return @\Auth::user()->profile->photo;
     }
-    return Profile::whereUserId($id)->first()->photo;
+    return @Profile::whereUserId($id)->first()->photo;
 }
 
 function getAvatarImage($name)
