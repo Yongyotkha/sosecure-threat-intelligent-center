@@ -447,77 +447,50 @@
 
         const chart_top_category = Highcharts.chart('chart-top-category', {
             chart: {
-                type: 'column',
-                scrollablePlotArea: {
-                    minWidth: 500,
-                    scrollPositionX: 1
-                }
+                height: 223, 
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
             },
             title: {
-                text: null
-            },
-            xAxis: {
-                categories: [
-                'Software',
-                'Cybersecurity',
-                'Financial',
-                'Services',
-
-                ],
-                crosshair: true
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                text: 'Values'
-                }
+                text: ''
             },
             tooltip: {
-                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-                footerFormat: '</table>',
-                shared: true,
-                useHTML: true
+                pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
             },
-            plotOptions: {
-                column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
-                },
-                series:{
-                    pointWidth: 30,
-                    color : '#ffc107',
-                },
-                style:{
-                    background: '#fff'
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
                 }
             },
-            legend: {
-                enabled: false
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f', '#d3d3d3'],
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    },
+                    style:{
+                        background: '#fff'
+                    }
+                }
             },
             series: [{
-                name: 'Software',
-                data: [49.9],
-            }, {
-                
-                name: 'Cybersecurity',
-                data: [null,83.6]
-
-            }, {
-                
-                name: 'Financial',
-                data: [null,null,48.9]
-
-            }, {
-                
-                name: 'Services',
-                data: [null,null,null,42.4]
-
-            }]
+                colorByPoint: false,
+                data: [
+                {  name: 'Software', y: 10, color: '#e64732'}, 
+                {  name: 'Cybersecurity',  y: 20 , color: '#fcc838'}, 
+                {  name: 'Financial', y: 30, color: '#63b8ff'  }, 
+                {  name: 'Services',   y: 40, color: '#88ce4f'  },
+                ]
+            }],
         });
 
 
+                
 
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
