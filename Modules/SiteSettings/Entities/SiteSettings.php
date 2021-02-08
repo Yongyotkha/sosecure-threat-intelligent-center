@@ -89,4 +89,28 @@ class SiteSettings extends Model{
     public function get_update_code(){
         return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'update_code')->orderBy('updated_at', 'desc');
     }
+
+    public function get_status_nginx(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'get_status_nginx')->orderBy('updated_at', 'desc');
+    }
+
+    public function restart_nginx(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'restart_nginx')->orderBy('updated_at', 'desc');
+    }
+
+    public function get_status_mongo(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'get_status_mongo')->orderBy('updated_at', 'desc');
+    }
+
+    public function restart_mongo(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'restart_mongo')->orderBy('updated_at', 'desc');
+    }
+
+    public function get_status_mysql(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'get_status_mysql')->orderBy('updated_at', 'desc');
+    }
+
+    public function restart_mysql(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'restart_mysql')->orderBy('updated_at', 'desc');
+    }
 }
