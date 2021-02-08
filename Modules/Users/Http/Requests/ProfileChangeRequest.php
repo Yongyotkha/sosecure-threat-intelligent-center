@@ -25,8 +25,10 @@ class ProfileChangeRequest extends FormRequest
     {
         return [
             'confirm_password' => 'same:password',
-            'username'         => 'required|unique:users,username,' . \Auth::user()->id,
-            'email'            => 'required|email|unique:users,email,' . \Auth::user()->id,
+            'username'         => 'required',
+            // 'username'         => 'required|unique:users,username,' . \Auth::user()->id,
+            'email'            => 'required|email',
+            // 'email'            => 'required|email|unique:users,email,' . \Auth::user()->id,
             'avatar'           => 'mimes:png,jpeg,jpg|max:1024',
             'signature'        => 'mimes:png,jpg,jpeg|max:1024',
         ];
