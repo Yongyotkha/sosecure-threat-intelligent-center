@@ -108,7 +108,6 @@
                                     <th>Transaction Last Start</th>
                                     <th>Transaction Last End</th>
                                     <th>Site</th>
-                                    <th>Message</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -274,9 +273,6 @@ function data_table(){
                 },
                 {
                     data: 'transcation_date_end',
-                },
-                {
-                    data: 'message',
                 },
                 {
                     data: 'site_id',
