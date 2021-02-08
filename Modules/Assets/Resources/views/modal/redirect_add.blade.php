@@ -10,14 +10,16 @@
                 <label class="col-lg-3 control-label">Site <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <select id="site" class="select2-option form-control" style="width:100%;">
-                        <option value="">- Select Site -</option>
                         @if (@$SiteSettings)
-
+                        <option value="">- Select Site -</option>
                             @foreach ($SiteSettings as $item)
                                 <option value="{{ @$item->code }}">{{ @$item->name }}</option>
                             @endforeach
 
+                        @else
+                        <option value="Error Your Site Don't Have Scan Assets">Your Site Don't Have Scan Assets</option>
                         @endif
+
                     </select>
                     <span style="color:red;"><small id="check_os"></small></span>
                 </div>
@@ -46,12 +48,14 @@
 
     function redirect_to_add_assets() {
         let selectedValue = $('#site').children("option:selected").val();
-        let url = "/sitesettings/assets/"+selectedValue;
+        let url = "/scans/scans-domain/asset/"+selectedValue;
         let target = '';
         if(selectedValue===""){
             toastr.error("Please Select Site", '@langapp('response_status') ');
         }else{
-            if(target == '_blank') { 
+            if(selectedValue == "Error Your Site Don't Have Scan Assets"){
+                toastr.error("Your Site Don't Have Scan Assets", '@langapp('response_status') ');
+            }else if(target == '_blank') { 
                 window.open(url, target);
             } else {
                 window.location = url;
