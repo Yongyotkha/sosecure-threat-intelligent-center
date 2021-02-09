@@ -55,13 +55,21 @@ class IndicatorsSettingController extends Controller
        }
 
        $LogsSent = LogsSent::where('site_id',@$get_data->id)->where('mode', 'indicator')->first();
-       if( $LogsSent && ($LogsSent -> status_progrss == 3)){
+    //    dd($LogsSent);
+
+        if($LogsSent) {
+            if($LogsSent->status_progrss == 3) {
+                $data['LogsSentBTN'] = 1;
+                $data['LogsSentMessage'] = "Send log waiting for operation!!";
+            } else {
+                $data['LogsSentBTN'] = 2;
+                $data['LogsSentMessage'] = "Send log waiting for operation!!";
+            }
+        } else {
             $data['LogsSentBTN'] = 1;
             $data['LogsSentMessage'] = "Send log waiting for operation!!";
-       }else{
-            $data['LogsSentBTN'] = 2;
-            $data['LogsSentMessage'] = "Send log waiting for operation!!";
-       }
+        }
+
        
 
        $data['content'] = $content;
@@ -195,9 +203,9 @@ class IndicatorsSettingController extends Controller
             $LogsSetting->end = $date_end_datetime_format;
             $LogsSetting->status_progrss = 1;
             $LogsSetting->save();
-            if($LogsSetting->status_progrss != 3) {
-                return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
-            }
+            // if($LogsSetting->status_progrss != 3) {
+            //     return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
+            // }
         }
         return ajaxResponse(
             [
