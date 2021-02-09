@@ -869,10 +869,10 @@ class NewsController extends Controller
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             if($check_read_news){
                 $html .= '<div class="list-news">';
-                $font_weight = 'font-weight: bold !important;';
+                $font_weight = '';
             }else{
                 $html .= '<div class="list-news" style="background-color:#ececec">';
-                $font_weight = '';
+                $font_weight = 'font-weight: bold !important;';
             }
 
             if($data->transaction_rss_id) {
