@@ -3660,8 +3660,9 @@ textarea.form-control{
 
 
   .select-box-header{
-    min-width:150px;
-    display:flex;display: flex;
+    min-width: 191px;
+    max-width: 191px;
+    display:flex;
     align-items: center;
   }
 
@@ -3691,4 +3692,8 @@ textarea.form-control{
 }
 .btn.buttons-csv{
     padding: 4px 12px !important;
+}
+
+.m-b-12{
+    margin-bottom: 12px !important;
 }
