@@ -109,7 +109,7 @@ class IndicatorsController extends Controller
         $dataForloop = IndicatorSummaryYear::select('type_name AS name','attribute_count AS data')->where("type",'summary_attr_type')->orderBy('attribute_count','desc')->take(10)->get();
         $data["attr_type"] = array();
         foreach ($dataForloop as $document) {
-            array_push($data["attr_type"], array('name'=>$document->name,'data'=>[$document->data]));
+            array_push($data["attr_type"], array('name'=>ucwords($document->name),'data'=>[$document->data]));
         }
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('indicators');
@@ -181,7 +181,7 @@ class IndicatorsController extends Controller
         $countKey = array();
         $countVal = array();
         foreach ($cursor[0]->indicator_type_counts as $key => $value) {
-            $countKey[]= $key;
+            $countKey[]= ucwords($key);
             $countVal[]= $value;
         }
         $data['countKey'] = $countKey;
