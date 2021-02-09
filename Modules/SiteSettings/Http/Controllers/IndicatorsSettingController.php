@@ -143,6 +143,8 @@ class IndicatorsSettingController extends Controller
     public function indicator_log(Request $request, $id = null)
     {
 
+        $SiteSettings = SiteSettings::select('id')->where('code',$id)->first();
+
         // dd($request->start_date);
         
         if ($request->start_date) {
@@ -180,12 +182,14 @@ class IndicatorsSettingController extends Controller
                 return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
             }
             // $LogsSetting->mode = 'indicator';
+            $LogsSetting->site_id = @$SiteSettings->id;
             $LogsSetting->start = $date_start_datetime_format;
             $LogsSetting->end = $date_end_datetime_format;
             $LogsSetting->status_progrss = 1;
             $LogsSetting->save();
         }else{
             $LogsSetting = new LogsSent;
+            $LogsSetting->site_id = @$SiteSettings->id;
             $LogsSetting->mode = 'indicator';
             $LogsSetting->start = $date_start_datetime_format;
             $LogsSetting->end = $date_end_datetime_format;

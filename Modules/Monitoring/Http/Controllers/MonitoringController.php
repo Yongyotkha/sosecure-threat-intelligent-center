@@ -184,8 +184,13 @@ class MonitoringController extends Controller
         return DataTables::of($model)
         ->editColumn('message', function (TransactionBatchjob $model) {
             $html = '';
+            if($model->message) {
+                $html .= ' <a href="'.route('monitoring.view_message_modal',['id' => $model->transaction_batchjob_id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>';
+            } else {
+                $html = '';
+            }
             // $html .= '<div class="text-elip-message" data-title='.$model->message.'>'.$model->message.'</div>';
-            $html .= ' <a href="'.route('monitoring.view_message_modal',['id' => $model->transaction_batchjob_id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i>'.$model->id.'</a>';
+            
             return  $html;
         })
         ->rawColumns(['name','mode','progress','transcation_date_start','transcation_date_end','site_id','message',])
