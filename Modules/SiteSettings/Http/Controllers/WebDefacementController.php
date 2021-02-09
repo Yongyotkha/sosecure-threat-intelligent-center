@@ -77,8 +77,8 @@ class WebDefacementController extends Controller
                             </div>
                             <div class="wdfm-footer start-top">
                                 <div class="wdfm-ft-left flex">
-                                    <div>Site : '.@$key->get_site->name.'</div>
-                                    <div class="status-flex">Status : &nbsp; '.get_webdefacment_status($key->status_val,'color').'</div>
+                                    <div><strong>Site </strong> : '.@$key->get_site->name.'</div>
+                                    <div class="status-flex"><strong>Status</strong> : &nbsp; '.get_webdefacment_status($key->status_val,'color').'</div>
                                     <div>Hash '.@$key->webdefacment_data_original_last($key->id)->hash.'</div>
                                     <div>Filesize '.formatSizeUnits(@$key->webdefacment_data_original_last($key->id)->filesize).'</div>
                                     <div>Element '.@$key->webdefacment_data_original_last($key->id)->element.'</div>

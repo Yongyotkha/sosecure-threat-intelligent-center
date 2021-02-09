@@ -186,7 +186,7 @@
                                 </div>
                                 <hr>
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">E-mail Alert : </label>
+                                    <label class="col-lg-3 control-label">E-mail Alert </label>
                                     <div class="col-lg-9">
                                         <select name="email_alert[]" id="email_alert" class="select2-option form-control" multiple="multiple">
                                             {{-- <option value="1">a</option>
@@ -203,7 +203,7 @@
                                 <hr>
 
                                 <div class="row text-right">
-                                        <label class="col-lg-3 control-label">Syslog Server Log</label>
+                                        <label class="col-lg-3 control-label m-b-10">Syslog Server Log</label>
                                 </div>
                              
                                 <div class="form-group row">

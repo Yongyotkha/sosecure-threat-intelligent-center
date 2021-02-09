@@ -543,9 +543,7 @@ active_btn('#groupby-type .btn-grey');
                                 if(val) {
                                     val = full.get_site.name;
                                 }
-                            
-                
-        
+                        
                             return val;
 
                         },

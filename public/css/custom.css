@@ -3144,6 +3144,8 @@ input.input-login:focus {
     line-height: 1.5;
     height: 20px;
     white-space: nowrap;
+    font-weight: 700;
+    color: #333;
 }
 
 @media (min-width:1060px) and (max-width:1400px){

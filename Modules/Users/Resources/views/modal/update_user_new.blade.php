@@ -90,9 +90,16 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-info mb-2" type="button" id="ch_pass" data-val="0" data-toggle="collapse" data-target="#collapse_ch_pass" aria-expanded="false" aria-controls="collapse_ch_pass">
-                    Edit Password
-                </button>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button class="btn btn-info mb-2" type="button" id="ch_pass" data-val="0" data-toggle="collapse" data-target="#collapse_ch_pass" aria-expanded="false" aria-controls="collapse_ch_pass">
+                                Edit Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
     
                 <div class="collapse" id="collapse_ch_pass">
                     <div class="form-group row">

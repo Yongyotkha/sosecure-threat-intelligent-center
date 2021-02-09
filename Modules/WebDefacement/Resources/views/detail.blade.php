@@ -286,8 +286,8 @@
                                         </div>
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
-                                                <div>Original</div>
-                                                <div>Last Update : {{@$webdefacment_data_original->last_update}}</div>
+                                                <div><strong>Original</strong></div>
+                                                <div><strong>Last Update</strong> : {{@$webdefacment_data_original->last_update}}</div>
                                                 <div><button class="btn btn-info" onclick="update_image()">Update</button></div>
                                             </div>
                                         </div>
@@ -313,9 +313,9 @@
                                         </div>
                                         <div class="wdfm-footer">
                                             <div class="wdfm-ft-left flex rw">
-                                                <div>Current</div>
-                                                <div>Last Update : {{@$webdefacment_data_check->last_update}}</div>
-                                                <div class="status-flex">Status : &nbsp;{{@$webdefacment_data_check->status_code}}</div>
+                                                <div><strong>Current</strong></div>
+                                                <div><strong>Last Update </strong>: {{@$webdefacment_data_check->last_update}}</div>
+                                                <div class="status-flex"><strong>Status </strong>: &nbsp;{{@$webdefacment_data_check->status_code}}</div>
                                             </div>
                                         </div>
                                     </div>
