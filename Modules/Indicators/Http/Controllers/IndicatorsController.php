@@ -87,40 +87,61 @@ class IndicatorsController extends Controller
         //         }
         //     }
         // }
-        $get_role_custom_first = @get_role_custom();
-        $SiteSettings = '';
-        $SiteSettings = @$get_role_custom_first['SiteSettings'];
-        $site_id_arr = @$get_role_custom_first['site_id_arr'];
-        if(@$get_role_custom_first['superadmin'] == 1) {
+        if(TYPE_WEB == 'center'){
+            $get_role_custom_first = @get_role_custom();
+            $SiteSettings = '';
             $SiteSettings = @$get_role_custom_first['SiteSettings'];
-        }else if(@$get_role_custom_first['client'] == 1) {
-            $SiteSettings = @$get_role_custom_first['SiteSettings'];
-        }else if(@$get_role_custom_first['site_support'] == 1) {
-            $SiteSettings = @$get_role_custom_first['SiteSettings'];
-        }else if(@$get_role_custom_first['site_admin'] == 1) {
-            $SiteSettings = @$get_role_custom_first['SiteSettings'];
-        }else if(@$get_role_custom_first['site_client'] == 1) {
-            $SiteSettings = @$get_role_custom_first['SiteSettings'];
-        }
-
-        $data["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
-        $data["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
-        // DB::raw('CONCAT("[",attribute_count, "]") as data2')
-        $dataForloop = IndicatorSummaryYear::select('type_name AS name','attribute_count AS data')->where("type",'summary_attr_type')->orderBy('attribute_count','desc')->take(10)->get();
-        $data["attr_type"] = array();
-        foreach ($dataForloop as $document) {
-            array_push($data["attr_type"], array('name'=>ucwords($document->name),'data'=>[$document->data]));
-        }
-        $data['SiteSettings'] = $SiteSettings;
-        $data['page'] = langapp('indicators');
-
-        if(isset($this->request->Search_Link_All)){
-            $data['Search_Link_All'] = $this->request->Search_Link_All;
+            $site_id_arr = @$get_role_custom_first['site_id_arr'];
+            if(@$get_role_custom_first['superadmin'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            }else if(@$get_role_custom_first['client'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            }else if(@$get_role_custom_first['site_support'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            }else if(@$get_role_custom_first['site_admin'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            }else if(@$get_role_custom_first['site_client'] == 1) {
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+            }
+    
+            $data["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
+            $data["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
+            // DB::raw('CONCAT("[",attribute_count, "]") as data2')
+            $dataForloop = IndicatorSummaryYear::select('type_name AS name','attribute_count AS data')->where("type",'summary_attr_type')->orderBy('attribute_count','desc')->take(10)->get();
+            $data["attr_type"] = array();
+            foreach ($dataForloop as $document) {
+                array_push($data["attr_type"], array('name'=>ucwords($document->name),'data'=>[$document->data]));
+            }
+            $data['SiteSettings'] = $SiteSettings;
+            $data['page'] = langapp('indicators');
+    
+            if(isset($this->request->Search_Link_All)){
+                $data['Search_Link_All'] = $this->request->Search_Link_All;
+            }else{
+                $data['Search_Link_All'] = "";
+            }
+    
+            return view('indicators::events')->with($data);
         }else{
-            $data['Search_Link_All'] = "";
+            $ip = $this->ip;
+            $mac = $this->mac;
+            $authorization_key = $this->header;
+            $url_indicator_events_table = $this->url_indicator_events_table;
+    
+           
+            $request_body_complete = [
+                'request' => 'data',
+            ];
+            $body_complete = json_encode($request_body_complete);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+            $response_complete = $this -> reconnnect($url_indicator_events_table, $form_body_complete, $authorization_key);
+            if($response_complete['status_code'] == 200){
+                return view('indicators::events')->with($data);
+            }else{
+                return response()->json($response_complete);
+            }
         }
-
-        return view('indicators::events')->with($data);
+        
     }
 
     public function events_detail()
