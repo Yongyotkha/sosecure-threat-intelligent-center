@@ -130,7 +130,7 @@
                                     </div>
 
                                     
-                                    <div class="col-lg-2 col-md-3 mb-1">
+                                    <div class="col-lg-6 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Filter By</h5>
                                         <div id="groupby-btn" class="btn-group special">
                                             <button id="source_btn" class="btn btn-grey check_group_by active">
@@ -139,11 +139,8 @@
                                             <button id="category_btn" class="btn btn-grey check_group_by">
                                                 <span> Category </span>
                                             </button>
-                                        </div>      
-                                    </div>
-
-                                    <div class="col-lg-4 col-md-3 mb-1">
-                                        <h5 class="font-weight-bold">&nbsp;</h5>
+                                        </div>   
+                                        
                                         <div id="source_search" class="m-t-10">
                                             <select name="news_source[]" id="news_source" class="select2-option form-control" multiple="multiple">
                                             </select>
