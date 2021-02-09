@@ -28,7 +28,7 @@
                         <section class="">
                             <div class="panel-body" style="padding: 0 15px;" id="chart-container">
                                 <div class="row">
-                                    <div class="col-xl-2 col-lg-2 col-md-12 padding-small-5px mb-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-12 nopadding mb-2">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
                                                 {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
@@ -53,7 +53,6 @@
                                                         </div>
                                                     </div>
                                                 </a>
-        
                                             </div>
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
                                                 <a href="{{route('monitoringvulnerabilitys.index')}}">
@@ -126,8 +125,6 @@
                                                     <div id="chart-show-pie" class="h-chart"></div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                 <div class="loadindicator backdrop-loader">
                                                     <div class="loader4 centerloader"></div>
@@ -220,8 +217,8 @@
                             <div id="fillter_click" class="button-group">
                                 <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
                                 <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">Web Defacement</button>
@@ -511,7 +508,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('dashboardnew.table_dashboard')!!}',

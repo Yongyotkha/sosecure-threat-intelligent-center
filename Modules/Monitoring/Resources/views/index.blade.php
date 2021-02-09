@@ -6,7 +6,7 @@
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
                 @icon('solid/arrow-left')
             </a> --}}
-            <div class="bc-head">@langapp('monitoring')>Batch</div>
+            <div class="bc-head">@langapp('monitoring') > Schedule Task</div>
 
             <a href="#hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
@@ -281,6 +281,7 @@ function data_table(){
                 },
                 {
                     data: 'message',
+                    className : 'text-center'
                 },
             ],
             columnDefs: [

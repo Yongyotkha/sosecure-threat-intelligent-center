@@ -137,22 +137,26 @@
                         <div class="col-md-4 nopadding">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
-                                    <div class="img-icon-card ice">
-                                        <img src="{{asset('images/windows.png')}}" alt="">
-                                    </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
-                                    <span class="number-card info" id="count_windows">0</span>
+                                    <a href="#" onclick="searchTB('','','os_type','Windows')">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/windows.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
+                                        <span class="number-card info" id="count_windows">0</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4 nopadding">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
-                                    <div class="img-icon-card ice">
-                                        <img src="{{asset('images/linux.png')}}" alt="">
-                                    </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
-                                    <span class="number-card green" id="count_linux">0</span>
+                                    <a href="#" onclick="searchTB('','','os_type','Linux')">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/linux.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
+                                        <span class="number-card green" id="count_linux">0</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -575,10 +579,16 @@
         });
     }
 
-    function searchTB(searchLinkAll='',colsearchLinkAll=''){
+    function searchTB(searchLinkAll='',colsearchLinkAll='',osClickCol='',osValue=''){
+        
         
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
+
+        if(osClickCol!==''){
+            selectedValue = osValue;
+            columnSearch = osClickCol;
+        }
         if(colsearchLinkAll!==''){
             columnSearch = colsearchLinkAll;
             selectedValue = searchLinkAll;
@@ -661,7 +671,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
             ajax: {
                 type: "POST",

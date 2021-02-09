@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-lg-3 control-label">Remark <span class="text-danger">*</span> </label>
+                    <label class="col-lg-3 control-label">Remark</label>
                     <div class="col-lg-9">
                         <input type="text" name="add_remark[]" id="add_remark" class="form-control">
                         <span style="color:red;"><small id="check_remark"></small></span>
@@ -71,8 +71,9 @@
                 </div>
 
                 <div class="form-group row">
-                    <div class="col-lg-12">
-                        <button class="btn btn-info" onclick="add_row()">Add</button>
+                    <label class="col-lg-3 control-label">&nbsp;</label>
+                    <div class="col-lg-9">
+                        <button class="btn btn-info" onclick="add_row()"><i class="fas fa-plus"></i> Add</button>
                     </div>
                 </div>
             </div>
@@ -201,7 +202,7 @@
         </div>
 
         <div class="form-group row">
-            <label class="col-lg-3 control-label">Remark <span class="text-danger">*</span> </label>
+            <label class="col-lg-3 control-label">Remark</label>
             <div class="col-lg-9">
                 <input type="text" name="name" id="remark_com" class="form-control">
                 <span style="color:red;"><small id="check_remark_com"></small></span>
@@ -210,8 +211,9 @@
 
 
         <div class="form-group row">
-            <div class="col-lg-12">
-                <button class="btn btn-info" onclick="add_row_command()">Add</button>
+            <label class="col-lg-3 control-label">&nbsp;</label>
+            <div class="col-lg-9">
+                <button class="btn btn-info" onclick="add_row_command()"><i class="fas fa-plus"></i> Add</button>
             </div>
         </div>
     </div>
@@ -264,6 +266,7 @@
 
 <script>
     $(function () {
+        $('.check_test_select').select2();
         $('#chk-add').hide();
         $('#chk-command').hide();
         

@@ -163,7 +163,7 @@
         
         $(function () {
             $('#table-cpe-template').DataTable({
-                "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+                "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
                 processing: true,
                 order: [[0, "desc"]],
             });

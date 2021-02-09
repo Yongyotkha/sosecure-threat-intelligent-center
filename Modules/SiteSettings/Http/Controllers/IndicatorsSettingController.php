@@ -46,7 +46,7 @@ class IndicatorsSettingController extends Controller
        
        $get_Logdata = new LogsSetting;
        
-       $get_Logdata = $get_Logdata->get_data( $get_data->id,"INDICATOR");
+       $get_Logdata = $get_Logdata->get_data( $get_data->id,"indicator");
 
        if($get_Logdata){
            $content=$get_Logdata->content;
@@ -54,14 +54,22 @@ class IndicatorsSettingController extends Controller
         $content=null;
        }
 
-       $LogsSent = LogsSent::where('mode', 'indicator')->first();
-       if( $LogsSent && ($LogsSent -> status_progrss == 3)){
+       $LogsSent = LogsSent::where('site_id',@$get_data->id)->where('mode', 'indicator')->first();
+    //    dd($LogsSent);
+
+        if($LogsSent) {
+            if($LogsSent->status_progrss == 3) {
+                $data['LogsSentBTN'] = 1;
+                $data['LogsSentMessage'] = "Send log waiting for operation!!";
+            } else {
+                $data['LogsSentBTN'] = 2;
+                $data['LogsSentMessage'] = "Send log waiting for operation!!";
+            }
+        } else {
             $data['LogsSentBTN'] = 1;
             $data['LogsSentMessage'] = "Send log waiting for operation!!";
-       }else{
-            $data['LogsSentBTN'] = 2;
-            $data['LogsSentMessage'] = "Send log waiting for operation!!";
-       }
+        }
+
        
 
        $data['content'] = $content;
@@ -76,10 +84,10 @@ class IndicatorsSettingController extends Controller
 
         $get_data = $this->siteSettings->get_data($id);
 
-        $LogsSetting = LogsSetting::where('site_id', $get_data->id)->where('type','INDICATOR')->first();
+        $LogsSetting = LogsSetting::where('site_id', $get_data->id)->where('type','indicator')->first();
         if($LogsSetting){
             $LogsSetting->site_id = $get_data->id;
-            $LogsSetting->type = "INDICATOR";
+            $LogsSetting->type = "indicator";
             $LogsSetting->ip = $request->ip_address;
             $LogsSetting->link = $request->syslog;
             $LogsSetting->protocal = $request->protocal;
@@ -88,7 +96,7 @@ class IndicatorsSettingController extends Controller
         }else{
             $LogsSetting = new LogsSetting;
             $LogsSetting->site_id = $get_data->id;
-            $LogsSetting->type = "INDICATOR";
+            $LogsSetting->type = "indicator";
             $LogsSetting->ip = $request->ip_address;
             $LogsSetting->link = $request->syslog;
             $LogsSetting->protocal = $request->protocal;
@@ -114,16 +122,16 @@ class IndicatorsSettingController extends Controller
 
         // dd($request->text_protocal_format);
         $get_data = $this->siteSettings->get_data($id);
-        $LogsSetting = LogsSetting::where('site_id', $get_data->id)->where('type','INDICATOR')->first();
+        $LogsSetting = LogsSetting::where('site_id', $get_data->id)->where('type','indicator')->first();
         if($LogsSetting){
             $LogsSetting->site_id = $get_data->id;
-            $LogsSetting->type = "INDICATOR";
+            $LogsSetting->type = "indicator";
             $LogsSetting->content = $request->text_protocal_format;
             $LogsSetting->save();
         }else{
             $LogsSetting = new LogsSetting;
             $LogsSetting->site_id = $get_data->id;
-            $LogsSetting->type = "INDICATOR";
+            $LogsSetting->type = "indicator";
             $LogsSetting->content = $request->text_protocal_format;
             $LogsSetting->save();
             
@@ -142,6 +150,8 @@ class IndicatorsSettingController extends Controller
 
     public function indicator_log(Request $request, $id = null)
     {
+
+        $SiteSettings = SiteSettings::select('id')->where('code',$id)->first();
 
         // dd($request->start_date);
         
@@ -174,26 +184,28 @@ class IndicatorsSettingController extends Controller
 
         // dd($request->text_protocal_format);
         $get_data = $this->siteSettings->get_data($id);
-        $LogsSetting = LogsSent::where('mode', 'indicator')->first();
+        $LogsSetting = LogsSent::where('site_id',@$SiteSettings->id)->where('mode', 'indicator')->first();
         if($LogsSetting){
             if($LogsSetting->status_progrss != 3) {
                 return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
             }
             // $LogsSetting->mode = 'indicator';
+            $LogsSetting->site_id = @$SiteSettings->id;
             $LogsSetting->start = $date_start_datetime_format;
             $LogsSetting->end = $date_end_datetime_format;
             $LogsSetting->status_progrss = 1;
             $LogsSetting->save();
         }else{
             $LogsSetting = new LogsSent;
+            $LogsSetting->site_id = @$SiteSettings->id;
             $LogsSetting->mode = 'indicator';
             $LogsSetting->start = $date_start_datetime_format;
             $LogsSetting->end = $date_end_datetime_format;
             $LogsSetting->status_progrss = 1;
             $LogsSetting->save();
-            if($LogsSetting->status_progrss != 3) {
-                return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
-            }
+            // if($LogsSetting->status_progrss != 3) {
+            //     return response()->json(['message' => 'Failed, Send log waiting for operation.!', 'errors' => ['missing' => ["Failed, Send log waiting for operation.! "]]], 500);
+            // }
         }
         return ajaxResponse(
             [
