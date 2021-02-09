@@ -185,7 +185,7 @@ class MonitoringController extends Controller
         ->editColumn('message', function (TransactionBatchjob $model) {
             $html = '';
             // $html .= '<div class="text-elip-message" data-title='.$model->message.'>'.$model->message.'</div>';
-            $html .= ' <a href="'.route('view_message_modal').'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>';
+            $html .= ' <a href="'.route('view_message_modal',['id' => $model->id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>';
             return  $html;
         })
         ->rawColumns(['name','mode','progress','transcation_date_start','transcation_date_end','site_id','message',])
@@ -194,9 +194,13 @@ class MonitoringController extends Controller
 
 
     // View Content DataLeak
-    public function view_message_modal()
+    public function view_message_modal(Request $request , $id)
     {
-        return view('monitoring::modal.view_message');
+        if($id) {
+            $TransactionBatchjob = TransactionBatchjob::where('id',$id)->first();
+        }
+        $data['message'] = @$TransactionBatchjob->message;
+        return view('monitoring::modal.view_message')->with($data);
     }
 
 }

@@ -10,6 +10,7 @@
                 <div class="row">
                     <div>
                         <!-- Message -->
+                        {{@$message}}
                     </div>
                 </div>
             </div>
