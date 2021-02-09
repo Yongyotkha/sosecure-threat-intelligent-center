@@ -150,7 +150,7 @@
                                                                     <a href="#">
                                                                         View Month
                                                                     </a>
-                                                                    <a href="javascript:void(0)" id="btn_change_fix" data-toggle="modal" data-target="#change_status">
+                                                                    <a href="#">
                                                                         View Year
                                                                     </a>
                                                                 </li>

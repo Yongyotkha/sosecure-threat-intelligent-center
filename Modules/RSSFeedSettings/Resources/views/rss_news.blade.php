@@ -219,7 +219,7 @@
                             <div class="row">
                                 <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6 col-lg-6 mb-small-5px">
+                                        <div class="col-md-6 col-lg-6 mb-small-5px nopadding">
                                             {{-- <div class="loadhost backdrop-loader">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
@@ -233,7 +233,7 @@
                                                 <div id="chart-top-source" class="h-chart"></div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 col-lg-6 mb-small-5px">
+                                        <div class="col-md-6 col-lg-6 mb-small-5px nopadding">
                                             {{-- <div class="loadvulserverity backdrop-loader">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
