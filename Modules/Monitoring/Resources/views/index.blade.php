@@ -281,6 +281,7 @@ function data_table(){
                 },
                 {
                     data: 'message',
+                    className : 'text-center'
                 },
             ],
             columnDefs: [

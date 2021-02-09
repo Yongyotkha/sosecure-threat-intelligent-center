@@ -17,6 +17,6 @@ Route::group(
         Route::get('/batchjob', 'MonitoringController@batchjob')->name('monitoring.batchjob')->middleware('can:menu_items');
         Route::post('/tableMonitor', 'MonitoringController@tableMonitor')->name('monitoring.tableMonitor')->middleware('can:menu_items');
 
-        Route::get('/view_message', 'MonitoringController@view_message')->name('monitoring.view_message')->middleware('can:menu_items');
+        Route::get('/view_message', 'MonitoringController@view_message_modal')->name('view_message_modal')->middleware('can:menu_items');
     }
 );
