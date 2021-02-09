@@ -940,6 +940,20 @@ class DataLeakController extends Controller
 
     }
 
+    // View Content DataLeak
+    public function view_dataleak_modal($code)
+    {
+        $data["code"] = $code;
+        return view('sitesettings::modal.view_content_dataleak')->with($data);
+    }
+    
+    // View Content Compromise
+    public function view_compromise_modal($code)
+    {
+        $data["code"] = $code;
+        return view('sitesettings::modal.view_content_compromise')->with($data);
+    }
+
     public function delete_dataleakdata_modal($code)
     {
 
@@ -949,7 +963,6 @@ class DataLeakController extends Controller
 
     public function delete_darkwebdata_modal($code)
     {
-
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
         $data["DataLeakSocialRef"] = $DataLeakSocialRef;
         return view('sitesettings::modal.delete_darkwebdata')->with($data);
