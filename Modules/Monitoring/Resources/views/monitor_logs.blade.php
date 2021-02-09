@@ -34,7 +34,7 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
-                            <div class="col-lg-12">
+                            <div class="col-lg-8">
                                 <div class="row d-flex align-items-center">
                                     <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
                                     <div class="col-sm-11 col-xs-12">
@@ -42,19 +42,18 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-5 text-center" style="padding-left: 97px">
-                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                    <i class="fa fa-calendar"></i>&nbsp;
-                                    <span></span> <i class="fa fa-caret-down"></i>
+                        
+                        
+                            <div class="col-lg-4 text-center" style="padding-left: 34px">
+                                <div class="row d-flex align-items-center">
+                                    <label for="" class="col-sm-1 col-xs-12 col-form-label" style="margin-right: 51px;">Date</label>
+                                    <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 text-center">
-                                <div style="margin-top: 8px;">
-                                    
-                                </div>
-                            </div>
+                           
                         </div>
                         <div class="row">
                             <div class="col-lg-12 text-right mt-2">
@@ -245,7 +244,7 @@ function data_table(){
             serverSide: true,
             destroy: true,
             order: [[ 5, "desc" ], [ 0, "asc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('monitoring.table_monitor_logs')!!}',
@@ -267,6 +266,7 @@ function data_table(){
             },
             columnDefs: [
                 {
+                    width: '10%',
                     targets: 0,
                     name:"site_id",
                     render: function (data, type, row) {
@@ -305,10 +305,10 @@ function data_table(){
                     name:"logs.log_trace",
                     render: function (data, type, row) {
                         if(row.log_trace){
-                        return '<div class="text-elip" data-rel="tooltip" title="'+row.log_trace+'">'+row.log_trace+'</div>';
-                       }else{
-                        return '';
-                       }
+                            return '<div class="text-elip" data-rel="tooltip" title="'+row.log_trace+'"><textarea rows="3" cols="50" disabled>'+row.log_trace+'</textarea></div>';
+                        }else{
+                            return '';
+                        }
                     }
                 },
                 {
