@@ -332,6 +332,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            "autoWidth" : false,
             order: [[ 5, "desc" ]],
             ajax: {
                 type: "POST",
@@ -374,7 +375,7 @@
                     orderable: false,
                     searchable: false,
                     sortable: false,
-                    width: '1px',
+                    width: '115px',
                     render: function (data, type, full, meta) {
 
                         if(full.get_rss_source!=null){
@@ -388,7 +389,7 @@
                 },
                 {
                     targets: 2,
-                    width: '10px',
+                    width: '245px',
                     name:'title',
                     render: function (data, type, full, meta) {
     
@@ -397,7 +398,7 @@
                 },
                 {
                     targets: 3,
-                    width: '10px',
+                    width: '300px',
                     ype: 'html',
                     name:'description',
                     render: function (data, type, full, meta) {
