@@ -11,12 +11,7 @@
     <section class="hbox stretch">      
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
-                <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
-                        data-target="#setting-nav">@icon('solid/bars')</a>
-                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
-                        <p class="h3 text-elipse-setting">{{@$siteSettings->name}}</p>
-                </header>
+                @include('partial.header-select-site')
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
                         @include('partial.menu_site')
