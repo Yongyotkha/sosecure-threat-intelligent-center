@@ -3673,7 +3673,9 @@ textarea.form-control{
 .dk.header.b-b{
     padding: 0 5px !important;
 }
-
-.buttons-csv{
+.btn:not(.btn-xs){
+    padding: 5px 12px;
+}
+.btn.buttons-csv{
     padding: 4px 12px !important;
 }
