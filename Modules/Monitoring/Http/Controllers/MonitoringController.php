@@ -9,6 +9,7 @@ use Yajra\DataTables\DataTables;
 use App\Entities\TransactionBatchjob;
 use DB;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\Monitoring\Entities\MonitorLogs;
 class MonitoringController extends Controller
 {
     /**
@@ -85,7 +86,7 @@ class MonitoringController extends Controller
         }
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('logs');
-        return view('monitoring::index')->with($data);
+        return view('monitoring::monitor_logs')->with($data);
     }
 
     /**
@@ -226,8 +227,10 @@ class MonitoringController extends Controller
         
         $model = '';
         $html = '';
+
         if ($request->isSearch == 1) {
-            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.id as transaction_batchjob_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', '')->where('status', 1);
+            $model = MonitorLogs::select('site.name as site_id', 'logs.id as logs','logs.file',
+            'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at');
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
                 $date_start_date = @$date_start_explode[0];
@@ -246,19 +249,17 @@ class MonitoringController extends Controller
                 $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
                 $date_end_time_time = date("H:i", strtotime($date_end_time));
                 $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                $model = $model -> whereBetween('transcation_date',array($date_start_datetime_format,$date_end_datetime_format));
+                $model = $model -> whereBetween('logs.updated_at',array($date_start_datetime_format,$date_end_datetime_format));
             }
 
             if($request->Keywords){
-                $keywords = "%".$request->Keywords."%";
+                
+                $keywords = "%". str_replace(array('\\', '"','\''), '\\\\', $request->Keywords)."%";
                 $model = $model->where(function ($query) use ($keywords){
-                    $query->where('transaction_batchjob.name','LIKE', $keywords)
-                    ->orWhere('mode', 'LIKE', $keywords);
+                    $query->where('logs.file','LIKE', $keywords)
+                    ->orWhere('logs.error_summary', 'LIKE', $keywords)
+                    ->orWhere('logs.log_trace', 'LIKE', $keywords);
                 });
-            }
-
-            if($request->select||$request->select==="0"){
-                $model = $model->where('progress', $request->select);
             }
 
             if($request->sitecode){
@@ -266,31 +267,16 @@ class MonitoringController extends Controller
                 $model = $model->where('site_id', $SiteSettings->id);
             }
 
-            $model = $model->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
+            $model = $model->leftjoin('site', 'logs.site_id', '=', 'site.id');
           
             
-        } else {
-
-            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.id as transaction_batchjob_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', 'transaction_batchjob.message')->where('status', 1)->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
-        
+        }else{
+            $model = MonitorLogs::select('site.name as site_id','logs.id as logs','logs.file',
+            'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at')
+            ->leftjoin('site', 'logs.site_id', '=', 'site.id');
         }
         
-            $model = $model;
-
-        return DataTables::of($model)
-        ->editColumn('message', function (TransactionBatchjob $model) {
-            $html = '';
-            if($model->message) {
-                $html .= ' <a href="'.route('monitoring.view_message_modal',['id' => $model->transaction_batchjob_id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>';
-            } else {
-                $html = '';
-            }
-            // $html .= '<div class="text-elip-message" data-title='.$model->message.'>'.$model->message.'</div>';
-            
-            return  $html;
-        })
-        ->rawColumns(['name','mode','progress','transcation_date_start','transcation_date_end','site_id','message',])
-        ->toJson();
+        return DataTables::of($model)->toJson();
     }
 
 
@@ -302,6 +288,18 @@ class MonitoringController extends Controller
         }
         $data['message'] = @$TransactionBatchjob->message;
         return view('monitoring::modal.view_message')->with($data);
+    }
+
+    public function delete_logs(Request $request){
+        MonitorLogs::where('id',$request->id)->delete();
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('monitoring.monitor_logs'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
 }
