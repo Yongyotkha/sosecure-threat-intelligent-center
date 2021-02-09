@@ -53,7 +53,6 @@
                                                         </div>
                                                     </div>
                                                 </a>
-        
                                             </div>
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
                                                 <a href="{{route('monitoringvulnerabilitys.index')}}">
@@ -126,8 +125,6 @@
                                                     <div id="chart-show-pie" class="h-chart"></div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
                                             <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                 <div class="loadindicator backdrop-loader">
                                                     <div class="loader4 centerloader"></div>
