@@ -131,7 +131,7 @@ class MonitoringController extends Controller
         $model = '';
         $html = '';
         if ($request->isSearch == 1) {
-            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', '')->where('status', 1);
+            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.id as transaction_batchjob_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', '')->where('status', 1);
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
                 $date_start_date = @$date_start_explode[0];
@@ -175,7 +175,7 @@ class MonitoringController extends Controller
             
         } else {
 
-            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', 'transaction_batchjob.message')->where('status', 1)->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
+            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.id as transaction_batchjob_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', 'transaction_batchjob.message')->where('status', 1)->leftjoin('site', 'transaction_batchjob.site_id', '=', 'site.id');
         
         }
         
@@ -184,8 +184,13 @@ class MonitoringController extends Controller
         return DataTables::of($model)
         ->editColumn('message', function (TransactionBatchjob $model) {
             $html = '';
+            if($model->message) {
+                $html .= ' <a href="'.route('monitoring.view_message_modal',['id' => $model->transaction_batchjob_id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>';
+            } else {
+                $html = '';
+            }
             // $html .= '<div class="text-elip-message" data-title='.$model->message.'>'.$model->message.'</div>';
-            $html .= ' <a href="'.route('view_message_modal').'" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>';
+            
             return  $html;
         })
         ->rawColumns(['name','mode','progress','transcation_date_start','transcation_date_end','site_id','message',])
@@ -194,9 +199,13 @@ class MonitoringController extends Controller
 
 
     // View Content DataLeak
-    public function view_message_modal()
+    public function view_message_modal(Request $request , $id)
     {
-        return view('monitoring::modal.view_message');
+        if($id) {
+            $TransactionBatchjob = TransactionBatchjob::where('id',$id)->first();
+        }
+        $data['message'] = @$TransactionBatchjob->message;
+        return view('monitoring::modal.view_message')->with($data);
     }
 
 }
