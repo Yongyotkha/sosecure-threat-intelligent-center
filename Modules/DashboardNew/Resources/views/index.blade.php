@@ -359,7 +359,14 @@
 
 <script>
 
-    
+Highcharts.setOptions({
+    lang: {
+      decimalPoint: '.',
+      thousandsSep: ','
+    }
+});
+
+
     $('#fillter_click .btn-selector').on('click',function(){
         $(this).siblings().removeClass('active');
         $(this).addClass('active');
@@ -709,11 +716,11 @@
                             text: ''
                         },
                         xAxis: {
-                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                            categories: result.data.nameXAxis
                         },
                         yAxis: {
                             title: {
-                            text: 'Number (Months)'
+                            text: result.data.nameYAxis
                             }
                         },
                         plotOptions: {
@@ -726,12 +733,12 @@
                         },
                         series: [
                         {
-                            name: 'Number of Event',
+                            name: result.data.nameSeriesEvent,
                             data: result.data.events,
                             color: '#3984e7'
                         }, 
                         {
-                            name: 'Number of Attribute',
+                            name: result.data.nameSeriesAttribute,
                             data: result.data.attribute,
                             color: '#e64732'
                         }, 

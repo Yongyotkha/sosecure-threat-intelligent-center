@@ -352,9 +352,22 @@ class DashboardNewController extends Controller
     public function chart_indicators(Request $request){
 
         if($request->displayType == 'mon'){
-            $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', now()->year)->where('type','summary_year')->get();
-            $attribute =now()->year;
-            $events = now();
+            $currentMonth = 2;//year - current is 2 old is 1
+            $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', $currentMonth)->where('type','summary_month')->get();
+            $events = array_fill(0, (int)date('t'), 0);
+            $attribute = array_fill(0, (int)date('t'), 0);
+            foreach($IndicatorSummaryYear  as $value){
+                $events[$value->month-1] = $value->event_count;
+                $attribute[$value->month-1] = $value->attribute_count;
+            }
+            $nameXAxis = array();
+            foreach ($events as $key => $value) {
+                $nameXAxis[$key] = (string)($key+1);
+            }
+            $nameYAxis = 'Number (Days)';
+            $nameSeriesEvent = 'Number of Event';
+            $nameSeriesAttribute = 'Number of Attribute';
+
         }else{
             $nameXAxis = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             $nameYAxis = 'Number (Months)';
@@ -412,6 +425,11 @@ class DashboardNewController extends Controller
             'data' => [
                 'events' => $events,
                 'attribute' => $attribute,
+                'nameXAxis' => $nameXAxis,
+                'nameYAxis' => $nameYAxis,
+                'nameSeriesAttribute' => $nameSeriesAttribute,
+                'nameSeriesEvent' => $nameSeriesEvent,
+                
             ]
         );
         return response()->json($response);
