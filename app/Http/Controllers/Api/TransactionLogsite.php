@@ -30,9 +30,9 @@ class TransactionLogsite extends ApiController
                     return response()->json($response);
                 }
                 if($data['data']['mode'] == 'complete'){
-                    $LogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('status_progrss' , 2)->get();
+                    $LogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('transaction_status' , 2)->get();
                     foreach($LogSendTransactions as $LogSendTransaction){
-                        $LogSendTransaction -> transaction_data_status = 3;
+                        $LogSendTransaction -> transaction_status = 3;
                         $LogSendTransaction -> save();
                     }
 
@@ -52,17 +52,21 @@ class TransactionLogsite extends ApiController
                     $HeadLogSendTransaction -> transaction_status = 3;
                     $HeadLogSendTransaction -> save();
                 }
+                $HeadLogSendTransaction = HeadLogSendTransaction::where('site_id', $data['site']['data']['id'])->first();
                 if($HeadLogSendTransaction->transaction_status == 3){
                     try {
                         if($data['data']['mode'] == 'wait'){
-                            $LogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('status_progrss' , 1)->take(20);
+                            $HeadLogSendTransaction -> transaction_status = 2;
+                            $HeadLogSendTransaction -> save();
+
+                            $LogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('transaction_status' , 1)->take(20)->get();
                             foreach($LogSendTransactions as $LogSendTransaction){
-                                $LogSendTransaction -> status_progrss = 2;
+                                $LogSendTransaction -> transaction_status = 2;
                                 $LogSendTransaction -> save();
 
                                 $LogSendTransaction -> ip = $data['site']['data']['server_log_ip'];
                                 $LogSendTransaction -> port = $data['site']['data']['server_log_port'];
-                                $LogSendTransaction -> protocol = $data['site']['data']['server_log_protocol'];
+                                $LogSendTransaction -> protocal = $data['site']['data']['server_log_protocol'];
                             }
                             $data_LogsSents = json_encode($LogSendTransactions);
                         }
@@ -80,44 +84,6 @@ class TransactionLogsite extends ApiController
                     $response = array(
                         'status_code' => 204,
                         'message' => 'No Content',
-                    );
-                    return response()->json($response);
-                }
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e -> getMessage(),
-            );
-            return response()->json($response);
-        }
-    }
-
-    public function tranfer_db(Request $request){
-        try{
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            if($data === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            }else{
-                try {
-                    if($data['data']){
-                        foreach($data['data'] as $logs){
-                            $log = new Log;
-                            $log -> site_id = $data['site']['data']['id'];
-                            $log -> file = $logs['file'];
-                            $log -> error_summary = $logs['error_summary'];
-                            $log -> log_trace = $logs['log_trace'];
-                            $log -> save();
-                        }
-                    }
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);
-                } catch (\Exception $e) {
-                    $response = array(
-                        'status_code' => 500,
-                        'message' => $e -> getMessage(),
                     );
                     return response()->json($response);
                 }
