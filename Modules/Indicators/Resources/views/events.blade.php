@@ -404,14 +404,13 @@ Highcharts.setOptions({
 
     function load_table(page=1){
         $('#table_events').DataTable({
-            searching: false,
             ordering: true,
             pageLength: 25,
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',
@@ -448,6 +447,7 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'public',
+                    className : 'text-center',
                 },
                 {
                     data: 'is_modified',
@@ -457,6 +457,7 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'attrCount',
+                    className : 'text-center',
                 },
                 {
                     data: 'pulse_id',
@@ -528,7 +529,7 @@ Highcharts.setOptions({
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',

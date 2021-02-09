@@ -602,6 +602,7 @@ active_btn('#groupby-type .btn-grey');
                     
                     {
                         targets: 4,
+                        width: '400px',
                         render: function (data, type, full, meta) {
                                                     
                             let val = '';
@@ -616,13 +617,13 @@ active_btn('#groupby-type .btn-grey');
                                 }
                                 
                             }
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+feedcontent+'">'+content+'</div>';
+                            return '<div class="text-elip-nowrap" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                         },
                     },
 
                     {
                         targets: 5,
-                        width: '60px',
+                        width: '400px',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
@@ -633,7 +634,7 @@ active_btn('#groupby-type .btn-grey');
                                 }
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+val+'">'+val+'</div>';
+                            return '<div class="text-elip-nowrap" data-rel="tooltip" title="'+val+'">'+val+'</div>';
 
                         },
                     
