@@ -27,7 +27,7 @@
                             <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</a>
                             @endif
                             <span>
-                                Data Leak Datas
+                                Data Leak Data
                             </span>
                         </div>
 
@@ -134,6 +134,8 @@
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Type</h5>
                                     <div id="groupby-type" class="btn-group special">

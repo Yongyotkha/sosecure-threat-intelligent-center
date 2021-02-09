@@ -86,11 +86,11 @@
                         <div class="panel-body" style="padding: 0 !important">
                             <div class="container-fluid" style="padding: 2rem;">
                                 <div class="row">
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-4 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Keyword</h5>
                                         <input type="text" id="search" class="form-control">
                                     </div>
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-4 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Source</h5>
                                         <select id="source_select" class="form-control">
                                             <option value="">All</option>
@@ -101,7 +101,7 @@
                                             @endif
                                         </select>
                                     </div>
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-4 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="datafeed_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                             <i class="fa fa-calendar"></i>&nbsp;
@@ -109,7 +109,7 @@
                                         </div>
                                     </div>
                                     <!--
-                                    <div class="col-lg-4 mb-1">
+                                    <div class="col-lg-4 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <label class="mr-3">
                                             <input type="checkbox" name="check_all" id="check_all" value="TRUE">
@@ -125,7 +125,9 @@
                                         </label>
                                     </div>
                                      -->
-                                    <div class="col-lg-4 mb-1">
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey check_status active" id="all" value="">
@@ -140,21 +142,23 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-12 text-right mt-2">
-                                        <button type="button" id="btn_darkweb_feed_search" class="btn btn-info btn-responsive btn-fz-13">
-                                            <i class="fas fa-search"></i>
-                                            @langapp('apply')
-                                        </button>
-                                        <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                            <i class="fas fa-broom"></i>
-                                            <span> Clear </span>
-                                        </button>
-                                        <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                            <i class="fas fa-times"></i>
-                                            <span> Close </span>
-                                        </button>
-                                    </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button type="button" id="btn_darkweb_feed_search" class="btn btn-info btn-responsive btn-fz-13">
+                                        <i class="fas fa-search"></i>
+                                        @langapp('apply')
+                                    </button>
+                                    <button type="button" id="btn_darkweb_feed_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-broom"></i>
+                                        <span> Clear </span>
+                                    </button>
+                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                        <i class="fas fa-times"></i>
+                                        <span> Close </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -662,7 +666,9 @@ function table_social_data(){
             },
             {
                 data: 'action',
-                name: 'action'
+                name: 'action',
+                orderable: false,
+                searchable: false,
             },
         ],
         columnDefs: [
