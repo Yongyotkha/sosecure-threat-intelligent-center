@@ -36,6 +36,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('check/transaction_job_clients/tranfer_db', 'Api\TransactionJobClients@tranfer_db');
 
     Route::post('indicator/events_table', 'Api\ApiGetMongoDB@events_table');
+
+    Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
