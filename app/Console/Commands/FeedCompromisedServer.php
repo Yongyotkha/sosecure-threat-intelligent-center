@@ -98,15 +98,25 @@ class FeedCompromisedServer extends Command
                             $cmd2 = "find ".$server_path." -type f ".$server_search_extenstion." -print0 | xargs -0 ls -lh --time-style=\"+%Y-%m-%d %H:%M:%S\"";
                             //echo $cmd2;
                             $return_value = $ssh->exec($cmd2);
-                    
+
                             $this->FileSaveDetail($server,$ssh,$return_value);
                         }
                     }else{
 
+                        $output=null;
+                        $retval=null;
+                      // exec("docker run -it vpershin93/winexe-docker build/winexe -U Administrator%Apss*2020 //150.95.91.205 'where /r C:\boy *.js *.css' ", $output, $retval);
+                      //  echo "Returned with status $retval and output:\n";
+                      //  print_r($output);
 
+                        $output=null;
+                        $retval=null;
+                        exec("docker run -it vpershin93/winexe-docker build/winexe -U Administrator%Apss*2020 //150.95.91.205 'forfiles /M jquery-ui.js /C 'cmd /c echo @fdate @ftime' ", $output, $retval);
+                        echo "Returned with status $retval and output:\n";
+                        print_r($output);
 
-
-
+         
+//
 
                     }
 
@@ -164,52 +174,52 @@ class FeedCompromisedServer extends Command
             try{
                 // $loop++;
                 // if($loop<$stop){
-                    $rand = rand(0,30000);
-                    $rand = $rand+30000;
-                    usleep($rand);
-                    $detail = $this->get_exec_subdetail($line,$ssh);
-                    
-                    if(!empty($detail)){
+                $rand = rand(0,30000);
+                $rand = $rand+30000;
+                usleep($rand);
+                $detail = $this->get_exec_subdetail($line,$ssh);
+
+                if(!empty($detail)){
+                    $CompromisedFileOriginal = new CompromisedFileOriginal;
+                    $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
+                    $this->info("Detail : " .json_encode($detail["file_path"]));
+                    if (!$CompromisedFileOriginal){
                         $CompromisedFileOriginal = new CompromisedFileOriginal;
-                        $CompromisedFileOriginal = $CompromisedFileOriginal->where('compromised_server_id', $server->id)->where('file_path', $detail["file_path"])->where('site_id', $server->site_id)->first();
-                        $this->info("Detail : " .json_encode($detail["file_path"]));
-                        if (!$CompromisedFileOriginal){
-                            $CompromisedFileOriginal = new CompromisedFileOriginal;
-                            $CompromisedFileOriginal->code = generator_uuid();
-                            $CompromisedFileOriginal->compromised_server_id = $server->id;
-                            $CompromisedFileOriginal->file_name = $detail["file_name"];
-                            $CompromisedFileOriginal->file_extension = $detail["file_extenstion"];
-                            $CompromisedFileOriginal->file_path = $detail["file_path"];
-                            $CompromisedFileOriginal->file_size = $detail["file_size"];
-                            $CompromisedFileOriginal->file_modified = $detail["file_modified"];
-                            $CompromisedFileOriginal->file_hash = $detail["file_hash"];
-                            $CompromisedFileOriginal->file_status = 1;
-                            $CompromisedFileOriginal->active = 1;
-                            $CompromisedFileOriginal->site_id = $server->site_id;
+                        $CompromisedFileOriginal->code = generator_uuid();
+                        $CompromisedFileOriginal->compromised_server_id = $server->id;
+                        $CompromisedFileOriginal->file_name = $detail["file_name"];
+                        $CompromisedFileOriginal->file_extension = $detail["file_extenstion"];
+                        $CompromisedFileOriginal->file_path = $detail["file_path"];
+                        $CompromisedFileOriginal->file_size = $detail["file_size"];
+                        $CompromisedFileOriginal->file_modified = $detail["file_modified"];
+                        $CompromisedFileOriginal->file_hash = $detail["file_hash"];
+                        $CompromisedFileOriginal->file_status = 1;
+                        $CompromisedFileOriginal->active = 1;
+                        $CompromisedFileOriginal->site_id = $server->site_id;
+                        $CompromisedFileOriginal->save();
+                        $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
+                    }else{
+
+                        if($CompromisedFileOriginal->file_modified==$detail["file_modified"]){
+                            $CompromisedFileOriginal->file_status = 2;
                             $CompromisedFileOriginal->save();
-                            $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                         }else{
-                        
-                            if($CompromisedFileOriginal->file_modified==$detail["file_modified"]){
+                            if($CompromisedFileOriginal->file_hash!=$detail["file_hash"]){
+                                $CompromisedFileOriginal->file_size = $detail["file_size"];
+                                $CompromisedFileOriginal->file_modified = $detail["file_modified"];
+                                $CompromisedFileOriginal->file_hash = $detail["file_hash"];
+                                $CompromisedFileOriginal->file_status = 3;
+                                $CompromisedFileOriginal->save();
+                                $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
+                            }else{
                                 $CompromisedFileOriginal->file_status = 2;
                                 $CompromisedFileOriginal->save();
-                            }else{
-                                if($CompromisedFileOriginal->file_hash!=$detail["file_hash"]){
-                                    $CompromisedFileOriginal->file_size = $detail["file_size"];
-                                    $CompromisedFileOriginal->file_modified = $detail["file_modified"];
-                                    $CompromisedFileOriginal->file_hash = $detail["file_hash"];
-                                    $CompromisedFileOriginal->file_status = 3;
-                                    $CompromisedFileOriginal->save();
-                                    $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
-                                }else{
-                                    $CompromisedFileOriginal->file_status = 2;
-                                    $CompromisedFileOriginal->save();
                                 
-                                }
                             }
-                            $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                         }
+                        $status_active = $this->checkAlgorithmAndSave($server,$detail,$CompromisedFileOriginal->code);
                     }
+                }
                 // }else{
                 //     break;
                 // }
@@ -226,7 +236,7 @@ class FeedCompromisedServer extends Command
         //$connection = ssh2_connect('shell.example.com', 22);
         // ssh2_auth_password($connection,$user,$pass);
         // $shell = ssh2_shell($connection,"bash");
-        
+
         //$output = user_exec($shell,$cmd);
         // echo json_encode($output);
         // fclose($shell);
@@ -240,37 +250,37 @@ class FeedCompromisedServer extends Command
           if(!strstr($line,$cmd)) {
             if(preg_match('/\[start\]/',$line)) {
               $start = true;
-            }elseif(preg_match('/\[end\]/',$line)) {
+          }elseif(preg_match('/\[end\]/',$line)) {
               return $output;
-            }elseif($start){
+          }elseif($start){
               $output[] = $line;
-            }
           }
-        }
-    }
+      }
+  }
+}
 
-    private  function pythonCheck($server,$ssh) {
-        $pathSave = $this->pathToSave.$server->id."/";
-        if (!file_exists($pathSave)) {
-            mkdir($pathSave, 0777, true);
-        }
-        $ssh->setTimeout($this->timeOutSub);
+private  function pythonCheck($server,$ssh) {
+    $pathSave = $this->pathToSave.$server->id."/";
+    if (!file_exists($pathSave)) {
+        mkdir($pathSave, 0777, true);
+    }
+    $ssh->setTimeout($this->timeOutSub);
         //$cmd = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-dir '/python_scanner/file_webshell/' -r";
         // $cmd = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-dir '/python_scanner/yara-scanner/' -r";
-        $cmd = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-dir '".$pathSave."' -r";
-        $output = @$ssh->exec($cmd);
-        $this->info($output);
-        return 0;
-    }
+    $cmd = "cd /python_scanner/yara-scanner/ && python3 yara_main.py --scan-dir '".$pathSave."' -r";
+    $output = @$ssh->exec($cmd);
+    $this->info($output);
+    return 0;
+}
 
-    private  function checkAlgorithmAndSave($server,$detail,$codename) {
-        $pathSave = $this->pathToSave.$server->id."/";
-        if (!file_exists($pathSave)) {
-            mkdir($pathSave, 0777, true);
-        }
-        $file = $pathSave.$codename.$detail["file_extenstion"];
-        file_put_contents($file, $detail["file_content"]);
-        chmod($file, 0777);
+private  function checkAlgorithmAndSave($server,$detail,$codename) {
+    $pathSave = $this->pathToSave.$server->id."/";
+    if (!file_exists($pathSave)) {
+        mkdir($pathSave, 0777, true);
+    }
+    $file = $pathSave.$codename.$detail["file_extenstion"];
+    file_put_contents($file, $detail["file_content"]);
+    chmod($file, 0777);
 
         // if(!is_file($file)){
         //     file_put_contents($file, $detail["file_content"]);
@@ -291,10 +301,10 @@ class FeedCompromisedServer extends Command
 
         //echo json_encode($blackListFoundString);
 
-        return 0;
-    }
+    return 0;
+}
 
-    private  function savePythonScan_backup($server,$detail,$feedtype,$keyword,$blackListFoundString) {
+private  function savePythonScan_backup($server,$detail,$feedtype,$keyword,$blackListFoundString) {
         $implode_blacklist = implode (",", $blackListFoundString);//insert
         $CompromisedFileCheck = CompromisedFileCheck::where('compromised_server_id', $server->id)->where('defacement_type', $keyword)->where('file_path', $detail["file_path"])->where('site_id',$server->site_id)->first(); 
         $insertLeak = true;
@@ -336,7 +346,7 @@ class FeedCompromisedServer extends Command
             ->where('temp_id', $server->id)
             ->where('feel_type', $keyword)
             ->where('feedcontent',$server->site_id)->first();
-           
+
             if(!$DataLeakFeedCheck){
                 $DataLeakFeedCheck = new DataLeakFeed;
                 $DataLeakFeedCheck->code = generator_uuid();
@@ -414,7 +424,7 @@ class FeedCompromisedServer extends Command
             ->where('temp_id', $server->id)
             ->where('feel_type', $keyword)
             ->where('feedcontent',$server->site_id)->first();
-           
+
             if(!$DataLeakFeedCheck){
                 $DataLeakFeedCheck = new DataLeakFeed;
                 $DataLeakFeedCheck->code = generator_uuid();
@@ -490,8 +500,8 @@ class FeedCompromisedServer extends Command
             // }else{
             //     $output["file_extenstion"] = substr($output["file_name"],$stringpos);
             // }
-           
-            
+
+
             // $this->info($output["file_name"]);
         // }
         return $output;
@@ -533,11 +543,11 @@ class FeedCompromisedServer extends Command
                             }
                         }
                     }
-                   
+
                     foreach ($trackFound as $position)
                     {
                         //ถ้ามีให้หาตำแหน่ง
-                       
+
                         if (!in_array($position, array_column($filtereds, 'value')))
                         {
                             //ไม่มีอยู่ใน ignore

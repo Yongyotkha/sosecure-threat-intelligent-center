@@ -39,6 +39,7 @@ use App\Entities\Transaction_client_compromised_server;
 
 use App\Entities\Transaction_client_asset;
 use App\Entities\Transaction_client_asset_data;
+use App\Entities\Transaction_client_credentials;
 class ApiTransferClients extends Controller
 {
 
@@ -59,25 +60,25 @@ class ApiTransferClients extends Controller
       $Sites_get = Sites::where('code',$code)->where('active',1)->where('system_site_online',1)->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', ">=", date("Y-m-d H:i:s"))->first();
 
       if (!$Sites_get) {
-         $dataout = [
-            'connect' => 0,
-            'result' => 0,
-            'queryData' =>$Sites_get,
-            'site_code_en' =>$code,
-            'messageErr' => 'Your account has expired; please contact your system administrator',
-        ];
-        return response()->json($dataout); 
-    }
-
-    if ($header !=$Sites_get->public_key) {
-      $dataout = [
+       $dataout = [
         'connect' => 0,
         'result' => 0,
-        'queryData' => array(),
+        'queryData' =>$Sites_get,
         'site_code_en' =>$code,
         'messageErr' => 'Your account has expired; please contact your system administrator',
     ];
     return response()->json($dataout); 
+}
+
+if ($header !=$Sites_get->public_key) {
+  $dataout = [
+    'connect' => 0,
+    'result' => 0,
+    'queryData' => array(),
+    'site_code_en' =>$code,
+    'messageErr' => 'Your account has expired; please contact your system administrator',
+];
+return response()->json($dataout); 
 }
 
 
@@ -213,7 +214,14 @@ if($dataDecode){
             $modeInsert = 'fx_transaction_client_asset_data';
             $nameBJ = 'Transaction asset_data compromised server - everyMinute()  Or Request';
 
-        }else {
+        }
+        else if ($nameTable == 'fx_transaction_client_credentials') {
+            $model_getData = new Transaction_client_credentials;
+            $modeInsert = 'fx_transaction_client_credentials';
+            $nameBJ = 'Transaction asset_data compromised server - everyMinute()  Or Request';
+
+        }
+        else {
             $connect = false;
             $result = false;
         }

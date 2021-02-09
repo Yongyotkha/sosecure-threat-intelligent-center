@@ -431,7 +431,7 @@ class MDCVEBatchJob extends Command
         //$modified ='2019-08-08';
         $sql3  = 'SELECT *
         FROM `fx_data_datacve`
-        WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        WHERE  modified >=CURDATE() + INTERVAL -90 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
         // $sql3  = 'SELECT *
         // FROM `data_datacve`
