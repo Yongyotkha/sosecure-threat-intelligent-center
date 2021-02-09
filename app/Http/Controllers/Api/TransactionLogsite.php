@@ -22,6 +22,13 @@ class TransactionLogsite extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{
+                if(empty($data['site']['data']['server_log_ip'])){
+                    $response = array(
+                        'status_code' => 204,
+                        'message' => 'No Content',
+                    );
+                    return response()->json($response);
+                }
                 if($data['data']['mode'] == 'complete'){
                     $LogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('status_progrss' , 2)->get();
                     foreach($LogSendTransactions as $LogSendTransaction){
@@ -49,14 +56,15 @@ class TransactionLogsite extends ApiController
                     try {
                         if($data['data']['mode'] == 'wait'){
                             $LogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('status_progrss' , 1)->take(20);
-                            $LogsSentID = [];
                             foreach($LogSendTransactions as $LogSendTransaction){
                                 $LogSendTransaction -> status_progrss = 2;
                                 $LogSendTransaction -> save();
-                                $LogsSentID[] = $LogSendTransaction -> type;
+
+                                $LogSendTransaction -> ip = $data['site']['data']['server_log_ip'];
+                                $LogSendTransaction -> port = $data['site']['data']['server_log_port'];
+                                $LogSendTransaction -> protocol = $data['site']['data']['server_log_protocol'];
                             }
-                            $LogsSettings = LogsSetting::where('site_id', $data['site']['data']['id'])->whereIn('type', $LogsSentID)->get();
-                            $data_LogsSents = json_encode($LogsSettings);
+                            $data_LogsSents = json_encode($LogSendTransactions);
                         }
                         $datas = encrypt_decrypt('encrypt', $data_LogsSents, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                         return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);

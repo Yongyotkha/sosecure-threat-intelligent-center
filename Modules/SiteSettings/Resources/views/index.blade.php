@@ -18,7 +18,7 @@
             @can('users_delete')
             <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs pull-right" value="bulk-delete"
                 disabled>
-                <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
+                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
                     @langapp('delete')</span>
             </button>
             @endcan

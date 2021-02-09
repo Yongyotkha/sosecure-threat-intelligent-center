@@ -40,6 +40,7 @@ use App\Entities\Transaction_client_compromised_server;
 use App\Entities\Transaction_client_asset;
 use App\Entities\Transaction_client_asset_data;
 use App\Entities\Transaction_client_credentials;
+use App\Entities\Transaction_client_cpe;
 class ApiTransferClients extends Controller
 {
 
@@ -60,25 +61,25 @@ class ApiTransferClients extends Controller
       $Sites_get = Sites::where('code',$code)->where('active',1)->where('system_site_online',1)->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', ">=", date("Y-m-d H:i:s"))->first();
 
       if (!$Sites_get) {
-       $dataout = [
+         $dataout = [
+            'connect' => 0,
+            'result' => 0,
+            'queryData' =>$Sites_get,
+            'site_code_en' =>$code,
+            'messageErr' => 'Your account has expired; please contact your system administrator',
+        ];
+        return response()->json($dataout); 
+    }
+
+    if ($header !=$Sites_get->public_key) {
+      $dataout = [
         'connect' => 0,
         'result' => 0,
-        'queryData' =>$Sites_get,
+        'queryData' => array(),
         'site_code_en' =>$code,
         'messageErr' => 'Your account has expired; please contact your system administrator',
     ];
     return response()->json($dataout); 
-}
-
-if ($header !=$Sites_get->public_key) {
-  $dataout = [
-    'connect' => 0,
-    'result' => 0,
-    'queryData' => array(),
-    'site_code_en' =>$code,
-    'messageErr' => 'Your account has expired; please contact your system administrator',
-];
-return response()->json($dataout); 
 }
 
 
@@ -200,25 +201,31 @@ if($dataDecode){
         }else if ($nameTable == 'fx_transaction_client_compromised_server') {
             $model_getData = new Transaction_client_compromised_server;
             $modeInsert = 'fx_transaction_client_compromised_server';
-            $nameBJ = 'Transaction Client compromised server - everyMinute()  Or Request';
+            $nameBJ = 'Transaction Client  - everyMinute()  Or Request';
 
         }
         else if ($nameTable == 'fx_transaction_client_asset') {
             $model_getData = new Transaction_client_asset;
             $modeInsert = 'fx_transaction_client_asset';
-            $nameBJ = 'Transaction asset compromised server - everyMinute()  Or Request';
+            $nameBJ = 'Transaction asset r - everyMinute()  Or Request';
 
         }
         else if ($nameTable == 'fx_transaction_client_asset_data') {
             $model_getData = new Transaction_client_asset_data;
             $modeInsert = 'fx_transaction_client_asset_data';
-            $nameBJ = 'Transaction asset_data compromised server - everyMinute()  Or Request';
+            $nameBJ = 'Transaction asset_data  - everyMinute()  Or Request';
 
         }
         else if ($nameTable == 'fx_transaction_client_credentials') {
             $model_getData = new Transaction_client_credentials;
             $modeInsert = 'fx_transaction_client_credentials';
-            $nameBJ = 'Transaction asset_data compromised server - everyMinute()  Or Request';
+            $nameBJ = 'Transaction credentials server - everyMinute()  Or Request';
+
+        }
+        else if ($nameTable == 'fx_transaction_client_cpe') {
+            $model_getData = new Transaction_client_cpe;
+            $modeInsert = 'Transaction_client_cpe';
+            $nameBJ = 'Transaction cpe - everyMinute()  Or Request';
 
         }
         else {
