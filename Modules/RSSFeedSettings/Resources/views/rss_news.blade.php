@@ -358,20 +358,12 @@
             text: null
         },
         xAxis: {
-            categories: [
-            'Krebsansecurity',
-            'Schneler',
-            'Trendmicro',
-            'Posttoday',
-            'Thairath',
-            'Sanook',
-            'Kapook',
-            'Prochacha1',
-            ],
+            type: 'category',
             crosshair: true,
             labels: {
                 overflow: 'justify',
                 autoRotation: false,
+                textAlign: 'center',
             }
        
         },
@@ -397,6 +389,7 @@
             series:{
                 pointWidth: 30,
                 color : '#ffc107',
+                align: 'center',
             },
             style:{
                 background: '#fff'
@@ -407,41 +400,28 @@
             enabled: false
         },
         series: [{
-            name: 'Krebsansecurity',
-            data: [49.9],
-        }, {
-            
-            name: 'Schneler',
-            data: [null,83.6]
-
-        }, {
-            
-            name: 'Trendmicro',
-            data: [null,null,48.9]
-
-        }, {
-            
-            name: 'Posttoday',
-            data: [null,null,null,42.4]
-
-        }, {
-            
-            name: 'Thairath',
-            data: [null,null,null,null,42.4]
-
-        }, {
-            
-            name: 'Sanook',
-            data: [null,null,null,null,null,42.4]
-        }, {
-            
-            name: 'Kapook',
-            data: [null,null,null,null,null,null,42.4]
-        }, {
-            
-            name: 'Prochacha1',
-            data: [null,null,null,null,null,null,null,42.4]
-
+            name: 'Population',
+            data: [
+            ['Krebsansecurity', 24.2],
+            ['Schneler', 20.8],
+            ['Trendmicro', 14.9],
+            ['Posttoday', 13.7],
+            ['Thairath', 13.7],
+            ['Sanook', 13.7],
+            ['Kapook', 13.7],
+            ['Prochacha1', 13.7],
+            ],
+            dataLabels: {
+            enabled: true,
+            color: '#333',
+            align: 'center',
+            format: '{point.y:.1f}',
+            y: 0, 
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif',
+            }
+            }
         }]
         });
 
