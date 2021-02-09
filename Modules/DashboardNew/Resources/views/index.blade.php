@@ -28,7 +28,7 @@
                         <section class="">
                             <div class="panel-body" style="padding: 0 15px;" id="chart-container">
                                 <div class="row">
-                                    <div class="col-xl-2 col-lg-2 col-md-12 padding-small-5px mb-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-12 nopadding mb-2">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
                                                 {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">

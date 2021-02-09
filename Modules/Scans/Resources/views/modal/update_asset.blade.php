@@ -13,21 +13,19 @@
 
 
         <div class="modal-body">
-
-            <div class="row">
-                <div class="col-xs-3 text-center">
-                    <h3 class="text-dark">Assets</h3>
-                </div>
-                <div class="col-xs-9 text-center">
-                    <h3 class="text-dark">Referent</h3>
-                </div>
-                <div class="col-md-12">
-                    <hr>
-                </div>
-            </div>
             <div id="show_asets_manual" class="row">
                 <div class="col-md-12">
                     <table class="table table-bordered asset-table-manual-0" id='table-data-assets'>
+                        <thead>
+                            <tr>
+                                <th>
+                                    <h3 class="text-dark">Assets</h3>
+                                </th>
+                                <th colspan="3">
+                                    <h3 class="text-dark">Referent</h3>
+                                </th>
+                            </tr>
+                        </thead>
                         <tbody id="assets_show_${number_tbody_rows}" class='test'>
                             {{-- @if ($AssetsData)
                                 @foreach ($AssetsData as $keyin => $Data)
