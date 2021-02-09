@@ -769,7 +769,7 @@
                         if(data.link){
                             linkto = data.link;
                         }else{
-                            linkto = '/assets';
+                            linkto = '/asset';
                         }
                         html += `
                         <tr>
