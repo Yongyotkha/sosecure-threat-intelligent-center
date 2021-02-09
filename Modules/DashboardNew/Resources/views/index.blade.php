@@ -217,8 +217,8 @@
                             <div id="fillter_click" class="button-group">
                                 <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
                                 <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
+                                <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
                                 <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">Web Defacement</button>
@@ -500,7 +500,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('dashboardnew.table_dashboard')!!}',

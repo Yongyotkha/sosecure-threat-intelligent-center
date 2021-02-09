@@ -731,7 +731,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<B><"d-flex justify-content-between"lf>rt<"bottom"ip><"clear">',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
             ajax: {
                 type: "POST",
