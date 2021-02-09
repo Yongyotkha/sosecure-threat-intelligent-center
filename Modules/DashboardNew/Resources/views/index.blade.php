@@ -144,10 +144,10 @@
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-left">
                                                                 <li>
-                                                                    <a href="#">
+                                                                    <a href="javascript:void(0)" onclick="load_month_displayType_f('mon')">
                                                                         View Month
                                                                     </a>
-                                                                    <a href="#">
+                                                                    <a href="javascript:void(0)" onclick="load_month_displayType_f('year')">
                                                                         View Year
                                                                     </a>
                                                                 </li>
@@ -374,6 +374,7 @@
     var dd = String(today_date.getDate()).padStart(2, '0');
     var mm = String(today_date.getMonth() + 1).padStart(2, '0');
     var yyyy = today_date.getFullYear();
+    
     today_date = mm + '-' + dd + '-' + yyyy;
     {{--$('#table-event').DataTable({
         processing: true,
@@ -381,6 +382,13 @@
 
     var start = moment().startOf('day');
     var end = moment();
+
+    var load_month_displayType = 'year';
+
+    function load_month_displayType_f(dummyVal='year') {
+        load_month_displayType = dummyVal;
+        chart_indicators();
+    }
 
     $('#date-rang').daterangepicker({
         timePicker: true,
@@ -677,6 +685,9 @@
             type: 'POST',
             dataType: "json",
             url: '{{ route("dashboardnew.chart_indicators") }}',
+            data: ({
+                displayType:load_month_displayType
+            }),
             beforeSend: function() {
                 $(".loadindicator").show();
             },

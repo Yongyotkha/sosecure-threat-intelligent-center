@@ -26,9 +26,6 @@ class TransactionJobClients extends ApiController
                             $transcation_jobs_client -> transaction_data_status = 2;
                             $transcation_jobs_client -> save();
 
-
-
-
                             $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('name', $transcation_jobs_client->mode)->where('site_id', $transcation_jobs_client->site_id)->first();
 
                             if(!$TF_Center_transaction_batchjob){
@@ -45,12 +42,6 @@ class TransactionJobClients extends ApiController
                             $TF_Center_transaction_batchjob->transcation_date_start = date('Y-m-d H:i:s');
                             $TF_Center_transaction_batchjob->save();
 
-
-                            
-
-
-
-
                         }
                         $data_transcation_jobs_clients = json_encode($transcation_jobs_clients);
                     }else if($data['data']['mode'] == 'complete'){
@@ -63,11 +54,6 @@ class TransactionJobClients extends ApiController
                             $transcation_jobs_client -> return_error = $data['data']['return_error'];
                         }
                         $transcation_jobs_client -> save();
-
-
-
-
-
 
                         $TF_Center_transaction_batchjob = TF_Center_transaction_batchjob::where('name', $transcation_jobs_client->mode)->where('site_id', $transcation_jobs_client->site_id)->first();
 
@@ -85,12 +71,6 @@ class TransactionJobClients extends ApiController
                         $TF_Center_transaction_batchjob->transcation_date_end = date('Y-m-d H:i:s');
                         $TF_Center_transaction_batchjob->message =$transcation_jobs_client ->return_data;
                         $TF_Center_transaction_batchjob->save();
-
-
-
-
-
-
 
                         $data_transcation_jobs_clients = json_encode([]);
                     }

@@ -350,48 +350,62 @@ class DashboardNewController extends Controller
     }
 
     public function chart_indicators(Request $request){
-        $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', now()->year)->get();
-        $events = [0,0,0,0,0,0,0,0,0,0,0,0];
-        $attribute = [0,0,0,0,0,0,0,0,0,0,0,0];
-        foreach($IndicatorSummaryYear as $data){
-            if($data -> month == 1){
-                $events[0] = $data -> event_count;
-                $attribute[0] = $data -> attribute_count;
-            }else if($data -> month == 2){
-                $events[1] = $data -> event_count;
-                $attribute[1] = $data -> attribute_count;
-            }else if($data -> month == 3){
-                $events[2] = $data -> event_count;
-                $attribute[2] = $data -> attribute_count;
-            }else if($data -> month == 4){
-                $events[3] = $data -> event_count;
-                $attribute[3] = $data -> attribute_count;
-            }else if($data -> month == 5){
-                $events[4] = $data -> event_count;
-                $attribute[4] = $data -> attribute_count;
-            }else if($data -> month == 6){
-                $events[5] = $data -> event_count;
-                $attribute[5] = $data -> attribute_count;
-            }else if($data -> month == 7){
-                $events[6] = $data -> event_count;
-                $attribute[6] = $data -> attribute_count;
-            }else if($data -> month == 8){
-                $events[7] = $data -> event_count;
-                $attribute[7] = $data -> attribute_count;
-            }else if($data -> month == 9){
-                $events[8] = $data -> event_count;
-                $attribute[8] = $data -> attribute_count;
-            }else if($data -> month == 10){
-                $events[9] = $data -> event_count;
-                $attribute[9] = $data -> attribute_count;
-            }else if($data -> month == 11){
-                $events[10] = $data -> event_count;
-                $attribute[10] = $data -> attribute_count;
-            }else if($data -> month == 12){
-                $events[11] = $data -> event_count;
-                $attribute[11] = $data -> attribute_count;
+
+        if($request->displayType == 'mon'){
+            $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', now()->year)->where('type','summary_year')->get();
+            $attribute =now()->year;
+            $events = now();
+        }else{
+            $nameXAxis = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            $nameYAxis = 'Number (Months)';
+            $nameSeriesEvent = 'Number of Event';
+            $nameSeriesAttribute = 'Number of Attribute';
+            $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', now()->year)->where('type','summary_year')->get();
+            $events = [0,0,0,0,0,0,0,0,0,0,0,0];
+            $attribute = [0,0,0,0,0,0,0,0,0,0,0,0];
+            foreach($IndicatorSummaryYear as $data){
+                if($data -> month == 1){
+                    $events[0] = $data -> event_count;
+                    $attribute[0] = $data -> attribute_count;
+                }else if($data -> month == 2){
+                    $events[1] = $data -> event_count;
+                    $attribute[1] = $data -> attribute_count;
+                }else if($data -> month == 3){
+                    $events[2] = $data -> event_count;
+                    $attribute[2] = $data -> attribute_count;
+                }else if($data -> month == 4){
+                    $events[3] = $data -> event_count;
+                    $attribute[3] = $data -> attribute_count;
+                }else if($data -> month == 5){
+                    $events[4] = $data -> event_count;
+                    $attribute[4] = $data -> attribute_count;
+                }else if($data -> month == 6){
+                    $events[5] = $data -> event_count;
+                    $attribute[5] = $data -> attribute_count;
+                }else if($data -> month == 7){
+                    $events[6] = $data -> event_count;
+                    $attribute[6] = $data -> attribute_count;
+                }else if($data -> month == 8){
+                    $events[7] = $data -> event_count;
+                    $attribute[7] = $data -> attribute_count;
+                }else if($data -> month == 9){
+                    $events[8] = $data -> event_count;
+                    $attribute[8] = $data -> attribute_count;
+                }else if($data -> month == 10){
+                    $events[9] = $data -> event_count;
+                    $attribute[9] = $data -> attribute_count;
+                }else if($data -> month == 11){
+                    $events[10] = $data -> event_count;
+                    $attribute[10] = $data -> attribute_count;
+                }else if($data -> month == 12){
+                    $events[11] = $data -> event_count;
+                    $attribute[11] = $data -> attribute_count;
+                }
             }
         }
+        
+
+
         $response = array(
             'error' => '', 
             'status_code' => '200',
