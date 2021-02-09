@@ -3666,3 +3666,7 @@ textarea.form-control{
         display: none !important;
     }
 }
+
+.dk.header.b-b{
+    padding: 0 5px !important;
+}
