@@ -25,7 +25,12 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Emails\SiteCreateUserMail;
+use DB;
 use Artisan;
+use App\Menu;
+use App\Menu_sub;
+use Modules\Users\Entities\user_menu_permission;
+use Modules\Users\Entities\user_menu_sub_permission;
 
 class UsersSettingsController extends Controller
 {
@@ -112,6 +117,24 @@ class UsersSettingsController extends Controller
                 $Roles = Roles::whereIn('id',['5'])->get();
             }
         }
+
+
+        // $data['role'] = $role;
+        // $Menu = Menu::where('deleted_at', null)->whereNotIn('id', [8,9,10])->where('active', 1)->orderBy('order', 'asc')->get();
+        $Menu = Menu::where('deleted_at', null)->where('active', 1)->orderBy('order', 'asc')->get();
+        $result_menu_permission = DB::table("site_menu_permission")->select('menu_code')->where("site_id", @$SiteSettings->id)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+        $result_menu_sub_permission = DB::table("site_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$SiteSettings->id)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+        
+        $result_user_menu_permission = DB::table("user_menu_permission")->select('menu_code')->where("site_id", @$SiteSettings->id)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_sub_permission)->get()->pluck('menu_code')->toArray();
+        $result_user_menu_sub_permission = DB::table("user_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$SiteSettings->id)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
+        
+
+        $data['user_menu_permission'] = $result_user_menu_permission;
+
+        $data['user_menu_sub_permission'] = $result_user_menu_sub_permission;
+        $data['menus'] = $Menu;
+
+        //
 
         $data['Roles'] = $Roles;
         $data['code'] = $request->code;
