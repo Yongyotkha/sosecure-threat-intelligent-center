@@ -47,34 +47,34 @@ class MDMISPFeedDaily extends Command
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        // $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_event_stamp;
-        // $ins_fx_transaction_otx_event_stamp = $col_fx_transaction_otx_event_stamp->insertOne([
-        //     'code' => generator_uuid(),
-        //     'transaction_date' => date("Y-m-d"),
-        //     'status' => 1,
-        //     'created_at' => $date_now,
-        //     'created_by' => "system",
-        //     'updated_at' => $date_now,
-        //     'updated_by' => "system",
-        //     'deleted_at' => null,
-        //     'source' => "misp",
-        // ]);
-        // $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_indicator_stamp;
-        // $ins_fx_transaction_otx_indicator_stamp = $col_fx_transaction_otx_indicator_stamp->insertOne([
-        //     'code' => generator_uuid(),
-        //     'transaction_date' => date("Y-m-d"),
-        //     'status' => 1,
-        //     'created_at' => $date_now,
-        //     'created_by' => "system",
-        //     'updated_at' => $date_now,
-        //     'updated_by' => "system",
-        //     'deleted_at' => null,
-        //     'source' => "misp",
-        // ]);
-        // $stamp_event_id = $ins_fx_transaction_otx_event_stamp->getInsertedId();
-        // $stamp_indicator_id = $ins_fx_transaction_otx_indicator_stamp->getInsertedId();
-        $stamp_event_id = 0;
-        $stamp_indicator_id = 0;
+        $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_event_stamp;
+        $ins_fx_transaction_otx_event_stamp = $col_fx_transaction_otx_event_stamp->insertOne([
+            'code' => generator_uuid(),
+            'transaction_date' => date("Y-m-d"),
+            'status' => 1,
+            'created_at' => $date_now,
+            'created_by' => "system",
+            'updated_at' => $date_now,
+            'updated_by' => "system",
+            'deleted_at' => null,
+            'source' => "misp",
+        ]);
+        $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_indicator_stamp;
+        $ins_fx_transaction_otx_indicator_stamp = $col_fx_transaction_otx_indicator_stamp->insertOne([
+            'code' => generator_uuid(),
+            'transaction_date' => date("Y-m-d"),
+            'status' => 1,
+            'created_at' => $date_now,
+            'created_by' => "system",
+            'updated_at' => $date_now,
+            'updated_by' => "system",
+            'deleted_at' => null,
+            'source' => "misp",
+        ]);
+        $stamp_event_id = $ins_fx_transaction_otx_event_stamp->getInsertedId();
+        $stamp_indicator_id = $ins_fx_transaction_otx_indicator_stamp->getInsertedId();
+        // $stamp_event_id = 0;
+        // $stamp_indicator_id = 0;
         $this->saveJson($stamp_event_id, $stamp_indicator_id);
 
     }
