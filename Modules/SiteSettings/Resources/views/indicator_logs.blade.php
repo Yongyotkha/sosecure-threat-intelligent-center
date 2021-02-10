@@ -16,84 +16,31 @@
             <section class="vbox">
     
                 <header class="header panel-heading bg-white b-b b-light">
-                    {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                    @icon('solid/arrow-left')
-                    </a> --}}
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                     <div class="bc-head">@langapp('settings') > Indicators Logs</div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
-                        title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a>
-                    <button type="submit" id="button" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete">
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt')
-                            @langapp('delete')</span>
-                    </button>
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
-                        data-target="#rss_modal">
-                        @icon('solid/plus') @langapp('create')
-                    </a> --}}
                 </header>
 
-                {{-- <section class="scrollable wrapper">
-                    <div class="row">
-                        <div class="col-lg-12"></div>
-                        <div class="col-lg-12 d-none">
-                            {!! Form::open(['route' => ['indisetting.upsert', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
-                           
-                                <section class="panel panel-default">
-                                    <header class="panel-heading accordion">
-                                        Config Syslog
-                                    </header>
-                                    <div class="panel-body panel-accordion">
-                                        <div style="padding: 2rem">
-                                            <div class="form-group">
-                                                <label for="">Syslog <span class="text-danger">*</span></label>
-                                                
-                                                <input type="text" class="form-control" name="syslog" value="{{@$LogsSetting->link}}" >
-                                             </div>
-                                             <div class="form-group">
-                                                <label for="">IP Address<span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="ip_address" value="{{@$LogsSetting->ip}}">
-                                             </div>
-                                             <div class="form-group">
-                                                <label for="">Protocol <span class="text-danger">*</span></label>
-                                                <select name="protocal" id="" class="select-option form-control">
-                                                    <option value="udp" {{@$LogsSetting->protocal=="udp"?"selected":""}}>udp</option>
-                                                    <option value="tcp" {{@$LogsSetting->protocal=="tcp"?"selected":""}}>tcp</option>   
-                                                </select>
-                                             </div>
-                                             <div class="form-group">
-                                                 <label for="">Port <span class="text-danger">*</span></label>
-                                                 <input type="text" class="form-control" name="port"  value="{{@$LogsSetting->port}}">
-                                              </div>
-                                        </div>  
-                                        <div class="panel-footer bg-white">
-
-
-                                            <button type="submit" class="btn btn-info submit btn-rounded"  id="btn-submitA"><i
-                                                    class="fas fa-paper-plane"></i>
-                                                Save
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                </section>
-                  
-                            {!! Form::close() !!}
-
-                        </div>
-                    </div> --}}
-        
+                <section class="scrollable wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}
-                                {!! Form::open(['route' => ['indisetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm_custom1 validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                            {{-- <form method="" action="" accept-charset="UTF-8" class="bs-example form-horizontal"> --}}                             
                                 <section class="panel panel-default">
-                                    <header class="panel-heading accordion">
-                                        Log Format
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-6">
+                                                <div style="margin-top:5px;">
+                                                    Log Format
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-xs-6 text-right">
+                                                <button id="togglecollapsetable" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#log-expand','#togglecollapsetable')">
+                                                    <i class="fas fa-minus-square"></i>Collapse
+                                                </button>
+                                            </div>
+                                        </div>
                                     </header>
-                                    <div class="panel-body panel-accordion">
+                                    {!! Form::open(['route' => ['indisetting.upsertSys', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm_custom1 validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                                    <div id="log-expand" class="panel-body">
                                         <div style="padding: 2rem">
                                              {{-- <div class="form-group">
                                                 <label for="">Protocol <span class="text-danger">*</span></label>
@@ -182,7 +129,7 @@
                                                  </textarea>
                                               </div>
                                         </div>  
-                                        <div class="panel-footer bg-white">
+                                        <div class="panel-footer bg-white text-right">
                                             {{-- <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i
                                                     class="fas fa-paper-plane"></i>
                                                 Save
@@ -204,13 +151,24 @@
         
                     <div class="row">
                         <div class="col-lg-12">
-                            {!! Form::open(['route' => ['indisetting.indicator_log', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm_custom2 validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
                             {{-- <form method="PUT" action="" accept-charset="UTF-8" class="ajaxifyForm_custom2 bs-example form-horizontal"> --}}
                                 <section class="panel panel-default">
-                                    <header class="panel-heading accordion">
-                                        Send Log
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-6">
+                                                <div style="margin-top:5px;">
+                                                    Send Log
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-xs-6 text-right">
+                                                <button id="togglecollapse_sendlog" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#send_log','#togglecollapse_sendlog')">
+                                                    <i class="fas fa-minus-square"></i>Collapse
+                                                </button>
+                                            </div>
+                                        </div>
                                     </header>
-                                    <div class="panel-body panel-accordion">
+                                    {!! Form::open(['route' => ['indisetting.indicator_log', 'id' => $siteSettings->code], 'class' => 'ajaxifyForm_custom2 validator', 'novalidate' => '', 'method' => 'PUT', 'files' => true]) !!}
+                                    <div id="send_log" class="panel-body ">
                                         <div style="padding: 2rem">
                                             <div class="row">
                                                 <div class="col-md-4">
@@ -241,7 +199,7 @@
                                                 </div>
                                             </div>
                                         </div>  
-                                        <div class="panel-footer bg-white">
+                                        <div class="panel-footer bg-white text-right">
 
                                              {{-- <button type="submit" class="btn btn-info formSaving submit btn-rounded" id="btn-submit2"><i
                                                     class="fas fa-paper-plane"></i>
@@ -287,6 +245,16 @@
 @endpush
 
 <script>
+
+function collpase_chart(id,text){
+    $(id).slideToggle();
+    if($(text).text() == 'Expanded'){
+        $(text).html('<i class="fas fa-minus-square"></i>Collapse');
+    }else{
+        $(text).html('<i class="fas fa-plus-square"></i>Expanded');
+    }
+}
+
 $('[data-toggle="tooltip"]').tooltip();
 function copy_btn(id){
     var copyText = document.getElementById(id);
