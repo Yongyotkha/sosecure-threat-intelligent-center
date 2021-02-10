@@ -278,6 +278,7 @@ class ApiGetMongoDB extends ApiController
                 $rowperpage = (int)$data['data']['rowperpage'];
                 $reqId = $data['data']['reqId'];
                 $count_page = $data['data']['count_page'];
+                $url = $data['data']['url'];
                 $start =  $row;
 
                 $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
@@ -335,7 +336,7 @@ class ApiGetMongoDB extends ApiController
                         "AttributeName"=>@$cursor_2['indicator_name'],
                         "ROLE"=>@$value['role'],
                         "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
-                        "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
+                        "Action"=>$url."?id=".@$cursor_2['indicator_id'].
                                 '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
                         
                     );
@@ -526,6 +527,7 @@ class ApiGetMongoDB extends ApiController
                 $menu = $data['data']['menu'];
                 $site = $data['data']['site'];
                 $domaincode = $data['data']['domaincode'];
+                $url = $data['data']['url'];
 
                 if($menu=='site'){
                     $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
@@ -578,7 +580,7 @@ class ApiGetMongoDB extends ApiController
                             array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
                             array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
                             array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
-                            array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
+                            array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.$url.'/asset/assets_delete_cpe/'.$CPE_Datavalue->code.'/'.$menu.'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
                             array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
                         }
         
@@ -598,13 +600,13 @@ class ApiGetMongoDB extends ApiController
                         if (count($Domain_list) == 0) {
                             $Assets_data_list = array();
                             $Assets_data_list['chk'] = "";
-                            $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
+                            $Assets_data_list['cpe'] = '<a href="'.$url.'/asset/assets_add_cpe/'.$value->code.'/'.$menu.'/'.$IP_Listvalue->code.'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
                             if(isset($TTSS->code)){
-                                $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+                                $Assets_data_list['action'] = '<a href="'.$url.'/scans/scans_assets_edit_modal/'.$value->code.'/'.@$TTSS->code.'/'.$menu. '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                                 <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                 </a>';
                             }else{
-                                $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+                                $Assets_data_list['action'] = '<a href="'.$url.'/scans/scans_assets_edit_modal/'.$value->code.'/'.@$value->site_id.'/'.$menu . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                                 <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                 </a>';
                             }
@@ -638,8 +640,8 @@ class ApiGetMongoDB extends ApiController
                             foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                 $Assets_data_list = array();
                                 $Assets_data_list['chk'] = "";
-                                $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
-                                $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+                                $Assets_data_list['cpe'] = '<a href="'.$url.'/asset/assets_add_cpe/'.$value->code.'/'.$menu.'/'.$IP_Listvalue->code.'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
+                                $Assets_data_list['action'] = '<a href="'.$url.'/scans/scans_assets_edit_modal/'.$value->code.'/'.@$value->site_id.'/'.$menu . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                                 <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                 </a>';
                                 //<a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
@@ -828,7 +830,7 @@ class ApiGetMongoDB extends ApiController
                 $f_search = $data['data']['f_search'];
                 $site_code = $data['data']['site_code'];
                 $user_id = $data['data']['user_id'];
-
+                $url = $data['data']['url'];
 
                 $site_id = '';
     
@@ -1064,7 +1066,7 @@ class ApiGetMongoDB extends ApiController
                             </label>
                         </div>-->
                         <div class="content-news-text">
-                            <a href="'.route('news.news_detail_code',['code' => $item -> code]).'">
+                            <a href="'.$url.'news/detail/'.$item -> code.'">
                                 <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                             </a>
                             <div class="entry-meta">
@@ -1074,7 +1076,7 @@ class ApiGetMongoDB extends ApiController
                             </div>
                         </div>
                         <div class="content-news-image">
-                            <a href="'.route('news.news_detail_code',['code' => $item -> code]).'">
+                            <a href="'.$url.'news/detail/'.$item -> code.'">
                                 <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)">
                             </a>
                         </div>
@@ -1116,6 +1118,7 @@ class ApiGetMongoDB extends ApiController
             }else{ 
                 $html = '';
                 $user_id = $data['data']['user_id'];
+                $url = $data['data']['url'];
                 $Bookmark = Bookmark::where('user_id',@$user_id)->orderBy('created_at','desc')->get();
                 if($Bookmark) {
                     foreach($Bookmark as $item){
@@ -1147,7 +1150,7 @@ class ApiGetMongoDB extends ApiController
                                 </label>
                             </div>-->
                             <div class="content-news-text">
-                                <a href="'.route('news.news_detail_code',['code' => @$item -> news -> code]).'">
+                                <a href="'.$url.'news/detail/'.@$item -> news -> code.'">
                                     <span class="head-news-text" style="'.@$font_weight.'">'.@$item -> news -> title_th.'</span>
                                 </a>
                                 <div class="entry-meta">
@@ -1157,7 +1160,7 @@ class ApiGetMongoDB extends ApiController
                                 </div>
                             </div>
                             <div class="content-news-image">
-                                <a href="'.route('news.news_detail_code',['code' => @$item -> news -> code]).'">
+                                <a href="'.$url.'news/detail/'.@$item -> news -> code.'">
                                     <img src="'.$url_logo.'" alt="" onerror="setDefaultPic(this)">
                                 </a>
                             </div>

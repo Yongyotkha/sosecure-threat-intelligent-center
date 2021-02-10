@@ -29,6 +29,7 @@ use App\DataLeakSocialRef;
 use App\R_s_s_news;
 use App\DataLeakSocialRefTemp;
 use App\DataLeakFeedTemp;
+use App\Entities\CPE;
 use App\leak_socail_ref_temp;
 use Modules\Scans\Entities\AssetsData;
 
@@ -135,67 +136,189 @@ class DashboardNewController extends Controller
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
                 if(!$request -> site){
-                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
-                    $value_id = [];
-                    foreach ($dataAssets as $key => $value) {
-                        $value_id[] = $value -> id;
-                    }
-                    $assets = AssetsData::select('value','site_id','asset_id')->whereIn('asset_id', $value_id)->get();
-                    foreach($assets as $data){
-                        $site = SiteSettings::select('name')->where('id', $data->site_id)->first(); 
-                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
-                        $data -> site = !empty($site) ? $site -> name : 'None';
-                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
-                        unset($data->site_id);
-                        unset($data->asset_id);
+                    $assets = [];
+                    $Assets_data = Assets::where('status',1)->get();
+                    foreach ($Assets_data as $key => $value) {
+                        $AssetsData_data = AssetsData::where('site_id',$value->site_id)->where('asset_id',$value->id)->where('status',1)->get();
+                        $Domain_list = [];
+                        $IP_List =[];
+                        foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
+                            if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
+                                //Domain
+                                array_push($Domain_list, $AssetsData_datavalue);
+                            }elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
+                                //IP Asset
+                                array_push($IP_List, $AssetsData_datavalue);
+                            }else{
+
+                            }
+                        }
+
+                        foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+                            $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+                            $CPE_List = array();
+                            foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                                array_push($CPE_List, $CPE_Datavalue->result .' : '.$CPE_Datavalue->os_type);
+                                
+                            }
+                            if (count($Domain_list) == 0) {
+                                $Assets_data_list = array();
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $Assets_data_list['site'] = $site->name;
+                                $Assets_data_list['host'] = "None";
+                                $Assets_data_list['value'] = $IP_Listvalue->value;
+                                array_push($assets, $Assets_data_list);
+                            }else{
+                                foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+                                    $Assets_data_list = array();
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $Assets_data_list['site'] = $site->name;
+                                    $Assets_data_list['host'] = $Domain_listvalue->value;
+                                    $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    array_push($assets, $Assets_data_list);
+                                }
+                            }
+                        }
                     }
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
-                    $value_id = [];
-                    foreach ($dataAssets as $key => $value) {
-                        $value_id[] = $value -> id;
-                    }
-                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->where('site_id', $site_id_m -> id)->get();
-                    foreach($assets as $data){
-                        $site = SiteSettings::select('name')->where('id', $site_id_m->id)->first(); 
-                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
-                        $data -> site = !empty($site) ? $site -> name : 'None';
-                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
-                        unset($data->asset_id);
+                    $assets = [];
+                    $Assets_data = Assets::where('status',1)->get();
+                    foreach ($Assets_data as $key => $value) {
+                        $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->where('asset_id',$value->id)->where('status',1)->get();
+                        $Domain_list = [];
+                        $IP_List =[];
+                        foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
+                            if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
+                                //Domain
+                                array_push($Domain_list, $AssetsData_datavalue);
+                            }elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
+                                //IP Asset
+                                array_push($IP_List, $AssetsData_datavalue);
+                            }else{
+
+                            }
+                        }
+
+                        foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+                            $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+                            $CPE_List = array();
+                            foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                                array_push($CPE_List, $CPE_Datavalue->result .' : '.$CPE_Datavalue->os_type);
+                                
+                            }
+                            if (count($Domain_list) == 0) {
+                                $Assets_data_list = array();
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $Assets_data_list['site'] = $site->name;
+                                $Assets_data_list['host'] = "None";
+                                $Assets_data_list['value'] = $IP_Listvalue->value;
+                                array_push($assets, $Assets_data_list);
+                            }else{
+                                foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+                                    $Assets_data_list = array();
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $Assets_data_list['site'] = $site->name;
+                                    $Assets_data_list['host'] = $Domain_listvalue->value;
+                                    $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    array_push($assets, $Assets_data_list);
+                                }
+                            }
+                        }
                     }
                 }
                 
             } else {
                 if(!$request -> site){
-                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
-                    $value_id = [];
-                    foreach ($dataAssets as $key => $value) {
-                        $value_id[] = $value -> id;
-                    }
-                    $assets = AssetsData::select('value','site_id','asset_id')->whereIn('asset_id', $value_id)->get();
-                    foreach($assets as $data){
-                        $site = SiteSettings::select('name')->where('id', $data->site_id)->first(); 
-                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
-                        $data -> site = !empty($site) ? $site -> name : 'None';
-                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
-                        unset($data->site_id);
-                        unset($data->asset_id);
+                    $assets = [];
+                    $Assets_data = Assets::where('status',1)->get();
+                    foreach ($Assets_data as $key => $value) {
+                        $AssetsData_data = AssetsData::where('site_id',$value->site_id)->where('asset_id',$value->id)->where('status',1)->get();
+                        $Domain_list = [];
+                        $IP_List =[];
+                        foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
+                            if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
+                                //Domain
+                                array_push($Domain_list, $AssetsData_datavalue);
+                            }elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
+                                //IP Asset
+                                array_push($IP_List, $AssetsData_datavalue);
+                            }else{
+
+                            }
+                        }
+
+                        foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+                            $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+                            $CPE_List = array();
+                            foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                                array_push($CPE_List, $CPE_Datavalue->result .' : '.$CPE_Datavalue->os_type);
+                                
+                            }
+                            if (count($Domain_list) == 0) {
+                                $Assets_data_list = array();
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $Assets_data_list['site'] = $site->name;
+                                $Assets_data_list['host'] = "None";
+                                $Assets_data_list['value'] = $IP_Listvalue->value;
+                                array_push($assets, $Assets_data_list);
+                            }else{
+                                foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+                                    $Assets_data_list = array();
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $Assets_data_list['site'] = $site->name;
+                                    $Assets_data_list['host'] = $Domain_listvalue->value;
+                                    $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    array_push($assets, $Assets_data_list);
+                                }
+                            }
+                        }
                     }
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
-                    $value_id = [];
-                    foreach ($dataAssets as $key => $value) {
-                        $value_id[] = $value -> id;
-                    }
-                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->where('site_id', $site_id_m -> id)->get();
-                    foreach($assets as $data){
-                        $site = SiteSettings::select('name')->where('id', $site_id_m->id)->first(); 
-                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
-                        $data -> site = !empty($site) ? $site -> name : 'None';
-                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
-                        unset($data->asset_id);
+                    $assets = [];
+                    $Assets_data = Assets::where('status',1)->get();
+                    foreach ($Assets_data as $key => $value) {
+                        $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->where('asset_id',$value->id)->where('status',1)->get();
+                        $Domain_list = [];
+                        $IP_List =[];
+                        foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
+                            if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
+                                //Domain
+                                array_push($Domain_list, $AssetsData_datavalue);
+                            }elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
+                                //IP Asset
+                                array_push($IP_List, $AssetsData_datavalue);
+                            }else{
+
+                            }
+                        }
+
+                        foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
+                            $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+                            $CPE_List = array();
+                            foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                                array_push($CPE_List, $CPE_Datavalue->result .' : '.$CPE_Datavalue->os_type);
+                                
+                            }
+                            if (count($Domain_list) == 0) {
+                                $Assets_data_list = array();
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $Assets_data_list['site'] = $site->name;
+                                $Assets_data_list['host'] = "None";
+                                $Assets_data_list['value'] = $IP_Listvalue->value;
+                                array_push($assets, $Assets_data_list);
+                            }else{
+                                foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+                                    $Assets_data_list = array();
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $Assets_data_list['site'] = $site->name;
+                                    $Assets_data_list['host'] = $Domain_listvalue->value;
+                                    $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    array_push($assets, $Assets_data_list);
+                                }
+                            }
+                        }
                     }
                 }
             }
