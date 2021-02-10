@@ -263,8 +263,6 @@ class MDCountIndicator extends Command
             [
                 '$group' => [
                     '_id' => [
-                        //'created_by' => '$created_by',
-                        // 'created_at'=>['$month'=>'$entryTime','$year'=>'$entryTime']
                         'year'=>['$month'=>'$created_at'],
                         'month' => ['$dayOfMonth'=>'$created_at'],
                         
