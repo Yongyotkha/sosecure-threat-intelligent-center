@@ -30,160 +30,177 @@
                                 <div class="row">
                                     <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                                         <div class="row">
-                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
-                                                {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
-                                                    <div class="card-dash">
-                                                        <div class="left-card">
-                                                            <div class="img-icon-card">
-                                                                <img src="{{asset('images/database.png')}}" alt="">
+                                            @can('assets')
+                                                <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
+                                                    {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
+                                                        <div class="card-dash">
+                                                            <div class="left-card">
+                                                                <div class="img-icon-card">
+                                                                    <img src="{{asset('images/database.png')}}" alt="">
+                                                                </div>
+                                                                <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
+                                                                <span class="number-card info number_asset"></span>
                                                             </div>
-                                                            <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
-                                                            <span class="number-card info number_asset"></span>
                                                         </div>
-                                                    </div>
-                                                </a> --}}
-                                                <a href="{{route('assets.index')}}">
-                                                    <div class="card-dash">
-                                                        <div class="left-card">
-                                                            <div class="img-icon-card">
-                                                                <img src="{{asset('images/database.png')}}" alt="">
+                                                    </a> --}}
+                                                    <a href="{{route('assets.index')}}">
+                                                        <div class="card-dash">
+                                                            <div class="left-card">
+                                                                <div class="img-icon-card">
+                                                                    <img src="{{asset('images/database.png')}}" alt="">
+                                                                </div>
+                                                                <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
+                                                                <span class="number-card info number_asset"></span>
                                                             </div>
-                                                            <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
-                                                            <span class="number-card info number_asset"></span>
                                                         </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
-                                                <a href="{{route('monitoringvulnerabilitys.index')}}">
-                                                    <div class="card-dash">
-                                                        <div class="left-card">
-                                                            <div class="img-icon-card">
-                                                                <img src="{{asset('images/antivirus.png')}}" alt="">
-                                                            </div>
-                                                            <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
-                                                            <span class="number-card green number_vulnerability"></span>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
-                                                <a href="{{route('darkweb.index_all_site')}}">
-                                                <div class="card-dash">
-                                                    <div class="left-card">
-                                                        <div class="img-icon-card">
-                                                            <img src="{{asset('images/compromise.png')}}" alt="">
-                                                        </div>
-                                                        <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
-                                                        <span class="number-card warning number_compromised"></span>
-                                                    </div>
+                                                    </a>
                                                 </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
-                                                <a href="{{route('socialdatas.index_all_site')}}">
+                                            @endcan
+
+                                            @can('vulnerabilities')
+                                                <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
+                                                    <a href="{{route('monitoringvulnerabilitys.index')}}">
+                                                        <div class="card-dash">
+                                                            <div class="left-card">
+                                                                <div class="img-icon-card">
+                                                                    <img src="{{asset('images/antivirus.png')}}" alt="">
+                                                                </div>
+                                                                <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
+                                                                <span class="number-card green number_vulnerability"></span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            @endcan
+                                            @can('vulnerabilities')
+                                                <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
+                                                    <a href="{{route('darkweb.index_all_site')}}">
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
-                                                                <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                                <img src="{{asset('images/compromise.png')}}" alt="">
                                                             </div>
-                                                            <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
-                                                            <span class="number-card dark number_data_leak"></span>
+                                                            <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
+                                                            <span class="number-card warning number_compromised"></span>
                                                         </div>
                                                     </div>
-                                                </a>
-                                            </div>
+                                                    </a>
+                                                </div>
+                                            @endcan
+                                            @can('data_leak')
+                                                <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
+                                                    <a href="{{route('socialdatas.index_all_site')}}">
+                                                        <div class="card-dash">
+                                                            <div class="left-card">
+                                                                <div class="img-icon-card">
+                                                                    <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                                </div>
+                                                                <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
+                                                                <span class="number-card dark number_data_leak"></span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            @endcan
                                         </div>
                                     </div>
                                     <div class="col-xl-10 col-lg-10 col-md-12">
                                         <div class="row">
-                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
-                                                <div class="loadhost backdrop-loader">
-                                                    <div class="loader4 centerloader"></div>
-                                                    <div class="loadding-text">Loading ...</div>
-                                                </div>
-                                                <div class="box-chart-color">
-                                                    <div class="d-flex align-items-center header-chart-p">
-                                                        <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue bold-500">Vulnerability Host</h1>
+                                            @can('vulnerabilities')
+                                                <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                    <div class="loadhost backdrop-loader">
+                                                        <div class="loader4 centerloader"></div>
+                                                        <div class="loadding-text">Loading ...</div>
                                                     </div>
-                                                    <div class="divider-dark"></div>
-                                                    <div id="chart-show-hl" class="h-chart"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
-                                                <div class="loadvulserverity backdrop-loader">
-                                                    <div class="loader4 centerloader"></div>
-                                                    <div class="loadding-text">Loading ...</div>
-                                                </div>
-                                                <div class="box-chart-color">
-                                                    <div class="d-flex align-items-center header-chart-p">
-                                                        <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue bold-500">Vulnerability Severity </h1>
+                                                    <div class="box-chart-color">
+                                                        <div class="d-flex align-items-center header-chart-p">
+                                                            <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                                            <h1 class="text-blue bold-500">Vulnerability Host</h1>
+                                                        </div>
+                                                        <div class="divider-dark"></div>
+                                                        <div id="chart-show-hl" class="h-chart"></div>
                                                     </div>
-                                                    <div class="divider-dark"></div>
-                                                    <div id="chart-show-pie" class="h-chart"></div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
-                                                <div class="loadindicator backdrop-loader">
-                                                    <div class="loader4 centerloader"></div>
-                                                    <div class="loadding-text">Loading ...</div>
+                                            @endcan
+                                            @can('vulnerabilities')
+                                                <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                    <div class="loadvulserverity backdrop-loader">
+                                                        <div class="loader4 centerloader"></div>
+                                                        <div class="loadding-text">Loading ...</div>
+                                                    </div>
+                                                    <div class="box-chart-color">
+                                                        <div class="d-flex align-items-center header-chart-p">
+                                                            <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
+                                                            <h1 class="text-blue bold-500">Vulnerability Severity </h1>
+                                                        </div>
+                                                        <div class="divider-dark"></div>
+                                                        <div id="chart-show-pie" class="h-chart"></div>
+                                                    </div>
                                                 </div>
-                                                <div class="box-chart-color">
-                                                    <div class="header-chart-p">
-                                                        <div class="d-flex align-items-center ">
-                                                            <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
-                                                            <h1 class="text-blue bold-500">Indicators</h1>
-                                                        </div>
-                                                        <div class="btn-group pull-right" style="margin-top: -25px;">
-                                                            <button
-                                                                class="btn btn-xs text-dark dropdown-toggle"
-                                                                data-toggle="dropdown">View
-                                                                <span class="caret"></span>
-                                                            </button>
-                                                            <ul class="dropdown-menu dropdown-menu-left">
-                                                                <li>
-                                                                    <a href="javascript:void(0)" onclick="load_month_displayType_f('mon')">
-                                                                        View Month
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" onclick="load_month_displayType_f('year')">
-                                                                        View Year
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                            @endcan
+                                            @can('indicators')
+                                                <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                    <div class="loadindicator backdrop-loader">
+                                                        <div class="loader4 centerloader"></div>
+                                                        <div class="loadding-text">Loading ...</div>
+                                                    </div>
+                                                    <div class="box-chart-color">
+                                                        <div class="header-chart-p">
+                                                            <div class="d-flex align-items-center ">
+                                                                <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
+                                                                <h1 class="text-blue bold-500">Indicators</h1>
+                                                            </div>
+                                                            <div class="btn-group pull-right" style="margin-top: -25px;">
+                                                                <button
+                                                                    class="btn btn-xs text-dark dropdown-toggle"
+                                                                    data-toggle="dropdown">View
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-left">
+                                                                    <li>
+                                                                        <a href="javascript:void(0)" onclick="load_month_displayType_f('mon')">
+                                                                            View Month
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" onclick="load_month_displayType_f('year')">
+                                                                            View Year
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
 
-                                                    </div>
-                                                    <div class="divider-dark"></div>
-                                                    <div id="chart-show-line" class="h-chart"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
-                                                <div class="loaddertb backdrop-loader">
-                                                    <div class="loader4 centerloader"></div>
-                                                    <div class="loadding-text">Loading ...</div>
-                                                </div>
-                                                <div class="box-chart-color">
-                                                    <div class="d-flex align-items-center header-chart-p">
-                                                        <img src="{{asset('images/table.png')}}" alt="" height="30px">
-                                                        <h1 class="text-blue bold-500">Assets</h1>
-                                                    </div>
-                                                    <div class="divider-dark"></div>
-                                                    <div class="table-responsive cve_assets h-table">
-                                                        <table class="table table-striped" id="table-assets">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Assets</th>
-                                                                    <th>Referent</th>
-                                                                    <th>View</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="cve_assets"></tbody>
-                                                        </table>
+                                                        </div>
+                                                        <div class="divider-dark"></div>
+                                                        <div id="chart-show-line" class="h-chart"></div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            @endcan
+                                            @can('assets')
+                                                <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
+                                                    <div class="loaddertb backdrop-loader">
+                                                        <div class="loader4 centerloader"></div>
+                                                        <div class="loadding-text">Loading ...</div>
+                                                    </div>
+                                                    <div class="box-chart-color">
+                                                        <div class="d-flex align-items-center header-chart-p">
+                                                            <img src="{{asset('images/table.png')}}" alt="" height="30px">
+                                                            <h1 class="text-blue bold-500">Assets</h1>
+                                                        </div>
+                                                        <div class="divider-dark"></div>
+                                                        <div class="table-responsive cve_assets h-table">
+                                                            <table class="table table-striped" id="table-assets">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Assets</th>
+                                                                        <th>Referent</th>
+                                                                        <th>View</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="cve_assets"></tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endcan
                                         </div>
                                     </div>
                                 </div>
@@ -215,13 +232,27 @@
                     <div class="row">
                         <div class="col-md-12 text-right">
                             <div id="fillter_click" class="button-group">
-                                <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
-                                <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
-                                <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">Web Defacement</button>
+                                @can('dashboard')
+                                    <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
+                                @endcan
+                                @can('news')
+                                    <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
+                                @endcan
+                                @can('indicators')
+                                    <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
+                                @endcan
+                                @can('vulnerabilities')
+                                    <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
+                                @endcan
+                                @can('compromised')
+                                    <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
+                                @endcan
+                                @can('data_leak')
+                                    <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
+                                @endcan
+                                @can('web_defacement')
+                                    <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">Web Defacement</button>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -465,8 +496,9 @@ Highcharts.setOptions({
         count_vulnerability_host();
         load_chart();
         chart_indicators();
-        cve_assets();
-
+        @can('assets')
+            cve_assets();
+        @endcan
 
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
         
