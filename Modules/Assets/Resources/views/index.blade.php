@@ -137,30 +137,30 @@
                             </div>
                         </div>
                         <div class="col-md-4 nopadding">
+                            <a href="javascript:void(0)" onclick="searchTB('','','os_type','Windows')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
-                                    <a href="javascript:void(0)" onclick="searchTB('','','os_type','Windows')">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/windows.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
                                         <span class="number-card info" id="count_windows">0</span>
-                                    </a>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 nopadding">
+                            <a href="javascript:void(0)" onclick="searchTB('','','os_type','Linux')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
-                                    <a href="javascript:void(0)" onclick="searchTB('','','os_type','Linux')">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/linux.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
                                         <span class="number-card green" id="count_linux">0</span>
-                                    </a>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
