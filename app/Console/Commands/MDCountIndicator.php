@@ -130,7 +130,7 @@ class MDCountIndicator extends Command
 
             }else{
                 $IndicatorSummaryYear->attribute_count =  $value["COUNT_Attr"];
-               
+            
                 $IndicatorSummaryYear->save();
 
             }
@@ -156,7 +156,7 @@ class MDCountIndicator extends Command
 
             }
         }
-  
+
 
         $pipeline3 = [
             [
@@ -204,7 +204,7 @@ class MDCountIndicator extends Command
             'created_at' => ['$gt' =>  $date_now_sub1],
         );
 
-        $query2 = array( 
+        $query2 = array(
             'created_at' => ['$gt' =>  $date_now_sub1],
         );
         $Attr_count_current = (int)$col_fx_otx_indicator_detail->count($query);
@@ -225,7 +225,7 @@ class MDCountIndicator extends Command
         }
 
 
- 
+
         $query = array(
             
         );
@@ -373,6 +373,149 @@ class MDCountIndicator extends Command
 
             }
         }
+
+
+        if(false){
+            //backup code
+            // join type
+            $options = [
+                'allowDiskUse' => TRUE
+            ];
+    
+            $pipeline = [
+                [
+                    '$match' => [
+                        'pulse_id'  => 'misp_1020',
+                    ]
+                ]
+                ,
+                [
+                    '$lookup' => [
+                        'localField' => 'indicator_id',
+                        'from' => 'fx_otx_indicator_detail',
+                        'foreignField' => 'indicator_id',
+                        'as' => 'b'
+                    ]
+                ]
+                ,
+                [
+                    '$group' => [
+                        '_id' => [
+                            'type' => '$b.type'
+                        ],
+                        'COUNT(*)' => [
+                            '$sum' => 1
+                        ]
+                    ]
+                ],
+                [
+                    '$project' => [
+                        'COUNT_AttrType' => '$COUNT(*)',
+                        'thisType' => '$_id.type',
+                        '_id' => 0,
+                    ]
+                ]
+                ,
+            ];
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $cursor = $col_fx_otx_events_indicator_ref->aggregate($pipeline, $options)->toArray();
+        }
+        
+        if(false){
+            //backup code
+            $pulseID = '5ff56a70c101904b55634d56'."";
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+
+            $findOne_col_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $pulseID));
+            $query2 = [
+                '$and' =>   
+                    [
+                        ['pulse_id' => $pulseID],
+                        ['is_count_attr' => ['$exists' => true]],
+                    ]
+            ];
+            $find_col_fx_otx_events_indicator_ref_2 = $col_fx_otx_events_indicator_ref->count($query2);
+
+            if($find_col_fx_otx_events_indicator_ref_2==$findOne_col_fx_otx_events["indicator_count"]){
+                //count corrrect
+                $query = [
+                    '$and' =>   
+                        [
+                            ['pulse_id' => $pulseID],
+                            ['is_count_attr' => ['$exists' => false]],
+                        ]
+                ];
+                $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+                $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
+                $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
+                foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
+                    $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+                    $countAttrAll++;
+                    if(!empty($findOne_col_fx_otx_indicator_detail)){
+                        if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
+                            $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+                        } else {
+                            $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                        }
+                    }
+                }
+
+                $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
+                    ['pulse_id' => $pulseID],
+                    ['$set' => 
+                        [
+                            'indicator_count' =>  $countAttrAll,
+                            'indicator_type_counts' => $countAttrArray,
+                        ],
+                    ]
+                );
+
+                $col_fx_otx_events_indicator_ref->updateMany(
+                    $query,
+                    array('$set' => array("is_count_attr" => 1))
+                );
+            }else{
+                //count false
+                $query = [
+                    'pulse_id' => $pulseID
+                ];
+                $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+                $countAttrArray = array();
+                $countAttrAll = 0;
+                foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
+                    $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+                    $countAttrAll++;
+                    if(!empty($findOne_col_fx_otx_indicator_detail)){
+                        // echo $findOne_col_fx_otx_indicator_detail["type"];
+                        if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
+                            $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+                        } else {
+                            $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                        }
+                    }
+                }
+
+                $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
+                    ['pulse_id' => $pulseID],
+                    ['$set' => 
+                        [
+                            'indicator_count' =>  $countAttrAll,
+                            'indicator_type_counts' => $countAttrArray,
+                        ],
+                    ]
+                );
+
+                $col_fx_otx_events_indicator_ref->updateMany(
+                    $query,
+                    array('$set' => array("is_count_attr" => 1))
+                );
+
+            }
+        }
+
+
         $this->info('END------------------------------------------------------------END');
     }
 
