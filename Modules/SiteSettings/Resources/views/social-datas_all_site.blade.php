@@ -217,7 +217,7 @@
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Data Leak Datas
+                                    <i class="fas fa-table"></i> Table Data Leak Data
                                 </div>
                             </div>
                         </header>

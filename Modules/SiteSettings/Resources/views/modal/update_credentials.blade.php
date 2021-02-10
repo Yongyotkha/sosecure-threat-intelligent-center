@@ -1,8 +1,8 @@
 <div class="modal-dialog modal-dialog-aside" id="edit_credentials_md">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();"
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();"
                     datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')</h4>
         </div>
 
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                     <i class="fas fa-times"></i>
                     Close
                 </button>

@@ -3697,3 +3697,20 @@ textarea.form-control{
 .m-b-12{
     margin-bottom: 12px !important;
 }
+
+
+.section-control{
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    width: 100%;
+    padding: 0;
+    justify-content: center;
+}
+
+.section-control li.control-list{
+    margin: .5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}

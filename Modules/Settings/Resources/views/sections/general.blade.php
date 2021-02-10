@@ -2,7 +2,7 @@
     <div class="col-lg-12">
         {!! Form::open(['route' => ['settings.edit', $section], 'class' => 'bs-example form-horizontal ajaxifyForm']) !!}
         <section class="panel panel-default">
-        <header class="panel-heading">@icon('solid/cogs') @langapp('company_details')  </header>
+        <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') @langapp('company_details')  </header>
         @php 
         $translations = Modules\Settings\Entities\Options::translations();
         $default_country = get_option('company_country');
@@ -281,7 +281,7 @@
             </div>
             @endif
         </div>
-        <div class="panel-footer">
+        <div class="panel-footer text-right">
             {!!  renderAjaxButton('save')  !!}
         </div>
     </section>

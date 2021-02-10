@@ -166,10 +166,10 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="save_assets()">
                         <i class="fas fa-paper-plane"></i>
                         Save
@@ -207,10 +207,10 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="save_assets_manual()">
                         <i class="fas fa-paper-plane"></i>
                         Save

@@ -875,14 +875,14 @@ class NewsController extends Controller
                 $font_weight = 'font-weight: bold !important;';
             }
 
-            if($data->transaction_rss_id) {
+            if(@$data->transaction_rss_id) {
                 if(@$data->logo) {
-                    $logo_url = config('app.url_center').@$data->logo;
+                    $logo_url = config('app.URL_CENTER_PUBLISH').@$data->logo;
                 } else {
                     $logo_url = @$data->logo_rss;
                 }
             } else {
-                $logo_url = config('app.url_center').@$data->logo;
+                $logo_url = config('app.URL_CENTER_PUBLISH').@$data->logo;
             }
             $html .= '
                 <!--<div class="checkbox-news-select">
@@ -950,14 +950,14 @@ class NewsController extends Controller
                 $html .= '<div class="list-news">';
             }
 
-            if($data -> news -> transaction_rss_id) {
+            if(@$data -> news -> transaction_rss_id) {
                 if(@$data -> news -> logo) {
-                    $url_logo = config('app.url_center').@$data -> news -> logo;
+                    $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                 } else {
                     $url_logo = @$data -> news -> logo_rss;
                 }
             } else {
-                $url_logo = config('app.url_center').@$data -> news -> logo;
+                $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
             }
             $html .= '
                 <div class="checkbox-news-select">
@@ -1014,14 +1014,14 @@ class NewsController extends Controller
                     $font_weight = '';
                 }
 
-                if($data -> news -> transaction_rss_id) {
+                if(@$data -> news -> transaction_rss_id) {
                     if(@$data -> news -> logo) {
-                        $url_logo = config('app.url_center').@$data -> news -> logo;
+                        $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                     } else {
                         $url_logo = @$data -> news -> logo_rss;
                     }
                 } else {
-                    $url_logo = config('app.url_center').@$data -> news -> logo;
+                    $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                 }
 
 
@@ -1034,7 +1034,7 @@ class NewsController extends Controller
                     </div>-->
                     <div class="content-news-text">
                         <a href="'.route('news.news_detail_code',['code' => @$data -> news -> code]).'">
-                            <span class="head-news-text" style="'.@$font_weight.'">'.$data -> news -> title_th.'</span>
+                            <span class="head-news-text" style="'.@$font_weight.'">'.@$data -> news -> title_th.'</span>
                         </a>
                         <div class="entry-meta">
                             <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> news -> public_date.'</span>
@@ -1048,7 +1048,7 @@ class NewsController extends Controller
                         </a>
                     </div>
                     <div class="action-bookmark">';
-                        $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.@$data -> news -> id.'" onclick="Bookmarks(this, '.$data -> news -> id.')"></i>';
+                        $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.@$data -> news -> id.'" onclick="Bookmarks(this, '.@$data -> news -> id.')"></i>';
                         $html .= '</div>
                 </div>
                 ';
