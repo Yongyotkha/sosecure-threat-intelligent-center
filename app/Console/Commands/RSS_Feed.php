@@ -42,22 +42,28 @@ class RSS_Feed extends Command
     {
 
         $TransactionBatchjob_Update = TransactionBatchjob::where('mode','batchjob_rssfeed')->first();
-        $TransactionBatchjob_Update->progress = 2;
-        $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
-        $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
-        $TransactionBatchjob_Update->save();
+        if ($TransactionBatchjob_Update->progress == 1) {
+            $TransactionBatchjob_Update->progress = 2;
+            $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
+            $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
+            $TransactionBatchjob_Update->save();
+            $RSSList = RSS::where('status', '1')->get();
+            foreach ($RSSList as $key => $value) {
+                echo $value->url;
+                $this->output_rss_feed($value->id, $value->url, 20, true, true, 200);
 
-        $RSSList = RSS::where('status', '1')->get();
-        foreach ($RSSList as $key => $value) {
+            }
 
-            $this->output_rss_feed($value->id, $value->url, 20, true, true, 200);
+            $TransactionBatchjob_Update = TransactionBatchjob::where('mode','batchjob_rssfeed')->first();
+            $TransactionBatchjob_Update->progress = 1;
+            $TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
+            $TransactionBatchjob_Update->save();
 
+            $date_delele = date("Y-m-d 00:00:00");
+            TransactionRssData::where('transcation_datetime', '<=', $date_delele)->delete();
         }
 
-        $TransactionBatchjob_Update = TransactionBatchjob::where('mode','batchjob_rssfeed')->first();
-        $TransactionBatchjob_Update->progress = 1;
-        $TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
-        $TransactionBatchjob_Update->save();
+
         $this->info('Update check completed');
     }
     public function GUID()

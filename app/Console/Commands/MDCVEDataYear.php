@@ -171,29 +171,36 @@ class MDCVEDataYear extends Command
             echo PHP_EOL . 'check...';
 
             $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $vendor_name . "' and vendor='" . $product_name . "' and version='" . $product_version . "'";
-            $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-            $num = mysqli_num_rows($result1);
+            $num =0;
+            try {
+              $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
+              $num = mysqli_num_rows($result1);
+          } catch (Exception $e) {
+
+          }
+          
+          
             //echo 'end check';
             //$num  = 0;
-            if ($num == 0) {
-                $created_atz = date("Y-m-d H:i:s");
-                $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
+          if ($num == 0) {
+            $created_atz = date("Y-m-d H:i:s");
+            $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
 
-                try {
-                    $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,rawtext,created_at)
-                    VALUES ('" . $CVE_Code . "','" . $vendor_name . "','" . $product_name . "','" . $product_version . "','" . $product_edition . "','" .  $vendor_text . "','" .  $created_at . "' ) ";
-                    $result = mysqli_query($conn, $sql);
-                } catch (Exception $e) {
+            try {
+                $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,rawtext,created_at)
+                VALUES ('" . $CVE_Code . "','" . $vendor_name . "','" . $product_name . "','" . $product_version . "','" . $product_edition . "','" .  $vendor_text . "','" .  $created_at . "' ) ";
+                $result = mysqli_query($conn, $sql);
+            } catch (Exception $e) {
 
-                } finally {
-
-                }
+            } finally {
 
             }
 
-            //--------------------------------
-            
         }
+
+            //--------------------------------
+
+    }
 
         // foreach ($json_data['cve']['affects']['vendor']['vendor_data'] as $vendorkey => $vendor) {
         //     $vendor_name = $vendor['vendor_name']; //microsoft
@@ -242,72 +249,41 @@ class MDCVEDataYear extends Command
         //     }
         // }
 
-        $description_data = "";
-        foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
-            $description_data = $description_data . $descriptionvalue['value'];
-        }
-        $description_data = htmlspecialchars($description_data, ENT_QUOTES);
+    $description_data = "";
+    foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
+        $description_data = $description_data . $descriptionvalue['value'];
+    }
+    $description_data = htmlspecialchars($description_data, ENT_QUOTES);
 
-        try {
-            $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
-            $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
+    try {
+        $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
+        $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
 
-            if (!$json_data['impact']['baseMetricV3']['cvssV3']['baseScore']) {
-                $baseScore = $json_data['impact']['baseMetricV2']['exploitabilityScore'];
-                $baseSeverity = $json_data['impact']['baseMetricV2']['cvssV3']['severity'];
-
-            }
-
-        } catch (Exception $e) {
+        if (!$json_data['impact']['baseMetricV3']['cvssV3']['baseScore']) {
+            $baseScore = $json_data['impact']['baseMetricV2']['exploitabilityScore'];
+            $baseSeverity = $json_data['impact']['baseMetricV2']['cvssV3']['severity'];
 
         }
 
+    } catch (Exception $e) {
 
-        print PHP_EOL . 'baseScore :' . $baseScore;
-        print PHP_EOL . 'baseSeverity :' . $baseSeverity;
+    }
 
-        $publishedDate = $json_data['publishedDate'];
-        $lastModifiedDate = $json_data['lastModifiedDate'];
-        print PHP_EOL . 'publishedDate : ' . explode('T', $publishedDate)[0];
-        print PHP_EOL . 'lastModifiedDate : ' . explode('T', $lastModifiedDate)[0];
+
+    print PHP_EOL . 'baseScore :' . $baseScore;
+    print PHP_EOL . 'baseSeverity :' . $baseSeverity;
+
+    $publishedDate = $json_data['publishedDate'];
+    $lastModifiedDate = $json_data['lastModifiedDate'];
+    print PHP_EOL . 'publishedDate : ' . explode('T', $publishedDate)[0];
+    print PHP_EOL . 'lastModifiedDate : ' . explode('T', $lastModifiedDate)[0];
 
 //=================================
-        $sql_samename = "SELECT namecve FROM fx_data_datacve WHERE namecve = '" . $CVE_Code . "'";
-        $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-        $num = mysqli_num_rows($result1);
+    $sql_samename = "SELECT namecve FROM fx_data_datacve WHERE namecve = '" . $CVE_Code . "'";
+    $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
+    $num = mysqli_num_rows($result1);
 //$num = 0;
-        if ($num > 0) {
-
-            $add_name = $CVE_Code;
-
-            $add_published = explode('T', $publishedDate)[0];
-
-            $add_modified = explode('T', $lastModifiedDate)[0];
-
-            $add_descript = $description_data;
-
-            $add_cvsssore = $baseScore;
-
-            $add_severity = $baseSeverity;
-
-            $add_pub_datez = date("Y-m-d H:i:s ");
-            $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
-
-            $created_atz = date("Y-m-d H:i:s ");
-
-            $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-
-            try {
-
-               $this->update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
-
-           } catch (Exception $e) {
-
-           } finally {
-
-           }
-
-       } else {
+    if ($num > 0) {
 
         $add_name = $CVE_Code;
 
@@ -330,7 +306,7 @@ class MDCVEDataYear extends Command
 
         try {
 
-           $this->insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+           $this->update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
 
        } catch (Exception $e) {
 
@@ -338,7 +314,38 @@ class MDCVEDataYear extends Command
 
        }
 
+   } else {
+
+    $add_name = $CVE_Code;
+
+    $add_published = explode('T', $publishedDate)[0];
+
+    $add_modified = explode('T', $lastModifiedDate)[0];
+
+    $add_descript = $description_data;
+
+    $add_cvsssore = $baseScore;
+
+    $add_severity = $baseSeverity;
+
+    $add_pub_datez = date("Y-m-d H:i:s ");
+    $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
+
+    $created_atz = date("Y-m-d H:i:s ");
+
+    $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
+
+    try {
+
+       $this->insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+
+   } catch (Exception $e) {
+
+   } finally {
+
    }
+
+}
         //==========================
 
 }
