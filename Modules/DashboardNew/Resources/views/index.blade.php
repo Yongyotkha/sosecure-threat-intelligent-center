@@ -28,9 +28,9 @@
                         <section class="">
                             <div class="panel-body" style="padding: 0 15px;" id="chart-container">
                                 <div class="row">
-                                    <div class="col-xl-2 col-lg-2 col-md-12 nopadding mb-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                                         <div class="row">
-                                            <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
+                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                 {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
                                                     <div class="card-dash">
                                                         <div class="left-card">
@@ -54,7 +54,7 @@
                                                     </div>
                                                 </a>
                                             </div>
-                                            <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
+                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                 <a href="{{route('monitoringvulnerabilitys.index')}}">
                                                     <div class="card-dash">
                                                         <div class="left-card">
@@ -67,7 +67,7 @@
                                                     </div>
                                                 </a>
                                             </div>
-                                            <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
+                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                 <a href="{{route('darkweb.index_all_site')}}">
                                                 <div class="card-dash">
                                                     <div class="left-card">
@@ -80,7 +80,7 @@
                                                 </div>
                                                 </a>
                                             </div>
-                                            <div class="col-lg-12 col-md-6 col-xs-6 mb-small-5px">
+                                            <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                 <a href="{{route('socialdatas.index_all_site')}}">
                                                     <div class="card-dash">
                                                         <div class="left-card">

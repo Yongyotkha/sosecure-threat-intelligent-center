@@ -210,7 +210,7 @@
                         </div>
                     </section>
 
-                    <section class="m-b-10">
+                    <section class="m-b-10 d-none">
                         <div class="row">
                             <div class="col-xl-12 col-lg-12 col-md-12">
                                 <div class="row">
@@ -222,7 +222,7 @@
                                         <div class="box-chart-color bg-white">
                                             <div class="d-flex align-items-center header-chart-p">
                                                 <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
-                                                <h1 class="text-blue bold-500">Top Source</h1>
+                                                <h1 class="text-blue bold-500">Top 10 Source</h1>
                                             </div>
                                             <div class="divider-dark"></div>
                                             <div id="chart-top-source" class="h-chart"></div>
@@ -236,7 +236,7 @@
                                         <div class="box-chart-color bg-white">
                                             <div class="d-flex align-items-center header-chart-p">
                                                 <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
-                                                <h1 class="text-blue bold-500">Top Category</h1>
+                                                <h1 class="text-blue bold-500">Top 10 Categories</h1>
                                             </div>
                                             <div class="divider-dark"></div>
                                             <div id="chart-top-category" class="h-chart"></div>
