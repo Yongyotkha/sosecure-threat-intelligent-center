@@ -23,6 +23,10 @@ use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 use Modules\Users\Entities\UserSite;
 use Modules\Users\Entities\model_has_roles;
+use Modules\Users\Entities\user_menu_permission;
+use Modules\Users\Entities\user_menu_sub_permission;
+use Modules\SiteSettings\Entities\site_menu_permission;
+use Modules\SiteSettings\Entities\site_menu_sub_permission;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -47,6 +51,7 @@ function get_role_custom() {
                 // dd($role_id);
 
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+    
                 $SiteSettings = '';
                 if(@$role_id == 1) {//if admin  | Auth::user()->hasRole('admin')
                     // dd(777);
@@ -88,19 +93,168 @@ function get_role_custom() {
                         ->get();
                     }
                 }
+
+
+
             }
             
-                $data = [
-                    "superadmin" => $superadmin,//center
-                    "client" => $client,//center
-                    "site_support" => $site_support,//site
-                    "site_admin" => $site_admin,//site
-                    "site_client" => $site_client,//site
-                    "site_id_arr" => $site_id_arr,//center,site
-                    "SiteSettings" => $SiteSettings//center,site
-                ];
+                // $data = [
+                //     "superadmin" => $superadmin,//center
+                //     "client" => $client,//center
+                //     "site_support" => $site_support,//site
+                //     "site_admin" => $site_admin,//site
+                //     "site_client" => $site_client,//site
+                //     "site_id_arr" => $site_id_arr,//center,site
+                //     "SiteSettings" => $SiteSettings//center,site
+                // ];
+
+                if(TYPE_WEB == 'client') {
+                    $result_menu_permission = site_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+                    $result_menu_sub_permission = site_menu_sub_permission::select('menu_sub_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+                    $data['user_menu_permission'] = user_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
+                    $data['user_menu_sub_permission'] = user_menu_sub_permission::select('menu_sub_code')->where("site_id", @$site_id_arr)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
+                }
+                // if(Gate::check('dashboard')) {
+                //    var_dump(123);
+                //    exit();
+                // }
+
+                
+
+                $data['superadmin'] = $superadmin;//center
+                $data['client'] = $client;//center
+                $data['site_support'] = $site_support;//center
+                $data['site_admin'] = $site_admin;//center
+                $data['site_client'] = $site_client;//center
+                $data['site_id_arr'] = $site_id_arr;//center
+                $data['SiteSettings'] = $SiteSettings;//center
                 return $data; 
             
+}
+
+
+function check_role_custom() {
+    $arr=[];
+    if(Auth::check()) {
+        $arr['dashboard'] = 0;
+        $arr['assets'] = 0;
+        $arr['news'] = 0;
+        $arr['indicators'] = 0;
+        $arr['vulnerabilities'] = 0;
+        $arr['compromised'] = 0;
+        $arr['data_leak'] = 0;
+        $arr['web_defacement'] = 0;
+        $arr['manage_users'] = 0;
+        $arr['settings'] = 0;
+        $arr['settings_categorys'] = 0;
+        $arr['settings_sites'] = 0;
+        $arr['settings_assets'] = 0;
+        $arr['settings_rss'] = 0;
+        $arr['settings_general'] = 0;
+        $arr['monitoring'] = 0;
+        $arr['monitoring_batch'] = 0;
+        $arr['role_center'] = 0;
+        $arr['role_site'] = 0;
+        if(TYPE_WEB == 'center') {
+            if(Gate::check('dashboard')) {
+                // var_dump(123);
+                // exit();
+                $arr['dashboard'] = 1;
+            }
+            if(Gate::check('assets')) {
+                $arr['assets'] = 1;
+            }
+            if(Gate::check('news')) {
+                $arr['news'] = 1;
+            }
+            if(Gate::check('indicators')) {
+                $arr['indicators'] = 1;
+            }
+            if(Gate::check('vulnerabilities')) {
+                $arr['vulnerabilities'] = 1;
+            }
+            if(Gate::check('compromised')) {
+                $arr['compromised'] = 1;
+            }
+            if(Gate::check('data_leak')) {
+                $arr['data_leak'] = 1;
+            }
+            if(Gate::check('web_defacement')) {
+                $arr['web_defacement'] = 1;
+            }
+            if(Gate::check('manage_users')) {
+                $arr['manage_users'] = 1;
+            }
+            if(Gate::check('settings')) {
+                $arr['settings'] = 1;
+            }
+            if(Gate::check('settings_categorys')) {
+                $arr['settings_categorys'] = 1;
+            }
+            if(Gate::check('settings_sites')) {
+                $arr['settings_sites'] = 1;
+            }
+            if(Gate::check('settings_assets')) {
+                $arr['settings_assets'] = 1;
+            }
+            if(Gate::check('settings_rss')) {
+                $arr['settings_rss'] = 1;
+            }
+            if(Gate::check('settings_general')) {
+                $arr['settings_general'] = 1;
+            }
+            if(Gate::check('monitoring')) {
+                $arr['monitoring'] = 1;
+            }
+            if(Gate::check('monitoring_batch')) {
+                $arr['monitoring_batch'] = 1;
+            }
+            if(Gate::check('role_center')) {
+                $arr['role_center'] = 1;
+            }
+            if(Gate::check('role_site')) {
+                $arr['role_site'] = 1;
+            }
+        } else if (TYPE_WEB == 'client') {
+                $model_has_roles = model_has_roles::where('model_id',@Auth::user()->id)->first();
+                $role_id = @$model_has_roles->role_id;
+                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                $result_menu_permission = site_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+                $result_menu_sub_permission = site_menu_sub_permission::select('menu_sub_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+                $result_user_menu_permission = user_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
+                $result_user_menu_sub_permission = user_menu_sub_permission::select('menu_sub_code')->where("site_id", @$site_id_arr)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
+
+                if($role_id = 6) {
+                    if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_menu_permission)){$arr['dashboard'] = 1;}
+                    if (in_array("556e3907-8b3f-4b32-9db4-a25ac9fbab06", $result_menu_permission)){$arr['assets'] = 1;}
+                    if (in_array("0a120651-fdfd-43e6-8369-bad5a713b8d5", $result_menu_permission)){$arr['news'] = 1;}
+                    if (in_array("89ecb70a-e693-4772-9789-a29666af3cd9", $result_menu_permission)){$arr['indicators'] = 1;}
+                    if (in_array("e37e3315-380e-4ba7-a4ad-0bcec9749e9a", $result_menu_permission)){$arr['vulnerabilities'] = 1;}
+                    if (in_array("854a1e60-9abf-4263-a187-60aec8cd4fb1", $result_menu_permission)){$arr['compromised'] = 1;}
+                    if (in_array("79b362a5-3789-445a-bd6c-846393ffd19d", $result_menu_permission)){$arr['data_leak'] = 1;}
+                    if (in_array("64f1c2af-94fa-460a-8a90-b9fd601193f9", $result_menu_permission)){$arr['web_defacement'] = 1;}
+                    if (in_array("6f580f26-8d46-452e-a84e-211b3f79268a", $result_menu_permission)){$arr['manage_users'] = 1;}
+                    if (in_array("8df567fb-33c3-4185-b1cd-ed618fe6ac29", $result_menu_permission)){$arr['settings'] = 1;}
+                    if (in_array("54735dbb-6987-4a7b-8aa3-121538aaad50", $result_menu_permission)){$arr['monitoring'] = 1;}
+                    
+                } else {
+                    if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_user_menu_permission)){$arr['dashboard'] = 1;}
+                    if (in_array("556e3907-8b3f-4b32-9db4-a25ac9fbab06", $result_user_menu_permission)){$arr['assets'] = 1;}
+                    if (in_array("0a120651-fdfd-43e6-8369-bad5a713b8d5", $result_user_menu_permission)){$arr['news'] = 1;}
+                    if (in_array("89ecb70a-e693-4772-9789-a29666af3cd9", $result_user_menu_permission)){$arr['indicators'] = 1;}
+                    if (in_array("e37e3315-380e-4ba7-a4ad-0bcec9749e9a", $result_user_menu_permission)){$arr['vulnerabilities'] = 1;}
+                    if (in_array("854a1e60-9abf-4263-a187-60aec8cd4fb1", $result_user_menu_permission)){$arr['compromised'] = 1;}
+                    if (in_array("79b362a5-3789-445a-bd6c-846393ffd19d", $result_user_menu_permission)){$arr['data_leak'] = 1;}
+                    if (in_array("64f1c2af-94fa-460a-8a90-b9fd601193f9", $result_user_menu_permission)){$arr['web_defacement'] = 1;}
+                    if (in_array("6f580f26-8d46-452e-a84e-211b3f79268a", $result_user_menu_permission)){$arr['manage_users'] = 1;}
+                    if (in_array("8df567fb-33c3-4185-b1cd-ed618fe6ac29", $result_user_menu_permission)){$arr['settings'] = 1;}
+                    if (in_array("54735dbb-6987-4a7b-8aa3-121538aaad50", $result_user_menu_permission)){$arr['monitoring'] = 1;}
+                }
+            
+
+        }
+    }
+    return $arr;
 }
 
 
