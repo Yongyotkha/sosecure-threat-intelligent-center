@@ -1,89 +1,125 @@
 <header class="header b-b clearfix">
     <div class="panel-body">
-        <div class="hide-fillter" style="margin-bottom: 1rem">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="form-group m-b-md">
-                        <label for="" class="">Keyword</label>
-                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+        <section class="panel panel-default hide-fillter" id="advance-search" style="display: none">
+            <header class="panel-heading font-bold panel-header-blue">
+                <div class="row">
+                    <div class="col-md-12">
+                        <i class="fas fa-filter"></i> Filter
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="" class="">Datatype Type</label>
-                        <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
-                            <option value="1">All</option>
-                        </select>
-                    </div>
-                </div>
+            </header>
+            <div class="panel-body">
+                <div class="hide-fillter" style="margin-bottom: 1rem">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group m-b-md">
+                                <h5 class="font-weight-bold">Keyword</h5>
+                                <input type="text" class="form-control" name="keyword" placeholder="Search">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <h5 class="font-weight-bold">Datatype Type</h5>
+                                <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
+                                    <option value="1">All</option>
+                                </select>
+                            </div>
+                        </div>
     
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group m-b-md">
-                        <label for="" class="">Referent</label>
-                        <input type="text" class="form-control" name="keyword" placeholder="">
                     </div>
-                </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group m-b-md">
+                                <h5 class="font-weight-bold">Referent</h5>
+                                <input type="text" class="form-control" name="keyword" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="font-weight-bold">Filter By</h5>
+                            <div id="groupby-btn" class="btn-group special mb-2">
+                                <button class="btn btn-grey active">
+                                    <span> Internet Name </span>
+                                </button>
+                                <button class="btn btn-grey">
+                                    <span> Domain Name </span>
+                                </button>
+                                <button class="btn btn-grey">
+                                    <span> IP Address </span>
+                                </button>
+                                <button class="btn btn-grey">
+                                    <span> IPv6 Address </span>
+                                </button>
+                            </div>
+                        </div>
     
     
-                {{-- <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="" class="">module</label>
-                        <select name="" id="module" class="select2-option form-control" multiple="multiple">
-                            <option value="1">All</option>
-                        </select>
+                        {{-- <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="" class="">module</label>
+                                <select name="" id="module" class="select2-option form-control" multiple="multiple">
+                                    <option value="1">All</option>
+                                </select>
+                            </div>
+                        </div> --}}
+                    
+                        {{-- <div class="col-md-4">
+                            <div class="form-group">
+                            <label for="" class="">Source</label>
+                            <select name="" id="source" class="select2-option form-control">
+                                <option value="all">All</option>
+                            </select>
+                            </div>
+                        </div> --}}
                     </div>
-                </div> --}}
-               
-                {{-- <div class="col-md-4">
-                    <div class="form-group">
-                      <label for="" class="">Source</label>
-                      <select name="" id="source" class="select2-option form-control">
-                          <option value="all">All</option>
-                      </select>
-                    </div>
-                </div> --}}
-            </div>
-            <div class="row">
-                <div class="col-md-12 text-right">
-                    <button class="btn btn-info btn-fz-13">
-                        <i class="fas fa-search"></i>
-                        <span> @langapp('apply') </span>
-                    </button>
-                    <button class="btn btn-default btn-fz-13">
-                        <i class="fas fa-broom"></i>
-                        <span> Clear </span>
-                    </button>
                 </div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table table-striped table-bordered" id="table-scans-data">
-                    <thead>
-                        <tr>
-                            <th class="no-sort">
-                                <label>
-                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                    <span class="label-text"></span>
-                                </label>
-                            </th>
-                            <th>Data Type</th>
-                            <th>Asset</th>
-                            <th>Referent</th>
-                            <th class="text-center">Last Update</th>
-                            <th class="text-center">Status</th>
-                            {{-- <th>Module</th> --}}
-                        </tr>
-                    </thead>
-                </table>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12 text-right">
+                        <button class="btn btn-info btn-fz-13">
+                            <i class="fas fa-search"></i>
+                            <span> @langapp('apply') </span>
+                        </button>
+                        <button class="btn btn-default btn-fz-13">
+                            <i class="fas fa-broom"></i>
+                            <span> Clear </span>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
+        <section class="panel panel-default">
+            <header class="panel-heading font-bold panel-header-blue">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <i class="fas fa-table"></i> Table Data
+                    </div>
+                </div>
+            </header>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="table-scans-data">
+                        <thead>
+                            <tr>
+                                <th class="no-sort">
+                                    <label>
+                                        <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </th>
+                                <th>Data Type</th>
+                                <th>Asset</th>
+                                <th>Referent</th>
+                                <th class="text-center">Last Update</th>
+                                <th class="text-center">Status</th>
+                                {{-- <th>Module</th> --}}
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-    </div>
 
 </header>
 
@@ -138,8 +174,12 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
+@include('stacks.js.activebutton')
 
 <script>
+
+    active_btn('#groupby-btn .btn-grey');
+
      $(function () {
         $('#asset-to-use').prop("disabled", true);
         $('#table-scans-data').DataTable({
@@ -483,7 +523,7 @@
 
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
-            $('.hide-fillter').toggle();
+            $('.hide-fillter').slideToggle();
         });
     });
 

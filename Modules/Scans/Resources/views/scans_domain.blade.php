@@ -17,9 +17,9 @@
                             <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset</button>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
+                            <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> <i class="fas fa-filter"></i> Filter</button>
                         </div>
-                        <div class="btn-group">
+                        <div class="btn-group d-none">
                             <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
                                 <span class="caret"></span>
                             </button>

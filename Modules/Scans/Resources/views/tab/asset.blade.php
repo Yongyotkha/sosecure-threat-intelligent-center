@@ -28,7 +28,7 @@
 
                     <div class="row">
                         <div class="col-md-4">
-                            <h5 class="font-weight-bold">Group By</h5>
+                            <h5 class="font-weight-bold">Filter By</h5>
                             <div id="groupby-btn" class="btn-group special mb-2">
                                 <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
                                     <span> Host </span>
@@ -48,7 +48,6 @@
                                     <option value="">- SELECT -</option>
                                 </select>
                             </div>
-
                         </div>
 
                         <div class="col-md-4">
@@ -187,8 +186,15 @@
             </div>
         </section> --}}
 
-        <div class="row">
-            <div class="col-md-12">
+        <section class="panel panel-default">
+            <header class="panel-heading font-bold panel-header-blue">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <i class="fas fa-table"></i> Table Asset
+                    </div>
+                </div>
+            </header>
+            <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered" id="table-assets-template">
                         <thead>
@@ -287,9 +293,9 @@
                     </tbody> 
                 </table>--}}
             </div>
-        </div>
-    </div>
+        </section>
 
+</div>
     <div class="modal" id="delete_asset" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
         style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
