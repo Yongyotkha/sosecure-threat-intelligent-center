@@ -694,18 +694,18 @@
                     name: 'chk',
                 },--}}
                 {
-                    width: '25%',
+                    width: '10%',
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
                 },
                 {
-                    width: '20%',
+                    width: '10%',
                     data: 'domain',
                     name: 'domain',
                 },
                 {
-                    width: '20%',
+                    width: '10%',
                     data: 'ip',
                     name: 'ip',
                 },

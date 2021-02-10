@@ -24,10 +24,18 @@
                         </select>
                     </div> --}}
 
+                    <a id="" href="" class="btn btn-sm btn-info">
+                        <span><i class="fas fa-cog icon"></i> Setting Format Log</span>
+                    </a>
+                    <a id="" href="" class="btn btn-sm btn-info">
+                        <span>Log Data</span>
+                    </a>
+
                     <a id="advance-search" href="#area_search"
-                        class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </a>
+                  
                
                 </div>
             </div>
@@ -411,7 +419,7 @@ Highcharts.setOptions({
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',
@@ -528,7 +536,7 @@ Highcharts.setOptions({
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',

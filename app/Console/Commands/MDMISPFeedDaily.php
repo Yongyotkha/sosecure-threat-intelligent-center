@@ -7,6 +7,7 @@ use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
+use Artisan;
 
 class MDMISPFeedDaily extends Command
 {
@@ -77,6 +78,8 @@ class MDMISPFeedDaily extends Command
         // $stamp_indicator_id = 0;
         $this->saveJson($stamp_event_id, $stamp_indicator_id);
 
+        $commandArtisan = 'app:MDCountIndicator';
+        Artisan::call($commandArtisan);
     }
 
     public function reconnnect($url, $limit)

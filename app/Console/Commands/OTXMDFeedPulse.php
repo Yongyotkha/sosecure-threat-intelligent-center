@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Exception;
 use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
+use Artisan;
+
 class OTXMDFeedPulse extends Command
 {
     /**
@@ -118,6 +120,9 @@ class OTXMDFeedPulse extends Command
         } else {
             $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
         }
+
+        $commandArtisan = 'app:MDCountIndicator';
+        Artisan::call($commandArtisan);
     }
 
     public function reconnnect($url, $limit)
@@ -190,9 +195,9 @@ class OTXMDFeedPulse extends Command
                             'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
                             'public' => isset($value["public"]) ? $value["public"] : "",
                             'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
-                            'indicator_count' => isset($value["indicator_count"]) ? $value["indicator_count"] : "",
+                            
                             'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
-                            'indicator_type_counts' => isset($value["indicator_type_counts"]) ? $value["indicator_type_counts"] : "",
+                            
                             'references' => isset($references) ? $references : "",
                             'tags' => isset($tags) ? $tags : "",
                             'industries' => isset($industries) ? $industries : "",
@@ -203,6 +208,8 @@ class OTXMDFeedPulse extends Command
                             'updated_by' => "system",
                         ],
                             '$setOnInsert' => [
+                                'indicator_type_counts' => array(),
+                                'indicator_count' => 0,
                                 'transcation_id' => $InsertedId,
                                 'status' => 1,
                                 'created_at' => $date_now ,
@@ -229,6 +236,8 @@ class OTXMDFeedPulse extends Command
                         if(!$checkSuccessDummy){
                             $checkSuccess = false;
                         }
+                        $this->countAttr($value["id"]);
+
                         $this->info("--END--");
 
                     }
@@ -241,6 +250,97 @@ class OTXMDFeedPulse extends Command
         }
         $dataOut["success"] = $checkSuccess;
         return $dataOut;
+    }
+
+    public function countAttr($pulseID_){
+        $pulseID = $pulseID_."";
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $findOne_col_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $pulseID));
+        $query2 = [
+            '$and' =>   
+                [
+                    ['pulse_id' => $pulseID],
+                    ['is_count_attr' => ['$exists' => true]],
+                ]
+        ];
+        $find_col_fx_otx_events_indicator_ref_2 = $col_fx_otx_events_indicator_ref->count($query2);
+        if($find_col_fx_otx_events_indicator_ref_2==$findOne_col_fx_otx_events["indicator_count"]){
+            //count corrrect
+            $query = [
+                '$and' =>   
+                    [
+                        ['pulse_id' => $pulseID],
+                        ['is_count_attr' => ['$exists' => false]],
+                    ]
+            ];
+            $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+            $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
+            $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
+            foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
+                $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+                $countAttrAll++;
+                if(!empty($findOne_col_fx_otx_indicator_detail)){
+                    if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
+                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+                    } else {
+                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                    }
+                }
+            }
+
+            $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
+                ['pulse_id' => $pulseID],
+                ['$set' => 
+                    [
+                        'indicator_count' =>  $countAttrAll,
+                        'indicator_type_counts' => $countAttrArray,
+                    ],
+                ]
+            );
+
+            $col_fx_otx_events_indicator_ref->updateMany(
+                $query,
+                array('$set' => array("is_count_attr" => 1))
+            );
+        }else{
+            //count false
+            $query = [
+                'pulse_id' => $pulseID
+            ];
+            $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+            $countAttrArray = array();
+            $countAttrAll = 0;
+            foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
+                $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+                $countAttrAll++;
+                if(!empty($findOne_col_fx_otx_indicator_detail)){
+                    // echo $findOne_col_fx_otx_indicator_detail["type"];
+                    if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
+                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+                    } else {
+                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                    }
+                }
+            }
+
+            $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
+                ['pulse_id' => $pulseID],
+                ['$set' => 
+                    [
+                        'indicator_count' =>  $countAttrAll,
+                        'indicator_type_counts' => $countAttrArray,
+                    ],
+                ]
+            );
+
+            $col_fx_otx_events_indicator_ref->updateMany(
+                $query,
+                array('$set' => array("is_count_attr" => 1))
+            );
+
+        }
     }
 
     public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
@@ -422,9 +522,9 @@ class OTXMDFeedPulse extends Command
                                     'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
                                     'public' => isset($value["public"]) ? $value["public"] : "",
                                     'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
-                                    'indicator_count' => isset($value["indicator_count"]) ? $value["indicator_count"] : "",
+                                    
                                     'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
-                                    'indicator_type_counts' => isset($value["indicator_type_counts"]) ? $value["indicator_type_counts"] : "",
+                                    
                                     'references' => isset($references) ? $references : "",
                                     'tags' => isset($tags) ? $tags : "",
                                     'industries' => isset($industries) ? $industries : "",
@@ -434,6 +534,8 @@ class OTXMDFeedPulse extends Command
                                     'updated_by' => "system",
                                 ],
                                     '$setOnInsert' => [
+                                        'indicator_count' => 0,
+                                        'indicator_type_counts' => array(),
                                         'groups' => isset($groups) ? $groups : "",
                                         'transcation_id' => null,
                                         'status' => 1,

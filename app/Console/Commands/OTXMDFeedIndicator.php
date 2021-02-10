@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Exception;
 use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
+use Artisan;
+
 class OTXMDFeedIndicator extends Command
 {
     /**
@@ -158,6 +160,8 @@ class OTXMDFeedIndicator extends Command
             $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
         }
 
+        $commandArtisan = 'app:MDCountIndicator';
+        Artisan::call($commandArtisan);
     }
 
     public function reconnnect($url, $limit)
@@ -575,9 +579,9 @@ class OTXMDFeedIndicator extends Command
                             'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : "",
                             'public' => isset($value["public"]) ? $value["public"] : "",
                             'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
-                            'indicator_count' => isset($value["indicator_count"]) ? $value["indicator_count"] : "",
+                            
                             'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
-                            'indicator_type_counts' => isset($value["indicator_type_counts"]) ? $value["indicator_type_counts"] : "",
+                            
                             'references' => isset($references) ? $references : "",
                             'tags' => isset($tags) ? $tags : "",
                             'industries' => isset($industries) ? $industries : "",
@@ -587,6 +591,8 @@ class OTXMDFeedIndicator extends Command
                             'updated_by' => "system",
                         ],
                             '$setOnInsert' => [
+                                'indicator_type_counts' => array(),
+                                'indicator_count' => 0,
                                 'groups' => isset($groups) ? $groups : "",
                                 'transcation_id' => null,
                                 'status' => 1,

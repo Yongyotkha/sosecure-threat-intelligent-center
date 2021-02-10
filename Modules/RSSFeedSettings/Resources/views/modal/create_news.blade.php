@@ -174,6 +174,13 @@
                                 </div>
                              </div>
                              <div class="col-lg-4">
+                                <label class="control-label">Send Mail </label>
+                                <br>
+                                <label class="switch" style="margin-top: 7px">
+                                    <input type="checkbox" name="" checked value="TRUE">
+                                    <span></span>
+                                </label>
+                                
                                 <label class="control-label">Status </label>
                                 <br>
                                 <label class="switch" style="margin-top: 7px">
@@ -189,6 +196,8 @@
                                     <input type="checkbox" name="status" checked value="TRUE">
                                     <span></span>
                                 </label>
+
+                            
                              </div>
                         </div>
                      </div>
