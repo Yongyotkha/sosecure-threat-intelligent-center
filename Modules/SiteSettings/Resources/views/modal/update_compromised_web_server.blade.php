@@ -13,9 +13,9 @@
 
 <div class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();"
+        <div class="modal-header bg-blue">
+            <button type="button" class="close text-center" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-center"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();"
                     datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> @langapp('make_changes')</h4>
         </div>
 
@@ -66,7 +66,7 @@
                     <label style="padding-top: 7px" class="col-lg-3 control-label"> </label>
                     
                     <div class="col-lg-8">
-                        <button type="button" class="btn btn-{{ get_option('theme_color')  }} block"
+                        <button type="button" class="btn btn-{{ get_option('theme_color')  }}"
                             onclick="test_data_edit()">Test Connection</button>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                 {{-- {!! Form::close() !!} --}}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                     <i class="fas fa-times"></i>
                     Close
                 </button>
