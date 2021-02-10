@@ -173,18 +173,10 @@
                                     </div>
                                 </div>
                              </div>
-                             <div class="col-lg-4">
-                                <label class="col-lg-1 control-label" style="margin-top: 8px; display: inline-block;">Send Mail </label>
-                                <div class="col-lg-1">
-                                    <label class="switch" style="margin-top: 8px; display: inline-block;">
-                                        <input type="checkbox" name="" checked value="TRUE">
-                                        <span></span>
-                                    </label>
-                                </div>
-                                
-                                <label class="col-lg-1 control-label" style="margin-top: 8px; display: inline-block;">Status </label>
-                                <div class="col-lg-1">
-                                    <label class="switch" style="margin-top: 8px; display: inline-block;">
+                             <div class="col-lg-1">
+                                <label class="control-label">Status </label>
+                                <div>
+                                    <label class="switch">
                                         {{-- @php
                                         $checked_val = '';
                                             if(@$RSSNews -> status == 1) {
@@ -197,8 +189,15 @@
                                         <span></span>
                                     </label>
                                 </div>
-
-                            
+                             </div>
+                             <div class="col-lg-1">
+                                <label class="control-label">Send Mail </label>
+                                <div >
+                                    <label class="switch">
+                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <span></span>
+                                    </label>
+                                </div>
                              </div>
                         </div>
                      </div>

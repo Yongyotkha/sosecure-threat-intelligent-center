@@ -5,7 +5,7 @@
         <header class="header bg-white b-b b-light">
             <div class="bc-head">Tag : {{@$id}}</div>
 
-            <a id="advance-search" href="#area_search"
+            <a id="advance-search" href="#hide-advance-search"
                 class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
@@ -23,13 +23,11 @@
 
         </header>
         <section class="scrollable wrapper">
-            <section id="area_search" class="panel panel-default">
-                <div class="panel-heading">
-                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
-                    {{-- |
-                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a> --}}
+            <section id="hide-advance-search" class="panel panel-default" style="display: none;">
+                <div class="panel-heading font-bold panel-header-blue">
+                    Filter
                 </div>
-                <div id="hide-advance-search" class="container-fluid" style="padding: 2rem; display: none;">
+                <div class="container-fluid" style="padding: 2rem;">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group m-b-md">
@@ -54,6 +52,10 @@
                             <button class="btn btn-default btn-fz-13" id="btn_reset">
                                 <i class=" fas fa-broom"></i>
                                 <span> Clear </span>
+                            </button> 
+                            <button class="btn btn-default btn-fz-13" id="close_filter">
+                                <i class=" fas fa-times"></i>
+                                <span> Close </span>
                             </button> 
                         </div>
                     </div>
