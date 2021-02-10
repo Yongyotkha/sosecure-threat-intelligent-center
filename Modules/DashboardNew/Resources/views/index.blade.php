@@ -190,9 +190,9 @@
                                                             <table class="table table-striped" id="table-assets">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Assets</th>
-                                                                        <th>Referent</th>
-                                                                        <th>View</th>
+                                                                        <th>Site</th>
+                                                                        <th>Host</th>
+                                                                        <th>Asset</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody id="cve_assets"></tbody>
@@ -798,36 +798,17 @@ Highcharts.setOptions({
                     $('#cve_assets').empty();
                     let html = ``;
                     for(let i in result.data){
-                        const data = result.data[i];
-                        let raw_data;
-                        let referent;
-                        let linkto;
-                        if(data.raw_data){
-                            raw_data = data.raw_data;
-                        }else{
-                            raw_data = 'No data';
-                        }
-                        if(data.referent){
-                            referent = data.referent;
-                        }else{
-                            referent = 'No data';
-                        }
-
-                        if(data.link){
-                            linkto = data.link;
-                        }else{
-                            linkto = '/asset';
-                        }
+                        const data = result.data[i];                    
                         html += `
                         <tr>
                             <td>
-                                <span>${raw_data}</span>
+                                <span>${data.site}</span>
                             </td>
                             <td>
-                                <span>${referent}</span>
+                                <span>${data.host}</span>
                             </td>
                             <td>
-                                <a href="${linkto}" class="btn btn-info btn-xs"><i class="fas fa-eye"></i></a>
+                                <span>${data.value}</span>
                             </td>
                         </tr>
                         `;

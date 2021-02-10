@@ -135,17 +135,68 @@ class DashboardNewController extends Controller
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
                 if(!$request -> site){
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('status', 1)->get();
+                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
+                    $value_id = [];
+                    foreach ($dataAssets as $key => $value) {
+                        $value_id[] = $value -> id;
+                    }
+                    $assets = AssetsData::select('value','site_id','asset_id')->whereIn('asset_id', $value_id)->get();
+                    foreach($assets as $data){
+                        $site = SiteSettings::select('name')->where('id', $data->site_id)->first(); 
+                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
+                        $data -> site = !empty($site) ? $site -> name : 'None';
+                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
+                        unset($data->site_id);
+                        unset($data->asset_id);
+                    }
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('site_id', $site_id_m->id)->where('status', 1)->get();
+                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
+                    $value_id = [];
+                    foreach ($dataAssets as $key => $value) {
+                        $value_id[] = $value -> id;
+                    }
+                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->get();
+                    foreach($assets as $data){
+                        $site = SiteSettings::select('name')->where('id', $site_id_m->id)->first(); 
+                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
+                        $data -> site = !empty($site) ? $site -> name : 'None';
+                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
+                        unset($data->asset_id);
+                    }
                 }
+                
             } else {
                 if(!$request -> site){
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('status', 1)->whereIn('site_id', $site_id_arr)->get();
+                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
+                    $value_id = [];
+                    foreach ($dataAssets as $key => $value) {
+                        $value_id[] = $value -> id;
+                    }
+                    $assets = AssetsData::select('value','site_id','asset_id')->whereIn('asset_id', $value_id)->get();
+                    foreach($assets as $data){
+                        $site = SiteSettings::select('name')->where('id', $data->site_id)->first(); 
+                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
+                        $data -> site = !empty($site) ? $site -> name : 'None';
+                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
+                        unset($data->site_id);
+                        unset($data->asset_id);
+                    }
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->get();
+                    $dataAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.status', 1)->get();
+                    $value_id = [];
+                    foreach ($dataAssets as $key => $value) {
+                        $value_id[] = $value -> id;
+                    }
+                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->get();
+                    foreach($assets as $data){
+                        $site = SiteSettings::select('name')->where('id', $site_id_m->id)->first(); 
+                        $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
+                        $data -> site = !empty($site) ? $site -> name : 'None';
+                        $data -> host = !empty($asset) ?  $asset -> raw_data : 'None';
+                        unset($data->asset_id);
+                    }
                 }
             }
         }
@@ -222,7 +273,6 @@ class DashboardNewController extends Controller
                     }
                 }else{
                     $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request -> site)->first();
-                    dd($SiteSettingsfor);
                     $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                     $dataOut["countAssets"] = 0;
                     foreach ($datacountAssets as $key => $value) {
