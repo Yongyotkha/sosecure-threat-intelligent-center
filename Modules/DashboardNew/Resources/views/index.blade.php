@@ -1,5 +1,7 @@
 @extends('layouts.app')
 @section('content')
+
+@php $role_custom = @check_role_custom(); @endphp
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
@@ -30,7 +32,7 @@
                                 <div class="row">
                                     <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                                         <div class="row">
-                                            @can('assets')
+                                            @if($role_custom['assets'])
                                                 <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                     {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
                                                         <div class="card-dash">
@@ -55,9 +57,9 @@
                                                         </div>
                                                     </a>
                                                 </div>
-                                            @endcan
+                                            @endif
 
-                                            @can('vulnerabilities')
+                                            @if($role_custom['vulnerabilities'])
                                                 <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                     <a href="{{route('monitoringvulnerabilitys.index')}}">
                                                         <div class="card-dash">
@@ -71,8 +73,8 @@
                                                         </div>
                                                     </a>
                                                 </div>
-                                            @endcan
-                                            @can('vulnerabilities')
+                                            @endif
+                                            @if($role_custom['vulnerabilities'])
                                                 <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                     <a href="{{route('darkweb.index_all_site')}}">
                                                     <div class="card-dash">
@@ -86,8 +88,8 @@
                                                     </div>
                                                     </a>
                                                 </div>
-                                            @endcan
-                                            @can('data_leak')
+                                            @endif
+                                            @if($role_custom['data_leak'])
                                                 <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                     <a href="{{route('socialdatas.index_all_site')}}">
                                                         <div class="card-dash">
@@ -101,12 +103,12 @@
                                                         </div>
                                                     </a>
                                                 </div>
-                                            @endcan
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-xl-10 col-lg-10 col-md-12">
                                         <div class="row">
-                                            @can('vulnerabilities')
+                                            @if($role_custom['vulnerabilities'])
                                                 <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                     <div class="loadhost backdrop-loader">
                                                         <div class="loader4 centerloader"></div>
@@ -121,8 +123,8 @@
                                                         <div id="chart-show-hl" class="h-chart"></div>
                                                     </div>
                                                 </div>
-                                            @endcan
-                                            @can('vulnerabilities')
+                                            @endif
+                                            @if($role_custom['vulnerabilities'])
                                                 <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                     <div class="loadvulserverity backdrop-loader">
                                                         <div class="loader4 centerloader"></div>
@@ -137,8 +139,8 @@
                                                         <div id="chart-show-pie" class="h-chart"></div>
                                                     </div>
                                                 </div>
-                                            @endcan
-                                            @can('indicators')
+                                            @endif
+                                            @if($role_custom['indicators'])
                                                 <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                     <div class="loadindicator backdrop-loader">
                                                         <div class="loader4 centerloader"></div>
@@ -173,8 +175,8 @@
                                                         <div id="chart-show-line" class="h-chart"></div>
                                                     </div>
                                                 </div>
-                                            @endcan
-                                            @can('assets')
+                                            @endif
+                                            @if($role_custom['assets'])
                                                 <div class="col-md-6 col-lg-6 nopadding mb-small-5px">
                                                     <div class="loaddertb backdrop-loader">
                                                         <div class="loader4 centerloader"></div>
@@ -200,7 +202,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @endcan
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -232,27 +234,27 @@
                     <div class="row">
                         <div class="col-md-12 text-center">
                             <div id="fillter_click" class="button-group">
-                                @can('dashboard')
+                                @if($role_custom['dashboard'])
                                     <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
-                                @endcan
-                                @can('news')
+                                @endif
+                                @if($role_custom['news'])
                                     <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
-                                @endcan
-                                @can('indicators')
+                                @endif
+                                @if($role_custom['indicators'])
                                     <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
-                                @endcan
-                                @can('vulnerabilities')
+                                @endif
+                                @if($role_custom['vulnerabilities'])
                                     <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
-                                @endcan
-                                @can('compromised')
+                                @endif
+                                @if($role_custom['compromised'])
                                     <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
-                                @endcan
-                                @can('data_leak')
+                                @endif
+                                @if($role_custom['data_leak'])
                                     <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
-                                @endcan
-                                @can('web_defacement')
+                                @endif
+                                @if($role_custom['web_defacement'])
                                     <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">Web Defacement</button>
-                                @endcan
+                                @endif
                             </div>
                         </div>
                     </div>
