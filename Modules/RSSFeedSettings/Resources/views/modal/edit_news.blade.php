@@ -176,7 +176,7 @@
                             </div>
                             <div class="col-lg-6">
                             <div class="row">
-                                <label class="col-lg-2 control-label">Send Mail </label>
+                                <label class="col-lg-2 control-label" style="margin-top: 8px; display: inline-block;">Send Mail </label>
                                 <div class="col-lg-2">
                                     <label class="switch" style="margin-top: 8px; display: inline-block;">
                                         <input type="checkbox" name="" checked value="TRUE">
