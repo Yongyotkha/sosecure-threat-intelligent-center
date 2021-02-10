@@ -186,7 +186,7 @@
 
                 <div class="panel-body">
                     <div class="tabbable">
-                        <ul class="nav nav-tabs nav-tabs-highlight">
+                        <ul class="nav nav-tabs nav-tabs-highlight d-none">
                             <li class="active"><a href="#tab_event" data-toggle="tab">Event (0)</a></li>
                             <li><a href="#tab_attr" data-toggle="tab">Attribute (0)</a></li>   
                             <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
