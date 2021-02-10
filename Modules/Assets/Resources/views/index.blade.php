@@ -269,7 +269,7 @@
                                         </th> --}}
                                         <th rowspan="2" class="align-middle">Site</th>
                                         <th rowspan="2" class="align-middle">Host</th>
-                                        <th rowspan="2" class="align-middle">IP</th>
+                                        <th rowspan="2" class="align-middle">Assets</th>
                                         <th colspan="7" class="text-center">CPE</th>
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
