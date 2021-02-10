@@ -11,7 +11,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                 <header class="header bg-white b-b clearfix">
                     <div class="row m-t-sm">
                         <div class="col-sm-12 m-b-xs">
-                            <p class="h3"><strong>{{ $user->name }}</strong>
+                            <p class="h3"><strong style="color: #333;margin-top:3px;display: inline-block;">{{ $user->name }}</strong>
                                 
                                 {{-- <a href="{{ route('users.gdpr.export') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                                     @icon('solid/database') GDPR Data
@@ -39,7 +39,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                         {!! Form::open(['route' => 'users.change', 'class' => 'bs-example ajaxifyForm']) !!}
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                                <header class="panel-heading">@langapp('information')
+                                <header class="panel-heading font-bold panel-header-blue">@langapp('information')
                                     @if($user->profile->company > 0 && $user->profile->business->primary_contact == Auth::id())
                                     {{-- <a href="{{ route('contacts.create', Auth::user()->profile->company) }}" class="btn btn-xs btn-success pull-right" data-toggle="ajaxModal" title="Add Contact Person" data-rel="tooltip" data-placement="bottom">@icon('regular/user-circle') @langapp('contact')</a> --}}
                                     @endif
@@ -146,7 +146,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                         </div>
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                            <header class="panel-heading">@langapp('authorization')</header>
+                            <header class="panel-heading font-bold panel-header-blue">@langapp('authorization')</header>
                             <div class="panel-body">
                                 {{-- <div class="form-group  d-none">
                                     <label>Slack Webhook URL <span data-rel="tooltip" title="Your slack webhook url">@icon('brands/slack', 'text-danger')</span></label>
@@ -219,7 +219,9 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     </div>
                                     
                                 </div> --}}
-                                {!! renderAjaxButton() !!}
+                                <div class="text-right">
+                                    {!! renderAjaxButton() !!}
+                                </div>
                                 
                             </div>
                         </section>
