@@ -55,6 +55,14 @@ class TransactionLogsite extends ApiController
                 $HeadLogSendTransaction = HeadLogSendTransaction::where('site_id', $data['site']['data']['id'])->first();
                 if($HeadLogSendTransaction->transaction_status == 3){
                     try {
+                        $countLogSendTransactions = LogSendTransaction::where('site_id', $data['site']['data']['id'])->where('transaction_status' , 1)->count();
+                        if($countLogSendTransactions == 0){
+                            $response = array(
+                                'status_code' => 204,
+                                'message' => 'No Content',
+                            );
+                            return response()->json($response);
+                        }
                         if($data['data']['mode'] == 'wait'){
                             $HeadLogSendTransaction -> transaction_status = 2;
                             $HeadLogSendTransaction -> save();
