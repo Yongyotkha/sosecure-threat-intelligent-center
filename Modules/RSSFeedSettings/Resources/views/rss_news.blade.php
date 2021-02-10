@@ -212,37 +212,35 @@
                     </section>
 
                     <section class="m-b-10">
-                        <div class="panel-body" style="padding: 0 15px;" id="chart-container">
-                            <div class="row">
-                                <div class="col-xl-12 col-lg-12 col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-6 col-lg-6 mb-small-5px nopadding">
-                                            {{-- <div class="loadhost backdrop-loader">
-                                                <div class="loader4 centerloader"></div>
-                                                <div class="loadding-text">Loading ...</div>
-                                            </div> --}}
-                                            <div class="box-chart-color bg-white">
-                                                <div class="d-flex align-items-center header-chart-p">
-                                                    <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
-                                                    <h1 class="text-blue bold-500">Top Source</h1>
-                                                </div>
-                                                <div class="divider-dark"></div>
-                                                <div id="chart-top-source" class="h-chart"></div>
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12 col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-6 mb-small-5px">
+                                        {{-- <div class="loadhost backdrop-loader">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div> --}}
+                                        <div class="box-chart-color bg-white">
+                                            <div class="d-flex align-items-center header-chart-p">
+                                                <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                                <h1 class="text-blue bold-500">Top Source</h1>
                                             </div>
+                                            <div class="divider-dark"></div>
+                                            <div id="chart-top-source" class="h-chart"></div>
                                         </div>
-                                        <div class="col-md-6 col-lg-6 mb-small-5px nopadding">
-                                            {{-- <div class="loadvulserverity backdrop-loader">
-                                                <div class="loader4 centerloader"></div>
-                                                <div class="loadding-text">Loading ...</div>
-                                            </div> --}}
-                                            <div class="box-chart-color bg-white">
-                                                <div class="d-flex align-items-center header-chart-p">
-                                                    <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
-                                                    <h1 class="text-blue bold-500">Top Category</h1>
-                                                </div>
-                                                <div class="divider-dark"></div>
-                                                <div id="chart-top-category" class="h-chart"></div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-6 mb-small-5px">
+                                        {{-- <div class="loadvulserverity backdrop-loader">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div> --}}
+                                        <div class="box-chart-color bg-white">
+                                            <div class="d-flex align-items-center header-chart-p">
+                                                <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
+                                                <h1 class="text-blue bold-500">Top Category</h1>
                                             </div>
+                                            <div class="divider-dark"></div>
+                                            <div id="chart-top-category" class="h-chart"></div>
                                         </div>
                                     </div>
                                 </div>
