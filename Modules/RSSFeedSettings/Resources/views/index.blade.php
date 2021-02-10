@@ -356,6 +356,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('rssfeedsettings.rss_setting_table') !!}',
                 data: function ( d ) {

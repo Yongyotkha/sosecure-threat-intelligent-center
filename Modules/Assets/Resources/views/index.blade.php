@@ -124,15 +124,17 @@
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
                         <div class="col-md-4 nopadding">
-                            <div class="card-dash-compro none-bg none-shadow">
-                                <div class="left-card">
-                                    <div class="img-icon-card ice">
-                                        <img src="{{asset('images/database.png')}}" alt="">
+                            <a href="#" onclick="searchTB()">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/database.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
+                                        <span class="number-card warning" id="count_assets">0</span>
                                     </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
-                                    <span class="number-card warning" id="count_assets">0</span>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 nopadding">
                             <a href="#" onclick="searchTB('','','os_type','Windows')">
