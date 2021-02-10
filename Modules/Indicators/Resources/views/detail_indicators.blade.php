@@ -205,7 +205,7 @@
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.load_pulses')!!}',

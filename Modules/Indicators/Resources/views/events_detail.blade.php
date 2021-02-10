@@ -101,9 +101,9 @@
                                                             <span class="label-text"></span>
                                                         </label>
                                                     </th> --}}
-                                                    <th>TYPE</th>
+                                                    <th>Type</th>
                                                     <th>Attribute Name</th>
-                                                    <th>ROLE</th>
+                                                    <th>Role</th>
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -260,7 +260,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('indicators.events_attributes_table')!!}',
                 type: "POST",
@@ -331,7 +331,7 @@
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_pulse_table')!!}',

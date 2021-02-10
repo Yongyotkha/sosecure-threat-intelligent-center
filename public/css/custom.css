@@ -1524,6 +1524,10 @@ ul.role-group li ul.role-group-sub li{
     justify-content: center; 
   }
 
+  div.dataTables_wrapper div.dataTables_processing{
+      z-index: 9999 !important;
+  }
+
   .card-text-ov h3{
     color: #333;
   }
@@ -3581,6 +3585,10 @@ input.input-login:focus {
 .btn-group.special {
     display: flex;
     white-space: nowrap;
+}
+
+.btn-group.special button.btn{
+    font-size: 12px !important;
 }
 
 /* .btn-group.special .btn{
