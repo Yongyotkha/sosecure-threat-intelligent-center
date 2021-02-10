@@ -107,7 +107,7 @@
                 &nbsp;
 
             </header>
-            <section class="scrollable wrapper bg-white" style="padding:0;">
+            <section class="scrollable wrapper" style="padding:0;">
                 <div class="sub-tab text-uc small m-b-sm">
 
                     <ul class="nav pro-nav-tabs nav-tabs-dashed">

@@ -1,9 +1,10 @@
 <header class="header b-b clearfix">
-    <div class="panel-body text-center">
+    <div class="panel-body bg-white text-center">
         <div class="row">
             <div class="col-md-4">
                 <div class="card-overview">
                     <div class="card-text-ov">
+                        <img src="{{asset('images/mosaic.png')}}" alt="">
                         <h3>Total Data Elements</h3>
                         <h1>{{ $site -> elements }}</h1>
                     </div>
