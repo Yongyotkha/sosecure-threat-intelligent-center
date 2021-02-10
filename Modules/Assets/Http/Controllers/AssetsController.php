@@ -633,20 +633,28 @@ class AssetsController extends Controller
                 }
     
             }
-            $dataOut["data"] =  $Assets_list;
-    
-            // $dataOut["countAssets"] = @AssetsData::whereIn('data_type_id', [5,6])->where('status', 1)->count();
-            $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){
-                                        $q->whereIn('data_type_id', [5,6]);
-            })->count();
+            $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+            $dataOut["countAssets"] = 0;
+            foreach ($datacountAssets as $key => $value) {
+                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                $countfn = count($AssetsData_data);
+                if($countfn==0){
+                    $dataOut["countAssets"]++;
+                }else{
+                    $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                }
+            }
+
             // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
             $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                                        $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
-                                    })->count();
+                $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
+            })->count();
             // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
             $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                                        $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
-                                    })->count();
+                $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
+            })->count();
+
+            $dataOut["data"] =  $Assets_list;
             return response()->json($dataOut);
         }else{
             $menu = $request->menu;
@@ -689,9 +697,21 @@ class AssetsController extends Controller
         if($request->sitecode){
             $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->sitecode)->first();
             $dataOut["SiteSettingsfor"] = $SiteSettingsfor;
-            $dataOut["countAssets"] = @Assets::select('id')->where('site_id',$SiteSettingsfor->id)->whereHas('get_assets_data', function($q) use ($SiteSettingsfor) {
-                $q->whereIn('data_type_id', [5,6]);
-            })->count();
+            // $dataOut["countAssets"] = @Assets::select('id')->where('site_id',$SiteSettingsfor->id)->whereHas('get_assets_data', function($q) use ($SiteSettingsfor) {
+            //     $q->whereIn('data_type_id', [5,6]);
+            // })->count();
+            $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+            $dataOut["countAssets"] = 0;
+            foreach ($datacountAssets as $key => $value) {
+                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                $countfn = count($AssetsData_data);
+                if($countfn==0){
+                    $dataOut["countAssets"]++;
+                }else{
+                    $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                }
+            }
+
             // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
             $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
                 $q->where('os_type', 1)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
@@ -701,9 +721,21 @@ class AssetsController extends Controller
                 $q->where('os_type', 2)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
             })->count();
         }else{
-            $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){
-                $q->whereIn('data_type_id', [5,6]);
-            })->count();
+            // $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){
+            //     $q->whereIn('data_type_id', [5,6]);
+            // })->count();
+            $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+            $dataOut["countAssets"] = 0;
+            foreach ($datacountAssets as $key => $value) {
+                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                $countfn = count($AssetsData_data);
+                if($countfn==0){
+                    $dataOut["countAssets"]++;
+                }else{
+                    $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                }
+            }
+
             // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
             $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q){
                 $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);

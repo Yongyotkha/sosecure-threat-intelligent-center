@@ -139,7 +139,7 @@
                         <div class="col-md-4 nopadding">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
-                                    <a href="#" onclick="searchTB('','','os_type','Windows')">
+                                    <a href="javascript:void(0)" onclick="searchTB('','','os_type','Windows')">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/windows.png')}}" alt="">
                                         </div>
@@ -152,7 +152,7 @@
                         <div class="col-md-4 nopadding">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
-                                    <a href="#" onclick="searchTB('','','os_type','Linux')">
+                                    <a href="javascript:void(0)" onclick="searchTB('','','os_type','Linux')">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/linux.png')}}" alt="">
                                         </div>
@@ -443,10 +443,40 @@
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
-
         data_table();
+        {{--$.when(data_table()).then(cookie_change_site());--}}
         
     });
+
+    function cookie_change_site(){
+        if((get_cookie_site())&&({!!json_encode($Search_Link_All)!!}==='')){
+                let currentVal = $('#select-site option:nth-child(2)').val();
+                let firstCurrentVal = $('#select-site option:nth-child(1)').val();
+                let cookieVal = get_cookie_site();
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '{{route('systemsetting.check_cookie_site')}}',
+                    type: "get",
+                    data: ({
+                        'currentVal':currentVal,
+                        'firstCurrentVal':firstCurrentVal,
+                        'cookieVal':cookieVal,
+                    }),
+                    datatype: "html",
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                }).done(function(data){
+                    $("#select-site").val(data.siteValue).trigger("change");
+                    loading('stop_load');
+                }).fail(function(jqXHR, ajaxOptions, thrownError){
+                    loading('stop_load');
+                    console.log("No response from server");
+                });
+            }
+    }
 
     var site_id = 0;
     $(function () {
@@ -637,6 +667,7 @@
 
     var t;
     function changeSite(val){
+        {{--set_cookie_site($('#select-site').val());--}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

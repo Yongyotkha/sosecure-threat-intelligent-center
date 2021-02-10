@@ -30,7 +30,7 @@ use App\R_s_s_news;
 use App\DataLeakSocialRefTemp;
 use App\DataLeakFeedTemp;
 use App\leak_socail_ref_temp;
-
+use Modules\Scans\Entities\AssetsData;
 
 class DashboardNewController extends Controller
 {
@@ -134,14 +134,14 @@ class DashboardNewController extends Controller
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('status', 1)->get();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
                     $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('site_id', $site_id_m->id)->where('status', 1)->get();
                 }
             } else {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('status', 1)->whereIn('site_id', $site_id_arr)->get();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
@@ -160,25 +160,84 @@ class DashboardNewController extends Controller
     }
 
     public function count_asset(Request $request){
+        // if(Auth::check()) {
+        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+        //     if(@get_role_custom()['superadmin'] == 1) {
+        //         if($request -> site == 0){
+        //             $assets = Assets::select('id')->where('status', 1)->count();
+        //         }else{
+        //             $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+        //             $assets = Assets::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->count();
+        //         }
+        //     } else {
+        //         if($request -> site == 0){
+        //             $assets = Assets::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->count();
+        //         }else{
+        //             $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+        //             $assets = Assets::select('id')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->count();
+        //         }
+        //     }
+        // }
         if(Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
-                    $assets = Assets::select('id')->where('status', 1)->count();
+                if(!$request -> site){
+                    $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                    $dataOut["countAssets"] = 0;
+                    foreach ($datacountAssets as $key => $value) {
+                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                        $countfn = count($AssetsData_data);
+                        if($countfn==0){
+                            $dataOut["countAssets"]++;
+                        }else{
+                            $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                        }
+                    }
                 }else{
-                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $assets = Assets::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->count();
+                    $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request -> site)->first();
+                    $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                    $dataOut["countAssets"] = 0;
+                    foreach ($datacountAssets as $key => $value) {
+                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                        $countfn = count($AssetsData_data);
+                        if($countfn==0){
+                            $dataOut["countAssets"]++;
+                        }else{
+                            $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                        }
+                    }
                 }
             } else {
-                if($request -> site == 0){
-                    $assets = Assets::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->count();
+                $site_id_arr = @get_role_custom()['site_id_arr'];
+                if(!$request -> site){
+                    $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                    $dataOut["countAssets"] = 0;
+                    foreach ($datacountAssets as $key => $value) {
+                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                        $countfn = count($AssetsData_data);
+                        if($countfn==0){
+                            $dataOut["countAssets"]++;
+                        }else{
+                            $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                        }
+                    }
                 }else{
-                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $assets = Assets::select('id')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->count();
+                    $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request -> site)->first();
+                    dd($SiteSettingsfor);
+                    $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                    $dataOut["countAssets"] = 0;
+                    foreach ($datacountAssets as $key => $value) {
+                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                        $countfn = count($AssetsData_data);
+                        if($countfn==0){
+                            $dataOut["countAssets"]++;
+                        }else{
+                            $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                        }
+                    }
                 }
             }
         }
-
+        $assets = $dataOut["countAssets"];
         $response = array(
             'error' => '', 
             'status_code' => '200',
@@ -191,14 +250,14 @@ class DashboardNewController extends Controller
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $CVEMapping = CVEMapping::select('id')->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
                     $CVEMapping = CVEMapping::select('id')->where('site_id', $site_id_m->id)->count();
                 }
             } else {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $CVEMapping = CVEMapping::select('id')->whereIn('site_id', $site_id_arr)->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
@@ -219,14 +278,14 @@ class DashboardNewController extends Controller
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id',$site_id_m->id)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
                 }
             } else {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
@@ -249,14 +308,14 @@ class DashboardNewController extends Controller
             $site_id_arr = @get_role_custom()['site_id_arr'];
             // $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->where('feel_type', 'social')->count();
                 }
             } else {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
@@ -277,14 +336,14 @@ class DashboardNewController extends Controller
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
                     $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
                 }
             } else {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
@@ -709,7 +768,7 @@ class DashboardNewController extends Controller
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $model->get();
                     $high = $model->where('severity', '=', 'HIGH')->count();
                     $medium = $model->where('severity', '=', 'MEDIUM')->count();
@@ -726,7 +785,7 @@ class DashboardNewController extends Controller
                     $none = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'NONE')->count();
                 }
             } else {
-                if($request -> site == 0){
+                if(!$request -> site){
                     $model->get();
                     $high = $model->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
                     $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
