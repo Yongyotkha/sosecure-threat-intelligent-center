@@ -417,7 +417,7 @@ class NewsController extends Controller
             }
             // dd($rss_news_id_array);
             if($rss_news_id_array) {
-                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
+                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('save_draft',0)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
                 // dd($RSSNews_last10);
             }
 
@@ -523,7 +523,7 @@ class NewsController extends Controller
             }
             // dd($rss_news_id_array);
             if($rss_news_id_array) {
-                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
+                $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('save_draft',0)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
                 // dd($RSSNews_last10);
             }
 
