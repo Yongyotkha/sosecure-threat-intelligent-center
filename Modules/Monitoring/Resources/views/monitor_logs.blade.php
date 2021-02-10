@@ -4,26 +4,33 @@
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
+            @icon('solid/arrow-left')
             </a> --}}
             <div class="bc-head">@langapp('monitoring') > Logs</div>
-
-            <a href="#hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+            <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete"
+                disabled>
+                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
+                    @langapp('delete')</span>
+            </button>
+            <a href="#hide-advance-search" id="advance-search"
+                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
-             <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px" onchange="changeSite()">
+            <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px"
+                    onchange="changeSite()">
                     <option value="">All Site</option>
                     @if($SiteSettings)
-                        @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                        @endforeach
+                    @foreach($SiteSettings as $SiteSettings_val)
+                    <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                    @endforeach
                     @endif
                 </select>
             </div>
+
         </header>
 
-        <section id="scrollable_news" class="scrollable wrapper" >
+        <section id="scrollable_news" class="scrollable wrapper">
             <section class="panel panel-default" id="hide-advance-search" style="display: none">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
@@ -42,30 +49,35 @@
                                     </div>
                                 </div>
                             </div>
-                        
-                        
+
+
                             <div class="col-lg-4 text-center" style="padding-left: 34px">
                                 <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-1 col-xs-12 col-form-label" style="margin-right: 51px;">Date</label>
-                                    <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                    <label for="" class="col-sm-1 col-xs-12 col-form-label"
+                                        style="margin-right: 51px;">Date</label>
+                                    <div id="newsrange"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
                             </div>
-                           
+
                         </div>
                         <div class="row">
                             <div class="col-lg-12 text-right mt-2">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
+                                <button type="button" id="btn_news_search"
+                                    class="btn btn-info btn-responsive btn-fz-13">
                                     <i class="fas fa-search"></i>
                                     @langapp('apply')
                                 </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <button type="button" id="btn_news_reset"
+                                    class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
-                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap">
                                     <i class="fas fa-times"></i>
                                     <span> Close </span>
                                 </button>
@@ -85,9 +97,16 @@
                 </header>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-monitoring-batchjob">
+                        <table class="table table-striped" id="table-monitoring-logs">
                             <thead>
                                 <tr>
+                                    <th class="no-sort w-10">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                class="select-chk" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
                                     <th>Site</th>
                                     <th>File</th>
                                     <th>Error Summary</th>
@@ -105,36 +124,36 @@
         </section>
     </section>
     <div class="modal" id="delete_logs" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
-    style="left: unset">
-    <div class="modal-dialog modal-dialog-aside" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-danger">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">@langapp('delete')</h4>
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <p class="text-danger">@langapp('delete_warning') </p>
+        style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
-                        class="fas fa-times text-muted"></i> Close</a>
-                <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit"
-                    onclick="delete_logs_click()"><i class="fas fa-paper-plane"></i> OK</button>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning') </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" id="close" data-dismiss="modal"><i
+                            class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit"
+                        onclick="delete_logs_click()"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
     {{-- <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a> --}}
-    
+
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+@include('stacks.css.datatables')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -153,6 +172,7 @@
     var Keywords = '';
     var select = '';
     var sitecode = '';
+    var count_table = 0;
 $(function () {
     
     
@@ -236,14 +256,14 @@ function changeSite(){
 }
 
 function data_table(){
-    var myTable = $('#table-monitoring-batchjob').DataTable({
+    var myTable = $('#table-monitoring-logs').DataTable({
             searching: false,
             ordering: true,
             pageLength: 25,
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[ 5, "desc" ], [ 0, "asc" ]],
+            order: [[ 5, "desc" ]],
             "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
@@ -263,11 +283,22 @@ function data_table(){
             },
             initComplete : function( settings, json){
                 $('[data-toggle="tooltip"]').tooltip();
+                var table = $('#table-monitoring-logs').DataTable();
+                count_table =table.rows().count();
             },
             columnDefs: [
                 {
-                    width: '10%',
                     targets: 0,
+                    orderable: false,
+                    width: '1px',
+                    render: function (data, type, row) {
+
+                        return  '<label><input type="checkbox" name="log_id" class="log_id" value="' + row.logs + '"><span class="label-text"></span></label>';
+                    },
+                },
+                {
+                    width: '10%',
+                    targets: 1,
                     name:"site_id",
                     render: function (data, type, row) {
                        if(row.site_id){
@@ -279,7 +310,7 @@ function data_table(){
                     }
                 },
                 {
-                    targets: 1,
+                    targets: 2,
                     name:"logs.file",
                     render: function (data, type, row) {
                         if(row.file){
@@ -290,7 +321,7 @@ function data_table(){
                     }
                 },
                 {
-                    targets: 2,
+                    targets: 3,
                     name:"logs.error_summary",
                     render: function (data, type, row) {
                         if(row.error_summary){
@@ -301,7 +332,7 @@ function data_table(){
                     }
                 },
                 {
-                    targets: 3,
+                    targets: 4,
                     name:"logs.log_trace",
                     render: function (data, type, row) {
                         if(row.log_trace){
@@ -312,8 +343,8 @@ function data_table(){
                     }
                 },
                 {
-                    targets: 4,
-                    name:"logs.created_at",
+                    targets: 5,
+                    name:"logs.updated_at",
                     className:"no-wrap",
                     render: function (data, type, row) {
                         return '<p><strong>created_at : </strong>'+row.created_at+'</p><p><strong>updated_at : </strong>'+row.updated_at+'</p>';
@@ -322,7 +353,7 @@ function data_table(){
                     }
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     orderable: false,
                     render: function (data, type, row) {
                         return`<a href="#" onclick="delete_logs_data(${row.logs})" class="btn btn-danger btn-xs"  data-toggle="modal" data-target="#delete_logs"><i class="fas fa-trash-alt"></i></a>`;
@@ -346,6 +377,7 @@ function data_table(){
             url:"{{ route('monitoring.delete_logs') }}",
             data:{
                 id: log_id_delete,
+                id_change: log_id_delete_change,
             },
             beforeSend: function(){
                 loading('load');
@@ -367,6 +399,47 @@ function data_table(){
                 
         });
     }
+
+    $('#table-monitoring-logs').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-monitoring-logs').on('click', '.log_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+
+            if($('.log_id').filter(':checked').length >= count_table){
+
+                document.getElementById("select-all").checked = true;
+            }
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.log_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    }); 
+
+    var log_id_delete_change =[];
+    $("#btn_del_select").click(function() {
+        log_id_delete_change =[];
+        $('#delete_logs').modal('show');
+        $('.log_id:checked').each(function () {
+            log_id_delete_change.push(this.value);         
+        });
+    });  
+
+
 </script>
 @endpush
 @endsection

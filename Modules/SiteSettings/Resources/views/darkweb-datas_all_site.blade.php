@@ -784,6 +784,7 @@ active_btn('#groupby-type .btn-grey');
     });
 
     $("#btn_del_select").click(function() {
+        val_id = [];
         $('.val_id:checked').each(function () {
             val_id.push(this.value);
             
