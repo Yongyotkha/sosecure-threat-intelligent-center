@@ -68,7 +68,6 @@
                                             <a href="{{route('rssfeedsettings.rss_data')}}" id="">
                                                 RSS Feed
                                             </a>
-        
                                         </li>
                                     </ul>
                                 </div>
