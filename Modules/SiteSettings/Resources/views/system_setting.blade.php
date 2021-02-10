@@ -343,146 +343,111 @@
                                             <div class="m-xs">
                                                 <span class="text-dark">Laravel Version</span>: <span
                                                     class="text-muted">{{ $siteSettings -> laravel_version == null ? 'ไม่มีข้อมูล' : $siteSettings -> laravel_version }}</span>
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="cache_clear();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip"
-                                                                    title="Clear Cache">cache:clear</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="config_cache();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip"
-                                                                    title="Config Cache">config:cache</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="config_clear();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip"
-                                                                    title="Clear Config">cache:clear</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="set_permission();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Set Permission">set
-                                                                    permission</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="update_code();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Update code">Update
-                                                                    Code</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="get_status_nginx();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Get status nginx">Get Status Nginx</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="restart_nginx();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Restart nginx">Restart Nginx</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="get_status_mongo();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Get status mongo">Get Status MongoDB</a>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_cache_clear -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_config_cache -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_config_clear -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_set_permission -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_update_code -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_status_nginx -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> restart_nginx -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_status_mongo -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                
+                                                <ul class="section-control">
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="cache_clear();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip"
+                                                        title="Clear Cache">cache:clear</a>
 
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="restart_mongo();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Restart mongo">Restart MongoDB</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="get_status_mysql();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Get status mysql">Get Status Mysql</a>
-                                                            </th>
-                                                            <th style="text-align:center;width:50px;">
-                                                                <a href="#" onclick="restart_mysql();"
-                                                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
-                                                                    data-rel="tooltip" title="Restart mysql">Restart Mysql</a>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> restart_mongo -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> get_status_mysql -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                            <td>
-                                                                <center>
-                                                                    {{ @$siteSettings -> restart_mysql -> updated_at}}
-                                                                </center>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                        <div>
+                                                            {{ @$siteSettings -> get_cache_clear -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="config_cache();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip"
+                                                        title="Config Cache">config:cache</a>
 
+                                                        <div>
+                                                            {{ @$siteSettings -> get_config_cache -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="config_clear();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip"
+                                                        title="Clear Config">cache:clear</a>
 
+                                                        <div>
+                                                            {{ @$siteSettings -> get_config_clear -> updated_at}} 
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="set_permission();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Set Permission">set
+                                                        permission</a>
 
+                                                        <div>
+                                                            {{ @$siteSettings -> get_set_permission -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="update_code();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Update code">Update
+                                                        Code</a>
 
+                                                        <div>
+                                                            {{ @$siteSettings -> get_update_code -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="get_status_nginx();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Get status nginx">Get Status Nginx</a>
+
+                                                        <div>
+                                                            {{ @$siteSettings -> get_status_nginx -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="restart_nginx();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Restart nginx">Restart Nginx</a>
+
+                                                        <div>
+                                                            {{ @$siteSettings -> restart_nginx -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="get_status_mongo();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Get status mongo">Get Status MongoDB</a>
+
+                                                        <div>
+                                                            {{ @$siteSettings -> get_status_mongo -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="restart_mongo();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Restart mongo">Restart MongoDB</a>
+
+                                                        <div>
+                                                            {{ @$siteSettings -> restart_mongo -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="get_status_mysql();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Get status mysql">Get Status Mysql</a>
+                                                        <div>
+                                                            {{ @$siteSettings -> get_status_mysql -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="restart_mysql();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Restart mysql">Restart Mysql</a>
+                                                        <div>
+                                                            {{ @$siteSettings -> restart_mysql -> updated_at}}
+                                                        </div>
+                                                    </li>
+                                                </ul>
                                             </div>
                                             <div class="line"></div>
                                             <div class="m-xs">
