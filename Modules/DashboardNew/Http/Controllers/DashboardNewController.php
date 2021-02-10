@@ -156,7 +156,7 @@ class DashboardNewController extends Controller
                     foreach ($dataAssets as $key => $value) {
                         $value_id[] = $value -> id;
                     }
-                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->get();
+                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->where('site_id', $site_id_m -> id)->get();
                     foreach($assets as $data){
                         $site = SiteSettings::select('name')->where('id', $site_id_m->id)->first(); 
                         $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();
@@ -189,7 +189,7 @@ class DashboardNewController extends Controller
                     foreach ($dataAssets as $key => $value) {
                         $value_id[] = $value -> id;
                     }
-                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->get();
+                    $assets = AssetsData::select('value','asset_id')->whereIn('asset_id', $value_id)->where('site_id', $site_id_m -> id)->get();
                     foreach($assets as $data){
                         $site = SiteSettings::select('name')->where('id', $site_id_m->id)->first(); 
                         $asset = Assets::select('raw_data')->where('id', $data -> asset_id)->first();

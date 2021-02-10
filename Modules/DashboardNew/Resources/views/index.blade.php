@@ -797,22 +797,37 @@ Highcharts.setOptions({
                 if(result.status_code == 200){
                     $('#cve_assets').empty();
                     let html = ``;
-                    for(let i in result.data){
-                        const data = result.data[i];                    
+                    if(result.data.length > 0){
+                        for(let i in result.data){
+                            const data = result.data[i];                    
+                            html += `
+                            <tr>
+                                <td>
+                                    <span>${data.site}</span>
+                                </td>
+                                <td>
+                                    <span>${data.host}</span>
+                                </td>
+                                <td>
+                                    <span>${data.value}</span>
+                                </td>
+                            </tr>
+                            `;
+                        }
+                    }else{
                         html += `
-                        <tr>
-                            <td>
-                                <span>${data.site}</span>
-                            </td>
-                            <td>
-                                <span>${data.host}</span>
-                            </td>
-                            <td>
-                                <span>${data.value}</span>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <span>No data available in table.</span>
+                                </td>
+                                <td></td>
+                            </tr>
                         `;
                     }
+                    
                     $('#cve_assets').html(html);
                 }
             }
