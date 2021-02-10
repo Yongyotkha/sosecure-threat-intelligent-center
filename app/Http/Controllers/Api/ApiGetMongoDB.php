@@ -174,6 +174,112 @@ class ApiGetMongoDB extends ApiController
         }
     }
 
+    public function load_relatedPulse(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $draw = $data['data']['draw'];
+                $start = $data['data']['start'];
+                $rowperpage = $data['data']['rowperpage'];
+                $order = 'modified';
+                $dir = -1;
+                
+                $reqId = $data['data']['reqId'];
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY);
+                $html = '';
+                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        
+        
+                $query = [
+                    'indicator_id' => $reqId,
+                    
+                ];
+        
+        
+                $options = [
+                    'sort' => [
+                        // $order => $dir
+                    ],
+                    'skip' => $start,
+                    'limit' => $rowperpage,
+                ];
+        
+                if($data['data']['count_page']==-1){
+                    $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+                    $count_filter = $cursor_count;
+                    // dd($cursor_count);
+                }else{
+                    $cursor_count = $data['data']['count_page'];
+                    $count_filter = $cursor_count;
+                }
+                $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
+                $document_all = $cursor->toArray();
+            
+        
+        
+                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                $options = array(
+                    'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                    ),
+                );
+        
+                $data_send = array();
+                $order_number = $start;
+                
+                if($document_all){
+                    foreach ($document_all as  $value) {
+                        $query = [
+                            'pulse_id' => $value->pulse_id
+                            
+                        ];
+                        $cursor_2 = $col_fx_otx_events->findOne($query,$options);
+                    
+                        //  dd($value);
+                        $order_number++;
+                        $nestedData['No'] = $order_number;
+                        $nestedData['name'] = $cursor_2["name"];
+                        $nestedData['groups'] = $this->explode_val($cursor_2["groups"],'groups',$data['data']['url']);
+                        $nestedData['tags'] = $this->explode_val($cursor_2["tags"],'tags',$data['data']['url']);
+                        $nestedData['public'] = ($cursor_2["public"]);
+                        $nestedData['is_modified'] = ($cursor_2["is_modified"]);
+                        $nestedData['attrCount'] = $cursor_2["indicator_count"];
+                        $nestedData['modified'] = change_date_utc_to_thai($cursor_2['modified']);
+                        $nestedData['count_view'] = $cursor_2["count_view"];
+                        $nestedData['pulse_id'] = $cursor_2["pulse_id"];
+                        $data_send[] = $nestedData;
+                    }
+                }
+        
+                $keysort = array_column($data_send, $order);
+                array_multisort($keysort, SORT_DESC, $data_send);
+                
+                $dataOut["draw"] = $draw;
+                $dataOut["recordsTotal"] = $cursor_count;
+                $dataOut["recordsFiltered"] = $count_filter;
+                $dataOut["data"] = $data_send;
+                $dataOut["cursor"] = $cursor;
+
+                $data_transcation = json_encode($dataOut);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
     public function events(Request $request){
         try{
             $header = $request->bearerToken();
