@@ -36,6 +36,8 @@ class IndicatorsController extends Controller
     protected $url_indicator_events_detail_select;
     protected $url_indicator_events;
     protected $url_indicator_load_attributes_tb;
+    protected $url_indicator_load_pulse_tb;
+    protected $url_indicator_count_view;
     /**
      * Request instance
      *
@@ -57,6 +59,8 @@ class IndicatorsController extends Controller
             $this->url_indicator_events = $this->base_url.'/indicator/events';
             $this->url_indicator_events_detail_select = $this->base_url.'/indicator/events_detail_select';
             $this->url_indicator_load_attributes_tb = $this->base_url.'/indicator/events_load_attributes_tb';
+            $this->url_indicator_load_pulse_tb = $this->base_url.'/indicator/events_load_pulse_tb';
+            $this->url_indicator_count_view = $this->base_url.'/indicator/events_count_view';
         }
     }
     /**
@@ -1488,90 +1492,117 @@ class IndicatorsController extends Controller
     }
 
 
-    public function load_pulse_tb(Request $request)
-    {
-
-        $draw = $_POST['draw'];
-        $row = (int)$_POST['start'];
-        $rowperpage = (int)$_POST['length'];
-        $start =  $row;
-        $reqId = $request->pulse_id;
-        
-        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-        $clientMD = new MongoClient($DB_MONGO_KEY);
-        $html = '';
-        $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
-        
-        $query = [
-            'main_pulse_id' => $reqId,
+    public function load_pulse_tb(Request $request){
+        if(TYPE_WEB == 'center'){
+            $draw = $_POST['draw'];
+            $row = (int)$_POST['start'];
+            $rowperpage = (int)$_POST['length'];
+            $start =  $row;
+            $reqId = $request->pulse_id;
             
-        ];
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $html = '';
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+            
+            $query = [
+                'main_pulse_id' => $reqId,
+                
+            ];
 
-        $options = [
-            'skip' => $start,//10
-            'limit' => $rowperpage//5
-        ];
+            $options = [
+                'skip' => $start,//10
+                'limit' => $rowperpage//5
+            ];
 
-        if($request->count_page==-1){
-            $cursor_count = $fx_otx_events_event_ref->count($query); 
-            $count_filter = $cursor_count;
+            if($request->count_page==-1){
+                $cursor_count = $fx_otx_events_event_ref->count($query); 
+                $count_filter = $cursor_count;
+            }else{
+                $cursor_count = $request->count_page;
+                $count_filter = $cursor_count;
+            }
+            
+        
+            
+            $cursor = $fx_otx_events_event_ref->find($query,$options);       
+            $document_all = $cursor->toArray();
+                
+                // set_time_limit(500); 
+            
+                // $count_doc = count($document_all);
+                
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $data = array();
+            $order_number = $start;
+
+            if($document_all){
+                foreach ($document_all as  $value) {
+                    $query = [
+                        'pulse_id' => $value->pulse_id     
+                    ];
+                    $document = $col_fx_otx_events->findOne($query,$options);
+                    
+                    $order_number++;
+                    $nestedData['No'] = $order_number;
+                    $nestedData['name'] = $document["name"];
+                    $nestedData['groups'] = explode_val($document["groups"],'groups');
+                    $nestedData['tags'] = explode_val($document["tags"],'tags');
+                    $nestedData['attr'] = '';
+                    $nestedData['attrCount'] = $document["indicator_count"];
+                    $nestedData['public'] = ($document["public"]);
+                    $nestedData['is_modified'] = ($document["is_modified"]);
+                    $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                    $nestedData['count_view'] = $document["count_view"];
+                    $nestedData['pulse_id'] = $document["pulse_id"];
+
+                    $data[] = $nestedData;
+                        
+                }
+            }
+            
+            $dataOut["draw"] = $draw;
+            $dataOut["recordsTotal"] = $cursor_count;
+            $dataOut["recordsFiltered"] = $count_filter;
+            $dataOut["data"] = $data;
+            $dataOut["cursor"] = $cursor;
+            return response()->json($dataOut);
         }else{
-            $cursor_count = $request->count_page;
-            $count_filter = $cursor_count;
-        }
-           
+            $ip = $this->ip;
+            $mac = $this->mac;
+            $authorization_key = $this->header;
+            $url_indicator_load_pulse_tb = $this->url_indicator_load_pulse_tb;
+
+            $draw = $request->draw;
+            $row = (int)$request->start;
+            $rowperpage = (int)$request->length;
+            $reqId = $request->pulse_id;
+            $count_page = $request->count_page;
     
-           
-        $cursor = $fx_otx_events_event_ref->find($query,$options);       
-        $document_all = $cursor->toArray();
-            
-            // set_time_limit(500); 
-         
-            // $count_doc = count($document_all);
-            
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $options = array(
-            'typeMap' => array(
-                'root' => 'array',
-                'document' => 'array',
-            ),
-        );
-        $data = array();
-        $order_number = $start;
+            $request_body_complete = [
+                'draw' => $draw,
+                'row' => $row,
+                'rowperpage' => $rowperpage,
+                'count_page' => $count_page,
+                'reqId' => $reqId,
+            ];
 
-        if($document_all){
-            foreach ($document_all as  $value) {
-                $query = [
-                    'pulse_id' => $value->pulse_id     
-                ];
-                $document = $col_fx_otx_events->findOne($query,$options);
-                   
-                $order_number++;
-                $nestedData['No'] = $order_number;
-                $nestedData['name'] = $document["name"];
-                $nestedData['groups'] = explode_val($document["groups"],'groups');
-                $nestedData['tags'] = explode_val($document["tags"],'tags');
-                $nestedData['attr'] = '';
-                $nestedData['attrCount'] = $document["indicator_count"];
-                $nestedData['public'] = ($document["public"]);
-                $nestedData['is_modified'] = ($document["is_modified"]);
-                $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                $nestedData['count_view'] = $document["count_view"];
-                $nestedData['pulse_id'] = $document["pulse_id"];
-
-                $data[] = $nestedData;
-                      
+            $body_complete = json_encode($request_body_complete);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+            $response_complete = $this -> reconnnect($url_indicator_load_pulse_tb, $form_body_complete, $authorization_key);
+            if($response_complete['status_code'] == "200"){
+                $dataOut = $response_complete['data'];
+                return response()->json($dataOut);
+            }else{
+                return response()->json($response_complete);
             }
         }
-        
-        $dataOut["draw"] = $draw;
-        $dataOut["recordsTotal"] = $cursor_count;
-        $dataOut["recordsFiltered"] = $count_filter;
-        $dataOut["data"] = $data;
-        $dataOut["cursor"] = $cursor;
-        return response()->json($dataOut);
-
-
     }
 
 
@@ -1806,31 +1837,58 @@ class IndicatorsController extends Controller
 
 
     public function count_view(Request $request) {
-        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-        $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $options = array(
-            'typeMap' => array(
-                'root' => 'array',
-                'document' => 'array',
-            ),
-        );
-        $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id),$options);
-        if($document){
-            $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
-                ['_id' => $document['_id']],
-                ['$set' => [
-                    'count_view' => $document['count_view']+1
-                    ]
-                ]
+        if(TYPE_WEB == 'center'){
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
             );
-        }
-        
-        if ($request->ajax()) {
-            $data = [
-                "count" => $document['count_view']+1,
+            $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id),$options);
+            if($document){
+                $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                    ['_id' => $document['_id']],
+                    ['$set' => [
+                        'count_view' => $document['count_view']+1
+                        ]
+                    ]
+                );
+            }
+            
+            if ($request->ajax()) {
+                $data = [
+                    "count" => $document['count_view']+1,
+                ];
+                return response()->json($data);
+            }
+        }else{
+            $ip = $this->ip;
+            $mac = $this->mac;
+            $authorization_key = $this->header;
+            $url_indicator_count_view = $this->url_indicator_count_view;
+    
+           
+            $request_body_complete = [
+                'request' => 'data',
+                'pulse_id' => $request->pulse_id
             ];
-            return response()->json($data);
+            $body_complete = json_encode($request_body_complete);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+            $response_complete = $this -> reconnnect($url_indicator_count_view, $form_body_complete, $authorization_key);
+
+            if($response_complete['status_code'] == "200"){
+                if ($request->ajax()) {
+                    $data = [
+                        "count" => $response_complete['data']['count'],
+                    ];
+                    return response()->json($data);
+                }
+            }else{
+                abort(404);
+            }
         }
     }
 

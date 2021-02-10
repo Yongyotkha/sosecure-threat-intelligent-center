@@ -348,6 +348,156 @@ class ApiGetMongoDB extends ApiController
         }
     }
 
+    
+    public function events_load_pulse_tb(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $draw = $data['data']['draw'];
+                $row = (int)$data['data']['row'];
+                $rowperpage = (int)$data['data']['rowperpage'];
+                $reqId = $data['data']['reqId'];
+                $count_page = $data['data']['count_page'];
+                $start =  $row;
+
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY);
+                $html = '';
+                $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+                
+                $query = [
+                    'main_pulse_id' => $reqId,
+                    
+                ];
+
+                $options = [
+                    'skip' => $start,//10
+                    'limit' => $rowperpage//5
+                ];
+
+                if($count_page==-1){
+                    $cursor_count = $fx_otx_events_event_ref->count($query); 
+                    $count_filter = $cursor_count;
+                }else{
+                    $cursor_count = $count_page;
+                    $count_filter = $cursor_count;
+                }
+                
+            
+                
+                $cursor = $fx_otx_events_event_ref->find($query,$options);       
+                $document_all = $cursor->toArray();
+                    
+                    // set_time_limit(500); 
+                
+                    // $count_doc = count($document_all);
+                    
+                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                $options = array(
+                    'typeMap' => array(
+                        'root' => 'array',
+                        'document' => 'array',
+                    ),
+                );
+                $data_res = array();
+                $order_number = $start;
+
+                if($document_all){
+                    foreach ($document_all as  $value) {
+                        $query = [
+                            'pulse_id' => $value->pulse_id     
+                        ];
+                        $document = $col_fx_otx_events->findOne($query,$options);
+                        
+                        $order_number++;
+                        $nestedData['No'] = $order_number;
+                        $nestedData['name'] = $document["name"];
+                        $nestedData['groups'] = explode_val($document["groups"],'groups');
+                        $nestedData['tags'] = explode_val($document["tags"],'tags');
+                        $nestedData['attr'] = '';
+                        $nestedData['attrCount'] = $document["indicator_count"];
+                        $nestedData['public'] = ($document["public"]);
+                        $nestedData['is_modified'] = ($document["is_modified"]);
+                        $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                        $nestedData['count_view'] = $document["count_view"];
+                        $nestedData['pulse_id'] = $document["pulse_id"];
+
+                        $data_res[] = $nestedData;
+                            
+                    }
+                }
+                
+                $dataOut["draw"] = $draw;
+                $dataOut["recordsTotal"] = $cursor_count;
+                $dataOut["recordsFiltered"] = $count_filter;
+                $dataOut["data"] = $data_res;
+                $dataOut["cursor"] = $cursor;
+
+                $data_transcation = json_encode($dataOut);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function events_count_view(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY);
+                $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                $options = array(
+                    'typeMap' => array(
+                        'root' => 'array',
+                        'document' => 'array',
+                    ),
+                );
+                $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $data['data']['pulse_id']),$options);
+                if($document){
+                    $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                        ['_id' => $document['_id']],
+                        ['$set' => [
+                            'count_view' => $document['count_view']+1
+                            ]
+                        ]
+                    );
+                }
+                
+                $data_res = [
+                    "count" => $document['count_view']+1,
+                ];
+
+                $data_transcation = json_encode($data_res);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+
     private function dataFalse($bearerToken, $mode, $data){
         try {
             $header = $bearerToken;
