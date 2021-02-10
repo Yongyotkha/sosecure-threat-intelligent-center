@@ -447,6 +447,14 @@
                                                             {{ @$siteSettings -> restart_mysql -> updated_at}}
                                                         </div>
                                                     </li>
+                                                    <li class="control-list">
+                                                        <a href="#" onclick="disabled_debug();"
+                                                        class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                                        data-rel="tooltip" title="Disabled debug">Disabled debug</a>
+                                                        <div>
+                                                            {{ @$siteSettings -> disabled_debug -> updated_at}}
+                                                        </div>
+                                                    </li>
                                                 </ul>
                                             </div>
                                             <div class="line"></div>
@@ -833,6 +841,34 @@
             url: "{{ route('sitesettings.artisan_call') }}",
             data: {
                 mode: 'restart_mysql',
+                site_id: '{{ $siteSettings -> id }}'
+            },
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function disabled_debug(){
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            data: {
+                mode: 'disabled_debug',
                 site_id: '{{ $siteSettings -> id }}'
             },
             success: function (response) {

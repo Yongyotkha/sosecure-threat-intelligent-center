@@ -127,11 +127,11 @@
                                     </div>
                                     <div class="card-ev-body">
                                         <div class="ev-left">
-                                            <span>{{ @number_format($attr_all->event_count) }}</span>
+                                            <span>{{ @number_format( TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count'] ) }}</span>
                                             <span class="ev-text-sec">All</span>
                                         </div>
                                         <div class="ev-right">
-                                            <span class="cl-orange">{{ @number_format($attr_current->event_count) }}</span>
+                                            <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
                                             <span>New Event</span>
                                         </div>
                                     </div>
@@ -144,11 +144,11 @@
                                     </div>
                                     <div class="card-ev-body">
                                         <div class="ev-left">
-                                            <span>{{ @number_format($attr_all->attribute_count) }}</span>
+                                            <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
                                             <span class="ev-text-sec">All</span>
                                         </div>
                                         <div class="ev-right">
-                                            <span class="cl-orange">{{ @number_format($attr_current->attribute_count) }}</span>
+                                            <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
                                             <span>New Attribute</span>
                                         </div>
                                     </div>
@@ -404,13 +404,14 @@ Highcharts.setOptions({
 
     function load_table(page=1){
         $('#table_events').DataTable({
+            searching: false,
             ordering: true,
             pageLength: 25,
             processing: true,
             serverSide: true,
             destroy: true,
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 6, "desc" ]],
+            dom: 'Blfrtip',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',
@@ -447,7 +448,6 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'public',
-                    className : 'text-center',
                 },
                 {
                     data: 'is_modified',
@@ -457,7 +457,6 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'attrCount',
-                    className : 'text-center',
                 },
                 {
                     data: 'pulse_id',
@@ -529,7 +528,7 @@ Highcharts.setOptions({
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            dom: 'Blfrtip',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',

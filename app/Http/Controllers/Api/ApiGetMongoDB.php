@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\IndicatorSummaryYear;
 use Illuminate\Http\Request;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
@@ -146,6 +147,196 @@ class ApiGetMongoDB extends ApiController
 
                 $data_transcation_jobs_clients = json_encode($dataOut);
                 $datas = encrypt_decrypt('encrypt', $data_transcation_jobs_clients, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function events(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $get_role_custom_first = @get_role_custom();
+                $SiteSettings = '';
+                $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                if(@$get_role_custom_first['superadmin'] == 1) {
+                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                }else if(@$get_role_custom_first['client'] == 1) {
+                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                }else if(@$get_role_custom_first['site_support'] == 1) {
+                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                }else if(@$get_role_custom_first['site_admin'] == 1) {
+                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                }else if(@$get_role_custom_first['site_client'] == 1) {
+                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                }
+
+                $data_send["attr_all"] = IndicatorSummaryYear::where("type",'summary_all')->first();
+                $data_send["attr_current"] = IndicatorSummaryYear::where("type",'summary_current')->first();
+                // DB::raw('CONCAT("[",attribute_count, "]") as data2')
+                $dataForloop = IndicatorSummaryYear::select('type_name AS name','attribute_count AS data')->where("type",'summary_attr_type')->orderBy('attribute_count','desc')->take(10)->get();
+                $data_send["attr_type"] = array();
+                foreach ($dataForloop as $document) {
+                    array_push($data_send["attr_type"], array('name'=>ucwords($document->name),'data'=>[$document->data]));
+                }
+                $data_send['SiteSettings'] = $SiteSettings;
+                $data_send['page'] = langapp('indicators');
+                if(isset($data_send['data']['Search_Link_All'])){
+                    $data_send['Search_Link_All'] = $data['data']['Search_Link_All'];
+                }else{
+                    $data_send['Search_Link_All'] = "";
+                }
+
+                $data_transcation = json_encode($data_send);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function events_detail_select(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $client = new MongoClient(DB_MONGO_01);
+                $collection = $client->sosecure_threatintelligent->fx_otx_events;
+                $id = $data['data']['id'];
+                $query = [
+                    'pulse_id' => $id
+                ];
+
+                $options = [
+                    'limit' => 1
+                ];
+
+                $cursor = $collection->find($query, $options)->toArray();
+                // $cursor[0]->created_at = change_date_utc_to_thai(@$cursor[0]->created_at);
+                // $cursor[0]->modified = change_date_utc_to_thai(@$cursor[0]->modified);
+                $data_transcation = json_encode($cursor);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function events_load_attributes_tb(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $draw = $data['data']['draw'];
+                $row = (int)$data['data']['row'];
+                $rowperpage = (int)$data['data']['rowperpage'];
+                $reqId = $data['data']['reqId'];
+                $count_page = $data['data']['count_page'];
+                $start =  $row;
+
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY);
+                $html = '';
+                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                
+                $query = [
+                    'pulse_id' => $reqId,
+                    
+                ];
+        
+                $options = [
+                    'skip' => $start,
+                    'limit' => $rowperpage,
+                    'sort' => [
+                        'created' => -1,
+                    ]
+                ];
+                
+            if($count_page==-1){
+                    $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+                    $count_filter = $cursor_count;
+            }else{
+                    $cursor_count = $count_page;
+                    $count_filter = $cursor_count;
+            }
+            
+        
+            
+                $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
+                $document_all = $cursor->toArray();
+            
+                $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+                $options = array(
+                    'typeMap' => array(
+                        'root' => 'array',
+                        'document' => 'array',
+                    ),
+                );
+                $data_result = array();
+                foreach ($document_all as  $value) {
+                    $query = [
+                        'indicator_id' => $value->indicator_id
+                        
+                    ];
+                    $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
+                
+                    //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
+                    // $view = '<a href="'.route('indicators.detail_indicator').
+                    //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
+                    //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
+                    $data_result[] = array( 
+                        "TYPE"=>@$cursor_2['type'],
+                        "AttributeName"=>@$cursor_2['indicator_name'],
+                        "ROLE"=>@$value['role'],
+                        "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
+                        "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
+                                '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
+                        
+                    );
+        
+                }
+                
+                $total_record = $cursor_count;
+                $total_count_filter = $count_filter;
+            
+        
+                $dataOut["draw"] = $draw;
+                $dataOut["recordsTotal"] = $cursor_count;
+                $dataOut["recordsFiltered"] = $total_count_filter;
+                $dataOut["data"] = $data_result;
+
+                $data_transcation = json_encode($dataOut);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
             }
         } catch (\Exception $e) {
