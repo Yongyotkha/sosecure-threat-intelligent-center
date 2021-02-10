@@ -44,6 +44,10 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
     Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
 
+    Route::post('news/index_client', 'Api\ApiGetMongoDB@index_client');
+    Route::post('news/jqueryLoadMoreNews', 'Api\ApiGetMongoDB@jqueryLoadMoreNews');
+    Route::post('news/jqueryLoadMoreNewsBookmark', 'Api\ApiGetMongoDB@jqueryLoadMoreNewsBookmark');
+
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
 });
 
