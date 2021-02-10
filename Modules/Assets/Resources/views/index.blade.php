@@ -23,16 +23,18 @@
                                 @endif
                             </select>
                         </div>
-    
+                        
                         @if(TYPE_WEB=='center')
                             <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                             </a>
+                            <input type="hidden" value="" id="site_code">
                         @else
                             <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                             </a>
+                            <input type="hidden" value="{{ @$SiteSettings[0]->code }}" id="site_code">
                         @endif
                         
 
@@ -124,43 +126,41 @@
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
                         <div class="col-md-4 nopadding">
-                            <a href="#" onclick="searchTB()">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/database.png')}}" alt="">
-                                        </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
-                                        <span class="number-card warning" id="count_assets">0</span>
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/database.png')}}" alt="">
                                     </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
+                                    <span class="number-card warning" id="count_assets">0</span>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="#" onclick="searchTB('','','os_type','Windows')">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <a href="#" onclick="searchTB('','','os_type','Windows')">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/windows.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
                                         <span class="number-card info" id="count_windows">0</span>
-                                    </div>
+                                    </a>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="#" onclick="searchTB('','','os_type','Linux')">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <a href="#" onclick="searchTB('','','os_type','Linux')">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/linux.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
                                         <span class="number-card green" id="count_linux">0</span>
-                                    </div>
+                                    </a>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -680,6 +680,7 @@
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
                     d.menu = "{{$menu}}";
+                    d.site = $('#site_code').val();
                 }
             },
             initComplete : function( settings, json){
@@ -694,18 +695,18 @@
                     name: 'chk',
                 },--}}
                 {
-                    width: '10%',
+                    width: '25%',
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
                 },
                 {
-                    width: '10%',
+                    width: '20%',
                     data: 'domain',
                     name: 'domain',
                 },
                 {
-                    width: '10%',
+                    width: '20%',
                     data: 'ip',
                     name: 'ip',
                 },
