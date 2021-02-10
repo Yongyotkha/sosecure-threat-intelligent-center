@@ -315,16 +315,16 @@ class RSSFeedSettingsController extends Controller
         // }else{
         //     $model = TransactionRssData::all();
         // }
-
+        $model = New RSSNews();
         if(($request -> keywords || $request -> startDate || $request -> endDate || $request -> status_news || $request -> news_source || $request -> news_category) && $request -> search_val == 1){
-            $model = RSSNews::where('status', 1);
+            
             if($request -> keywords){
-                $model_where = RSSNews::where('status', 1)->where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
+                $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
                 
                 if($model_where) {
-                    $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
+                    $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
                 } else {
-                    $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
+                    $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
                 }
                 
             }
@@ -359,7 +359,7 @@ class RSSFeedSettingsController extends Controller
                 // dd($date_end_time_time);
 
                 // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
             }
 
 
@@ -367,10 +367,10 @@ class RSSFeedSettingsController extends Controller
             if($request -> status_news){
                 if($request -> status_news == 1 || $request -> status_news == 2){
                     if($request -> status_news == 1) {
-                        $model -> where('save_draft','=',0);
+                        $model =  $model -> where('save_draft','=',0);
                         
                     } else if ($request -> status_news == 2) {
-                        $model -> where('save_draft',1);
+                        $model =  $model -> where('save_draft',1);
                         // dd($model);
                     }
                     
@@ -379,7 +379,7 @@ class RSSFeedSettingsController extends Controller
             if($request -> news_source){
 
                 // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
-                $model -> whereIn('source', $request -> news_source);
+                $model = $model -> whereIn('source', $request -> news_source);
             }
 
             if($request -> news_category){
@@ -391,18 +391,16 @@ class RSSFeedSettingsController extends Controller
                 // $model -> whereIn('source', $request -> news_source);
        
                     // dd($news_cate_id_val);
-                    $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                    $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
                         $query->whereIn('news_category_id', $news_cate_id);
                     });
         
 
             }
-            $model -> get();
-        }else{
-            // dd($request->search_val);
-            $model = RSSNews::all();
+            
         }
-
+        $model = $model -> get();
+        
 
         // $model = RSSNews::all();
         return DataTables::of($model)
@@ -422,7 +420,12 @@ class RSSFeedSettingsController extends Controller
             //     return rtrim($html, ' , ');
             // })
             ->addColumn('source', function (RSSNews $model) {
-                return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+                if($model -> source){
+                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+                }else{
+                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="None">None</div>';
+                }
+                
             })
             ->addColumn('title', function (RSSNews $model) {
                 if($model -> title_th){
@@ -503,6 +506,191 @@ class RSSFeedSettingsController extends Controller
             })
             ->rawColumns(['chk','site_name','source','title','cate','data_status','link','status','action'])
             ->toJson();
+    }
+
+    public function load_top_source(Request $request){
+        $model = New RSSNews();
+        if($request -> search_val == 1){
+            
+            if($request -> keywords){
+                $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
+                
+                if($model_where) {
+                    $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
+                } else {
+                    $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
+                }
+                
+            }
+
+            if($request -> isDateSearch == 1){
+                $date_start = $request->startDate;
+                $date_end = $request->endDate;
+
+                $date_start_explode = explode(" ",$date_start);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start);
+
+                $date_end_explode = explode(" ",$date_end);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // dd($date_end_time_time);
+
+                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+            }
+
+            if($request -> status_news){
+                if($request -> status_news == 1 || $request -> status_news == 2){
+                    if($request -> status_news == 1) {
+                        $model =  $model -> where('save_draft','=',0);
+                        
+                    } else if ($request -> status_news == 2) {
+                        $model =  $model -> where('save_draft',1);
+                        // dd($model);
+                    }
+                    
+                }  
+            }
+            if($request -> news_source){
+
+                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+                $model = $model -> whereIn('source', $request -> news_source);
+            }
+
+            if($request -> news_category){
+                $news_cate_id = $request -> news_category;
+                $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                    $query->whereIn('news_category_id', $news_cate_id);
+                });
+            }
+            
+        }
+
+        $model = $model         
+        ->select(DB::raw('count(source) as source_count , source as source'))
+        ->groupBy('source')
+        ->orderBy('source_count', 'desc')
+        ->limit(10)
+        ->get();
+
+        $host = array();
+        foreach($model as $value){
+
+            $host[] = [empty($value->source)?'None':$value->source,(int)$value->source_count];
+        }
+    
+        if ($request->ajax()) {
+
+            return response()->json($host);
+        }
+
+    }
+
+    public function load_top_category(Request $request){
+        $model = New RSSNews();
+        if($request -> search_val == 1){
+            
+            if($request -> keywords){
+                $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
+                
+                if($model_where) {
+                    $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
+                } else {
+                    $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
+                }
+                
+            }
+
+            if($request -> isDateSearch == 1){
+                $date_start = $request->startDate;
+                $date_end = $request->endDate;
+
+                $date_start_explode = explode(" ",$date_start);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start);
+
+                $date_end_explode = explode(" ",$date_end);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // dd($date_end_time_time);
+
+                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+            }
+
+            if($request -> status_news){
+                if($request -> status_news == 1 || $request -> status_news == 2){
+                    if($request -> status_news == 1) {
+                        $model =  $model -> where('save_draft','=',0);
+                        
+                    } else if ($request -> status_news == 2) {
+                        $model =  $model -> where('save_draft',1);
+                        // dd($model);
+                    }
+                    
+                }  
+            }
+            if($request -> news_source){
+
+                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+                $model = $model -> whereIn('source', $request -> news_source);
+            }
+
+            if($request -> news_category){
+                $news_cate_id = $request -> news_category;
+                $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                    $query->whereIn('news_category_id', $news_cate_id);
+                });
+            }
+            
+        }
+
+        $model = $model         
+        ->select(DB::raw('count(source) as source_count , source as source'))
+        ->groupBy('source')
+        ->orderBy('source_count', 'desc')
+        ->limit(10)
+        ->get();
+
+        $host = array();
+        $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
+        foreach($model as $key => $value){
+
+            $host[] = array(
+                'name' => empty($value->source)?'None':$value->source,
+                'y' => (int)$value->source_count,
+                'color' => $color[$key] ,
+            );
+
+            
+        }
+    
+        if ($request->ajax()) {
+
+            return response()->json($host);
+        }
+
     }
 
     public function tableRssSetting(){

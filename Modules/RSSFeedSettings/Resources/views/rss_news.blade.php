@@ -215,10 +215,10 @@
                             <div class="col-xl-12 col-lg-12 col-md-12">
                                 <div class="row">
                                     <div class="col-md-6 col-lg-6 mb-small-5px">
-                                        {{-- <div class="loadhost backdrop-loader">
+                                        <div class="loadhost backdrop-loader">
                                             <div class="loader4 centerloader"></div>
                                             <div class="loadding-text">Loading ...</div>
-                                        </div> --}}
+                                        </div>
                                         <div class="box-chart-color bg-white">
                                             <div class="d-flex align-items-center header-chart-p">
                                                 <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
@@ -229,10 +229,10 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-lg-6 mb-small-5px">
-                                        {{-- <div class="loadvulserverity backdrop-loader">
+                                        <div class="category backdrop-loader">
                                             <div class="loader4 centerloader"></div>
                                             <div class="loadding-text">Loading ...</div>
-                                        </div> --}}
+                                        </div>
                                         <div class="box-chart-color bg-white">
                                             <div class="d-flex align-items-center header-chart-p">
                                                 <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
@@ -340,137 +340,16 @@
 @include('stacks.js.highchart')
 <script>
 
-    const chart_top_source = Highcharts.chart('chart-top-source', {
-        chart: {
-            type: 'column',
-            scrollablePlotArea: {
-            minWidth: 1200,
-            scrollPositionX: 1
-            }
-        },
-        title: {
-            text: null
-        },
-        xAxis: {
-            type: 'category',
-            crosshair: true,
-            labels: {
-                overflow: 'justify',
-                autoRotation: false,
-                textAlign: 'center',
-            }
-       
-        },
-        yAxis: {
-            min: 0,
-            title: {
-            text: 'Values'
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            },
-            series:{
-                pointWidth: 30,
-                color : '#ffc107',
-                align: 'center',
-            },
-            style:{
-                background: '#fff'
-            }
-        },
-  
-        legend: {
-            enabled: false
-        },
-        series: [{
-            name: 'Population',
-            data: [
-            ['Krebsansecurity', 24.2],
-            ['Schneler', 20.8],
-            ['Trendmicro', 14.9],
-            ['Posttoday', 13.7],
-            ['Thairath', 13.7],
-            ['Sanook', 13.7],
-            ['Kapook', 13.7],
-            ['Prochacha1', 13.7],
-            ],
-            dataLabels: {
-            enabled: true,
-            color: '#333',
-            align: 'center',
-            format: '{point.y:.1f}',
-            y: 0, 
-            style: {
-                fontSize: '13px',
-                fontFamily: 'Verdana, sans-serif',
-            }
-            }
-        }]
-        });
-
-        const chart_top_category = Highcharts.chart('chart-top-category', {
-            chart: {
-                height: 223, 
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            title: {
-                text: ''
-            },
-            tooltip: {
-                pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f', '#d3d3d3'],
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                    },
-                    style:{
-                        background: '#fff'
-                    }
-                }
-            },
-            series: [{
-                colorByPoint: false,
-                data: [
-                {  name: 'Software', y: 10, color: '#e64732'}, 
-                {  name: 'Cybersecurity',  y: 20 , color: '#fcc838'}, 
-                {  name: 'Financial', y: 30, color: '#63b8ff'  }, 
-                {  name: 'Services',   y: 40, color: '#88ce4f'  },
-                ]
-            }],
-        });
-
-
-                
-
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
 
 
     $(function(){
+        load_top_source();
+        load_top_category();
+        datatable();
+        
+
         if($('#source_btn').hasClass('active')){
             $('#source_search').show();
             $('#category_search').hide();
@@ -535,7 +414,10 @@
         console.log(news_source);
         console.log(news_category);
         console.log(keywords);--}}
+        load_top_source();
+        load_top_category();
         datatable();
+        
     }
 
     $(function() {
@@ -594,8 +476,10 @@
             end = moment();
             cb(start, end);
             isDateSearch = null;
-            
+            load_top_source();
+            load_top_category();
             datatable();
+            
         });
 
 });
@@ -633,10 +517,6 @@ $(function() {
 
     });--}}
 
-
-    $(function () {
-        datatable();
-    });
 
 });
 
@@ -977,6 +857,188 @@ $(document).ready(function(){
         tempInput.select();
         document.execCommand("copy");
         document.body.removeChild(tempInput);
+    }
+
+    function load_top_source(){
+        if(search_val == 1 || search_val == 0) {
+            $("#chart-top-source").html('');             
+        }
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('rssfeedsettings.load_top_source') !!}',
+            type: "POST",
+            data: ({
+                keywords : keywords,
+                status_news : status_news,
+                news_source : news_source,
+                news_category : news_category,
+                search_val : search_val,
+                startDate : startDate,
+                endDate : endDate,
+                isDateSearch : isDateSearch,
+
+            }),
+            beforeSend: function(){
+                $('.loadhost').show();
+
+            },
+        }).done(function(data){
+             
+            $('.loadhost').hide();
+            const chart_top_source = Highcharts.chart('chart-top-source', {
+                chart: {
+                    type: 'column',
+                    scrollablePlotArea: {
+                    minWidth: 1200,
+                    scrollPositionX: 1
+                    }
+                },
+                title: {
+                    text: null
+                },
+                xAxis: {
+                    type: 'category',
+                    crosshair: true,
+                    labels: {
+                        overflow: 'justify',
+                        autoRotation: false,
+                        textAlign: 'center',
+                    }
+            
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                    text: 'Values'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    },
+                    series:{
+                        pointWidth: 30,
+                        color : '#ffc107',
+                        align: 'center',
+                    },
+                    style:{
+                        background: '#fff'
+                    }
+                },
+        
+                legend: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Population',
+                    data: data,
+                    dataLabels: {
+                        enabled: true,
+                        color: '#333',
+                        align: 'center',
+                        format: '{point.y{{--:.1f--}}}',
+                        y: 0, 
+                        style: {
+                            fontSize: '13px',
+                            fontFamily: 'Verdana, sans-serif',
+                        }
+                    }
+                }]
+            });
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.loadhost').hide();
+            console.log("No response from server");
+        });
+        
+    }
+
+    function load_top_category(){
+        if(search_val == 1 || search_val == 0) {
+            $("#chart-top-category").html('');             
+        }
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: '{!! route('rssfeedsettings.load_top_category') !!}',
+            type: "POST",
+            data: ({
+                keywords : keywords,
+                status_news : status_news,
+                news_source : news_source,
+                news_category : news_category,
+                search_val : search_val,
+                startDate : startDate,
+                endDate : endDate,
+                isDateSearch : isDateSearch,
+
+            }),
+            beforeSend: function(){
+                $('.category').show();
+
+            },
+        }).done(function(data){
+             
+            $('.category').hide();
+            const chart_top_category = Highcharts.chart('chart-top-category', {
+            chart: {
+                height: 223, 
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: ''
+            },
+            tooltip: {
+                pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f', '#d3d3d3'],
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    },
+                    style:{
+                        background: '#fff'
+                    }
+                }
+            },
+            series: [{
+                colorByPoint: false,
+                data: data,
+            }],
+        });
+
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            $('.loadhost').hide();
+            console.log("No response from server");
+        });
+        
     }
 
 
