@@ -75,7 +75,7 @@
 
                             <a id="btn_client_view" href="{{site_url('/news_client')}}"
                                 class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-eye"></i> Client View</span>
+                                <span><i class="fas fa-eye"></i> Site View</span>
                             </a>
 
                             <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
