@@ -42,6 +42,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/events_load_pulse_tb', 'Api\ApiGetMongoDB@events_load_pulse_tb');
     Route::post('indicator/events_count_view', 'Api\ApiGetMongoDB@events_count_view');
 
+    Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
+
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
 });
 
