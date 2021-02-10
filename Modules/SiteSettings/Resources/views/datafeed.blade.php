@@ -81,7 +81,7 @@
                                 <div class="row">
                                     <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Type</h5>
-                                        <select id="type" class="form-control">
+                                        <select id="type" class="form-control select-2-type">
                                             <option value="">All</option>
                                             <option value="social">PUBLIC</option>
                                             <option value="darkweb_public">DARK WEB</option> 
@@ -345,6 +345,8 @@
     });
 
 
+    $('.select-2-type').select2();
+    
     $(function() { 
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');

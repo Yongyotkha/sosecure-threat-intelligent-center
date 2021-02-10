@@ -170,7 +170,7 @@
                                                 <span> Public </span>
                                             </button>
                                             <button class="btn btn-grey" value="darkweb">
-                                                <span> Darkweb </span>
+                                                <span> Dark Web </span>
                                             </button>
                                             <button class="btn btn-grey" value="webserver">
                                                 <span> Web Server </span>
@@ -784,6 +784,7 @@ active_btn('#groupby-type .btn-grey');
     });
 
     $("#btn_del_select").click(function() {
+        val_id = [];
         $('.val_id:checked').each(function () {
             val_id.push(this.value);
             

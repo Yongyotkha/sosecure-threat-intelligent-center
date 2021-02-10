@@ -129,8 +129,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel-footer">
-                                {!! closeModalButton() !!}
+                            <div class="panel-footer  text-right">
+                                {{-- {!! closeModalButton() !!} --}}
                                 <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
                             </div>
                             {!! Form::close() !!}

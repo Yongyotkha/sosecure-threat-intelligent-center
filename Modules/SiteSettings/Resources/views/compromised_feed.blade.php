@@ -625,6 +625,7 @@ function change_status(){
 
     $("#btn_del_select").click(function() {
         $('.val_id:checked').each(function () {
+            val_id = [];
             val_id.push(this.value);
             
         });

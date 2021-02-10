@@ -427,7 +427,9 @@ active_btn('#groupby-status .btn-grey');
                 {
                     data: 'action',
                     name: 'approve',
-
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
                 },
             ],
             columnDefs: [

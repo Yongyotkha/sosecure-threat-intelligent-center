@@ -33,6 +33,9 @@ class IndicatorsController extends Controller
     protected $urlLimit = 3;
     protected $base_url;
     protected $url_indicator_events_table;
+    protected $url_indicator_events_detail_select;
+    protected $url_indicator_events;
+    protected $url_indicator_load_attributes_tb;
     /**
      * Request instance
      *
@@ -51,6 +54,9 @@ class IndicatorsController extends Controller
             $this->client = new \GuzzleHttp\Client();
             $this->base_url = config('app.url_center').'/api/v1/'.config('app.mode').'/'.config('app.site_code');
             $this->url_indicator_events_table = $this->base_url.'/indicator/events_table';
+            $this->url_indicator_events = $this->base_url.'/indicator/events';
+            $this->url_indicator_events_detail_select = $this->base_url.'/indicator/events_detail_select';
+            $this->url_indicator_load_attributes_tb = $this->base_url.'/indicator/events_load_attributes_tb';
         }
     }
     /**
@@ -120,28 +126,30 @@ class IndicatorsController extends Controller
             }else{
                 $data['Search_Link_All'] = "";
             }
-    
             return view('indicators::events')->with($data);
+
         }else{
             $ip = $this->ip;
             $mac = $this->mac;
             $authorization_key = $this->header;
-            $url_indicator_events_table = $this->url_indicator_events_table;
+            $url_indicator_events = $this->url_indicator_events;
     
            
             $request_body_complete = [
                 'request' => 'data',
+                'Search_Link_All' => $this->request->Search_Link_All
             ];
             $body_complete = json_encode($request_body_complete);
             $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
-            $response_complete = $this -> reconnnect($url_indicator_events_table, $form_body_complete, $authorization_key);
-            if($response_complete['status_code'] == 200){
+            $response_complete = $this -> reconnnect($url_indicator_events, $form_body_complete, $authorization_key);
+
+            if($response_complete['status_code'] == "200"){
+                $data = $response_complete['data'];
                 return view('indicators::events')->with($data);
             }else{
-                return response()->json($response_complete);
+                abort(404);
             }
-        }
-        
+        } 
     }
 
     public function events_detail()
@@ -150,71 +158,86 @@ class IndicatorsController extends Controller
         return view('indicators::events_detail')->with($data);
     }
 
-    public function events_detail_select(Request $request,$id)
+    public function events_detail_select(Request $request, $id)
 
     {
-        
-     
-        $client = new Client(DB_MONGO_01);
-        $collection = $client->sosecure_threatintelligent->fx_otx_events;
+        if(TYPE_WEB == 'center'){
+            $client = new Client(DB_MONGO_01);
+            $collection = $client->sosecure_threatintelligent->fx_otx_events;
 
-        $query = [
-            'pulse_id' => $id
-        ];
+            $query = [
+                'pulse_id' => $id
+            ];
 
-        $options = [
-            'limit' => 1
-        ];
+            $options = [
+                'limit' => 1
+            ];
 
-        $cursor = $collection->find($query, $options)->toArray();
+            $cursor = $collection->find($query, $options)->toArray();
 
+            $_array = array();
 
-        $_array = array();
+            $data['otx_events'] = $cursor;
+            $data['page'] = langapp('indicators');
+            $data['indicator_type_counts'] = $cursor[0]->indicator_type_counts->count();
+            $data['count_related_pulse'] = @$cursor[0]->count_related_pulse;
+            $countKey = array();
+            $countVal = array();
+            foreach ($cursor[0]->indicator_type_counts as $key => $value) {
+                $countKey[]= ucwords($key);
+                $countVal[]= $value;
+            }
+            $data['countKey'] = $countKey;
+            $data['countVal'] = $countVal;
 
-        // dd($cursor[0]->indicator_type_counts);
-        // if($cursor[0]->indicator_count){
-
+            $data['indicator_id'] = $request->id;
             
-        //     dd($cursor[0]->indicator_type_counts->count());
-        //     foreach ($cursor as $document) {
-
-        //         $test = $document['indicator_type_counts'];
-                
-        //         array_push($_array, $test);
-                
-        //     }
-        //     dd($_array);
-
-        // }
-        // else{
-        //     $data['indicator_count'] = '';
-        //     $_array = [];
-        //     dd($_array);
-        // }
+            $data['type'] = $request->type;
+            $data['indicator'] = $request->indicator;
         
+            $data['pulse_id'] = $id;
+            return view('indicators::events_detail')->with($data);
+        }else{
+            $ip = $this->ip;
+            $mac = $this->mac;
+            $authorization_key = $this->header;
+            $url_indicator_events_detail_select = $this->url_indicator_events_detail_select;
+    
+           
+            $request_body_complete = [
+                'request' => 'data',
+                'id' => $id,
+            ];
+            $body_complete = json_encode($request_body_complete);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+            $response_complete = $this -> reconnnect($url_indicator_events_detail_select, $form_body_complete, $authorization_key);
+            if($response_complete['status_code'] == 200){
+                $cursor = $response_complete['data'];
+                // dd($cursor);
+                $data['otx_events'] = $cursor;
+                $data['page'] = langapp('indicators');
+                $data['indicator_type_counts'] = count($cursor[0]['indicator_type_counts']);
+                $data['count_related_pulse'] = @$cursor[0]['count_related_pulse'];
+                $countKey = array();
+                $countVal = array();
+                foreach ($cursor[0]['indicator_type_counts'] as $key => $value) {
+                    $countKey[]= ucwords($key);
+                    $countVal[]= $value;
+                }
+                $data['countKey'] = $countKey;
+                $data['countVal'] = $countVal;
 
-
-       
-        $data['otx_events'] = $cursor;
-        $data['page'] = langapp('indicators');
-        $data['indicator_type_counts'] = $cursor[0]->indicator_type_counts->count();
-        $data['count_related_pulse'] = @$cursor[0]->count_related_pulse;
-        $countKey = array();
-        $countVal = array();
-        foreach ($cursor[0]->indicator_type_counts as $key => $value) {
-            $countKey[]= ucwords($key);
-            $countVal[]= $value;
+                $data['indicator_id'] = $request->id;
+                
+                $data['type'] = $request->type;
+                $data['indicator'] = $request->indicator;
+            
+                $data['pulse_id'] = $id;
+                return view('indicators::events_detail')->with($data);
+            }else{
+                abort(404);
+            }
         }
-        $data['countKey'] = $countKey;
-        $data['countVal'] = $countVal;
-
-        $data['indicator_id'] = $request->id;
-        
-        $data['type'] = $request->type;
-        $data['indicator'] = $request->indicator;
-      
-        $data['pulse_id'] = $id;
-        return view('indicators::events_detail')->with($data);
     }
 
     public function attributes()
@@ -1344,103 +1367,124 @@ class IndicatorsController extends Controller
         public function load_attributes_tb(Request $request)
     {
         // dd( $_POST['order']);
-        $draw = $_POST['draw'];
-        $row = (int)$_POST['start'];
-        $rowperpage = (int)$_POST['length'];
-
-
-
-        $start =  $row;
-
-
-        $reqId = $request->pulse_id;
-        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-        $clientMD = new MongoClient($DB_MONGO_KEY);
-        $html = '';
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-        
-        $query = [
-            'pulse_id' => $reqId,
+        if(TYPE_WEB == 'center'){
+            $draw = $_POST['draw'];
+            $row = (int)$_POST['start'];
+            $rowperpage = (int)$_POST['length'];
+    
+    
+    
+            $start =  $row;
+    
+    
+            $reqId = $request->pulse_id;
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $html = '';
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             
-        ];
-
-        $options = [
-            'skip' => $start,
-            'limit' => $rowperpage,
-            'sort' => [
-                'created' => -1,
-            ]
-        ];
-        
-       if($request->count_page==-1){
-            $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
-            $count_filter = $cursor_count;
-       }else{
-            $cursor_count = $request->count_page;
-            $count_filter = $cursor_count;
-       }
-       
-
-     
-        $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
-        $document_all = $cursor->toArray();
-       
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-        $options = array(
-            'typeMap' => array(
-                'root' => 'array',
-                'document' => 'array',
-            ),
-        );
-        $data = array();
-        foreach ($document_all as  $value) {
             $query = [
-                'indicator_id' => $value->indicator_id
+                'pulse_id' => $reqId,
                 
             ];
-            $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
+    
+            $options = [
+                'skip' => $start,
+                'limit' => $rowperpage,
+                'sort' => [
+                    'created' => -1,
+                ]
+            ];
+            
+           if($request->count_page==-1){
+                $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+                $count_filter = $cursor_count;
+           }else{
+                $cursor_count = $request->count_page;
+                $count_filter = $cursor_count;
+           }
            
-            //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
-            // $view = '<a href="'.route('indicators.detail_indicator').
-            //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
-            //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
-            $data[] = array( 
-                "TYPE"=>@$cursor_2['type'],
-                "AttributeName"=>@$cursor_2['indicator_name'],
-                "ROLE"=>@$value['role'],
-                "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
-                "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
-                          '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
-                
-             );
-   
-        }
-        
-        $total_record = $cursor_count;
-        $total_count_filter = $count_filter;
-     
-
-        $dataOut["draw"] = $_POST['draw'];
-        $dataOut["recordsTotal"] = $cursor_count;
-        $dataOut["recordsFiltered"] = $total_count_filter;
-        $dataOut["data"] = $data;
-            //dd($dataOut);
-        return response()->json($dataOut);
-        if ($request->ajax()) {
+    
+         
+            $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
+            $document_all = $cursor->toArray();
+           
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $data = array();
+            foreach ($document_all as  $value) {
+                $query = [
+                    'indicator_id' => $value->indicator_id
+                    
+                ];
+                $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
+               
+                //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
+                // $view = '<a href="'.route('indicators.detail_indicator').
+                //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
+                //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
+                $data[] = array( 
+                    "TYPE"=>@$cursor_2['type'],
+                    "AttributeName"=>@$cursor_2['indicator_name'],
+                    "ROLE"=>@$value['role'],
+                    "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
+                    "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
+                              '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
+                    
+                 );
+       
+            }
+            
+            $total_record = $cursor_count;
+            $total_count_filter = $count_filter;
+         
+    
+            $dataOut["draw"] = $_POST['draw'];
+            $dataOut["recordsTotal"] = $cursor_count;
+            $dataOut["recordsFiltered"] = $total_count_filter;
+            $dataOut["data"] = $data;
+                //dd($dataOut);
             return response()->json($dataOut);
-        }    
+            if ($request->ajax()) {
+                return response()->json($dataOut);
+            }    
+    
+        }else{
+            $ip = $this->ip;
+            $mac = $this->mac;
+            $authorization_key = $this->header;
+            $url_indicator_load_attributes_tb = $this->url_indicator_load_attributes_tb;
 
+            $draw = $request->draw;
+            $row = (int)$request->start;
+            $rowperpage = (int)$request->length;
+            $reqId = $request->pulse_id;
+            $count_page = $request->count_page;
+    
+            $request_body_complete = [
+                'draw' => $draw,
+                'row' => $row,
+                'rowperpage' => $rowperpage,
+                'count_page' => $count_page,
+                'reqId' => $reqId,
+            ];
 
+            $body_complete = json_encode($request_body_complete);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+            $response_complete = $this -> reconnnect($url_indicator_load_attributes_tb, $form_body_complete, $authorization_key);
 
-        // if ($request->ajax()) {
-        //     $data = [
-        //          "html" => $html,
-        //         "pagination" => $pagination,
-        //         "showing_amount_text" => $showing_amount_text,
-        //     ];
-        //     return response()->json($data);
-        // }
-
+            if($response_complete['status_code'] == "200"){
+                $dataOut = $response_complete['data'];
+                return response()->json($dataOut);
+            }else{
+                return response()->json($response_complete);
+            }
+        }
     }
 
 

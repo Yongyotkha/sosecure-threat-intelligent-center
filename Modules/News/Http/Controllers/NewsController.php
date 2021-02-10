@@ -877,12 +877,12 @@ class NewsController extends Controller
 
             if(@$data->transaction_rss_id) {
                 if(@$data->logo) {
-                    $logo_url = config('app.url_center').@$data->logo;
+                    $logo_url = config('app.URL_CENTER_PUBLISH').@$data->logo;
                 } else {
                     $logo_url = @$data->logo_rss;
                 }
             } else {
-                $logo_url = config('app.url_center').@$data->logo;
+                $logo_url = config('app.URL_CENTER_PUBLISH').@$data->logo;
             }
             $html .= '
                 <!--<div class="checkbox-news-select">
@@ -952,12 +952,12 @@ class NewsController extends Controller
 
             if(@$data -> news -> transaction_rss_id) {
                 if(@$data -> news -> logo) {
-                    $url_logo = config('app.url_center').@$data -> news -> logo;
+                    $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                 } else {
                     $url_logo = @$data -> news -> logo_rss;
                 }
             } else {
-                $url_logo = config('app.url_center').@$data -> news -> logo;
+                $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
             }
             $html .= '
                 <div class="checkbox-news-select">
@@ -1016,12 +1016,12 @@ class NewsController extends Controller
 
                 if(@$data -> news -> transaction_rss_id) {
                     if(@$data -> news -> logo) {
-                        $url_logo = config('app.url_center').@$data -> news -> logo;
+                        $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                     } else {
                         $url_logo = @$data -> news -> logo_rss;
                     }
                 } else {
-                    $url_logo = config('app.url_center').@$data -> news -> logo;
+                    $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                 }
 
 

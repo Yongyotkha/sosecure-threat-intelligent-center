@@ -54,8 +54,10 @@
                             <h1>{{@$otx_events[0]['name']}}</h1>
                             <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public :
                                 {!!check_publish(@$otx_events[0]['public'])!!}</p>
-                            <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified :
-                                {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
+                 
+                                    <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified :
+                                        {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
+             
                             <p>Tags : {!!explode_val(@$otx_events[0]['tags'],'tags')!!}</p>
                             <p>Groups : {!!explode_val(@$otx_events[0]['groups'],'groups')!!}</p>
                         </div>
@@ -101,9 +103,9 @@
                                                             <span class="label-text"></span>
                                                         </label>
                                                     </th> --}}
-                                                    <th>TYPE</th>
+                                                    <th>Type</th>
                                                     <th>Attribute Name</th>
-                                                    <th>ROLE</th>
+                                                    <th>Role</th>
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -260,7 +262,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('indicators.events_attributes_table')!!}',
                 type: "POST",
@@ -331,7 +333,7 @@
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            dom: 'Blfrtip',
+            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_pulse_table')!!}',

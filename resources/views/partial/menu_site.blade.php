@@ -105,13 +105,13 @@
                 </a>
             </li>
             <li style="padding-left:2rem">
-                <a href="{{route('compromised_data.index', ['id' => $siteSettings->code])}}">
-                    Compromised Data
+                <a href="{{route('compromised_feed.index', ['id' => $siteSettings->code])}}">
+                    Compromised Feed
                 </a>
             </li>
             <li style="padding-left:2rem">
-                <a href="{{route('compromised_feed.index', ['id' => $siteSettings->code])}}">
-                    Compromised Feed
+                <a href="{{route('compromised_data.index', ['id' => $siteSettings->code])}}">
+                    Compromised Data
                 </a>
             </li>
         </ul>
@@ -123,17 +123,17 @@
             Data Leak
         </a>
        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+           <li style="padding-left:2rem">
+               <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
+                   Data Leak Feed
+               </a>
+           </li>
             <li style="padding-left:2rem">
                 <a href="{{route('socialdatas.index', ['id' => $siteSettings->code])}}">
                     Data Leak Data
                 </a>
             </li>
 
-            <li style="padding-left:2rem">
-                <a href="{{route('darkweb_datas.index', ['id' => $siteSettings->code])}}">
-                    Data Leak Feed
-                </a>
-            </li>
         </ul>
     </li>
     

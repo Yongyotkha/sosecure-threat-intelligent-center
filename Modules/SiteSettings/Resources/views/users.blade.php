@@ -360,6 +360,7 @@
 
         let del_val = [];
         $("#btn_del_select").click(function(){
+            del_val = [];
             $('#delete_user').modal('show');
             $("input[type='checkbox'][name='checked']").each(function(){
                 

@@ -117,7 +117,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                             <i class="fas fa-times"></i>
                             Close
                         </button>
@@ -609,6 +609,7 @@
     }
 
     $("#btn_del_select").click(function() {
+        credentials_id_delete_change[];
         $('#delete_credentials').modal('show');
         $('.credentials_id:checked').each(function () {
             credentials_id_delete_change.push(this.value);     

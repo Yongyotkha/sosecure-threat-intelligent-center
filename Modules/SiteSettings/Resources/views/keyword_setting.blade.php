@@ -208,6 +208,7 @@
         var keyword_id = [];
      
         $("#btn-change-status").click(function() {
+            keyword_id[];
             $('.keyword_id:checked').each(function () {
                 keyword_id.push(this.value);
             });

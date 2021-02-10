@@ -113,4 +113,10 @@ class SiteSettings extends Model{
     public function restart_mysql(){
         return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'restart_mysql')->orderBy('updated_at', 'desc');
     }
+
+    public function disabled_debug(){
+        return $this->belongsTo(transcation_jobs_clients::class, 'id', 'site_id')->select('updated_at')->where('mode', 'disabled_debug')->orderBy('updated_at', 'desc');
+    }
+
+    
 }

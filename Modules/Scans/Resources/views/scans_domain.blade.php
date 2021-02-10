@@ -17,9 +17,9 @@
                             <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset</button>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance"> @langapp('filter') Advance</button>
+                            <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i> @langapp('Search_Advance')</a>
                         </div>
-                        <div class="btn-group">
+                        <div class="btn-group d-none">
                             <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
                                 <span class="caret"></span>
                             </button>
@@ -107,7 +107,7 @@
                 &nbsp;
 
             </header>
-            <section class="scrollable wrapper bg-white" style="padding:0;">
+            <section class="scrollable wrapper" style="padding:0;">
                 <div class="sub-tab text-uc small m-b-sm">
 
                     <ul class="nav pro-nav-tabs nav-tabs-dashed">
@@ -162,26 +162,14 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-xs-3 text-center">
-                            <h3 class="text-dark">Assets</h3>
-                        </div>
-                        <div class="col-xs-9 text-center">
-                            <h3 class="text-dark">Referent</h3>
-                        </div>
-                        <div class="col-md-12">
-                            <hr>
-                        </div>
-                    </div>
-                    <div id="show_asets" class="row">
-                    </div>
+                    <div id="show_asets" class="row"></div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="save_assets()">
                         <i class="fas fa-paper-plane"></i>
                         Save
@@ -205,28 +193,24 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-xs-3 text-center">
+                        <div class="col-md-3" style="padding-left: 3rem">
                             <h3 class="text-dark">Assets</h3>
                         </div>
-                        <div class="col-xs-9 text-center">
-                            <h3 class="text-dark">Referent</h3>
-                        </div>
-                        <div class="col-md-12">
-                            <hr>
+                        <div class="col-md-9" style="padding-left: 6rem">
+                            <h3 class="text-dark" >Referent</h3>
                         </div>
                     </div>
-                    <div id="show_asets_manual" class="row">
-                    </div>
-                    <button type="button" class="btn btn-sm btn-info m-xs" onclick="add_new_assets_manual()">
+                    <div id="show_asets_manual"> </div>
+                    <button type="button" class="btn btn-sm btn-info m-xs" style="margin-left: 1.8rem;" onclick="add_new_assets_manual()">
                         <span>@icon('solid/plus')  Add Assets
                     </button>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
                     <button type="button" class="btn btn-info btn-rounded" onclick="save_assets_manual()">
                         <i class="fas fa-paper-plane"></i>
                         Save
