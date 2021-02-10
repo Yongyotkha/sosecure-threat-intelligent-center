@@ -182,66 +182,89 @@
                         </div>
                     </div>
                 </header>
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="table_events">
-                            <thead>
-                                <tr>
 
-                                    <th>No</th>
-                                    <th>Event Name</th>
-                                    <th>Group</th>
-                                    <th>Tags</th>
-                                    <th>Published</th>
-                                    <th>Last Status</th>
-                                    <th style="width: 200px;">DateTime</th>
-                                    <th>Attribute</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- <tr>
-                                    <td>
-                                        <label>
-                                            <input value="" type="checkbox" />
-                                            <span class="label-text"></span>
-                                        </label>
-                                    </td>
-                                    <td>1</td>
-                                    <td>Suspicious proxy agent</td>
-                                    <td>
-                                        <a href="">MIST FEED</a>
-                                        <a href="">Phishing,UW</a>
-                                    </td>
-                                    <td>
-                                        <a href="">Scan,Agent,</a>
-                                        <a href="">Proxy,Spider</a>
-                                    </td>
-                                    <td>
-                                        <a href="">5421</a>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-check"></i>
-                                    </td>
-                                    <td>
-                                        Modified
-                                    </td>
-                                    <td>
-                                        2020-12-07 11:11
-                                    </td>
-                                    <td>
-                                        152
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
-                                btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                                </tr> --}}
-                            </tbody>
-                        </table>
-                        <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+
+                <div class="panel-body">
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs nav-tabs-highlight">
+                            <li class="active"><a href="#tab_event" data-toggle="tab">Event (0)</a></li>
+                            <li><a href="#tab_attr" data-toggle="tab">Attribute (0)</a></li>   
+                            <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
+                            <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>   
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_event">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="table_events">
+                                        <thead>
+                                            <tr>
+            
+                                                <th>No</th>
+                                                <th>Event Name</th>
+                                                <th>Group</th>
+                                                <th>Tags</th>
+                                                <th>Published</th>
+                                                <th>Last Status</th>
+                                                <th style="width: 200px;">DateTime</th>
+                                                <th>Attribute</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{-- <tr>
+                                                <td>
+                                                    <label>
+                                                        <input value="" type="checkbox" />
+                                                        <span class="label-text"></span>
+                                                    </label>
+                                                </td>
+                                                <td>1</td>
+                                                <td>Suspicious proxy agent</td>
+                                                <td>
+                                                    <a href="">MIST FEED</a>
+                                                    <a href="">Phishing,UW</a>
+                                                </td>
+                                                <td>
+                                                    <a href="">Scan,Agent,</a>
+                                                    <a href="">Proxy,Spider</a>
+                                                </td>
+                                                <td>
+                                                    <a href="">5421</a>
+                                                </td>
+                                                <td>
+                                                    <i class="fas fa-check"></i>
+                                                </td>
+                                                <td>
+                                                    Modified
+                                                </td>
+                                                <td>
+                                                    2020-12-07 11:11
+                                                </td>
+                                                <td>
+                                                    152
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
+                                            btn-info"><i class="far fa-eye"></i> View</a>
+                                            </td>
+                                            </tr> --}}
+                                        </tbody>
+                                    </table>
+                                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+                                    </div>
+                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab_attr">
+                            
+                            </div>
+                            <div class="tab-pane" id="tab_otx">
+                            
+                            </div>
+                            <div class="tab-pane" id="tab_misp">
+                            
+                            </div>
                         </div>
-                        <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
                     </div>
                 </div>
             </section>
