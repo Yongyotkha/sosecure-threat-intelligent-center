@@ -694,24 +694,22 @@
                     name: 'chk',
                 },--}}
                 {
-                    width: '25%',
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
                 },
                 {
-                    width: '20%',
                     data: 'domain',
                     name: 'domain',
                 },
                 {
-                    width: '20%',
                     data: 'ip',
                     name: 'ip',
                 },
                 {
                     data: 'CPE_Vendor',
                     name: 'CPE_Vendor',
+                    width : '100%',
                     className: 'padingtablezero text-center no-wrap'
                 },
                 {
