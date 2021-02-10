@@ -170,7 +170,7 @@
                                                 <span> Public </span>
                                             </button>
                                             <button class="btn btn-grey" value="darkweb">
-                                                <span> Darkweb </span>
+                                                <span> Dark Web </span>
                                             </button>
                                             <button class="btn btn-grey" value="webserver">
                                                 <span> Web Server </span>

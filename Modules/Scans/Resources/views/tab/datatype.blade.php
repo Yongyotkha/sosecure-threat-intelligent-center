@@ -7,7 +7,7 @@
                 </div>
         </header>
         <div class="panel-body">
-            <div class="hide-fillter" style="margin-bottom: 1rem">
+            <div style="margin-bottom: 1rem">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group m-b-md">
@@ -81,6 +81,10 @@
                     <button class="btn btn-default btn-fz-13">
                         <i class="fas fa-broom"></i>
                         <span> Clear </span>
+                    </button>
+                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                        <i class="fas fa-times"></i>
+                        <span> Close </span>
                     </button>
                 </div>
             </div>
@@ -520,6 +524,9 @@
 
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
+            $('.hide-fillter').slideToggle();
+        });
+        $('#close_filter').click(function(){
             $('.hide-fillter').slideToggle();
         });
     });
