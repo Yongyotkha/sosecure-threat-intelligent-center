@@ -2782,7 +2782,7 @@ a.author-by{
 }
 
 .btn-login-cus{
-    padding: 1.5rem;
+    padding: 1.5rem !important;
     font-size: 2rem;
 }
 
@@ -3744,6 +3744,9 @@ textarea.form-control{
     justify-content: center;
 }
 
+.section-control.start{
+    justify-content: start !important;
+}
 .section-control li.control-list{
     margin: .5rem;
     display: flex;

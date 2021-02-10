@@ -141,6 +141,38 @@
                             <textarea class="form-control ta" name="email_signature">{{ get_option('email_signature') }}</textarea>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-3 control-label">Control</div>
+                        <div class="col-md-6">
+                            <ul class="section-control start">
+                                <li class="control-list">
+                                    <a href="#" onclick="cache_clear();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip"
+                                    title="Clear Cache">cache:clear</a>
+                                </li>
+                                <li class="control-list">
+                                    <a href="#" onclick="config_cache();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip"
+                                    title="Config Cache">config:cache</a>
+                                </li>
+                                <li class="control-list">
+                                    <a href="#" onclick="config_clear();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip"
+                                    title="Clear Config">cache:clear</a>
+                                </li>
+                                <li class="control-list">
+                                    <a href="#" onclick="set_permission();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip" title="Set Permission">set permission</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     @if (count($translations) > 0)
                 </div>
                 @foreach ($translations as $lang)
@@ -276,6 +308,36 @@
                             <textarea class="form-control ta" name="email_signature_{{ $lang }}">{{ get_option('email_signature') }}</textarea>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-lg-3 control-label">Control</div>
+                        <div class="col-md-6">
+                            <ul class="section-control start">
+                                <li class="control-list">
+                                    <a href="#" onclick="cache_clear();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip"
+                                    title="Clear Cache">cache:clear</a>
+                                </li>
+                                <li class="control-list">
+                                    <a href="#" onclick="config_cache();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip"
+                                    title="Config Cache">config:cache</a>
+                                </li>
+                                <li class="control-list">
+                                    <a href="#" onclick="config_clear();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip"
+                                    title="Clear Config">cache:clear</a>
+                                </li>
+                                <li class="control-list">
+                                    <a href="#" onclick="set_permission();"
+                                    class="btn btn-xs btn-{{ get_option('theme_color') }}"
+                                    data-rel="tooltip" title="Set Permission">set permission</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     
                 </div>
                 @endforeach
@@ -295,4 +357,103 @@
 @endpush
 @push('pagescript')
 @include('stacks.js.form')
+
+<script>
+    function cache_clear() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function config_cache() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function config_clear() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+
+    function set_permission() {
+        $.ajax({
+            type: "POST",
+            url: "{{ route('sitesettings.artisan_call') }}",
+            success: function (response) {
+                loading('stop_load');
+                if (response.status === true) {
+                    toastr.success(response.message, '@langapp('response_status ')');
+                } else {
+                    toastr.error(response.message, '@langapp('response_status ')');
+                }
+            },
+            error: function (error) {
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status ') ');
+            }
+        });
+    }
+</script>
 @endpush

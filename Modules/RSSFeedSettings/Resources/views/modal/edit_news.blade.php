@@ -151,10 +151,10 @@
                             </div> --}}
                     <br>
                         <div class="form-group row">
-                            <div class="col-lg-6">
+                            <div class="col-lg-3 col-md-6">
                             <div class="row">
-                                <label class="col-lg-2 control-label"> <span style="margin-top: 8px; display: inline-block;"> Public Date </span></label>
-                                <div class="col-lg-10">
+                                <label class="col-lg-4 control-label"> <span style="margin-top: 8px; display: inline-block;"> Public Date </span></label>
+                                <div class="col-lg-8">
                                     <div class="input-group date">
                                         <input id="send_date" type="text" class="form-control datetimepicker-input"
                                         @php
@@ -174,17 +174,17 @@
                                 </div>
                             </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-lg-9 col-md-6">
                             <div class="row">
-                                <label class="col-lg-2 control-label" style="margin-top: 8px; display: inline-block;">Send Mail </label>
-                                <div class="col-lg-2">
+                                <label class="col-lg-1 control-label" style="margin-top: 8px; display: inline-block;">Send Mail </label>
+                                <div class="col-lg-1">
                                     <label class="switch" style="margin-top: 8px; display: inline-block;">
                                         <input type="checkbox" name="" checked value="TRUE">
                                         <span></span>
                                     </label>
                                 </div>
                                 <label class="col-lg-1 control-label" style="margin-top: 8px; display: inline-block;">Status </label>
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <label class="switch" style="margin-top: 8px; display: inline-block;">
                                         @php
                                         $checked_val = '';
