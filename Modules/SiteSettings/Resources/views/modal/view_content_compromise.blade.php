@@ -9,7 +9,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <h5>
-                        <!-- Content -->
+                        {{@$feedcontent}}
                     </h5>
                 </div>
             </div>

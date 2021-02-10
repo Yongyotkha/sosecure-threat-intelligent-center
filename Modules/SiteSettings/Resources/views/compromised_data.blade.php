@@ -465,10 +465,13 @@ active_btn('#groupby-type .btn-grey');
                     {
                         targets: 9,
                         width: '10px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
                 
 
-                            return `<a href="${base_url}/compromised_feed/delete_compromised_feed_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
+                            return `
+                            <a href="${base_url}/darkweb_data/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
+                            <a href="${base_url}/compromised_feed/delete_compromised_feed_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                             
                         },
                     },
@@ -588,6 +591,7 @@ active_btn('#groupby-type .btn-grey');
 
     $("#btn_del_select").click(function() {
         $('#delete_com_data_modal').modal('show');
+        val_id = [];
         $('.val_id:checked').each(function () {
             val_id.push(this.value);
             

@@ -609,6 +609,7 @@
     }
 
     $("#btn_del_select").click(function() {
+        credentials_id_delete_change[];
         $('#delete_credentials').modal('show');
         $('.credentials_id:checked').each(function () {
             credentials_id_delete_change.push(this.value);     

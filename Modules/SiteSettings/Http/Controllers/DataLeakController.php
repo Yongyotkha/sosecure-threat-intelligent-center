@@ -706,7 +706,9 @@ class DataLeakController extends Controller
             ->editColumn(
                 'action',
                 function (DataLeakSocialRef $model) {
-                    return "<a href='" . route('socialdatas.delete', ['code' => $model->code]) . "' class='btn btn-danger btn-xs' data-toggle='ajaxModal'>
+                    return "
+                    <a href='" . route('socialdatas.view_content_dataleak', ['code' => $model->code]) . "' class='btn btn-info btn-xs' data-toggle='ajaxModal'><i class='fas fa-eye'></i></a>
+                    <a href='" . route('socialdatas.delete', ['code' => $model->code]) . "' class='btn btn-danger btn-xs' data-toggle='ajaxModal'>
                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
                 </a>";
                 }
@@ -944,6 +946,9 @@ class DataLeakController extends Controller
     public function view_dataleak_modal($code)
     {
         $data["code"] = $code;
+        $model = DataLeakSocialRef::select('data_leak_feed.feedcontent')->join('data_leak_feed', 'data_leak_feed.id', '=',
+        'data_leak_socail_ref.data_leak_feed_id')->where('data_leak_socail_ref.code',$code)->first();
+        $data["feedcontent"] = $model->feedcontent;
         return view('sitesettings::modal.view_content_dataleak')->with($data);
     }
     
@@ -951,6 +956,9 @@ class DataLeakController extends Controller
     public function view_compromise_modal($code)
     {
         $data["code"] = $code;
+        $model1 = DataLeakSocialRef::select('data_leak_feed.feedcontent')->join('data_leak_feed', 'data_leak_feed.id', '=',
+        'data_leak_socail_ref.data_leak_feed_id')->where('data_leak_socail_ref.code',$code)->first();
+        $data["feedcontent"] = $model1->feedcontent;
         return view('sitesettings::modal.view_content_compromise')->with($data);
     }
 

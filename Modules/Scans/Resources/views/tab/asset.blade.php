@@ -440,7 +440,7 @@
 
     var del_val = [];
     $("#btn_del_select").click(function() {
-        
+        del_val = [];
         $('#delete_asset').modal('show');
         $('.asset_id:checked').each(function () {
             del_val.push(this.value);
