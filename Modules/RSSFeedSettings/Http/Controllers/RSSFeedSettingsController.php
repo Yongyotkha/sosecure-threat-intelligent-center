@@ -916,7 +916,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                            $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -958,7 +958,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                            $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -1140,7 +1140,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                            $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -1182,7 +1182,7 @@ class RSSFeedSettingsController extends Controller
                         //ทำการอัพโหลดภาพ
                             file_put_contents($path, $data);
                             $img->removeattribute('src');
-                            $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                            $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                         } else {
 
                         }
@@ -1408,7 +1408,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }
@@ -1452,7 +1452,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }
@@ -1585,7 +1585,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }
@@ -1627,7 +1627,7 @@ class RSSFeedSettingsController extends Controller
                                 //ทำการอัพโหลดภาพ
                                     file_put_contents($path, $data);
                                     $img->removeattribute('src');
-                                    $img->setattribute('src', config('app.url_center').'/images/file_editor/'.$image_name);
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
                                 } else {
 
                                 }

@@ -263,8 +263,6 @@ class MDCountIndicator extends Command
             [
                 '$group' => [
                     '_id' => [
-                        //'created_by' => '$created_by',
-                        // 'created_at'=>['$month'=>'$entryTime','$year'=>'$entryTime']
                         'year'=>['$month'=>'$created_at'],
                         'month' => ['$dayOfMonth'=>'$created_at'],
                         
@@ -333,6 +331,10 @@ class MDCountIndicator extends Command
         $countEvents = $col_fx_otx_events->aggregate($pipeline2, $options);
         $countEvents = $countEvents->toArray();
         
+        $updateall = IndicatorSummaryYear::where('type',  'summary_month')->update(['event_count' => 0,
+        'attribute_count' => 0
+        ]);
+
         foreach ( $countAttr as $value) {
             $IndicatorSummaryYear = IndicatorSummaryYear::where('year', $value["year"]==(int)date('m')?2:1)
             ->where('month',  $value["month"])->where('type',  'summary_month')->first();
@@ -355,7 +357,7 @@ class MDCountIndicator extends Command
 
         foreach ( $countEvents as $value) {
             $IndicatorSummaryYear = IndicatorSummaryYear::where('year', $value["year"]==(int)date('m')?2:1)
-            ->where('month',  $value["month"])->where('type',  'summary_month')->first();
+                ->where('month',  $value["month"])->where('type',  'summary_month')->first();
             if(!$IndicatorSummaryYear){
                 $IndicatorSummaryYear = new IndicatorSummaryYear;
                 $IndicatorSummaryYear->year = $value["year"]==(int)date('m')?2:1;
@@ -365,7 +367,6 @@ class MDCountIndicator extends Command
                 $IndicatorSummaryYear->type =  'summary_month';
                 $IndicatorSummaryYear->status = 1;
                 $IndicatorSummaryYear->save();
-
             }else{
                 $IndicatorSummaryYear->event_count =  $value["COUNT_Event"];
                 $IndicatorSummaryYear->save();
