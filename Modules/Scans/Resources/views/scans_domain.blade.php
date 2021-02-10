@@ -201,7 +201,7 @@
                         </div>
                     </div>
                     <div id="show_asets_manual"> </div>
-                    <button type="button" class="btn btn-sm btn-info m-xs" onclick="add_new_assets_manual()">
+                    <button type="button" class="btn btn-sm btn-info m-xs" style="margin-left: 1.8rem;" onclick="add_new_assets_manual()">
                         <span>@icon('solid/plus')  Add Assets
                     </button>
                 </div>

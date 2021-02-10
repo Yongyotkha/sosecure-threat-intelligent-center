@@ -66,7 +66,7 @@
                                                 Create News
                                             </a>
                                             <a href="{{route('rssfeedsettings.rss_data')}}" id="">
-                                                RSS Feed
+                                                RSS Data
                                             </a>
                                         </li>
                                     </ul>
