@@ -266,8 +266,6 @@
     function delete_assets_manual(c){
          $('#rows_manual_' + c).remove();
     }
-    
-
 
     function save_assets_manual(){
         loading('load');

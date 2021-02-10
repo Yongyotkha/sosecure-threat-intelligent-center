@@ -162,19 +162,7 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-xs-3 text-center">
-                            <h3 class="text-dark">Assets</h3>
-                        </div>
-                        <div class="col-xs-9 text-center">
-                            <h3 class="text-dark">Referent</h3>
-                        </div>
-                        <div class="col-md-12">
-                            <hr>
-                        </div>
-                    </div>
-                    <div id="show_asets" class="row">
-                    </div>
+                    <div id="show_asets" class="row"></div>
                 </div>
 
                 <div class="modal-footer">
@@ -205,18 +193,14 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-xs-3 text-center">
+                        <div class="col-md-3" style="padding-left: 3rem">
                             <h3 class="text-dark">Assets</h3>
                         </div>
-                        <div class="col-xs-9 text-center">
-                            <h3 class="text-dark">Referent</h3>
-                        </div>
-                        <div class="col-md-12">
-                            <hr>
+                        <div class="col-md-9" style="padding-left: 6rem">
+                            <h3 class="text-dark" >Referent</h3>
                         </div>
                     </div>
-                    <div id="show_asets_manual" class="row">
-                    </div>
+                    <div id="show_asets_manual"> </div>
                     <button type="button" class="btn btn-sm btn-info m-xs" onclick="add_new_assets_manual()">
                         <span>@icon('solid/plus')  Add Assets
                     </button>
