@@ -1187,6 +1187,7 @@
     }
 
     $("#btn_del_select").click(function() {
+        web_server_id_delete_chang = [];
         $('#delete_web_sever').modal('show');
         $('.web_server_id:checked').each(function () {
             web_server_id_delete_chang.push(this.value);

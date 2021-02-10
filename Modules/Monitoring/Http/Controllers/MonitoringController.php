@@ -291,7 +291,14 @@ class MonitoringController extends Controller
     }
 
     public function delete_logs(Request $request){
-        MonitorLogs::where('id',$request->id)->delete();
+        if($request->id_change){
+            foreach($request->id_change as $id_change){
+                MonitorLogs::where('id',$id_change)->delete();
+            }
+        }else{
+            MonitorLogs::where('id',$request->id)->delete();
+        }
+
         return ajaxResponse(
             [
                 'message'  => langapp('changes_saved_successful'),
