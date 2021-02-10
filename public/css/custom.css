@@ -3549,9 +3549,25 @@ input.input-login:focus {
     font-size: 13px !important;
 }
 
+.btn-selector{
+    color: #3869d4;
+    border: 1px solid #3869d4;
+    background-color: transparent !important;
+    border-radius: 3px;
+    transition: .2s linear;
+}
+.btn-selector:not(:last-child){
+    margin-right: .5rem;
+}
+.btn-selector:hover{
+    color: #fff!important;
+    background-color: #3869d4 !important;
+    border-color: #3869d4;
+}
+
 .btn-selector.active{
     color: #fff!important;
-    background-color: #3869d4;
+    background-color: #3869d4 !important;
     border-color: #3869d4;
 }
 

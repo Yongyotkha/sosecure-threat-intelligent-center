@@ -213,7 +213,7 @@
                 </header>
                 <div class="panel-body" id="table-container">
                     <div class="row">
-                        <div class="col-md-12 text-right">
+                        <div class="col-md-12 text-center">
                             <div id="fillter_click" class="button-group">
                                 <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
                                 <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
