@@ -387,7 +387,10 @@ function table_social_data(search_val){
             },
             {
                 data: 'action',
-                name: 'action'
+                name: 'action',    
+                orderable: false,
+                searchable: false,
+                sortable: false,
             },
         ],
         columnDefs: [
