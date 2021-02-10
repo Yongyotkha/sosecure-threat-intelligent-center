@@ -494,8 +494,8 @@
                                 </div>
 
                         </div>
-                        <div class="panel-footer">
-                            {!! closeModalButton() !!}
+                        <div class="panel-footer text-right">
+                            {{-- {!! closeModalButton() !!} --}}
                             {!! renderAjaxButton() !!}
                         </div>
                         {!! Form::close() !!}
