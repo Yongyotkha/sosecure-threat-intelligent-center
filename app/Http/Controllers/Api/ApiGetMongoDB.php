@@ -40,7 +40,7 @@ class ApiGetMongoDB extends ApiController
                 
                 $order = $data['data']['order'];
                 $dir = $data['data']['dir'];
-
+                $url = $data['data']['url'];
             
 
 
@@ -137,8 +137,8 @@ class ApiGetMongoDB extends ApiController
                             $order_number++;
                             $nestedData['No'] = $order_number;
                             $nestedData['name'] = $document["name"];
-                            $nestedData['groups'] = explode_val($document["groups"],'groups');
-                            $nestedData['tags'] = explode_val($document["tags"],'tags');
+                            $nestedData['groups'] = $this->explode_val($document["groups"],'groups',$url);
+                            $nestedData['tags'] = $this->explode_val($document["tags"],'tags',$url);
                             $nestedData['attr'] = '';
                             $nestedData['attrCount'] = $document["indicator_count"];
                             $nestedData['public'] = ($document["public"]);
@@ -381,7 +381,7 @@ class ApiGetMongoDB extends ApiController
                 $reqId = $data['data']['reqId'];
                 $count_page = $data['data']['count_page'];
                 $start =  $row;
-
+                $url = $data['data']['url'];
                 $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
                 $clientMD = new MongoClient($DB_MONGO_KEY);
                 $html = '';
@@ -434,8 +434,8 @@ class ApiGetMongoDB extends ApiController
                         $order_number++;
                         $nestedData['No'] = $order_number;
                         $nestedData['name'] = $document["name"];
-                        $nestedData['groups'] = explode_val($document["groups"],'groups');
-                        $nestedData['tags'] = explode_val($document["tags"],'tags');
+                        $nestedData['groups'] = $this->explode_val($document["groups"],'groups',$url);
+                        $nestedData['tags'] = $this->explode_val($document["tags"],'tags',$url);
                         $nestedData['attr'] = '';
                         $nestedData['attrCount'] = $document["indicator_count"];
                         $nestedData['public'] = ($document["public"]);
@@ -1066,7 +1066,7 @@ class ApiGetMongoDB extends ApiController
                             </label>
                         </div>-->
                         <div class="content-news-text">
-                            <a href="'.$url.'news/detail/'.$item -> code.'">
+                            <a href="'.$url.'/news/detail/'.$item -> code.'">
                                 <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                             </a>
                             <div class="entry-meta">
@@ -1076,7 +1076,7 @@ class ApiGetMongoDB extends ApiController
                             </div>
                         </div>
                         <div class="content-news-image">
-                            <a href="'.$url.'news/detail/'.$item -> code.'">
+                            <a href="'.$url.'/news/detail/'.$item -> code.'">
                                 <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)">
                             </a>
                         </div>
@@ -1150,7 +1150,7 @@ class ApiGetMongoDB extends ApiController
                                 </label>
                             </div>-->
                             <div class="content-news-text">
-                                <a href="'.$url.'news/detail/'.@$item -> news -> code.'">
+                                <a href="'.$url.'/news/detail/'.@$item -> news -> code.'">
                                     <span class="head-news-text" style="'.@$font_weight.'">'.@$item -> news -> title_th.'</span>
                                 </a>
                                 <div class="entry-meta">
@@ -1160,7 +1160,7 @@ class ApiGetMongoDB extends ApiController
                                 </div>
                             </div>
                             <div class="content-news-image">
-                                <a href="'.$url.'news/detail/'.@$item -> news -> code.'">
+                                <a href="'.$url.'/news/detail/'.@$item -> news -> code.'">
                                     <img src="'.$url_logo.'" alt="" onerror="setDefaultPic(this)">
                                 </a>
                             </div>
@@ -1217,5 +1217,28 @@ class ApiGetMongoDB extends ApiController
             );
             return response()->json($response);
         }
+    }
+
+    private function explode_val($val,$type=null,$url) {
+        $result = '';
+        if($val) {
+            $val_arr = explode(",",$val);
+            if($val_arr) {
+                foreach($val_arr as $tag) {
+                    if($type == 'tags') {
+                        $result .=  '<a href="'.$url.'/indicators/tags'.$tag.'">'.$tag.'</a> ,';
+                    } else if ($type == 'groups') {
+                        $result .=  '<a href="'.$url.'/indicators/groups'.$tag.'">'.$tag.'</a> ,';
+                    } else {
+                        $result .=  '<a href="#">'.$tag.'</a> ,';
+                    }
+    
+                }
+                $result = rtrim($result,',');
+            }
+        } else {
+            $result = '';
+        }
+        return $result;
     }
 }
