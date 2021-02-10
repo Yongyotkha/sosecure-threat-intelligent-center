@@ -28,3 +28,20 @@ function get_word_leak_compromise(val, type)
     
     return html;
 }
+
+function set_cookie_site(value){
+    let d = new Date();
+    d.setTime(d.getTime() + (1 * 2 * 60 * 60 * 1000));
+    let expires = "expires="+d.toUTCString();
+    document.cookie = 'insight_select_site_search' + "=" + value + ";" + expires + ";path=/";
+}
+
+function get_cookie_site(){
+    if (document.cookie.split(';').some(function(item) {
+        return item.trim().indexOf('insight_select_site_search=') == 0
+    })) {
+        return document.cookie.split('; ').find(row => row.startsWith('insight_select_site_search')).split('=')[1];
+    }else{
+        return false;
+    }
+}

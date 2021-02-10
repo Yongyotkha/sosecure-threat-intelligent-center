@@ -207,3 +207,4 @@ Route::post('/Credentials/credentials_edit', 'CredentialsController@credentials_
 Route::post('/Credentials/credentials_change_status', 'CredentialsController@credentials_change_status')->name('credentials.credentials_change_status')->middleware('can:menu_items');
 // Route::post('/webdefacement/detail/update_original', 'WebDefacementController@update_original')->name('webdefacement.update_original')->middleware('can:menu_items');
 // Route::post('/webdefacement/detail/update_image', 'WebDefacementController@update_image')->name('webdefacement.update_image')->middleware('can:menu_items');
+Route::get('/check_cookie_site', 'SystemSettingsController@check_cookie_site')->name('systemsetting.check_cookie_site')->middleware('can:menu_items');

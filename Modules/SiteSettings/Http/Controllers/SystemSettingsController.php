@@ -105,4 +105,23 @@ class SystemSettingsController extends Controller
     {
         //
     }
+
+    public function check_cookie_site(Request $request)
+    {
+        // firstCurrentVal
+        // cookieVal
+        // currentVal
+        $sttt = "";
+        if($request->currentVal){
+
+        }else{
+            
+        }
+        if(preg_match("/[a-z]/i", $sttt)){
+            //use code
+            print "it has alphabet!";
+        }else{
+            //use id
+        }
+    }
 }
