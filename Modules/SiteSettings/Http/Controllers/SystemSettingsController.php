@@ -108,20 +108,35 @@ class SystemSettingsController extends Controller
 
     public function check_cookie_site(Request $request)
     {
-        // firstCurrentVal
-        // cookieVal
-        // currentVal
-        $sttt = "";
-        if($request->currentVal){
-
+        $firstCurrentVal = $request->firstCurrentVal;
+        $currentVal = $request->currentVal;//secondVal
+        $cookieVal = $request->cookieVal;
+        
+        if(!empty($cookieVal)){
+            if(!empty($currentVal)){
+                if(preg_match("/[a-z]/i", $cookieVal)){
+                    $SiteSettingsfor = SiteSettings::where('code', $cookieVal)->first();
+                }else{
+                    $SiteSettingsfor = SiteSettings::where('id', $cookieVal)->first();
+                }
+                if(preg_match("/[a-z]/i", $currentVal)){
+                    //use code
+                    $data["siteValue"] = $SiteSettingsfor->code;
+                }else{
+                    //use id
+                    $data["siteValue"] = $SiteSettingsfor->id;
+                }
+            }else{
+                $data["siteValue"] = $firstCurrentVal;
+            }
         }else{
-            
+            $data["siteValue"] = $firstCurrentVal;
         }
-        if(preg_match("/[a-z]/i", $sttt)){
-            //use code
-            print "it has alphabet!";
+        
+        if ($request->ajax()) {
+            return response()->json($data);
         }else{
-            //use id
+            return false;
         }
     }
 }
