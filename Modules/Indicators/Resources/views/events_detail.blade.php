@@ -262,7 +262,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 url: '{!! route('indicators.events_attributes_table')!!}',
                 type: "POST",
@@ -333,7 +333,7 @@
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_pulse_table')!!}',

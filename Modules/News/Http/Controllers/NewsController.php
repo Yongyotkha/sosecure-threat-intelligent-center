@@ -893,12 +893,12 @@ class NewsController extends Controller
                 </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
+                        <span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                     </a>
                     <div class="entry-meta">
                     <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
-                    <span><p>&nbsp;'.strip_tags($n_detail).'</p></span>
+                    <span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
                     </div>
                 </div>
                 <div class="content-news-image">

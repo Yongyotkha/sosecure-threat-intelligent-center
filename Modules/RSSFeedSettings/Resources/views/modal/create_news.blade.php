@@ -59,12 +59,7 @@
                              </div>
                          </div>
                          <br>
-                         <div class="form-group row">
-                            <label for="" class="col-lg-12 control-label">Source <span class="text-danger">*</span></label>
-                            <div class="col-lg-12">
-                                <input type="text" class="form-control" name="source" value="{{ @$rss -> get_rss -> name }}" readonly>
-                            </div>
-                        </div>
+
                          {{-- <div class="row d-none">
                             <label for="" class="col-md-12 control-label" id="label_topic">Topic <span class="text-danger">*</span></label>
                             <div class="col-md-12">
@@ -99,7 +94,7 @@
                                         <div class="tab-pane active" id="tab_th">
                                             <section class="panel-body border-n">
                                                 <div class="form-group row">
-                                                    <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH) <span class="text-danger">*</span></label>
+                                                    <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH)</label>
                                                     <div class="col-lg-12">
                                                         {{-- @php
                                                             $title_default = '';
@@ -109,12 +104,12 @@
                                                                 $title_default = $rss->title;
                                                             }
                                                         @endphp --}}
-                                                        <input type="text" class="form-control" name="title_th" id="title_th" value="{{ @$rss -> title }}" required>
+                                                        <input type="text" class="form-control" name="title_th" id="title_th" value="{{ @$rss -> title }}">
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
-                                                    <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
+                                                    <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH)</label>
                                                     <div class="col-lg-12">
                                                         <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1" required></textarea>
                                                     </div>
@@ -124,14 +119,14 @@
                                         <div class="tab-pane" id="tab_en">
                                             <section class="panel-body border-n">
                                                 <div class="form-group row">
-                                                    <label for="" class="col-lg-12 control-label">Text (EN) <span class="text-danger">*</span></label>
+                                                    <label for="" class="col-lg-12 control-label">Text (EN)</span></label>
                                                     <div class="col-lg-12">
                                                         <input type="text" class="form-control" name="title_en" id="title_en" >
                                                     </div>
                                                 </div>
             
                                                 <div class="form-group row">
-                                                    <label for="" class="col-lg-12 control-label">Detail (EN) <span class="text-danger">*</span></label>
+                                                    <label for="" class="col-lg-12 control-label">Detail (EN)</label>
                                                     <div class="col-lg-12">
                                                         <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1"></textarea>
                                                     </div>
@@ -174,6 +169,15 @@
                                 </div>
                              </div>
                              <div class="col-lg-1">
+                                <label class="control-label">Send Mail </label>
+                                <div >
+                                    <label class="switch">
+                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <span></span>
+                                    </label>
+                                </div>
+                             </div>
+                             <div class="col-lg-1">
                                 <label class="control-label">Status </label>
                                 <div>
                                     <label class="switch">
@@ -185,16 +189,7 @@
                                                 $checked_val = 'checked';
                                             }
                                         @endphp --}}
-                                        <input type="checkbox" name="status" value="TRUE">
-                                        <span></span>
-                                    </label>
-                                </div>
-                             </div>
-                             <div class="col-lg-1">
-                                <label class="control-label">Send Mail </label>
-                                <div >
-                                    <label class="switch">
-                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <input type="checkbox" name="status" checked value="TRUE">
                                         <span></span>
                                     </label>
                                 </div>
@@ -206,7 +201,7 @@
                  <div class="modal-footer">
                     {!! closeModalButton() !!}
                     <button type="submit" class="btn btn-warning formDraft btn-rounded"><i class="fas fa-save"></i> SaveDraft</button>
-                    <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
+                    <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i class="fas fa-paper-plane"></i> Save Public</button>
                     {{-- {!! renderAjaxButton() !!} --}}
                     {!! Form::close() !!}
                     {{-- <form action="{{ route('rssfeedsettings.rss_data_preview_news') }}" method="post" target="_blank">

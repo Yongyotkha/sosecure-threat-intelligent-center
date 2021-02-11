@@ -760,6 +760,9 @@ ul.item-list-dash li:not(:last-child){
 .text-date{
     margin-right: 1rem;
 }
+.mobi-d-block span:not(:last-child){
+    margin-right: 1rem;
+}
 .badeg-news,.badeg-view{
     white-space: nowrap;
     color: #fff;
@@ -771,7 +774,6 @@ ul.item-list-dash li:not(:last-child){
 }
 .badeg-view{
     background: #65bd77;
-    margin-left: 1rem;
 }
 .headding-secondary-text{
     display: block;
@@ -819,7 +821,7 @@ ul.news_related li a:hover{
 }
 
 .show-content-news{
-    padding: 3rem 2rem;
+    padding: 3rem 1rem;
     line-height: 150%;
 }
 .entry-view{
@@ -829,8 +831,12 @@ ul.news_related li a:hover{
 
 .shared-news{
     position: absolute;
-    right: 10px;
+    right: 30px;
     top: 8%;
+}
+
+#content_news * img{
+    width: 100%;
 }
 
 .form-control:not(textarea.form-control){
@@ -983,6 +989,9 @@ ul.news_related li a:hover{
         left: 0px;
         opacity: 0;
         transition: .3s ease-in-out;
+    }
+    .m-b-xs-5{
+        margin-bottom: 5px !important;
     }
 }
 
@@ -3354,9 +3363,9 @@ input.input-login:focus {
 }
 
 .ev-right > span:first-child{
-    font-size: 18px;
+    font-size: 27px;
     font-weight: 700;
-    height: 30px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3555,6 +3564,7 @@ input.input-login:focus {
     background-color: transparent !important;
     border-radius: 3px;
     transition: .2s linear;
+    margin-bottom: 4px;
 }
 .btn-selector:not(:last-child){
     margin-right: .5rem;
@@ -3752,4 +3762,56 @@ textarea.form-control{
     display: flex;
     flex-direction: column;
     justify-content: start;
+}
+
+
+@media screen and (max-width:768px){
+    .bottom{
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.max-w-select{
+    min-width:150px !important;
+    display:inline-block;
+}
+
+@media screen and (max-width:560px){
+    .column-xs-flex{
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    .max-w-select{
+        max-width:110px !important;
+        display:inline-block;
+    }
+}
+
+div.dataTables_paginate li.first > a, div.dataTables_paginate li.previous > a {
+    position: relative;
+    padding-left: 10px !important;
+}
+div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
+    padding-right: 10px !important;
+}
+
+.details-news-elip{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.content-news-text span.head-news-text.text-elip-ovf {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    display: -webkit-box;
+    max-width: 100%;
+    max-height: 46px;
+    -webkit-line-clamp: 2;
+    width: 100%;
+    -webkit-box-orient: vertical;
 }

@@ -29,9 +29,11 @@
             <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 <div class="header-flex-overflow" style="height: 47px;">
                     <div class="fwb-16">
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
-                        @endif 
+                        @if(TYPE_WEB == 'center')
+                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
+                            @endif 
+                        @endif
                         <span style="margin-top: 2px">
                             Compromise Data
                         </span>
@@ -39,7 +41,7 @@
 
                     <div class="ml-2 text-right">
                     
-                        <div class="text-left" style="margin-top: 8px; min-width:270px;display:inline-block;">
+                        <div class="text-left max-w-select" style="margin-top: 8px;display:inline-block;">
                             <select name="site" id="site" class="text-left select2-option form-control select-site">
                                 <option value="" selected="selected">All Site</option>
                                 @if($SiteSettings)
@@ -53,11 +55,12 @@
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
                             // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                        <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                            class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                Feed</span></a>
-                        @endif
+                        @if(TYPE_WEB == 'center')
+                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
+                                    class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
+                                        Feed</span></a>
+                            @endif
                         @endif
 
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">

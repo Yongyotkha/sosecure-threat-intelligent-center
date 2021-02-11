@@ -16,8 +16,8 @@
                 class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
-            <div class="pull-right max-w-select" style="margin-top: 9px;">
-                <select name="site" id="site" class="select2-option form-control select-site"
+            <div class="pull-right" style="margin-top: 8px; width: 300px;">
+                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px"
                     onchange="changeSite()">
                     <option value="">All Site</option>
                     @if($SiteSettings)
@@ -92,7 +92,7 @@
                 </header>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-monitoring-logs">
+                        <table class="table table-striped" id="table-send-logs">
                             <thead>
                                 <tr>
                                     <th class="no-sort w-10">
@@ -251,7 +251,7 @@ function changeSite(){
 }
 
 function data_table(){
-    var myTable = $('#table-monitoring-logs').DataTable({
+    var myTable = $('#table-send-logs').DataTable({
             searching: false,
             ordering: true,
             pageLength: 25,
@@ -262,7 +262,7 @@ function data_table(){
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
-                url: '{!! route('monitoring.table_monitor_logs')!!}',
+                url: '{!! route('monitoring.table_send_logs')!!}',
                 dataSrc: function ( json ) {
                     return json.data;
                 },
@@ -278,7 +278,7 @@ function data_table(){
             },
             initComplete : function( settings, json){
                 $('[data-toggle="tooltip"]').tooltip();
-                var table = $('#table-monitoring-logs').DataTable();
+                var table = $('#table-send-logs').DataTable();
                 count_table =table.rows().count();
             },
             columnDefs: [
@@ -395,7 +395,7 @@ function data_table(){
         });
     }
 
-    $('#table-monitoring-logs').on('click', '.select-chk', function () {
+    $('#table-send-logs').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
 
             $('#btn_del_select').prop("disabled", false);
@@ -408,7 +408,7 @@ function data_table(){
         }
     });
 
-    $('#table-monitoring-logs').on('click', '.log_id', function () {
+    $('#table-send-logs').on('click', '.log_id', function () {
         if ($(this).is(':checked')) {
             $('#btn_del_select').prop("disabled", false);
 

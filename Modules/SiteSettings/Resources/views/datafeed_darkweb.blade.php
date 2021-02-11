@@ -32,8 +32,8 @@
                         </div>
 
                         <div class="ml-2 text-right">
-                            <div class="text-left" style="margin-top: 8px; min-width:270px;display:inline-block;">
-                                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
+                            <div class="text-left max-w-select" style="margin-top: 8px; display:inline-block;">
+                                <select name="site" id="site" class="select2-option form-control select-site">
                                     <option value="">All Site</option>
                                     @if($SiteSettings)
                                     @foreach($SiteSettings as $SiteSettings_val)
@@ -610,7 +610,7 @@ function table_social_data(){
         processing: true,
         serverSide: true,
         destroy: true,
-        "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+        "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
         ajax: {
             url: '{!! route('datafeed.darkweb_datatables') !!}',
             data: {

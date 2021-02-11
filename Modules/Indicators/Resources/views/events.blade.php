@@ -340,7 +340,8 @@ Highcharts.setOptions({
             }
         },
         legend: {
-            reversed: true
+            reversed: true,
+            itemMarginTop: 5,
         },
         plotOptions: {
             series: {
@@ -442,7 +443,7 @@ Highcharts.setOptions({
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',
@@ -559,7 +560,7 @@ Highcharts.setOptions({
             serverSide: true,
             destroy: true,
             order: [[ 6, "desc" ]],
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',

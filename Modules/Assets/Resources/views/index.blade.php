@@ -12,8 +12,8 @@
                     </div>
     
                     <div class="ml-2 text-right">
-                        <div class="text-left pull-left" style="min-width:270px;display:inline-block;">
-                            <select name="" id="select-site" class="select2-option select-site" style="min-width: 270px" onchange="changeSite(value)">
+                        <div class="text-left pull-left max-w-select">
+                            <select name="" id="select-site" class="select2-option select-site" onchange="changeSite(value)">
                                 <option value="">All Site</option>
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
@@ -710,7 +710,7 @@
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
             ajax: {
                 type: "POST",

@@ -11,8 +11,8 @@
             <a href="#hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
             </a>
-             <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px" onchange="changeSite()">
+             <div class="pull-right max-w-select" style="margin-top: 8px;">
+                <select name="site" id="site" class="select2-option form-control select-site" onchange="changeSite()">
                     <option value="">All Site</option>
                     @if($SiteSettings)
                         @foreach($SiteSettings as $SiteSettings_val)
@@ -239,7 +239,7 @@ function data_table(){
             serverSide: true,
             destroy: true,
             order: [[ 5, "desc" ], [ 0, "asc" ]],
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('monitoring.tableMonitor')!!}',

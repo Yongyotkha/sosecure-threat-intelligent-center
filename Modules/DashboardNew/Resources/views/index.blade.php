@@ -6,8 +6,8 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
             <div class="bc-head">Summary Dashboard</div>
-            <div style="margin-top: 8px; width: 270px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;"
+            <div class="max-w-select" style="margin-top: 8px;">
+                <select name="site" id="site" class="select2-option form-control select-site"
                     onchange="changeSite(value)">
                     <option value="0" selected>All Site</option>
                     @if ($site_settings)
@@ -214,11 +214,11 @@
             <hr>
             <section class="panel panel-default" style="margin-top: 5rem">
                 <header class="panel-heading font-bold panel-header-blue">
-                    <div class="row d-flex-center">
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12 m-b-xs-5">
                             <i class="fas fa-table"></i> Table Activities
                         </div>
-                        <div class="col-md-6 text-right">
+                        <div class="col-md-6 col-xs-12 text-right">
                             <div id="date-rang"
                                 style="color:#333;background: #efefef; cursor: pointer; padding: 1px 10px; border: 1px solid #ddd; display:inline-block;margin-right: 5px;margin-bottom:0;">
                                 <i class="fa fa-calendar"></i>&nbsp;
@@ -555,7 +555,7 @@ Highcharts.setOptions({
             processing: true,
             serverSide: false,
             destroy: true,
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('dashboardnew.table_dashboard')!!}',
@@ -1083,14 +1083,19 @@ Highcharts.setOptions({
                     }
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
-                            height: 223, 
-                            type: 'bar'
+                            type: 'bar',
                         },
                         title: {
                             text: null
                         },
                         xAxis: {
-                            categories: host_name
+                            categories: host_name,
+                            min: 0,
+                            max: 1,
+                            scrollbar: {
+                                enabled: true
+                            },
+                            tickLength: 0
                         },
                         yAxis: {
                             min: 0,
@@ -1098,11 +1103,10 @@ Highcharts.setOptions({
                             text: null
                             }
                         },
-                        scrollbar: {
-                            enabled: true
-                        },
                         legend: {
-                            reversed: true
+                            pointWidth: 30,
+                            reversed: true,
+                            itemMarginTop: 5,
                         },
                         plotOptions: {
                             series: {
