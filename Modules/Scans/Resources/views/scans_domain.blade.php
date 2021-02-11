@@ -17,7 +17,7 @@
                             <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset</button>
                         </div>
                         <div class="btn-group">
-                            <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i> @langapp('Search_Advance')</a>
+                            <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></a>
                         </div>
                         <div class="btn-group d-none">
                             <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
@@ -94,11 +94,11 @@
                         <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Assets To Use</button>
                     </div>
                     <div class="btn-group">
-                        <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i> @langapp('Search_Advance')</a>
+                        <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></a>
                     </div>
                     <div class="btn-group">
                         <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
-                            <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                            <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt') @langapp('delete')</span>
                         </button>
                     </div>
 

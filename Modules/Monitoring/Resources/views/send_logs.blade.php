@@ -6,7 +6,7 @@
             {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
             @icon('solid/arrow-left')
             </a> --}}
-            <div class="bc-head">@langapp('monitoring') > Logs</div>
+            <div class="bc-head">Logs</div>
             <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete"
                 disabled>
                 <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
