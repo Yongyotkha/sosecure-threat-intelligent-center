@@ -3792,3 +3792,10 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
     padding-right: 10px !important;
 }
 
+.details-news-elip{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+}
+
