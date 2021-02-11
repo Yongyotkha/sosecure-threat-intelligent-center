@@ -445,40 +445,9 @@
             $('.hide-fillter').toggle();
         });
         {{--data_table();--}}
-        $.when(data_table()).then(cookie_change_site());
+        $.when(data_table()).then(cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site));
         
     });
-
-    function cookie_change_site(){
-        if((get_cookie_site())&&({!!json_encode($Search_Link_All)!!}==='')){
-                let currentVal = $(`#${id_select_site} option:nth-child(2)`).val();
-                let firstCurrentVal = $(`#${id_select_site} option:nth-child(1)`).val();
-                let cookieVal = get_cookie_site();
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: '{{route('systemsetting.check_cookie_site')}}',
-                    type: "get",
-                    data: ({
-                        'currentVal':currentVal,
-                        'firstCurrentVal':firstCurrentVal,
-                        'cookieVal':cookieVal,
-                    }),
-                    datatype: "html",
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                }).done(function(data){
-                    console.log(data);
-                    $(`#${id_select_site}`).val(data.siteValue).trigger("change");
-                    loading('stop_load');
-                }).fail(function(jqXHR, ajaxOptions, thrownError){
-                    loading('stop_load');
-                    console.log("No response from server");
-                });
-            }
-    }
 
     var site_id = 0;
     $(function () {

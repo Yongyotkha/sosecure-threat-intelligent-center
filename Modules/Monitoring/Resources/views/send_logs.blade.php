@@ -160,6 +160,7 @@
 
 
 <script>
+    var id_select_site = 'site';
     var isDateSearch = 0;
     var isSearch = 0;
     var startDate =  '';
@@ -170,9 +171,12 @@
     var count_table = 0;
 $(function () {
     
+    if(get_cookie_site()){
+        cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+    }else{
+        data_table();
+    }
     
-    data_table();
-
     var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
     var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
     
@@ -245,6 +249,7 @@ function cb(start, end) {
 }
 
 function changeSite(){
+    set_cookie_site($(`#${id_select_site}`).val());
     isSearch = 1;
     sitecode = $("#site").val();
     data_table();
