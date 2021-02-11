@@ -453,7 +453,7 @@ class RSSFeedSettingsController extends Controller
                         
                     }
                     if($html=='None-delete0'){
-                        $html=str_replace('-delete0','', $html);
+                        $html = str_replace('-delete0','', $html);
                     }else{
                         $html = str_replace('None-delete0','', $html);
                     }
@@ -693,15 +693,30 @@ class RSSFeedSettingsController extends Controller
         // ->limit(10)
         // ->get();
 
-        $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
-        (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+        $model = $model
+        ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
+        ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
         where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
-        and fx_categories.active=1) as test
-        on fx_r_s_s_news.id = test.rssid
-        group by name_cat
-        order by categories_count desc
-        limit 10" ;
-        $model = DB::select( DB::raw($sql));
+        and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
+        function($join)
+        {
+           $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
+        })
+        ->groupBy('name_cat')
+        ->orderBy('categories_count', 'desc')
+        ->limit(10)
+        ->get();
+
+
+        // $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
+        // (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+        // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+        // and fx_categories.active=1) as test
+        // on fx_r_s_s_news.id = test.rssid
+        // group by name_cat
+        // order by categories_count desc
+        // limit 10" ;
+        // $model = DB::select( DB::raw($sql));
 
 
         $host = array();
@@ -709,7 +724,7 @@ class RSSFeedSettingsController extends Controller
         foreach($model as $key => $value){
 
             $host[] = array(
-                'name' => empty($value->name_cat)?'None':$value->name_cat,
+                'name' => empty($value->categories_name_)?'None':$value->categories_name_,
                 'y' => (int)$value->categories_count,
                 'color' => $color[$key] ,
             );
