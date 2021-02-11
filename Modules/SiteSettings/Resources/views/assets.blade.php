@@ -30,11 +30,11 @@
                     <div class="bc-head">Site Setting &gt; @langapp('assets')</div>
 
                     <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
+                        <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span></span>
                     </button>
 
                     <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
 
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"

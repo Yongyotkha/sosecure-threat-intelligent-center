@@ -24,18 +24,28 @@
 
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                    <div class="bc-head">Site Setting &gt; Domain</div>
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow" style="height: 47px;">
+                        <div class="fwb-16">
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
+                            <span style="margin-top: 2px">
+                                Site Setting &gt; Domain
+                            </span>
+                        </div>
+    
+                        <div class="ml-2 text-right">
+                        
+                            <a href="{{route('domain.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                                <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
+                                <span class="hide-text">@langapp('add')</span>
+                            </a>
+    
+                            <button type="button" onclick="delete_domain_select()" id="btn_del_select" class="btn btn-sm btn-danger"  disabled>
+                                <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                            </button>
 
-                    <button type="button" onclick="delete_domain_select()" id="btn_del_select" class="btn btn-sm btn-danger pull-right m-xs"  disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="right">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#add-domain">
-                        @icon('solid/plus') @langapp('create')
-                    </a> --}}
-
-                    <a href="{{route('domain.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right" data-toggle="ajaxModal">@icon('solid/plus') @langapp('add')</a>
+                        </div>     
+                    </div>
                 </header>
 
                 <section class="scrollable wrapper">

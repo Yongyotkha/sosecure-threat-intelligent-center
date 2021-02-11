@@ -14,19 +14,32 @@
         </aside>
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                    <div class="bc-head">Site Settings > Compromise Data </div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a> --}}
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt') @langapp('delete')</span>
-                    </button>
-                    <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                     </button>
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow" style="height: 47px;">
+                        <div class="fwb-16">
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
+                            <span style="margin-top: 2px">
+                                Site Settings > Compromise Data 
+                            </span>
+                        </div>
+    
+                        <div class="ml-2 text-right">
+                        
+                            <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
+                                value="bulk-delete" disabled>
+                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                            </button>
+
+                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                            </a>
+    
+                          
+
+                        </div>     
+                    </div>
                 </header>
+
                 <section class="scrollable wrapper">
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
                         <header class="panel-heading font-bold panel-header-blue">
