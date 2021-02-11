@@ -1,8 +1,11 @@
 @extends('layouts.public')
 @section('image','{{@$RSSNews->logo}}')
-@section('title','   {!!@$RSSNews_name!!}')
+@section('title','{!!@$RSSNews_name!!}')
 @section('description','{!!@$RSSNews_detail!!}')
 @section('content')
+@php 
+    // dd($RSSNews_name);
+@endphp
 <section id="content" class="bg">
     <section class="vbox">
         <div class="section-jumborton">
@@ -43,7 +46,8 @@
                             <div class="menu-shared-main <!--d-none-->">
                                 <ul class="menu-shared">
                                     <li>
-                                        <a href="javascript:void(0)" id="share_facebook" target="_blank">
+                                        <a href="javascript:void(0)" id="share_facebook" target="_blank"
+                                            onclick="shared_news('{!!@$RSSNews_name!!}','{{route('news.public_detail_select', ['code' => @$RSSNews->code , 'lang' => $lang])}}')">
                                             <i class="fab fa-facebook-f icon-sc face"></i>
                                         </a>
                                     </li>
@@ -160,6 +164,7 @@
     });
 
     function shared_news(name,url) {
+        console.log(name);
         $("meta[property='og:title']").attr("content",name);
         $("meta[property='og:url']").attr("content",url);
 
