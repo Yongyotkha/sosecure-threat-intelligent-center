@@ -309,4 +309,82 @@ class MonitoringController extends Controller
         );
     }
 
+    public function send_logs(){
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }
+        $data['SiteSettings'] = $SiteSettings;
+        $data['page'] = langapp('send_logs');
+        return view('monitoring::send_logs')->with($data);
+    }
+
+    public function table_send_logs(Request $request)
+    {
+        
+        $model = '';
+        $html = '';
+
+        if ($request->isSearch == 1) {
+            $model = MonitorLogs::select('site.name as site_id', 'logs.id as logs','logs.file',
+            'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at');
+            if($request->isDateSearch==1){
+                $date_start_explode = explode(" ",$request->startDate);
+                $date_start_date = @$date_start_explode[0];
+                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // dd($date_start_time);
+                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // dd($date_start_date_format);
+                $date_start_time_time = date("H:i", strtotime($date_start_time));
+                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // dd($date_start_time_time);
+
+                $date_end_explode = explode(" ",$request->endDate);
+                $date_end_date = @$date_end_explode[0];
+                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // dd($date_end_time);
+                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                $date_end_time_time = date("H:i", strtotime($date_end_time));
+                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                $model = $model -> whereBetween('logs.updated_at',array($date_start_datetime_format,$date_end_datetime_format));
+            }
+
+            if($request->Keywords){
+                
+                $keywords = "%". str_replace(array('\\', '"','\''), '\\\\', $request->Keywords)."%";
+                $model = $model->where(function ($query) use ($keywords){
+                    $query->where('logs.file','LIKE', $keywords)
+                    ->orWhere('logs.error_summary', 'LIKE', $keywords)
+                    ->orWhere('logs.log_trace', 'LIKE', $keywords);
+                });
+            }
+
+            if($request->sitecode){
+                $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$request->sitecode)->first();
+                $model = $model->where('site_id', $SiteSettings->id);
+            }
+
+            $model = $model->leftjoin('site', 'logs.site_id', '=', 'site.id');
+          
+            
+        }else{
+            $model = MonitorLogs::select('site.name as site_id','logs.id as logs','logs.file',
+            'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at')
+            ->leftjoin('site', 'logs.site_id', '=', 'site.id');
+        }
+        
+        return DataTables::of($model)->toJson();
+    }
+
 }
