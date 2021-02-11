@@ -29,9 +29,11 @@
             <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 <div class="header-flex-overflow" style="height: 47px;">
                     <div class="fwb-16">
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
-                        @endif 
+                        @if(TYPE_WEB == 'center')
+                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
+                            @endif 
+                        @endif
                         <span style="margin-top: 2px">
                             Compromise Data
                         </span>
@@ -53,11 +55,13 @@
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
                             // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                        <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                            class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                Feed</span></a>
-                        @endif
+                            @if(TYPE_WEB == 'center')
+                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                    <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
+                                        class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
+                                            Feed</span></a>
+                                @endif
+                            @endif
                         @endif
 
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">

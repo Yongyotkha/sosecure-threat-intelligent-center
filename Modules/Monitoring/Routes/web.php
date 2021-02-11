@@ -22,5 +22,7 @@ Route::group(
         Route::get('/monitor_logs', 'MonitoringController@monitor_logs')->name('monitoring.monitor_logs')->middleware('can:menu_items');
         Route::post('/table_monitor_logs', 'MonitoringController@table_monitor_logs')->name('monitoring.table_monitor_logs')->middleware('can:menu_items');
         Route::post('/delete_logs', 'MonitoringController@delete_logs')->name('monitoring.delete_logs')->middleware('can:menu_items');
+        Route::get('/send_logs', 'MonitoringController@send_logs')->name('monitoring.send_logs')->middleware('can:menu_items');
+        Route::post('/table_send_logs', 'MonitoringController@table_send_logs')->name('monitoring.table_send_logs')->middleware('can:menu_items');
     }
 );
