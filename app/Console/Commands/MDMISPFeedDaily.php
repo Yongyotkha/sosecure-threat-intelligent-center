@@ -48,7 +48,7 @@ class MDMISPFeedDaily extends Command
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_event_stamp;
+        $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_event_stamp;
         $ins_fx_transaction_otx_event_stamp = $col_fx_transaction_otx_event_stamp->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date("Y-m-d"),
@@ -60,7 +60,7 @@ class MDMISPFeedDaily extends Command
             'deleted_at' => null,
             'source' => "misp",
         ]);
-        $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_indicator_stamp;
+        $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicator_stamp;
         $ins_fx_transaction_otx_indicator_stamp = $col_fx_transaction_otx_indicator_stamp->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date("Y-m-d"),
@@ -240,7 +240,7 @@ class MDMISPFeedDaily extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_atest->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $tlpcolor = null;
         $tags = null;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
@@ -298,8 +298,8 @@ class MDMISPFeedDaily extends Command
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $data["all"] = 0;
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_atest->fx_otx_events;
-        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_atest->fx_otx_events_event_ref;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
 
         if (!empty($valueEvent["RelatedEvent"])) {
             foreach ($valueEvent["RelatedEvent"] as $key => $value) {
@@ -370,10 +370,10 @@ class MDMISPFeedDaily extends Command
     {
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_atest->fx_otx_indicator_detail;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_atest->fx_otx_events_indicator_ref;
-        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_atest->fx_transaction_otx_indicators_data;
-        $col_fx_otx_type = $clientMD->sosecure_threatintelligent_atest->fx_otx_type;
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+        $col_fx_otx_type = $clientMD->sosecure_threatintelligent->fx_otx_type;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $data["all"] = 0;
         $data["byType"] = array();
