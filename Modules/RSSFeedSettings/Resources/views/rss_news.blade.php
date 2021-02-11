@@ -40,8 +40,9 @@
         <aside>
             <section class="vbox">
 
-                <header class="header panel-heading bg-white b-b b-light">
-                    <div class="header-flex-overflow" style="height: 46px;">
+                
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow m-t-10">
                         <div class="fwb-16">
                             <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</button>
                             <span>
@@ -50,7 +51,6 @@
                         </div>
         
                         <div class="ml-2 text-right">
-                            
                             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                                 {{-- <button type="button" class="btn btn-secondary">1</button>
                                 <button type="button" class="btn btn-secondary">2</button> --}}
@@ -93,10 +93,10 @@
                                 class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                             </a>
-    
                         </div>
                     </div>
                 </header>
+
 
        
 
