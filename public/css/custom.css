@@ -3357,9 +3357,9 @@ input.input-login:focus {
 }
 
 .ev-right > span:first-child{
-    font-size: 18px;
+    font-size: 27px;
     font-weight: 700;
-    height: 30px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
