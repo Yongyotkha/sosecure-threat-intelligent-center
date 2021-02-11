@@ -55,11 +55,12 @@
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
                             // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(TYPE_WEB == 'center')
-                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
-                                <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                                    class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                        Feed</span></a>
+                            @if(TYPE_WEB == 'center')
+                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                    <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
+                                        class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
+                                            Feed</span></a>
+                                @endif
                             @endif
                         @endif
 

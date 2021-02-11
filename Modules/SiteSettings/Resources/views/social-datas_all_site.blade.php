@@ -47,9 +47,10 @@
                             @if(!empty(get_role_custom()))
                             {{-- // var_dump(get_role_custom()['superadmin']);
                                 // var_dump(get_role_custom()['site_admin']); --}}
-                            @if(TYPE_WEB == 'center')
-                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
-                                    <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info  m-xs"><span> Dataleak Feed</span></a>
+                                @if(TYPE_WEB == 'center')
+                                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info  m-xs"><span> Dataleak Feed</span></a>
+                                    @endif
                                 @endif
                             @endif
     
