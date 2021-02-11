@@ -174,6 +174,15 @@
                                 </div>
                              </div>
                              <div class="col-lg-1">
+                                <label class="control-label">Send Mail </label>
+                                <div >
+                                    <label class="switch">
+                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <span></span>
+                                    </label>
+                                </div>
+                             </div>
+                             <div class="col-lg-1">
                                 <label class="control-label">Status </label>
                                 <div>
                                     <label class="switch">
@@ -185,16 +194,7 @@
                                                 $checked_val = 'checked';
                                             }
                                         @endphp --}}
-                                        <input type="checkbox" name="status" value="TRUE">
-                                        <span></span>
-                                    </label>
-                                </div>
-                             </div>
-                             <div class="col-lg-1">
-                                <label class="control-label">Send Mail </label>
-                                <div >
-                                    <label class="switch">
-                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <input type="checkbox" name="status" checked value="TRUE">
                                         <span></span>
                                     </label>
                                 </div>
@@ -206,7 +206,7 @@
                  <div class="modal-footer">
                     {!! closeModalButton() !!}
                     <button type="submit" class="btn btn-warning formDraft btn-rounded"><i class="fas fa-save"></i> SaveDraft</button>
-                    <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
+                    <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i class="fas fa-paper-plane"></i> Save Public</button>
                     {{-- {!! renderAjaxButton() !!} --}}
                     {!! Form::close() !!}
                     {{-- <form action="{{ route('rssfeedsettings.rss_data_preview_news') }}" method="post" target="_blank">
