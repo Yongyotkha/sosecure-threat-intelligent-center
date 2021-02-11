@@ -496,7 +496,7 @@ function change_status(code) {
     }  
     var del_val = [];
     $("#btn_del_select").click(function() {
-        del_val[];
+        del_val = [];
         $('#delete_socail_data_modal').modal('show');
         $('.data_feed_id:checked').each(function () {
             del_val.push(this.value);

@@ -764,6 +764,7 @@ active_btn('#groupby-type .btn-grey');
     });
 
     $("#btn-change-status").click(function() {
+        social_id = [];
         $('.social_id:checked').each(function () {
             social_id.push(this.value);
             
