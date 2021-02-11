@@ -1,5 +1,7 @@
 @extends('layouts.public')
 @section('image','{{@$RSSNews->logo}}')
+@section('title','   {!!@$RSSNews_name!!}')
+@section('description','{!!@$RSSNews_detail!!}')
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
@@ -34,7 +36,7 @@
                     <div class="shared-news">
                         <div class="pos-rlt">
                             <button class="btn-shared"
-                                onclick="shared_news('{{route('news.public_detail_select', ['code' => @$RSSNews->code , 'lang' => $lang])}}')"
+                                onclick="shared_news('{!!@$RSSNews_name!!}','{{route('news.public_detail_select', ['code' => @$RSSNews->code , 'lang' => $lang])}}')"
                                 data-toggle="tooltip" data-placement="top" data-original-title="Shared">
                                 <i class="fas fa-share-square"></i>
                             </button>
@@ -47,7 +49,7 @@
                                     </li>
                                     <li>
                                         <a href="javascript:void(0)" id="share_line" target="_blank"
-                                            onclick="shared_news('{{route('news.public_detail_select', ['code' => @$RSSNews->code , 'lang' => $lang])}}')">
+                                            onclick="shared_news('{!!@$RSSNews_name!!}','{{route('news.public_detail_select', ['code' => @$RSSNews->code , 'lang' => $lang])}}')">
                                             <i class="fab fa-line icon-sc line"></i>
                                         </a>
                                     </li>
@@ -157,9 +159,9 @@
         $('.menu-shared').addClass('open-shared');
     });
 
-    function shared_news(url) {
-        $("meta[property='og:title']").attr("content",'');
-        $("meta[property='og:url']").attr("content",'test');
+    function shared_news(name,url) {
+        $("meta[property='og:title']").attr("content",name);
+        $("meta[property='og:url']").attr("content",url);
 
         $("#share_facebook").attr("onClick","js_popup('https://www.facebook.com/sharer.php?u="+url+"',783,600); return false;");
         $("#share_line").attr("onClick","js_popup('https://social-plugins.line.me/lineit/share?url="+url+"',783,600); return false;");

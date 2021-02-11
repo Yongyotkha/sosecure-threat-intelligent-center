@@ -17,9 +17,7 @@
                 </section>
             </section>
         </aside>
-        <aside>
             <section class="vbox">
-
                 <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                     <div class="header-flex-overflow m-t-5">
                         <div class="fwb-16">
@@ -34,8 +32,7 @@
                         <div class="ml-2 text-right">
                      
                             <div class="text-left" style="margin-right:5px;min-width: 270px;display:inline-block;">
-                                <select name="site" id="site" class="text-left select2-option form-control select-site"
-                                    style="min-width: 270px">
+                                <select name="site" id="site" class="text-left select2-option form-control select-site">
                                     <option value="">All Site</option>
                                     @if($SiteSettings)
                                     @foreach($SiteSettings as $SiteSettings_val)
@@ -286,7 +283,6 @@
                     </section>
                 </section>
             </section>
-        </aside>
     </section>
 
     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)

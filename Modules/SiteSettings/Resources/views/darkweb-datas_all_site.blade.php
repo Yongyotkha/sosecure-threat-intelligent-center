@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
-
+<section id="content" class="bg">
+    
 @php
 // dd(get_role_custom());
 // dd($site_admin);
@@ -8,8 +9,6 @@
 // dd(get_role_custom()['site_admin']);
 
 @endphp
-
-<section id="content" class="bg">
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
@@ -26,282 +25,279 @@
                 </section>
             </section>
         </aside>
-        <aside>
-            <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow" style="height: 47px;">
-                        <div class="fwb-16">
-                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
-                            @endif 
-                            <span style="margin-top: 2px">
-                                Compromise Data
-                            </span>
-                        </div>
-
-                        <div class="ml-2 text-right">
-                     
-                            <div class="text-left" style="margin-top: 8px; min-width:270px;display:inline-block;">
-                                <select name="site" id="site" class="text-left select2-option form-control select-site"
-                                    style="min-width:270px">
-                                    <option value="" selected="selected">All Site</option>
-                                    @if($SiteSettings)
-                                    @foreach($SiteSettings as $SiteSettings_val)
-                                    <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                                    @endforeach
-                                    @endif
-                                </select>
-                            </div>
-    
-                            @if(!empty(get_role_custom()))
-                            {{-- // var_dump(get_role_custom()['superadmin']);
-                                // var_dump(get_role_custom()['site_admin']); --}}
-                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                                class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                    Feed</span></a>
-                            @endif
-                            @endif
-    
-                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                            </a>
-        
-                     
-        
-                            <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  "
-                                value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                                    @langapp('delete')</span>
-                            </button>
-    
-                     
-                        </div>
-
-                        
+        <section class="vbox">
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow" style="height: 47px;">
+                    <div class="fwb-16">
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" >@icon('solid/bars')</a>
+                        @endif 
+                        <span style="margin-top: 2px">
+                            Compromise Data
+                        </span>
                     </div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
-                    data-rel="tooltip" title="@langapp('export') CSV">
-                    @icon('solid/download') CSV
-                    </a> --}}
-                </header>
-                
-                <section class="scrollable wrapper">
 
-                    <div class="container-fluid" style="margin-bottom:10px;">
+                    <div class="ml-2 text-right">
+                    
+                        <div class="text-left" style="margin-top: 8px; min-width:270px;display:inline-block;">
+                            <select name="site" id="site" class="text-left select2-option form-control select-site">
+                                <option value="" selected="selected">All Site</option>
+                                @if($SiteSettings)
+                                @foreach($SiteSettings as $SiteSettings_val)
+                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+                        </div>
+
+                        @if(!empty(get_role_custom()))
+                        {{-- // var_dump(get_role_custom()['superadmin']);
+                            // var_dump(get_role_custom()['site_admin']); --}}
+                        @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
+                        <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
+                            class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
+                                Feed</span></a>
+                        @endif
+                        @endif
+
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                        </a>
+    
+                    
+    
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  "
+                            value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
+                                @langapp('delete')</span>
+                        </button>
+
+                    
+                    </div>
+
+                    
+                </div>
+                {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
+                data-rel="tooltip" title="@langapp('export') CSV">
+                @icon('solid/download') CSV
+                </a> --}}
+            </header>
+            
+            <section class="scrollable wrapper">
+
+                <div class="container-fluid" style="margin-bottom:10px;">
+                    <div class="row">
+                        <div class="col-md-4 nopadding">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                    </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                    <span class="number-card warning" id='compromise-count'>0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                    </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                    <span class="number-card info" id='darkweb-count'>0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/webserver.png')}}" alt="">
+                                    </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Web Server</h3>
+                                    <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                    <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
-                            <div class="col-md-4 nopadding">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/icebergline2.png')}}" alt="">
-                                        </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
-                                        <span class="number-card warning" id='compromise-count'>0</span>
+                            <div class="col-md-12">
+                                <i class="fas fa-filter"></i> Filter
+                            </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid" style="padding: 2rem;">
+                            <div class="row">
+
+                                {{-- <div class="col-md-4 mb-1">
+                                    <h5 class="font-weight-bold">Source</h5>
+                                    <select id="source" class="select2-option form-control">
+                                        <option value="">All</option>
+                                        <option value="compromise">Public</option>
+                                        <option value="darkweb">Darkweb</option>
+                                        <option value="webserver">Webserver</option>
+                                        <option value="server">Server</option>
+                                    </select>
+                                </div> --}}
+
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Content</h5>
+                                    <input type="text" id="keyword" class="form-control">
+                                </div>
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Date</h5>
+                                    <div id="social_datas_date" class="form-control text-center"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Type</h5>
+                                    <div id="groupby-type" class="btn-group special">
+                                        <button id="all" class="btn btn-grey active" value="">
+                                            <span> All</span>
+                                        </button>
+                                        <button class="btn btn-grey" value="public">
+                                            <span> Public </span>
+                                        </button>
+                                        <button class="btn btn-grey" value="darkweb">
+                                            <span> Dark Web </span>
+                                        </button>
+                                        <button class="btn btn-grey" value="webserver">
+                                            <span> Web Server </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4 nopadding">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/icebergline1.png')}}" alt="">
-                                        </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
-                                        <span class="number-card info" id='darkweb-count'>0</span>
+                            <div class="row">
+                                {{-- <div class="col-lg-4">
+                                    <div class="row d-flex align-items-center">
+                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Site</label>
+                                        <div class="col-sm-9 col-xs-12">
+                                            <select id="site" class="select2-option form-control">
+                                                <option value="" selected>All</option>
+                                                @if ($site)
+
+                                                @foreach ($site as $data)
+                                                <option value="{{$data->id}}">{{$data->name}}
+                                        </option>
+                                        @endforeach
+
+                                        @endif
+                                        </select>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 nopadding">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/webserver.png')}}" alt="">
-                                        </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper ">Web Server</h3>
-                                        <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>
-
-                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <i class="fas fa-filter"></i> Filter
-                                </div>
-                        </header>
-                        <div class="panel-body" style="padding: 0 !important">
-                            <div class="container-fluid" style="padding: 2rem;">
-                                <div class="row">
-
-                                   {{-- <div class="col-md-4 mb-1">
-                                        <h5 class="font-weight-bold">Source</h5>
-                                        <select id="source" class="select2-option form-control">
-                                            <option value="">All</option>
-                                            <option value="compromise">Public</option>
-                                            <option value="darkweb">Darkweb</option>
-                                            <option value="webserver">Webserver</option>
-                                            <option value="server">Server</option>
-                                        </select>
-                                    </div> --}}
-
-                                    <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Content</h5>
-                                        <input type="text" id="keyword" class="form-control">
-                                    </div>
-                                    <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Date</h5>
-                                        <div id="social_datas_date" class="form-control text-center"
-                                            style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                            <i class="fa fa-calendar"></i>&nbsp;
-                                            <span></span> <i class="fa fa-caret-down"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 mb-1">
-                                        <h5 class="font-weight-bold">Type</h5>
-                                        <div id="groupby-type" class="btn-group special">
-                                            <button id="all" class="btn btn-grey active" value="">
-                                                <span> All</span>
-                                            </button>
-                                            <button class="btn btn-grey" value="public">
-                                                <span> Public </span>
-                                            </button>
-                                            <button class="btn btn-grey" value="darkweb">
-                                                <span> Dark Web </span>
-                                            </button>
-                                            <button class="btn btn-grey" value="webserver">
-                                                <span> Web Server </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    {{-- <div class="col-lg-4">
-                                        <div class="row d-flex align-items-center">
-                                            <label for="" class="col-sm-3 col-xs-12 col-form-label">Site</label>
-                                            <div class="col-sm-9 col-xs-12">
-                                                <select id="site" class="select2-option form-control">
-                                                    <option value="" selected>All</option>
-                                                    @if ($site)
-
-                                                    @foreach ($site as $data)
-                                                    <option value="{{$data->id}}">{{$data->name}}
-                                            </option>
-                                            @endforeach
-
-                                            @endif
-                                            </select>
-                                        </div>
-                                        </div>
-                                    </div> --}}
-                                </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                    onclick="search()">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="social_reset2" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
                             </div>
                         </div>
-                        <div class="panel-footer">
-                            <div class="row">
-                                <div class="col-lg-12 text-right">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
-                                        onclick="search()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="social_reset2" class="btn btn-default btn-responsive btn-fz-13"
-                                        style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13"
-                                        style="white-space: nowrap">
-                                        <i class="fas fa-times"></i>
-                                        <span> Close </span>
-                                    </button>
-                                </div>
+                    </div>
+                </section>
+
+
+                
+
+                <section class="panel panel-default">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Compromise Data
                             </div>
                         </div>
-                    </section>
+                    </header>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table_social_datas">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort w-10">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                    class="select-chk" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th>Site</th>
+                                        <th>Type</th>
 
-
-                  
-
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Compromise Data
-                                </div>
-                            </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table_social_datas">
-                                    <thead>
-                                        <tr>
-                                            <th class="no-sort w-10">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox"
-                                                        class="select-chk" />
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th>
-                                            <th>Site</th>
-                                            <th>Type</th>
-
-                                            <th>Keyword Ref</th>
-                                            <th>Content</th>
-                                            <th>Remark</th>
-                                            <th>Data Feed</th>
-                                            <th>View</th>
-                                            <th>Status</th>
-                                            <th>@langapp('action')</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{-- <tr>
-                                            <td>
-                                                <label>
-                                                    <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                Pantip
-                                            </td>
-                                            <td>
-                                                Fibre
-                                            </td>
-                                            <td>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                            </td>
-                                            <td class="no-wrap">
-                                                2020-12-2020 12:12
-                                            </td>
-                                            <td>
-                                                1
-                                            </td>
-                                            <td>
-                                                <label class="switch">
-                                                    <input type="hidden" value="FALSE" name="">
-                                                    <input type="checkbox" name="status" checked value="TRUE">
-                                                    <span></span>
-                                                </label>
-                                            </td>
-                                            <td class="no-wrap text-center">
-                                                <button class="btn btn-danger btn-xs">
-                                                    @icon('solid/trash-alt')
-                                                </button>
-                                            </td>
-                                        </tr> --}}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        <th>Keyword Ref</th>
+                                        <th>Content</th>
+                                        <th>Remark</th>
+                                        <th>Data Feed</th>
+                                        <th>View</th>
+                                        <th>Status</th>
+                                        <th>@langapp('action')</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- <tr>
+                                        <td>
+                                            <label>
+                                                <input name="select_all" value="1" type="checkbox" class="select-chk"/>
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            Pantip
+                                        </td>
+                                        <td>
+                                            Fibre
+                                        </td>
+                                        <td>
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
+                                        </td>
+                                        <td class="no-wrap">
+                                            2020-12-2020 12:12
+                                        </td>
+                                        <td>
+                                            1
+                                        </td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="hidden" value="FALSE" name="">
+                                                <input type="checkbox" name="status" checked value="TRUE">
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                        <td class="no-wrap text-center">
+                                            <button class="btn btn-danger btn-xs">
+                                                @icon('solid/trash-alt')
+                                            </button>
+                                        </td>
+                                    </tr> --}}
+                                </tbody>
+                            </table>
                         </div>
-                    </section>
+                    </div>
                 </section>
             </section>
-        </aside>
+        </section>
     </section>
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

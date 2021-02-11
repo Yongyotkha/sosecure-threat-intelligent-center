@@ -3,7 +3,6 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         <section class="vbox">
-
             <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 <div class="header-flex-overflow m-t-10">
                     <div class="fwb-16">
@@ -372,7 +371,7 @@
 
 
         <!-- Modal Scans -->
-        <div class="modal in fixed-left" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal in fixed-left" id="asset_to_use" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside size-half-50" role="document">
             <div class="modal-content">

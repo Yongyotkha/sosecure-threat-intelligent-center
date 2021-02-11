@@ -78,8 +78,9 @@ class AuthController extends ApiController
                     $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
                     // $Menu_permission_site = Menu_permission_site::all();
                     $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
+                    $permission_custom = @check_permission_site_custom();
 
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site]);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom]);
                     // return response()->json(['message' => 'Successful', 
                     //                             'error' => '', 
                     //                             'status_code' => '200', 

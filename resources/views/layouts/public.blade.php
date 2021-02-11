@@ -4,8 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="mtsc.co.th">
     <meta name="keywords" content="">
-    <meta name="description" content="">
-    
+    <meta property="og:title" name="title" content="@yield('title')">
+    <meta property="og:description"  name="description" content="@yield('description')">
     <meta property="og:url" content="@yield('url_share')">
     <meta property="og:image" content="@yield('image')">
 
