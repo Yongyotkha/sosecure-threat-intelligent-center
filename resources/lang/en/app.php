@@ -972,6 +972,7 @@ return [
     'last_online'                                => 'Last Online',
     'link'                                       => 'Link',
     'logs'                                       => 'Logs',
+    'application_logs'                           => 'Application logs',
     'send_logs'                                  => 'Send logs',
     'delete_all'                                 => 'Delete All',
     'remark'                                     => 'Remark',
