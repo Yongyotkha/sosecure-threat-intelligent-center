@@ -223,20 +223,21 @@ class OTXMDFeedPulse extends Command
                         ['upsert' => true]
                     );
                     if(isset($value["id"])){
+                        
+                        
                         echo "Indi : ".$value["id"];
                         $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
                         $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
-                        //$checkSuccessDummy = true;
+                        $this->countAttr($value["id"],$clientMD);
                         if(!$checkSuccessDummy){
                             $checkSuccess = false;
                         }
                         echo "  Pulse : ".$value["id"];
                         $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
-                        //$checkSuccessDummy = true;
                         if(!$checkSuccessDummy){
                             $checkSuccess = false;
                         }
-                        $this->countAttr($value["id"]);
+                        
 
                         $this->info("--END--");
 
@@ -252,7 +253,7 @@ class OTXMDFeedPulse extends Command
         return $dataOut;
     }
 
-    public function countAttr($pulseID_){
+    public function countAttr($pulseID_,$clientMD){
         $pulseID = $pulseID_."";
         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
@@ -267,6 +268,7 @@ class OTXMDFeedPulse extends Command
         ];
         $find_col_fx_otx_events_indicator_ref_2 = $col_fx_otx_events_indicator_ref->count($query2);
         if($find_col_fx_otx_events_indicator_ref_2==$findOne_col_fx_otx_events["indicator_count"]){
+            
             //count corrrect
             $query = [
                 '$and' =>   
@@ -299,13 +301,14 @@ class OTXMDFeedPulse extends Command
                     ],
                 ]
             );
-
+            
             $col_fx_otx_events_indicator_ref->updateMany(
                 $query,
                 array('$set' => array("is_count_attr" => 1))
             );
         }else{
             //count false
+            
             $query = [
                 'pulse_id' => $pulseID
             ];
@@ -334,7 +337,7 @@ class OTXMDFeedPulse extends Command
                     ],
                 ]
             );
-
+            
             $col_fx_otx_events_indicator_ref->updateMany(
                 $query,
                 array('$set' => array("is_count_attr" => 1))
@@ -478,14 +481,7 @@ class OTXMDFeedPulse extends Command
             $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100', $urlLimit);
             if ($reconCall["success"]) {
                 $otxFeedData = json_decode($reconCall["result"], true);
-                $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                        [   'pulse_id' => isset($pulseID) ? $pulseID : ""
-                        ],
-                        [   '$set' => [
-                                'count_related_pulse' => isset($otxFeedData["count"]) ? $otxFeedData["count"] : 0
-                            ],
-                        ]
-                );
+                
             } else {
                 $otxFeedDataCheck = false;
                 $otxSuccessCheck = false;
@@ -597,6 +593,20 @@ class OTXMDFeedPulse extends Command
                     $otxFeedDataCheck = false;
                 }
             }
+
+            $query = [
+                'main_pulse_id' => isset($pulseID) ? $pulseID : ""
+            ];
+            $find_col_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->count($query);
+            $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                [   
+                    'pulse_id' => isset($pulseID) ? $pulseID : ""
+                ],
+                [   '$set' => [
+                        'count_related_pulse' => $find_col_fx_otx_events_event_ref
+                    ],
+                ]
+            );
         } catch (Exception $e) {
             $otxSuccessCheck = false;
         }
