@@ -58,22 +58,24 @@
                             @if(TYPE_WEB == 'center')
                                 @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                                     <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                                        class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                            Feed</span></a>
+                                        class="btn btn-sm btn-info  m-xs">
+                                        <span data-rel="tooltip" title="Compromise Feed" data-placement="bottom"><i class="fas fa-rss"></i> 
+                                            <span class="hide-text">
+                                                CompromiseFeed
+                                            </span>
+                                        </span>
+                                    </a>
                                 @endif
                             @endif
                         @endif
 
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
-    
-                    
-    
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  "
+
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
-                            <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                                @langapp('delete')</span>
+                            <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
                         </button>
 
                     

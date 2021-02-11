@@ -9,15 +9,14 @@
             <div class="bc-head">@langapp('monitoring') > Logs</div>
             <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete"
                 disabled>
-                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                    @langapp('delete')</span>
+                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
+                    <span class="hide-text">@langapp('delete')</span></span>
             </button>
-            <a href="#hide-advance-search" id="advance-search"
-                class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
             </a>
-            <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px"
+            <div class="pull-right max-w-select" style="margin-top: 8px;">
+                <select name="site" id="site" class="select2-option form-control select-site"
                     onchange="changeSite()">
                     <option value="">All Site</option>
                     @if($SiteSettings)

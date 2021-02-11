@@ -54,9 +54,9 @@
                                 Change Status
                             </button>
 
-                            <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                             </button>
+                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                            </a>
                         </div>
                     </div>
                 </header>

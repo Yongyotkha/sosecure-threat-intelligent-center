@@ -24,10 +24,9 @@
                         </select>
                     </div>
 
-                    <button id="advance-search" href="#hide-advance-search"
-                        class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
-                        <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </button>
+                    <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
+                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                    </a>
 
                     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                     <a href="#" id="btn_md_create"

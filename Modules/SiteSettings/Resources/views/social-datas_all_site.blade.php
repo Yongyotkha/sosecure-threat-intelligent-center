@@ -54,14 +54,15 @@
                                 @endif
                             @endif
     
-                            <a href="#" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
     
                             <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs"
                                 value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                                    @langapp('delete')</span>
+                                <span data-rel="tooltip" title="Delete" data-placement="bottom">
+                                    @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
+                                </span>
                             </button>
                         </div>
                     </div>

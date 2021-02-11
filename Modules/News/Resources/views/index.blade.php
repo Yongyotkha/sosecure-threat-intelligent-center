@@ -27,7 +27,7 @@
                         </div>
     
                         <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
 
                     </div>

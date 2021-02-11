@@ -75,23 +75,21 @@
 
                             <a id="btn_client_view" href="{{site_url('/news_client')}}"
                                 class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-eye"></i> Site View</span>
+                                <span data-rel="tooltip" title="Site View" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text"> Site View</span></span>
                             </a>
 
                             <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
                                 class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-cog icon"><b class="bg-info"></b></i></span>
+                                <span data-rel="tooltip" title="Setting" data-placement="bottom"><i class="fas fa-cog icon"></i></span>
                             </a>
         
         
-                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"
-                                value="bulk-delete" disabled>
-                                <span>@icon('solid/trash-alt') @langapp('delete')</span>
+                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
+                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
                             </button>
         
-                            <a id="advance-search" href="#hide-advance-search"
-                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
                         </div>
                     </div>

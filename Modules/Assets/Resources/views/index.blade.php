@@ -26,20 +26,18 @@
                         @if(TYPE_WEB=='center')
                             <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
                             </a>
                             <input type="hidden" value="" id="site_code">
                         @else
                             <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
                             <input type="hidden" value="{{ @$SiteSettings[0]->code }}" id="site_code">
                         @endif
                         
 
                         <div class="button-control d-none">
-
-        
                             <div class="btn-group d-none">
                                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
                             </div>

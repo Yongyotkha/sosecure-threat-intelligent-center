@@ -3790,6 +3790,9 @@ textarea.form-control{
     .btn-group.special button.btn {
         font-size: 9px !important;
     }
+    .hide-text{
+        display: none !important;
+    }
 }
 
 div.dataTables_paginate li.first > a, div.dataTables_paginate li.previous > a {
