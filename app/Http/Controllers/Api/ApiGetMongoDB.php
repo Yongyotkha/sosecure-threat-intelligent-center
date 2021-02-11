@@ -936,6 +936,7 @@ class ApiGetMongoDB extends ApiController
                 $f_search = $data['data']['f_search'];
                 $site_code = $data['data']['site_code'];
                 $user_id = $data['data']['user_id'];
+                $page = $data['data']['page'];
                 $url = $data['data']['url'];
 
                 $site_id = '';
@@ -1062,7 +1063,9 @@ class ApiGetMongoDB extends ApiController
                     // dd($news);
                     // dd($news->total);
                     $news_all = $news->count();
-                    $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
+                    // $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
+                    
+                    $news = $news->orderBy('created_at','desc')->skip($page == 2 ? $page * 10 : 0)->take(PAGINATE_NUM)->get();
                 }else{
                     $news = RSSNews::where(function ($query) {
                         $query->where('save_draft',  0)
@@ -1077,7 +1080,8 @@ class ApiGetMongoDB extends ApiController
                         });
                     }
                     $news_all = $news->count();
-                    $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
+                    // $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
+                    $news = $news->orderBy('created_at','desc')->skip($page == 2 ? $page * 10 : 0)->take(PAGINATE_NUM)->get();
                 }
     
                 // dd($news);
@@ -1173,12 +1177,12 @@ class ApiGetMongoDB extends ApiController
                         </div>-->
                         <div class="content-news-text">
                             <a href="'.$url.'/news/detail/'.$item -> code.'">
-                                <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
+                                <span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                             </a>
                             <div class="entry-meta">
                             <span class="entry-view"> <i class="fas fa-eye"></i> '.$item -> view.'</span>
                             <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
-                            <span><p>&nbsp;'.strip_tags($n_detail).'</p></span>
+                            <span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
                             </div>
                         </div>
                         <div class="content-news-image">
@@ -1200,6 +1204,163 @@ class ApiGetMongoDB extends ApiController
                     "html" => $html,
                     "count" => $news_all
                 ];
+                $data_transcation = json_encode($dataOut);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function url_bookmark(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $user_id = $data['data']['user_id'];
+                $news_id = $data['data']['news_id'];
+
+                $checkBookmark = Bookmark::where('user_id', $user_id)->where('news_id', $news_id)->first();
+                if($checkBookmark){
+                    $checkBookmark -> delete();
+                }else{
+                    $Bookmark = new Bookmark();
+                    $Bookmark -> code = generator_uuid();
+                    $Bookmark -> user_id = $user_id;
+                    $Bookmark -> news_id = $news_id;
+                    $Bookmark -> save();
+                }
+
+                $dataOut = [
+                    "data" => '',
+                ];
+                $data_transcation = json_encode($dataOut);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function url_news_detail_code(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $code = $data['data']['code'];
+                $user_id = $data['data']['user_id'];
+                $RSSNews_prev = '';
+                $RSSNews_next = '';
+                $RSSNews_last10 = '';
+                $lang = 'th';
+                $RSSNews = RSSNews::where("code",$code)->with('get_cate')->first();
+
+                $cate_id_all = [];
+                if($RSSNews->get_cate) {
+                    foreach($RSSNews->get_cate as $cate) {
+                        $cate->get_cate_name->id;
+                        $cate_id_all[] = intval($cate->get_cate_name->id);
+                        // dd($cate->get_cate_name->id);
+                    }
+                }
+                // dd($cate_id_all);
+
+
+                if($cate_id_all) {
+                    $NewsCategory = RSSNewsCategory::whereIn('news_category_id', $cate_id_all)->where('status',1)->get();
+                    // dd($NewsCategory);
+                    
+                    
+                    $rss_news_id_array = [];
+                    if($NewsCategory) {
+                        foreach($NewsCategory as $NewsCategory_val) {
+                            if($NewsCategory_val->rss_news_id == $RSSNews->id) {
+
+                            } else {
+                                $rss_news_id_array[] = intval($NewsCategory_val->rss_news_id);
+                            }
+                            // dd($topic->topic->id);
+                        }
+                    }
+                    // dd($rss_news_id_array);
+                    if($rss_news_id_array) {
+                        $RSSNews_last10 = RSSNews::whereIn('id', $rss_news_id_array)->where('status',1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','DESC')->limit(10)->get();
+                        // dd($RSSNews_last10);
+                    }
+
+
+                    $rss_news_id_all_array = [];
+                    if($NewsCategory) {
+                        foreach($NewsCategory as $NewsCategory_val) {
+                            
+                                $rss_news_id_all_array[] = intval($NewsCategory_val->rss_news_id);
+                            
+                            // dd($topic->topic->id);
+                        }
+                    }
+                    // dd($rss_news_id_all_array);
+                    if($rss_news_id_all_array) {
+                        $RSSNews_prev = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','<',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                        $RSSNews_next = RSSNews::whereIn('id', $rss_news_id_all_array)->where('status',1)->where('id','>',$RSSNews->id)->orderBy('created_at','DESC')->limit(1)->first();
+                        // dd($RSSNews_last10);
+                    }
+                    
+                }
+
+                // dd($RSSNews_prev);
+                // dd($RSSNews_next);
+                if($lang == 'th') {
+                    $RSSNews_name = $RSSNews->title_th;
+                    $RSSNews_detail = $RSSNews->detail_th;
+                } else {
+                    $RSSNews_name = $RSSNews->title_en;
+                    $RSSNews_detail = $RSSNews->detail_en;
+                }
+
+
+                $dataOut['RSSNews_prev'] = $RSSNews_prev;
+                $dataOut['RSSNews_next'] = $RSSNews_next;
+                $dataOut['RSSNews_last10'] = $RSSNews_last10;
+                $dataOut['RSSNews_name'] = $RSSNews_name;
+                $dataOut['RSSNews_detail'] = $RSSNews_detail;
+                $dataOut['lang'] = $lang;
+                $dataOut['RSSNews'] = $RSSNews;
+                $dataOut['page'] = langapp('news_detail');
+                // $RSSNews;
+                $ReadNews_data = ReadNews::where('user_id',$user_id)->where('news_id',$RSSNews->id)->where('status',1)->first();
+                if($ReadNews_data) {
+
+                } else {
+                    $ReadNews = new ReadNews;
+                    $ReadNews->code = generator_uuid();
+                    $ReadNews->site_id = null;
+                    $ReadNews->user_id = $user_id;
+                    $ReadNews->news_id = $RSSNews->id;
+                    $ReadNews->save();
+                }
+
+
+                $RSSNews->view = $RSSNews->view+1;
+                $RSSNews->save();
+
                 $data_transcation = json_encode($dataOut);
                 $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
