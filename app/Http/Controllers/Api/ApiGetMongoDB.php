@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Bookmark;
+use App\DataLeakSocialRef;
 use App\Entities\IndicatorSummaryYear;
 use App\ReadCategories;
 use App\ReadNews;
@@ -10,16 +11,21 @@ use App\TransactionTimeStampScans;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Modules\Assets\Entities\OSType;
 use Modules\CategorySettings\Entities\CategorySettings;
+use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Modules\Scans\Entities\Assets;
 use Modules\Scans\Entities\AssetsData;
 use Modules\Scans\Entities\CPE;
+use Modules\SiteSettings\Entities\DataCveven;
 use Modules\SiteSettings\Entities\Domain;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\Users\Entities\UserSite;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 
@@ -1444,6 +1450,477 @@ class ApiGetMongoDB extends ApiController
                 ];
 
                 $data_transcation = json_encode($dataOut);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function count_asset(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site = $data['data']['site'];
+                if($get_role_custom == 1) {
+                    if(!$site){
+                        $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                        $dataOut["countAssets"] = 0;
+                        foreach ($datacountAssets as $key => $value) {
+                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                            $countfn = count($AssetsData_data);
+                            if($countfn==0){
+                                $dataOut["countAssets"]++;
+                            }else{
+                                $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                            }
+                        }
+                    }else{
+                        $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
+                        $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                        $dataOut["countAssets"] = 0;
+                        foreach ($datacountAssets as $key => $value) {
+                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                            $countfn = count($AssetsData_data);
+                            if($countfn==0){
+                                $dataOut["countAssets"]++;
+                            }else{
+                                $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                            }
+                        }
+                    }
+                } else {
+                    $site_id_arr = $data['data']['site_id_arr'];
+                    if(!$site){
+                        $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                        $dataOut["countAssets"] = 0;
+                        foreach ($datacountAssets as $key => $value) {
+                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                            $countfn = count($AssetsData_data);
+                            if($countfn==0){
+                                $dataOut["countAssets"]++;
+                            }else{
+                                $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                            }
+                        }
+                    }else{
+                        $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
+                        $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
+                        $dataOut["countAssets"] = 0;
+                        foreach ($datacountAssets as $key => $value) {
+                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                            $countfn = count($AssetsData_data);
+                            if($countfn==0){
+                                $dataOut["countAssets"]++;
+                            }else{
+                                $dataOut["countAssets"] = $dataOut["countAssets"]+$countfn;
+                            }
+                        }
+                    }
+                }
+                $assets = $dataOut["countAssets"];
+
+                $data_transcation = json_encode($assets);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function count_vulnerability(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site = $data['data']['site'];
+                $user_id = $data['data']['user_id'];
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                if($get_role_custom == 1) {
+                    if(!$site){
+                        $CVEMapping = CVEMapping::select('id')->count();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $CVEMapping = CVEMapping::select('id')->where('site_id', $site_id_m->id)->count();
+                    }
+                } else {
+                    if(!$site){
+                        $CVEMapping = CVEMapping::select('id')->whereIn('site_id', $site_id_arr)->count();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $CVEMapping = CVEMapping::select('id')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->count();
+                    }
+                }
+
+                $data_transcation = json_encode($CVEMapping);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function count_compromised(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site = $data['data']['site'];
+                $user_id = $data['data']['user_id'];
+                
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                if($get_role_custom == 1) {
+                    if(!$site){
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id',$site_id_m->id)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                    }
+                } else {
+                    if(!$site){
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                    }
+                }
+
+                $data_transcation = json_encode($DataLeakSocialRef);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function count_data_leak(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site = $data['data']['site'];
+                $site_id_arr = $data['data']['site_id_arr'];
+
+                if($get_role_custom == 1) {
+                    if(!$site){
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->where('feel_type', 'social')->count();
+                    }
+                } else {
+                    if(!$site){
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                    }
+                }
+
+                $data_transcation = json_encode($DataLeakSocialRef);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function count_vulnerability_host(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site = $data['data']['site'];
+                $user_id = $data['data']['user_id'];
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                if($get_role_custom == 1) {
+                    if(!$site){
+                        $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+                    }
+                } else {
+                    if(!$site){
+                        $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+                    }else{
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+                    }
+                }
+        
+        
+                
+                $vendor = [];
+                $title = [];
+                foreach($CVEAssets as $item){
+                    $vendor[] = $item -> vendor;
+                    $title[] = $item -> title;
+                }
+                $DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
+                $namecve = [];
+                $check_total_namecve = array();
+                $host_name = [];
+                foreach($DataCveven as $item){
+                    $namecve[] = $item -> namecve;
+                    $check_total_namecve[] = collect([
+                        'total' => $item -> total,
+                        'namecve' => $item -> namecve,
+                        'title' => $item -> title
+                    ]);
+                }
+        
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                if($get_role_custom == 1) {
+                    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                } else {
+                    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('site_id', $site_id_arr)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                }
+        
+        
+                foreach($CVEMapping as $value){
+                    foreach($check_total_namecve as $item){
+                        if($value -> namecve == $item['namecve']){
+                            $value['total'] = $item['total'];
+                            $value['title'] = $item['title'];
+                            $host_name[] = $item['title'];
+                        }
+                    }
+                }
+                $result = array();
+                foreach ($host_name as $element) {
+                    $result[$element] = $element;
+                }
+                
+                $response = array(
+                    'data' => $CVEMapping,
+                    'host_name' => $result
+                );
+
+                $data_transcation = json_encode($response);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function chart_indicators(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $displayType = $data['data']['displayType'];
+                if($displayType == 'mon'){
+                    $currentMonth = 2;//year - current is 2 old is 1
+                    $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', $currentMonth)->where('type','summary_month')->get();
+                    $events = array_fill(0, (int)date('t'), 0);
+                    $attribute = array_fill(0, (int)date('t'), 0);
+                    foreach($IndicatorSummaryYear  as $value){
+                        $events[$value->month-1] = $value->event_count;
+                        $attribute[$value->month-1] = $value->attribute_count;
+                    }
+                    $nameXAxis = array();
+                    foreach ($events as $key => $value) {
+                        $nameXAxis[$key] = (string)($key+1);
+                    }
+                    $nameYAxis = 'Number (Days)';
+                    $nameSeriesEvent = 'Number of Event';
+                    $nameSeriesAttribute = 'Number of Attribute';
+        
+                }else{
+                    $nameXAxis = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    $nameYAxis = 'Number (Months)';
+                    $nameSeriesEvent = 'Number of Event';
+                    $nameSeriesAttribute = 'Number of Attribute';
+                    $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', now()->year)->where('type','summary_year')->get();
+                    $events = [0,0,0,0,0,0,0,0,0,0,0,0];
+                    $attribute = [0,0,0,0,0,0,0,0,0,0,0,0];
+                    foreach($IndicatorSummaryYear as $item){
+                        if($item -> month == 1){
+                            $events[0] = $item -> event_count;
+                            $attribute[0] = $item -> attribute_count;
+                        }else if($item -> month == 2){
+                            $events[1] = $item -> event_count;
+                            $attribute[1] = $item -> attribute_count;
+                        }else if($item -> month == 3){
+                            $events[2] = $item -> event_count;
+                            $attribute[2] = $item -> attribute_count;
+                        }else if($item -> month == 4){
+                            $events[3] = $item -> event_count;
+                            $attribute[3] = $item -> attribute_count;
+                        }else if($item -> month == 5){
+                            $events[4] = $item -> event_count;
+                            $attribute[4] = $item -> attribute_count;
+                        }else if($item -> month == 6){
+                            $events[5] = $item -> event_count;
+                            $attribute[5] = $item -> attribute_count;
+                        }else if($item -> month == 7){
+                            $events[6] = $item -> event_count;
+                            $attribute[6] = $item -> attribute_count;
+                        }else if($item -> month == 8){
+                            $events[7] = $item -> event_count;
+                            $attribute[7] = $item -> attribute_count;
+                        }else if($item -> month == 9){
+                            $events[8] = $item -> event_count;
+                            $attribute[8] = $item -> attribute_count;
+                        }else if($item -> month == 10){
+                            $events[9] = $item -> event_count;
+                            $attribute[9] = $item -> attribute_count;
+                        }else if($item -> month == 11){
+                            $events[10] = $item -> event_count;
+                            $attribute[10] = $item -> attribute_count;
+                        }else if($item -> month == 12){
+                            $events[11] = $item -> event_count;
+                            $attribute[11] = $item -> attribute_count;
+                        }
+                    }
+                }
+                
+                $response = [
+                    'events' => $events,
+                    'attribute' => $attribute,
+                    'nameXAxis' => $nameXAxis,
+                    'nameYAxis' => $nameYAxis,
+                    'nameSeriesAttribute' => $nameSeriesAttribute,
+                    'nameSeriesEvent' => $nameSeriesEvent,
+                ];
+
+                $data_transcation = json_encode($response);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function load_chart(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $site = $data['data']['site'];
+                $user_id = $data['data']['user_id'];
+                $get_role_custom = $data['data']['get_role_custom'];
+                $model = new CVEMapping;
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                if($get_role_custom == 1) {
+                    if(!$site){
+                        $model->get();
+                        $high = $model->where('severity', '=', 'HIGH')->count();
+                        $medium = $model->where('severity', '=', 'MEDIUM')->count();
+                        $critical = $model->where('severity', '=', 'CRITICAL')->count();
+                        $low = $model->where('severity', '=', 'LOW')->count();
+                        $none = $model->where('severity', '=', 'NONE')->count();
+                    }else{
+                        $model->get();
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $high = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'HIGH')->count();
+                        $medium = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'MEDIUM')->count();
+                        $critical = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'CRITICAL')->count();
+                        $low = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'LOW')->count();
+                        $none = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'NONE')->count();
+                    }
+                } else {
+                    if(!$site){
+                        $model->get();
+                        $high = $model->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
+                        $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
+                        $critical = $model->where('severity', '=', 'CRITICAL')->whereIn('site_id', $site_id_arr)->count();
+                        $low = $model->where('severity', '=', 'LOW')->whereIn('site_id', $site_id_arr)->count();
+                        $none = $model->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
+                    }else{
+                        $model->get();
+                        $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                        $high = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'HIGH')->whereIn('site_id', $site_id_arr)->count();
+                        $medium = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'MEDIUM')->whereIn('site_id', $site_id_arr)->count();
+                        $critical = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'CRITICAL')->whereIn('site_id', $site_id_arr)->count();
+                        $low = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'LOW')->whereIn('site_id', $site_id_arr)->count();
+                        $none = $model->where('site_id', $site_id_m->id)->where('severity', '=', 'NONE')->whereIn('site_id', $site_id_arr)->count();
+                    }
+                }
+        
+        
+                $response = [
+                    "count_high" => $high,
+                    "count_medium" => $medium,
+                    "count_critical" => $critical,
+                    "count_low" => $low,
+                    "count_none" => $none,
+                ];
+
+                $data_transcation = json_encode($response);
                 $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
             }

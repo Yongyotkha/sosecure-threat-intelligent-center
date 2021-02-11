@@ -42,7 +42,15 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/events_load_pulse_tb', 'Api\ApiGetMongoDB@events_load_pulse_tb');
     Route::post('indicator/events_count_view', 'Api\ApiGetMongoDB@events_count_view');
     Route::post('indicator/load_relatedPulse', 'Api\ApiGetMongoDB@load_relatedPulse');
-
+    
+    Route::post('dashboard/count_asset', 'Api\ApiGetMongoDB@count_asset');
+    Route::post('dashboard/count_vulnerability', 'Api\ApiGetMongoDB@count_vulnerability');
+    Route::post('dashboard/count_compromised', 'Api\ApiGetMongoDB@count_compromised');
+    Route::post('dashboard/count_data_leak', 'Api\ApiGetMongoDB@count_data_leak');
+    Route::post('dashboard/count_vulnerability_host', 'Api\ApiGetMongoDB@count_vulnerability_host');
+    Route::post('dashboard/chart_indicators', 'Api\ApiGetMongoDB@chart_indicators');
+    Route::post('dashboard/load_chart', 'Api\ApiGetMongoDB@load_chart');
+    
     Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
 
     Route::post('news/index_client', 'Api\ApiGetMongoDB@index_client');
