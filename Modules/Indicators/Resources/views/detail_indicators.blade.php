@@ -80,35 +80,44 @@
                         </div>
                     </div>
                     <section class="panel panel-default" style="margin: 10px;">
-                        <div class="container-fluid" style="padding:1rem;">
-                            <div class="row m-b-md">
-                                <div class="col-sm-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped" id="table-related-event">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Event Name</th>
-                                                    <th>Group</th>
-                                                    <th>Tags</th>
-                                                    <th>Published</th>
-                                                    <th>Last Status</th>
-                                                    <th style="width: 200px;">DateTime</th>
-                                                    <th>Attribute</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-
-                                        </table>
-                                        {{--<div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>--}}
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div style="margin-top:5px;">
+                                        <i class="fas fa-table"></i> Table Related
                                     </div>
                                 </div>
-                            </div>
-                            {{-- <div class="show-indicators">
-                                <div id="loadspinner_related_pulse" class="content-spinner-loading">
-                            </div> --}}
-                        </div>
+                        </header>
+                        <div class="panel-body" style="padding: 0 !important">
+                            <div class="container-fluid" style="padding:1rem;">
+                                <div class="row m-b-md">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" id="table-related-event">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Event Name</th>
+                                                        <th>Group</th>
+                                                        <th>Tags</th>
+                                                        <th>Published</th>
+                                                        <th>Last Status</th>
+                                                        <th style="width: 200px;">DateTime</th>
+                                                        <th>Attribute</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
 
+                                            </table>
+                                            {{--<div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>--}}
+                                        </div>
+                                    </div>
+                                </div>
+                                {{-- <div class="show-indicators">
+                                    <div id="loadspinner_related_pulse" class="content-spinner-loading">
+                                </div> --}}
+                            </div>
+                        </div>
                     </section>
                 </section>
             </section>
