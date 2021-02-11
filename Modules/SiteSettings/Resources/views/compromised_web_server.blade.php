@@ -29,27 +29,35 @@
             </section>
         </aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
-                        style="margin-top: 0;display: none">@icon('solid/bars')</a>
-                    <div class="bc-head">Site Settings > Web Server </div>
+                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                    <div class="header-flex-overflow" style="height: 47px;">
+                        <div class="fwb-16">
+                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                            <span style="margin-top: 2px">
+                                Site Settings > Web Server
+                            </span>
+                        </div>
+    
+                        <div class="ml-2 text-right">
+                        
+                            <button id="add_asset" data-toggle="modal" data-target="#add_asset_modal"
+                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')<span class="hide-text">Add</span></span>
+                            </button>
+                            
+                            <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
+                            value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                            </button>
 
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right"
-                        value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                            @langapp('delete')</span>
-                    </button>
-                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right"
-                        data-toggle="modal" data-target="#change_status" disabled>
-                        Change Status
-                    </button>
-                    <button id="add_asset" data-toggle="modal" data-target="#add_asset_modal"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span>@icon('solid/plus') Add</span>
-                    </button>
-                    {{-- <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                    <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-                    </button> --}}
+                            <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }}"
+                                data-toggle="modal" data-target="#change_status" disabled>
+                                <span data-rel="tooltip" title="Change Status" data-placement="bottom"><i class="fas fa-exchange-alt"></i><span class="hide-text">Change Status</span></span>
+                            </button>
+             
+
+                        </div>     
+                    </div>
                 </header>
                 <section class="scrollable wrapper">
                     {{-- <section class="panel panel-default" id="hide-advance-search" style="display: none;">
