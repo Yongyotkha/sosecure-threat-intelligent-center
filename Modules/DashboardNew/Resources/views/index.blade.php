@@ -6,7 +6,7 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
             <div class="bc-head">Summary Dashboard</div>
-            <div style="margin-top: 8px; min-width: 270px;">
+            <div class="max-w-select" style="margin-top: 8px;">
                 <select name="site" id="site" class="select2-option form-control select-site"
                     onchange="changeSite(value)">
                     <option value="0" selected>All Site</option>
