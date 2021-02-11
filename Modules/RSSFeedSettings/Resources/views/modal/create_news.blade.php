@@ -173,31 +173,31 @@
                                     </div>
                                 </div>
                              </div>
-                             <div class="col-lg-4">
-                                <label class="control-label">Send Mail </label>
-                                <br>
-                                <label class="switch" style="margin-top: 7px">
-                                    <input type="checkbox" name="" checked value="TRUE">
-                                    <span></span>
-                                </label>
-                                
+                             <div class="col-lg-1">
                                 <label class="control-label">Status </label>
-                                <br>
-                                <label class="switch" style="margin-top: 7px">
-                                    {{-- @php
-                                    $checked_val = '';
-                                        if(@$RSSNews -> status == 1) {
-                                            $checked_val = 'checked';
-                                        } else {
-                                            
-                                        }
-                                    @endphp --}}
-
-                                    <input type="checkbox" name="status" checked value="TRUE">
-                                    <span></span>
-                                </label>
-
-                            
+                                <div>
+                                    <label class="switch">
+                                        {{-- @php
+                                        $checked_val = '';
+                                            if(@$RSSNews -> status == 1) {
+                                                $checked_val = 'checked';
+                                            } else if(@$action == 'create') {
+                                                $checked_val = 'checked';
+                                            }
+                                        @endphp --}}
+                                        <input type="checkbox" name="status" value="TRUE">
+                                        <span></span>
+                                    </label>
+                                </div>
+                             </div>
+                             <div class="col-lg-1">
+                                <label class="control-label">Send Mail </label>
+                                <div >
+                                    <label class="switch">
+                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <span></span>
+                                    </label>
+                                </div>
                              </div>
                         </div>
                      </div>

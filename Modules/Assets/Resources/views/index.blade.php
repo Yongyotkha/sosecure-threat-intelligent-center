@@ -23,16 +23,18 @@
                                 @endif
                             </select>
                         </div>
-    
+                        
                         @if(TYPE_WEB=='center')
                             <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                             </a>
+                            <input type="hidden" value="" id="site_code">
                         @else
                             <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                             </a>
+                            <input type="hidden" value="{{ @$SiteSettings[0]->code }}" id="site_code">
                         @endif
                         
 
@@ -124,22 +126,20 @@
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
                         <div class="col-md-4 nopadding">
-                            <a href="#" onclick="searchTB()">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/database.png')}}" alt="">
-                                        </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
-                                        <span class="number-card warning" id="count_assets">0</span>
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                    <div class="img-icon-card ice">
+                                        <img src="{{asset('images/database.png')}}" alt="">
                                     </div>
+                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
+                                    <span class="number-card warning" id="count_assets">0</span>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="#" onclick="searchTB('','','os_type','Windows')">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
+                            <a href="javascript:void(0)" onclick="searchTB('','','os_type','Windows')">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/windows.png')}}" alt="">
                                         </div>
@@ -150,9 +150,9 @@
                             </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="#" onclick="searchTB('','','os_type','Linux')">
-                                <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
+                            <a href="javascript:void(0)" onclick="searchTB('','','os_type','Linux')">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/linux.png')}}" alt="">
                                         </div>
@@ -269,7 +269,7 @@
                                         </th> --}}
                                         <th rowspan="2" class="align-middle">Site</th>
                                         <th rowspan="2" class="align-middle">Host</th>
-                                        <th rowspan="2" class="align-middle">IP</th>
+                                        <th rowspan="2" class="align-middle">Assets</th>
                                         <th colspan="7" class="text-center">CPE</th>
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
@@ -443,10 +443,40 @@
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
-
         data_table();
+        {{--$.when(data_table()).then(cookie_change_site());--}}
         
     });
+
+    function cookie_change_site(){
+        if((get_cookie_site())&&({!!json_encode($Search_Link_All)!!}==='')){
+                let currentVal = $('#select-site option:nth-child(2)').val();
+                let firstCurrentVal = $('#select-site option:nth-child(1)').val();
+                let cookieVal = get_cookie_site();
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '{{route('systemsetting.check_cookie_site')}}',
+                    type: "get",
+                    data: ({
+                        'currentVal':currentVal,
+                        'firstCurrentVal':firstCurrentVal,
+                        'cookieVal':cookieVal,
+                    }),
+                    datatype: "html",
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                }).done(function(data){
+                    $("#select-site").val(data.siteValue).trigger("change");
+                    loading('stop_load');
+                }).fail(function(jqXHR, ajaxOptions, thrownError){
+                    loading('stop_load');
+                    console.log("No response from server");
+                });
+            }
+    }
 
     var site_id = 0;
     $(function () {
@@ -637,6 +667,7 @@
 
     var t;
     function changeSite(val){
+        {{--set_cookie_site($('#select-site').val());--}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -680,6 +711,7 @@
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
                     d.menu = "{{$menu}}";
+                    d.site = $('#site_code').val();
                 }
             },
             initComplete : function( settings, json){
@@ -694,18 +726,18 @@
                     name: 'chk',
                 },--}}
                 {
-                    width: '10%',
+                    width: '25%',
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
                 },
                 {
-                    width: '10%',
+                    width: '20%',
                     data: 'domain',
                     name: 'domain',
                 },
                 {
-                    width: '10%',
+                    width: '20%',
                     data: 'ip',
                     name: 'ip',
                 },

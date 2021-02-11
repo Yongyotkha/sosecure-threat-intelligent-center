@@ -75,7 +75,7 @@
 
                             <a id="btn_client_view" href="{{site_url('/news_client')}}"
                                 class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-eye"></i> Client View</span>
+                                <span><i class="fas fa-eye"></i> Site View</span>
                             </a>
 
                             <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
@@ -274,6 +274,7 @@
                                                 <th>Category</th>
                                                 <th width="20px">Data Status</th>
                                                 <th width="30px">Public Date</th>
+                                                <th width="30px">Modified Date</th>
                                                 <th>View Count</th>
                                                 <th width="40px">Link</th>
                                                 <th>Status</th>
@@ -648,6 +649,10 @@ $(function() {
                 {
                     data: 'public_date',
                     name: 'public_date',
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at',
                 },
                 {
                     data: 'view',

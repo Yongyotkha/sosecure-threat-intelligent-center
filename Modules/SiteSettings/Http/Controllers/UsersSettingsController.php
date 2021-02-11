@@ -25,7 +25,12 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Emails\SiteCreateUserMail;
+use DB;
 use Artisan;
+use App\Menu;
+use App\Menu_sub;
+use Modules\Users\Entities\user_menu_permission;
+use Modules\Users\Entities\user_menu_sub_permission;
 
 class UsersSettingsController extends Controller
 {
@@ -112,6 +117,35 @@ class UsersSettingsController extends Controller
                 $Roles = Roles::whereIn('id',['5'])->get();
             }
         }
+
+
+        // $data['role'] = $role;
+        // $Menu = Menu::where('deleted_at', null)->whereNotIn('id', [8,9,10])->where('active', 1)->orderBy('order', 'asc')->get();
+        
+        $result_menu_permission = DB::table("site_menu_permission")->select('menu_code')->where("site_id", @$SiteSettings->id)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+        $result_menu_sub_permission = DB::table("site_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$SiteSettings->id)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+        // dd($result_menu_permission);
+        $Menu = Menu::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_permission)->orderBy('order', 'asc');
+        // dd($Menu);
+        // $Menu = $Menu->whereHas('get_menu_sub', function($q) use($result_menu_sub_permission) {
+        //             $q->whereIn('code',$result_menu_sub_permission);
+        //         });
+        $Menu = $Menu->get();
+        // dd($Menu);
+        $Menu_sub = Menu_sub::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_sub_permission)->orderBy('order', 'asc')->get();
+        
+
+        // $result_user_menu_permission = DB::table("user_menu_permission")->select('menu_code')->where("site_id", @$SiteSettings->id)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
+        // $result_user_menu_sub_permission = DB::table("user_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$SiteSettings->id)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
+        
+
+        // $data['user_menu_permission'] = $result_user_menu_permission;
+
+        // $data['user_menu_sub_permission'] = $result_user_menu_sub_permission;
+        $data['menus'] = $Menu;
+        $data['Menu_sub'] = $Menu_sub;
+
+        //
 
         $data['Roles'] = $Roles;
         $data['code'] = $request->code;
@@ -267,6 +301,44 @@ class UsersSettingsController extends Controller
 
                     Artisan::call('cache:clear');
                     Artisan::call('config:clear');
+
+
+                    if ($User) {
+
+                        user_menu_permission::where('user_id', @$User->id)->where('site_id',$SiteSettings->id)->delete();
+                        
+                        if ($request->menu) {
+                            if (count($request->menu) > 0) {
+                                foreach ($request->menu as $menu) {
+                                    $tb_menu = Menu::select("id")->where("code", $menu)->first();
+                                    $user_menu_permission = new user_menu_permission;
+                                    $user_menu_permission->user_id = $User->id;
+                                    $user_menu_permission->site_id = $SiteSettings->id;
+                                    $user_menu_permission->menu_id = $tb_menu->id;
+                                    $user_menu_permission->menu_code = $menu;
+                                    $user_menu_permission->save();
+                                }
+                            }
+                        } else {
+                            
+                        }
+            
+                        user_menu_sub_permission::where('user_id', @$User->id)->where('site_id',$SiteSettings->id)->delete();
+                        if ($request->menu_sub) {
+                            if (count($request->menu_sub) > 0) {
+                                foreach ($request->menu_sub as $menu_sub) {
+                                    $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();
+                                    $user_menu_sub_permission = new user_menu_sub_permission;
+                                    $user_menu_sub_permission->user_id = $User->id;
+                                    $user_menu_sub_permission->site_id = $SiteSettings->id;
+                                    $user_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
+                                    $user_menu_sub_permission->menu_sub_code = $menu_sub;
+                                    $user_menu_sub_permission->save();
+                                }
+                            }
+                        }
+             
+                    }
             
             
                         $this->summary = [
@@ -511,6 +583,44 @@ class UsersSettingsController extends Controller
                 }
 
             }
+        }
+
+
+        if($user) {
+
+            user_menu_permission::where('user_id', @$user->id)->where('site_id',$SiteSettings->id)->delete();
+            
+            if ($request->menu) {
+                if (count($request->menu) > 0) {
+                    foreach ($request->menu as $menu) {
+                        $tb_menu = Menu::select("id")->where("code", $menu)->first();
+                        $user_menu_permission = new user_menu_permission;
+                        $user_menu_permission->user_id = $user->id;
+                        $user_menu_permission->site_id = $SiteSettings->id;
+                        $user_menu_permission->menu_id = $tb_menu->id;
+                        $user_menu_permission->menu_code = $menu;
+                        $user_menu_permission->save();
+                    }
+                }
+            } else {
+                
+            }
+
+            user_menu_sub_permission::where('user_id', @$user->id)->where('site_id',$SiteSettings->id)->delete();
+            if ($request->menu_sub) {
+                if (count($request->menu_sub) > 0) {
+                    foreach ($request->menu_sub as $menu_sub) {
+                        $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();
+                        $user_menu_sub_permission = new user_menu_sub_permission;
+                        $user_menu_sub_permission->user_id = $user->id;
+                        $user_menu_sub_permission->site_id = $SiteSettings->id;
+                        $user_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
+                        $user_menu_sub_permission->menu_sub_code = $menu_sub;
+                        $user_menu_sub_permission->save();
+                    }
+                }
+            }
+ 
         }
 
 
@@ -1005,13 +1115,36 @@ class UsersSettingsController extends Controller
     public function edit(Request $request, $id)
     {
         $site_code = $request->s;//site_code
+        $SiteSettings = SiteSettings::where('code',$site_code)->first();
         // dd($site_code);
         $User = User::where('code', $id)->first();
 
         $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
         $role_id = $model_has_roles->role_id;
 
-        $Roles = Roles::whereIn('id',[4,5,6])->get();
+        $Roles = Roles::whereIn('id',[4,5])->get();
+
+
+        $result_menu_permission = DB::table("site_menu_permission")->select('menu_code')->where("site_id", @$SiteSettings->id)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+        $result_menu_sub_permission = DB::table("site_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$SiteSettings->id)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+        // dd($result_menu_permission);
+        $Menu = Menu::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_permission)->orderBy('order', 'asc');
+        // dd($Menu);
+        // $Menu = $Menu->whereHas('get_menu_sub', function($q) use($result_menu_sub_permission) {
+        //             $q->whereIn('code',$result_menu_sub_permission);
+        //         });
+        $Menu = $Menu->get();
+        // dd($Menu);
+        $Menu_sub = Menu_sub::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_sub_permission)->orderBy('order', 'asc')->get();
+        
+        $result_user_menu_permission = DB::table("user_menu_permission")->select('menu_code')->where("site_id", @$SiteSettings->id)->where("user_id", @$User->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
+        $result_user_menu_sub_permission = DB::table("user_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$SiteSettings->id)->where("user_id", @$User->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
+        
+        $data['user_menu_permission'] = $result_user_menu_permission;
+        $data['user_menu_sub_permission'] = $result_user_menu_sub_permission;
+        $data['menus'] = $Menu;
+        $data['Menu_sub'] = $Menu_sub;
+
         $data['site_code'] = $site_code;
         $data['Roles'] = $Roles;
         $data['roles_select'] = $role_id;

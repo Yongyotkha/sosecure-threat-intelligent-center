@@ -58,6 +58,52 @@
                     </select>
                 </div>
             </div>
+
+
+            <div class="form-group row">
+                <label class="col-lg-2 control-label">Permission Menu <span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
+                    <ul class="role-group">
+                        @php  $i=1;  @endphp
+                        @foreach(@$menus AS $menu)
+                        <li>
+                            <div class="role-main">
+                                <span class="role-click" onclick="openrole(this,'role-{{$i}}')">@if(count($menu->get_menu_sub) > 0)@icon('solid/plus')@else <i class="fas fa-minus icon"></i>  @endif</span>
+                                <span class="checkbox chk-inline">
+                                    <label>
+                                        <input type="checkbox" name="menu[]" value="{{$menu->code}}">
+                                        <span class="label-text" data-rel="tooltip" title="">{{$menu->name}}</span>
+                                    </label>
+                                </span>
+                            </div>
+                            
+                            @if(!empty($Menu_sub))
+                                <ul id="role-{{$i}}" class="role-group-sub">
+                                @foreach(@$Menu_sub as $menu_sub) 
+                                    <li>
+                                        <div class="role-sub">
+                                            <span class="checkbox chk-inline">
+                                                <label>
+                                                    <input type="checkbox" name="menu_sub[]" value="{{$menu_sub->code}}">
+                                                    <span class="label-text" data-rel="tooltip" title="">{{$menu_sub->name}}</span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </li>
+                                @endforeach
+                                </ul>
+                            @endif
+                            
+
+                        </li>
+                        @php $i++; @endphp
+                        @endforeach
+                        
+                    </ul>
+                </div>
+            </div>
+
+
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Status </label>
                 <div class="col-lg-10">
@@ -140,6 +186,10 @@
     {{-- Crop Images --}}
     <script>
 
+        function openrole(onck,id){
+            $('#'+id).slideToggle(150);
+        }
+
         $(document).ready(function () {
             $('#role').select2();
         });
@@ -181,11 +231,8 @@
                         $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
                     }
                     
-                    
                 }); 
-           
-         
-             
+
         });
 
 
