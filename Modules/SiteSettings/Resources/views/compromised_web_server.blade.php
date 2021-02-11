@@ -6,8 +6,6 @@
         display: block;
         width: 100%;
         border: none;
-
-
         font-size: 16px;
         cursor: pointer;
         text-align: center;
@@ -30,7 +28,6 @@
                 </section>
             </section>
         </aside>
-        <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
@@ -164,7 +161,6 @@
                 </section>
             </section>
     </section>
-    </aside>
 </section>
 
 <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

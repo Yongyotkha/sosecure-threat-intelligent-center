@@ -12,180 +12,178 @@
                 </section>
             </section>
         </aside>
-        <aside>
-            <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow" style="height: 47px;">
-                        <div class="fwb-16">
-                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                            <span style="margin-top: 2px">
-                                Site Settings > Data Leak Data
-                            </span>
-                        </div>
-    
-                        <div class="ml-2 text-right">
-                        
-                            <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="right">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
-                            </button>
-                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                            </a>
-                        </div>     
+        <section class="vbox">
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow" style="height: 47px;">
+                    <div class="fwb-16">
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
+                        <span style="margin-top: 2px">
+                            Site Settings > Data Leak Data
+                        </span>
                     </div>
-                </header>
-                <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-filter"></i> Filter
-                                </div>
-                            </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="container-fluid">
-                                <div class="row m-b-md">
-                                    <div class="col-lg-4">
-                                        <h5 class="font-weight-bold">Search</h5>
-                                        <input type="text" id="search" class="form-control">
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <h5 class="font-weight-bold">Source</h5>
-                                        <select id="source" class="select2-option form-control">
-                                            <option value="" selected>All</option>
-                                            @if ($source)
 
-                                            @foreach ($source as $source)
-                                            <option value="{{$source->id}}">{{$source->source}}
-                                            </option>
-                                            @endforeach
-
-                                            @endif
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <h5 class="font-weight-bold">Date</h5>
-                                        <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                            <i class="fa fa-calendar"></i>&nbsp;
-                                            <span></span> <i class="fa fa-caret-down"></i>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <h5 class="font-weight-bold">Type</h5>
-                                        <div id="groupby-type" class="btn-group special">
-                                            <button id="all" class="btn btn-grey active" value="">
-                                                <span> All</span>
-                                            </button>
-                                            <button class="btn btn-grey" value="social">
-                                                <span> Public </span>
-                                            </button>
-                                            <button class="btn btn-grey" value="darkweb_public">
-                                                <span> Darkweb </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel-footer">
-                            <div class="row">
-                                <div class="col-lg-12 text-right">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="table_social_data(1)">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-times"></i>
-                                        <span> Close </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
+                    <div class="ml-2 text-right">
                     
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Data Leak Data
-                                </div>
-                            </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table  class="table table-striped" id="table_social_datas">
-                                    <thead>
-                                        <tr>
-                                            <th class="no-sort w-10">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th>
-                                            <th>Site</th>
-                                            <th>Type</th>
-                                            <th>Source</th>
-                                            <th>Keyword Ref</th>
-                                            <th>Content</th>
-                                            <th>Data Feed</th>
-                                            <th>View</th>
-                                            <th>Status</th>
-                                            <th class="no-sort" width="5%">@langapp('action')</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{-- <tr>
-                                            <td>
-                                                <label>
-                                                    <input name="select_all" value="1" type="checkbox" class="select-chk"/>
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                Pantip
-                                            </td>
-                                            <td>
-                                                Fibre
-                                            </td>
-                                            <td>
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
-                                            </td>
-                                            <td class="no-wrap">
-                                                2020-12-2020 12:12
-                                            </td>
-                                            <td>
-                                                1
-                                            </td>
-                                            <td>
-                                                <label class="switch">
-                                                    <input type="hidden" value="FALSE" name="">
-                                                    <input type="checkbox" name="status" checked value="TRUE">
-                                                    <span></span>
-                                                </label>
-                                            </td>
-                                            <td class="no-wrap text-center">
-                                                <button class="btn btn-danger btn-xs">
-                                                    @icon('solid/trash-alt')
-                                                </button>
-                                            </td>
-                                        </tr> --}}
-                                    </tbody>
-                                </table>
+                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Delete" data-placement="right">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                        </button>
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
+                    </div>     
+                </div>
+            </header>
+            <section class="scrollable wrapper">
+                <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-filter"></i> Filter
                             </div>
                         </div>
-                    </section>
+                    </header>
+                    <div class="panel-body">
+                        <div class="container-fluid">
+                            <div class="row m-b-md">
+                                <div class="col-lg-4">
+                                    <h5 class="font-weight-bold">Search</h5>
+                                    <input type="text" id="search" class="form-control">
+                                </div>
+                                <div class="col-lg-4">
+                                    <h5 class="font-weight-bold">Source</h5>
+                                    <select id="source" class="select2-option form-control">
+                                        <option value="" selected>All</option>
+                                        @if ($source)
+
+                                        @foreach ($source as $source)
+                                        <option value="{{$source->id}}">{{$source->source}}
+                                        </option>
+                                        @endforeach
+
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-lg-4">
+                                    <h5 class="font-weight-bold">Date</h5>
+                                    <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <h5 class="font-weight-bold">Type</h5>
+                                    <div id="groupby-type" class="btn-group special">
+                                        <button id="all" class="btn btn-grey active" value="">
+                                            <span> All</span>
+                                        </button>
+                                        <button class="btn btn-grey" value="social">
+                                            <span> Public </span>
+                                        </button>
+                                        <button class="btn btn-grey" value="darkweb_public">
+                                            <span> Darkweb </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="table_social_data(1)">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                
+                <section class="panel panel-default">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Data Leak Data
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table  class="table table-striped" id="table_social_datas">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort w-10">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th>Site</th>
+                                        <th>Type</th>
+                                        <th>Source</th>
+                                        <th>Keyword Ref</th>
+                                        <th>Content</th>
+                                        <th>Data Feed</th>
+                                        <th>View</th>
+                                        <th>Status</th>
+                                        <th class="no-sort" width="5%">@langapp('action')</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- <tr>
+                                        <td>
+                                            <label>
+                                                <input name="select_all" value="1" type="checkbox" class="select-chk"/>
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            Pantip
+                                        </td>
+                                        <td>
+                                            Fibre
+                                        </td>
+                                        <td>
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos,
+                                        </td>
+                                        <td class="no-wrap">
+                                            2020-12-2020 12:12
+                                        </td>
+                                        <td>
+                                            1
+                                        </td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="hidden" value="FALSE" name="">
+                                                <input type="checkbox" name="status" checked value="TRUE">
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                        <td class="no-wrap text-center">
+                                            <button class="btn btn-danger btn-xs">
+                                                @icon('solid/trash-alt')
+                                            </button>
+                                        </td>
+                                    </tr> --}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
             </section>
-        </aside>
+        </section>
     </section>
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

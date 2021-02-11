@@ -12,7 +12,6 @@
                 </section>
             </section>
         </aside>
-        <aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
@@ -71,7 +70,6 @@
                     </section>
                 </section>
             </section>
-        </aside>
     </section>
 
     <div class="modal in fixed-left" id="add-credentials" tabindex="-1" role="dialog"

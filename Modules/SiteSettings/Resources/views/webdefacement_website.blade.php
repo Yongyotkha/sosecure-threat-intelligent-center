@@ -13,7 +13,7 @@
                 </section>
             </section>
         </aside>
-        <aside>
+  
             <section class="vbox">
     
                 <header class="header panel-heading bg-white b-b b-light">
@@ -180,7 +180,7 @@
                     </section>
                 </section>
             </section>
-        </aside>
+     
     </section>
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

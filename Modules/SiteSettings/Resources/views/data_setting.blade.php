@@ -17,7 +17,6 @@
             </section>
         </aside>
 
-        <aside>
             <section class="vbox">
 
                 <header class="header bg-white b-b clearfix">
@@ -240,11 +239,8 @@
                     </div>
                 </section>
             </section>
-        </aside>
     </section>
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html">
-
-    </a>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 </section>
 
 

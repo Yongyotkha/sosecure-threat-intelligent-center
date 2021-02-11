@@ -12,152 +12,150 @@
                 </section>
             </section>
         </aside>
-        <aside>
-            <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow" style="height: 47px;">
-                        <div class="fwb-16">
-                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
-                            <span style="margin-top: 2px">
-                                Site Settings > Compromise Data 
-                            </span>
-                        </div>
-    
-                        <div class="ml-2 text-right">
-                        
-                            <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
-                                value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
-                            </button>
-
-                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                            </a>
-    
-                          
-
-                        </div>     
+        <section class="vbox">
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow" style="height: 47px;">
+                    <div class="fwb-16">
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
+                        <span style="margin-top: 2px">
+                            Site Settings > Compromise Data 
+                        </span>
                     </div>
-                </header>
 
-                <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                        <header class="panel-heading font-bold panel-header-blue">
+                    <div class="ml-2 text-right">
+                    
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
+                            value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                        </button>
+
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
+
+                        
+
+                    </div>     
+                </div>
+            </header>
+
+            <section class="scrollable wrapper">
+                <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <i class="fas fa-filter"></i> Filter
+                            </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid">
                             <div class="row">
-                                <div class="col-md-12">
-                                    <i class="fas fa-filter"></i> Filter
+                                <div class="col-lg-6 mb-1">
+                                    <h5 class="font-weight-bold">Content</h5>
+                                    <input type="text" id="keyword" class="form-control">
                                 </div>
-                        </header>
-                        <div class="panel-body" style="padding: 0 !important">
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-lg-6 mb-1">
-                                        <h5 class="font-weight-bold">Content</h5>
-                                        <input type="text" id="keyword" class="form-control">
-                                    </div>
-                                    {{-- <div class="col-lg-3 mb-1">
-                                        <h5 class="font-weight-bold">Source</h5>
-                                        <select id="source" class="select2-option form-control">
-                                            <option value="" selected>All</option>
-                                            @if ($source)
+                                {{-- <div class="col-lg-3 mb-1">
+                                    <h5 class="font-weight-bold">Source</h5>
+                                    <select id="source" class="select2-option form-control">
+                                        <option value="" selected>All</option>
+                                        @if ($source)
 
-                                            @foreach ($source as $source)
-                                            <option value="{{$source->id}}">{{$source->source}}
-                                            </option>
-                                            @endforeach
-            
-                                            @endif
-                                        </select>
-                                    </div> --}}
-                                    <div class="col-lg-6 mb-1">
-                                        <h5 class="font-weight-bold">Date</h5>
-                                        <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                            <i class="fa fa-calendar"></i>&nbsp;
-                                            <span></span> <i class="fa fa-caret-down"></i>
-                                        </div>
+                                        @foreach ($source as $source)
+                                        <option value="{{$source->id}}">{{$source->source}}
+                                        </option>
+                                        @endforeach
+        
+                                        @endif
+                                    </select>
+                                </div> --}}
+                                <div class="col-lg-6 mb-1">
+                                    <h5 class="font-weight-bold">Date</h5>
+                                    <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
-
-                                    <div class="col-lg-12 mb-1">
-                                        <h5 class="font-weight-bold">Type</h5>
-                                        <div id="groupby-type" class="btn-group special">
-                                            <button id="all" class="btn btn-grey active" value="">
-                                                <span> All</span>
-                                            </button>
-                                            <button class="btn btn-grey" value="public">
-                                                <span> Public </span>
-                                            </button>
-                                            <button class="btn btn-grey" value="darkweb">
-                                                <span> Darkweb </span>
-                                            </button>
-                                            <button class="btn btn-grey" value="webserver">
-                                                <span> Web Server </span>
-                                            </button>
-                                        </div>
-                                    </div>
-
                                 </div>
+
+                                <div class="col-lg-12 mb-1">
+                                    <h5 class="font-weight-bold">Type</h5>
+                                    <div id="groupby-type" class="btn-group special">
+                                        <button id="all" class="btn btn-grey active" value="">
+                                            <span> All</span>
+                                        </button>
+                                        <button class="btn btn-grey" value="public">
+                                            <span> Public </span>
+                                        </button>
+                                        <button class="btn btn-grey" value="darkweb">
+                                            <span> Darkweb </span>
+                                        </button>
+                                        <button class="btn btn-grey" value="webserver">
+                                            <span> Web Server </span>
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="panel-footer">
-                            <div class="row">
-                                <div class="col-lg-12 text-right">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-times"></i>
-                                        <span> Close </span>
-                                    </button>
-                                </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="social_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
                             </div>
                         </div>
-                    </section>
+                    </div>
+                </section>
 
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Compromise Data
-                                </div>
-                            </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table  class="table table-striped" id="table_social_datas">
-                                    <thead>
-                                        <tr>
-                                            <th class="no-sort w-10">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th>
-                                            <th>Site</th>
-                                            <th>Type</th>
-                                            <th>Keyword Ref</th>
-                                            <th>Content</th>
-                                            <th>Remark</th>
-                                            <th>Data Feed</th>
-                                            <th>View</th>
-                                            <th>Status</th>
-                                            <th>@langapp('action')</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                </table>
+                <section class="panel panel-default">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Compromise Data
                             </div>
                         </div>
-                    </section>
+                    </header>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table  class="table table-striped" id="table_social_datas">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort w-10">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>
+                                        <th>Site</th>
+                                        <th>Type</th>
+                                        <th>Keyword Ref</th>
+                                        <th>Content</th>
+                                        <th>Remark</th>
+                                        <th>Data Feed</th>
+                                        <th>View</th>
+                                        <th>Status</th>
+                                        <th>@langapp('action')</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
             </section>
-        </aside>
+        </section>
     </section>
 
     {{-- <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

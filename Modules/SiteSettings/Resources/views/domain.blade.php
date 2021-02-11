@@ -22,7 +22,7 @@
             </section>
         </aside>
 
-        <aside>
+ 
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                     <div class="header-flex-overflow" style="height: 47px;">
@@ -96,7 +96,7 @@
                     </div>
                 </section>
             </section>
-        </aside>
+      
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 
