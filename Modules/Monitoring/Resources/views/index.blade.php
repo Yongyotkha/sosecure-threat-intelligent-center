@@ -239,7 +239,7 @@ function data_table(){
             serverSide: true,
             destroy: true,
             order: [[ 5, "desc" ], [ 0, "asc" ]],
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('monitoring.tableMonitor')!!}',

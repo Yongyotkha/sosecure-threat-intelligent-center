@@ -219,7 +219,7 @@
 
     $(function () {
         $('#table-functioncommand-template').DataTable({
-            "dom": '<"d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             processing: true,
             order: [[0, "desc"]],
         });

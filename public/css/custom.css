@@ -3758,3 +3758,27 @@ textarea.form-control{
     justify-content: start;
 }
 
+
+@media screen and (max-width:768px){
+    .bottom{
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width:560px){
+    .column-xs-flex{
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+}
+
+div.dataTables_paginate li.first > a, div.dataTables_paginate li.previous > a {
+    position: relative;
+    padding-left: 10px !important;
+}
+div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
+    padding-right: 10px !important;
+}
+
