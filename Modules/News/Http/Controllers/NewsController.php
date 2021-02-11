@@ -893,7 +893,7 @@ class NewsController extends Controller
                 </div>-->
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
-                        <span class="head-news-text" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
+                        <span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                     </a>
                     <div class="entry-meta">
                     <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>

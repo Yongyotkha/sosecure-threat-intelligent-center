@@ -3772,6 +3772,11 @@ textarea.form-control{
     }
 }
 
+.max-w-select{
+    min-width:150px !important;
+    display:inline-block;
+}
+
 @media screen and (max-width:560px){
     .column-xs-flex{
         display: flex !important;
@@ -3799,3 +3804,14 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
     width: 100%;
 }
 
+.content-news-text span.head-news-text.text-elip-ovf {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    display: -webkit-box;
+    max-width: 100%;
+    max-height: 46px;
+    -webkit-line-clamp: 2;
+    width: 100%;
+    -webkit-box-orient: vertical;
+}
