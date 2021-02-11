@@ -391,7 +391,7 @@
 @include('stacks.js.highchart')
 
 <script>
-
+var id_select_site = 'site';
 Highcharts.setOptions({
     lang: {
       decimalPoint: '.',
@@ -456,9 +456,9 @@ Highcharts.setOptions({
 
     
     function changeSite(value) {
+        set_cookie_site($(`#${id_select_site}`).val());
         site = value;
         data_table();
-
         count_asset();
         count_vulnerability();
         count_compromised();
@@ -466,7 +466,6 @@ Highcharts.setOptions({
         count_vulnerability_host();
         load_chart();
         cve_assets();
-        
     }
 
     function clearValue(value) {
@@ -490,18 +489,22 @@ Highcharts.setOptions({
 
     $( document ).ready(function() {
         $("#clearValue").addClass('active');
-        data_table();
-        count_asset();
-        count_vulnerability();
-        count_compromised();
-        count_data_leak();
-        count_vulnerability_host();
-        load_chart();
         chart_indicators();
-        @can('assets')
-            cve_assets();
-        @endcan
-
+        if(get_cookie_site()){
+            cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+        }else{
+            data_table();
+            count_asset();
+            count_vulnerability();
+            count_compromised();
+            count_data_leak();
+            count_vulnerability_host();
+            load_chart();
+            @can('assets')
+                cve_assets();
+            @endcan
+        }
+        
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
         
 
@@ -537,6 +540,9 @@ Highcharts.setOptions({
     }
 
     var t;
+
+    
+
     function data_table(){
         startDate =  $("#date-rang").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#date-rang").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');

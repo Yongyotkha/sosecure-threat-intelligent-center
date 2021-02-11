@@ -417,7 +417,7 @@ active_btn('#groupby-type .btn-grey');
             visible_c = false;
         }
 
-
+    var id_select_site = 'site';
     var search_val = 0;
     var keywords = null;
     var site = null;
@@ -457,8 +457,13 @@ active_btn('#groupby-type .btn-grey');
     });
 
     $(function() {
-        table_social_data();
-        get_count();
+        if(get_cookie_site()){
+            cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+        }else{
+            table_social_data();
+            get_count();
+        }
+        
     });
 
     $(".btn-grey").click(function() {
@@ -467,6 +472,7 @@ active_btn('#groupby-type .btn-grey');
     });
 
     $("#site").change(function() {
+        set_cookie_site($(`#${id_select_site}`).val());
         site = this.value;   
         table_social_data();
         get_count();

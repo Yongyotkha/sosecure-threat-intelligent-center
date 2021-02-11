@@ -376,7 +376,7 @@
 <script>
 
     active_btn('#btngroup_status .btn');
-
+    var id_select_site = 'site';
     var keywords = null;
     var site = null;
     var datatype = null;
@@ -449,7 +449,11 @@
 
 
     $(function () {
-        load_card();
+        if(get_cookie_site()){
+            cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+        }else{
+            load_card();
+        }
     });
     
 
@@ -495,6 +499,7 @@
     }
 
     $("#site").change(function() {
+        set_cookie_site($(`#${id_select_site}`).val());
         site = this.value;        
         load_card(search_);
 

@@ -426,10 +426,10 @@
 @include('stacks.js.advanced_search')
 
 <script>
-
+    
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
-
+    var id_select_site = 'select-site';
     {{--$('#table-assets-template-test').DataTable();--}}
     
     $(document).ready(function () {
@@ -442,40 +442,10 @@
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
-        data_table();
-        {{--$.when(data_table()).then(cookie_change_site());--}}
+        {{--data_table();--}}
+        $.when(data_table()).then(cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site));
         
     });
-
-    function cookie_change_site(){
-        if((get_cookie_site())&&({!!json_encode($Search_Link_All)!!}==='')){
-                let currentVal = $('#select-site option:nth-child(2)').val();
-                let firstCurrentVal = $('#select-site option:nth-child(1)').val();
-                let cookieVal = get_cookie_site();
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: '{{route('systemsetting.check_cookie_site')}}',
-                    type: "get",
-                    data: ({
-                        'currentVal':currentVal,
-                        'firstCurrentVal':firstCurrentVal,
-                        'cookieVal':cookieVal,
-                    }),
-                    datatype: "html",
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                }).done(function(data){
-                    $("#select-site").val(data.siteValue).trigger("change");
-                    loading('stop_load');
-                }).fail(function(jqXHR, ajaxOptions, thrownError){
-                    loading('stop_load');
-                    console.log("No response from server");
-                });
-            }
-    }
 
     var site_id = 0;
     $(function () {
@@ -670,7 +640,7 @@
 
     var t;
     function changeSite(val){
-        {{--set_cookie_site($('#select-site').val());--}}
+        set_cookie_site($(`#${id_select_site}`).val());
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -45,3 +45,33 @@ function get_cookie_site(){
         return false;
     }
 }
+
+function cookie_change_site(rountURL,dummySite){
+    if(get_cookie_site()){
+            let currentVal = $(`#${dummySite} option:nth-child(2)`).val();
+            let firstCurrentVal = $(`#${dummySite} option:nth-child(1)`).val();
+            let cookieVal = get_cookie_site();
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: rountURL,
+                type: "get",
+                data: ({
+                    'currentVal':currentVal,
+                    'firstCurrentVal':firstCurrentVal,
+                    'cookieVal':cookieVal,
+                }),
+                datatype: "html",
+                beforeSend: function(){
+                    loading('load');
+                },
+            }).done(function(data){
+                $(`#${dummySite}`).val(data.siteValue).trigger("change");
+                loading('stop_load');
+            }).fail(function(jqXHR, ajaxOptions, thrownError){
+                loading('stop_load');
+                console.log("No response from server");
+            });
+        }
+}
