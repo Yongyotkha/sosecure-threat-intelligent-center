@@ -265,25 +265,32 @@ function data_table(){
             },
             columns: [
                 {
+                    name:'transaction_batchjob.name',
                     data: 'name',
                 },
                 {
+                    name:'transaction_batchjob.mode',
                     data: 'mode',
                 },
                 {
+                    name:'transaction_batchjob.progress',
                     data: 'progress',
                 },
                 {
+                    name:'transaction_batchjob.transcation_date_start',
                     data: 'transcation_date_start',
                 },
                 {
+                    name:'transaction_batchjob.transcation_date_end',
                     data: 'transcation_date_end',
                 },
                 {
+                    name:'site.name',
                     data: 'site_id',
                     className : 'nowrap'
                 },
                 {
+                    name:'transaction_batchjob.message',
                     data: 'message',
                     className : 'text-center'
                 },
