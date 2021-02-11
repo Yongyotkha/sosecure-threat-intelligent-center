@@ -625,13 +625,14 @@ class DarkWebController extends Controller
                 }
             }
 
-            $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+            
 
             if($site_id) {
                 $news = $news->where('site_id', $site_id);
                 $countGroupBy = $countGroupBy->where('site_id', $site_id);
             }
-            // $countGroupBy = $countGroupBy->get();
+            $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+            $countGroupBy = $countGroupBy->get();
 
 
         }
