@@ -125,18 +125,20 @@
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
                         <div class="col-md-4 nopadding">
-                            <div class="card-dash-compro none-bg none-shadow">
-                                <div class="left-card">
-                                    <div class="img-icon-card ice">
-                                        <img src="{{asset('images/database.png')}}" alt="">
+                            <a href="javascript:void(0)" onclick="searchTB('','clearFilter')">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/database.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
+                                        <span class="number-card warning" id="count_assets">0</span>
                                     </div>
-                                    <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
-                                    <span class="number-card warning" id="count_assets">0</span>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="javascript:void(0)" onclick="searchTB('','','os_type','Windows')">
+                            <a href="javascript:void(0)" onclick="searchTB('Windows','os_type')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -149,7 +151,7 @@
                             </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="javascript:void(0)" onclick="searchTB('','','os_type','Linux')">
+                            <a href="javascript:void(0)" onclick="searchTB('Linux','os_type')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -610,20 +612,23 @@
         });
     }
 
-    function searchTB(searchLinkAll='',colsearchLinkAll='',osClickCol='',osValue=''){
+    function searchTB(searchLinkAll='',colsearchLinkAll=''){
         
         
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
 
-        if(osClickCol!==''){
-            selectedValue = osValue;
-            columnSearch = osClickCol;
-        }
         if(colsearchLinkAll!==''){
-            columnSearch = colsearchLinkAll;
-            selectedValue = searchLinkAll;
+            if(colsearchLinkAll=='clearFilter'){
+                columnSearch = '';
+                selectedValue = '';
+            }else{
+                columnSearch = colsearchLinkAll;
+                selectedValue = searchLinkAll;
+            }
         }
+
+
         let selectedSiteName = '';
         if($('#select-site').children("option:selected").val()!=0){
             selectedSiteName = $('#select-site').children("option:selected").text();
@@ -647,7 +652,8 @@
         }else if(columnSearch=='ip_asset_id'){
  
         }else{
-            columnSearch = '';
+            columnSearch = 100;
+            selectedValue = '';
         }
         t.search( '' ).columns().search( '' ).draw();
         if(columnSearch=='ip_asset_id'){

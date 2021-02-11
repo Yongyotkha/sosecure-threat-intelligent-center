@@ -163,7 +163,7 @@ class DashboardNewController extends Controller
                             }
                             if (count($Domain_list) == 0) {
                                 $Assets_data_list = array();
-                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                 $Assets_data_list['site'] = $site->name;
                                 $Assets_data_list['host'] = "None";
                                 $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -171,7 +171,7 @@ class DashboardNewController extends Controller
                             }else{
                                 foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                     $Assets_data_list = array();
-                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = $Domain_listvalue->value;
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -209,7 +209,7 @@ class DashboardNewController extends Controller
                             }
                             if (count($Domain_list) == 0) {
                                 $Assets_data_list = array();
-                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                 $Assets_data_list['site'] = $site->name;
                                 $Assets_data_list['host'] = "None";
                                 $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -217,7 +217,7 @@ class DashboardNewController extends Controller
                             }else{
                                 foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                     $Assets_data_list = array();
-                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = $Domain_listvalue->value;
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -257,7 +257,7 @@ class DashboardNewController extends Controller
                             }
                             if (count($Domain_list) == 0) {
                                 $Assets_data_list = array();
-                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                 $Assets_data_list['site'] = $site->name;
                                 $Assets_data_list['host'] = "None";
                                 $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -265,7 +265,7 @@ class DashboardNewController extends Controller
                             }else{
                                 foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                     $Assets_data_list = array();
-                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = $Domain_listvalue->value;
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -303,7 +303,7 @@ class DashboardNewController extends Controller
                             }
                             if (count($Domain_list) == 0) {
                                 $Assets_data_list = array();
-                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                 $Assets_data_list['site'] = $site->name;
                                 $Assets_data_list['host'] = "None";
                                 $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -311,7 +311,7 @@ class DashboardNewController extends Controller
                             }else{
                                 foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                     $Assets_data_list = array();
-                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->first(); 
+                                    $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = $Domain_listvalue->value;
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
@@ -324,7 +324,7 @@ class DashboardNewController extends Controller
             }
         }
         
-
+    //$assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('status', 1)->get();
         $response = array(
             'error' => '', 
             'status_code' => '200',
