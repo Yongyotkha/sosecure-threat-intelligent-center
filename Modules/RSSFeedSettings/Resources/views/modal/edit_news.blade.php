@@ -103,15 +103,15 @@
                                     <div class="tab-pane active" id="tab_th">
                                         <section class="panel-body border-n">
                                             <div class="form-group row">
-                                                <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH) <span class="text-danger">*</span></label>
+                                                <label for="" class="col-lg-12 control-label" id="label_title_th">Text (TH)</label>
                                                 <div class="col-lg-12">
                                           
-                                                    <input type="text" class="form-control" name="title_th" id="title_th" value="{{@$RSSNews->title_th}}" required>
+                                                    <input type="text" class="form-control" name="title_th" id="title_th" value="{{@$RSSNews->title_th}}">
                                                 </div>
                                             </div>
         
                                             <div class="form-group row">
-                                                <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH) <span class="text-danger">*</span></label>
+                                                <label for="" class="col-lg-12 control-label" id="label_detail_th">Detail (TH)</label>
                                                 <div class="col-lg-12">
                                                     <textarea class="form-control htmleditor" name="detail_th" id="detail_th" data-id="1">{!!@$RSSNews->detail_th!!}</textarea>
                                                 </div>
@@ -121,14 +121,14 @@
                                     <div class="tab-pane" id="tab_en">
                                         <section class="panel-body border-n">
                                             <div class="form-group row">
-                                                <label for="" class="col-lg-12 control-label">Text (EN) <span class="text-danger">*</span></label>
+                                                <label for="" class="col-lg-12 control-label">Text (EN)</label>
                                                 <div class="col-lg-12">
                                                     <input type="text" class="form-control" name="title_en" id="title_en" value="{{@$RSSNews->title_en}}">
                                                 </div>
                                             </div>
         
                                             <div class="form-group row">
-                                                <label for="" class="col-lg-12 control-label">Detail (EN) <span class="text-danger">*</span></label>
+                                                <label for="" class="col-lg-12 control-label">Detail (EN)</label>
                                                 <div class="col-lg-12">
                                                     <textarea class="form-control htmleditor" name="detail_en" id="detail_en" data-id="1">{!!@$RSSNews->detail_en!!}</textarea>
                                                 </div>
@@ -241,7 +241,10 @@ $('form').each(function () {
         $(this).data('validator').settings.ignore = ".note-editor *";
 });
 
-
+$('#source_create').select2({
+            tags: true,
+            tokenSeparators: [' ']
+});
 
 
 var form_save = '.formSaving';
