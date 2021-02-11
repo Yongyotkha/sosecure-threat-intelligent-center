@@ -984,6 +984,9 @@ ul.news_related li a:hover{
         opacity: 0;
         transition: .3s ease-in-out;
     }
+    .m-b-xs-5{
+        margin-bottom: 5px !important;
+    }
 }
 
 ul.total-count{
@@ -3555,6 +3558,7 @@ input.input-login:focus {
     background-color: transparent !important;
     border-radius: 3px;
     transition: .2s linear;
+    margin-bottom: 4px;
 }
 .btn-selector:not(:last-child){
     margin-right: .5rem;
@@ -3753,3 +3757,4 @@ textarea.form-control{
     flex-direction: column;
     justify-content: start;
 }
+

@@ -214,11 +214,11 @@
             <hr>
             <section class="panel panel-default" style="margin-top: 5rem">
                 <header class="panel-heading font-bold panel-header-blue">
-                    <div class="row d-flex-center">
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12 m-b-xs-5">
                             <i class="fas fa-table"></i> Table Activities
                         </div>
-                        <div class="col-md-6 text-right">
+                        <div class="col-md-6 col-xs-12 text-right">
                             <div id="date-rang"
                                 style="color:#333;background: #efefef; cursor: pointer; padding: 1px 10px; border: 1px solid #ddd; display:inline-block;margin-right: 5px;margin-bottom:0;">
                                 <i class="fa fa-calendar"></i>&nbsp;

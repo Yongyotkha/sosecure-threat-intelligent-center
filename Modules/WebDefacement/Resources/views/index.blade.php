@@ -14,7 +14,7 @@
 
                 <div class="ml-2 text-right">
                     <div class="text-left" style="min-width:270px;display:inline-block;">
-                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px">
+                        <select name="site" id="site" class="select2-option form-control select-site">
                             <option value="">All Site</option>
                             @if($SiteSettings)
                             @foreach($SiteSettings as $SiteSettings_val)
@@ -25,13 +25,13 @@
                     </div>
 
                     <button id="advance-search" href="#hide-advance-search"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                        class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
                         <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
                     </button>
 
                     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                     <a href="#" id="btn_md_create"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }}" data-toggle="modal"
                         data-target="#wdfm_website">
                         @icon('solid/plus') @langapp('add')
                     </a>
