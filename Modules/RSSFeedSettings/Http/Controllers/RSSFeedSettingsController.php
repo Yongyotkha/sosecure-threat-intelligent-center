@@ -816,8 +816,8 @@ class RSSFeedSettingsController extends Controller
         
         $get_source_query = "SELECT DISTINCT name FROM fx_rss UNION SELECT DISTINCT source FROM fx_r_s_s_news";
         $get_source = DB::select($get_source_query);
+        
         $get_source = collect($get_source);
-
         $data['get_source'] = @$get_source;
         $data['action'] = 'create';
         // dd($data['get_source']);
@@ -1070,6 +1070,7 @@ class RSSFeedSettingsController extends Controller
 
 
     public function rss_data_store_news_create(Request $request){
+
         $logo = '/images/image-not-found.jpg';
         if ($request->hasFile('logo')) {
             $image = $request->file('logo');
