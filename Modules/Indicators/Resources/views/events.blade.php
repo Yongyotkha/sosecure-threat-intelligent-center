@@ -340,7 +340,8 @@ Highcharts.setOptions({
             }
         },
         legend: {
-            reversed: true
+            reversed: true,
+            itemMarginTop: 5,
         },
         plotOptions: {
             series: {

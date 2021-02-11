@@ -6,8 +6,8 @@
     <section class="vbox">
         <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
             <div class="bc-head">Summary Dashboard</div>
-            <div style="margin-top: 8px; width: 270px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;"
+            <div style="margin-top: 8px; min-width: 270px;">
+                <select name="site" id="site" class="select2-option form-control select-site"
                     onchange="changeSite(value)">
                     <option value="0" selected>All Site</option>
                     @if ($site_settings)
@@ -1046,14 +1046,19 @@ Highcharts.setOptions({
                     }
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
-                            height: 223, 
-                            type: 'bar'
+                            type: 'bar',
                         },
                         title: {
                             text: null
                         },
                         xAxis: {
-                            categories: host_name
+                            categories: host_name,
+                            min: 0,
+                            max: 1,
+                            scrollbar: {
+                                enabled: true
+                            },
+                            tickLength: 0
                         },
                         yAxis: {
                             min: 0,
@@ -1061,11 +1066,10 @@ Highcharts.setOptions({
                             text: null
                             }
                         },
-                        scrollbar: {
-                            enabled: true
-                        },
                         legend: {
-                            reversed: true
+                            pointWidth: 30,
+                            reversed: true,
+                            itemMarginTop: 5,
                         },
                         plotOptions: {
                             series: {
