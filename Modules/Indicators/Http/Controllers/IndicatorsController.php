@@ -1750,7 +1750,7 @@ class IndicatorsController extends Controller
                foreach ($cursor as $document)
                {
         
-    
+                if($document["indicator_count"] > 0){
                     $order_number++;
                     $nestedData['No'] = $order_number;
                     $nestedData['name'] = $document["name"];
@@ -1769,6 +1769,7 @@ class IndicatorsController extends Controller
                     
                    
                    $data[] = $nestedData;
+                }
     
                }
            }
