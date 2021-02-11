@@ -21,8 +21,10 @@
                 <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                     <div class="header-flex-overflow m-t-5">
                         <div class="fwb-16">
-                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</a>
+                            @if(TYPE_WEB == 'center')
+                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</a>
+                                @endif
                             @endif
                             <span>
                                 Data Leak Data
@@ -45,10 +47,10 @@
                             @if(!empty(get_role_custom()))
                             {{-- // var_dump(get_role_custom()['superadmin']);
                                 // var_dump(get_role_custom()['site_admin']); --}}
-                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                            <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}"
-                                class="btn btn-sm btn-info  m-xs"><span> Dataleak Feed</span></a>
-                            @endif
+                            @if(TYPE_WEB == 'center')
+                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                    <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info  m-xs"><span> Dataleak Feed</span></a>
+                                @endif
                             @endif
     
                             <a href="#" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
