@@ -760,6 +760,9 @@ ul.item-list-dash li:not(:last-child){
 .text-date{
     margin-right: 1rem;
 }
+.mobi-d-block span:not(:last-child){
+    margin-right: 1rem;
+}
 .badeg-news,.badeg-view{
     white-space: nowrap;
     color: #fff;
@@ -771,7 +774,6 @@ ul.item-list-dash li:not(:last-child){
 }
 .badeg-view{
     background: #65bd77;
-    margin-left: 1rem;
 }
 .headding-secondary-text{
     display: block;
@@ -819,7 +821,7 @@ ul.news_related li a:hover{
 }
 
 .show-content-news{
-    padding: 3rem 2rem;
+    padding: 3rem 1rem;
     line-height: 150%;
 }
 .entry-view{
@@ -829,8 +831,12 @@ ul.news_related li a:hover{
 
 .shared-news{
     position: absolute;
-    right: 10px;
+    right: 30px;
     top: 8%;
+}
+
+#content_news * img{
+    width: 100%;
 }
 
 .form-control:not(textarea.form-control){

@@ -25,7 +25,7 @@
                             {{-- {{@var_dump($cate)}} --}}
                             {{-- {{@$cate->cate->name}} --}}
                             <span class="badeg-news"><i class="fas fa-newspaper"></i>
-                                {{@$cate->get_cate_name->name}}</span>&nbsp;
+                                {{@$cate->get_cate_name->name}}</span>
                             @endforeach
 
                             @endif
@@ -40,7 +40,7 @@
                         <div class="pos-rlt">
                             <button class="btn-shared"
                                 onclick="shared_news('{!!@$RSSNews_name!!}','{{route('news.public_detail_select', ['code' => @$RSSNews->code , 'lang' => $lang])}}')"
-                                data-toggle="tooltip" data-placement="top" data-original-title="Shared">
+                                data-toggle="tooltip" data-placement="bottom" data-original-title="Shared">
                                 <i class="fas fa-share-square"></i>
                             </button>
                             <div class="menu-shared-main <!--d-none-->">
