@@ -41,8 +41,8 @@
             <section class="vbox">
 
                 
-                <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow m-t-10">
+                <header class="header panel-heading bg-white b-b b-light" >
+                    <div class="header-flex-overflow" style="height: 48px;">
                         <div class="fwb-16">
                             <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</button>
                             <span>
