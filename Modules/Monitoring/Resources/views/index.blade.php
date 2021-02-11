@@ -8,8 +8,8 @@
             </a> --}}
             <div class="bc-head">@langapp('monitoring') > Schedule Task</div>
 
-            <a href="#hide-advance-search"  id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+            <a href="#hide-advance-search" id="advance-search" class="pull-right btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
             </a>
              <div class="pull-right max-w-select" style="margin-top: 8px;">
                 <select name="site" id="site" class="select2-option form-control select-site" onchange="changeSite()">
@@ -140,6 +140,7 @@
 
 
 <script>
+    var id_select_site = 'site';
     var isDateSearch = 0;
     var isSearch = 0;
     var startDate =  '';
@@ -148,9 +149,11 @@
     var select = '';
     var sitecode = '';
 $(function () {
-    
-    
-    data_table();
+    if(get_cookie_site()){
+        cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+    }else{
+        data_table();
+    }
 
     var start = moment();{{--moment().startOf('hour')--}} {{--moment().subtract(1, 'year').startOf('year')--}}
     var end = moment();{{--moment().startOf('hour').add(32, 'hour')--}} {{--moment().subtract(0, 'year').endOf('year')--}}
@@ -225,6 +228,7 @@ function cb(start, end) {
 }
 
 function changeSite(){
+    set_cookie_site($(`#${id_select_site}`).val());
     isSearch = 1;
     sitecode = $("#site").val();
     data_table();

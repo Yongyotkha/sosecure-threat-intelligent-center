@@ -202,9 +202,14 @@
 @include('stacks.js.form')
 
 <script>
-    $(function() {
+var id_select_site = 'site';
 
-        data_table();
+    $(function() {
+        if(get_cookie_site()){
+            cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+        }else{
+            data_table();
+        }
 
         $("#frm-user button").click(function(ev){
             ev.preventDefault();
@@ -313,6 +318,7 @@
     var role =null;
     
     $('#site').on('change', function() {
+        set_cookie_site($(`#${id_select_site}`).val());
         site = this.value;
         data_table();
     });

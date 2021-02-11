@@ -55,24 +55,27 @@
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
                             // var_dump(get_role_custom()['site_admin']); --}}
-                        @if(TYPE_WEB == 'center')
-                            @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
-                                <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
-                                    class="btn btn-sm btn-info  m-xs"><span><i class="fas fa-rss"></i> Compromise
-                                        Feed</span></a>
+                            @if(TYPE_WEB == 'center')
+                                @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                    <a id="btn_compromise_feed" href="{{route('datafeed.darkweb_index')}}"
+                                        class="btn btn-sm btn-info  m-xs">
+                                        <span data-rel="tooltip" title="Compromise Feed" data-placement="bottom"><i class="fas fa-rss"></i> 
+                                            <span class="hide-text">
+                                                CompromiseFeed
+                                            </span>
+                                        </span>
+                                    </a>
+                                @endif
                             @endif
                         @endif
 
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
-    
-                    
-    
-                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  "
+
+                        <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
-                            <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                                @langapp('delete')</span>
+                            <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
                         </button>
 
                     
@@ -382,8 +385,8 @@
 
 <script>
 
-active_btn('#groupby-type .btn-grey');
-
+    active_btn('#groupby-type .btn-grey');
+    var id_select_site = 'site';
     var admin = '{{$admin}}';
         var visible_c = '';
 
@@ -433,8 +436,13 @@ active_btn('#groupby-type .btn-grey');
 
 
     $(function() {
-        table_social_data();
-        get_count();
+        if(get_cookie_site()){
+            cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+        }else{
+            table_social_data();
+            get_count();
+        }
+        
     });
 
     $(".btn-grey").click(function() {
@@ -443,6 +451,7 @@ active_btn('#groupby-type .btn-grey');
     });
 
     $("#site").change(function() {
+        set_cookie_site($(`#${id_select_site}`).val());
         site = this.value;        
         table_social_data();
         get_count();

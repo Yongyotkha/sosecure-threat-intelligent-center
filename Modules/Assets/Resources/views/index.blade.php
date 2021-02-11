@@ -26,20 +26,18 @@
                         @if(TYPE_WEB=='center')
                             <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
                             </a>
                             <input type="hidden" value="" id="site_code">
                         @else
                             <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
                             <input type="hidden" value="{{ @$SiteSettings[0]->code }}" id="site_code">
                         @endif
                         
 
                         <div class="button-control d-none">
-
-        
                             <div class="btn-group d-none">
                                 <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance">Import Asset</button>
                             </div>
@@ -428,10 +426,10 @@
 @include('stacks.js.advanced_search')
 
 <script>
-
+    
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
-
+    var id_select_site = 'select-site';
     {{--$('#table-assets-template-test').DataTable();--}}
     
     $(document).ready(function () {
@@ -444,40 +442,10 @@
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
-        data_table();
-        {{--$.when(data_table()).then(cookie_change_site());--}}
+        {{--data_table();--}}
+        $.when(data_table()).then(cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site));
         
     });
-
-    function cookie_change_site(){
-        if((get_cookie_site())&&({!!json_encode($Search_Link_All)!!}==='')){
-                let currentVal = $('#select-site option:nth-child(2)').val();
-                let firstCurrentVal = $('#select-site option:nth-child(1)').val();
-                let cookieVal = get_cookie_site();
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: '{{route('systemsetting.check_cookie_site')}}',
-                    type: "get",
-                    data: ({
-                        'currentVal':currentVal,
-                        'firstCurrentVal':firstCurrentVal,
-                        'cookieVal':cookieVal,
-                    }),
-                    datatype: "html",
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                }).done(function(data){
-                    $("#select-site").val(data.siteValue).trigger("change");
-                    loading('stop_load');
-                }).fail(function(jqXHR, ajaxOptions, thrownError){
-                    loading('stop_load');
-                    console.log("No response from server");
-                });
-            }
-    }
 
     var site_id = 0;
     $(function () {
@@ -672,7 +640,7 @@
 
     var t;
     function changeSite(val){
-        {{--set_cookie_site($('#select-site').val());--}}
+        set_cookie_site($(`#${id_select_site}`).val());
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

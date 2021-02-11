@@ -48,6 +48,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('news/index_client', 'Api\ApiGetMongoDB@index_client');
     Route::post('news/jqueryLoadMoreNews', 'Api\ApiGetMongoDB@jqueryLoadMoreNews');
     Route::post('news/jqueryLoadMoreNewsBookmark', 'Api\ApiGetMongoDB@jqueryLoadMoreNewsBookmark');
+    Route::post('news/url_bookmark', 'Api\ApiGetMongoDB@url_bookmark');
+    Route::post('news/url_news_detail_code', 'Api\ApiGetMongoDB@url_news_detail_code');
 
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
 });

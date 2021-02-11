@@ -43,7 +43,7 @@
                                 </select>
                             </div>
 
-                            <button id="btn-change-status" class="m-xs btn btn-sm btn-{{ get_option('theme_color')  }}" onclick="change_status_compromised_feed()" disabled>
+                            <button id="btn-change-status" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}" onclick="change_status_compromised_feed()" disabled>
                                 Change Status
                             </button>
 
@@ -51,13 +51,17 @@
                                 {{-- // var_dump(get_role_custom()['superadmin']);
                                 // var_dump(get_role_custom()['site_admin']); --}}
                                 @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['site_admin'] == 1)
-                                    <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info m-xs"><span> Compromise Data</span></a>
+                                    <a id="btn_compromise_data" href="{{site_url('/darkweb-datas')}}" class="btn btn-sm btn-info">
+                                        <span data-rel="tooltip" title="Compromise Data" data-placement="bottom"><i class="fas fa-rss"></i><span class="hide-text">Compromise Data</span></span>
+                                    </a>
                                 @endif
                             @endif
         
 
                             <button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom">
+                                    <i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')<span>
+                                </span>
                              </button>
         
         

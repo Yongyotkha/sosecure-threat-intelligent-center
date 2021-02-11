@@ -158,7 +158,7 @@ class MonitoringController extends Controller
         $model = '';
         $html = '';
         if ($request->isSearch == 1) {
-            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.id as transaction_batchjob_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', '')->where('status', 1);
+            $model = TransactionBatchjob::select('site.name as site_id', 'transaction_batchjob.id as transaction_batchjob_id', 'transaction_batchjob.transcation_date_end', 'transaction_batchjob.transcation_date_start', 'transaction_batchjob.progress', 'transaction_batchjob.mode', 'transaction_batchjob.name', 'transaction_batchjob.message')->where('status', 1);
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
                 $date_start_date = @$date_start_explode[0];
