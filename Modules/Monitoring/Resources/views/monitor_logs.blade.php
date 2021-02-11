@@ -294,10 +294,10 @@ function data_table(){
                 {
                     width: '10%',
                     targets: 1,
-                    name:"site_id",
+                    name:"site_name",
                     render: function (data, type, row) {
-                       if(row.site_id){
-                        return row.site_id;
+                       if(row.site_name){
+                        return row.site_name;
                        }else{
                         return '';
                        }

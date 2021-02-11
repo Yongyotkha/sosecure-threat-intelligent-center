@@ -10,6 +10,8 @@ use App\Entities\TransactionBatchjob;
 use DB;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Monitoring\Entities\MonitorLogs;
+use Modules\Monitoring\Entities\SentLogs;
+
 class MonitoringController extends Controller
 {
     /**
@@ -229,7 +231,7 @@ class MonitoringController extends Controller
         $html = '';
 
         if ($request->isSearch == 1) {
-            $model = MonitorLogs::select('site.name as site_id', 'logs.id as logs','logs.file',
+            $model = MonitorLogs::select('site.name as site_name', 'logs.id as logs','logs.site_id','logs.file',
             'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at');
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
@@ -327,6 +329,8 @@ class MonitoringController extends Controller
         }
         $data['SiteSettings'] = $SiteSettings;
         $data['page'] = langapp('send_logs');
+        $data['type'] = SentLogs::select('type')->distinct()->get();
+
         return view('monitoring::send_logs')->with($data);
     }
 
@@ -337,8 +341,11 @@ class MonitoringController extends Controller
         $html = '';
 
         if ($request->isSearch == 1) {
-            $model = MonitorLogs::select('site.name as site_id', 'logs.id as logs','logs.file',
-            'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at');
+     
+            $model = SentLogs::select('site.name as site_name', 'logs_sent_transaction.id as logs','logs_sent_transaction.mode',
+            'logs_sent_transaction.content','logs_sent_transaction.type','logs_sent_transaction.transaction_status',
+            'logs_sent_transaction.created_at', 'logs_sent_transaction.updated_at','logs_sent_transaction.site_id')
+            ->leftjoin('site', 'logs_sent_transaction.site_id', '=', 'site.id');
             if($request->isDateSearch==1){
                 $date_start_explode = explode(" ",$request->startDate);
                 $date_start_date = @$date_start_explode[0];
@@ -357,34 +364,66 @@ class MonitoringController extends Controller
                 $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
                 $date_end_time_time = date("H:i", strtotime($date_end_time));
                 $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                $model = $model -> whereBetween('logs.updated_at',array($date_start_datetime_format,$date_end_datetime_format));
+                $model = $model -> whereBetween('logs_sent_transaction.updated_at',array($date_start_datetime_format,$date_end_datetime_format));
             }
 
             if($request->Keywords){
                 
                 $keywords = "%". str_replace(array('\\', '"','\''), '\\\\', $request->Keywords)."%";
-                $model = $model->where(function ($query) use ($keywords){
-                    $query->where('logs.file','LIKE', $keywords)
-                    ->orWhere('logs.error_summary', 'LIKE', $keywords)
-                    ->orWhere('logs.log_trace', 'LIKE', $keywords);
-                });
+                $model = $model->where('content','LIKE', $keywords);
+            }
+
+            if($request->select_val){
+                
+                $model = $model->where('transaction_status', $request->select_val);
+                
+            }
+
+            if($request->type){
+   
+                $model = $model->where('type', $request->type);
+                
             }
 
             if($request->sitecode){
+
                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$request->sitecode)->first();
                 $model = $model->where('site_id', $SiteSettings->id);
+                
             }
 
-            $model = $model->leftjoin('site', 'logs.site_id', '=', 'site.id');
+           
           
             
         }else{
-            $model = MonitorLogs::select('site.name as site_id','logs.id as logs','logs.file',
-            'logs.error_summary','logs.log_trace', 'logs.created_at', 'logs.updated_at')
-            ->leftjoin('site', 'logs.site_id', '=', 'site.id');
+            $model = SentLogs::select('site.name as site_name', 'logs_sent_transaction.id as logs','logs_sent_transaction.mode',
+            'logs_sent_transaction.content','logs_sent_transaction.type',
+            'logs_sent_transaction.transaction_status', 'logs_sent_transaction.created_at', 'logs_sent_transaction.updated_at')
+            ->leftjoin('site', 'logs_sent_transaction.site_id', '=', 'site.id');
         }
         
         return DataTables::of($model)->toJson();
+    }
+
+    public function delete_send_logs(Request $request){
+        if($request->id_change){
+
+            foreach($request->id_change as $id_change){
+                SentLogs::where('id',$id_change)->delete();
+            }
+        }else{
+           
+            SentLogs::where('id',$request->id)->delete();
+        }
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('monitoring.send_logs'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
 }

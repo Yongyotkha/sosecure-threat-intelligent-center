@@ -41,21 +41,51 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
-                            <div class="col-lg-6">
+                            <div class="col-lg-12">
                                 <h5 class="font-weight-bold">Keyword</h5>
                                 <input type="text" id="Keywords" class="form-control">
                             </div>
 
+                        </div>
 
-                            <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <h5 class="font-weight-bold">Progress</h5>
+                                <div class="row d-flex align-items-center">
+                                    
+      
+                                    <div class="col-sm-9 col-xs-12">
+                                        <select id="select_val" class="select2-option form-control">
+                                            <option value="" selected>All</option>
+                                            <option value="1" >Waiting</option>
+                                            <option value="2" >Progress</option>
+                                            <option value="3" >Complete</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <h5 class="font-weight-bold">Type</h5>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-sm-9 col-xs-12">
+                                        <select id="type" class="select2-option form-control">
+                                            <option value="" selected>All</option>
+                                            @if(@$type)
+                                            @foreach($type as $type)
+                                                <option value="{{@$type->type}}">{{@$type->type}}</option>
+                                            @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 ">
                                 <h5 class="font-weight-bold">Date</h5>
-                                <div id="newsrange" class="text-center"
-                                    style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;
                                     <span></span> <i class="fa fa-caret-down"></i>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -103,9 +133,9 @@
                                         </label>
                                     </th>
                                     <th>Site</th>
-                                    <th>File</th>
-                                    <th>Error Summary</th>
-                                    <th>Log Trace</th>
+                                    <th>Content</th>
+                                    <th>Type</th>
+                                    <th>Transaction Status</th>
                                     <th>Date</th>
                                     <th>Action</th>
                                 </tr>
@@ -165,9 +195,11 @@
     var startDate =  '';
     var endDate = '';
     var Keywords = '';
-    var select = '';
+    var select_val = '';
     var sitecode = '';
     var count_table = 0;
+    var type = '';
+
 $(function () {
     
     
@@ -211,6 +243,8 @@ $(function () {
         endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         Keywords = $("#Keywords").val();
         sitecode = $("#site").val();
+        select_val = $("#select_val").val();
+        type = $("#type").val();
         data_table();
 
     });
@@ -220,6 +254,7 @@ $(function () {
         $("#Keywords").val('');
         $("#select_val").val('').trigger("change");
         $("#site").val('').trigger("change");
+        $("#type").val('').trigger("change");;
 
         isSearch = 0;
         isDateSearch = 0;
@@ -232,8 +267,9 @@ $(function () {
         startDate=  '';
         endDate=  '';
         Keywords = '';
-        select = '';
+        select_val = '';
         sitecode = '';
+        type = '';
         data_table();
 
     });
@@ -272,8 +308,10 @@ function data_table(){
                     d.startDate = startDate;
                     d.endDate = endDate;
                     d.Keywords = Keywords;
-                    d.select = select;
+                    d.select_val = select_val;
                     d.sitecode = sitecode;
+                    d.type = type;
+   
                 }
             },
             initComplete : function( settings, json){
@@ -294,10 +332,10 @@ function data_table(){
                 {
                     width: '10%',
                     targets: 1,
-                    name:"site_id",
+                    name:"site_name",
                     render: function (data, type, row) {
-                       if(row.site_id){
-                        return row.site_id;
+                       if(row.site_name){
+                        return row.site_name;
                        }else{
                         return '';
                        }
@@ -306,10 +344,10 @@ function data_table(){
                 },
                 {
                     targets: 2,
-                    name:"logs.file",
+                    name:"logs_sent_transaction.content",
                     render: function (data, type, row) {
-                        if(row.file){
-                        return row.file;
+                        if(row.content){
+                        return row.content;
                        }else{
                         return '';
                        }
@@ -317,29 +355,42 @@ function data_table(){
                 },
                 {
                     targets: 3,
-                    name:"logs.error_summary",
+                    name:"logs_sent_transaction.type",
                     render: function (data, type, row) {
-                        if(row.error_summary){
-                        return '<div class="text-elip" data-rel="tooltip" title="'+row.error_summary+'">'+row.error_summary+'</div>';
-                       }else{
-                        return '';
-                       }
-                    }
-                },
-                {
-                    targets: 4,
-                    name:"logs.log_trace",
-                    render: function (data, type, row) {
-                        if(row.log_trace){
-                            return '<div class="text-elip" data-rel="tooltip" title="'+row.log_trace+'"><textarea rows="3" cols="50" disabled>'+row.log_trace+'</textarea></div>';
+                        if(row.type){
+                            return row.type;
                         }else{
                             return '';
                         }
                     }
                 },
                 {
+                    targets: 4,
+                    name:"logs_sent_transaction.transaction_status",
+                    render: function (data, type, row) {
+                        let inner = '';
+                        if(row.transaction_status == 0){
+                            inner = '';
+                            inner = '<span class="badge badge-danger" style="background-color: #ea2e49;">Not Working</span';
+                        }else if(row.transaction_status == 1){
+                            inner = '';
+                            inner = '<span class="badge badge-wait" style="background-color: #ea2e49;">Waiting</span';
+                        }else if(row.transaction_status == 2){
+                            inner = '';
+                            inner = '<span class="badge badge-success" style="background-color: #ea2e49;">Progress</span';
+                        }else if(row.transaction_status == 3){
+                            inner = '';
+                            inner = '<span class="badge badge-success" style="background-color: #00b303;">Complete</span';
+                        }else{
+                            inner = '';
+                            inner = '<span class="badge badge-none" style="background-color: #ea2e49;">Unknow</span';
+                        }
+                        return inner;
+                    }
+                },
+                {
                     targets: 5,
-                    name:"logs.updated_at",
+                    name:"logs_sent_transaction.updated_at",
                     className:"no-wrap",
                     render: function (data, type, row) {
                         return '<p><strong>created_at : </strong>'+row.created_at+'</p><p><strong>updated_at : </strong>'+row.updated_at+'</p>';
@@ -369,7 +420,7 @@ function data_table(){
     function delete_logs_click () {
         $.ajax({
              type:"POST",
-            url:"{{ route('monitoring.delete_logs') }}",
+            url:"{{ route('monitoring.delete_send_logs') }}",
             data:{
                 id: log_id_delete,
                 id_change: log_id_delete_change,
