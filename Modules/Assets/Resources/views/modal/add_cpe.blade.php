@@ -374,17 +374,6 @@
 
         });
 
-        $("#add_remark").keypress(function() {
-
-            $('#check_remark').html('');
-
-        });
-
-        $("#remark_com").keypress(function() {
-
-            $('#check_remark_com').html('');
-
-        });
 
         $("#result").keypress(function() {
 
@@ -502,8 +491,6 @@
             $('#check_os').html('Please select os type.');
         }else if(res.length==1){           
             $('#check_cpe').html('Please select cpe.');
-        }else if(add_remark==''){
-            $('#check_remark').html('Please fill out.');
         }else{
             html=``;
             html+=`<tr>
@@ -541,8 +528,6 @@
             $('#check_os_information').html('Please fill out.');
         }else if(cpe_information==''){
             $('#check_cpe_information').html('Please fill out.');
-        }else if(remark_com==''){
-            $('#check_remark_com').html('Please fill out.');
         }else{
             html=``;
             html+=`<tr>

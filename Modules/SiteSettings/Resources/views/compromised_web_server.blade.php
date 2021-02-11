@@ -1120,6 +1120,7 @@
     }
 
     $("#btn-change-status").click(function() {
+        web_server_id_chang = [];
         $('#change_fix').modal('show');
         $('.web_server_id:checked').each(function () {
             web_server_id_chang.push(this.value);
