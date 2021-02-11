@@ -30,6 +30,7 @@ use Modules\RSSFeedSettings\Entities\TransactionRssData;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\DataTables;
 
+
 class RSSFeedSettingsController extends Controller
 {
     /**
@@ -437,13 +438,26 @@ class RSSFeedSettingsController extends Controller
                 }
             })
             ->addColumn('cate', function (RSSNews $model) {
+         
                 $html = '';
-                if(empty($model->get_cate)){
-                    $html = '-';
+                if($model->get_cate=="[]"){
+                    $html = 'None';
                 }else{
+
                     foreach($model->get_cate as $cate_val) {
-                        $html .= $cate_val->get_cate_name->name.', ';
+                        if($cate_val->get_cate_name_news){
+                            $html .= $cate_val->get_cate_name_news->name.', ';
+                        }else{
+                            $html .= 'None-delete0';
+                        }
+                        
                     }
+                    if($html=='None-delete0'){
+                        $html=str_replace('-delete0','', $html);
+                    }else{
+                        $html = str_replace('None-delete0','', $html);
+                    }
+                    
                     $html = rtrim($html,", ");
                 }
                 return $html;
@@ -665,21 +679,38 @@ class RSSFeedSettingsController extends Controller
             }
             
         }
+       
+        // $RSSNewsCategory = RSSNewsCategory::select('rss_news_id','categories.name')->join('categories','categories.id','=','r_s_s_news_categories.news_category_id')->where('categories.active',1);
+        // dd($RSSNewsCategory->get());
+        // $model = $model         
+        // ->select('categories.name as categories_name_',DB::raw('count(*) as categories_count'))
+        // ->leftjoin('r_s_s_news_categories','r_s_s_news.id','=','r_s_s_news_categories.rss_news_id')
+        // ->leftjoin('categories','categories.id','=','r_s_s_news_categories.news_category_id')
+        // ->where('categories.active',1)
+        // ->where('categories.deleted_at',null)
+        // ->groupBy('categories.name')
+        // ->orderBy('categories_count', 'desc')
+        // ->limit(10)
+        // ->get();
 
-        $model = $model         
-        ->select(DB::raw('count(source) as source_count , source as source'))
-        ->groupBy('source')
-        ->orderBy('source_count', 'desc')
-        ->limit(10)
-        ->get();
+        $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
+        (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+        where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+        and fx_categories.active=1) as test
+        on fx_r_s_s_news.id = test.rssid
+        group by name_cat
+        order by categories_count desc
+        limit 10" ;
+        $model = DB::select( DB::raw($sql));
+
 
         $host = array();
         $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
         foreach($model as $key => $value){
 
             $host[] = array(
-                'name' => empty($value->source)?'None':$value->source,
-                'y' => (int)$value->source_count,
+                'name' => empty($value->name_cat)?'None':$value->name_cat,
+                'y' => (int)$value->categories_count,
                 'color' => $color[$key] ,
             );
 
