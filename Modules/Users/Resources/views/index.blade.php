@@ -29,7 +29,7 @@
                                 @can('roles_view_all')
                                 <a href="{{  route('users.roles')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                     <span data-rel="tooltip" title="Permissions" data-placement="bottom">
-                                        @icon('solid/user-secret')<span class="hide-text">@langapp('roles')</span>
+                                        @icon('solid/user-secret')<span class="hide-text">Manage @langapp('roles')</span>
                                     </span>
                                 </a>
                 
