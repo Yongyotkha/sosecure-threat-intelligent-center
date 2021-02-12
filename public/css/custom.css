@@ -3836,3 +3836,10 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
 textarea.resize-none{
     resize: none;
 }
+
+.ovf-link{
+    display: inline-block;
+    max-width: 300px;
+    overflow-y: auto;
+    max-height: 50px;
+}

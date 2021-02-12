@@ -503,6 +503,7 @@ function explode_val($val,$type=null) {
     if($val) {
         $val_arr = explode(",",$val);
         if($val_arr) {
+            $result .= '<div class="ovf-link">';
             foreach($val_arr as $tag) {
                 if($type == 'tags') {
                     $result .=  '<a href="'.route('indicators.link_tags', ['id' => $tag]).'">'.$tag.'</a> ,';
@@ -513,6 +514,7 @@ function explode_val($val,$type=null) {
                 }
                 
             }
+            $result .= '</div>';
             $result = rtrim($result,',');
         }
     } else {
