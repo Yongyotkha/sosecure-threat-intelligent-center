@@ -11,6 +11,7 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use App\file_version;
 use Illuminate\Support\Collection;
 use Modules\Users\Entities\User;
+use Modules\Users\Entities\UserSite;
 
 class ApiController extends Controller
 {
@@ -22,6 +23,45 @@ class ApiController extends Controller
             }else{
                 if(($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s")) && $site->deleted_at == null){
                     return ['error' => '', 'status_code' => '200', 'data' => $site];
+                }else{
+                    return ['error' => 'Site expried or Site deleted', 'status_code' => '403'];
+                }
+            }
+        }else{
+            $items = [
+                'ip_key'  => '192.168.0.1',
+                'mac_address_key' => '000:000:000:000',
+            ];
+            $collection = Collection::make($items);
+            $site = $collection->toArray();
+            return ['error' => '', 'status_code' => '200', 'data' => $site];
+        }
+    }
+
+    protected function AuthorizationSite($header, $mode, $user_id, $menu){
+        if($mode == 'site_offline'){
+            $check_permission_site_custom_api = check_permission_site_custom_api($user_id, $menu);
+            if($check_permission_site_custom_api === 0){
+                return ['error' => "You don't have permission to access", 'status_code' => '403' ];
+            }
+            $site = SiteSettings::where('public_key', '!=', null)->where('public_key', $header)->first();
+            $user_site = UserSite::select('site_id')->where('user_id', $user_id)->where('active', 1)->get();
+            $rows_site = 0;
+            foreach($user_site as $data){
+                if($site -> id == $data -> site_id){
+                    $rows_site++;
+                }
+            }
+
+            if(empty($site)){
+                return ['error' => 'Unauthorized', 'status_code' => '401'];
+            }else{
+                if(($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s")) && $site->deleted_at == null){
+                    if($rows_site > 0){
+                        return ['error' => '', 'status_code' => '200', 'data' => ''];
+                    }else{
+                        return ['error' => "You don't have permission to access", 'status_code' => '403'];
+                    }
                 }else{
                     return ['error' => 'Site expried or Site deleted', 'status_code' => '403'];
                 }
