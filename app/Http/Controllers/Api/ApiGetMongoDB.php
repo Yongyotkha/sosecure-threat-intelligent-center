@@ -151,7 +151,7 @@ class ApiGetMongoDB extends ApiController
                             $nestedData['is_modified'] = ($document["is_modified"]);
                             $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
                             $nestedData['count_view'] = $document["count_view"];
-                            $nestedData['puls   e_id'] = $document["pulse_id"];
+                            $nestedData['pulse_id'] = $document["pulse_id"];
                         
                             // <a href="'.rou   te('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
                             // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
