@@ -887,39 +887,39 @@ class DashboardNewController extends Controller
             }
         }
 
-        if (!$request->pagename||$request->pagename=='Indicators') {
-            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-            $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        // if (!$request->pagename||$request->pagename=='Indicators') {
+        //     $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        //     $clientMD = new MongoClient($DB_MONGO_KEY);
+        //     $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
 
-            $options = [
-                'allowDiskUse' => TRUE
-            ];
+        //     $options = [
+        //         'allowDiskUse' => TRUE
+        //     ];
 
-            $pipeline = [
-                [
-                    '$match' => [
-                        'created_at'  => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)],
-                    ]
-                ],
-                [
-                    '$project' => [
-                        '_id' => 0,
-                        'sitename' => 'All Site',
-                        'content' => '$name',
-                        'datetime' => ['$dateToString'=>['format'=>'%Y-%m-%d %H:%M:%S','date'=>'$created_at','timezone'=>'Asia/Bangkok']],
-                        'pagename' => 'Indicators',
-                        'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
-                    ]
-                ]
-            ];
+        //     $pipeline = [
+        //         [
+        //             '$match' => [
+        //                 'created_at'  => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)],
+        //             ]
+        //         ],
+        //         [
+        //             '$project' => [
+        //                 '_id' => 0,
+        //                 'sitename' => 'All Site',
+        //                 'content' => '$name',
+        //                 'datetime' => ['$dateToString'=>['format'=>'%Y-%m-%d %H:%M:%S','date'=>'$created_at','timezone'=>'Asia/Bangkok']],
+        //                 'pagename' => 'Indicators',
+        //                 'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+        //             ]
+        //         ]
+        //     ];
 
-            // dd($pipeline);
-            $data_fx_otx_events = $col_fx_otx_events->aggregate($pipeline,$options);
+        //     // dd($pipeline);
+        //     $data_fx_otx_events = $col_fx_otx_events->aggregate($pipeline,$options);
            
-            $data_fx_otx_events = $data_fx_otx_events->toArray();
+        //     $data_fx_otx_events = $data_fx_otx_events->toArray();
         
-        }
+        // }
 
 
             $model = array_merge($dataCVEMapping,$dataR_s_s_news,$DataLeakFeed_social,$DataLeakFeed_compromised,$data_fx_otx_events);

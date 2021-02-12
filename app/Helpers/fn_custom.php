@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Auth;
 define("TYPE_WEB", 'center');//center , client
 define("PAGINATE_NUM", 10);
 
-define("DB_MONGO_01", 'mongodb://10.104.0.10:27017');
+define("DB_MONGO_01", 'mongodb://10.104.0.15:27017');
 
 define("PATH_MY_IP_TF", 'http://127.0.0.2');
 

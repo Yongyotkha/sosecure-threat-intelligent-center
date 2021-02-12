@@ -240,9 +240,9 @@
                                 @if($role_custom['news'])
                                     <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
                                 @endif
-                                @if($role_custom['indicators'])
-                                    <button class="btn btn-selector d-none" onclick="select_pagename('Indicators')">Indicators</button>
-                                @endif
+                                {{-- @if($role_custom['indicators'])
+                                    <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
+                                @endif --}}
                                 @if($role_custom['vulnerabilities'])
                                     <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
                                 @endif
