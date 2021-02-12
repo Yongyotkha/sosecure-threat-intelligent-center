@@ -10,17 +10,19 @@
                     @icon('solid/arrow-left')
                 </a>
 
+                @can('roles_create')
+                <a href="{{ route('users.roles.create') }}" data-toggle="ajaxModal" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
+                    @icon('solid/plus') @langapp('create')
+                </a>
+                @endcan
+                
                 @can('menu_users')
                 <a href="{{ route('users.index') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                     @icon('solid/user-circle') @langapp('users')
                 </a>
                 @endcan
 
-                @can('roles_create')
-                <a href="{{ route('users.roles.create') }}" data-toggle="ajaxModal" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
-                    @icon('solid/plus') @langapp('create')
-                </a>
-                @endcan
+               
 
            
         
