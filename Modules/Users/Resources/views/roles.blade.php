@@ -5,18 +5,33 @@
     <section class="hbox stretch">
         <section class="vbox">
             <header class="header panel-heading bg-white b-b b-light">
-                @can('menu_users')
+
                 <a href="{{ route('users.index') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm">
+                    @icon('solid/arrow-left')
+                </a>
+
+                @can('menu_users')
+                <a href="{{ route('users.index') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                     @icon('solid/user-circle') @langapp('users')
                 </a>
                 @endcan
+
                 @can('roles_create')
                 <a href="{{ route('users.roles.create') }}" data-toggle="ajaxModal" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                     @icon('solid/plus') @langapp('create')
                 </a>
                 @endcan
+
+           
+        
             </header>
             <section class="scrollable wrapper">
+
+                <div class="alert alert-warning">
+                    <h5>1. Create Role</h5>
+                    <h5>2. Setting Permission menu</h5>
+                 </div>
+
                 <section class="panel panel-default">
                     <header class="panel-heading font-bold panel-header-blue">
                         <div class="row d-flex-center">
@@ -33,6 +48,7 @@
                                         <th class="hide">ID</th>
                                         <th class="">@langapp('name')</th>
                                         <th class="">Guard</th>
+                                        <th class="">Permission Menu</th>
                                         <th style="width: 120px">Action</th>
                                     </tr>
                                 </thead>
@@ -45,13 +61,39 @@
                                         <td class="">
                                             {{ $role->guard_name }}
                                         </td>
+                                        <td class="">
+                                            <div class="d-il-block">
+                                                <div class="checkbox">
+                                                    <label><input type="checkbox" name="" checked="" value="TRUE">
+                                                    <span class="label-text" data-rel="tooltip" title="" data-original-title="">Dashboard</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="d-il-block">
+                                                <div class="checkbox">
+                                                    <label><input type="checkbox" name="" checked="" value="TRUE">
+                                                    <span class="label-text" data-rel="tooltip" title="" data-original-title="">Assets</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="d-il-block">
+                                                <div class="checkbox">
+                                                    <label><input type="checkbox" name="" checked="" value="TRUE">
+                                                    <span class="label-text" data-rel="tooltip" title="" data-original-title="">News</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="d-il-block">
+                                                <div class="checkbox">
+                                                    <label><input type="checkbox" name="" checked="" value="TRUE">
+                                                    <span class="label-text" data-rel="tooltip" title="" data-original-title="">Indicators</span></label>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td class="nowrap">
                                             
                                             {{-- @if($role->id != 1 && $role->id != 2 && $role->id != 4 && $role->id != 5) --}}
                                             
-                                            <a href="{{ route('users.roles.permission_custom', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                            {{-- <a href="{{ route('users.roles.permission_custom', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/shield-alt')
-                                            </a>
+                                            </a> --}}
                                             
                                             <a href="{{ route('users.roles.permission', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/shield-alt')

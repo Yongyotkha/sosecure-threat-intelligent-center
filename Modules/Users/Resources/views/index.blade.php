@@ -28,11 +28,17 @@
 
                                 @can('roles_view_all')
                                 <a href="{{  route('users.roles')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                    @icon('solid/user-secret') @langapp('roles') </a>
+                                    <span data-rel="tooltip" title="Permissions" data-placement="bottom">
+                                        @icon('solid/user-secret')<span class="hide-text">Manage @langapp('roles')</span>
+                                    </span>
+                                </a>
                 
                                 <a href="{{  route('users.perm')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                    @icon('solid/shield-alt') @langapp('permissions')</a>
-                
+                                    <span data-rel="tooltip" title="Permissions" data-placement="bottom">
+                                        @icon('solid/shield-alt')<span class="hide-text">@langapp('permissions')</span>
+                                    </span>
+                                </a>
+                                
                                 @endcan
                             @endif
                         @endif
@@ -67,16 +73,18 @@
                             @if(@get_role_custom()['superadmin'] == 1)
 
                             @can('users_create')
-                            <a href="{{ route('users.create') }}" class=" m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}"
+                            <a href="{{ route('users.create') }}" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}"
                                 data-toggle="ajaxModal">
-                                @icon('solid/plus') @langapp('create')
+                                <span data-rel="tooltip" title="Create" data-placement="bottom">
+                                @icon('solid/plus') <span class="hide-text">@langapp('create')</span>
+                                </span>
                             </a>
                             @endcan
                         
                             @can('users_delete')
-                            <button type="submit" id="btn_del_select" class="m-l-xs btn btn-sm btn-danger" value="bulk-delete"
-                                data-rel="tooltip" title="Are you sure?" data-placement="bottom" disabled>
-                                @icon('solid/trash-alt') @langapp('delete')
+                            <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"
+                                data-rel="tooltip" title="Delete" data-placement="bottom" disabled>
+                                @icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span>
                             </button>
                             @endcan
             
@@ -86,7 +94,7 @@
                             <a href="{{ route('announcements.index') }}" style="display: none"
                                 class="btn btn-sm btn-{{ get_option('theme_color') }}" data-rel="tooltip"
                                 title="@langapp('announcements')" data-placement="bottom">
-                                @icon('solid/bullhorn') @langapp('announcements')
+                                @icon('solid/bullhorn') <span class="hide-text">@langapp('announcements')</span>
                             </a>
                             @endif
                 
@@ -102,6 +110,10 @@
 
             <section class="scrollable wrapper">
 
+                <div class="alert alert-warning">
+                   <h5>1. Create user</h5>
+                   <h5>2. Modify e-mail and setting password</h5>
+                </div>
 
 
                 <section class="panel panel-default">

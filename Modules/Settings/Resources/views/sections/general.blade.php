@@ -11,11 +11,10 @@
             <input type="hidden" name="languages" value="{{  implode(',', $translations)  }}">
             @if (count($translations) > 0)
             <ul class="nav nav-tabs" role="tablist">
-                <li><a class="active" data-toggle="tab" href="#tab-english">EN</a></li>
-                <li><a data-toggle="tab" href="#tab-th">TH</a></li>
-                {{-- @foreach ($translations as $lang)
+                <li><a class="active" data-toggle="tab" href="#tab-english">en</a></li>
+                @foreach ($translations as $lang)
                 <li><a data-toggle="tab" href="#tab-{{  $lang  }}">{{ $lang }}</a></li>
-                @endforeach --}}
+                @endforeach
             </ul>
             <div class="tab-content tab-content-fix">
                 <div class="tab-pane fade in active" id="tab-english">

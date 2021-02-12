@@ -156,7 +156,7 @@
                 </div>
                 <div class="modal-footer">
                     <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                    <button type="button" class="btn btn-info submit btn-rounded delete-all" onclick="delete_web_server_save()"><i class="fas fa-paper-plane"></i> OK</button>
+                    <button type="button" class="btn btn-info submit btn-rounded delete-all"><i class="fas fa-paper-plane"></i> OK</button>
                 </div>
             </div>
         </div>
