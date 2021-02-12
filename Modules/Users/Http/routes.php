@@ -31,6 +31,7 @@ Route::group(
         Route::post('roles', 'RoleController@save')->name('roles.save')->middleware(['can:roles_create']);
         Route::put('roles/{id}', 'RoleController@update')->name('roles.update')->middleware(['can:roles_update']);
         Route::delete('roles/{id}', 'RoleController@destroy')->name('roles.destroy')->middleware(['can:roles_delete']);
+        Route::post('roles/data_table', 'RoleController@data_table')->name('roles.data_table');
 
         Route::get('data', 'UserCustomController@tableData')->name('users.data')->middleware('can:menu_users');
         Route::post('del_user', 'UserCustomController@del_user')->name('users.del_user')->middleware('can:menu_users');

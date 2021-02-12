@@ -45,15 +45,14 @@
                             <table class="table table-striped" id="roles-table">
                                 <thead>
                                     <tr>
-                                        <th class="hide">ID</th>
                                         <th class="">@langapp('name')</th>
-                                        <th class="">Guard</th>
+                                        {{-- <th class="">Guard</th> --}}
                                         <th class="">Permission Menu</th>
                                         <th style="width: 120px">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (Role::get() as $key => $role)
+                                    {{-- @foreach (Role::get() as $key => $role)
                                     <tr>
                                         <td>{{ $role->id }}</td>
                                         <td>{{ ucfirst($role->name) }}</td>
@@ -89,29 +88,25 @@
                                         </td>
                                         <td class="nowrap">
                                             
-                                            {{-- @if($role->id != 1 && $role->id != 2 && $role->id != 4 && $role->id != 5) --}}
-                                            
-                                            {{-- <a href="{{ route('users.roles.permission_custom', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
-                                                @icon('solid/shield-alt')
-                                            </a> --}}
                                             
                                             <a href="{{ route('users.roles.permission', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/shield-alt')
                                             </a>
-                                            
+                                            @if($role->id != 1 && $role->id != 2 && $role->id != 4 && $role->id != 5 && $role->id != 6)
                                             <a href="{{ route('users.roles.edit', ['id' => $role->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/pencil-alt')
                                             </a>
+                                            
                                             <a href="{{ route('users.roles.delete', ['id' => $role->id]) }}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/trash-alt')
                                             </a>
-                                            {{-- @endif --}}
+                                            @endif
                                        
                                             
                                         </td>
                                         
                                     </tr>
-                                    @endforeach
+                                    @endforeach --}}
                                 </tbody>
                             </table>
                         </div>
@@ -128,12 +123,82 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 <script>
-$(function() {
-var table = $('#roles-table').DataTable({
-processing: true,
-order: [[ 0, "asc" ]],
-});
-});
+    $(function() {
+        data_table();
+    });
+
+    function data_table() {
+    
+        $('#roles-table').DataTable({
+            pageLength: 50,
+            processing: true,
+            destroy: true,
+            ajax: {
+                type: "POST",
+                url: '{!! route('roles.data_table') !!}',
+                data: {
+                },
+            },
+        
+            initComplete : function( settings, json){
+                $('[data-toggle="tooltip"]').tooltip();
+            
+                
+            },
+            createdRow: function ( row, data, index ) {
+                $(row).attr('id', 'tr' + data.id);
+            },
+            columnDefs: [
+
+                {
+                    targets: 0,
+
+                    width: '1px',
+                    render: function (data, type, full, meta) {
+
+                        return  full.name;
+                    },
+                },
+                {
+                    targets: 1,
+
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+
+                        return full.sub_menu_name;
+                    },
+                },
+                {
+                    targets: 2,
+                    width: '10px',
+                    render: function (data, type, full, meta) {
+                        html ='';
+                        html += `<a href="/users/role-permission_role/${full.id}" 
+                        
+                        class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">@icon('solid/shield-alt')
+                        </a>`;
+                        if(full.id != 1 && full.id != 2 && full.id != 4 && full.id != 5 && full.id != 6){
+                            html += `<a href="/users/edit-role/${full.id}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
+                                                @icon('solid/pencil-alt')
+                                    </a>
+                                            
+                                    <a href="/users/delete-role/${full.id}" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                                        @icon('solid/trash-alt')
+                                    </a>`;
+                        }
+
+                        return html;
+                            
+                    },
+                },
+
+
+            ]
+        
+        });
+    }
+
+
 </script>
 @endpush
 @endsection
