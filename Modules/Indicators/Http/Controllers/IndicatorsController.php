@@ -1740,7 +1740,8 @@ class IndicatorsController extends Controller
            }
     
            
-           
+        $query['indicator_count'] = ['$ne' => 0];
+        $cursor = $col_fx_otx_events->find($query,$options);
         $cursor = $cursor->toArray();
     
         $data = array();
@@ -1749,8 +1750,6 @@ class IndicatorsController extends Controller
            {
                foreach ($cursor as $document)
                {
-        
-                if($document["indicator_count"] > 0){
                     $order_number++;
                     $nestedData['No'] = $order_number;
                     $nestedData['name'] = $document["name"];
@@ -1769,7 +1768,6 @@ class IndicatorsController extends Controller
                     
                    
                    $data[] = $nestedData;
-                }
     
                }
            }

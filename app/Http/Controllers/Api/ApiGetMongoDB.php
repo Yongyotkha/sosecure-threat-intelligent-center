@@ -132,7 +132,7 @@ class ApiGetMongoDB extends ApiController
                         $cursor = $col_fx_otx_events->find($query,$options);
                 }
 
-                $query['indicator_count'] = 0;
+                $query['indicator_count'] = ['$ne' => 0];
                 $cursor = $col_fx_otx_events->find($query,$options);
                 $cursor = $cursor->toArray();
 
@@ -142,8 +142,6 @@ class ApiGetMongoDB extends ApiController
                 {
                     foreach ($cursor as $document)
                     {
-                
-                        if($document["indicator_count"] > 0){
                             $order_number++;
                             $nestedData['No'] = $order_number;
                             $nestedData['name'] = $document["name"];
@@ -162,8 +160,6 @@ class ApiGetMongoDB extends ApiController
                             
                         
                         $data_nestedData[] = $nestedData;
-
-                        }
                             
                     }
                 }
