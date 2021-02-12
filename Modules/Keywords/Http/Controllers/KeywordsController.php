@@ -9,7 +9,7 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use MongoDB\Client as MongoClient;
 class KeywordsController extends Controller
 {
     /**
@@ -208,13 +208,40 @@ class KeywordsController extends Controller
 
     public function delete_process($id = null)
     {
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_social_Keyword = $clientMD->social->Keyword;
+
         $Site_keywords = Site_keywords::where("id",$id)->first();
+
+        if($Site_keywords->type == 'social'){
+            $isDeleteKeyword = true;
+            $all_site_Keywords = Site_keywords::where("name",$Site_keywords->name)->where("id",'!=',$Site_keywords->id)->where("deleted_at",null)->get()->toArray();
+            if(count($all_site_Keywords)>0){
+                foreach ($all_site_Keywords as $key => $value) {
+                    $findSite = SiteSettings::where('id',$value["site_id"])->where("active",1)->where("deleted_at",null)->first();
+                    if(!empty($findSite)){
+                        $isDeleteKeyword = false;
+                    }
+                }
+            }
+            if($isDeleteKeyword){
+                $deleteResult = $col_social_Keyword->deleteOne(['_id' => $Site_keywords->name,'created_by'=>'mtsc']);
+            }
+        }
+        
+        
         $model = Site_keywords::where("id",$id);
         // dd($model);
         $model->delete();
 
         // $site_code = $this->siteSettings->find_code($model->$site_id);
         $SiteSettings = SiteSettings::where('id',$Site_keywords->site_id)->first();
+
+
+
+        
+
 
         return ajaxResponse(
             [
@@ -232,9 +259,30 @@ class KeywordsController extends Controller
 
         //  dd($request->id);
 
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_social_Keyword = $clientMD->social->Keyword;
+        
         foreach($request->id as $keyword_id){
-
             $Site_keywords  = Site_keywords::where('id', $keyword_id)->first();
+            
+            if($Site_keywords->type == 'social'){
+                $isDeleteKeyword = true;
+                $all_site_Keywords = Site_keywords::where("name",$Site_keywords->name)->where("id",'!=',$Site_keywords->id)->where("deleted_at",null)->get()->toArray();
+                if(count($all_site_Keywords)>0){
+                    foreach ($all_site_Keywords as $key => $value) {
+                        $findSite = SiteSettings::where('id',$value["site_id"])->where("active",1)->where("deleted_at",null)->first();
+                        if(!empty($findSite)){
+                            $isDeleteKeyword = false;
+                        }
+                    }
+                }
+                if($isDeleteKeyword){
+                    $deleteResult = $col_social_Keyword->deleteOne(['_id' => $Site_keywords->name,'created_by'=>'mtsc']);
+                }
+            }
+            
+
             $data = Site_keywords::where("id",$keyword_id);
             $data->delete();
 

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
-
+use MongoDB\Client as MongoClient;
 class KeywordSettingController extends Controller
 {
     /**
@@ -92,16 +92,51 @@ class KeywordSettingController extends Controller
      */
     public function update(KeywordsRequest $request, $id = null)
     {
-        
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_social_Keyword = $clientMD->social->Keyword;
         // dd($request);
         // exit();
         // $domain = $this->domain->findOrFail($id);
+        $Old_Site_keywords = Site_keywords::where('id',$id)->first();
         $Site_keywords = Site_keywords::findOrFail($id);
         // $domain->update($request->all());
         $Site_keywords->name = $request->name;
         $Site_keywords->type = $request->type;
         $Site_keywords->status = $request->status ? 1 : 0;
         $Site_keywords->save();
+
+        if($Site_keywords->type == 'social'){
+            $isEditKeyword = true;
+            $all_site_Keywords = Site_keywords::where("name",$Old_Site_keywords->name)->where("id",'!=',$Old_Site_keywords->id)->where("deleted_at",null)->get()->toArray();
+            if(count($all_site_Keywords)>0){
+                foreach ($all_site_Keywords as $key => $value) {
+                    $findSite = SiteSettings::where('id',$value["site_id"])->where("active",1)->where("deleted_at",null)->first();
+                    if(!empty($findSite)){
+                        $isEditKeyword = false;
+                    }
+                }
+            }
+            if($isEditKeyword){
+                $deleteResult = $col_social_Keyword->deleteOne(['_id' => "".$Old_Site_keywords->name,'created_by'=>'mtsc']);
+                $findOne = $col_social_Keyword->findOne(['_id' => "".$Site_keywords->name]);
+                if(empty($findOne)){
+                    $insertOneResult = $col_social_Keyword->insertOne([
+                        '_id' => "".$Site_keywords->name,
+                        'created_by' => 'mtsc',
+                    ]);
+                }
+            }else{
+                $findOne = $col_social_Keyword->findOne(['_id' => "".$Site_keywords->name]);
+                if(empty($findOne)){
+                    $insertOneResult = $col_social_Keyword->insertOne([
+                        '_id' => "".$Site_keywords->name,
+                        'created_by' => 'mtsc',
+                    ]);
+                }
+            }
+        }
+
 
         $site_code = $this->siteSettings->find_code($Site_keywords->site_id);
 
@@ -131,7 +166,9 @@ class KeywordSettingController extends Controller
 
     public function save(KeywordsRequest $request)//DomainRequest
     {
-
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_social_Keyword = $clientMD->social->Keyword;
      
         
         // $this->authorize('create', Domain::class);
@@ -152,10 +189,7 @@ class KeywordSettingController extends Controller
         // $segment3 =  request()->segment(3);
         //  dd($segment3);
         $code = $request->code;
-
         $SiteSettings = SiteSettings::where('code',$code)->first();
-
-
         foreach ($request->type as $key) {
             $Site_keywords = new Site_keywords;
             $Site_keywords->code = generator_uuid();
@@ -165,10 +199,18 @@ class KeywordSettingController extends Controller
             $Site_keywords->status = $request->status ? 1 : 0;
             $Site_keywords->created_by = @Auth::user()->id;
             $Site_keywords->save();
+            if($Site_keywords->type == 'social'){
+                $findOne = $col_social_Keyword->findOne(['_id' => "".$Site_keywords->name]);
+                if(empty($findOne)){
+                    $insertOneResult = $col_social_Keyword->insertOne([
+                        '_id' => "".$Site_keywords->name,
+                        'created_by' => 'mtsc',
+                    ]);
+                }
+            }
         }
-        
 
-
+       
         // foreach($request->category AS $cate) {
         //     $SiteCategory = new SiteCategory;
         //     $SiteCategory->site_id = $Domain->id;
@@ -180,6 +222,8 @@ class KeywordSettingController extends Controller
         //     $this->uploadLogo($request, $Domain);
         // }
 
+        
+        
 
         return ajaxResponse(
             [
