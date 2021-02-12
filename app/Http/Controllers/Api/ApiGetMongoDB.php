@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Bookmark;
+use App\DataLeakFeed;
+use App\DataLeakFeedTemp;
 use App\DataLeakSocialRef;
 use App\Entities\IndicatorSummaryYear;
+use App\leak_socail_ref_temp;
 use App\ReadCategories;
 use App\ReadNews;
 use App\TransactionTimeStampScans;
@@ -1925,6 +1928,243 @@ class ApiGetMongoDB extends ApiController
                 $data_transcation = json_encode($response);
                 $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function table_dashboard(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'dashboard'){
+                    return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $sitecode = $data['data']['sitecode'];
+                    $pagename = $data['data']['pagename'];
+                    $get_role_custom = $data['data']['get_role_custom'];
+    
+                    $model = '';
+                    $html = '';
+
+                    $date_start_explode = explode(" ",$startDate);
+                    $date_start_date = @$date_start_explode[0];
+                    $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                    // dd($date_start_time);
+                    $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                    // dd($date_start_date_format);
+                    $date_start_time_time = date("H:i", strtotime($date_start_time));
+                    $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                    // dd($date_start_time_time);
+
+                    $date_end_explode = explode(" ",$endDate);
+                    $date_end_date = @$date_end_explode[0];
+                    $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                    // dd($date_end_time);
+                    $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                    $date_end_time_time = date("H:i", strtotime($date_end_time));
+                    $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+
+                    $SiteSettings = null;
+
+                    if($sitecode){
+                        $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$sitecode)->first();
+                    }
+
+                    
+                    $dataCVEMapping = array();
+                    $dataR_s_s_news = array();
+                    $DataLeakFeed_social = array();
+                    $DataLeakFeed_compromised = array();
+                    $data_fx_otx_events = array();
+                    if (!$pagename||$pagename=='Vulnerabilities') {
+                        $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        if(isset($SiteSettings->id)){
+                            $dataCVEMapping = $dataCVEMapping->where("data_datacve_mapping.site_id",$SiteSettings->id);
+                        }
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id')->get()->toArray();
+                    }
+
+                    if (!$pagename||$pagename=='News') {
+                        $dataR_s_s_news_th = R_s_s_news::select('title_th as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/th") AS link , "News" AS pagename'))->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
+                        ->where(function ($query) {
+                            $query->whereNotNull('title_th')->where('title_th', '!=', '');//detail_th   
+                        })->get()->toArray();
+                        $dataR_s_s_news_en = R_s_s_news::select('title_en as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/en") AS link , "News" AS pagename'))->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))
+                        ->where(function ($query) {
+                            $query->whereNotNull('title_en')->where('title_en', '!=', '');//detail_en
+                        })->get()->toArray();
+                        $dataR_s_s_news = array_merge($dataR_s_s_news_th,$dataR_s_s_news_en);
+                    }
+
+                    if (!$pagename||$pagename=='Data Leak') {
+                        if($get_role_custom == 1) {//|| @get_role_custom()['site_admin'] == 1
+                            $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                            foreach ($DataLeakFeed_social as $key => $value) {
+                                $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
+                                if($leak_socail_ref_temps){
+                                    if(isset($SiteSettings->id)){
+                                        $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
+                                        if ($pos === false) {
+                                            unset($DataLeakFeed_social[$key]);
+                                            continue;
+                                        }
+                                    }
+                                    $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                                    $name_site = '';
+                                    foreach ($site as $data) {
+                                        $name_site .= $data->name . ' ,';
+                                    }
+                                    $name_site = rtrim($name_site, " ,");
+                                    $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                                }else{
+                                    unset($DataLeakFeed_social[$key]);
+                                }
+                                
+                            }
+                        }else{
+                            $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feel_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                            foreach ($DataLeakFeed_social as $key => $value) {
+                                $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
+                                if($leak_socail_ref_temps){
+                                    $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                                    $name_site = '';
+                                    foreach ($site as $data) {
+                                        $name_site .= $data->name . ' ,';
+                                    }
+                                    $name_site = rtrim($name_site, " ,");
+                                    $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                                }else{
+                                    unset($DataLeakFeed_social[$key]);
+                                }
+                                
+
+                            }
+                        }
+                    }
+                    
+                    
+                    // if (!$pagename||$pagename=='Compromised') {
+                    //     if(@get_role_custom()['superadmin'] == 1) {//|| @get_role_custom()['site_admin'] == 1
+                    //         $DataLeakFeed_compromised = DataLeakFeed::select('id','source_name as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Compromised" AS pagename'))->whereNull('deleted_at')->where('feel_type','!=', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                    //         foreach ($DataLeakFeed_compromised as $key => $value) {
+                    //             $leak_socail_ref = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
+                    //             if($leak_socail_ref){
+                    //                 if(isset($SiteSettings->id)){
+                    //                     $pos = strpos($leak_socail_ref->site_id, $SiteSettings->id."");
+                    //                     if ($pos === false) {
+                    //                         unset($DataLeakFeed_compromised[$key]);
+                    //                         continue;
+                    //                     }
+                    //                 }
+                    //                 $site = SiteSettings::select('name')->where('id', $leak_socail_ref->site_id)->first();
+                    //                 $name_site='';
+                    //                 if($site){
+                    //                     $name_site = $site->id;
+                    //                 }
+                    //                 $DataLeakFeed_compromised[$key]["sitename"] = $name_site;
+                    //             }else{
+                    //                 unset($DataLeakFeed_compromised[$key]);
+                    //             }
+                    //         }
+                    //     }else{
+                    //         $DataLeakFeed_compromised = DataLeakFeed::select('id','source_name as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Compromised" AS pagename'))->whereNull('deleted_at')->where('feel_type', '!=' , 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                    //         foreach ($DataLeakFeed_compromised as $key => $value) {
+                    //             $leak_socail_ref = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
+                    //             if($leak_socail_ref){
+                    //                 $site = SiteSettings::select('name')->where('id', $leak_socail_ref->site_id)->first();
+                    //                 $name_site = '';
+                    //                 if($site){
+                    //                     $name_site = $site->id;
+                    //                 }
+                    //                 $DataLeakFeed_compromised[$key]["sitename"] = $name_site;
+                    //             }else{
+                    //                 unset($DataLeakFeed_compromised[$key]);
+                    //             }
+                    //         }
+                    //     }
+                    // }
+
+                    if (!$pagename||$pagename=='Compromised') {
+                        if($get_role_custom == 1) {//|| @get_role_custom()['site_admin'] == 1
+                            $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->where('data_leak_feed.feel_type','!=', 'social')->whereBetween('data_leak_feed.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                            $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                            if(isset($SiteSettings->id)){
+                                $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
+                            }
+                            $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
+                        }else{
+                            $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->where('data_leak_feed.feel_type','!=', 'social')->whereBetween('data_leak_feed.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                            $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id')->get()->toArray();
+                        }
+                    }
+
+                    // if (!$pagename||$pagename=='Indicators') {
+                    //     $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                    //     $clientMD = new MongoClient($DB_MONGO_KEY);
+                    //     $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+
+                    //     $options = [
+                    //         'allowDiskUse' => TRUE
+                    //     ];
+
+                    //     $pipeline = [
+                    //         [
+                    //             '$match' => [
+                    //                 'created_at'  => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)],
+                    //             ]
+                    //         ],
+                    //         [
+                    //             '$project' => [
+                    //                 '_id' => 0,
+                    //                 'sitename' => 'All Site',
+                    //                 'content' => '$name',
+                    //                 'datetime' => ['$dateToString'=>['format'=>'%Y-%m-%d %H:%M:%S','date'=>'$created_at','timezone'=>'Asia/Bangkok']],
+                    //                 'pagename' => 'Indicators',
+                    //                 'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                    //             ]
+                    //         ]
+                    //     ];
+
+                    //     // dd($pipeline);
+                    //     $data_fx_otx_events = $col_fx_otx_events->aggregate($pipeline,$options);
+                    
+                    //     $data_fx_otx_events = $data_fx_otx_events->toArray();
+                    
+                    // }
+
+
+                        $model = array_merge($dataCVEMapping,$dataR_s_s_news,$DataLeakFeed_social,$DataLeakFeed_compromised,$data_fx_otx_events);
+                        $dataOut = array();
+                        usort($model, function($a, $b) {
+                            $t1 = strtotime($a['datetime']);
+                            $t2 = strtotime($b['datetime']);
+                            return $t2 - $t1;
+                        });
+
+                        $dataOut["data"] =  $model;
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
             }
         } catch (\Exception $e) {
             $response = array(

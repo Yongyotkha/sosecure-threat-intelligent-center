@@ -50,6 +50,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('dashboard/count_vulnerability_host', 'Api\ApiGetMongoDB@count_vulnerability_host');
     Route::post('dashboard/chart_indicators', 'Api\ApiGetMongoDB@chart_indicators');
     Route::post('dashboard/load_chart', 'Api\ApiGetMongoDB@load_chart');
+    Route::post('dashboard/table_dashboard', 'Api\ApiGetMongoDB@table_dashboard');
     
     Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
 
