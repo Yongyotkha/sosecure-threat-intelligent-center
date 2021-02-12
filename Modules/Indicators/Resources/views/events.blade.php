@@ -24,11 +24,11 @@
                         </select>
                     </div> --}}
 
-                    <a id="" href="" class="btn btn-sm btn-info">
+                    <a id="" href="" class="btn btn-sm btn-info d-none">
                         <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
                     </a>
                     <a id="" href="" class="btn btn-sm btn-info">
-                        <span data-rel="tooltip" title="Log Data" data-placement="bottom"><i class="fas fa-tv"></i><span class="hide-text">Log Data</span></span>
+                        <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
                     </a>
 
                     <a id="advance-search" href="#area_search"

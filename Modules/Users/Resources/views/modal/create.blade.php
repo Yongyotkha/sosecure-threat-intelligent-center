@@ -261,7 +261,7 @@
 
                
 
-                    @include('partial.privacy_consent')
+                    {{-- @include('partial.privacy_consent') --}}
     
                     <div class="modal-footer">
                         
