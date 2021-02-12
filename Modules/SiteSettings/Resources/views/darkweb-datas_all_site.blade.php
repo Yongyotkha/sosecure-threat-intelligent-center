@@ -625,7 +625,7 @@
                                 }
                                 
                             }
-                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'.content.'</textarea>';
+                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'+content+'</textarea>';
                         },
                     },
 
@@ -642,7 +642,7 @@
                                 }
                             }
         
-                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'.val.'</textarea>';
+                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'+val+'</textarea>';
 
                         },
                     
