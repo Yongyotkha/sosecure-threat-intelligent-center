@@ -562,7 +562,7 @@ $(function() {
         });
 
 
-
+        
         $.ajax({
             type:"POST",
             url:"{{ route('rssfeedsettings.rss_news_delete_select') }}",
@@ -571,6 +571,7 @@ $(function() {
             },
             beforeSend: function(){
                 $('.delete_domain_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+                $('.delete_domain_submit').attr('disabled',true);
             },
             success:function(response) {
                 $('.delete_domain_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
@@ -578,6 +579,7 @@ $(function() {
                 window.location.href = response.redirect;
             },
             error: function (error){
+                $('.delete_domain_submit').attr('disabled',false);
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {

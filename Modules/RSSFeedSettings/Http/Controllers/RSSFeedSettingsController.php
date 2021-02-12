@@ -1073,6 +1073,10 @@ class RSSFeedSettingsController extends Controller
 
         $logo = '/images/image-not-found.jpg';
         if ($request->hasFile('logo')) {
+                $request->validate([
+                    'logo' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
+                ]);
+
             $image = $request->file('logo');
             $imagename = time().'.'.$image->getClientOriginalExtension();
             $destinationPath = public_path('images/logo_news');
