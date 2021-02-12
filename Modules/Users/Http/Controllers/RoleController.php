@@ -19,6 +19,8 @@ use Spatie\Permission\Models\Role;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
 use Artisan;
+use App\Roles;
+use Yajra\DataTables\DataTables;
 class RoleController extends Controller
 {
     /**
@@ -728,5 +730,36 @@ class RoleController extends Controller
     private function getPage()
     {
         return langapp('users');
+    }
+
+    public function data_table()
+    {
+
+        $model = role_menu_permission::
+        select('roles.id as roles_id','roles.name as roles_name','menu.name as menu_name')
+        ->leftjoin('menu', 'role_menu_permission.menu_id', '=', 'menu.id')
+        ->rightjoin('roles', 'role_menu_permission.role_id', '=', 'roles.id');
+        
+ 
+        $model_sub = role_menu_sub_permission::select('roles.id as roles_id','roles.name as roles_name','menu_sub.name as menu_name')
+        ->leftjoin('menu_sub', 'role_menu_sub_permission.menu_sub_id', '=', 'menu_sub.id')
+        ->rightjoin('roles', 'role_menu_sub_permission.role_id', '=', 'roles.id')
+        ->union($model)
+        ->groupBy('roles_id');
+        // ->get();
+
+        $data =  DB::table(DB::raw("({$model_sub->toSql()}) AS fx_s"))
+        ->select('s.roles_id as id','s.roles_name as name',DB::raw('group_concat(fx_s.menu_name) as sub_menu_name'))
+         ->groupBy('s.roles_id')
+        ->get();
+        return DataTables::of($data)->toJson();
+
+  
+
+    
+
+
+
+
     }
 }
