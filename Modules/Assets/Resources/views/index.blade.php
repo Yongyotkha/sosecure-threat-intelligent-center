@@ -273,7 +273,7 @@
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
                                         <th rowspan="2" class="align-middle">CPESTRING</th>
-                                        <th rowspan="2" class="align-middle">asset_id</th>
+                                        <th rowspan="2" class="align-middle">Asset ID</th>
                                     </tr>
                                     <tr>
                                         <th>Vendor</th>
@@ -281,7 +281,7 @@
                                         <th>Versions</th>
                                         <th>Edition</th>
                                         <th>Remark</th>
-                                        <th>Os Type</th>
+                                        <th>OS Type</th>
                                         <th>Delete CPE</th>
                                     </tr>
                                 </thead>
