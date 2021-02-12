@@ -351,7 +351,7 @@ function data_table(){
                     name:"logs_sent_transaction.content",
                     render: function (data, type, row) {
                         if(row.content){
-                        return '<textarea class="resize-none" rows="3" cols="50" disabled="">'+row.content+'</textarea>';
+                        return '<textarea class="resize-none" rows="3" cols="100" disabled="">'+row.content+'</textarea>';
                        }else{
                         return '';
                        }
