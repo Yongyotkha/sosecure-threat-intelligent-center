@@ -3843,3 +3843,7 @@ textarea.resize-none{
     overflow-y: auto;
     max-height: 50px;
 }
+
+.d-il-block{
+    display: inline-block;
+}
