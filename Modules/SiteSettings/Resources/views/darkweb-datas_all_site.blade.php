@@ -625,7 +625,7 @@
                                 }
                                 
                             }
-                            return '<div class="text-elip-nowrap" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                            return '<div class="scroll-ovf" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
                         },
                     },
 
@@ -642,7 +642,7 @@
                                 }
                             }
         
-                            return '<div class="text-elip-nowrap" data-rel="tooltip" title="'+val+'">'+val+'</div>';
+                            return '<div class="scroll-ovf" data-rel="tooltip" title="'+val+'">'+val+'</div>';
 
                         },
                     

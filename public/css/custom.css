@@ -3821,3 +3821,10 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
     width: 100%;
     -webkit-box-orient: vertical;
 }
+
+.scroll-ovf{
+    overflow-y: auto;
+    max-height: 100px;
+    width: 350px;
+    white-space: normal;
+}
