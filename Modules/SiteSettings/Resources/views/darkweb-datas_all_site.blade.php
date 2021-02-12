@@ -631,7 +631,7 @@
                                 }
                                 
                             }
-                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'+content+'</textarea>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+content+'</div>';
                         },
                     },
 
@@ -648,7 +648,7 @@
                                 }
                             }
         
-                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'+val+'</textarea>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div>';
 
                         },
                     
