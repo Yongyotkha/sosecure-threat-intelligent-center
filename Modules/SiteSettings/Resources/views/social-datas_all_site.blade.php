@@ -73,9 +73,15 @@
                 <section class="scrollable wrapper">
                     <div class="container-fluid" style="margin-bottom:10px;">
                         <div class="row">
-                            <div class="col-md-12 nopadding">
+                            {{-- <div class="col-md-12 nopadding">
                                 <div class="main-card-dash-flex">
-                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
+                                    
+                                </div>
+                            </div> --}}
+
+                            <div class="col-md-6 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
                                                 <img src="{{asset('images/icebergline2.png')}}" alt="">
@@ -83,8 +89,12 @@
                                             <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
                                             <span class="number-card warning" id='compromise-count'>0</span>
                                         </div>
-                                    </div>
-                                    <div class="card-dash-compro custom-w-50 none-bg none-shadow">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
                                                 <img src="{{asset('images/icebergline1.png')}}" alt="">
@@ -92,9 +102,8 @@
                                             <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
                                             <span class="number-card info"  id='darkweb-count'>0</span>
                                         </div>
-                                    </div>
+                                     </a>
                                 </div>
-                             
                             </div>
                         </div>
                     </div>
