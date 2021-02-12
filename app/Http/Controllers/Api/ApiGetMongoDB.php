@@ -132,8 +132,8 @@ class ApiGetMongoDB extends ApiController
                         $cursor = $col_fx_otx_events->find($query,$options);
                 }
 
-                
-                
+                $query['indicator_count'] = 0;
+                $cursor = $col_fx_otx_events->find($query,$options);
                 $cursor = $cursor->toArray();
 
                 $data_nestedData = array();
