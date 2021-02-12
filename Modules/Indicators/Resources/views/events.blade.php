@@ -25,7 +25,7 @@
                     </div> --}}
 
                     <a id="" href="" class="btn btn-sm btn-info">
-                        <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-cog icon"></i><span class="hide-text">Setting Format Log</span></span>
+                        <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
                     </a>
                     <a id="" href="" class="btn btn-sm btn-info">
                         <span data-rel="tooltip" title="Log Data" data-placement="bottom"><i class="fas fa-tv"></i><span class="hide-text">Log Data</span></span>
