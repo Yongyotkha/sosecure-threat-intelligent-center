@@ -51,6 +51,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('dashboard/chart_indicators', 'Api\ApiGetMongoDB@chart_indicators');
     Route::post('dashboard/load_chart', 'Api\ApiGetMongoDB@load_chart');
     Route::post('dashboard/table_dashboard', 'Api\ApiGetMongoDB@table_dashboard');
+    Route::post('dashboard/cve_assets', 'Api\ApiGetMongoDB@cve_assets');
     
     Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
 
