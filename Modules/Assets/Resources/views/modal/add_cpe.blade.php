@@ -640,6 +640,7 @@
                     assets:@json($assets),
                     page:"{{$menu}}",
                     idip:"{{$idip}}",
+                    iddomain:"{{$iddomain}}",
                 },
                 beforeSend: function(){
                     loading('load');

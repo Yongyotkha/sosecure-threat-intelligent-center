@@ -19,6 +19,7 @@ use App\TransactionTimeStampScans;
 use Modules\SiteSettings\Entities\Domain;
 use App\transaction_client_cpe;
 use Artisan;
+use Modules\SiteSettings\Entities\cve_assets;
 
 class AssetsController extends Controller
 {
@@ -247,6 +248,7 @@ class AssetsController extends Controller
         $data['Credentials'] = Credentials::select('code','name')->where('status', 1)->where('site_id', @$data['assets']->site_id)->get();
         $data['menu'] = $request->menu;
         $data['idip'] = $request->idip;
+        $data['iddomain'] = $request->iddomain;
         return view('assets::modal.add_cpe')->with($data);
     }
 
@@ -266,6 +268,12 @@ class AssetsController extends Controller
             $CPE_id = $CPE->id;
             $Assetsfor = AssetsData::where('id',$CPE_Asset_id)->first();
             $transaction_client_cpe = transaction_client_cpe::where('site_id', $Assetsfor->site_id)->where('transaction_id', $CPE_id)->first();
+            
+            $cve_assets_ref = cve_assets::where('site_id',$Assetsfor->site_id)->where('ref_cpe',$CPE_id)->first();
+            if($cve_assets_ref){
+                $cve_assets_ref->delete();
+            }
+            
             if($transaction_client_cpe){
                 $transaction_client_cpe -> transaction_mode = 'delete';
                 $transaction_client_cpe -> transaction_data_status = 1;
@@ -599,7 +607,7 @@ class AssetsController extends Controller
                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                             $Assets_data_list = array();
                             $Assets_data_list['chk'] = "";
-                            $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
+                            $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'?iddomain='.$Domain_listvalue->code.'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
                             $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
                             <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                             </a>';
@@ -774,6 +782,15 @@ class AssetsController extends Controller
     {
         $assets = $request->assets;
         $idip = AssetsData::where('code', $request->idip)->first();
+
+        if(isset($request->iddomain)){
+            $iddomainVal = AssetsData::where('code', $request->iddomain)->first();
+            $domainValue = $iddomainVal->value;
+        }else{
+            $domainValue = "";
+        }
+        $SiteSettingsfor = SiteSettings::withTrashed()->where('id', $idip->site_id)->first();
+
         // if($request->data[0][4]=='Delete'){
         //     dd($request->data[0][0]);
         // }else{
@@ -838,6 +855,37 @@ class AssetsController extends Controller
         
                     }
         
+                    
+                    $model->save();
+                    
+                    $cve_assets_ref = cve_assets::where('site_id',$idip->site_id)->where('ref_cpe',$model->id)->first();
+                    if($cve_assets_ref){
+                        $cve_assets_ref->vendor = $model->vendor;
+                        $cve_assets_ref->title = $model->title;
+                        $cve_assets_ref->version = $model->version;
+                        $cve_assets_ref->edition = $model->edition;
+                        $cve_assets_ref->Site = $SiteSettingsfor->name;
+                        $cve_assets_ref->IP = $idip->value;
+                        $cve_assets_ref->Hostname = $domainValue;
+                        $cve_assets_ref->site_id = $idip->site_id;
+                        $cve_assets_ref->ref_cpe = $model->id;
+                        $cve_assets_ref->save();
+                    }else{
+                        $cve_assets_ref = new cve_assets;
+                        $cve_assets_ref->code = generator_uuid();
+                        $cve_assets_ref->vendor = $model->vendor;
+                        $cve_assets_ref->title = $model->title;
+                        $cve_assets_ref->version = $model->version;
+                        $cve_assets_ref->edition = $model->edition;
+                        $cve_assets_ref->Site = $SiteSettingsfor->name;
+                        $cve_assets_ref->IP = $idip->value;
+                        $cve_assets_ref->Hostname = $domainValue;
+                        $cve_assets_ref->site_id = $idip->site_id;
+                        $cve_assets_ref->active = 1;
+                        $cve_assets_ref->ref_cpe = $model->id;
+                        $cve_assets_ref->save();
+                    }
+                    $model->ref_cve_assets = $cve_assets_ref->id;
                     $model->save();
                     $transaction_client_cpe = transaction_client_cpe::where('site_id', $idip->site_id)->where('transaction_id', $model->id)->first();
                     if($transaction_client_cpe){
