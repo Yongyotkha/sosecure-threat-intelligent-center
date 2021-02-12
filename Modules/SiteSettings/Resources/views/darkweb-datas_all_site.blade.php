@@ -625,7 +625,7 @@
                                 }
                                 
                             }
-                            return '<div class="scroll-ovf" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'.content.'</textarea>';
                         },
                     },
 
@@ -642,7 +642,7 @@
                                 }
                             }
         
-                            return '<div class="scroll-ovf" data-rel="tooltip" title="'+val+'">'+val+'</div>';
+                            return '<textarea class="resize-none" rows="3" cols="50" disabled="">'.val.'</textarea>';
 
                         },
                     

@@ -3825,6 +3825,14 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
 .scroll-ovf{
     overflow-y: auto;
     max-height: 100px;
-    width: 350px;
+    max-width: 350px;
     white-space: normal;
+}
+
+.max-h-50{
+    max-height: 55px !important;
+}
+
+textarea.resize-none{
+    resize: none;
 }
