@@ -649,10 +649,12 @@ $(function() {
                 {
                     data: 'public_date',
                     name: 'public_date',
+                    className: 'no-wrap'
                 },
                 {
                     data: 'updated_at',
                     name: 'updated_at',
+                    className: 'no-wrap'
                 },
                 {
                     data: 'view',

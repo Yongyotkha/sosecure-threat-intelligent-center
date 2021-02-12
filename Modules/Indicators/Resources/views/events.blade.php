@@ -205,7 +205,7 @@
                                                 <th>Tags</th>
                                                 <th>Published</th>
                                                 <th>Last Status</th>
-                                                <th style="width: 200px;">DateTime</th>
+                                                <th class="nowrap">DateTime</th>
                                                 <th>Attribute</th>
                                                 <th>Action</th>
                                             </tr>
@@ -610,6 +610,7 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'modified',
+                    className : 'nowrap'
                 },
                 {
                     data: 'attrCount',
