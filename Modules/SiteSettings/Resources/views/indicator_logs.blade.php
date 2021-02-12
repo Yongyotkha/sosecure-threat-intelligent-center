@@ -123,6 +123,7 @@
                                              </div>
 
                                              <div class="form-group">
+                                                <p class="font-weight-bold text-muted">[[M]] = Feb, [[m]] = 02, [[Y]] = 2021, [[y]] = 21, [[D]] = Thu, [[d]] = 11, H:i:s = 08:12:25</p>
                                                  <textarea name="text_protocal_format" id="text_protocal_format" cols="30" rows="5"  class="form-control">
                                                     {{@$content}}
                                                  </textarea>

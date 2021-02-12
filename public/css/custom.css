@@ -2357,7 +2357,7 @@ ul.topics-news-list li a:hover{
 
 .card-dash-vuln{
     background-color: #f3f3f3;
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    box-shadow: 0 1px 5px rgba(0,0,0,.2);
     height: 195px;
     padding: 1rem;
     display: flex;
