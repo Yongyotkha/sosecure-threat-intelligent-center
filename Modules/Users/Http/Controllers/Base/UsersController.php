@@ -45,6 +45,11 @@ abstract class UsersController extends Controller
      *
      * @return \Illuminate\View\View
      */
+    public function test()
+    {
+        dd(123);
+        return view('users::index')->with($data);
+    }
     public function index()
     {
 
