@@ -56,6 +56,17 @@ class WebDefacementProccess extends Command
       $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
       $TransactionBatchjob_Update->save();
 
+      $WebdefacmentSetting_datas_reset =  WebdefacmentSetting::where('active',1)->where('webdeflacement_progress',2)->whereNull('deleted_at')->get();
+      $newTime = date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")." -5 minutes"));
+      foreach ($WebdefacmentSetting_datas_reset as $key => $value) {
+        if ($newTime >= $value->last_check) {
+          $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
+          $WebdefacmentSetting_update->webdeflacement_progress = 1;
+          $WebdefacmentSetting_update->save();
+        }
+      }
+
+
       $WebdefacmentSetting_datas =  WebdefacmentSetting::where('active',1)->where('webdeflacement_progress',1)->whereNull('deleted_at')->get();
       foreach ($WebdefacmentSetting_datas as $key => $value) {
         $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
