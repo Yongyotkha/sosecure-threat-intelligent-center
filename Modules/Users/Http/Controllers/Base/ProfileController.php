@@ -79,6 +79,9 @@ abstract class ProfileController extends Controller
         // $user->profile->company > 0 ? \Auth::user()->profile->business->update($request->company) : false;
 
         if ($request->hasFile('avatar')) {
+            $request->validate([
+                'avatar' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
+            ]);
             $this->uploadAvatar($request);
         }
 
