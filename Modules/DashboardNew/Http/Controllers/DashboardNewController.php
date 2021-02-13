@@ -103,19 +103,29 @@ class DashboardNewController extends Controller
                                     ->where("feel_type", '=', 'social')
                                     ->count();
         } else {
-            $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id', $site_id_arr)->count();
-            $data['count_CVEMapping'] = CVEMapping::whereIn('site_id', $site_id_arr)->count();
-            $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id', $site_id_arr)->get();
-            $data['count_compromised'] = DataLeakSocialRef::where("status", '=', 1)
+            if($role_custom['assets']) {
+                $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id', $site_id_arr)->count(); 
+            }
+            if($role_custom['vulnerabilities']) {
+                $data['count_CVEMapping'] = CVEMapping::whereIn('site_id', $site_id_arr)->count();
+            }
+            if($role_custom['assets']) {
+                $data['get_CVEAssets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id', $site_id_arr)->get();
+            }
+            if($role_custom['compromised']) {
+                $data['count_compromised'] = DataLeakSocialRef::where("status", '=', 1)
                                     ->where("deleted_at", '=', null)
                                     ->where("feel_type", '!=', 'social')
                                     ->whereIn('site_id', $site_id_arr)
                                     ->count();
-            $data['count_dataLeak'] = DataLeakSocialRef::where("status", '=', 1)
-                                    ->where("deleted_at", '=', null)
-                                    ->where("feel_type", '=', 'social')
-                                    ->whereIn('site_id', $site_id_arr)
-                                    ->count();
+            }
+            if($role_custom['data_leak']) {
+                $data['count_dataLeak'] = DataLeakSocialRef::where("status", '=', 1)
+                                        ->where("deleted_at", '=', null)
+                                        ->where("feel_type", '=', 'social')
+                                        ->whereIn('site_id', $site_id_arr)
+                                        ->count();
+            }
         }
 
         
