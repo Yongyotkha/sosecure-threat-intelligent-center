@@ -9,7 +9,8 @@ use Illuminate\Console\Command;
 use Modules\SiteSettings\Entities\SiteSettings;
 use MongoDB\BSON\UTCDateTime;
 use App\Entities\TransactionBatchjob;
-
+use App\Menu;
+use App\Menu_permission_site;
 class MDFeedDarkWeb extends Command
 {
     /**
@@ -47,19 +48,33 @@ class MDFeedDarkWeb extends Command
         //     'domain' => 't.me',
         //     'q' => 't.me',
         // ];
-        $SiteSettings = SiteSettings::where('active', '1')->whereNull('deleted_at')->with('get_keywords_darkweb')->with('get_domains_default');
+        $SiteSettings = SiteSettings::where('active', '1')->whereNull('deleted_at')->where('system_site_online',1)->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', ">=", date("Y-m-d H:i:s"))->with('get_keywords_darkweb')->with('get_domains_default');
+
+
+
+
         $SiteSettings = $SiteSettings->get();
         // $time_stamp = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
         // $time_stamp = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
 
         foreach ($SiteSettings as $value) {
             try{
-                $response = $this->perform_query($value);
-               
-            } catch (Exception $e) {
-                echo "Fail handle : " . $e->getMessage();
-            }
+                $Menu_permission_site_data =   Menu_permission_site::where('site_id',$value->id)->where(function ($query) {
+                $query->where('menu_code', '=', '854a1e60-9abf-4263-a187-60aec8cd4fb1')
+                ->orWhere('menu_code', '=', '79b362a5-3789-445a-bd6c-846393ffd19d');
+            })->get();
+              print_r($Menu_permission_site_data);
+    //           if (count($Menu_permission_site_data) > 0) {
+    //             echo "ok";
+    // // $response = $this->perform_query($value);
+    //         }
+
+
+
+          } catch (Exception $e) {
+            echo "Fail handle : " . $e->getMessage();
         }
+    }
         //use ($site_id)
 
         // $SiteSettings->whereHas('get_keywords', function ($query) {
@@ -69,146 +84,155 @@ class MDFeedDarkWeb extends Command
         //echo(json_encode($SiteSettings->get()));
         ///$response = $this->perform_query($payload);
 
-        $this->info('END------------------------------------------------------------END');
+    $this->info('END------------------------------------------------------------END');
+}
+
+public function payloadToString($payload)
+{
+
+    $search = '';
+    $count = 0;
+    foreach ($payload as $key => $value) {
+        if ($count == 0) {
+            $search .= '?' . $key . '=' . $value;
+            $count++;
+        } else {
+            $search .= '&' . $key . '=' . $value;
+        }
     }
+    return $search;
+}
 
-    public function payloadToString($payload)
-    {
-
-        $search = '';
-        $count = 0;
-        foreach ($payload as $key => $value) {
+public function querysToString($payload, $fromDate, $toDate)
+{
+    $search = '';
+    $count = 0;
+    foreach ($payload as $value) {
+        foreach ($value as $key => $value2) {
             if ($count == 0) {
-                $search .= '?' . $key . '=' . $value;
-                $count++;
+                $count = 1;
+                $search .= '?' . $key . '=' . $value2;
             } else {
-                $search .= '&' . $key . '=' . $value;
+                $search .= '&' . $key . '=' . $value2;
             }
         }
-        return $search;
+
     }
+    $search .= '&from=' . $fromDate;
+    $search .= '&to=' . $toDate;
+    return $search;
+}
 
-    public function querysToString($payload, $fromDate, $toDate)
-    {
-        $search = '';
-        $count = 0;
-        foreach ($payload as $value) {
-            foreach ($value as $key => $value2) {
-                if ($count == 0) {
-                    $count = 1;
-                    $search .= '?' . $key . '=' . $value2;
-                } else {
-                    $search .= '&' . $key . '=' . $value2;
-                }
-            }
+public function addOffset($search, $offset)
+{
+    $search = $search;
+    $search .= '&offset=' . $offset;
+    return $search;
+}
 
+public function mapTypeDomain($typeSearch,$domain,$ip){
+    $payload = array();
+    if ($typeSearch == 'email') {
+        $payload[] = array('emailDomain' => $domain);
+        $payload[] = array('emailDomain' => '*.' . $domain);
+    } else if($typeSearch == 'ip') {
+        if(isset($ip)){
+            $payload[] = array($typeSearch => $ip);
+        }else{
+            $payload[] = array($typeSearch => "");
         }
-        $search .= '&from=' . $fromDate;
-        $search .= '&to=' . $toDate;
-        return $search;
-    }
-
-    public function addOffset($search, $offset)
-    {
-        $search = $search;
-        $search .= '&offset=' . $offset;
-        return $search;
-    }
-
-    public function mapTypeDomain($typeSearch,$domain,$ip){
-        $payload = array();
-        if ($typeSearch == 'email') {
-            $payload[] = array('emailDomain' => $domain);
-            $payload[] = array('emailDomain' => '*.' . $domain);
-        } else if($typeSearch == 'ip') {
-            if(isset($ip)){
-                $payload[] = array($typeSearch => $ip);
-            }else{
-                $payload[] = array($typeSearch => "");
-            }
-        }else if($typeSearch == 'q') {
-            if(isset($ip)){
-                $payload[] = array($typeSearch =>  '"'.$domain.'" OR "'.$ip.'"');
-            }else{
-                $payload[] = array($typeSearch =>  '"'.$domain.'"');
-            }
-        }else {
+    }else if($typeSearch == 'q') {
+        if(isset($ip)){
+            $payload[] = array($typeSearch =>  '"'.$domain.'" OR "'.$ip.'"');
+        }else{
+            $payload[] = array($typeSearch =>  '"'.$domain.'"');
+        }
+    }else {
             //q only search domain
-            $payload[] = array($typeSearch => $domain);
-        }
-        $payload[] = array('count' => '20');
-        $payload[] = array('sort' => 'd');
-        return $payload;
+        $payload[] = array($typeSearch => $domain);
     }
+    $payload[] = array('count' => '20');
+    $payload[] = array('sort' => 'd');
+    return $payload;
+}
 
-    public function perform_query($Site_payload)
-    {
+public function perform_query($Site_payload)
+{
         // $publicKey = '+x4QtLeFMejTD6kYel4aYA==';
         // $privateKey = 'L57IL/Kt7PMZFMrZXNiSD5YFZrMSc6kQUmAu6/oS9Qk=';
-        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+    $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
+    $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
         $reconnectLimit = 3;
         if (!empty($Site_payload["get_keywords_darkweb"]) > 0) {
+            $keywords_list = array();
             foreach ($Site_payload["get_keywords_darkweb"] as $value) {
+               // print_r($value["name"]);
+                array_push($keywords_list, $value["name"]);
+            }
 
-                try {
-                    $payload = $this->mapTypeDomain($value["name"],$Site_payload["get_domains_default"][0]["domain"],$Site_payload["get_domains_default"][0]["IP"]);
-                    // $payload = array();
-                    // if ($value["name"] == 'email') {
-                    //     $payload[] = array('emailDomain' => $Site_payload["get_domains_default"][0]["domain"]);
-                    //     $payload[] = array('emailDomain' => '*.' . $Site_payload["get_domains_default"][0]["domain"]);
-                    // } else {
-                    //     $payload[] = array($value["name"] => $Site_payload["get_domains_default"][0]["domain"]);
-                    // }
-                    // $payload[] = array('count' => '20');
-                    // $payload[] = array('sort' => 'd');
-                    
+            $keywords_string = implode (", ", $keywords_list);
 
-                    $time_stamp_from = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
-                    $time_stamp_from = "0001-08-26T00:00:00Z";
-                    $time_stamp_to = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
-                    $search = $this->querysToString($payload, $time_stamp_from, $time_stamp_to);
-                    $_clientHttp = $this->getInitialNumbers($search, 'GET', $reconnectLimit);
-                    $site_Data["site_type_search"] = $value["name"];
-                    $site_Data["site_id"] = $value["site_id"];
-                    $site_Data["site_name"] = $Site_payload["name"];
-                    $site_Data["site_domain"] = $Site_payload["get_domains_default"][0]["domain"];
-                    $site_Data["site_domain_name"] = $Site_payload["get_domains_default"][0]["name"];
-                    $site_Data["site_domain_ip"] = $Site_payload["get_domains_default"][0]["IP"];
-                    $getIDStamp = $this->createStamp($site_Data);
-                    $saveCheck = $_clientHttp["success"];
-                    echo $_clientHttp["total"] . " : IS All_DATA";
-                    $this->info(json_encode($site_Data));
-                    if($_clientHttp["total"]>0){
-                        if ($_clientHttp["total"] <= 20) {
+            try {
+                $payload = $this->mapTypeDomain('q',$Site_payload["get_domains_default"][0]["domain"],$Site_payload["get_domains_default"][0]["IP"]);
+
+
+            //         // $payload = array();
+            //         // if ($value["name"] == 'email') {
+            //         //     $payload[] = array('emailDomain' => $Site_payload["get_domains_default"][0]["domain"]);
+            //         //     $payload[] = array('emailDomain' => '*.' . $Site_payload["get_domains_default"][0]["domain"]);
+            //         // } else {
+            //         //     $payload[] = array($value["name"] => $Site_payload["get_domains_default"][0]["domain"]);
+            //         // }
+            //         // $payload[] = array('count' => '20');
+            //         // $payload[] = array('sort' => 'd');
+
+
+                $time_stamp_from = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
+                $time_stamp_from = "2021-01-01T07:52:25Z";
+                $time_stamp_to = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
+                $search = $this->querysToString($payload, $time_stamp_from, $time_stamp_to);
+                print_r($search);
+                $_clientHttp = $this->getInitialNumbers($search, 'GET', $reconnectLimit);
+                $site_Data["site_type_search"] = $value["name"];
+                $site_Data["site_id"] = $value["site_id"];
+                $site_Data["site_name"] = $Site_payload["name"];
+                $site_Data["site_domain"] = $Site_payload["get_domains_default"][0]["domain"];
+                $site_Data["site_domain_name"] = $Site_payload["get_domains_default"][0]["name"];
+                $site_Data["site_domain_ip"] = $Site_payload["get_domains_default"][0]["IP"];
+                $getIDStamp = $this->createStamp($site_Data);
+                $saveCheck = $_clientHttp["success"];
+                echo $_clientHttp["total"] . " : IS All_DATA";
+                $this->info(json_encode($site_Data));
+                if($_clientHttp["total"]>0){
+                    if ($_clientHttp["total"] <= 20) {
                             //echo json_encode($_clientHttp["alldata"]);
-                            $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                        $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
                             // $saveCheck = $this->saveDarkwebDetail($_clientHttp["alldata"],
                             // $value["name"], $value["site_id"],$Site_payload["name"], $Site_payload["get_domains_default"][0]["domain"], $Site_payload["get_domains_default"][0]["name"]
                             // );
-                        } else {
-                            $firstCrawlDate  = $_clientHttp["alldata"]["results"][0]["crawlDate"];
-                            $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
-                            $saveCheck = $this->paginate($site_Data,$getIDStamp,
-                            $_clientHttp["total"],$payload,$search, 'GET', $reconnectLimit,2,$firstCrawlDate
-                            );
-                        }
-                    }
-                    if ($saveCheck==true) {
-                        $updateResult2 = $col_fx_transaction_darkweb_stamp->updateOne(
-                            ['_id' => $getIDStamp],
-                            ['$set' => ['status' => 2]]
-                        );
-                        $this->info("app:OTXMDFeedIndicator SUCCESS");
                     } else {
-                        $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
+                        $firstCrawlDate  = $_clientHttp["alldata"]["results"][0]["crawlDate"];
+                        $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                        $saveCheck = $this->paginate($site_Data,$getIDStamp,
+                            $_clientHttp["total"],$payload,$search, 'GET', $reconnectLimit,2,$firstCrawlDate
+                        );
                     }
-                } catch (Exception $e) {
-                    echo "Fail Perform : " . $e->getMessage();
                 }
-
+                if ($saveCheck==true) {
+                    $updateResult2 = $col_fx_transaction_darkweb_stamp->updateOne(
+                        ['_id' => $getIDStamp],
+                        ['$set' => ['status' => 2]]
+                    );
+                    $this->info("app:MDFeedDarkWeb SUCCESS");
+                } else {
+                    $this->info("app:MDFeedDarkWeb FAIL SOME CONTENT");
+                }
+            } catch (Exception $e) {
+                echo "Fail Perform : " . $e->getMessage();
             }
+
+       // }
         }
 
         $this->info('SUCCESS ONE SEARCH');
@@ -327,7 +351,7 @@ class MDFeedDarkWeb extends Command
                     return stripos($var, $site_domain) !== false;
                 }));
 
-                    $body_search = array();
+                $body_search = array();
                 if (!is_bool($keyIndex)) {
                     foreach ($keyIndex as $index_key) {
                         $body_search[] = $implodeValue[$index_key];
@@ -341,7 +365,7 @@ class MDFeedDarkWeb extends Command
                         return stripos($var, $site_domain) !== false;
                     }));
                 }
-                    $emails_search = array();
+                $emails_search = array();
                 if (!empty($keyIndex_2)) {
                     foreach ($keyIndex_2 as $index_key) {
                         $emails_search[] = $value["emails"][$index_key];
@@ -350,51 +374,51 @@ class MDFeedDarkWeb extends Command
 
 
 
-                    $findUnique = $col_fx_transaction_darkweb_data->findOne(
-                        [
-                            'darkweb_id' => @$value["id"],
-                            'transaction_site_id' => @$site_Data["site_id"],
-                            'transaction_site_type_search' => @$site_Data["site_type_search"],
-                            'transaction_site_domain' => @$site_Data["site_domain"]
-                        ], 
-                        [
-                            'projection' => [
-                                "_id" => 1
-                            ]
+                $findUnique = $col_fx_transaction_darkweb_data->findOne(
+                    [
+                        'darkweb_id' => @$value["id"],
+                        'transaction_site_id' => @$site_Data["site_id"],
+                        'transaction_site_type_search' => @$site_Data["site_type_search"],
+                        'transaction_site_domain' => @$site_Data["site_domain"]
+                    ], 
+                    [
+                        'projection' => [
+                            "_id" => 1
                         ]
-                    );
-                    echo json_encode($findUnique);
-                    if (empty($findUnique)) {
-                        $this->info(" : INSERTED");
-                        $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
-                            'darkweb_id' => @$value["id"],
-                            'body_search' => @$body_search,
+                    ]
+                );
+                echo json_encode($findUnique);
+                if (empty($findUnique)) {
+                    $this->info(" : INSERTED");
+                    $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
+                        'darkweb_id' => @$value["id"],
+                        'body_search' => @$body_search,
                             //'body' => @$value["body"],
-                            'hackishness' => @$value["hackishness"],
-                            'title' => @$value["title"],
-                            'url' => @$value["url"],
-                            'crawlDate' => @$value["crawlDate"],
-                            'fileSize' => @$value["fileSize"],
-                            'domain' => @$value["domain"],
-                            'emails' => @$emails_search,
-                            'headers' => @$value["headers"],
-                            'transaction_site_type_search' => @$site_Data["site_type_search"],
-                            'transaction_site_id' => @$site_Data["site_id"],
-                            'transaction_site_name' => @$site_Data["site_name"],
-                            'transaction_site_domain' => @$site_Data["site_domain"],
-                            'transaction_site_domain_name' => @$site_Data["site_domain_name"],
-                            'transaction_site_domain_ip' => @$site_Data["site_domain_ip"],
-                            'updated_at' => $date_now,
-                            'updated_by' => "system",
-                            'transcation_id' => $get_InsertedId,
-                            'status' => 1,
-                            'created_at' => $date_now,
-                            'created_by' => "system",
-                            'deleted_at' => null,
-                            'transaction_date' => date("Y-m-d"),
-                            'count_view' => 0,
-                        ]);
-                    }
+                        'hackishness' => @$value["hackishness"],
+                        'title' => @$value["title"],
+                        'url' => @$value["url"],
+                        'crawlDate' => @$value["crawlDate"],
+                        'fileSize' => @$value["fileSize"],
+                        'domain' => @$value["domain"],
+                        'emails' => @$emails_search,
+                        'headers' => @$value["headers"],
+                        'transaction_site_type_search' => @$site_Data["site_type_search"],
+                        'transaction_site_id' => @$site_Data["site_id"],
+                        'transaction_site_name' => @$site_Data["site_name"],
+                        'transaction_site_domain' => @$site_Data["site_domain"],
+                        'transaction_site_domain_name' => @$site_Data["site_domain_name"],
+                        'transaction_site_domain_ip' => @$site_Data["site_domain_ip"],
+                        'updated_at' => $date_now,
+                        'updated_by' => "system",
+                        'transcation_id' => $get_InsertedId,
+                        'status' => 1,
+                        'created_at' => $date_now,
+                        'created_by' => "system",
+                        'deleted_at' => null,
+                        'transaction_date' => date("Y-m-d"),
+                        'count_view' => 0,
+                    ]);
+                }
                 
 
             }
