@@ -504,7 +504,7 @@ Highcharts.setOptions({
                     targets: 1,
                     render: function (data, type, row) {
                         var inner = '';
-                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                        inner =  '<div class="ovf-link"><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
                         return inner;
                     }
                       
