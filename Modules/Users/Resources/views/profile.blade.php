@@ -2,7 +2,7 @@
 @section('content')
 @php
 $user = Auth::user();
-$channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
+// $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
 @endphp
 <section id="content">
     <section class="hbox stretch">
@@ -40,9 +40,9 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                         <div class="col-lg-12">
                             <section class="panel panel-default">
                                 <header class="panel-heading font-bold panel-header-blue">@langapp('information')
-                                    @if($user->profile->company > 0 && $user->profile->business->primary_contact == Auth::id())
-                                    {{-- <a href="{{ route('contacts.create', Auth::user()->profile->company) }}" class="btn btn-xs btn-success pull-right" data-toggle="ajaxModal" title="Add Contact Person" data-rel="tooltip" data-placement="bottom">@icon('regular/user-circle') @langapp('contact')</a> --}}
-                                    @endif
+                                    {{-- @if($user->profile->company > 0 && $user->profile->business->primary_contact == Auth::id())
+                                    <a href="{{ route('contacts.create', Auth::user()->profile->company) }}" class="btn btn-xs btn-success pull-right" data-toggle="ajaxModal" title="Add Contact Person" data-rel="tooltip" data-placement="bottom">@icon('regular/user-circle') @langapp('contact')</a>
+                                    @endif --}}
 
                                     @if(!Auth::user()->hasRole('client'))
                                     @if (Auth::user()->on_holiday)
@@ -57,15 +57,15 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     
                                     <div class="form-group">
                                         <label>@langapp('fullname')  @required</label>
-                                        <input type="text" class="form-control" name="name" value="{{ $user->name }}" required readonly>
+                                        <input type="text" class="form-control" name="name" value="{{ $user->name }}" required>
                                     </div>
-                                    <div class="form-group d-none">
+                                    {{-- <div class="form-group d-none">
                                         <label>@langapp('hourly_rate') </label>
                                         <input type="text" class="form-control" name="profile[hourly_rate]" value="{{ $user->profile->hourly_rate }}">
-                                    </div>
-                                    <input type="hidden" value="{{  $user->profile->company }}" name="profile[company]">
-                                    @if ($user->profile->company > 0)
-                                    <div class="form-group">
+                                    </div> --}}
+                                    {{-- <input type="hidden" value="{{  $user->profile->company }}" name="profile[company]"> --}}
+                                    @if (@$user->profile->company > 0)
+                                    {{-- <div class="form-group">
                                         <label>@langapp('company')</label>
                                         <input type="text" class="form-control" name="company[name]"
                                         value="{{ optional($user->profile)->business->name }}">
@@ -94,21 +94,21 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                         <label>Slack URL <span data-rel="tooltip" title="Your company slack webhook">@icon('brands/slack', 'text-info')</span></label>
                                         <input type="text" class="form-control" name="company[slack_webhook_url]"
                                         value="{{ optional($user->profile)->business->slack_webhook_url }}">
-                                    </div>
+                                    </div> --}}
                                     @endif
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label>@langapp('phone') </label>
                                         <input type="text" class="form-control" name="profile[phone]" value="{{ $user->profile->phone }}" readonly>
-                                    </div>
+                                    </div> --}}
                                     
-                                    <div class="form-group  d-none">
+                                    {{-- <div class="form-group  d-none">
                                         <label>@langapp('locale')</label>
                                         <select class="select2-option form-control" name="locale">
                                             @foreach (languages() as $language)
                                             <option value="{{ $language['code'] }}" {{ $user->locale == $language['code'] ? ' selected' : '' }}>{{ ucfirst($language['name']) }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <input type="hidden" name="profile[use_gravatar]" value="0">
                                     {{-- <div class="form-group">
                                         <div class="form-check text-muted">
@@ -131,7 +131,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     </div>
                                     <div class="form-group  d-none">
                                         <span class="pull-right">
-                                            <img class="" src="{{ $user->profile->sign }}" width="50" alt="">
+                                            <img class="" src="{{ @$user->profile->sign }}" width="50" alt="">
                                         </span>
                                         <label>{{ langapp('signature') }}</label>
                                         <input type="file" name="signature">
@@ -139,14 +139,14 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     </div>
                                     <div class="form-group  d-none">
                                         <label>@langapp('email_signature')</label>
-                                        <textarea class="form-control markdownEditor" name="profile[email_signature]" data-hidden-buttons='["cmdHeading", "cmdQuote","cmdCode", "cmdList", "cmdList0"]'>{{ $user->profile->email_signature }}</textarea>
+                                        <textarea class="form-control markdownEditor" name="profile[email_signature]" data-hidden-buttons='["cmdHeading", "cmdQuote","cmdCode", "cmdList", "cmdList0"]'>{{ @$user->profile->email_signature }}</textarea>
                                     </div>
                                 </div>
                             </section>
                         </div>
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                            <header class="panel-heading font-bold panel-header-blue">@langapp('authorization')</header>
+                            <header class="panel-heading">@langapp('authorization')</header>
                             <div class="panel-body">
                                 {{-- <div class="form-group  d-none">
                                     <label>Slack Webhook URL <span data-rel="tooltip" title="Your slack webhook url">@icon('brands/slack', 'text-danger')</span></label>
@@ -219,9 +219,7 @@ $channels = !is_null($user->profile->channels) ? $user->profile->channels : [];
                                     </div>
                                     
                                 </div> --}}
-                                <div class="text-right">
-                                    {!! renderAjaxButton() !!}
-                                </div>
+                                {!! renderAjaxButton() !!}
                                 
                             </div>
                         </section>
