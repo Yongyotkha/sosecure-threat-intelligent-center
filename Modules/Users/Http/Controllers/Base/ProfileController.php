@@ -74,7 +74,7 @@ abstract class ProfileController extends Controller
             )
         );
         // $channels = $request->has('profile.channels') ? array_keys($request->profile['channels']) : [];
-        $user->profile->update($request->profile);
+        // $user->profile->update($request->profile);
         // $user->profile->update(['channels' => $channels]);
         // $user->profile->company > 0 ? \Auth::user()->profile->business->update($request->company) : false;
 
