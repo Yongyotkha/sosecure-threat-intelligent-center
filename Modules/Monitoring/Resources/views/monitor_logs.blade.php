@@ -314,7 +314,7 @@ function data_table(){
                     name:"logs.file",
                     render: function (data, type, row) {
                         if(row.file){
-                        return row.file;
+                        return '<textarea class="resize-none" rows="3" cols="50" disabled>'+row.file+'</textarea>';
                        }else{
                         return '';
                        }
@@ -325,7 +325,7 @@ function data_table(){
                     name:"logs.error_summary",
                     render: function (data, type, row) {
                         if(row.error_summary){
-                        return '<div class="text-elip" data-rel="tooltip" title="'+row.error_summary+'">'+row.error_summary+'</div>';
+                        return '<textarea class="resize-none" rows="3" cols="50" disabled>'+row.error_summary+'</textarea>';
                        }else{
                         return '';
                        }
@@ -336,7 +336,7 @@ function data_table(){
                     name:"logs.log_trace",
                     render: function (data, type, row) {
                         if(row.log_trace){
-                            return '<div class="text-elip" data-rel="tooltip" title="'+row.log_trace+'"><textarea rows="3" cols="50" disabled>'+row.log_trace+'</textarea></div>';
+                            return '<textarea class="resize-none" rows="3" cols="50" disabled>'+row.log_trace+'</textarea>';
                         }else{
                             return '';
                         }

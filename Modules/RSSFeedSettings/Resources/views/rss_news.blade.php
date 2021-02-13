@@ -266,7 +266,7 @@
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th width="20px">Source Name</th>
+                                                <th width="20px">Source</th>
                                                 <th width="20%">Title</th>
                                                 <th>Category</th>
                                                 <th width="20px">Data Status</th>

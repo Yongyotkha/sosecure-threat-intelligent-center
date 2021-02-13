@@ -440,6 +440,7 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('cate', function (RSSNews $model) {
          
                 $html = '';
+                $html .= '<div class="scroll-ovf-content">';
                 if($model->get_cate=="[]"){
                     $html = 'None';
                 }else{
@@ -460,6 +461,7 @@ class RSSFeedSettingsController extends Controller
                     
                     $html = rtrim($html,", ");
                 }
+                $html .= '</div>';
                 return $html;
             })
             ->addColumn('data_status', function (RSSNews $model) {
