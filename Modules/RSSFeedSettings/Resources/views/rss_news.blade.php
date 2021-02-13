@@ -83,14 +83,13 @@
                                 <span data-rel="tooltip" title="Setting" data-placement="bottom"><i class="fas fa-cog icon"></i></span>
                             </a>
         
-        
-                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
-                            </button>
-        
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
+
+                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
+                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
+                            </button>
                         </div>
                     </div>
                 </header>

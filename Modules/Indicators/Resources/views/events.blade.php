@@ -486,6 +486,7 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'modified',
+                    className : 'nowrap'
                 },
                 {
                     data: 'attrCount',
@@ -610,7 +611,6 @@ Highcharts.setOptions({
                 },
                 {
                     data: 'modified',
-                    className : 'nowrap'
                 },
                 {
                     data: 'attrCount',
