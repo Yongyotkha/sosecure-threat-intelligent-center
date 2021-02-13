@@ -61,6 +61,16 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('news/url_bookmark', 'Api\ApiGetMongoDB@url_bookmark');
     Route::post('news/url_news_detail_code', 'Api\ApiGetMongoDB@url_news_detail_code');
 
+    Route::post('vulnerabilitys/vulnerabilitys_table', 'Api\ApiGetMongoDB@vulnerabilitys_table');
+    Route::post('vulnerabilitys/index', 'Api\ApiGetMongoDB@vulnerabilitys_index');
+    Route::post('vulnerabilitys/count', 'Api\ApiGetMongoDB@vulnerabilitys_count');
+    Route::post('vulnerabilitys/top_host', 'Api\ApiGetMongoDB@vulnerabilitys_top_host');
+    Route::post('vulnerabilitys/fixed', 'Api\ApiGetMongoDB@vulnerabilitys__fixed');
+    Route::post('vulnerabilitys/all', 'Api\ApiGetMongoDB@vulnerabilitys_all');
+
+    Route::post('compromised/count_val', 'Api\ApiGetMongoDB@compromised_count_val');
+    Route::post('compromised/table', 'Api\ApiGetMongoDB@compromised_table');
+
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
 });
 
