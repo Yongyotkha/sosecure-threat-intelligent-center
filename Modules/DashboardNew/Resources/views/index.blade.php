@@ -459,13 +459,27 @@ Highcharts.setOptions({
         set_cookie_site($(`#${id_select_site}`).val());
         site = value;
         data_table();
+        @if($role_custom['assets'])
         count_asset();
+        @endif
+        @if($role_custom['vulnerabilities'])
         count_vulnerability();
+        @endif
+        @if($role_custom['compromised'])
         count_compromised();
+        @endif
+        @if($role_custom['data_leak'])
         count_data_leak();
+        @endif
+        @if($role_custom['vulnerabilities'])
         count_vulnerability_host();
+        @endif
+        @if($role_custom['vulnerabilities'])
         load_chart();
+        @endif
+        @if($role_custom['assets'])
         cve_assets();
+        @endif
     }
 
     function clearValue(value) {
@@ -489,20 +503,34 @@ Highcharts.setOptions({
 
     $( document ).ready(function() {
         $("#clearValue").addClass('active');
+        @if($role_custom['indicators'])
         chart_indicators();
+        @endif
         if(get_cookie_site()){
             cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
         }else{
             data_table();
-            count_asset();
-            count_vulnerability();
-            count_compromised();
-            count_data_leak();
-            count_vulnerability_host();
-            load_chart();
-            @can('assets')
+            @if($role_custom['assets'])
+                count_asset();
+            @endif
+            @if($role_custom['vulnerabilities'])
+                count_vulnerability();
+            @endif
+            @if($role_custom['compromised'])
+                count_compromised();
+            @endif
+            @if($role_custom['data_leak'])
+                count_data_leak();
+            @endif
+            @if($role_custom['vulnerabilities'])
+                count_vulnerability_host();
+            @endif
+            @if($role_custom['vulnerabilities'])
+                load_chart();
+            @endif
+            @if($role_custom['assets'])
                 cve_assets();
-            @endcan
+            @endif
         }
         
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
