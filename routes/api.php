@@ -70,8 +70,10 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
     Route::post('compromised/count_val', 'Api\ApiGetMongoDB@compromised_count_val');
     Route::post('compromised/table', 'Api\ApiGetMongoDB@compromised_table');
+    Route::post('compromised/view', 'Api\ApiGetMongoDB@compromised_view');
     
     Route::post('data_leak/table', 'Api\ApiGetMongoDB@data_leak_table');
+    Route::post('data_leak/view', 'Api\ApiGetMongoDB@data_leak_view');
     Route::post('data_leak/count_val', 'Api\ApiGetMongoDB@data_leak_count_val');
 
     Route::post('web_defacement/load_card', 'Api\ApiGetMongoDB@web_defacement_load_card');
