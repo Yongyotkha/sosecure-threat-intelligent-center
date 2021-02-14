@@ -273,12 +273,13 @@
                 },
                 {
                     targets: 4,
+                    className: 'text-center',
                     render: function (data, type, row) {
                         var inner = '';
                         if(row.public==1) {
-                            inner = '<i class="fas fa-check"></i>';
+                            inner = '<i class="fas fa-check text-success"></i>';
                         } else {
-                            inner = '<i class="fas fa-times"></i>';
+                            inner = '<i class="fas fa-times text-danger"></i>';
                         }
                         return inner;
                     }
@@ -395,12 +396,13 @@
                 },
                 {
                     targets: 4,
+                    className: 'text-center',
                     render: function (data, type, row) {
                         var inner = '';
                         if(row.public==1) {
-                            inner = '<i class="fas fa-check"></i>';
+                            inner = '<i class="fas fa-check text-success"></i>';
                         } else {
-                            inner = '<i class="fas fa-times"></i>';
+                            inner = '<i class="fas fa-times text-danger"></i>';
                         }
                         return inner;
                     }

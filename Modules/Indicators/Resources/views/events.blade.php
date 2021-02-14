@@ -671,6 +671,7 @@
             },
             {
                 targets: 5,
+                className: 'text-center',
                 render: function (data, type, row) {
                     var inner = '';
                     if(row.public==1) {
