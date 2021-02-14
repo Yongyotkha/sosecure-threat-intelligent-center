@@ -70,6 +70,17 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
     Route::post('compromised/count_val', 'Api\ApiGetMongoDB@compromised_count_val');
     Route::post('compromised/table', 'Api\ApiGetMongoDB@compromised_table');
+    
+    Route::post('data_leak/table', 'Api\ApiGetMongoDB@data_leak_table');
+    Route::post('data_leak/count_val', 'Api\ApiGetMongoDB@data_leak_count_val');
+
+    Route::post('web_defacement/load_card', 'Api\ApiGetMongoDB@web_defacement_load_card');
+    Route::post('web_defacement/detail', 'Api\ApiGetMongoDB@web_defacement_detail');
+    Route::post('web_defacement/update_original', 'Api\ApiGetMongoDB@web_defacement_update_original');
+    Route::post('web_defacement/update_original_detail', 'Api\ApiGetMongoDB@web_defacement_update_original_detail');
+    Route::post('web_defacement/deface_now', 'Api\ApiGetMongoDB@web_defacement_deface_now');
+    Route::post('web_defacement/deface_now_detail', 'Api\ApiGetMongoDB@web_defacement_deface_now_detail');
+    Route::post('web_defacement/update_image', 'Api\ApiGetMongoDB@web_defacement_update_image');
 
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
 });
