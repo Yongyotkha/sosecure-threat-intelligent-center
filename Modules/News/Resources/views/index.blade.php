@@ -8,7 +8,10 @@
 
             <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 <div class="header-flex-overflow m-t-10">
-                    <div class="fwb-16">
+                    <div class="fwb-16" style="display: flex;align-items: center;">
+                        <a href="{{route('news.index')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                            @icon('solid/arrow-left')
+                        </a>
                         <span>
                             @langapp('news')
                         </span>
