@@ -90,10 +90,13 @@ class AuthController extends ApiController
                     $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
 
                     $check_goto_menu = @check_goto_menu($Menu_permission_site);
+                    if(!$check_goto_menu) {
+                        return response()->json(['error' => 'User does not have permission to access.', 'status_code' => '400']);
+                    }
 
                     $permission_custom = @check_permission_site_custom(@$user->id);
 
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom]);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom, 'check_goto_menu' => $check_goto_menu]);
                     // return response()->json(['message' => 'Successful', 
                     //                             'error' => '', 
                     //                             'status_code' => '200', 
