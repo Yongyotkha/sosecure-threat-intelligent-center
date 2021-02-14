@@ -146,7 +146,7 @@ $user = Auth::user();
                         </div>
                         <div class="col-lg-12">
                             <section class="panel panel-default">
-                            <header class="panel-heading">@langapp('authorization')</header>
+                            <header class="panel-heading font-bold panel-header-blue">@langapp('authorization')</header>
                             <div class="panel-body">
                                 {{-- <div class="form-group  d-none">
                                     <label>Slack Webhook URL <span data-rel="tooltip" title="Your slack webhook url">@icon('brands/slack', 'text-danger')</span></label>

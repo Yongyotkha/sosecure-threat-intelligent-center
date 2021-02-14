@@ -194,12 +194,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <h5 class="font-weight-bold">Group</h5>
                         <select name="sl_group[]" id="sl_group" class="form-control">
                             <option value=""></option>
                         </select>
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="table-responsive">

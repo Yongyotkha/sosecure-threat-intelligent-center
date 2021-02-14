@@ -7,7 +7,7 @@
                 <div class="header-flex-overflow m-t-10">
                     <div class="fwb-16">
                         <span>
-                            @langapp('assets')
+                            {{ (request()->is('assets')) ? 'Assets' : '' || (request()->is('assets/all')) ? 'Settings > Assets' : '' }}
                         </span>
                     </div>
     
