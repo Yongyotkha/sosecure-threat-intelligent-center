@@ -90,15 +90,16 @@ class LoginController extends Controller
             $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
             // session_start();
             $_SESSION["menu"] = $menu;
+            $menu_goto = Menu::select('menu_id')->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get()->pluck('menu_id')->toArray();
             // session('menu', $menu);
             // dd($menu);
             // dd(55);
             if(Session::has('check_goto_menu')){
                 Session::forget('check_goto_menu');
-                Session::put('check_goto_menu', @check_goto_menu($menu));
+                Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
             } else {
-                if(@check_goto_menu($menu)) {
-                    Session::put('check_goto_menu', @check_goto_menu($menu));
+                if(@check_goto_menu(@$menu_goto)) {
+                    Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
                 }
             }
 
