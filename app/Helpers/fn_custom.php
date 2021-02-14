@@ -384,8 +384,8 @@ function check_permission_site_custom_api($user_id, $menu) {
 function check_goto_menu($Menu_permission_site=null) {
     $url = '';
     if(!empty($Menu_permission_site)) {
-        // $menu_id = $Menu_permission_site[0];
-        $menu_id = 3;
+        $menu_id = $Menu_permission_site[0];
+        // $menu_id = 3;
         $menu = Menu::where('id',$menu_id)->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->first();
         if($menu) {
             if($menu->type_url == 'site_url') {
