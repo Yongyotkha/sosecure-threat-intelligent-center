@@ -93,6 +93,15 @@ class LoginController extends Controller
             // session('menu', $menu);
             // dd($menu);
             // dd(55);
+            if(Session::has('check_goto_menu')){
+                Session::forget('check_goto_menu');
+                Session::put('check_goto_menu', @check_goto_menu($menu));
+            } else {
+                if(@check_goto_menu($menu)) {
+                    Session::put('check_goto_menu', @check_goto_menu($menu));
+                }
+            }
+
             
             return $this->sendLoginResponse($request);
 

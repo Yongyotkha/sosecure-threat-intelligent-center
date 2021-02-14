@@ -1,5 +1,14 @@
 @extends('layouts.auth')
 @section('content')
+@php 
+    if(Auth::check()) {
+        if(Session::has('check_goto_menu')){
+            $check_goto_menu = session('check_goto_menu');
+            header('Location: '.site_url($check_goto_menu));
+        } 
+    }
+@endphp
+
 <section id="content">
     {{-- <div id="login-darken"></div> --}}
     <div id="login-form" class="container aside-xxl animated fadeInUp">

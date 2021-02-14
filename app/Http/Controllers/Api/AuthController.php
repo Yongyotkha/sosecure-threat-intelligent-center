@@ -79,15 +79,17 @@ class AuthController extends ApiController
 
                     $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
                     $menu_sub = Menu_sub::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
-                    // $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
-                    // $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
-
-
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', @$user->id)->get();
-                    $result_menu_permission = site_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
-                    $result_menu_sub_permission = site_menu_sub_permission::select('menu_sub_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
-                    $Menu_permission_site = user_menu_permission::select('menu_id')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_id')->toArray();
-                    $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
+                    if($model_has_roles->role_id == 6) {
+                        $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->pluck('menu_id')->toArray();
+                        $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->pluck('menu_sub_id')->toArray();
+                    } else {
+                        $site_id_arr = UserSite::select('site_id')->where('user_id', @$user->id)->get();
+                        $result_menu_permission = site_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+                        $result_menu_sub_permission = site_menu_sub_permission::select('menu_sub_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+                        $Menu_permission_site = user_menu_permission::select('menu_id')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_id')->toArray();
+                        $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
+                    }
+                    
 
                     $check_goto_menu = @check_goto_menu($Menu_permission_site);
                     if(!$check_goto_menu) {
