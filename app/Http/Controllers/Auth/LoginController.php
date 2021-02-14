@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\model_has_roles;
-
+use Session;
 use App\Menu;
 use App\Menu_sub;
 
@@ -87,21 +87,13 @@ class LoginController extends Controller
         if ( ($this->oldLogin($request))) {//custom login
             // The user is active, not suspended, and exists.
 
-            $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+            // $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
             // session_start();
-            $_SESSION["menu"] = $menu;
-            $menu_goto = Menu::select('menu_id')->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get()->pluck('menu_id')->toArray();
+            // $_SESSION["menu"] = $menu;
             // session('menu', $menu);
             // dd($menu);
             // dd(55);
-            if(Session::has('check_goto_menu')){
-                Session::forget('check_goto_menu');
-                Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
-            } else {
-                if(@check_goto_menu(@$menu_goto)) {
-                    Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
-                }
-            }
+
 
             
             return $this->sendLoginResponse($request);
@@ -157,6 +149,7 @@ class LoginController extends Controller
      */
     public function oldLogin($request)
     {
+        // dd(1234);
         $role_status = 0;
         $User = User::where('email',$request->email)->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1)->first();
         // $User = User::where('email', $request->email)->first();
@@ -176,6 +169,16 @@ class LoginController extends Controller
             $passwordHasher = new PasswordHash(8, true);
             $passwordMatch  = $passwordHasher->CheckPassword($request->password, $user->password);
             if ($passwordMatch) {
+                    $menu_goto = Menu::select('id')->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get()->pluck('id')->toArray();
+    
+                    if(Session::has('check_goto_menu')){
+                        Session::forget('check_goto_menu');
+                        Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
+                    } else {
+                        if(@check_goto_menu(@$menu_goto)) {
+                            Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
+                        }
+                    }
                 return Auth::login($user, true);
             }
         }

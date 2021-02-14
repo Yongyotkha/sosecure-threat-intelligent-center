@@ -3,8 +3,11 @@
 @php 
     if(Auth::check()) {
         if(Session::has('check_goto_menu')){
+            // dd(123);
             $check_goto_menu = session('check_goto_menu');
+            // dd($check_goto_menu);
             header('Location: '.site_url($check_goto_menu));
+            dd($check_goto_menu);
         } 
     }
 @endphp
