@@ -175,7 +175,7 @@
                     width: '10px',
                     render: function (data, type, full, meta) {
                         html ='';
-                        html += `<a href="/users/role-permission_role/${full.id}" 
+                        html += `<a href="/users/role-permission/${full.id}" 
                         
                         class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">@icon('solid/shield-alt')
                         </a>`;

@@ -15,7 +15,7 @@
     // Route::get('/', 'SiteSettingsController@index');
 
 Route::group(
-    ['middleware' => ['web', 'permission:role_center'], 'prefix' => 'sitesettings'],
+    ['middleware' => ['web', 'permission:role_center', 'permission:settings'], 'prefix' => 'sitesettings'],
     function () {
         Route::get('/', 'SiteSettingsController@index')->name('sitesettings.index')->middleware('can:menu_items');
         Route::get('/test_mongo', 'SiteSettingsController@test_mongo')->name('sitesettings.test_mongo')->middleware('can:menu_items');
@@ -220,14 +220,14 @@ Route::group(
 
 Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware(['can:menu_items','permission:data_leak']);
 Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware(['can:menu_items','permission:compromised']);
-Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb');
-Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb');
+Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb')->middleware(['can:menu_items','permission:data_leak']);
+Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb')->middleware(['can:menu_items','permission:compromised']);
 
 Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor')->middleware('can:menu_items');
 Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_details')->name('vulsetting.detail')->middleware('can:menu_items');
 
 // View Content
-Route::get('/darkweb_data/view_content/{code}', 'DataLeakController@view_compromise_modal')->name('socialdatas.view_content_compromise');
-Route::get('/socialdatas/view_content/{code}', 'DataLeakController@view_dataleak_modal')->name('socialdatas.view_content_dataleak');
+Route::get('/socialdatas/view_content/{code}', 'DataLeakController@view_dataleak_modal')->name('socialdatas.view_content_dataleak')->middleware(['can:menu_items','permission:data_leak']);
+Route::get('/darkweb_data/view_content/{code}', 'DataLeakController@view_compromise_modal')->name('socialdatas.view_content_compromise')->middleware(['can:menu_items','permission:compromised']);
 
 Route::get('/check_cookie_site', 'SystemSettingsController@check_cookie_site')->name('systemsetting.check_cookie_site')->middleware('can:menu_items');
