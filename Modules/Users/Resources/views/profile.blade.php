@@ -219,7 +219,9 @@ $user = Auth::user();
                                     </div>
                                     
                                 </div> --}}
-                                {!! renderAjaxButton() !!}
+                                <div class="text-right">
+                                    {!! renderAjaxButton() !!}
+                                </div>
                                 
                             </div>
                         </section>
