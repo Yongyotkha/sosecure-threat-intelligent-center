@@ -7,7 +7,8 @@
                 <div class="header-flex-overflow m-t-10">
                     <div class="fwb-16">
                         <span>
-                            {{ (request()->is('assets')) ? 'Assets' : '' || (request()->is('assets/all')) ? 'Settings > Assets' : '' }}
+                            {{ (request()->is('asset')) ? 'Assets' : '' }}
+                            {{(request()->is('asset/all')) ? 'Settings > Assets' : ''}}
                         </span>
                     </div>
     
