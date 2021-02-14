@@ -370,21 +370,15 @@ class RoleController extends Controller
                                 if(!empty($SiteSettings_id_arr)) {
                                     foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
                                       
-                                        $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
-                                        if($transaction_client_role_permissions){
-                                            $transaction_client_role_permissions -> transaction_mode = 'insert';
-                                            $transaction_client_role_permissions -> transaction_data_status = 1;
-                                            $transaction_client_role_permissions -> status = 1;
-                                            $transaction_client_role_permissions -> save();
-                                        }else{
+                              
                                             $transaction_client_role_permissions = new transaction_client_role_permissions();
                                             $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                            $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                            $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                             $transaction_client_role_permissions -> transaction_mode = 'insert';
                                             $transaction_client_role_permissions -> transaction_data_status = 1;
                                             $transaction_client_role_permissions -> status = 1;
                                             $transaction_client_role_permissions -> save();
-                                        }
+                                       
                                     }
                                 }
                             }
@@ -412,21 +406,21 @@ class RoleController extends Controller
                             $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
                             if(!empty($SiteSettings_id_arr)) {
                                 foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
-                                    $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
-                                    if($transaction_client_role_permissions){
-                                        $transaction_client_role_permissions -> transaction_mode = 'insert';
-                                        $transaction_client_role_permissions -> transaction_data_status = 1;
-                                        $transaction_client_role_permissions -> status = 1;
-                                        $transaction_client_role_permissions -> save();
-                                    }else{
+                                    // $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
+                                    // if($transaction_client_role_permissions){
+                                    //     $transaction_client_role_permissions -> transaction_mode = 'insert';
+                                    //     $transaction_client_role_permissions -> transaction_data_status = 1;
+                                    //     $transaction_client_role_permissions -> status = 1;
+                                    //     $transaction_client_role_permissions -> save();
+                                    // }else{
                                         $transaction_client_role_permissions = new transaction_client_role_permissions();
                                         $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                        $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                        $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                         $transaction_client_role_permissions -> transaction_mode = 'insert';
                                         $transaction_client_role_permissions -> transaction_data_status = 1;
                                         $transaction_client_role_permissions -> status = 1;
                                         $transaction_client_role_permissions -> save();
-                                    }
+                                    // }
                                 }
                             }
 
@@ -456,21 +450,21 @@ class RoleController extends Controller
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
                                 if(!empty($SiteSettings_id_arr)) {
                                     foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
-                                        $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
-                                        if($transaction_client_role_permissions){
-                                            $transaction_client_role_permissions -> transaction_mode = 'insert';
-                                            $transaction_client_role_permissions -> transaction_data_status = 1;
-                                            $transaction_client_role_permissions -> status = 1;
-                                            $transaction_client_role_permissions -> save();
-                                        }else{
+                                        // $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
+                                        // if($transaction_client_role_permissions){
+                                        //     $transaction_client_role_permissions -> transaction_mode = 'insert';
+                                        //     $transaction_client_role_permissions -> transaction_data_status = 1;
+                                        //     $transaction_client_role_permissions -> status = 1;
+                                        //     $transaction_client_role_permissions -> save();
+                                        // }else{
                                             $transaction_client_role_permissions = new transaction_client_role_permissions();
                                             $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                            $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                            $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                             $transaction_client_role_permissions -> transaction_mode = 'insert';
                                             $transaction_client_role_permissions -> transaction_data_status = 1;
                                             $transaction_client_role_permissions -> status = 1;
                                             $transaction_client_role_permissions -> save();
-                                        }
+                                        // }
                                     }
                                 }
     
@@ -498,21 +492,21 @@ class RoleController extends Controller
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
                                 if(!empty($SiteSettings_id_arr)) {
                                     foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
-                                        $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
-                                        if($transaction_client_role_permissions){
-                                            $transaction_client_role_permissions -> transaction_mode = 'insert';
-                                            $transaction_client_role_permissions -> transaction_data_status = 1;
-                                            $transaction_client_role_permissions -> status = 1;
-                                            $transaction_client_role_permissions -> save();
-                                        }else{
+                                        // $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
+                                        // if($transaction_client_role_permissions){
+                                        //     $transaction_client_role_permissions -> transaction_mode = 'insert';
+                                        //     $transaction_client_role_permissions -> transaction_data_status = 1;
+                                        //     $transaction_client_role_permissions -> status = 1;
+                                        //     $transaction_client_role_permissions -> save();
+                                        // }else{
                                             $transaction_client_role_permissions = new transaction_client_role_permissions();
                                             $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                            $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                            $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                             $transaction_client_role_permissions -> transaction_mode = 'insert';
                                             $transaction_client_role_permissions -> transaction_data_status = 1;
                                             $transaction_client_role_permissions -> status = 1;
                                             $transaction_client_role_permissions -> save();
-                                        }
+                                        // }
                                     }
                                 }
     
@@ -540,21 +534,21 @@ class RoleController extends Controller
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
                                 if(!empty($SiteSettings_id_arr)) {
                                     foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
-                                        $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
-                                        if($transaction_client_role_permissions){
-                                            $transaction_client_role_permissions -> transaction_mode = 'insert';
-                                            $transaction_client_role_permissions -> transaction_data_status = 1;
-                                            $transaction_client_role_permissions -> status = 1;
-                                            $transaction_client_role_permissions -> save();
-                                        }else{
+                                        // $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
+                                        // if($transaction_client_role_permissions){
+                                        //     $transaction_client_role_permissions -> transaction_mode = 'insert';
+                                        //     $transaction_client_role_permissions -> transaction_data_status = 1;
+                                        //     $transaction_client_role_permissions -> status = 1;
+                                        //     $transaction_client_role_permissions -> save();
+                                        // }else{
                                             $transaction_client_role_permissions = new transaction_client_role_permissions();
                                             $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                            $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                            $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                             $transaction_client_role_permissions -> transaction_mode = 'insert';
                                             $transaction_client_role_permissions -> transaction_data_status = 1;
                                             $transaction_client_role_permissions -> status = 1;
                                             $transaction_client_role_permissions -> save();
-                                        }
+                                        // }
                                     }
                                 }
     
@@ -587,7 +581,7 @@ class RoleController extends Controller
                             $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
                             if(!empty($SiteSettings_id_arr)) {
                                 foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
-                                    $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
+                                    $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions_last)->first();
                                     if($transaction_client_role_permissions){
                                         $transaction_client_role_permissions -> transaction_mode = 'insert';
                                         $transaction_client_role_permissions -> transaction_data_status = 1;
@@ -596,7 +590,7 @@ class RoleController extends Controller
                                     }else{
                                         $transaction_client_role_permissions = new transaction_client_role_permissions();
                                         $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                        $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                        $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                         $transaction_client_role_permissions -> transaction_mode = 'insert';
                                         $transaction_client_role_permissions -> transaction_data_status = 1;
                                         $transaction_client_role_permissions -> status = 1;
@@ -647,21 +641,21 @@ class RoleController extends Controller
                                 if(!empty($SiteSettings_id_arr)) {
                                     foreach($SiteSettings_id_arr as $SiteSettings_id_arr_val) {
                                       
-                                                $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions->id)->first();
-                                                if($transaction_client_role_permissions){
-                                                    $transaction_client_role_permissions -> transaction_mode = 'insert';
-                                                    $transaction_client_role_permissions -> transaction_data_status = 1;
-                                                    $transaction_client_role_permissions -> status = 1;
-                                                    $transaction_client_role_permissions -> save();
-                                                }else{
+                                                // $transaction_client_role_permissions = transaction_client_role_permissions::where('site_id', $SiteSettings_id_arr_val)->where('transaction_id', $role_permissions_last)->first();
+                                                // if($transaction_client_role_permissions){
+                                                //     $transaction_client_role_permissions -> transaction_mode = 'insert';
+                                                //     $transaction_client_role_permissions -> transaction_data_status = 1;
+                                                //     $transaction_client_role_permissions -> status = 1;
+                                                //     $transaction_client_role_permissions -> save();
+                                                // }else{
                                                     $transaction_client_role_permissions = new transaction_client_role_permissions();
                                                     $transaction_client_role_permissions -> site_id = $SiteSettings_id_arr_val;
-                                                    $transaction_client_role_permissions -> transaction_id = $role_permissions->id;
+                                                    $transaction_client_role_permissions -> transaction_id = $role_permissions_last;
                                                     $transaction_client_role_permissions -> transaction_mode = 'insert';
                                                     $transaction_client_role_permissions -> transaction_data_status = 1;
                                                     $transaction_client_role_permissions -> status = 1;
                                                     $transaction_client_role_permissions -> save();
-                                                }
+                                                // }
                                     }
                                 }
                             }
