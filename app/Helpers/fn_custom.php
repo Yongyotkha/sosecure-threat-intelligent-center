@@ -379,6 +379,22 @@ function check_permission_site_custom_api($user_id, $menu) {
     }
 }
 
+function check_goto_menu($Menu_permission_site=null) {
+    $url = '';
+    if(!empty($Menu_permission_site)) {
+        $menu_id = $Menu_permission_site[0];
+        $menu = Menu::where('id',$menu_id)->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->first();
+        if($menu) {
+            if($menu->type_url == 'site_url') {
+                $url = $menu->url_client;
+            } else if($menu->type_url == 'route') {
+                $url = route($menu_val->url_client);
+            }
+        }
+    }
+    return $url;
+}
+
 
 function gen_uuid() {
     return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
