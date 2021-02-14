@@ -185,8 +185,7 @@
 
             <div class="panel-body">
 
-                <div class="row">
-                    
+                <div class="row m-b-12">
                     <div class="col-md-12">
                         <h5 class="font-weight-bold">Industries</h5>
                         <div class="text-center">

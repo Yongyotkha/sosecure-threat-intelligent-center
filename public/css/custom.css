@@ -1911,6 +1911,14 @@ ul.topics-news-list li a:hover{
     max-width: 163px;
 }
 
+.text-elipse-vul{
+    white-space: nowrap; 
+    max-width: 150px; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    width: 100%;
+}
+
 .text-elip-message{
     white-space: nowrap; 
     max-width: 150px; 
