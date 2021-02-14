@@ -3,6 +3,10 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
+            <a href="{{route('indicators.events')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+            </a>
+
             <div class="bc-head">Tag : {{@$id}}</div>
 
             <a id="advance-search" href="#hide-advance-search"

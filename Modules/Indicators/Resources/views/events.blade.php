@@ -31,8 +31,7 @@
                     <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
                 </a>
 
-                <a id="advance-search" href="#area_search"
-                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
             </a>
 
@@ -187,10 +186,20 @@
             <div class="panel-body">
 
                 <div class="row">
-                    <div class="col-md-12 text-center">
-                        <div id="fillter_click" class="button-group" >
-                            <span id="btn_industrise"></span>
+                    
+                    <div class="col-md-12">
+                        <h5 class="font-weight-bold">Industries</h5>
+                        <div class="text-center">
+                            <div id="fillter_click" class="button-group">
+                                <span id="btn_industrise"></span>
+                            </div>
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="font-weight-bold">Group</h5>
+                        <select name="sl_group[]" id="sl_group" class="form-control">
+                            <option value=""></option>
+                        </select>
                     </div>
                 </div>
 
@@ -322,6 +331,7 @@
   });
 
 
+    $('.sl_group').select2();
     $('.select2-option').select2();
 
     var start_date = '';

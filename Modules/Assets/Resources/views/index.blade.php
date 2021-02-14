@@ -192,7 +192,7 @@
                                             <span> Host </span>
                                         </button>
                                         <button class="btn btn-grey" onclick="selectGroupBy('ip')">
-                                            <span> IP </span>
+                                            <span> Assets </span>
                                         </button>
                                         <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
                                             <span> CPE </span>
