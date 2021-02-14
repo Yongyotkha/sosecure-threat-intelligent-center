@@ -89,6 +89,7 @@ class AuthController extends ApiController
                     $Menu_permission_site = user_menu_permission::select('menu_id')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_id')->toArray();
                     $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
 
+                    $check_goto_menu = @check_goto_menu($Menu_permission_site);
 
                     $permission_custom = @check_permission_site_custom(@$user->id);
 
