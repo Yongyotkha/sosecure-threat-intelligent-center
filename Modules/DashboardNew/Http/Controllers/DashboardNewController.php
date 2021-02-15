@@ -835,31 +835,31 @@ class DashboardNewController extends Controller
         if (!$request->pagename||$request->pagename=='Data Leak') {
             $role_custom = @check_role_custom();
             if($role_custom['data_leak']) {
-                // if(@get_role_custom()['superadmin'] == 1) {//|| @get_role_custom()['site_admin'] == 1
-                //     $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feel_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
-                //     foreach ($DataLeakFeed_social as $key => $value) {
-                //         $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
-                //         if($leak_socail_ref_temps){
-                //             if(isset($SiteSettings->id)){
-                //                 $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
-                //                 if ($pos === false) {
-                //                     unset($DataLeakFeed_social[$key]);
-                //                     continue;
-                //                 }
-                //             }
-                //             $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
-                //             $name_site = '';
-                //             foreach ($site as $data) {
-                //                 $name_site .= $data->name . ' ,';
-                //             }
-                //             $name_site = rtrim($name_site, " ,");
-                //             $DataLeakFeed_social[$key]["sitename"] = $name_site;
-                //         }else{
-                //             unset($DataLeakFeed_social[$key]);
-                //         }
+                if(@get_role_custom()['superadmin'] == 1) {//|| @get_role_custom()['site_admin'] == 1
+                    $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                    foreach ($DataLeakFeed_social as $key => $value) {
+                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
+                        if($leak_socail_ref_temps){
+                            if(isset($SiteSettings->id)){
+                                $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
+                                if ($pos === false) {
+                                    unset($DataLeakFeed_social[$key]);
+                                    continue;
+                                }
+                            }
+                            $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                            $name_site = '';
+                            foreach ($site as $data) {
+                                $name_site .= $data->name . ' ,';
+                            }
+                            $name_site = rtrim($name_site, " ,");
+                            $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                        }else{
+                            unset($DataLeakFeed_social[$key]);
+                        }
                         
-                //     }
-                // }else{
+                    }
+                }else{
                     $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feel_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
                         $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
@@ -877,7 +877,7 @@ class DashboardNewController extends Controller
                         
 
                     }
-                // }
+                }
             }
         }
         
