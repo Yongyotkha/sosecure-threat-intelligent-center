@@ -1289,15 +1289,17 @@ class RSSFeedSettingsController extends Controller
             //     }
             // }
             if($request->formsubmit !== 'formDraft'){
-                if($email_site_alert) {
-                    foreach($email_site_alert as $data){
-                        // var_dump($data);
-                        $this->news = [
-                            'news' => $RSSNews_check,
-                        ];
-
-                        // dd($this->news);
-                        Mail::to($data)->send(new NewsMail($this->news));
+                if ($request->sent_mail == 1) {
+                    if($email_site_alert) {
+                        foreach($email_site_alert as $data){
+                            // var_dump($data);
+                            $this->news = [
+                                'news' => $RSSNews_check,
+                            ];
+    
+                            // dd($this->news);
+                            Mail::to($data)->send(new NewsMail($this->news));
+                        }
                     }
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1506,12 +1508,14 @@ class RSSFeedSettingsController extends Controller
             //     }
             // }
             if($request->formsubmit !== 'formDraft'){
-                if($email_site_alert) {
-                    foreach($email_site_alert as $data){
-                        $this->news = [
-                            'news' => $RSSNews,
-                        ];
-                        Mail::to($data)->send(new NewsMail($this->news));
+                if ($request->sent_mail == 1) {
+                    if($email_site_alert) {
+                        foreach($email_site_alert as $data){
+                            $this->news = [
+                                'news' => $RSSNews,
+                            ];
+                            Mail::to($data)->send(new NewsMail($this->news));
+                        }
                     }
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1735,13 +1739,15 @@ class RSSFeedSettingsController extends Controller
 
 
                     if($request->formsubmit !== 'formDraft'){
-                        if($email_site_alert) {
-                            foreach($email_site_alert as $data){
-                                $this->news = [
-                                    'news' => $RSSNews_check,
-                                ];
-                                // dd($this->news);
-                                Mail::to($data)->send(new NewsMail($this->news));
+                        if ($request->sent_mail == 1) {
+                            if($email_site_alert) {
+                                foreach($email_site_alert as $data){
+                                    $this->news = [
+                                        'news' => $RSSNews_check,
+                                    ];
+                                    // dd($this->news);
+                                    Mail::to($data)->send(new NewsMail($this->news));
+                                }
                             }
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1952,13 +1958,15 @@ class RSSFeedSettingsController extends Controller
                         // }
                     }
                     if($request->formsubmit !== 'formDraft'){
-                        if($email_site_alert) {
-                            foreach($email_site_alert as $data){
-                                $this->news = [
-                                    'news' => $RSSNews,
-                                ];
-                                // dd($this->news);
-                                Mail::to($data)->send(new NewsMail($this->news));
+                        if ($request->sent_mail == 1) {
+                            if($email_site_alert) {
+                                foreach($email_site_alert as $data){
+                                    $this->news = [
+                                        'news' => $RSSNews,
+                                    ];
+                                    // dd($this->news);
+                                    Mail::to($data)->send(new NewsMail($this->news));
+                                }
                             }
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
