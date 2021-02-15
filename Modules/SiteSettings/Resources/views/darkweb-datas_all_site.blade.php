@@ -388,6 +388,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
+@include('stacks.js.readmore')
 
 <script>
 
@@ -524,6 +525,8 @@
     
     function table_social_data(){
 
+        readmore_btn('#table_social_datas','.btn-readmore','scroll-ovf-content-fixh-60');
+
         $('#table_social_datas').DataTable({
                 pageLength: 50,
                 processing: true,
@@ -632,7 +635,7 @@
                                 }
                                 
                             }
-                            return '<div class="scroll-ovf-content-fixh-60">'+content+'</div>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+content+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
                         },
                     },
 
@@ -649,7 +652,7 @@
                                 }
                             }
         
-                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
 
                         },
                     
@@ -712,10 +715,10 @@
                     },
 
                 ]
-        
             });
     }
 
+    
     function social_active(id) {
         let checkState = $("#social_active_" + id).is(":checked") ? 1 : 0;
         axios.post('{{route('DataLeakController.darkweb_data_change_status')}}', {

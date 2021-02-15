@@ -3853,14 +3853,23 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
     white-space: normal;
 }
 .scroll-ovf-content-fixh-60{
-    overflow-y: auto;
+    white-space: nowrap; 
+    max-width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    /* overflow-y: auto;
     height: 60px;
     max-height: 60px;
     max-width: 350px;
     padding: 3px 0;
-    white-space: normal;
+    white-space: normal; */
     /* background-color: #f5f5f5;
     border: 1px solid rgba(85, 85, 85, 0.3); */
+}
+
+.btn-readmore{
+    margin-top: 5px;
+    padding: 0 !important;
 }
 
 .max-h-50{
