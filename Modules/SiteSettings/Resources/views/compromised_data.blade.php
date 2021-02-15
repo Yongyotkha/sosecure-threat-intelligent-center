@@ -231,6 +231,7 @@
 @endpush
 
 @push('pagescript')
+@include('stacks.js.readmore')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
@@ -307,7 +308,7 @@ active_btn('#groupby-type .btn-grey');
 
     function table_social_data(){
 
- 
+        readmore_btn('#table_social_datas','.btn-readmore','scroll-ovf-content-fixh-60');
 
         $('#table_social_datas').DataTable({
                 pageLength: 50,
@@ -417,8 +418,7 @@ active_btn('#groupby-type .btn-grey');
                                 
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+feedcontent+'">'+content+'</div>';
-
+                            return '<div class="scroll-ovf-content-fixh-60">'+feedcontent+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
                         },
                     },
                     {
@@ -433,7 +433,7 @@ active_btn('#groupby-type .btn-grey');
                                 }
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+val+'">'+val+'</div>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
 
 
                         },
