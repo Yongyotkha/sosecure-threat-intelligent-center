@@ -90,6 +90,9 @@
         </div>
     </section>
 
+
+
+
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
@@ -110,221 +113,249 @@
         </div>
     </section>
 
-   
-    <section id="about">
-      <div class="container">
-
-        <header class="section-header">
-          <h3>About Us</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-        </header>
-
-        <div class="row about-container">
-
-          <div class="col-lg-6 content order-lg-1 order-2">
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
-
-            <div class="icon-box wow fadeInUp">
-              <div class="icon"><i class="fa fa-shopping-bag"></i></div>
-              <h4 class="title"><a href="">Eiusmod Tempor</a></h4>
-              <p class="description">Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi</p>
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="primary-text-blue text-center">Data Leak Detection</h1>
+                </div>
             </div>
-
-            <div class="icon-box wow fadeInUp" data-wow-delay="0.2s">
-              <div class="icon"><i class="fa fa-photo"></i></div>
-              <h4 class="title"><a href="">Magni Dolores</a></h4>
-              <p class="description">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
-            </div>
-
-            <div class="icon-box wow fadeInUp" data-wow-delay="0.4s">
-              <div class="icon"><i class="fa fa-bar-chart"></i></div>
-              <h4 class="title"><a href="">Dolor Sitema</a></h4>
-              <p class="description">Minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat tarad limino ata</p>
-            </div>
-
-          </div>
-
-          <div class="col-lg-6 background order-lg-2 order-1 wow fadeInUp">
-            <img src="img/about-img.svg" class="img-fluid" alt="">
-          </div>
         </div>
+        <div class="iceberg-section">
+            <div class="container-fluid px-5">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h1 class="primary-text-blue text-center mt-3 fz-70 font-weight-500">Surface Web</h1>
+                    </div>
 
-        <div class="row about-extra">
-          <div class="col-lg-6 wow fadeInUp">
-            <img src="img/about-extra-1.svg" class="img-fluid" alt="">
-          </div>
-          <div class="col-lg-6 wow fadeInUp pt-5 pt-lg-0">
-            <h4>Voluptatem dignissimos provident quasi corporis voluptates sit assumenda.</h4>
-            <p>
-              Ipsum in aspernatur ut possimus sint. Quia omnis est occaecati possimus ea. Quas molestiae perspiciatis occaecati qui rerum. Deleniti quod porro sed quisquam saepe. Numquam mollitia recusandae non ad at et a.
-            </p>
-            <p>
-              Ad vitae recusandae odit possimus. Quaerat cum ipsum corrupti. Odit qui asperiores ea corporis deserunt veritatis quidem expedita perferendis. Qui rerum eligendi ex doloribus quia sit. Porro rerum eum eum.
-            </p>
-          </div>
+                    <div class="col-md-4 text-center">
+                        <img class="img-fluid" src="{{asset('asset_salepage/images/iceberg.png')}}" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <span class="secondary-text">
+                            ตรวจจับการรั่วไหลของข้อมูลที่ถูก Hackerนำไปเผยเแพร่บน Internet จากแหล่งข้อมูลต่างๆ
+                        </span>
+                        <ul class="list-img-ioc">
+                            <li>
+                                <img src="{{asset('asset_salepage/images/Group80.png')}}" alt="">
+                                <p>Data Leak</p>
+                            </li>
+                            <li>
+                                <img src="{{asset('asset_salepage/images/Group81.png')}}" alt="">
+                                <p>Social Network</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <div class="bg-blue-linear">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span class="secondary-text mb-3 text-white">
+                                ตรวจจับการรั่วไหลของข้อมูลในตลาดมืด (Darkweb) ที่มีการนำข้อมูลในองค์กรมา เผยแพร่หรือจำหน่าย
+                            </span>
+        
+                            <ul class="list-img-ioc text-center">
+                                <li>
+                                    <img src="{{asset('asset_salepage/images/Group84.png')}}" alt="">
+                                    <p class="text-white">Credential</p>
+                                </li>
+                                <li>
+                                    <img src="{{asset('asset_salepage/images/Group83.png')}}" alt="">
+                                    <p class="text-white">Credit Card</p>
+                                </li>
+                                <li>
+                                    <img src="{{asset('asset_salepage/images/Group82.png')}}" alt="">
+                                    <p class="text-white">Finance Info</p>
+                                </li>
+                                <li>
+                                    <img src="{{asset('asset_salepage/images/Group82.png')}}" alt="">
+                                    <p class="text-white">Confidential Data</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 offset-md-4 d-flex align-items-center">
+                            <h1 class="fz-70 text-white font-weight-500">Dark Web</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="row about-extra">
-          <div class="col-lg-6 wow fadeInUp order-1 order-lg-2">
-            <img src="img/about-extra-2.svg" class="img-fluid" alt="">
-          </div>
-
-          <div class="col-lg-6 wow fadeInUp pt-4 pt-lg-0 order-2 order-lg-1">
-            <h4>Neque saepe temporibus repellat ea ipsum et. Id vel et quia tempora facere reprehenderit.</h4>
-            <p>
-             Delectus alias ut incidunt delectus nam placeat in consequatur. Sed cupiditate quia ea quis. Voluptas nemo qui aut distinctio. Cumque fugit earum est quam officiis numquam. Ducimus corporis autem at blanditiis beatae incidunt sunt. 
-            </p>
-            <p>
-              Voluptas saepe natus quidem blanditiis. Non sunt impedit voluptas mollitia beatae. Qui esse molestias. Laudantium libero nisi vitae debitis. Dolorem cupiditate est perferendis iusto.
-            </p>
-            <p>
-              Eum quia in. Magni quas ipsum a. Quis ex voluptatem inventore sint quia modi. Numquam est aut fuga mollitia exercitationem nam accusantium provident quia.
-            </p>
-          </div>
-          
-        </div>
-
-      </div>
-    </section><!-- #about -->
-
-    <!--==========================
-      Services Section
-    ============================-->
-    <section id="services" class="section-bg">
-      <div class="container">
-
-        <header class="section-header">
-          <h3>Services</h3>
-          <p>Laudem latine persequeris id sed, ex fabulas delectus quo. No vel partiendo abhorreant vituperatoribus.</p>
-        </header>
-
-        <div class="row">
-
-          <div class="col-md-6 col-lg-5 offset-lg-1 wow bounceInUp" data-wow-duration="1.4s">
-            <div class="box">
-              <div class="icon"><i class="ion-ios-analytics-outline" style="color: #ff689b;"></i></div>
-              <h4 class="title"><a href="">Lorem Ipsum</a></h4>
-              <p class="description">Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident</p>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-5 wow bounceInUp" data-wow-duration="1.4s">
-            <div class="box">
-              <div class="icon"><i class="ion-ios-bookmarks-outline" style="color: #e9bf06;"></i></div>
-              <h4 class="title"><a href="">Dolor Sitema</a></h4>
-              <p class="description">Minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat tarad limino ata</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-5 offset-lg-1 wow bounceInUp" data-wow-delay="0.1s" data-wow-duration="1.4s">
-            <div class="box">
-              <div class="icon"><i class="ion-ios-paper-outline" style="color: #3fcdc7;"></i></div>
-              <h4 class="title"><a href="">Sed ut perspiciatis</a></h4>
-              <p class="description">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur</p>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-5 wow bounceInUp" data-wow-delay="0.1s" data-wow-duration="1.4s">
-            <div class="box">
-              <div class="icon"><i class="ion-ios-speedometer-outline" style="color:#41cf2e;"></i></div>
-              <h4 class="title"><a href="">Magni Dolores</a></h4>
-              <p class="description">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-5 offset-lg-1 wow bounceInUp" data-wow-delay="0.2s" data-wow-duration="1.4s">
-            <div class="box">
-              <div class="icon"><i class="ion-ios-world-outline" style="color: #d6ff22;"></i></div>
-              <h4 class="title"><a href="">Nemo Enim</a></h4>
-              <p class="description">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque</p>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-5 wow bounceInUp" data-wow-delay="0.2s" data-wow-duration="1.4s">
-            <div class="box">
-              <div class="icon"><i class="ion-ios-clock-outline" style="color: #4680ff;"></i></div>
-              <h4 class="title"><a href="">Eiusmod Tempor</a></h4>
-              <p class="description">Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi</p>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section><!-- #services -->
-
-    <!--==========================
-      Why Us Section
-    ============================-->
-    <section id="why-us" class="wow fadeIn">
-      <div class="container">
-        <header class="section-header">
-          <h3>Why choose us?</h3>
-          <p>Laudem latine persequeris id sed, ex fabulas delectus quo. No vel partiendo abhorreant vituperatoribus.</p>
-        </header>
-
-        <div class="row row-eq-height justify-content-center">
-
-          <div class="col-lg-4 mb-4">
-            <div class="card wow bounceInUp">
-                <i class="fa fa-diamond"></i>
-              <div class="card-body">
-                <h5 class="card-title">Corporis dolorem</h5>
-                <p class="card-text">Deleniti optio et nisi dolorem debitis. Aliquam nobis est temporibus sunt ab inventore officiis aut voluptatibus.</p>
-                <a href="#" class="readmore">Read more </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 mb-4">
-            <div class="card wow bounceInUp">
-                <i class="fa fa-language"></i>
-              <div class="card-body">
-                <h5 class="card-title">Voluptates dolores</h5>
-                <p class="card-text">Voluptates nihil et quis omnis et eaque omnis sint aut. Ducimus dolorum aspernatur.</p>
-                <a href="#" class="readmore">Read more </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 mb-4">
-            <div class="card wow bounceInUp">
-                <i class="fa fa-object-group"></i>
-              <div class="card-body">
-                <h5 class="card-title">Eum ut aspernatur</h5>
-                <p class="card-text">Autem quod nesciunt eos ea aut amet laboriosam ab. Eos quis porro in non nemo ex. </p>
-                <a href="#" class="readmore">Read more </a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="row counters">
-
-          <div class="col-lg-3 col-6 text-center">
-            <span data-toggle="counter-up">274</span>
-            <p>Clients</p>
-          </div>
-
-          <div class="col-lg-3 col-6 text-center">
-            <span data-toggle="counter-up">421</span>
-            <p>Projects</p>
-          </div>
-
-          <div class="col-lg-3 col-6 text-center">
-            <span data-toggle="counter-up">1,364</span>
-            <p>Hours Of Support</p>
-          </div>
-
-          <div class="col-lg-3 col-6 text-center">
-            <span data-toggle="counter-up">18</span>
-            <p>Hard Workers</p>
-          </div>
-  
-        </div>
-
-      </div>
     </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-md-6">
+                    <div class="mb-5">
+                        <h1 class="primary-text">
+                            Compromised Detection
+                        </h1>
+                        <span class="secondary-text">
+                            ตรวจจับการถูกโจมตีจาก Hacker และการยึดเครื่องหรือฝัง Backdoor ในเครื่อง Server โดยการใช้ Indicator จากฐานข้อมูลเชิงลึก
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 text-center">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/dash.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-md-6 text-center">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/defaced.png')}}" alt="">
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="mb-5">
+                        <h1 class="primary-text">
+                            Web Defaced Detection
+                        </h1>
+                        <span class="secondary-text">
+                            เฝ้าระวังการโจมตีด้วยเทคนิคการเปลี่ยนหน้าเว็บไซต์ (Web Defaced) เพื่อรักษาความน่าเชื่อถือขององค์กร
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="content-section py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="primary-text text-center m-0">
+                        Advanced Vulnerability Detection
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-blue">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1 class="primary-text text-center text-white">
+                        Vulnerability Detection
+                    </h1>
+                    <span class="secondary-text text-white mb-4">
+                        ระบบ Threat inSight สามารถช่วยตรวจจับช่องโหว่ของระบบโดยอ้างอิงจากฐานข้อมูลช่องโหว่ (CVE) ที่เป็นมาตรฐานสากล
+                    </span>
+
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/smartmockups_kl0coiz8.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text text-center">
+                            Mis-Configuration Detection
+                        </h1>
+                        <span class="secondary-text">
+                            ระบบสามารถตรวจจับ Configuration ที่ไม่ปลอดภัยโดยอ้างอิงตาม Security Guideline จากสถาบัน CIS และสามารถปรับแก้ไข Configuration ให้ปลอดภัยด้วยระบบ
+                        </span>
+                    </div>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/Icom.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-md-6 text-center">
+                    <h1 class="primary-text text-center">
+                        Cybersecurity News Feed
+                    </h1>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/cyber.png')}}" alt="">
+                </div>
+                <div class="col-lg-6 col-md-6 text-center">
+                    <div class="mb-5">
+                        <span class="secondary-text">
+                            อัพเดทข่าวสารด้วย Cybersecurity จากแหล่งข่าวต่างๆ ทั่วโลก และสามารถแจ้งข่าวสารผ่านทาง Email
+                        </span>
+                    </div>
+                    <ul class="cyber-news-feed">
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/posttoday-v1.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/Trend-Micro-Logo.svg.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/sanook.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/krebsan.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/thairath.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/kapook.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/prachachat-logo.png')}}" alt="">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-md-6 text-center">
+                    <div class="mb-4">
+                        <span class="secondary-text text-center">
+                            ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
+                        </span>
+                    </div>
+                    <div>
+                        <ul class="list-img-ioc justify-content-center">
+                            <li>
+                                <img src="{{asset('asset_salepage/images/Group87.png')}}" alt="">
+                                <p>Phishing</p>
+                            </li>
+                            <li>
+                                <img src="{{asset('asset_salepage/images/Group86.png')}}" alt="">
+                                <p>Fake Mobile <br> Application</p>
+                            </li>
+                            <li>
+                                <img src="{{asset('asset_salepage/images/Group75.png')}}" alt="">
+                                <p>Drive-By <br>Download</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 col-md-6 text-center">
+                    <h1 class="primary-text text-center">
+                        Social Engineering Detection
+                    </h1>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/vec.png')}}" alt="">
+                </div>
+          
+            </div>
+        </div>
+    </section>
+   
+
 
     <!--==========================
       Contact Section
