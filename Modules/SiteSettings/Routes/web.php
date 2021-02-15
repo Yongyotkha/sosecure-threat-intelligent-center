@@ -222,6 +222,8 @@ Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('soc
 Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware(['can:menu_items','permission:compromised']);
 // Modal Add Compromise 
 Route::get('/darkweb-datas/create', 'DataLeakController@create_compromise')->name('compromise.create')->middleware('can:menu_items');
+Route::post('/darkweb-datas/create/add_compromise', 'DataLeakController@add_compromise')->name('compromise.add_compromise')->middleware('can:menu_items');
+
 Route::get('/dataleak/create', 'DataLeakController@create_dataleak')->name('dataleak.create')->middleware('can:menu_items');
 
 Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb')->middleware(['can:menu_items','permission:data_leak']);

@@ -24,14 +24,19 @@
 
                     <div class="ml-2 text-right">
                     
+                        <a href="{{route('compromise.create') }}?site={{@$siteCode}}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                            <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
+                            <span class="hide-text">@langapp('add')</span>
+                        </a>
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
                         <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
                             <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
                         </button>
 
-                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                        </a>
+
 
                         
 
@@ -371,6 +376,7 @@ active_btn('#groupby-type .btn-grey');
                     {
                         targets: 2,
                         width: '60px',
+                        className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.feel_type;
                             if(val) {
