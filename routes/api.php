@@ -67,6 +67,12 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('vulnerabilitys/top_host', 'Api\ApiGetMongoDB@vulnerabilitys_top_host');
     Route::post('vulnerabilitys/fixed', 'Api\ApiGetMongoDB@vulnerabilitys__fixed');
     Route::post('vulnerabilitys/all', 'Api\ApiGetMongoDB@vulnerabilitys_all');
+    Route::post('vulnerabilitys/all_asset_data', 'Api\ApiGetMongoDB@vulnerabilitys_all_asset_data');
+    Route::post('vulnerabilitys/asset_data_detail', 'Api\ApiGetMongoDB@vulnerabilitys_asset_data_detail');
+    Route::post('vulnerabilitys/change_status_detail', 'Api\ApiGetMongoDB@vulnerabilitys_change_status_detail');
+    Route::post('vulnerabilitys/change_status', 'Api\ApiGetMongoDB@vulnerabilitys_change_status');
+    Route::post('vulnerabilitys/cve_table', 'Api\ApiGetMongoDB@vulnerabilitys_cve_table');
+    Route::post('vulnerabilitys/load_cve', 'Api\ApiGetMongoDB@vulnerabilitys_load_cve');
 
     Route::post('compromised/count_val', 'Api\ApiGetMongoDB@compromised_count_val');
     Route::post('compromised/table', 'Api\ApiGetMongoDB@compromised_table');
