@@ -52,21 +52,23 @@ class data_leak_social extends Command
         $tz = new \DateTimeZone('Asia/Bangkok');
         $start = date("Y-m-d").' 00:00:00';
         $end = date("Y-m-d").' 23:59:59';
-        $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime(($start)*1000));
-        $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime(($end)*1000));
+       // $start = '2020-01-01'.' 00:00:00';
+      ?//  $end = date("Y-m-d").' 23:59:59';
+      $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
+      $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
 
         // print_r($dateStart->toDateTime()->format(DATE_RSS));
-        $date_start = $dateStart->toDateTime();
-        $date_end = $dateEnd->toDateTime();
+      $date_start = $dateStart->toDateTime();
+      $date_end = $dateEnd->toDateTime();
 
-        $date_start->setTimezone($tz);
-        $date_end->setTimezone($tz);
+      $date_start->setTimezone($tz);
+      $date_end->setTimezone($tz);
 
-        $start = $date_start->format(DATE_ATOM);
-        $end = $date_end->format(DATE_ATOM);
+      $start = $date_start->format(DATE_ATOM);
+      $end = $date_end->format(DATE_ATOM);
 
-        echo $start;
-        echo $end;
+      echo $start;
+      echo $end;
         // // Query Class
         // $query = new \MongoDB\Driver\Query(array('feedtimestamp' => array('$gt' => $start, '$lte' => $end)));
 
@@ -74,31 +76,31 @@ class data_leak_social extends Command
         // $cursor = $manager->executeQuery('social.Feed', $query);
 
         // Convert cursor to Array and print result
-        $mongo_url = config('app.DB_MONGO_DEV');
-        $client = new \MongoDB\Client($mongo_url);
-        $db_name = 'social';
-        $db = $client->$db_name;
-        $collection = $db->Feed;
+      $mongo_url = config('app.DB_MONGO_DEV');
+      $client = new \MongoDB\Client($mongo_url);
+      $db_name = 'social';
+      $db = $client->$db_name;
+      $collection = $db->Feed;
 
         // $where = array(
         //     'feedtimestamp' => array('$gt' => $start, '$lt' => $end),
         // );
 
-        $time_stamp_search = new \MongoDB\BSON\UTCDateTime(Carbon::now('UTC')->subDays(1));
-        $Site_keywords = Site_keywords::where('status', 1)->where('deleted_at', null)->where('type', 'social')->get();
-        foreach ($Site_keywords as $key => $Site_keyword) {
+      $time_stamp_search = new \MongoDB\BSON\UTCDateTime(Carbon::now('UTC')->subDays(1));
+      $Site_keywords = Site_keywords::where('status', 1)->where('deleted_at', null)->where('type', 'social')->get();
+      foreach ($Site_keywords as $key => $Site_keyword) {
 
 
-            $where = array(
+        $where = array(
             //'feedtimepost' => ['$gt' => $time_stamp_search],
             //'feedcontent' => ['$regex'=>'PTT', '$options' => 'i'],
             //'sourceid' => 1,
            // "\$gte"=>$date1,
            // "\$lt"=>$date2
-                'feedtimepost' => ['$gte' => $dateStart,'$lt' => $dateEnd],
-                'feedcontent' => new \MongoDB\BSON\Regex($Site_keyword -> name),
+            'feedtimepost' => ['$gte' => $dateStart,'$lt' => $dateEnd],
+            'feedcontent' => new \MongoDB\BSON\Regex($Site_keyword -> name),
            // 'feedcontent' => new \MongoDB\BSON\Regex('ทำไมแฟนผมเป็นแบบนี้'),
-            );
+        );
 
 
         $cursor = $collection->find($where);   //This is the main line
