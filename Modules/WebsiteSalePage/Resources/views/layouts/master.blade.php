@@ -27,7 +27,6 @@
     <body>
         @yield('content')
 
-        <script src="{{ asset('asset_salepage//js/salepage.js') }}"></script>
         <!-- JavaScript Libraries -->
         <script src="{{ asset('asset_salepage/lib/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('asset_salepage/lib/jquery/jquery-migrate.min.js') }}"></script>
