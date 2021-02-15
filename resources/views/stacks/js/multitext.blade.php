@@ -2,9 +2,9 @@
 
 <script>
     function multi_readmore() {
-        $( ".text-trucate-ovf" ).each(function( index ) {
+        $( "table tbody tr .text-trucate-ovf").each(function() {
         $(this).multiTextToggleCollapse({
-            line: 2
+            line: 1
             });
         });
     }

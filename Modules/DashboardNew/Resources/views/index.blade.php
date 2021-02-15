@@ -650,12 +650,10 @@ Highcharts.setOptions({
                     },
                 },
                 {
-                    width:'100%',
+                    width:'400px',
                     targets: 3,
-                    render: function (data, type, full, meta) {
-                        
-                        return '<div class="text-trucate-ovf">'+full.content+'</div>';
-                            
+                    render: function (data, type, full, meta) {    
+                        return '<div class="text-trucate-ovf">'+full.content+'</div>';    
                     },
                 },
                 {

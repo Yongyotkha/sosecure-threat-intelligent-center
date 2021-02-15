@@ -4,7 +4,7 @@
 
     $.fn.multiTextToggleCollapse = function (settings) {
         var defalutConfig = {
-            line: 4,
+            line: 1,
         };
 
         var config = $.extend(defalutConfig, settings);
