@@ -529,7 +529,10 @@
         });
     }
   
+    
+
     function table_social_data(){
+
         $('#table_social_datas').DataTable({
                 pageLength: 50,
                 processing: true,
@@ -550,14 +553,15 @@
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
                         return d;
-                    },
+                    }
                 },
             
+                "fnDrawCallback": function( oSettings ) {
+                    multi_readmore()
+                },
+                
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
-
-                    multi_readmore()
-             
                     {{--console.log(json);--}}
                     
                 },
@@ -623,7 +627,7 @@
                     
                     {
                         targets: 4,
-                        width: '400px',
+                        width: '400px',                     
                         render: function (data, type, full, meta) {                  
                             let val = '';
                             let content = '';
@@ -642,7 +646,7 @@
 
                     {
                         targets: 5,
-                        width: '400px',
+                        width: '500px',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
@@ -652,7 +656,6 @@
                                     val = full.get_data_leak_feed_one.source_name;
                                 }
                             }
-        
                             return '<div class="text-trucate-ovf">'+val+'</div>';
 
                         },
@@ -712,7 +715,6 @@
 
                 ]
             });
-
     }
 
     

@@ -591,9 +591,11 @@ Highcharts.setOptions({
                     d.sitecode = site;
                 }
             },
+            "fnDrawCallback": function( oSettings ) {
+                multi_readmore()
+            },
             initComplete : function( settings, json){
                 $('[data-rel="tooltip"]').tooltip();
-                multi_readmore()
             },
             columns: [
                 {

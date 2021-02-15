@@ -535,12 +535,15 @@ active_btn('#groupby-type .btn-grey');
                         d.check_type = check_type;
 
                         return d;
-                },
                     },
+                },
             
+                "fnDrawCallback": function( oSettings ) {
+                    multi_readmore()
+                },
+                
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
-                    multi_readmore()
                     {{--console.log(json);--}}
                 
                     
