@@ -371,6 +371,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 @include('stacks.css.highchart')
+@include('stacks.css.multitext')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
@@ -382,6 +383,7 @@
 @include('stacks.js.form')
 @include('stacks.js.highchart')
 @include('stacks.js.activebutton')
+@include('stacks.js.multitext')
 
 <script>
 active_btn('#filter-chart-btn .btn-chart-fil');
@@ -591,6 +593,7 @@ Highcharts.setOptions({
             },
             initComplete : function( settings, json){
                 $('[data-rel="tooltip"]').tooltip();
+                multi_readmore()
             },
             columns: [
                 {
@@ -649,7 +652,7 @@ Highcharts.setOptions({
                     targets: 3,
                     render: function (data, type, full, meta) {
                         
-                        return '<div class="scroll-ovf-dash" data-rel="tooltip" data-title="'+full.content+'">'+full.content+'</div>';
+                        return '<div class="text-trucate-ovf">'+full.content+'</div>';
                             
                     },
                 },

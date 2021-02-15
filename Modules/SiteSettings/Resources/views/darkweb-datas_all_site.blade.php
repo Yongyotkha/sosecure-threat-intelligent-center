@@ -383,7 +383,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
-@include('stacks.js.multitext')
+@include('stacks.css.multitext')
 @endpush
 
 @push('pagescript')
@@ -556,11 +556,8 @@
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
 
-                    $(".example").multiTextToggleCollapse({
-                        line: 2
-                    });
+                    multi_readmore()
              
-
                     {{--console.log(json);--}}
                     
                 },
@@ -637,13 +634,9 @@
                                 for(let i in res){
                                     var data = res[i];
                                     content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
-                                }
-                                
+                                } 
                             }
-
-                     
-         
-                            return '<div class="example">'+content+'</div>';
+                            return '<div class="text-trucate-ovf">'+content+'</div>';
                         },
                     },
 
@@ -660,7 +653,7 @@
                                 }
                             }
         
-                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div>';
+                            return '<div class="text-trucate-ovf">'+val+'</div>';
 
                         },
                     
@@ -684,10 +677,7 @@
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-        
                             return full.view;
-
                         },
                     },
                     {
@@ -713,8 +703,6 @@
                         className: 'nowrap',
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-
                             return `
                             <a href="${base_url}/darkweb_data/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
                             <a href="${base_url}/darkweb_data/delete_darkwebdata_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
@@ -724,6 +712,7 @@
 
                 ]
             });
+
     }
 
     
