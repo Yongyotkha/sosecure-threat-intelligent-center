@@ -3852,6 +3852,13 @@ div.dataTables_paginate li.next > a, div.dataTables_paginate li.last > a{
     padding: 3px 0;
     white-space: normal;
 }
+.scroll-ovf-dash{
+    overflow-y: auto;
+    max-height: 55px;
+    padding: 3px 0;
+    white-space: normal;
+}
+
 .scroll-ovf-content-fixh-60{
     white-space: nowrap; 
     max-width: 350px;

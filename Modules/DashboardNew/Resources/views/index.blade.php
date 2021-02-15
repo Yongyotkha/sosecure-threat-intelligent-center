@@ -632,6 +632,7 @@ Highcharts.setOptions({
                 {
                     targets: 1,
                     width: '10px',
+                    className:'nowrap',
                     render: function (data, type, full, meta) {
                         
                         return full.sitename;
@@ -641,6 +642,7 @@ Highcharts.setOptions({
                 {
                     targets: 2,
                     width: '10px',
+                    className:'nowrap',
                     render: function (data, type, full, meta) {
                         
                         return full.pagename;
@@ -648,16 +650,17 @@ Highcharts.setOptions({
                     },
                 },
                 {
+                    width:'100%',
                     targets: 3,
-                    width: '10px',
                     render: function (data, type, full, meta) {
                         
-                        return full.content;
+                        return '<div class="scroll-ovf-dash">'+full.content+'</div>';
                             
                     },
                 },
                 {
                     targets: 4,
+                    className:'nowrap',
                     width: '10px',
                     render: function (data, type, full, meta) {
                         
