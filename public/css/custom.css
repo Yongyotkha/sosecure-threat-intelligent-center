@@ -3932,3 +3932,9 @@ textarea.resize-none{
 .d-il-block{
     display: inline-block;
 }
+
+.tooltip-inner{
+    max-width: unset !important;
+    width: fit-content;
+    display: inline-block;
+}

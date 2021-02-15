@@ -383,6 +383,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+@include('stacks.js.multitext')
 @endpush
 
 @push('pagescript')
@@ -396,6 +397,8 @@
 @include('stacks.js.activebutton')
 @include('stacks.js.readmore')
 @include('stacks.js.fullscreen')
+@include('stacks.js.multitext')
+
 <script>
 
     active_btn('#groupby-type .btn-grey');
@@ -408,7 +411,6 @@
         } else {
             visible_c = false;
         }
-
 
     var search_val = false;
     var keywords = null;
@@ -526,13 +528,8 @@
         
         });
     }
-
-
-    
+  
     function table_social_data(){
-
-        readmore_btn('#table_social_datas','.btn-readmore','scroll-ovf-content-fixh-60');
-
         $('#table_social_datas').DataTable({
                 pageLength: 50,
                 processing: true,
@@ -552,7 +549,6 @@
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
-
                         return d;
                     },
                 },
@@ -560,13 +556,17 @@
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
 
+                    $(".example").multiTextToggleCollapse({
+                        line: 2
+                    });
+             
+
                     {{--console.log(json);--}}
                     
                 },
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-
                 columnDefs: [
                     {
                         targets: 0,
@@ -627,8 +627,7 @@
                     {
                         targets: 4,
                         width: '400px',
-                        render: function (data, type, full, meta) {
-                                                    
+                        render: function (data, type, full, meta) {                  
                             let val = '';
                             let content = '';
                             val = full.get_data_leak_feed_one;
@@ -641,7 +640,10 @@
                                 }
                                 
                             }
-                            return '<div class="scroll-ovf-content-fixh-60">'+content+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+
+                     
+         
+                            return '<div class="example">'+content+'</div>';
                         },
                     },
 
@@ -658,7 +660,7 @@
                                 }
                             }
         
-                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div>';
 
                         },
                     
