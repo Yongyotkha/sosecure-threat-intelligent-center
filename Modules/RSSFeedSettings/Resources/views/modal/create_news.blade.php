@@ -172,7 +172,7 @@
                                 <label class="control-label">Send Mail </label>
                                 <div >
                                     <label class="switch">
-                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <input type="checkbox" name="sent_mail" checked value="1">
                                         <span></span>
                                     </label>
                                 </div>
