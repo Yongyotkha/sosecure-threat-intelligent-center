@@ -1,3 +1,6 @@
+html{
+  scroll-behavior: smooth;
+}
 body {
   background: #fff;
   color: #444;
@@ -1201,14 +1204,14 @@ h6 {
 --------------------------------------------------------------*/
 
 #footer {
-  background: #00428a;
+  background: #0F2027;
   padding: 0 0 30px 0;
   color: #eee;
   font-size: 14px;
 }
 
 #footer .footer-top {
-  background: #004a99;
+  background: #0F2027;
   padding: 60px 0 30px 0;
 }
 
@@ -1382,6 +1385,42 @@ h6 {
 .list-img-ioc li:not(:last-child){
   margin-right: 2rem;
 }
+/* Contact Content */
+
+.contact-container{
+  background: #3869D4;
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  height: 293px;
+}
+
+.contact-list{
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style: none;
+  padding: 2rem;
+}
+
+.icon-contact{
+  display: inline-block;
+  width: 30px;
+  float: left;
+  text-align: center;
+  margin-right: 1rem;
+  height: 30px;
+}
+.icon-contact i{
+  font-size: 20px !important;
+}
+
+.icon-email{
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+}
+
 
 /* Custome Text*/
 .primary-text{
@@ -1500,5 +1539,14 @@ h6 {
 @media (max-width: 574px) {
   #intro {
     padding: 100px 0 20px 0;
+  }
+  .bg-blue-linear {
+      position: static !important;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      display: flex;
+      align-items: center;
+      padding: 2rem !important;
   }
 }
