@@ -465,6 +465,16 @@ class DataLeakController extends Controller
         return view('sitesettings::darkweb-datas_all_site')->with($data);
     }
 
+    public function create_compromise()
+    {
+        return view('sitesettings::modal.create_compromise');
+    }
+
+    public function create_dataleak()
+    {
+        return view('sitesettings::modal.create_dataleak');
+    }
+
     /**
      * Show the form for creating a new resource.
      * @return Response

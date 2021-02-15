@@ -65,6 +65,10 @@
                                             </span>
                                         </span>
                                     </a>
+                                    <a href="{{route('compromise.create') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                                        <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
+                                        <span class="hide-text">@langapp('add')</span>
+                                    </a>
                                 @endif
                             @endif
                         @endif
@@ -72,6 +76,8 @@
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                             <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
+
+                 
 
                         <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
@@ -389,7 +395,7 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
 @include('stacks.js.readmore')
-
+@include('stacks.js.fullscreen')
 <script>
 
     active_btn('#groupby-type .btn-grey');

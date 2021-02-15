@@ -52,6 +52,11 @@
                                         <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info m-l-xs"><span> Dataleak Feed</span></a>
                                     @endif
 
+                                    <a href="{{route('dataleak.create') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                                        <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
+                                        <span class="hide-text">@langapp('add')</span>
+                                    </a>
+                                    
                                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger"
                                         value="bulk-delete" disabled>
                                         <span data-rel="tooltip" title="Delete" data-placement="bottom">
@@ -61,6 +66,8 @@
 
                                 @endif
                             @endif
+
+                  
     
                             <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
@@ -414,7 +421,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
-
+@include('stacks.js.fullscreen')
 <script>
 
 active_btn('#groupby-type .btn-grey');

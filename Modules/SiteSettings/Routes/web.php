@@ -220,8 +220,14 @@ Route::group(
 
 Route::get('/socialdatas', 'DataLeakController@socialdatas_all_site')->name('socialdatas.index_all_site')->middleware(['can:menu_items','permission:data_leak']);
 Route::get('/darkweb-datas', 'DataLeakController@darkweb_datas_all_site')->name('darkweb.index_all_site')->middleware(['can:menu_items','permission:compromised']);
+// Modal Add Compromise 
+Route::get('/darkweb-datas/create', 'DataLeakController@create_compromise')->name('compromise.create')->middleware('can:menu_items');
+Route::get('/dataleak/create', 'DataLeakController@create_dataleak')->name('dataleak.create')->middleware('can:menu_items');
+
 Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb')->middleware(['can:menu_items','permission:compromised']);
+
+
 
 Route::get('/vulnerability_assets/getSelectedVendor', 'VulnerabilityController@get_selected_vendor_detail')->name('vul_assets.selected_vendor')->middleware('can:menu_items');
 Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_details')->name('vulsetting.detail')->middleware('can:menu_items');
