@@ -1459,7 +1459,7 @@ class DataLeakController extends Controller
 
         if ($request->search_val == 1) {
 
-            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social');
+            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public']);
 
             if ($request->site) {
                 $site = SiteSettings::select('id')->where('code', $request->site)->first();
@@ -1474,7 +1474,8 @@ class DataLeakController extends Controller
             }
 
             if ($request->type) {
-                $model = $model->where('feel_type', $request->type);
+
+                $model = $model->where('feed_type', $request->type);
             }
             // if ($request->source_select) {
             //     $model = $model->where('sourceid', $request->source_select);
@@ -1528,7 +1529,7 @@ class DataLeakController extends Controller
             $model = $model->get();
         } else {
 
-            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social');
+            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public']);
             if ($request->site) {
                 $site = SiteSettings::select('id')->where('code', $request->site)->first();
 
@@ -1574,8 +1575,8 @@ class DataLeakController extends Controller
             ->editColumn(
                 'source',
                 function (DataLeakFeedTemp $model) {
-                    if ($model->source_name) {
-                        return get_word_leak_compromise($model->feel_type,'data_leak');
+                    if ($model->feed_type) {
+                        return get_word_leak_compromise($model->feed_type,'data_leak');
                     } else {
                         return '-';
                     }
@@ -3192,10 +3193,22 @@ class DataLeakController extends Controller
 
     public function dark_web_datatables(Request $request)
     {
+        $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public'])->with('get_socail_ref_temp');
 
+        $site = SiteSettings::select('id')->where('code', $request->site)->first();
+
+        $model->whereHas('get_socail_ref_temp', function ($query) use ($site) {
+
+            $query->where('site_id', 'LIKE', '%' . $site->id . '%');
+        });
+        
+        // $model->whereHas('get_socail_ref_temp', function ($query) use ($site) {
+        //     $query->where('site_id', $site->id);
+        // })->get();
+        // dd($model);
         if ($request->search_val == 1) {
 
-            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public']);
+            // $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type','social');
             // $model->whereHas('get_socail_ref_temp', function ($query) use ($request) {
 
             //     $query->where('site_id', 'LIKE', '%' . $request->site . '%');
@@ -3206,7 +3219,7 @@ class DataLeakController extends Controller
             }
 
             if ($request->source_select) {
-                $model = $model->where('sourceid', $request->source_select);
+                $model = $model->where('feed_type', $request->source_select);
             }
 
             if ($request->check_type) {
@@ -3253,17 +3266,7 @@ class DataLeakController extends Controller
                 // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
                 $model = $model->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
             }
-
-            $model = $model->get();
-        } else {
-            $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social')->with('get_socail_ref_temp');
-            
-            $model->whereHas('get_socail_ref_temp', function ($query) use ($request) {
-
-                $query->where('site_id', $request->site);
-            })->get();
- 
-        }
+        } 
 
 
         return DataTables::of($model)
