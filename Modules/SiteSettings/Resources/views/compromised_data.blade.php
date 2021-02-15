@@ -328,7 +328,7 @@ active_btn('#groupby-type .btn-grey');
                     },
             
                 initComplete : function( settings, json){
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-rel="tooltip"]').tooltip();
 
                     {{--console.log(json);--}}
                 

@@ -628,6 +628,12 @@ function table_social_data(){
             },
             type: "POST",
         },
+        initComplete : function( settings, json){
+            $('[data-rel="tooltip"]').tooltip();
+
+            {{--console.log(json);--}}
+            
+        },
         order: [
             [0, "desc"]
         ],
