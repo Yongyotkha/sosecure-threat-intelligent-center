@@ -590,7 +590,7 @@ class UsersSettingsController extends Controller
 
             user_menu_permission::where('user_id', @$user->id)->where('site_id',$SiteSettings->id)->delete();
             
-            if ($request->menu) {
+            if (!empty($request->menu)) {
                 if (count($request->menu) > 0) {
                     foreach ($request->menu as $menu) {
                         $tb_menu = Menu::select("id")->where("code", $menu)->first();
@@ -607,7 +607,7 @@ class UsersSettingsController extends Controller
             }
 
             user_menu_sub_permission::where('user_id', @$user->id)->where('site_id',$SiteSettings->id)->delete();
-            if ($request->menu_sub) {
+            if (!empty($request->menu_sub)) {
                 if (count($request->menu_sub) > 0) {
                     foreach ($request->menu_sub as $menu_sub) {
                         $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();

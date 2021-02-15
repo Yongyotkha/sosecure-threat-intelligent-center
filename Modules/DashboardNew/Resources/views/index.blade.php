@@ -423,9 +423,9 @@ Highcharts.setOptions({
     var start = moment().startOf('day');
     var end = moment();
 
-    var load_month_displayType = 'year';
+    var load_month_displayType = 'mon';
 
-    function load_month_displayType_f(dummyVal='year') {
+    function load_month_displayType_f(dummyVal='mon') {
         load_month_displayType = dummyVal;
         chart_indicators();
     }
