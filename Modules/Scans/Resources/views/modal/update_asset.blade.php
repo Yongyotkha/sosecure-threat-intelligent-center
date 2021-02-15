@@ -141,10 +141,10 @@
                     html += `<tr id="rows_manual_${i}">
                         <td>`;
                         if(i==0){
-                            html += `
-                            <input type="hidden" id="domain_id_manual" class="form-control" value="{{ @$site->domain_id }}">
-                            <input type="hidden" id="site_id_manual" class="form-control" value="{{ @$site->site_id }}">
-                            <input type="text" name="assets_manual[]" data-raw_data_manual="${0}" value = "${@json($scans->raw_data)}" class="form-control">`;
+                            html += 
+                            html += '<input type="hidden" id="domain_id_manual" class="form-control" value="{{ @$site->domain_id }}">';
+                            html += '<input type="hidden" id="site_id_manual" class="form-control" value="{{ @$site->site_id }}">';
+                            html += `<input type="text" name="assets_manual[]" data-raw_data_manual="${0}" value = "${@json($scans->raw_data)}" class="form-control">`;
                         }else{
                             html +='';
                         }
