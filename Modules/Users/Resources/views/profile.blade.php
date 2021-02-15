@@ -125,7 +125,7 @@ $user = Auth::user();
                                         </span>
                                         <label>@langapp('avatar') </label>
                                         <input type="file" name="avatar">
-                                        
+                                        <span>Remark Upload File Extension (.png .jpg .jpeg) <span class="text-danger">Max Size 2MB</span></span>
                                         
                                         
                                     </div>
