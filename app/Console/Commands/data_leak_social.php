@@ -52,8 +52,8 @@ class data_leak_social extends Command
         $tz = new \DateTimeZone('Asia/Bangkok');
         $start = date("Y-m-d").' 00:00:00';
         $end = date("Y-m-d").' 23:59:59';
-        $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
-        $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
+        $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime(($start)*1000));
+        $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime(($end)*1000));
 
         // print_r($dateStart->toDateTime()->format(DATE_RSS));
         $date_start = $dateStart->toDateTime();
