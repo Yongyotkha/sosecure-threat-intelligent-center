@@ -402,6 +402,12 @@ active_btn('#groupby-status .btn-grey');
                 },
                 type: "POST",
             },
+            initComplete : function( settings, json){
+                    $('[data-rel="tooltip"]').tooltip();
+
+                    {{--console.log(json);--}}
+                    
+                },
             columns: [
                 {
                     data: 'chk',

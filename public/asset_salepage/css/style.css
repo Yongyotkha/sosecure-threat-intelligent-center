@@ -1459,8 +1459,7 @@ h6 {
   align-items: center;
 }
 .secondary-text{
-  text-align: left;
-  font: normal normal normal 17px/30px Prompt;
+  font: normal normal normal 22px/30px Prompt;
   letter-spacing: 0px;
   color: #000000;
   opacity: 1;

@@ -48,10 +48,10 @@
     <section id="start-section" class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6">
+                <div class="col-lg-6 col-md-6 mb-3">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/threatpic.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-md-6">
+                <div class="col-lg-6 col-md-6 mb-3">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Threat Sharing
@@ -188,7 +188,7 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6">
+                <div class="col-lg-6 col-md-6 mb-3">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Compromised Detection
@@ -198,7 +198,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 text-center">
+                <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/dash.png')}}" alt="">
                 </div>
             </div>
@@ -208,10 +208,10 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 text-center">
+                <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/defaced.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-md-6">
+                <div class="col-lg-6 col-md-6 mb-3">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Web Defaced Detection
@@ -276,13 +276,13 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 text-center">
+                <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <h1 class="primary-text text-center">
                         Cybersecurity News Feed
                     </h1>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/cyber.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-md-6 text-center">
+                <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <div class="mb-5">
                         <span class="secondary-text">
                             อัพเดทข่าวสารด้วย Cybersecurity จากแหล่งข่าวต่างๆ ทั่วโลก และสามารถแจ้งข่าวสารผ่านทาง Email
@@ -319,7 +319,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 text-center">
+                <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <div class="mb-4">
                         <span class="secondary-text text-center">
                             ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
@@ -344,7 +344,7 @@
 
                 </div>
 
-                <div class="col-lg-6 col-md-6 text-center">
+                <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <h1 class="primary-text text-center">
                         Social Engineering Detection
                     </h1>

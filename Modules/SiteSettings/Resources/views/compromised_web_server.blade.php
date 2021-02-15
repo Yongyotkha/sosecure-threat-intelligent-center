@@ -877,7 +877,7 @@
             },
         
             initComplete : function( settings, json){
-                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-rel="tooltip"]').tooltip();
             
                 
             },

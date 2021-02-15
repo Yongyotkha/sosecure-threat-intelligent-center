@@ -638,7 +638,7 @@ $(function() {
                 {
                     data: 'cate',
                     name: 'cate',
-                    className: 'w-10 text-center'
+                    className: 'text-center'
                 },
                 {
                     data: 'data_status',
@@ -893,8 +893,7 @@ $(document).ready(function(){
                 chart: {
                     type: 'column',
                     scrollablePlotArea: {
-                    minWidth: 1200,
-                    scrollPositionX: 1
+                    minWidth: 300,
                     }
                 },
                 title: {
@@ -938,7 +937,6 @@ $(document).ready(function(){
                         background: '#fff'
                     }
                 },
-        
                 legend: {
                     enabled: false
                 },

@@ -152,25 +152,17 @@
                                                                 <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
                                                                 <h1 class="text-blue bold-500">Indicators</h1>
                                                             </div>
-                                                            <div class="btn-group pull-right" style="margin-top: -25px;">
-                                                                <button
-                                                                    class="btn btn-xs text-dark dropdown-toggle"
-                                                                    data-toggle="dropdown">View
-                                                                    <span class="caret"></span>
-                                                                </button>
-                                                                <ul class="dropdown-menu dropdown-menu-left">
-                                                                    <li>
-                                                                        <a href="javascript:void(0)" onclick="load_month_displayType_f('mon')">
-                                                                            View Month
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" onclick="load_month_displayType_f('year')">
-                                                                            View Year
-                                                                        </a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
 
+                                                            <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('mon')">
+                                                                    Month
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('year')">
+                                                                    Year
+                                                                </a>
+                                                            </div>
                                                         </div>
+
                                                         <div class="divider-dark"></div>
                                                         <div id="chart-show-line" class="h-chart"></div>
                                                     </div>
@@ -389,8 +381,11 @@
 @include('stacks.js.chart')
 @include('stacks.js.form')
 @include('stacks.js.highchart')
+@include('stacks.js.activebutton')
 
 <script>
+active_btn('#filter-chart-btn .btn-chart-fil');
+
 var id_select_site = 'site';
 Highcharts.setOptions({
     lang: {
@@ -536,7 +531,7 @@ Highcharts.setOptions({
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
         
 
-        $('[data-toggle="tooltip"]').tooltip(); 
+        $('[data-rel="tooltip"]').tooltip(); 
 
 
         
@@ -595,7 +590,7 @@ Highcharts.setOptions({
                 }
             },
             initComplete : function( settings, json){
-                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-rel="tooltip"]').tooltip();
             },
             columns: [
                 {
@@ -654,7 +649,7 @@ Highcharts.setOptions({
                     targets: 3,
                     render: function (data, type, full, meta) {
                         
-                        return '<div class="scroll-ovf-dash">'+full.content+'</div>';
+                        return '<div class="scroll-ovf-dash" data-rel="tooltip" data-title="'+full.content+'">'+full.content+'</div>';
                             
                     },
                 },
