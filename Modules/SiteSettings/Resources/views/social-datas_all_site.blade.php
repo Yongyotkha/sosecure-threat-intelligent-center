@@ -49,21 +49,23 @@
                                 // var_dump(get_role_custom()['site_admin']); --}}
                                 @if(TYPE_WEB == 'center')
                                     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
-                                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info  m-xs"><span> Dataleak Feed</span></a>
+                                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info m-l-xs"><span> Dataleak Feed</span></a>
                                     @endif
+
+                                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger"
+                                        value="bulk-delete" disabled>
+                                        <span data-rel="tooltip" title="Delete" data-placement="bottom">
+                                            @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
+                                        </span>
+                                    </button>
+
                                 @endif
                             @endif
     
                             <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
-    
-                            <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs"
-                                value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="bottom">
-                                    @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
-                                </span>
-                            </button>
+
                         </div>
                     </div>
                 </header>
