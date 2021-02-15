@@ -425,7 +425,7 @@ Highcharts.setOptions({
 
     var load_month_displayType = 'year';
 
-    function load_month_displayType_f(dummyVal='year') {
+    function load_month_displayType_f(dummyVal='mon') {
         load_month_displayType = dummyVal;
         chart_indicators();
     }
