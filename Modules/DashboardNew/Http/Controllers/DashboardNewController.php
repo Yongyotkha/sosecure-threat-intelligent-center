@@ -59,7 +59,10 @@ class DashboardNewController extends Controller
      */
     public function index()
     {
-        
+        $role_custom = @check_role_custom();
+        if(!$role_custom['dashboard']) {
+            check_permission403();
+        }
         // $menu = array();
         // if(isset($_SESSION["menu"])){
         //     // unset($_SESSION["lastname"]);
