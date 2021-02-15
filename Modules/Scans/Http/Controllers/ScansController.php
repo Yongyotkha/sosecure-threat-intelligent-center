@@ -178,7 +178,7 @@ class ScansController extends Controller
         
         foreach ($request->assets as $data) {
             $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
-            
+
             if (!$Assets) {
               
                 $Assets = new Assets;
@@ -213,6 +213,7 @@ class ScansController extends Controller
                     ->where('data_type_id', $item['data_type'])
                     ->first();
                 if (!$AssetsData) {
+                    
                     if ($item['raw_data_base'] == $data['raw_data_base']) {
                         $AssetsData = new AssetsData;
                         $AssetsData->code = generator_uuid();
@@ -790,7 +791,7 @@ class ScansController extends Controller
         $Assets->raw_data = $request->assets[0]['raw_data'];
         $Assets->save();
         
-        
+
         foreach ($request->assets_data as $data) {
             $myArray = explode(',', $data['data_type']);
             
@@ -816,7 +817,7 @@ class ScansController extends Controller
                     $transaction_client_asset_data -> save();
                 }
             } else {
-                
+             
                 $AssetsData = new AssetsData;
                 $AssetsData->code = generator_uuid();
                 $AssetsData -> created_by = Auth::user()->id;
