@@ -15,6 +15,7 @@ use Modules\Users\Entities\model_has_roles;
 use Session;
 use App\Menu;
 use App\Menu_sub;
+use Modules\Users\Entities\role_menu_permission;
 
 class LoginController extends Controller
 {
@@ -170,7 +171,13 @@ class LoginController extends Controller
             $passwordMatch  = $passwordHasher->CheckPassword($request->password, $user->password);
             if ($passwordMatch) {
                     $menu_goto = Menu::select('id')->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get()->pluck('id')->toArray();
-    
+                    $role_menu_permission = role_menu_permission::select('menu_id')->where('role_id',$model_has_roles->role_id)->where('deleted_at',null)->whereIn('menu_id',$menu_goto)->get()->pluck('menu_id')->toArray();
+                    if($model_has_roles->role_id != 1) {
+                        if(!$role_menu_permission) {
+                            return response()->json(['error' => 'User does not have permission to access.', 'status_code' => '400']);
+                        }
+                        $menu_goto = $role_menu_permission;
+                    }
                     if(Session::has('check_goto_menu')){
                         Session::forget('check_goto_menu');
                         Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));

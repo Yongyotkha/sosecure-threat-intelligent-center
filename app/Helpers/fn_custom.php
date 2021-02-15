@@ -381,24 +381,39 @@ function check_permission_site_custom_api($user_id, $menu) {
     }
 }
 
-function check_goto_menu($Menu_permission_site=null) {
+function check_goto_menu($Menu_permission_site=null,$type='center') {
     $url = '';
     if(!empty($Menu_permission_site)) {
         $menu_id = $Menu_permission_site[0];
         // $menu_id = 3;
         $menu = Menu::where('id',$menu_id)->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->first();
         if($menu) {
-            if($menu->type_url == 'site_url') {
-                $url = $menu->url_client;
-            } else if($menu->type_url == 'route') {
-                // $url = route($menu->url_client);
-                // $url_arr = explode("/",$url);
-                // $url = $url_arr[2];
-                $url_length = strlen(url(''));
-                $urlfull_length = strlen(route($menu->url_client));
-                // $url = stripos(route($menu->url_client), "/");
-                // $url = substr(route($menu->url_client),0,$url_arr[2]+1);
-                $url = substr(route($menu->url_client),$url_length,$urlfull_length);
+            if($type == 'center') {
+                if($menu->type_url == 'site_url') {
+                    $url = $menu->url;
+                } else if($menu->type_url == 'route') {
+                    // $url = route($menu->url_client);
+                    // $url_arr = explode("/",$url);
+                    // $url = $url_arr[2];
+                    $url_length = strlen(url(''));
+                    $urlfull_length = strlen(route($menu->url));
+                    // $url = stripos(route($menu->url_client), "/");
+                    // $url = substr(route($menu->url_client),0,$url_arr[2]+1);
+                    $url = substr(route($menu->url),$url_length,$urlfull_length);
+                }
+            } else {
+                if($menu->type_url == 'site_url') {
+                    $url = $menu->url_client;
+                } else if($menu->type_url == 'route') {
+                    // $url = route($menu->url_client);
+                    // $url_arr = explode("/",$url);
+                    // $url = $url_arr[2];
+                    $url_length = strlen(url(''));
+                    $urlfull_length = strlen(route($menu->url_client));
+                    // $url = stripos(route($menu->url_client), "/");
+                    // $url = substr(route($menu->url_client),0,$url_arr[2]+1);
+                    $url = substr(route($menu->url_client),$url_length,$urlfull_length);
+                }
             }
         }
     }
