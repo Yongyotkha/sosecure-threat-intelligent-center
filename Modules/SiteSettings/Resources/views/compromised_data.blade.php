@@ -24,14 +24,19 @@
 
                     <div class="ml-2 text-right">
                     
+                        <a href="{{route('compromise.create') }}?site={{@$siteCode}}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                            <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
+                            <span class="hide-text">@langapp('add')</span>
+                        </a>
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
                         <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
                             <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
                         </button>
 
-                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                        </a>
+
 
                         
 
@@ -226,6 +231,7 @@
 @endpush
 
 @push('pagescript')
+@include('stacks.js.readmore')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
@@ -302,7 +308,7 @@ active_btn('#groupby-type .btn-grey');
 
     function table_social_data(){
 
- 
+        readmore_btn('#table_social_datas','.btn-readmore','scroll-ovf-content-fixh-60');
 
         $('#table_social_datas').DataTable({
                 pageLength: 50,
@@ -371,6 +377,7 @@ active_btn('#groupby-type .btn-grey');
                     {
                         targets: 2,
                         width: '60px',
+                        className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.feel_type;
                             if(val) {
@@ -411,8 +418,7 @@ active_btn('#groupby-type .btn-grey');
                                 
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+feedcontent+'">'+content+'</div>';
-
+                            return '<div class="scroll-ovf-content-fixh-60">'+feedcontent+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
                         },
                     },
                     {
@@ -427,7 +433,7 @@ active_btn('#groupby-type .btn-grey');
                                 }
                             }
         
-                            return '<div class="text-elip" data-rel="tooltip" style="width:400px;" title="'+val+'">'+val+'</div>';
+                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
 
 
                         },

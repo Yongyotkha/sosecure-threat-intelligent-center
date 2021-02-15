@@ -32,6 +32,7 @@ use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use phpseclib\Net\SSH2;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class DataLeakController extends Controller
 {
@@ -287,7 +288,7 @@ class DataLeakController extends Controller
                     }
                 }
             }
-
+            $DataLeakFeed_send_mail[] = $DataLeakFeedTemp;
             if ($this->request->sent_mail == 1) {
                 $site_email_alert = site_config_email_alert::where("site_id", $site_id)->get();
                 if ($site_email_alert) {
@@ -402,6 +403,7 @@ class DataLeakController extends Controller
         $data['source'] = DataLeakSocial::where("status", '=', 1)->where('deleted_at', null)->get();
 
         $data['siteID'] = $siteID->id;
+        $data['siteCode'] = $siteID->code;
         $data['page'] = 'Compromised_Data_in_site';
         $data['siteSettings'] = $get_data;
         return view('sitesettings::compromised_data')->with($data);
@@ -465,9 +467,13 @@ class DataLeakController extends Controller
         return view('sitesettings::darkweb-datas_all_site')->with($data);
     }
 
-    public function create_compromise()
+    public function create_compromise(Request $request)
     {
-        return view('sitesettings::modal.create_compromise');
+        $data['site'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        $data['site_code'] = $request->site;
+
+        
+        return view('sitesettings::modal.create_compromise')->with($data);
     }
 
     public function create_dataleak()
@@ -1034,6 +1040,8 @@ class DataLeakController extends Controller
             $DataLeakSocialRef->delete();
             $DataLeakFeedTemp->approve = 0;
             $DataLeakFeedTemp->save();
+        }else{
+            $DataLeakSocialRef->delete();
         }
 
         return ajaxResponse(
@@ -1233,6 +1241,9 @@ class DataLeakController extends Controller
                 $data = DataLeakSocialRef::where('id', $val_id)->delete();
                 $DataLeakFeedTemp->approve = 0;
                 $DataLeakFeedTemp->save();
+            }
+            else{
+                $data = DataLeakSocialRef::where('id', $val_id)->delete();
             }
         }
         return ajaxResponse(
@@ -2612,7 +2623,7 @@ class DataLeakController extends Controller
                 })
                 ->with('get_site')->with('get_data_leak_feed_one');
 
-            $model->get();
+                $model->orderBy('id', 'desc');
         }
 
         return DataTables::of($model)->toJson();
@@ -2779,7 +2790,7 @@ class DataLeakController extends Controller
     public function web_server_delete(Request $request)
     {
 
-        // dd($request->id);
+        
         if ($request->id_chang) {
 
             foreach ($request->id_chang as $id_chang) {
@@ -3343,6 +3354,75 @@ class DataLeakController extends Controller
             )
             ->rawColumns(['chk', 'site', 'source', 'keyword', 'content', 'data_feed', 'url', 'action'])
             ->make(true);
+    }
+
+    public function add_compromise(Request $request)
+    {
+    
+        $DataLeakFeed = new DataLeakFeed();
+        $DataLeakFeed->code = generator_uuid();
+        $DataLeakFeed->feel_type = @$request->type;
+        $DataLeakFeed->feedcontent = @$request->content;
+        $DataLeakFeed->keyword = @$request->keyword;
+        $DataLeakFeed->source_name = @$request->remark;
+        $DataLeakFeed->feedtimepost = Carbon::now();
+        $DataLeakFeed->status = 1;
+        $DataLeakFeed->save();
+        $DataLeakFeed_send_mail[] = $DataLeakFeed;
+
+            if($request->site){
+                foreach($request->site as $site){
+                    $SiteSettings = SiteSettings::where('code', $site)->first();
+                    $DataLeakSocialRefs = new DataLeakSocialRef;
+                    $DataLeakSocialRefs->code = generator_uuid();
+                    $DataLeakSocialRefs->site_id = $SiteSettings->id;
+                    $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
+                    $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                    $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->status = 1;
+                    $DataLeakSocialRefs->save();
+                    if ($request->sent_mail == true) {
+                        $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                        if ($site_email_alert) {
+                            foreach ($site_email_alert as $site_email_alert_val) {
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                            }
+                        }
+                    }
+                }
+                $site = route('darkweb.index_all_site');
+            }else{
+                $SiteSettings = SiteSettings::where('code', @$request->site_code)->first();
+                $DataLeakSocialRefs = new DataLeakSocialRef;
+                $DataLeakSocialRefs->code = generator_uuid();
+                $DataLeakSocialRefs->site_id = $SiteSettings->id;
+                $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
+                $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                $DataLeakSocialRefs->status = 1;
+                $DataLeakSocialRefs->save();
+                $site = route('compromised_data.index', ['code' => @$request->site_code]);
+                if ($request->sent_mail == true) {
+                    $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                    if ($site_email_alert) {
+                        foreach ($site_email_alert as $site_email_alert_val) {
+                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                        }
+                    }
+                }
+            }
+
+
+        
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => $site,
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
 }

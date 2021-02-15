@@ -61,6 +61,10 @@ class AssetsController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['assets']) {
+            check_permission403();
+        }
         //<><><>
         // if(Auth::check()) {
         //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
@@ -121,6 +125,10 @@ class AssetsController extends Controller
 
     public function index_all_asset()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['assets']) {
+            check_permission403();
+        }
         //<><><>
         // if(Auth::check()) {
         //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();

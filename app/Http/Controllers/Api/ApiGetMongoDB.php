@@ -4660,8 +4660,8 @@ class ApiGetMongoDB extends ApiController
                             <div class="wdfm-card">
                                 <div class="wdfm-header">
                                     <div class="wdfm-img">
-                                        <a href="'.config('app.URL_CENTER_PUBLISH').@$key->image_last.'" data-lightbox="name-img-2" >
-                                            <img src="'.config('app.URL_CENTER_PUBLISH').@$key->image_last.'" onerror="setDefaultPic(this)"/>
+                                        <a href="'.env('URL_CENTER_PUBLISH').@$key->image_last.'" data-lightbox="name-img-2" >
+                                            <img src="'.env('URL_CENTER_PUBLISH').@$key->image_last.'" onerror="setDefaultPic(this)"/>
                                         </a>
                                     </div>
                                 </div>

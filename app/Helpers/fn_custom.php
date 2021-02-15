@@ -900,5 +900,11 @@ function get_word_leak_compromise($val, $type)
     return $html;
 }
 
+function check_permission403()
+{
+    Auth::logout();
+    abort(403, 'Unauthorized action.');
+}
+
 
 ?>

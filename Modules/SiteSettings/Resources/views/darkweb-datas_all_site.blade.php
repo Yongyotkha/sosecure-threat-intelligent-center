@@ -826,10 +826,8 @@
                         loading('load');
                     },
                     success:function(response) {
-                        loading('stop_load');
                         toastr.success(response.message, '@langapp('response_status')');
                         window.location.href = response.redirect;
-                        $('#delete_all').modal('hide');
                     },
                     error: function (error){
                         loading('stop_load');
