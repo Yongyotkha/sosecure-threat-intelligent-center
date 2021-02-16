@@ -286,6 +286,10 @@ class NewsController extends Controller
 
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['page'] = langapp('news');
         // $data['Category'] = CategorySettings::where('active',1)->get();
         $data['category'] = CategorySettings::where('active',1)->get();
@@ -296,6 +300,10 @@ class NewsController extends Controller
 
     public function index_client()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $RSSNews_count = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
         // dd($news_all);
         // $RSSNews_count = RSSNews::count("id");
@@ -376,12 +384,20 @@ class NewsController extends Controller
 
     public function news_detail()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['page'] = langapp('news_detail');
        return view('news::news_detail')->with($data);
     }
 
     public function news_detail_code($code)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $RSSNews_prev = '';
         $RSSNews_next = '';
         $RSSNews_last10 = '';
@@ -648,6 +664,10 @@ class NewsController extends Controller
     }
 
     public function jqueryLoadMoreNews(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
 
         $date_start = $request->date_start;
         $date_end = $request->date_end;
@@ -927,6 +947,10 @@ class NewsController extends Controller
     }
 
     public function jqueryLoadMoreNewsTopic(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $html = '';
         $NewsTopic = NewsTopics::where('topic_id', $request->topic_id)->wherehas('news', function($q){
             $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc');
@@ -1001,6 +1025,10 @@ class NewsController extends Controller
     }
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $html = '';
         $Bookmark = Bookmark::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();
         if($Bookmark) {
