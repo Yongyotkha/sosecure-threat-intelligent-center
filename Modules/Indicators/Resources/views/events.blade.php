@@ -470,7 +470,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[ 6, "desc" ], [ 7, "desc" ]],
+            order: [[ 7, "desc" ]],
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
@@ -562,6 +562,19 @@
                         inner = 'Modified';
                     } else {
                         inner = 'Created';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.modified) {
+                        inner = row.modified;
+                    } else {
+                        inner = row.modified;
                     }
                     return inner;
                 }

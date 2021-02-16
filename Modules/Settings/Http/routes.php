@@ -1,7 +1,7 @@
 <?php
 
 Route::group(
-    ['middleware' => 'web', 'prefix' => 'settings', 'namespace' => 'Modules\Settings\Http\Controllers'],
+    ['middleware' => ['web', 'permission:settings'], 'prefix' => 'settings', 'namespace' => 'Modules\Settings\Http\Controllers'],
     function () {
         Route::get('locale/{locale}', 'SettingController@index')->name('settings.locale')->middleware('can:settings_update');
         Route::post('menu/reorder', 'SettingController@reorderMenu')->name('menu.reorder')->middleware('can:settings_update');
@@ -76,7 +76,7 @@ Route::group(
         Route::get('artisan/{key}/{command}', 'CommandsController@run')->name('commands.run')->middleware('demo');
         Route::get('artisan/regenerate', 'CommandsController@regenerateKey')->name('commands.key')->middleware(['can:settings_update', 'demo']);
 
-        Route::get('/{section?}', 'SettingController@index')->name('settings.index')->middleware('can:menu_settings');
-        Route::post('{section}', 'SettingController@configure')->name('settings.edit')->middleware(['can:settings_update']);//->middleware(['demo', 'can:settings_update']);
+        Route::get('/{section?}', 'SettingController@index')->name('settings.index')->middleware('can:menu_items');
+        Route::post('{section}', 'SettingController@configure')->name('settings.edit')->middleware('can:menu_items');//->middleware(['demo', 'can:settings_update']);
     }
 );
