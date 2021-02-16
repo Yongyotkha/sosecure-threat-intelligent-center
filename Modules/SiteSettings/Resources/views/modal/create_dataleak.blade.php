@@ -40,6 +40,12 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label class="col-lg-3 control-label">Source </label>
+                <div class="col-lg-9">
+                    <input type="text" name="source" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
                 <label class="col-lg-3 control-label">Content<span class="text-danger">*</span></label>
                 <div class="col-lg-9">
                     

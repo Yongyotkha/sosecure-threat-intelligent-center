@@ -319,7 +319,6 @@ active_btn('#groupby-type .btn-grey');
                     url: '{!! route('compromised_feed.darkweb_all_site_tb') !!}',
                     data: function ( d ) {
                         d.keywords = keywords;
-
                         d.source = source;
                         d.search_val = search_val;
                         d.startDate = startDate;
