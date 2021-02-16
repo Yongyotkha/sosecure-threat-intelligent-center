@@ -778,10 +778,10 @@ class SocialController extends Controller
             $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
             $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
         }else{
-            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orWhere('feel_type', 'darkweb_public')->count();
+            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social','darkweb_public'])->count();
             $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public']);//->get()
             $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public'])->groupBy('feel_type');
-           
+  
 
             if(Auth::check()) {
 
@@ -831,8 +831,8 @@ class SocialController extends Controller
             $data = [
                 "html" => $html,
                 "count" => $Data_leak_feed_all,
-                "darkweb" => $count_sub_type["darkweb"],
-                "social" => $count_sub_type["social"],
+                "darkweb" => @$count_sub_type["darkweb_public"],
+                "social" => @$count_sub_type["social"],
             ];
             return response()->json($data); 
         }

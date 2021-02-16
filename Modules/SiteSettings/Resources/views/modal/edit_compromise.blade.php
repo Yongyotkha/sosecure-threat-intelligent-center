@@ -2,54 +2,45 @@
     <div class="modal-content">
         <div class="modal-header bg-blue">
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Add Data Leak</h4>
+            <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Edit Compromise</h4>
         </div>
-    {!! Form::open(['route' => ['dataleak.add_dataleak'], 'class' => 'ajaxifyForm_custom', 'files' => false]) !!}
+    {!! Form::open(['route' => ['compromise.edit_compromise'], 'class' => 'ajaxifyForm_custom', 'files' => false]) !!}
         <div class="modal-body">
-            @if(!@$site_code)  
-            <div class="form-group row">
-                <label class="col-lg-3 control-label">Site <span class="text-danger">*</span> </label>
-                <div class="col-lg-9">
-                                      
-                    <select name="site[]" id="site" class="text-left select2-option form-control select-site" multiple required>
-                        @if(@$site)
-                        @foreach($site as $SiteSettings_val)
-                        <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                        @endforeach
-                        @endif
-                    </select>
-                    
-                </div>
-            </div>
-            @else
-            <input type="hidden" id="site_code" name="site_code" value={{@$site_code}}>
+            <input type="hidden" name="id_DataLeakFeed" class="form-control" value="{{$DataLeakFeed->id}}">
+            @if ($site)
+            <input type="hidden" name="site_code" class="form-control" value="{{$site}}">   
             @endif
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Type <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <select name="type" id="type" class="select2-option form-control" required>
-                        <option value="social">Public</option>
-                        <option value="darkweb_public">Dark Web</option>
+                        <option value="compromise">Public</option>
+                        <option value="darkweb">Dark Web</option>
+                        <option value="webserver">Web Server</option>
                     </select>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Keyword Ref <span class="text-danger">*</span></label>
                 <div class="col-lg-9">
-                    <input type="text" name="keyword" class="form-control">
+                    <input type="text" name="keyword" class="form-control" value="{{$DataLeakFeed->keyword}}">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Content<span class="text-danger">*</span></label>
                 <div class="col-lg-9">
                     
-                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1" required ></textarea>
+                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1" required >
+                    {{$DataLeakFeed->feedcontent}}
+                    </textarea>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Remark<span class="text-danger">*</span></label>
                 <div class="col-lg-9">
-                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required></textarea>
+                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required>
+                        {{$DataLeakFeed->source_name}}
+                    </textarea>
                 </div>
             </div>
 
@@ -81,6 +72,8 @@
 @include('scripts.summernote')
 @include('stacks.js.markdown')
 <script>
+
+    $('#type').val(@json($DataLeakFeed->feel_type));
 
     $('form').each(function () {
         if ($(this).data('validator'))

@@ -215,6 +215,8 @@ Route::group(
         Route::post('/darkweb/delete_darkwebdata_process/{code}', 'DataLeakController@delete_darkwebdata_process')->name('darkweb.delete_darkwebdata_process');
         Route::post('/darkweb/delete_select_process', 'DataLeakController@delete_darkweb_select_process')->name('darkweb.delete_select_process');
         Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkweb_data_change_status')->name('DataLeakController.darkweb_data_change_status')->middleware(['can:menu_items','permission:compromised']);
+        Route::get('/darkweb_data/edit_darkwebdata_modal/{code}', 'DataLeakController@edit_darkwebdata_modal')->middleware(['can:menu_items','permission:compromised']);
+        Route::post('/darkweb_data/edit_compromise', 'DataLeakController@edit_compromise')->name('compromise.edit_compromise')->middleware(['can:menu_items','permission:compromised']);
     }
 );
 
@@ -225,6 +227,9 @@ Route::get('/darkweb-datas/create', 'DataLeakController@create_compromise')->nam
 Route::post('/darkweb-datas/create/add_compromise', 'DataLeakController@add_compromise')->name('compromise.add_compromise')->middleware('can:menu_items');
 
 Route::get('/dataleak/create', 'DataLeakController@create_dataleak')->name('dataleak.create')->middleware('can:menu_items');
+Route::post('/dataleak/create/add_dataleak', 'DataLeakController@add_dataleak')->name('dataleak.add_dataleak')->middleware('can:menu_items');
+Route::get('/dataleak/edit_dataleak_modal/{code}', 'DataLeakController@edit_dataleak_modal')->middleware('can:menu_items');
+Route::post('/dataleak/edit_dataleak', 'DataLeakController@edit_dataleak')->name('dataleak.edit_dataleak')->middleware('can:menu_items');
 
 Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb')->middleware(['can:menu_items','permission:compromised']);

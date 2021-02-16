@@ -24,12 +24,13 @@
 
                     <div class="ml-2 text-right">
                     
+
+                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
                         <a href="{{route('compromise.create') }}?site={{@$siteCode}}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
                             <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
                             <span class="hide-text">@langapp('add')</span>
-                        </a>
-                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
                         <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
@@ -254,6 +255,7 @@ active_btn('#groupby-type .btn-grey');
     var isDateSearch = null;
     var val_id = [];
     var check_type = null;
+    var siteCode = @json($siteCode);
 
 
     $('#table_social_datas').on('click', '.select-chk', function () {
@@ -488,6 +490,9 @@ active_btn('#groupby-type .btn-grey');
 
                             return `
                             <a href="${base_url}/darkweb_data/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
+                            <a href="${base_url}/darkweb_data/edit_darkwebdata_modal/${full.code}?site=${siteCode}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                            </a>
                             <a href="${base_url}/compromised_feed/delete_compromised_feed_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                             
                         },
