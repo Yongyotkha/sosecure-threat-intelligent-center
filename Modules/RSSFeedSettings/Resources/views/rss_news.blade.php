@@ -638,7 +638,6 @@ $(function() {
                 {
                     data: 'cate',
                     name: 'cate',
-                    className: 'text-center'
                 },
                 {
                     data: 'data_status',
