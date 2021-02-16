@@ -2787,7 +2787,7 @@ class ApiGetMongoDB extends ApiController
                     })
                     ->addColumn('description', function (CVEMapping $model) {
                         $html = '';
-                        $html .= '<div class="text-trucate-ovf">'.$model->description.'</div><br>';
+                        $html .= '<div class="text-trucate-ovf">'.$model->description.'</div>';
                         $html .= '<strong>Published:</strong> '.@$model->published.'&nbsp; &nbsp; <strong>Modified:</strong> '.@$model->modified.'';
                         return $html;
                     })
