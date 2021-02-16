@@ -386,7 +386,7 @@ class RoleController extends Controller
                     }
 
                     //---add permission default-------------
-                    $permission_arr = [68,82];
+                    $permission_arr = [68,82];//permission_id
                     if(!empty($permission_arr)) {
                         foreach($permission_arr as $permission_arr_val) {
                             $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
@@ -430,7 +430,7 @@ class RoleController extends Controller
 
 
                     if($request->role_id == 4 || $request->role_id == 5 || $request->role_id == 6) {//ฝั่ง site
-                        $permission_arr = [174];
+                        $permission_arr = [174];//permission_id
                         if(!empty($permission_arr)) {
                             foreach($permission_arr as $permission_arr_val) {
                                 $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
@@ -472,7 +472,7 @@ class RoleController extends Controller
                             }
                         }
                     }  else if($request->role_id == 1) {//super admin
-                        $permission_arr = [42,43,44,68,78,82,117,118,119,120,121,122,138,139,140,141,173];
+                        $permission_arr = [42,43,44,68,78,82,117,118,119,120,121,122,138,139,140,141,173,175,176];//permission_id
                         if(!empty($permission_arr)) {
                             foreach($permission_arr as $permission_arr_val) {
                                 $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
@@ -514,7 +514,7 @@ class RoleController extends Controller
                             }
                         }
                     } else {//client ฝั่ง center
-                        $permission_arr = [173];
+                        $permission_arr = [173];//permission_id
                         if(!empty($permission_arr)) {
                             foreach($permission_arr as $permission_arr_val) {
                                 $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
@@ -561,7 +561,7 @@ class RoleController extends Controller
                 }
             } else {
                 if($request->role_id == 1) {//super admin
-                    $permission_arr = [42,43,44,68,78,82,117,118,119,120,121,122,138,139,140,141,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173];//173
+                    $permission_arr = [42,43,44,68,78,82,117,118,119,120,121,122,138,139,140,141,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,175,176];//173
                     if(!empty($permission_arr)) {
                         foreach($permission_arr as $permission_arr_val) {
                             $role_permissions_last = role_permissions::select('id')->orderBy('id', 'desc')->first();
