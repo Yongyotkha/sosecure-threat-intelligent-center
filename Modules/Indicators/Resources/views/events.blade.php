@@ -208,10 +208,10 @@
                             <tr>
 
                                 <th>No</th>
+                                <th>Industries</th>
                                 <th>Event Name</th>
                                 <th>Group</th>
                                 <th>Tags</th>
-                                <th>Industries</th>
                                 <th>Published</th>
                                 <th>Last Status</th>
                                 <th class="nowrap">DateTime</th>
@@ -498,6 +498,9 @@
                 sortable: false,
             },
             {
+                data: 'industries',
+            },
+            {
                 data: 'name',
             },
             {
@@ -506,9 +509,7 @@
             {
                 data: 'tags',
             },
-            {
-                data: 'industries',
-            },
+
             {
                 data: 'public',
             },
@@ -532,7 +533,7 @@
             ],
             columnDefs: [
             {
-                targets: 1,
+                targets: 2,
                 render: function (data, type, row) {
                     var inner = '';
                     inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
