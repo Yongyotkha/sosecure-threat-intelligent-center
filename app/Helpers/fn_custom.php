@@ -150,6 +150,8 @@ function check_role_custom() {
         $arr['settings_general'] = 0;
         $arr['monitoring'] = 0;
         $arr['monitoring_batch'] = 0;
+        $arr['application_logs'] = 0;
+        $arr['send_logs'] = 0;
         $arr['role_center'] = 0;
         $arr['role_site'] = 0;
         if(TYPE_WEB == 'center') {
@@ -205,6 +207,12 @@ function check_role_custom() {
             }
             if(Gate::check('monitoring_batch')) {
                 $arr['monitoring_batch'] = 1;
+            }
+            if(Gate::check('application_logs')) {
+                $arr['application_logs'] = 1;
+            }
+            if(Gate::check('send_logs')) {
+                $arr['send_logs'] = 1;
             }
             if(Gate::check('role_center')) {
                 $arr['role_center'] = 1;
@@ -273,6 +281,8 @@ function check_permission_site_custom($user_id) {
         $arr['settings_general'] = 0;
         $arr['monitoring'] = 0;
         $arr['monitoring_batch'] = 0;
+        $arr['application_logs'] = 0;
+        $arr['send_logs'] = 0;
         $arr['role_center'] = 0;
         $arr['role_site'] = 0;
        
@@ -336,6 +346,8 @@ function check_permission_site_custom_api($user_id, $menu) {
         $arr['settings_general'] = 0;
         $arr['monitoring'] = 0;
         $arr['monitoring_batch'] = 0;
+        $arr['application_logs'] = 0;
+        $arr['send_logs'] = 0;
         $arr['role_center'] = 0;
         $arr['role_site'] = 0;
        
