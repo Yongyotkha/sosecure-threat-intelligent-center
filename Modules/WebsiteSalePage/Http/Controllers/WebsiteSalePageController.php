@@ -12,9 +12,13 @@ class WebsiteSalePageController extends Controller
      * Display a listing of the resource.
      * @return Response
      */
-    public function index()
+    public function th()
     {
-        return view('websitesalepage::index');
+        return view('websitesalepage::th');
+    }
+    public function en()
+    {
+        return view('websitesalepage::en');
     }
 
     /**

@@ -12,5 +12,6 @@
 */
 
 Route::prefix('websitesalepage')->group(function() {
-    Route::get('/', 'WebsiteSalePageController@index');
+    Route::get('/th', 'WebsiteSalePageController@th')->name('web.th');
+    Route::get('/en', 'WebsiteSalePageController@en')->name('web.en');
 });

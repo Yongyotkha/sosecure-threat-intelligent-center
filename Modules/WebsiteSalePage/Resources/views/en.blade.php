@@ -12,10 +12,10 @@
             <div class="collapse navbar-collapse ml-auto" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
+                        <a class="nav-link" href="{{route('web.en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
+                        <a class="nav-link" href="{{route('web.th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
                     <li class="nav-item ml-4">
                         <button type="button" class="btn btn-outline-secondary px-4">Login</button>
@@ -32,9 +32,10 @@
     <div class="container">
       <div class="intro-info">
         <h2>Intelligence Detection</h2>
-        <h3>ระบบ Threat inSight ถูกพัฒนาขึ้นเพื่อช่วยให้องกรค์สามารถตรวจจับ 
-            การโจมตีได้อย่างรวดเร็ว และยังสามารถทำงานร่วมกับการเฝ้าระวังขององค์กรได้ดี 
-            และเรายังมีเทคโนโลยีที่ตรวจจับการรั่วไหลของข้อมูลขององค์กรบน Internet และ Dark Web
+        <h3>
+            Threat insight System is improved for helping organizations detect threats faster and also working with
+            surveillance in the same time. We have data leak detection technology to protect data 
+            of organizationson internet and dark web.
         </h3>
       </div>
 
@@ -57,13 +58,13 @@
                             Threat Sharing
                         </h1>
                         <span class="secondary-text">
-                            เชื่อมต่อข้อมูลภัยคุกคามและ Indicator ต่างๆ จาก ผู้ให้บริการข้อมูลต่างๆ มารวมอยู่ที่นี่ และเชื่อมต่อกับ ระบบวิเคราะห์ Log (SIEM) ได้เป็นอย่างดี
+                            Threat data connect and indicators from data providers gathering in threat sharing and connect with Log (SIEM) system as well.
                         </span>
                     </div>
 
                     <div>
                         <h1 class="primary-text text-right">
-                            รูปแบบของ IOC
+                            Type of IOC
                         </h1>
                         <ul class="list-img-ioc">
                             <li>
@@ -102,7 +103,7 @@
                             Asset Discovery
                         </h1>
                         <span class="secondary-text">
-                            เราช่วยมองหาสิ่งที่สนใจ และรวบรวมเครื่อง Server และ Asset ต่างๆ ที่ให้บริการบน Internet โดยการรวบรวมจาก OSINT และสามารถนำเข้าข้อมูลเพื่อตรวจจับช่องโหว่ และภัยคุกคามต่างๆ ได้ต่อเนื่อง
+                            To help you finding any interesting information and gathering server and asset which service on theinternet and collecting from OSINT. In the same way, we are able to import data for gap detection and threats continuously.
                         </span>
                     </div>
                 </div>
@@ -133,7 +134,7 @@
                     </div>
                     <div class="col-md-4 order-md-3 order-2">
                         <span class="secondary-text">
-                            ตรวจจับการรั่วไหลของข้อมูลที่ถูก Hackerนำไปเผยเแพร่บน Internet จากแหล่งข้อมูลต่างๆ
+                            Data leak detection form dark web that bring data of organization for publishing and selling.
                         </span>
                         <ul class="list-img-ioc">
                             <li>
@@ -154,7 +155,7 @@
                     <div class="row">
                         <div class="col-md-4 order-md-1 order-2">
                             <span class="secondary-text mb-3 text-white">
-                                ตรวจจับการรั่วไหลของข้อมูลในตลาดมืด (Darkweb) ที่มีการนำข้อมูลในองค์กรมา เผยแพร่หรือจำหน่าย
+                                We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
                             </span>
         
                             <ul class="list-img-ioc text-center">
@@ -194,7 +195,7 @@
                             Compromised Detection
                         </h1>
                         <span class="secondary-text">
-                            ตรวจจับการถูกโจมตีจาก Hacker และการยึดเครื่องหรือฝัง Backdoor ในเครื่อง Server โดยการใช้ Indicator จากฐานข้อมูลเชิงลึก
+                            We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
                         </span>
                     </div>
                 </div>
@@ -217,7 +218,7 @@
                             Web Defaced Detection
                         </h1>
                         <span class="secondary-text">
-                            เฝ้าระวังการโจมตีด้วยเทคนิคการเปลี่ยนหน้าเว็บไซต์ (Web Defaced) เพื่อรักษาความน่าเชื่อถือขององค์กร
+                            To detect attack website from attacker by using web defacement technique and the organization still maintain credibility.
                         </span>
                     </div>
                 </div>
@@ -246,7 +247,7 @@
                         Vulnerability Detection
                     </h1>
                     <span class="secondary-text text-white mb-4">
-                        ระบบ Threat inSight สามารถช่วยตรวจจับช่องโหว่ของระบบโดยอ้างอิงจากฐานข้อมูลช่องโหว่ (CVE) ที่เป็นมาตรฐานสากล
+                        Threat Insight System is able to detect the gap of system. This system is based on database of the Common Vulnerabilities and Exposures (CVE) system.
                     </span>
 
                     <img class="img-fluid" src="{{asset('asset_salepage/images/smartmockups_kl0coiz8.png')}}" alt="">
@@ -264,7 +265,7 @@
                             Mis-Configuration Detection
                         </h1>
                         <span class="secondary-text">
-                            ระบบสามารถตรวจจับ Configuration ที่ไม่ปลอดภัยโดยอ้างอิงตาม Security Guideline จากสถาบัน CIS และสามารถปรับแก้ไข Configuration ให้ปลอดภัยด้วยระบบ
+                            The system can detect unsafe configuration based on Security Guideline from CIS center. Also, editing configuration for safety from the system.
                         </span>
                     </div>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/Icom.png')}}" alt="">
@@ -285,7 +286,7 @@
                 <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <div class="mb-5">
                         <span class="secondary-text">
-                            อัพเดทข่าวสารด้วย Cybersecurity จากแหล่งข่าวต่างๆ ทั่วโลก และสามารถแจ้งข่าวสารผ่านทาง Email
+                            Update news about cybersecurity from others source around the world and getting notification via Email.
                         </span>
                     </div>
                     <ul class="cyber-news-feed">
@@ -322,7 +323,7 @@
                 <div class="col-lg-6 col-md-6 mb-3 text-center">
                     <div class="mb-4">
                         <span class="secondary-text text-center">
-                            ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
+                            Detection user attack by using social engineering technique such as Phishing, Fake mobile application, Drive-By-Download.
                         </span>
                     </div>
                     <div>
