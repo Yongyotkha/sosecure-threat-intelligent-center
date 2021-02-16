@@ -1617,7 +1617,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'content',
                 function (DataLeakFeedTemp $model) {
-                    return '<div class="scroll-ovf-content-fixh-60">' . $model->feedcontent . '</div>';
+                    return '<div>' . $model->feedcontent . '</div>';
                 }
             )
             ->editColumn(
@@ -2342,7 +2342,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'content',
                 function (DataLeakFeedTemp $model) {
-                    return '<div class="scroll-ovf-content-fixh-60">' . $model->feedcontent . '</div>';
+                    return '<div>' . $model->feedcontent . '</div>';
                 }
             )
             ->editColumn(
@@ -3321,7 +3321,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'content',
                 function (DataLeakFeedTemp $model) {
-                    return '<div class="scroll-ovf-content-fixh-60">'. $model->feedcontent . '</div>';
+                    return '<div>'. $model->feedcontent . '</div>';
                 }
             )
             ->editColumn(
