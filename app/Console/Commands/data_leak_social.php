@@ -53,7 +53,7 @@ class data_leak_social extends Command
         $start = date("Y-m-d").' 00:00:00';
         $end = date("Y-m-d").' 23:59:59';
        // $start = '2020-01-01'.' 00:00:00';
-      ?//  $end = date("Y-m-d").' 23:59:59';
+      //  $end = date("Y-m-d").' 23:59:59';
       $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
       $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
 
