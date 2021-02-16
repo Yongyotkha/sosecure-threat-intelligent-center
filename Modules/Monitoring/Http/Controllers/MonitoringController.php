@@ -39,7 +39,7 @@ class MonitoringController extends Controller
     public function index()
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         
@@ -50,7 +50,7 @@ class MonitoringController extends Controller
     public function batchjob()
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         // <><><>
@@ -78,7 +78,7 @@ class MonitoringController extends Controller
     public function monitor_logs()
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         // <><><>
@@ -167,7 +167,7 @@ class MonitoringController extends Controller
     public function tableMonitor(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         
@@ -243,7 +243,7 @@ class MonitoringController extends Controller
     public function table_monitor_logs(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         
@@ -306,7 +306,7 @@ class MonitoringController extends Controller
     public function view_message_modal(Request $request , $id)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         if($id) {
@@ -318,7 +318,7 @@ class MonitoringController extends Controller
 
     public function delete_logs(Request $request){
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         if($request->id_change){
@@ -341,7 +341,8 @@ class MonitoringController extends Controller
 
     public function send_logs(){
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        // dd($role_custom);
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         $get_role_custom_first = @get_role_custom();
@@ -369,7 +370,7 @@ class MonitoringController extends Controller
     public function table_send_logs(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         
@@ -443,7 +444,7 @@ class MonitoringController extends Controller
 
     public function delete_send_logs(Request $request){
         $role_custom = @check_role_custom();
-        if(!$role_custom['Monitoring']) {
+        if(!$role_custom['monitoring']) {
             check_permission403();
         }
         if($request->id_change){
