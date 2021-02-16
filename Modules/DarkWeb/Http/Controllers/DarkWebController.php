@@ -44,6 +44,10 @@ class DarkWebController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['compromised']) {
+            check_permission403();
+        }
 
         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         if(Auth::check()) {
@@ -139,6 +143,10 @@ class DarkWebController extends Controller
     }
 
     public function jqueryLoadMoreNews(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['compromised']) {
+            check_permission403();
+        }
 
         $date_start = $request->date_start;
         $date_end = $request->date_end;
@@ -451,6 +459,10 @@ class DarkWebController extends Controller
     }
 
     public function count_val(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['compromised']) {
+            check_permission403();
+        }
 
 
         $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
@@ -765,6 +777,10 @@ class DarkWebController extends Controller
     }
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['compromised']) {
+            check_permission403();
+        }
         $html = '';
         $Bookmark = Bookmarks_compromised::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();//->paginate(PAGINATE_NUM);//->get()
    
@@ -855,6 +871,10 @@ class DarkWebController extends Controller
     }
 
     public function bookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['compromised']) {
+            check_permission403();
+        }
         $checkBookmark = Bookmarks_compromised::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $request -> news_id)->first();
         if($checkBookmark){
             $checkBookmark -> delete();

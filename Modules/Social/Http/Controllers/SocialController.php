@@ -43,6 +43,10 @@ class SocialController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
 
         if(Auth::check()) {
 
@@ -142,6 +146,10 @@ class SocialController extends Controller
 
 
     public function jqueryLoadMoreNews(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
 
         $date_start = $request->date_start;
         $date_end = $request->date_end;
@@ -403,6 +411,10 @@ class SocialController extends Controller
     }
 
     public function jqueryLoadMoreNewsTopic(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
         $html = '';
         $NewsTopic = NewsTopics::where('topic_id', $request->topic_id)->wherehas('news', function($q){
             $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc');
@@ -467,6 +479,10 @@ class SocialController extends Controller
     }
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
         $html = '';
         $Bookmark = Bookmarks_social::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();//->paginate(PAGINATE_NUM);//->get()
         // $Bookmark = Bookmarks_social::orderBy('created_at','desc')->get();
@@ -555,6 +571,10 @@ class SocialController extends Controller
     }
 
     public function bookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
         $checkBookmark = Bookmarks_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $request -> news_id)->first();
         if($checkBookmark){
             $checkBookmark -> delete();
@@ -569,6 +589,7 @@ class SocialController extends Controller
     }
 
     public function add_read(Request $request) {
+       
         $addread = $request->addread;
 
         try {
@@ -623,6 +644,10 @@ class SocialController extends Controller
 
 
     public function count_val(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
 
         // dd($request->check_type);
 
