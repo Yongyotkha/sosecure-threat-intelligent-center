@@ -3366,11 +3366,57 @@ class DataLeakController extends Controller
         $DataLeakFeed = new DataLeakFeed();
         $DataLeakFeed->code = generator_uuid();
         $DataLeakFeed->feel_type = @$request->type;
-        $DataLeakFeed->feedcontent = @$request->content;
+        // $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
         $DataLeakFeed->source_name = @$request->remark;
         $DataLeakFeed->feedtimepost = Carbon::now();
         $DataLeakFeed->status = 1;
+
+
+        $content = @$_POST['content']; //รับค่าจาก messageInput
+        if($content) {
+            $dom = new \domdocument();
+            if($dom->getelementsbytagname('img')){
+                $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+                //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                $images = $dom->getelementsbytagname('img');
+                //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                foreach($images as $k => $img){
+                    $data = $img->getattribute('src');
+                    $img_check_src = explode(";",$data);
+                    if(@$img_check_src[1]) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data)= explode(',', $data);
+                        $data = base64_decode($data);
+                    //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name= time().$k.'.png';
+                    //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') .'/'. $image_name;
+                    //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                    } else {
+
+                    }
+                }
+                $content = $dom->savehtml();
+
+            }
+        }
+        $DataLeakFeed->feedcontent = $content;
+
+
+
+
+
+
+
         $DataLeakFeed->save();
         $DataLeakFeed_send_mail[] = $DataLeakFeed;
 
@@ -3444,12 +3490,50 @@ class DataLeakController extends Controller
     public function edit_compromise(Request $request){
         $DataLeakFeed = DataLeakFeed::where('id',@$request->id_DataLeakFeed)->first();
         $DataLeakFeed->feel_type = @$request->type;
-        $DataLeakFeed->feedcontent = @$request->content;
+        // $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
         $DataLeakFeed->source_name = @$request->remark;
         if ($request->sent_mail == true) {
             $DataLeakFeed->feedtimepost = Carbon::now();
-        }        
+        }
+        
+        $content = @$_POST['content']; //รับค่าจาก messageInput
+        if($content) {
+            $dom = new \domdocument();
+            if($dom->getelementsbytagname('img')){
+                $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+                //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                $images = $dom->getelementsbytagname('img');
+                //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                foreach($images as $k => $img){
+                    $data = $img->getattribute('src');
+                    $img_check_src = explode(";",$data);
+                    if(@$img_check_src[1]) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data)= explode(',', $data);
+                        $data = base64_decode($data);
+                    //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name= time().$k.'.png';
+                    //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') .'/'. $image_name;
+                    //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                    } else {
+
+                    }
+                }
+                $content = $dom->savehtml();
+
+            }
+        }
+        $DataLeakFeed->feedcontent = $content;
         $DataLeakFeed->save();
         $DataLeakFeed_send_mail[] = $DataLeakFeed;
 
@@ -3495,11 +3579,48 @@ class DataLeakController extends Controller
         $DataLeakFeed = new DataLeakFeed();
         $DataLeakFeed->code = generator_uuid();
         $DataLeakFeed->feel_type = @$request->type;
-        $DataLeakFeed->feedcontent = @$request->content;
+        // $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
         $DataLeakFeed->source_name = @$request->source;
         $DataLeakFeed->feedtimepost = Carbon::now();
         $DataLeakFeed->status = 1;
+        $content = @$_POST['content']; //รับค่าจาก messageInput
+        if($content) {
+            $dom = new \domdocument();
+            if($dom->getelementsbytagname('img')){
+                $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+                //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                $images = $dom->getelementsbytagname('img');
+                //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                foreach($images as $k => $img){
+                    $data = $img->getattribute('src');
+                    $img_check_src = explode(";",$data);
+                    if(@$img_check_src[1]) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data)= explode(',', $data);
+                        $data = base64_decode($data);
+                    //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name= time().$k.'.png';
+                    //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') .'/'. $image_name;
+                    //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                    } else {
+
+                    }
+                }
+                $content = $dom->savehtml();
+
+            }
+        }
+        $DataLeakFeed->feedcontent = $content;
         $DataLeakFeed->save();
         $DataLeakFeed_send_mail[] = $DataLeakFeed;
 
@@ -3574,12 +3695,49 @@ class DataLeakController extends Controller
 
         $DataLeakFeed = DataLeakFeed::where('id',@$request->id_DataLeakFeed)->first();
         $DataLeakFeed->feel_type = @$request->type;
-        $DataLeakFeed->feedcontent = @$request->content;
+        // $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
         $DataLeakFeed->source_name = @$request->source;
         if ($request->sent_mail == true) {
             $DataLeakFeed->feedtimepost = Carbon::now();
-        }        
+        }
+        $content = @$_POST['content']; //รับค่าจาก messageInput
+        if($content) {
+            $dom = new \domdocument();
+            if($dom->getelementsbytagname('img')){
+                $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+                //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                $images = $dom->getelementsbytagname('img');
+                //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                foreach($images as $k => $img){
+                    $data = $img->getattribute('src');
+                    $img_check_src = explode(";",$data);
+                    if(@$img_check_src[1]) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data)= explode(',', $data);
+                        $data = base64_decode($data);
+                    //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name= time().$k.'.png';
+                    //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') .'/'. $image_name;
+                    //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                    } else {
+
+                    }
+                }
+                $content = $dom->savehtml();
+
+            }
+        }
+        $DataLeakFeed->feedcontent = $content;        
         $DataLeakFeed->save();
         $DataLeakFeed_send_mail[] = $DataLeakFeed;
 

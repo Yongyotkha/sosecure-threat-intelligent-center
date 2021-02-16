@@ -590,7 +590,6 @@ active_btn('#groupby-type .btn-grey');
                         render: function (data, type, full, meta) {
                             
                             if(full.get_data_leak_feed_one.source_name){
-                                console.log(full.get_data_leak_feed_one.source_name);
                                 return full.get_data_leak_feed_one.source_name;
                             }
                             return '-';
