@@ -307,9 +307,6 @@ active_btn('#groupby-type .btn-grey');
 
 
     function table_social_data(){
-
-        readmore_btn('#table_social_datas','.btn-readmore','scroll-ovf-content-fixh-60');
-
         $('#table_social_datas').DataTable({
                 pageLength: 50,
                 processing: true,
@@ -403,7 +400,7 @@ active_btn('#groupby-type .btn-grey');
                     
                     {
                         targets: 4,
-                        width: '10px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
                             let val = '';
                             let content = '';
@@ -418,12 +415,12 @@ active_btn('#groupby-type .btn-grey');
                                 
                             }
         
-                            return '<div class="scroll-ovf-content-fixh-60">'+feedcontent+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                            return '<div>'+feedcontent+'</div>';
                         },
                     },
                     {
                         targets: 5,
-                        width: '60px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
                             if(val) {
@@ -433,7 +430,7 @@ active_btn('#groupby-type .btn-grey');
                                 }
                             }
         
-                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                            return '<div>'+val+'</div>';
 
 
                         },
@@ -441,7 +438,7 @@ active_btn('#groupby-type .btn-grey');
                     },
                     {
                         targets: 6,
-                        width: '80px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
                             let val = '';
                             val = full.get_data_leak_feed_one;
