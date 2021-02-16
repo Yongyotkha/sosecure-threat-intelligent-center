@@ -837,7 +837,7 @@ class ApiGetMongoDB extends ApiController
                 // $RSSNews_count = RSSNews::count("id");
                 $RSSNews_all = RSSNews::all();
         
-                //<><><>
+                //<><><div>
                 // if(Auth::check()) {
         
                 //     $site_id_arr = UserSite::select('site_id')->where('user_id', @$user_id)->get();
@@ -2787,7 +2787,7 @@ class ApiGetMongoDB extends ApiController
                     })
                     ->addColumn('description', function (CVEMapping $model) {
                         $html = '';
-                        $html .= '<textarea class="resize-none" rows="3" cols="100" disabled="">'.$model->description.'</textarea><br>';
+                        $html .= '<div class="text-trucate-ovf">'.$model->description.'</div><br>';
                         $html .= '<strong>Published:</strong> '.@$model->published.'&nbsp; &nbsp; <strong>Modified:</strong> '.@$model->modified.'';
                         return $html;
                     })
