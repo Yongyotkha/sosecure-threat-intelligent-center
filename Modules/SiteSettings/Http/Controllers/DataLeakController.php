@@ -470,15 +470,17 @@ class DataLeakController extends Controller
     public function create_compromise(Request $request)
     {
         $data['site'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
-        $data['site_code'] = $request->site;
+        $data['site_code'] = @$request->site;
 
         
         return view('sitesettings::modal.create_compromise')->with($data);
     }
 
-    public function create_dataleak()
+    public function create_dataleak(Request $request)
     {
-        return view('sitesettings::modal.create_dataleak');
+        $data['site'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
+        $data['site_code'] = @$request->site;
+        return view('sitesettings::modal.create_dataleak')->with($data);
     }
 
     /**
@@ -548,7 +550,7 @@ class DataLeakController extends Controller
         //why use %...%
         $model = DataLeakSocialRef::where('site_id', 'LIKE', '' . $site->id . '')->where('deleted_at', null)
         ->whereHas('get_data_leak_feed_one', function ($query) {
-            $query->where('feel_type', '=', 'social');
+            $query->whereIn('feel_type',['social','darkweb_public']);
         })
         ->with('get_site')
         ->with('get_data_leak_feed_one');
@@ -722,11 +724,12 @@ class DataLeakController extends Controller
             ->editColumn(
                 'action',
                 function (DataLeakSocialRef $model) {
-                    return "
-                    <a href='" . route('socialdatas.view_content_dataleak', ['code' => $model->code]) . "' class='btn btn-info btn-xs' data-toggle='ajaxModal'><i class='fas fa-eye'></i></a>
-                    <a href='" . route('socialdatas.delete', ['code' => $model->code]) . "' class='btn btn-danger btn-xs' data-toggle='ajaxModal'>
-                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
-                </a>";
+                //     return "
+                //     <a href='" . route('socialdatas.view_content_dataleak', ['code' => $model->code]) . "' class='btn btn-info btn-xs' data-toggle='ajaxModal'><i class='fas fa-eye'></i></a>
+                //     <a href='" . route('socialdatas.delete', ['code' => $model->code]) . "' class='btn btn-danger btn-xs' data-toggle='ajaxModal'>
+                // <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
+                // </a>";
+                return '';
                 }
             )
             ->rawColumns(['chk','type','site', 'source', 'keyword', 'content', 'data_feed', 'view_count', 'status', 'action'])
@@ -770,7 +773,7 @@ class DataLeakController extends Controller
     {
         $model = DataLeakSocialRef::where('deleted_at', null)
             ->whereHas('get_data_leak_feed_one', function ($query) {
-                $query->where('feel_type', '=', 'social');
+                $query->whereIn('feel_type', ['social','darkweb_public']);
             })
             ->with('get_site')
             ->with('get_data_leak_feed_one');
@@ -1102,6 +1105,8 @@ class DataLeakController extends Controller
             $DataLeakSocialRef->delete();
             $DataLeakFeedTemp->approve = 0;
             $DataLeakFeedTemp->save();
+        }else{
+            $DataLeakSocialRef->delete();
         }
 
         return ajaxResponse(
@@ -1180,6 +1185,8 @@ class DataLeakController extends Controller
                 $data = DataLeakSocialRef::where('id', $social_id)->delete();
                 $DataLeakFeedTemp->approve = 0;
                 $DataLeakFeedTemp->save();
+            }else{
+                $data = DataLeakSocialRef::where('id', $social_id)->delete();
             }
         }
         return ajaxResponse(
@@ -3358,7 +3365,7 @@ class DataLeakController extends Controller
 
     public function add_compromise(Request $request)
     {
-    
+   
         $DataLeakFeed = new DataLeakFeed();
         $DataLeakFeed->code = generator_uuid();
         $DataLeakFeed->feel_type = @$request->type;
@@ -3424,5 +3431,197 @@ class DataLeakController extends Controller
             Response::HTTP_OK
         );
     }
+    public function edit_darkwebdata_modal($code,Request $request){
+
+        
+        $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
+        $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();;
+        $data['DataLeakFeed'] = $DataLeakFeed;
+
+        $data['site'] = @$request->site;
+
+        
+        return view('sitesettings::modal.edit_compromise')->with($data);
+    }
+
+    public function edit_compromise(Request $request){
+        $DataLeakFeed = DataLeakFeed::where('id',@$request->id_DataLeakFeed)->first();
+        $DataLeakFeed->feel_type = @$request->type;
+        $DataLeakFeed->feedcontent = @$request->content;
+        $DataLeakFeed->keyword = @$request->keyword;
+        $DataLeakFeed->source_name = @$request->remark;
+        if ($request->sent_mail == true) {
+            $DataLeakFeed->feedtimepost = Carbon::now();
+        }        
+        $DataLeakFeed->save();
+        $DataLeakFeed_send_mail[] = $DataLeakFeed;
+
+        $DataLeakSocialRefs = DataLeakSocialRef::where('data_leak_feed_id',$DataLeakFeed->id)->get();
+            if($DataLeakSocialRefs){
+                foreach($DataLeakSocialRefs as $DataLeakSocialRefs){
+                    $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                    $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->save();
+                    if ($request->sent_mail == true) {
+                        $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                        if ($site_email_alert) {
+                            foreach ($site_email_alert as $site_email_alert_val) {
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                            }
+                        }
+                    }
+                }
+                
+            }
+            if($request->site_code){
+                $site = route('compromised_data.index', ['code' => @$request->site_code]);
+            }else{
+                $site = route('darkweb.index_all_site');
+            }
+             
+        
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => $site,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
+    }
+
+    public function add_dataleak(Request $request)
+    {
+   
+        $DataLeakFeed = new DataLeakFeed();
+        $DataLeakFeed->code = generator_uuid();
+        $DataLeakFeed->feel_type = @$request->type;
+        $DataLeakFeed->feedcontent = @$request->content;
+        $DataLeakFeed->keyword = @$request->keyword;
+        // $DataLeakFeed->source_name = @$request->remark;
+        $DataLeakFeed->feedtimepost = Carbon::now();
+        $DataLeakFeed->status = 1;
+        $DataLeakFeed->save();
+        $DataLeakFeed_send_mail[] = $DataLeakFeed;
+
+            if($request->site){
+                foreach($request->site as $site){
+                    $SiteSettings = SiteSettings::where('code', $site)->first();
+                    $DataLeakSocialRefs = new DataLeakSocialRef;
+                    $DataLeakSocialRefs->code = generator_uuid();
+                    $DataLeakSocialRefs->site_id = $SiteSettings->id;
+                    $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
+                    $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                    $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->status = 1;
+                    $DataLeakSocialRefs->save();
+                    if ($request->sent_mail == true) {
+                        $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                        if ($site_email_alert) {
+                            foreach ($site_email_alert as $site_email_alert_val) {
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
+                            }
+                        }
+                    }
+                }
+                $site = route('socialdatas.index_all_site');
+            }else{
+                $SiteSettings = SiteSettings::where('code', @$request->site_code)->first();
+                $DataLeakSocialRefs = new DataLeakSocialRef;
+                $DataLeakSocialRefs->code = generator_uuid();
+                $DataLeakSocialRefs->site_id = $SiteSettings->id;
+                $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
+                $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                $DataLeakSocialRefs->status = 1;
+                $DataLeakSocialRefs->save();
+                $site = route('socialdatas.index', ['id' => @$request->site_code]);
+                if ($request->sent_mail == true) {
+                    $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                    if ($site_email_alert) {
+                        foreach ($site_email_alert as $site_email_alert_val) {
+                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
+                        }
+                    }
+                }
+            }
+
+
+        
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => $site,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+    public function edit_dataleak_modal($code,Request $request){
+
+        
+        $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
+        $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();;
+        $data['DataLeakFeed'] = $DataLeakFeed;
+
+        $data['site'] = @$request->site;
+
+        
+        return view('sitesettings::modal.edit_dataleak')->with($data);
+    }
+
+    public function edit_dataleak(Request $request){
+
+        $DataLeakFeed = DataLeakFeed::where('id',@$request->id_DataLeakFeed)->first();
+        $DataLeakFeed->feel_type = @$request->type;
+        $DataLeakFeed->feedcontent = @$request->content;
+        $DataLeakFeed->keyword = @$request->keyword;
+        // $DataLeakFeed->source_name = @$request->remark;
+        if ($request->sent_mail == true) {
+            $DataLeakFeed->feedtimepost = Carbon::now();
+        }        
+        $DataLeakFeed->save();
+        $DataLeakFeed_send_mail[] = $DataLeakFeed;
+
+        $DataLeakSocialRefs = DataLeakSocialRef::where('data_leak_feed_id',$DataLeakFeed->id)->get();
+            if($DataLeakSocialRefs){
+                foreach($DataLeakSocialRefs as $DataLeakSocialRefs){
+                    $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                    $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->save();
+                    if ($request->sent_mail == true) {
+                        $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                        if ($site_email_alert) {
+                            foreach ($site_email_alert as $site_email_alert_val) {
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
+                            }
+                        }
+                    }
+                }
+                
+            }
+            if($request->site_code){
+                $site = route('socialdatas.index', ['id' => @$request->site_code]);
+            }else{
+                $site = route('socialdatas.index_all_site');
+            }
+             
+        
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => $site,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
+    }
+
+    
 
 }
