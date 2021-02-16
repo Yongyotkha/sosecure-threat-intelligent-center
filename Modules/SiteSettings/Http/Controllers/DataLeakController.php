@@ -3500,7 +3500,7 @@ class DataLeakController extends Controller
         $DataLeakFeed->feel_type = @$request->type;
         $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
-        $DataLeakFeed->source_name = @$request->remark;
+        // $DataLeakFeed->source_name = @$request->remark;
         $DataLeakFeed->feedtimepost = Carbon::now();
         $DataLeakFeed->status = 1;
         $DataLeakFeed->save();
@@ -3579,7 +3579,7 @@ class DataLeakController extends Controller
         $DataLeakFeed->feel_type = @$request->type;
         $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
-        $DataLeakFeed->source_name = @$request->remark;
+        // $DataLeakFeed->source_name = @$request->remark;
         if ($request->sent_mail == true) {
             $DataLeakFeed->feedtimepost = Carbon::now();
         }        

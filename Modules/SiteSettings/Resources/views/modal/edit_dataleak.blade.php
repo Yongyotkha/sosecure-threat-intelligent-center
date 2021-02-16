@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Keyword Ref <span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Keyword Ref </label>
                 <div class="col-lg-9">
                     <input type="text" name="keyword" class="form-control" value="{{$DataLeakFeed->keyword}}">
                 </div>
@@ -34,14 +34,14 @@
                     </textarea>
                 </div>
             </div>
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-lg-3 control-label">Remark<span class="text-danger">*</span></label>
                 <div class="col-lg-9">
                     <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required>
                         {{$DataLeakFeed->source_name}}
                     </textarea>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="form-group row">
                 <label for="" class="col-md-3">Send Mail</label>

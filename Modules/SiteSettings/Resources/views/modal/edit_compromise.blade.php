@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Keyword Ref <span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Keyword Ref</label>
                 <div class="col-lg-9">
                     <input type="text" name="keyword" class="form-control" value="{{$DataLeakFeed->keyword}}">
                 </div>
