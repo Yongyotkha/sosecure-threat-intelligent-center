@@ -12,10 +12,10 @@
             <div class="collapse navbar-collapse ml-auto" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
+                        <a class="nav-link" href="{{route('web.en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
+                        <a class="nav-link" href="{{route('web.th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
                     <li class="nav-item ml-4">
                         <button type="button" class="btn btn-outline-secondary px-4">Login</button>

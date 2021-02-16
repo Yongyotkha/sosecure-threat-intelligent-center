@@ -4,8 +4,9 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Module SalePage</title>
+        <title>Intelligence Detection</title>
 
+        <link rel="icon" href="{{ asset('images/logo_threat/logo-fav.png')}}" type="image/png">
        <!-- Google Fonts -->
        <link rel="preconnect" href="https://fonts.gstatic.com">
        <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -22,7 +23,6 @@
 
         <!-- Main Stylesheet File -->
         <link href="{{ asset('asset_salepage/css/style.css')}}" rel="stylesheet">
-
     </head>
     <body>
         @yield('content')
