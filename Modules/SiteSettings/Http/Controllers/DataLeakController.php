@@ -3521,7 +3521,7 @@ class DataLeakController extends Controller
                         $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                         if ($site_email_alert) {
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
                             }
                         }
                     }
@@ -3542,7 +3542,7 @@ class DataLeakController extends Controller
                     $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                     if ($site_email_alert) {
                         foreach ($site_email_alert as $site_email_alert_val) {
-                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
                         }
                     }
                 }
@@ -3596,7 +3596,7 @@ class DataLeakController extends Controller
                         $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                         if ($site_email_alert) {
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
                             }
                         }
                     }
