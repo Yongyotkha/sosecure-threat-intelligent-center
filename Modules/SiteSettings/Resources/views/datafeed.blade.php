@@ -492,7 +492,7 @@
                             content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                         }
                         
-                        return '<div class="scroll-ovf-content-fixh-60" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                        return '<div>'+content+'</div>';
                     },
                 },
             ]

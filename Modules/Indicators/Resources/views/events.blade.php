@@ -535,7 +535,7 @@
                 targets: 1,
                 render: function (data, type, row) {
                     var inner = '';
-                    inner =  '<div class="ovf-link"><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
+                    inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
                     return inner;
                 }
 
@@ -615,7 +615,7 @@
             },
             initComplete : function( settings, json){
                 datatable = json.cursor;
-                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-rel="tooltip"]').tooltip();
             },
 
             columns: [

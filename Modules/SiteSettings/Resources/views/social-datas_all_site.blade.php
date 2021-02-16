@@ -410,7 +410,6 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
-@include('stacks.css.multitext')
 @endpush
 
 @push('pagescript')
@@ -423,7 +422,6 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
 @include('stacks.js.fullscreen')
-@include('stacks.js.multitext')
 <script>
 
 active_btn('#groupby-type .btn-grey');
@@ -536,12 +534,7 @@ active_btn('#groupby-type .btn-grey');
 
                         return d;
                     },
-                },
-            
-                "fnDrawCallback": function( oSettings ) {
-                    multi_readmore()
-                },
-                
+                },  
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
                     {{--console.log(json);--}}
@@ -630,7 +623,7 @@ active_btn('#groupby-type .btn-grey');
                                     console.log(data2);
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                return '<div class="text-trucate-ovf">'+content+'</div>';
+                                return '<div>'+content+'</div>';
                             }else{
                                 return '';
                             }

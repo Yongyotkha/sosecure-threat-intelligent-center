@@ -383,7 +383,6 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
-@include('stacks.css.multitext')
 @endpush
 
 @push('pagescript')
@@ -397,7 +396,6 @@
 @include('stacks.js.activebutton')
 @include('stacks.js.readmore')
 @include('stacks.js.fullscreen')
-@include('stacks.js.multitext')
 
 <script>
 
@@ -554,16 +552,10 @@
                         d.check_type = check_type;
                         return d;
                     }
-                },
-            
-                "fnDrawCallback": function( oSettings ) {
-                    multi_readmore()
-                },
-                
+                },               
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
                     {{--console.log(json);--}}
-                    
                 },
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
@@ -640,7 +632,7 @@
                                     content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                                 } 
                             }
-                            return '<div class="text-trucate-ovf">'+content+'</div>';
+                            return '<div>'+content+'</div>';
                         },
                     },
 
@@ -656,7 +648,7 @@
                                     val = full.get_data_leak_feed_one.source_name;
                                 }
                             }
-                            return '<div class="text-trucate-ovf">'+val+'</div>';
+                            return '<div>'+val+'</div>';
 
                         },
                     

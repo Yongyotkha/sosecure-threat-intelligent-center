@@ -177,6 +177,7 @@ style="left: unset">
 @include('stacks.css.datatables')
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
+@include('stacks.css.multitext')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
@@ -186,6 +187,7 @@ style="left: unset">
 @include('stacks.js.daterangpicker')
 @include('stacks.js.form')
 @include('stacks.js.advanced_search')
+@include('stacks.js.multitext')
 
 
 <script>
@@ -322,6 +324,9 @@ style="left: unset">
 
                 }
             },
+            "fnDrawCallback": function( oSettings ) {
+                multi_readmore()
+            },
             initComplete : function( settings, json){
                 $('[data-toggle="tooltip"]').tooltip();
                 var table = $('#table-send-logs').DataTable();
@@ -341,6 +346,7 @@ style="left: unset">
                 width: '10%',
                 targets: 1,
                 name:"site_name",
+                className :'nowrap',
                 render: function (data, type, row) {
                  if(row.site_name){
                     return row.site_name;
@@ -355,7 +361,7 @@ style="left: unset">
             name:"logs_sent_transaction.content",
             render: function (data, type, row) {
                 if(row.content){
-                    return '<textarea class="resize-none" rows="3" cols="100" disabled="">'+row.content+'</textarea>';
+                    return '<div class="text-trucate-ovf">'+row.content+'</div>';
                 }else{
                     return '';
                 }

@@ -147,6 +147,7 @@
 @include('stacks.css.datatables')
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
+@include('stacks.css.multitext')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
@@ -156,6 +157,7 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.form')
 @include('stacks.js.advanced_search')
+@include('stacks.js.multitext')
 
 
 <script>
@@ -281,6 +283,9 @@ function data_table(){
                     d.sitecode = sitecode;
                 }
             },
+            "fnDrawCallback": function( oSettings ) {
+                multi_readmore()
+            },
             initComplete : function( settings, json){
                 $('[data-toggle="tooltip"]').tooltip();
                 var table = $('#table-monitoring-logs').DataTable();
@@ -300,6 +305,7 @@ function data_table(){
                     width: '10%',
                     targets: 1,
                     name:"site_name",
+                    className :'nowrap',
                     render: function (data, type, row) {
                        if(row.site_name){
                         return row.site_name;
@@ -311,10 +317,11 @@ function data_table(){
                 },
                 {
                     targets: 2,
+                    width: '25%',
                     name:"logs.file",
                     render: function (data, type, row) {
                         if(row.file){
-                        return '<textarea class="resize-none" rows="3" cols="50" disabled>'+row.file+'</textarea>';
+                        return '<div class="text-trucate-ovf">'+row.file+'</div>';
                        }else{
                         return '';
                        }
@@ -322,21 +329,23 @@ function data_table(){
                 },
                 {
                     targets: 3,
+                    width: '25%',
                     name:"logs.error_summary",
                     render: function (data, type, row) {
                         if(row.error_summary){
-                        return '<textarea class="resize-none" rows="3" cols="50" disabled>'+row.error_summary+'</textarea>';
+                        return '<div class="text-trucate-ovf">'+row.error_summary+'</div>';
                        }else{
                         return '';
                        }
                     }
                 },
                 {
+                    width: '25%',
                     targets: 4,
                     name:"logs.log_trace",
                     render: function (data, type, row) {
                         if(row.log_trace){
-                            return '<textarea class="resize-none" rows="3" cols="50" disabled>'+row.log_trace+'</textarea>';
+                            return '<div class="text-trucate-ovf">'+row.log_trace+'</div>';
                         }else{
                             return '';
                         }
