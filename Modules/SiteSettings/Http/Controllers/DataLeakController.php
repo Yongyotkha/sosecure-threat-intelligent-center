@@ -635,10 +635,10 @@ class DataLeakController extends Controller
                 $query->where('sourceid', 'LIKE', '%' . $source . '%');
             });
 
-            $model = $model->get();
-        }else {
-            $model = $model->get();
+           
         }
+        $model->orderBy('created_at', 'desc');
+        
         return DataTables::of($model)
             ->editColumn(
                 'chk',
@@ -695,7 +695,7 @@ class DataLeakController extends Controller
             ->editColumn(
                 'data_feed',
                 function (DataLeakSocialRef $model) {
-                    return @$model->get_data_leak_feed->feedtimestamp;
+                    return @$model->get_data_leak_feed->feedtimepost;
                 }
             )
             ->editColumn(
@@ -950,7 +950,7 @@ class DataLeakController extends Controller
 
             }
 
-            $model->get();
+            $model->orderBy('created_at', 'desc');
         }
 
         return DataTables::of($model)->toJson();
@@ -1275,7 +1275,7 @@ class DataLeakController extends Controller
         if ($request->search_val == 'true') {
 
             // $model = DataLeakFeed::where($where);
-            $model = DataLeakSocialRef::where('deleted_at', null)->with('get_site')->with('get_data_leak_feed_one');
+            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])->with('get_site')->with('get_data_leak_feed_one');
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
 
             // if($request -> keywords){
@@ -2550,7 +2550,7 @@ class DataLeakController extends Controller
         if ($request->search_val == 'true') {
 
             // $model = DataLeakFeed::where($where);
-            $model = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $request->site_id)->with('get_site')->with('get_data_leak_feed_one');
+            $model = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $request->site_id)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])->with('get_site')->with('get_data_leak_feed_one');
 
             // if($request -> keywords){
             //     $model = $model->where('source_name', 'LIKE', '%'.$request -> keywords.'%');
@@ -2624,11 +2624,8 @@ class DataLeakController extends Controller
             //                     })->orderBy('id', 'desc')->with('get_social_ref');
 
             $model = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $request->site_id)
-                ->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere) {
-                    $q->where($where1);
-                    $q->orwhere($orwhere);
-                })
-                ->with('get_site')->with('get_data_leak_feed_one');
+            ->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])
+            ->with('get_site')->with('get_data_leak_feed_one');
 
                 $model->orderBy('id', 'desc');
         }
@@ -3463,7 +3460,7 @@ class DataLeakController extends Controller
                     $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
                     $DataLeakSocialRefs->save();
                     if ($request->sent_mail == true) {
-                        $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                        $site_email_alert = site_config_email_alert::where("site_id", $DataLeakSocialRefs->site_id)->get();
                         if ($site_email_alert) {
                             foreach ($site_email_alert as $site_email_alert_val) {
                                 Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
@@ -3500,7 +3497,7 @@ class DataLeakController extends Controller
         $DataLeakFeed->feel_type = @$request->type;
         $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
-        // $DataLeakFeed->source_name = @$request->remark;
+        $DataLeakFeed->source_name = @$request->source;
         $DataLeakFeed->feedtimepost = Carbon::now();
         $DataLeakFeed->status = 1;
         $DataLeakFeed->save();
@@ -3521,7 +3518,7 @@ class DataLeakController extends Controller
                         $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                         if ($site_email_alert) {
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
                             }
                         }
                     }
@@ -3542,7 +3539,7 @@ class DataLeakController extends Controller
                     $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                     if ($site_email_alert) {
                         foreach ($site_email_alert as $site_email_alert_val) {
-                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
+                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
                         }
                     }
                 }
@@ -3579,7 +3576,7 @@ class DataLeakController extends Controller
         $DataLeakFeed->feel_type = @$request->type;
         $DataLeakFeed->feedcontent = @$request->content;
         $DataLeakFeed->keyword = @$request->keyword;
-        // $DataLeakFeed->source_name = @$request->remark;
+        $DataLeakFeed->source_name = @$request->source;
         if ($request->sent_mail == true) {
             $DataLeakFeed->feedtimepost = Carbon::now();
         }        
@@ -3593,10 +3590,10 @@ class DataLeakController extends Controller
                     $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
                     $DataLeakSocialRefs->save();
                     if ($request->sent_mail == true) {
-                        $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                        $site_email_alert = site_config_email_alert::where("site_id", $DataLeakSocialRefs->site_id)->get();
                         if ($site_email_alert) {
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'dataleak'));
+                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
                             }
                         }
                     }

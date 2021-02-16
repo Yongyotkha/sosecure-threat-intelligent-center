@@ -576,10 +576,10 @@ active_btn('#groupby-type .btn-grey');
                         width: '60px',
                         render: function (data, type, full, meta) {
                 
-                            if(full.get_data_leak_feed_one){
+                            if(full.get_data_leak_feed_one.feel_type){
                                 return get_word_leak_compromise(full.get_data_leak_feed_one.feel_type,'data_leak');
                             }
-                            return '';
+                            return '-';
 
                         },
                     
@@ -588,11 +588,12 @@ active_btn('#groupby-type .btn-grey');
                         targets: 3,
                         width: '60px',
                         render: function (data, type, full, meta) {
-                
-                            if(full.get_data_leak_feed_one){
+                            
+                            if(full.get_data_leak_feed_one.source_name){
+                                console.log(full.get_data_leak_feed_one.source_name);
                                 return full.get_data_leak_feed_one.source_name;
                             }
-                            return '';
+                            return '-';
 
                         },
                     
@@ -604,8 +605,14 @@ active_btn('#groupby-type .btn-grey');
                 
         
                             return full.keyword;
+                            if(full.keyword){
+                                return full.keyword;
+                            }
+                            return '-';
 
                         },
+
+                     
                             
                     
                     },
@@ -614,18 +621,17 @@ active_btn('#groupby-type .btn-grey');
                         width: '10px',
                         render: function (data, type, full, meta) {
                           
-                            if(full.get_data_leak_feed_one){
+                            if(full.get_data_leak_feed_one.feedcontent){
                                 var feedcontent = full.get_data_leak_feed_one.feedcontent;
                                 var res = full.keyword.split(",");
                                 let content = '';
                                 for(let i in res){
                                     const data2 = res[i];
-                                    console.log(data2);
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
                                 return '<div>'+content+'</div>';
                             }else{
-                                return '';
+                                return '-';
                             }
                            
                         },
@@ -636,7 +642,7 @@ active_btn('#groupby-type .btn-grey');
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
-                            if(full.get_data_leak_feed_one){
+                            if(full.get_data_leak_feed_one.feedtimepost){
                             return full.get_data_leak_feed_one.feedtimepost;
                             }else{
                                 return '';
@@ -648,12 +654,9 @@ active_btn('#groupby-type .btn-grey');
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-                            if(full.get_data_leak_feed_one){
+
                             return full.get_data_leak_feed_one.view;
-                            }else{
-                                return '';
-                            }
+
 
                         },
                     },
