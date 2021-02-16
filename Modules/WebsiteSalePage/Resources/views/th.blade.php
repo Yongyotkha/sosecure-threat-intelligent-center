@@ -48,10 +48,10 @@
     <section id="start-section" class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 mb-3">
+                <div class="col-lg-6 col-lg-6 mb-3">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/threatpic.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-md-6 mb-3">
+                <div class="col-lg-6 col-lg-6 mb-3">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Threat Sharing
@@ -96,7 +96,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-8 col-md-8">
+                <div class="col-lg-8 col-lg-8">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Asset Discovery
@@ -106,17 +106,17 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4 text-center">
+                <div class="col-lg-4 col-lg-4 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/AssetDiscovery.png')}}" alt="">
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="content-section bg-c-muted">
+    <section class="content-section">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <h1 class="primary-text-blue text-center">Data Leak Detection</h1>
                 </div>
             </div>
@@ -124,15 +124,15 @@
         <div class="iceberg-section">
             <div class="container-fluid px-5">
                 <div class="row">
-                    <div class="col-md-4 order-md-1 order-1">
+                    <div class="col-lg-4 order-lg-1 order-1">
                         <h1 class="primary-text-blue text-center mt-3 fz-70 font-weight-500">Surface Web</h1>
                     </div>
 
-                    <div class="col-md-4 text-center order-md-2 order-3 d-md-block d-none">
+                    <div class="col-lg-4 text-center order-lg-2 order-3 d-lg-block d-none">
                         <img class="img-fluid" src="{{asset('asset_salepage/images/iceberg.png')}}" alt="">
                     </div>
-                    <div class="col-md-4 order-md-3 order-2">
-                        <span class="secondary-text">
+                    <div class="col-lg-4 order-lg-3 order-2">
+                        <span class="secondary-text text-blue">
                             ตรวจจับการรั่วไหลของข้อมูลที่ถูก Hackerนำไปเผยเแพร่บน Internet จากแหล่งข้อมูลต่างๆ
                         </span>
                         <ul class="list-img-ioc">
@@ -152,7 +152,7 @@
             <div class="bg-blue-linear px-5">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-4 order-md-1 order-2">
+                        <div class="col-lg-4 order-lg-1 order-2">
                             <span class="secondary-text mb-3 text-white">
                                 ตรวจจับการรั่วไหลของข้อมูลในตลาดมืด (Darkweb) ที่มีการนำข้อมูลในองค์กรมา เผยแพร่หรือจำหน่าย
                             </span>
@@ -176,7 +176,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="order-md-2 order-1 col-md-4 offset-md-4 d-flex align-items-center">
+                        <div class="order-lg-2 order-1 col-lg-4 offset-lg-4 d-flex align-items-center">
                             <h1 class="fz-70 text-white font-weight-500">Dark Web</h1>
                         </div>
                     </div>
@@ -188,7 +188,7 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 mb-3">
+                <div class="col-lg-6 col-lg-6 mb-3">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Compromised Detection
@@ -198,7 +198,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/dash.png')}}" alt="">
                 </div>
             </div>
@@ -208,10 +208,10 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/defaced.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-md-6 mb-3">
+                <div class="col-lg-6 col-lg-6 mb-3 order-lg-2 order-1">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Web Defaced Detection
@@ -258,7 +258,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12 col-md-12 text-center">
+                <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
                         <h1 class="primary-text text-center">
                             Mis-Configuration Detection
@@ -276,13 +276,13 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <h1 class="primary-text text-center">
                         Cybersecurity News Feed
                     </h1>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/cyber.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-md-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <div class="mb-5">
                         <span class="secondary-text">
                             อัพเดทข่าวสารด้วย Cybersecurity จากแหล่งข่าวต่างๆ ทั่วโลก และสามารถแจ้งข่าวสารผ่านทาง Email
@@ -319,7 +319,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
                     <div class="mb-4">
                         <span class="secondary-text text-center">
                             ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
@@ -344,7 +344,7 @@
 
                 </div>
 
-                <div class="col-lg-6 col-md-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1">
                     <h1 class="primary-text text-center">
                         Social Engineering Detection
                     </h1>
