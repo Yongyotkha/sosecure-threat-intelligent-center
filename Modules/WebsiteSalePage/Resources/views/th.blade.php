@@ -2,7 +2,7 @@
 
 @section('content')
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="/websitesalepage">
                 <img src="{{asset('images/logo_threat/logo.png')}}" height="45px" class="d-inline-block align-top" alt="">
             </a>
@@ -48,15 +48,15 @@
     <section id="start-section" class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-lg-6 mb-3">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/threatpic.png')}}" alt="">
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3">
                     <div class="mb-5">
-                        <h1 class="primary-text">
+                        <h1 class="primary-text text-right">
                             Threat Sharing
                         </h1>
-                        <span class="secondary-text">
+                        <span class="secondary-text text-right">
                             เชื่อมต่อข้อมูลภัยคุกคามและ Indicator ต่างๆ จาก ผู้ให้บริการข้อมูลต่างๆ มารวมอยู่ที่นี่ และเชื่อมต่อกับ ระบบวิเคราะห์ Log (SIEM) ได้เป็นอย่างดี
                         </span>
                     </div>
@@ -135,7 +135,7 @@
                         <span class="secondary-text text-blue">
                             ตรวจจับการรั่วไหลของข้อมูลที่ถูก Hackerนำไปเผยเแพร่บน Internet จากแหล่งข้อมูลต่างๆ
                         </span>
-                        <ul class="list-img-ioc">
+                        <ul class="list-img-ioc mt-3">
                             <li>
                                 <img src="{{asset('asset_salepage/images/Group80.png')}}" alt="">
                                 <p>Data Leak</p>
@@ -157,7 +157,7 @@
                                 ตรวจจับการรั่วไหลของข้อมูลในตลาดมืด (Darkweb) ที่มีการนำข้อมูลในองค์กรมา เผยแพร่หรือจำหน่าย
                             </span>
         
-                            <ul class="list-img-ioc text-center">
+                            <ul class="list-img-ice text-center">
                                 <li>
                                     <img src="{{asset('asset_salepage/images/Group84.png')}}" alt="">
                                     <p class="text-white">Credential</p>
@@ -321,12 +321,12 @@
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
                     <div class="mb-4">
-                        <span class="secondary-text text-center">
+                        <span class="secondary-text text-left">
                             ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
                         </span>
                     </div>
                     <div>
-                        <ul class="list-img-ioc justify-content-center">
+                        <ul class="list-img-ioc justify-content-between">
                             <li>
                                 <img src="{{asset('asset_salepage/images/Group87.png')}}" alt="">
                                 <p>Phishing</p>

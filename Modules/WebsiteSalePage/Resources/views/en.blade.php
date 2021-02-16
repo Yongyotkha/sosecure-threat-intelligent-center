@@ -2,7 +2,7 @@
 
 @section('content')
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="/websitesalepage">
                 <img src="{{asset('images/logo_threat/logo.png')}}" height="45px" class="d-inline-block align-top" alt="">
             </a>
@@ -54,10 +54,10 @@
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3">
                     <div class="mb-5">
-                        <h1 class="primary-text">
+                        <h1 class="primary-text text-right">
                             Threat Sharing
                         </h1>
-                        <span class="secondary-text">
+                        <span class="secondary-text text-right">
                             Threat data connect and indicators from data providers gathering in threat sharing and connect with Log (SIEM) system as well.
                         </span>
                     </div>
@@ -136,7 +136,7 @@
                         <span class="secondary-text text-blue">
                             Data leak detection form dark web that bring data of organization for publishing and selling.
                         </span>
-                        <ul class="list-img-ioc">
+                        <ul class="list-img-ioc mt-3">
                             <li>
                                 <img src="{{asset('asset_salepage/images/Group80.png')}}" alt="">
                                 <p>Data Leak</p>
@@ -158,7 +158,7 @@
                                 We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
                             </span>
         
-                            <ul class="list-img-ioc text-center">
+                            <ul class="list-img-ice text-center">
                                 <li>
                                     <img src="{{asset('asset_salepage/images/Group84.png')}}" alt="">
                                     <p class="text-white">Credential</p>
@@ -322,12 +322,12 @@
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
                     <div class="mb-4">
-                        <span class="secondary-text text-center">
+                        <span class="secondary-text text-left">
                             Detection user attack by using social engineering technique such as Phishing, Fake mobile application, Drive-By-Download.
                         </span>
                     </div>
                     <div>
-                        <ul class="list-img-ioc justify-content-center">
+                        <ul class="list-img-ioc justify-content-between">
                             <li>
                                 <img src="{{asset('asset_salepage/images/Group87.png')}}" alt="">
                                 <p>Phishing</p>
