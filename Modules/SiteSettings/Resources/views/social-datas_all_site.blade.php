@@ -544,7 +544,7 @@ active_btn('#groupby-type .btn-grey');
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-
+                "order": [ 6, 'desc' ],
                 columnDefs: [
                     {
                         targets: 0,

@@ -437,9 +437,7 @@
                 },
                 type: "POST",
             },
-            order: [
-                [0, "desc"]
-            ],
+            "order": [ 5, 'desc' ],
             columns: [
                 {
                     data: 'chk',

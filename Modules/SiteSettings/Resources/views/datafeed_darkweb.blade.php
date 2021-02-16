@@ -634,9 +634,7 @@ function table_social_data(){
             {{--console.log(json);--}}
             
         },
-        order: [
-            [0, "desc"]
-        ],
+        "order": [ 6, 'desc' ],
         columns: [
             {
                 data: 'chk',
