@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Keyword Ref </label>
+                <label class="col-lg-3 control-label">Keyword </label>
                 <div class="col-lg-9">
                     <input type="text" name="keyword" class="form-control">
                 </div>

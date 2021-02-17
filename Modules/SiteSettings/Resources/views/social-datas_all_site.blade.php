@@ -254,7 +254,7 @@
                                             <th>Site</th>
                                             <th>Type</th>
                                             <th>Source</th>
-                                            <th>Keyword Ref</th>
+                                            <th>Keyword</th>
                                             <th>Content</th>
                                             <th>Data Feed</th>
                                             <th>View</th>
@@ -884,7 +884,7 @@ var click_type = null;
         click_type = data;
         search_val = 1;
         table_social_data();
-        get_count();
+        {{--get_count();--}}
     }
 
 
