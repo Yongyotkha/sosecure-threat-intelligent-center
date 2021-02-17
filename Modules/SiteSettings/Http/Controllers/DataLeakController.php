@@ -1329,12 +1329,12 @@ class DataLeakController extends Controller
 
             }
 
-            if($request ->click_type) {
+            // if($request ->click_type) {
 
-                $model = $model-> where('feel_type', '=' ,$request -> click_type);
-                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
+            //     $model = $model-> where('feel_type', '=' ,$request -> click_type);
+            //     $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
 
-            }
+            // }
 
 
             //<><><>
