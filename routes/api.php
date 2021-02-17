@@ -42,6 +42,9 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/events_load_pulse_tb', 'Api\ApiGetMongoDB@events_load_pulse_tb');
     Route::post('indicator/events_count_view', 'Api\ApiGetMongoDB@events_count_view');
     Route::post('indicator/load_relatedPulse', 'Api\ApiGetMongoDB@load_relatedPulse');
+    Route::post('indicator/industries', 'Api\ApiGetMongoDB@industries');
+    Route::post('indicator/table_tags', 'Api\ApiGetMongoDB@table_tags');
+    Route::post('indicator/table_groups', 'Api\ApiGetMongoDB@table_groups');
     
     Route::post('dashboard/count_asset', 'Api\ApiGetMongoDB@count_asset');
     Route::post('dashboard/count_vulnerability', 'Api\ApiGetMongoDB@count_vulnerability');
@@ -54,6 +57,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('dashboard/cve_assets', 'Api\ApiGetMongoDB@cve_assets');
     
     Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
+    Route::post('asset/count_asset', 'Api\ApiGetMongoDB@asset_count_asset');
+    Route::post('asset/get_selected_filter', 'Api\ApiGetMongoDB@get_selected_filter');
 
     Route::post('news/index_client', 'Api\ApiGetMongoDB@index_client');
     Route::post('news/jqueryLoadMoreNews', 'Api\ApiGetMongoDB@jqueryLoadMoreNews');
