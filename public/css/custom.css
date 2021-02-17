@@ -3938,7 +3938,3 @@ textarea.resize-none{
     width: fit-content;
     display: inline-block;
 }
-
-div.panel.table td,.table tbody td{
-    vertical-align: top !important;
-}
