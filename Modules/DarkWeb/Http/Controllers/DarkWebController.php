@@ -510,26 +510,51 @@ class DarkWebController extends Controller
 
         
 
-        if(  $request -> f_search == 1 && ($request -> keywords || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request ->check_type) ){
+        if(  $request -> f_search == 1 && ($request -> keywords || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request ->check_type || $request ->click_type) ){
 
-            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
-            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
+            $model = DataLeakSocialRef::where('deleted_at', null)
+            ->whereHas('get_data_leak_feed_one', function ($query) {
+                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+            })
+            ->with('get_site')
+            ->with('get_data_leak_feed_one');
+
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)
+            ->whereHas('get_data_leak_feed_one', function ($query) {
+                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+            })
+            ->with('get_site')
+            ->with('get_data_leak_feed_one');
 
 
-            if($request -> social) {
-                $model = $model-> where('feel_type', '=' ,$request -> social);
-                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> social);
-            }else{
-                $model = $model->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
-                $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+            // if($request -> social) {
+            //     $model = $model-> where('feel_type', '=' ,$request -> social);
+            //     $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> social);
+            // }else{
+            //     $model = $model->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+            //     $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+            // }
+
+            if ($request->keywords) {
+                $keywords = $request->keywords;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                });
+
+                $countGroupBy->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                });
+
             }
 
-            if($request -> keywords){
-                $model = $model->where('keyword', 'LIKE', '%' . $request->keywords . '%');
-                // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> keywords.'%');
-            }
+            // if($request -> keywords){
+            //     $model = $model->where('keyword', 'LIKE', '%' . $request->keywords . '%');
+            //     // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+            //     // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+            //     $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> keywords.'%');
+            // }
 
             
 
@@ -555,6 +580,13 @@ class DarkWebController extends Controller
 
                 $model = $model-> where('feel_type', '=' ,$request -> check_type);
                 $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
+
+            }
+
+            if($request ->click_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> click_type);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
 
             }
 

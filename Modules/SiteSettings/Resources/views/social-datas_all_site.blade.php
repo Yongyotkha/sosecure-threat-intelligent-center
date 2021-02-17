@@ -90,7 +90,7 @@
 
                             <div class="col-md-6 nopadding">
                                 <div class="card-dash-compro none-bg none-shadow ">
-                                    <a href="">
+                                    <a href="#" onclick="dataType('social')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
                                                 <img src="{{asset('images/icebergline2.png')}}" alt="">
@@ -103,7 +103,7 @@
                             </div>
                             <div class="col-md-6 nopadding">
                                 <div class="card-dash-compro none-bg none-shadow">
-                                    <a href="">
+                                    <a href="#" onclick="dataType('darkweb_public')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
                                                 <img src="{{asset('images/icebergline1.png')}}" alt="">
@@ -497,6 +497,7 @@ active_btn('#groupby-type .btn-grey');
         });
 
     function search(){
+        click_type = null;
         search_val = 1;
         keywords = $('#keyword').val();
         type = $('#type option:selected').val();
@@ -531,6 +532,7 @@ active_btn('#groupby-type .btn-grey');
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
+                        d.click_type = click_type;
 
                         return d;
                     },
@@ -761,7 +763,7 @@ active_btn('#groupby-type .btn-grey');
     cb(start, end);
 
             $("#social_reset").click(function() {
-                
+                click_type = null;
                 keywords = null;
                 type = null;
                 source = null;
@@ -842,6 +844,7 @@ active_btn('#groupby-type .btn-grey');
                 endDate : endDate,
                 isDateSearch : isDateSearch,
                 check_type : check_type,
+                click_type : click_type,
                 
             }),
             beforeSend: function(){
@@ -874,6 +877,15 @@ active_btn('#groupby-type .btn-grey');
 
         });
 }
+
+var click_type = null;
+    function dataType(data){
+        
+        click_type = data;
+        search_val = 1;
+        table_social_data();
+        get_count();
+    }
 
 
 
