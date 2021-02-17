@@ -41,7 +41,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
-class ApiWebdefacementController extends Controller
+class ApiWebdefacementController extends ApiController
 {
     public function web_defacement_load_card(Request $request){
         try{
@@ -508,7 +508,7 @@ class ApiWebdefacementController extends Controller
             return response()->json($response);
         }
     }
-    
+
     private function dataFalse($bearerToken, $mode, $data){
         try {
             $header = $bearerToken;

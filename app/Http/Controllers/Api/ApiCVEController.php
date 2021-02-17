@@ -41,7 +41,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
-class ApiCVEController extends Controller
+class ApiCVEController extends ApiController
 {
     public function vulnerabilitys_table(Request $request){
         try{

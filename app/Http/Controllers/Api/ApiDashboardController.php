@@ -41,7 +41,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
-class ApiDashboardController extends Controller
+class ApiDashboardController extends ApiController
 {
     public function count_asset(Request $request){
         try{

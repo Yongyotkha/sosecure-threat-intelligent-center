@@ -41,7 +41,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
-class ApiCompromisedController extends Controller
+class ApiCompromisedController extends ApiController
 {
     public function compromised_count_val(Request $request){
         try{

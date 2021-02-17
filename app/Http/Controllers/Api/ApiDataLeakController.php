@@ -41,7 +41,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
-class ApiDataLeakController extends Controller
+class ApiDataLeakController extends ApiController
 {
     public function data_leak_view(Request $request){
         try{
