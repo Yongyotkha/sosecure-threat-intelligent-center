@@ -2654,7 +2654,7 @@ class ApiGetMongoDB extends ApiController
                             $model = $model->where('severity', 'LOW');
                         }
                         else if($level =='none'){
-                            $model = $model->where(function ($query) use ($request) {
+                            $model = $model->where(function ($query) {
                                 $query->where('severity', 'NONE')
                                     ->orWhere('severity', '');
                             });
@@ -2889,6 +2889,49 @@ class ApiGetMongoDB extends ApiController
                     $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
                     $response['count_CVEMapping'] = CVEMapping::count();
                     $response['count_isFix'] = CVEMapping::where("is_fix", '=', 1)->count();
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function vulnerabilitys_load_cve(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    $site = $data['data']['site'];
+                    if(empty($site)){
+                        $response['page'] = langapp('monitoring_vulnerabilitys');
+                        $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
+                        $response['count_CVEMapping'] = CVEMapping::count();
+                        $response['count_isFix'] = CVEMapping::where("is_fix", '=', 1)->count();
+                    }else{
+                        $response['page'] = langapp('monitoring_vulnerabilitys');
+                        $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->where('site_id', $site)->count();
+                        $response['count_CVEMapping'] = CVEMapping::where('site_id', $site)->count();
+                        $response['count_isFix'] = CVEMapping::where("is_fix", '=', 1)->where('site_id', $site)->count();
+                    }
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -3525,6 +3568,260 @@ class ApiGetMongoDB extends ApiController
                         "isFix_none" => $isFix_none,
                     ];
 
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function vulnerabilitys_change_status(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $id = $data['data']['id'];
+                    $active = $data['data']['active'];
+
+                    $CVEMapping = CVEMapping::where("id", $id)->first();
+                    $CVEMapping->is_fix = $active;
+                    $CVEMapping->save();
+
+                    $response = [
+                        "data" => 'success',
+                    ];
+                
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function vulnerabilitys_change_status_detail(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+    
+                    $id = $data['data']['id'];
+                    $id_asset = $data['data']['id_asset'];
+                    $active = $data['data']['active'];
+
+                    $CVEMapping = CVEMapping::where("id", $id)->first();
+                    $CVEMapping->is_fix = $active;
+                    $CVEMapping->save();
+            
+                    $CVEAssets = CVEAssets::where("id", $id_asset)->first();
+
+                    $response = [
+                        "code" => $CVEAssets -> code,
+                    ];
+                
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function vulnerabilitys_asset_data_detail(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+    
+                    $code = $data['data']['code'];
+                    $cve_asset = CVEAssets::where('active',1)->where('code',$code)->with('get_site')->first();
+                    $page = langapp('monitoring_vulnerabilitys');
+                    $response = [
+                        "cve_asset" => $cve_asset,
+                        "page" => $page,
+                    ];
+                
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function vulnerabilitys_cve_table(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $fix = $data['data']['fix'];
+                    $id = $data['data']['id'];
+                    $date_start = $data['data']['date_start'];
+                    $date_end = $data['data']['date_end'];
+
+                    if($isDateSearch||$fix){
+                        $model = CVEMapping::where('cveven_id',$id)->orderBy('modified', 'desc');
+            
+                        if ($isDateSearch) {
+                       
+                            $date_start = $startDate;
+                            $date_end = $endDate;
+                    
+                            $date_start_explode = explode(" ", $date_start);
+                            $date_start_date = @$date_start_explode[0];
+                            $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
+                    
+                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                    
+                            $date_start_time_time = date("H:i", strtotime($date_start_time));
+                            $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+                    
+                    
+                            $date_end_explode = explode(" ", $date_end);
+                            $date_end_date = @$date_end_explode[0];
+                            $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
+                            // dd($date_end_time);
+                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                            $date_end_time_time = date("H:i", strtotime($date_end_time));
+                            $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+            
+                            $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                        }
+            
+                        if($fix){
+                            if($fix==1){
+                                $model = $model->where('is_fix',0);
+                            }else if($fix==2){
+                                $model = $model->where('is_fix',1);
+                            }
+            
+                        }
+                    }else{
+                        $model = CVEMapping::where('cveven_id',$id)->where('is_fix',0)->orderBy('modified', 'desc');
+                    }
+                    
+                    $model -> get();
+             
+                    $response = DataTables::of($model)->toJson();
+                
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function vulnerabilitys_all_asset_data(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+    
+                    $site = $data['data']['site'];
+                    $model = CVEAssets::where('active',1)->with('get_site');
+        
+                    if($site){ 
+                        $model = $model->where('site_id',$site);
+                    }
+                        
+
+                    $model -> get();
+
+                    $response = DataTables::of($model)->toJson();
+                
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);

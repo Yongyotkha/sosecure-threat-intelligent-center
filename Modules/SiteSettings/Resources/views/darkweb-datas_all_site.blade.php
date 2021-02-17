@@ -383,6 +383,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+@include('stacks.css.multitext')
 @endpush
 
 @push('pagescript')
@@ -396,6 +397,8 @@
 @include('stacks.js.activebutton')
 @include('stacks.js.readmore')
 @include('stacks.js.fullscreen')
+@include('stacks.js.multitext')
+
 <script>
 
     active_btn('#groupby-type .btn-grey');
@@ -408,7 +411,6 @@
         } else {
             visible_c = false;
         }
-
 
     var search_val = false;
     var keywords = null;
@@ -526,12 +528,10 @@
         
         });
     }
-
-
+  
     
-    function table_social_data(){
 
-        readmore_btn('#table_social_datas','.btn-readmore','scroll-ovf-content-fixh-60');
+    function table_social_data(){
 
         $('#table_social_datas').DataTable({
                 pageLength: 50,
@@ -552,21 +552,22 @@
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
-
                         return d;
-                    },
+                    }
                 },
             
+                "fnDrawCallback": function( oSettings ) {
+                    multi_readmore()
+                },
+                
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
-
                     {{--console.log(json);--}}
                     
                 },
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-
                 columnDefs: [
                     {
                         targets: 0,
@@ -626,9 +627,8 @@
                     
                     {
                         targets: 4,
-                        width: '400px',
-                        render: function (data, type, full, meta) {
-                                                    
+                        width: '400px',                     
+                        render: function (data, type, full, meta) {                  
                             let val = '';
                             let content = '';
                             val = full.get_data_leak_feed_one;
@@ -638,16 +638,15 @@
                                 for(let i in res){
                                     var data = res[i];
                                     content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
-                                }
-                                
+                                } 
                             }
-                            return '<div class="scroll-ovf-content-fixh-60">'+content+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                            return '<div class="text-trucate-ovf">'+content+'</div>';
                         },
                     },
 
                     {
                         targets: 5,
-                        width: '400px',
+                        width: '500px',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
@@ -657,8 +656,7 @@
                                     val = full.get_data_leak_feed_one.source_name;
                                 }
                             }
-        
-                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                            return '<div class="text-trucate-ovf">'+val+'</div>';
 
                         },
                     
@@ -682,10 +680,7 @@
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-        
                             return full.view;
-
                         },
                     },
                     {
@@ -711,8 +706,6 @@
                         className: 'nowrap',
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-
                             return `
                             <a href="${base_url}/darkweb_data/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
                             <a href="${base_url}/darkweb_data/delete_darkwebdata_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;

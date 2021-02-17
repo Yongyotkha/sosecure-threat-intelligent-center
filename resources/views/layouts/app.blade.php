@@ -50,6 +50,7 @@
     <link rel="stylesheet" href="{{ getAsset('jquery-easy-loading/src/loading.css') }}" type="text/css"/>
     <link rel="stylesheet" href="{{ getAsset('sweetalert2/dist/sweetalert2.css') }}" type="text/css"/>
 
+
     <link rel="stylesheet" href="{{ getAsset('plugins/apps/pace.css') }}" type="text/css"/>
 
     @if(config('system.material_design'))
@@ -287,6 +288,7 @@
 
 <script src="{{ getAsset('jquery-easy-loading/dist/jquery.loading.js') }}" type="text/javascript"></script>
 <script src="{{ getAsset('sweetalert2/dist/sweetalert2.js') }}" type="text/javascript"></script>
+
 
 
 <script>
