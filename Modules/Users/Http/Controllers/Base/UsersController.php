@@ -376,6 +376,12 @@ abstract class UsersController extends Controller
         
         return DataTables::of($model)
             ->editColumn(
+                'no',
+                function ($model) {
+                    return $model->id;
+                }
+            )
+            ->editColumn(
                 'name',
                 function ($model) {
                     // return '<a href="' . route('users.view', $model->id) . '"><span class="thumb-xs avatar lobilist-check"><img src="' . @$model->profile->photo . '" class="img-circle"></span> ' . str_limit($model->name, 15) . '</a>';

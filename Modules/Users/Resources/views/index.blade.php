@@ -13,7 +13,7 @@
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
                             // var_dump(get_role_custom()['site_admin']); --}}
-                            @if(@get_role_custom()['superadmin'] == 1)
+                            {{-- @if(@get_role_custom()['superadmin'] == 1) --}}
                             
                                 <div class="btn-group" style="padding-right: 2px;width: 120px;">
                                     <select name="role" id="role" class="select2-option form-control select-site" >
@@ -26,7 +26,7 @@
                                     </select>
                                 </div>
 
-                                @can('roles_view_all')
+                                @can('manage_users')
                                 <a href="{{  route('users.roles')  }}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                     <span data-rel="tooltip" title="Permissions" data-placement="bottom">
                                         @icon('solid/user-secret')<span class="hide-text">Manage @langapp('roles')</span>
@@ -40,7 +40,7 @@
                                 </a>
                                 
                                 @endcan
-                            @endif
+                            {{-- @endif --}}
                         @endif
 
                     </div>
@@ -70,38 +70,36 @@
                         @if(!empty(get_role_custom()))
                         {{-- // var_dump(get_role_custom()['superadmin']);
                             // var_dump(get_role_custom()['site_admin']); --}}
-                            @if(@get_role_custom()['superadmin'] == 1)
+                            {{-- @if(@get_role_custom()['superadmin'] == 1) --}}
 
-                            @can('users_create')
-                            <a href="{{ route('users.create') }}" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}"
-                                data-toggle="ajaxModal">
-                                <span data-rel="tooltip" title="Create" data-placement="bottom">
-                                @icon('solid/plus') <span class="hide-text">@langapp('create')</span>
-                                </span>
-                            </a>
-                            @endcan
-                        
-                            @can('users_delete')
-                            <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"
-                                data-rel="tooltip" title="Delete" data-placement="bottom" disabled>
-                                @icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span>
-                            </button>
-                            @endcan
+                                @can('manage_users')
+                                <a href="{{ route('users.create') }}" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}"
+                                    data-toggle="ajaxModal">
+                                    <span data-rel="tooltip" title="Create" data-placement="bottom">
+                                    @icon('solid/plus') <span class="hide-text">@langapp('create')</span>
+                                    </span>
+                                </a>
+                                @endcan
+                            
+                                @can('manage_users')
+                                <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"
+                                    data-rel="tooltip" title="Delete" data-placement="bottom" disabled>
+                                    @icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span>
+                                </button>
+                                @endcan
             
             
             
-                            @if(isAdmin() || can('announcements_create'))
-                            <a href="{{ route('announcements.index') }}" style="display: none"
-                                class="btn btn-sm btn-{{ get_option('theme_color') }}" data-rel="tooltip"
-                                title="@langapp('announcements')" data-placement="bottom">
-                                @icon('solid/bullhorn') <span class="hide-text">@langapp('announcements')</span>
-                            </a>
-                            @endif
-                
-                               
-
-
-                            @endif
+                                {{-- @if(isAdmin() || can('announcements_create'))
+                                <a href="{{ route('announcements.index') }}" style="display: none"
+                                    class="btn btn-sm btn-{{ get_option('theme_color') }}" data-rel="tooltip"
+                                    title="@langapp('announcements')" data-placement="bottom">
+                                    @icon('solid/bullhorn') <span class="hide-text">@langapp('announcements')</span>
+                                </a>
+                                @endif --}}
+                    
+                             
+                            {{-- @endif --}}
                         @endif
                         
                     </div>
@@ -140,6 +138,7 @@
                                                     <span class="label-text"></span>
                                                 </label>
                                             </th>
+                                            <th class="">No. </th>
                                             <th class="">@langapp('name') </th>
                                             <th class="">Role</th>
                                             <th class="">@langapp('email') </th>
@@ -266,6 +265,13 @@ var id_select_site = 'site';
             order: [[ 8, "desc" ]],
             columns: [
                 { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false },
+                {
+                    data: 'no',
+                    className: "w-15",
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
                 { data: 'name', name: 'name' },
                 { data: 'rolename', name: 'model_role_id' },
                 { data: 'email', name: 'email' },
