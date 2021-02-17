@@ -39,6 +39,7 @@ use Modules\Users\Entities\User;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
+use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
 class ApiGetMongoDB extends ApiController
 {
@@ -179,6 +180,368 @@ class ApiGetMongoDB extends ApiController
                 $data_transcation_jobs_clients = json_encode($dataOut);
                 $datas = encrypt_decrypt('encrypt', $data_transcation_jobs_clients, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function table_groups(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+
+                    $draw = $data['data']['draw'];
+                    $row = $data['data']['row'];
+                    $rowperpage = $data['data']['rowperpage'];
+                    $order = $data['data']['order'];
+                    $dir = $data['data']['dir'];
+                    $reqId = $data['data']['reqId'];
+                    $count_page = $data['data']['count_page'];
+                    $keywords = $data['data']['keywords'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $tags = $data['data']['tags'];
+                    $industries = $data['data']['industries'];
+                    $url = $data['data']['url'];
+                    $start =  $row;
+
+                    $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                    $clientMD = new MongoClient($DB_MONGO_KEY);
+                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+
+                    $query = array(
+                        'groups' => new Regex('^.*'.$tags.'.*$', 'i'),
+                        'status' => 1,
+                        'deleted_at' => null,
+                    );
+
+                    $options = [
+                        'projection' => [
+                            '_id' => 0,
+                            'name' => 1,
+                            'groups' => 1,
+                            'tags' => 1,
+                            'industries' =>1,
+                            'public' => 1,
+                            'is_modified' => 1,
+                            'modified' => 1,
+                            'count_view' => 1,
+                            'pulse_id' => 1,
+                            'indicator_count' => 1,
+                        ],
+                        'sort' => [
+                            $order => $dir
+                        ],
+                        'skip' => $start,
+                        'limit' => $rowperpage,
+                    ];
+
+
+
+                    if($count_page==-1){
+                        $cursor_count = $col_fx_otx_events->count($query);
+                        $count_filter = $cursor_count;
+                    }else{
+                        $cursor_count = $count_page;
+                        $count_filter = $cursor_count;
+                    }
+
+                    if($keywords||$isDateSearch || $industries)
+                    {
+
+
+                        if ($keywords) {
+                            $query['name'] = ['$regex'=>$keywords, '$options' => 'i'];
+                                // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$keywords, '$options' => 'i']));
+                        } 
+                        if ($industries) {
+                            $query['industries'] = ['$regex'=>$industries, '$options' => 'i'];
+                        }
+
+                        $isDateSearch = filter_var($isDateSearch, FILTER_VALIDATE_BOOLEAN);
+
+                        if($isDateSearch){
+                                    // dd($startDate);
+                            if ($startDate&&$endDate) {
+
+                                $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($startDate)*1000), '$lte' => new UTCDateTime(strtotime($endDate)*1000)];
+                                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                            }else if($startDate){
+                                $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($startDate)*1000)];
+                                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
+                            }else if($endDate){
+                                $query['modified'] = ['$lte' => new UTCDateTime(strtotime($endDate)*1000)];
+                                        // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                            }
+                        }
+                        $cursor = $col_fx_otx_events->find($query,$options);
+                        $count_filter = $col_fx_otx_events->count($query);
+
+                    } else {
+                        $cursor = $col_fx_otx_events->find($query,$options);
+                    }
+
+
+
+                    $cursor = $cursor->toArray();
+
+                    $data_res = array();
+                    $order_number = $start;
+                    if(!empty($cursor))
+                    {
+                    foreach ($cursor as $document)
+                    {
+
+
+                        $order_number++;
+                        $nestedData['No'] = $order_number;
+                        $nestedData['name'] = $document["name"];
+                        $nestedData['groups'] = $this->explode_val($document["groups"],'groups', $url);
+                        $nestedData['tags'] = $this->explode_val($document["tags"],'tags', $url);
+                        $nestedData['industries'] = $this->explode_val($document["industries"], null,$url);
+                        $nestedData['attr'] = '';
+                        $nestedData['attrCount'] = $document["indicator_count"];
+                        $nestedData['public'] = ($document["public"]);
+                        $nestedData['is_modified'] = ($document["is_modified"]);
+                        $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                        $nestedData['count_view'] = $document["count_view"];
+                        $nestedData['pulse_id'] = $document["pulse_id"];
+
+                                    // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
+                                    // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+
+
+                        $data_res[] = $nestedData;
+
+                    }
+                    }
+                    $dataOut["draw"] = $draw;
+                    $dataOut["recordsTotal"] = $cursor_count;
+                    $dataOut["recordsFiltered"] = $count_filter;
+                    $dataOut["data"] = $data;
+                    $dataOut["cursor"] = $cursor;
+            
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function table_tags(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+
+                    $draw = $data['data']['draw'];
+                    $row = $data['data']['row'];
+                    $rowperpage = $data['data']['rowperpage'];
+                    $order = $data['data']['order'];
+                    $dir = $data['data']['dir'];
+                    $reqId = $data['data']['reqId'];
+                    $count_page = $data['data']['count_page'];
+                    $keywords = $data['data']['keywords'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $tags = $data['data']['tags'];
+                    $industries = $data['data']['industries'];
+                    $url = $data['data']['url'];
+                    $start =  $row;
+            
+
+                    $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                    $clientMD = new MongoClient($DB_MONGO_KEY);
+                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            
+                    $query = array(
+                        'tags' => new Regex('^.*'.$tags.'.*$', 'i'),
+                        'status' => 1,
+                        'deleted_at' => null,
+                    );
+            
+                    $options = [
+                        'projection' => [
+                            '_id' => 0,
+                            'name' => 1,
+                            'groups' => 1,
+                            'tags' => 1,
+                            'industries' => 1,
+                            'public' => 1,
+                            'is_modified' => 1,
+                            'modified' => 1,
+                            'count_view' => 1,
+                            'pulse_id' => 1,
+                            'indicator_count' => 1,
+                        ],
+                        'sort' => [
+                            $order => $dir
+                        ],
+                        'skip' => $start,
+                        'limit' => $rowperpage,
+                    ];
+            
+            
+            
+                    if($count_page==-1){
+                        $cursor_count = $col_fx_otx_events->count($query);
+                        $count_filter = $cursor_count;
+                    }else{
+                        $cursor_count = $count_page;
+                        $count_filter = $cursor_count;
+                    }
+            
+                    if($keywords||$isDateSearch || $industries)
+                    {
+            
+            
+                            if ($keywords) {
+                                $query['name'] = ['$regex'=>$keywords, '$options' => 'i'];
+                                    // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$keywords, '$options' => 'i']));
+                            } 
+                            if ($industries) {
+                                $query['industries'] = ['$regex'=>$industries, '$options' => 'i'];
+                            }
+                            $isDateSearch = filter_var($isDateSearch, FILTER_VALIDATE_BOOLEAN);
+            
+                        if($isDateSearch){
+                                    // dd($startDate);
+                            if ($startDate&&$endDate) {
+            
+                                $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($startDate)*1000), '$lte' => new UTCDateTime(strtotime($endDate)*1000)];
+                                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                            }else if($startDate){
+                                $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($startDate)*1000)];
+                                        // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
+                            }else if($endDate){
+                                $query['modified'] = ['$lte' => new UTCDateTime(strtotime($endDate)*1000)];
+                                        // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                            }
+                        }
+                        $cursor = $col_fx_otx_events->find($query,$options);
+                        $count_filter = $col_fx_otx_events->count($query);
+            
+                    } else {
+                        $cursor = $col_fx_otx_events->find($query,$options);
+                    }
+            
+            
+            
+                    $cursor = $cursor->toArray();
+            
+                    $data_res = array();
+                    $order_number = $start;
+                    if(!empty($cursor))
+                    {
+                        foreach ($cursor as $document)
+                        {
+            
+            
+                            $order_number++;
+                            $nestedData['No'] = $order_number;
+                            $nestedData['name'] = $document["name"];
+                            $nestedData['groups'] = $this->explode_val($document["groups"],'groups', $url);
+                            $nestedData['tags'] = $this->explode_val($document["tags"],'tags', $url);
+                            $nestedData['industries'] = $this->explode_val($document["industries"], null,$url);
+                            $nestedData['attr'] = '';
+                            $nestedData['attrCount'] = $document["indicator_count"];
+                            $nestedData['public'] = ($document["public"]);
+                            $nestedData['is_modified'] = ($document["is_modified"]);
+                            $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                            $nestedData['count_view'] = $document["count_view"];
+                            $nestedData['pulse_id'] = $document["pulse_id"];
+            
+                                        // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
+                                        // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+            
+            
+                            $data_res[] = $nestedData;
+            
+                        }
+                    }
+                    $dataOut["draw"] = $draw;
+                    $dataOut["recordsTotal"] = $cursor_count;
+                    $dataOut["recordsFiltered"] = $count_filter;
+                    $dataOut["data"] = $data_res;
+                    $dataOut["cursor"] = $cursor;
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function industries(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    
+                    $Indicatorindustries = IndicatorSummaryYear::where('type', 'industries')->where('status', 1)->orderBy('order')->select('industries_name')->get();
+
+                    $data_transcation = json_encode($Indicatorindustries);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
             }
         } catch (\Exception $e) {
             $response = array(
@@ -5561,9 +5924,9 @@ class ApiGetMongoDB extends ApiController
             if($val_arr) {
                 foreach($val_arr as $tag) {
                     if($type == 'tags') {
-                        $result .=  '<a href="'.$url.'/indicators/tags'.$tag.'">'.$tag.'</a> ,';
+                        $result .=  '<a href="'.$url.'/indicators/tags/'.$tag.'">'.$tag.'</a> ,';
                     } else if ($type == 'groups') {
-                        $result .=  '<a href="'.$url.'/indicators/groups'.$tag.'">'.$tag.'</a> ,';
+                        $result .=  '<a href="'.$url.'/indicators/groups/'.$tag.'">'.$tag.'</a> ,';
                     } else {
                         $result .=  '<a href="#">'.$tag.'</a> ,';
                     }
