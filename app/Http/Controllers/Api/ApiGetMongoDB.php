@@ -4112,28 +4112,47 @@ class ApiGetMongoDB extends ApiController
             
                     if(  $f_search == 1 && ($keywords || $social || $date_start || $date_end || $site_id || $check_type) ){
             
-                        $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
-                        $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
+                        $model = DataLeakSocialRef::where('deleted_at', null)
+                        ->whereHas('get_data_leak_feed_one', function ($query) {
+                            $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+                        })
+                        ->with('get_site')
+                        ->with('get_data_leak_feed_one');
+            
+                        $countGroupBy = DataLeakSocialRef::where('deleted_at', null)
+                        ->whereHas('get_data_leak_feed_one', function ($query) {
+                            $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+                        })
+                        ->with('get_site')
+                        ->with('get_data_leak_feed_one');
             
             
-                        if($social) {
-                            $model = $model-> where('feel_type', '=' ,$social);
-                            $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$social);
-                        }else{
-                            $model = $model->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
-                            $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+                        // if($social) {
+                        //     $model = $model-> where('feel_type', '=' ,$social);
+                        //     $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$social);
+                        // }else{
+                        //     $model = $model->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+                        //     $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);
+                        // }
+            
+                        if ($request->keywords) {
+                            $keywords = $request->keywords;
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                                $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                                    ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                            });
+            
+                            $countGroupBy->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                                $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                                    ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                            });
+            
                         }
-            
-                        if($keywords){
-                            $model = $model->where('keyword', 'LIKE', '%' . $keywords . '%');
-                            $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$keywords.'%');
-                        }
-            
                         
             
                         if($date_start) {
                           
-                            if($isDateSearch=="true"){
+                            if($isDateSearch==1){
                             
                                 $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
                                     $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
