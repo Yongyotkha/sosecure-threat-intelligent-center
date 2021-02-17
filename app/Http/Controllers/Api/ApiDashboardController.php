@@ -61,7 +61,7 @@ class ApiDashboardController extends ApiController
                     }
                     $get_role_custom = $data['data']['get_role_custom'];
                     $site = $data['data']['site'];
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
                             $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                             $dataOut["countAssets"] = 0;
@@ -153,7 +153,7 @@ class ApiDashboardController extends ApiController
                     $site = $data['data']['site'];
                     $user_id = $data['data']['user_id'];
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
                             $CVEMapping = CVEMapping::select('id')->count();
                         }else{
@@ -204,7 +204,7 @@ class ApiDashboardController extends ApiController
                     $user_id = $data['data']['user_id'];
                     
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
                             $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                         }else{
@@ -254,7 +254,7 @@ class ApiDashboardController extends ApiController
                     $site = $data['data']['site'];
                     $site_id_arr = $data['data']['site_id_arr'];
 
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
                             $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
                         }else{
@@ -305,7 +305,7 @@ class ApiDashboardController extends ApiController
                     $user_id = $data['data']['user_id'];
 
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
                             $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
                         }else{
@@ -343,7 +343,7 @@ class ApiDashboardController extends ApiController
                     }
             
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
                     } else {
                         $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('site_id', $site_id_arr)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
@@ -511,7 +511,7 @@ class ApiDashboardController extends ApiController
                     $model = new CVEMapping;
 
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if($get_role_custom == 1) {
+                    if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
                             $model->get();
                             $high = $model->where('severity', '=', 'HIGH')->count();
