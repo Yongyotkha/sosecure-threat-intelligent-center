@@ -560,7 +560,7 @@ class DarkWebController extends Controller
 
             if($date_start) {
               
-                if($request -> isDateSearch=="true"){
+                if($request -> isDateSearch==1){
                     // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                     // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                 
