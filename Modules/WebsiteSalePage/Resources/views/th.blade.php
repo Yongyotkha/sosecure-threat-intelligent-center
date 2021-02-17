@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-lg-4 text-center">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/AssetDiscovery.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
                 </div>
             </div>
         </div>
