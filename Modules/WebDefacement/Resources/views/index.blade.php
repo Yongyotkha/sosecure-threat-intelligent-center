@@ -62,16 +62,16 @@
                             <div class="col-lg-8 mb-1">
                                 <h5 class="font-weight-bold">CVSS</h5>
                                 <div id="btngroup_status"  class="btn-group special mb-2">
-                                    <button class="btn btn-grey active">
+                                    <button type="button" class="btn btn-grey active" onclick="set_level(null);">
                                         <span> All </span>
                                     </button>
-                                    <button class="btn btn-grey">
+                                    <button type="button" class="btn btn-grey" onclick="set_level('High');">
                                         <span> High </span>
                                     </button>
-                                    <button class="btn btn-grey">
+                                    <button type="button" class="btn btn-grey" onclick="set_level('Medium');">
                                         <span> Medium </span>
                                     </button>
-                                    <button class="btn btn-grey">
+                                    <button type="button" class="btn btn-grey" onclick="set_level('Normal');">
                                         <span> Normal </span>
                                     </button>
                                 </div>
@@ -385,6 +385,10 @@
     var site_id = 0;
     var site_code = null;
 
+    function set_level(__level){
+        level = __level;
+    }
+
 
     $('#example-blacklist').hide();
     $('input[type="checkbox"]').on('change',function(){
@@ -459,7 +463,6 @@
 
     
     function load_card(search_){
-        console.log(level);
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -505,12 +508,11 @@
 
     });
 
-    function search (level_=null) {
+    function search () {
 
         search_ = 1;
         keywords = $('#keywords').val();
         datatype = $('#datatype').val(); 
-        level = level_;
        
         
         load_card(search_);
