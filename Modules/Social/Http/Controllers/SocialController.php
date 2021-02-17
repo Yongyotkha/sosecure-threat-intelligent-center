@@ -658,8 +658,8 @@ class SocialController extends Controller
         $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
         
 
-        $date_start = $request->date_start;
-        $date_end = $request->date_end;
+        $date_start = $request->startDate;
+        $date_end = $request->startDate;
         $site_id = '';
         $site_code = $request ->site_id;
 
@@ -698,8 +698,8 @@ class SocialController extends Controller
 
         if(  $request -> search_val == 1){
 
-            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
-            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
+            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
 
 
             // if($request -> type) {
@@ -746,7 +746,7 @@ class SocialController extends Controller
 
             
 
-            if($date_start) {
+  
               
                 if($request -> isDateSearch==1){
                     // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
@@ -762,11 +762,7 @@ class SocialController extends Controller
                 
                 }
 
-            }
-
-            if($date_end) {
-
-            }
+      
 
 
 

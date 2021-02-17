@@ -472,8 +472,8 @@ class DarkWebController extends Controller
         $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
         
 
-        $date_start = $request->date_start;
-        $date_end = $request->date_end;
+        $date_start = $request->startDate;
+        $date_end = $request->endDate;
         $site_id = '';
         $site_code = $request ->site_id;
 
@@ -510,7 +510,7 @@ class DarkWebController extends Controller
 
         
 
-        if(  $request -> f_search == 1 && ($request -> keywords || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request ->check_type || $request ->click_type) ){
+        if(  $request -> f_search == 1){
 
             $model = DataLeakSocialRef::where('deleted_at', null)
             ->whereHas('get_data_leak_feed_one', function ($query) {
@@ -558,7 +558,7 @@ class DarkWebController extends Controller
 
             
 
-            if($date_start) {
+
               
                 if($request -> isDateSearch==1){
                     // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
@@ -574,7 +574,7 @@ class DarkWebController extends Controller
                 
                 }
 
-            }
+
 
             if($request ->check_type) {
 
