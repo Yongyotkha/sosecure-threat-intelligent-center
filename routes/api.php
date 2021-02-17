@@ -54,6 +54,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('dashboard/cve_assets', 'Api\ApiGetMongoDB@cve_assets');
     
     Route::post('asset/table_asset', 'Api\ApiGetMongoDB@table_asset');
+    Route::post('asset/count_asset', 'Api\ApiGetMongoDB@asset_count_asset');
+    Route::post('asset/get_selected_filter', 'Api\ApiGetMongoDB@get_selected_filter');
 
     Route::post('news/index_client', 'Api\ApiGetMongoDB@index_client');
     Route::post('news/jqueryLoadMoreNews', 'Api\ApiGetMongoDB@jqueryLoadMoreNews');
