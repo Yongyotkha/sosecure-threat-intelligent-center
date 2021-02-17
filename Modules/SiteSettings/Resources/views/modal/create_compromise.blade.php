@@ -41,16 +41,18 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Content<span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Content</label>
                 <div class="col-lg-9">
                     
-                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1" required ></textarea>
+                    <textarea  class="form-control htmleditor" id="content1" name="content"  data-id="1" ></textarea>
+                    <span style="color:red;"><small id="check_content"></small></span>
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Remark<span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Remark</label>
                 <div class="col-lg-9">
-                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required></textarea>
+                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1"></textarea>
+                    <span style="color:red;"><small id="check_remark"></small></span>
                 </div>
             </div>
 
@@ -90,48 +92,53 @@
     $(document).ready(function () {
         $('.select2-option').select2();
     });
+
+
+
+    var content = null;
+    var remark = null;
     $('.ajaxifyForm_custom').submit(function (event) {
         event.preventDefault();
 
-        $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-        $('.btn').attr('disabled',true);
-        
-        var data = new FormData(this);
-        if(form_save == '.formSavingAndRun'){
-            data.append('formsubmit', 'formSavingAndRun');
-        }else if(form_save == '.formPreview'){
-            data.append('formsubmit', 'formPreview');
-        }else if(form_save == '.formDraft'){
-            data.append('formsubmit', 'formDraft');
-        }
-        axios.post($(this).attr("action"), data)
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            $('.btn').attr('disabled',true);
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
             .then(function (response) {
                 
                 toastr.success(response.data.message, '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                 window.location.href = response.data.redirect;
-        })
-        .catch(function (error) {
-            if(error.response.data.exception){
-                $('.btn').attr('disabled',false);
-                toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
-                $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-            }else{
-                $('.btn').attr('disabled',false);
-                var errors = error.response.data.errors;
-                var errorsHtml= '';
-                $.each( errors, function( key, value ) {
-                    errorsHtml += '<li>' + value[0] + '</li>'; 
-                });
-                toastr.error( errorsHtml , '@langapp('response_status') ');
-                $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-            }
-            
-            
-        }); 
-       
-     
-         
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    $('.btn').attr('disabled',false);
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    $('.btn').attr('disabled',false);
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            });
+        
+  
     });
 </script>
 @endpush

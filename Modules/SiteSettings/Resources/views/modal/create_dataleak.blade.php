@@ -46,10 +46,10 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Content<span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Content</label>
                 <div class="col-lg-9">
                     
-                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1" required ></textarea>
+                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1"  ></textarea>
                 </div>
             </div>
             {{-- <div class="form-group row">

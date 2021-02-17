@@ -4,7 +4,7 @@
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Edit Compromise</h4>
         </div>
-    {!! Form::open(['route' => ['compromise.edit_compromise'], 'class' => 'ajaxifyForm_custom', 'files' => false]) !!}
+    {!! Form::open(['route' => ['compromise.edit_compromise'], 'class' => 'ajaxifyForm_custom', 'files' => false] ) !!}
         <div class="modal-body">
             <input type="hidden" name="id_DataLeakFeed" class="form-control" value="{{$DataLeakFeed->id}}">
             @if ($site)
@@ -27,18 +27,18 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Content<span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Content</label>
                 <div class="col-lg-9">
                     
-                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1" required >
+                    <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1" >
                     {{$DataLeakFeed->feedcontent}}
                     </textarea>
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Remark<span class="text-danger">*</span></label>
+                <label class="col-lg-3 control-label">Remark</label>
                 <div class="col-lg-9">
-                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required>
+                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1">
                         {{$DataLeakFeed->source_name}}
                     </textarea>
                 </div>
