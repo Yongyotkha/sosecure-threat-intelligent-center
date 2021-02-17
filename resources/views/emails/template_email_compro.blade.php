@@ -35,21 +35,31 @@
                 {{-- Section TH --}}
                 <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 0px">
                   @foreach($compromised as $data)
-                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background:#eee;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6"> 
-                        <a href="{{ @$data -> feedlink }}" target="_blank" style="margin-bottom:10px;display:block;"><span style="font-weight:700;color:#2a79ff">{{ @$data -> source_name }}</span></a>
-                        <a href="{{ @$data -> feedlink }}" target="_blank">
-                        <p style="margin:0 !important;color:#3869d4;">
-                          {!! @$data -> feedcontent !!}
-                        </p>
-                        </a>
-                      <span style="font-weight:500;font-size:14px;color:#060606">Date: {{ @$data -> created_at }}
-                    </a>
+                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background: #eeeeeea8;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px"> 
+                        <div style="text-align: center;">
+                          <h1 style="font-weight:700;color:#000;font-size: 40px;">Add Complete</h1>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Site : </span> <span> Test Site </span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Type : </span> <span> PUBLIC</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Keyword Ref : </span> Mobile <span></span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Source : </span> <span> {{ @$data -> source_name }} </span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Content : </span> <span>{!! @$data -> feedcontent !!}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Date : </span> <span>{{ @$data -> created_at }}</span>
+                        </div>
                   </div>
                   @endforeach
-                  
-
-                </div>
-
+                </div>   
               {{-- Under Line --}}
               <div style="border: 1px solid #eee;margin-top:30px;"></div>
 
