@@ -4351,7 +4351,7 @@ class ApiGetMongoDB extends ApiController
                     $assets = $data['data']['assets'];
                     $isDateSearch = $data['data']['isDateSearch'];
                     $check = $data['data']['check'];
-                    $datatype = $data['data']['datatype'];
+                    $check_type = $data['data']['check_type'];
                     $level = $data['data']['level'];
                     $source = $data['data']['source'];
                     $click_type = $data['data']['click_type'];
