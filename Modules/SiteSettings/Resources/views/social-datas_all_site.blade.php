@@ -884,7 +884,7 @@ var click_type = null;
         click_type = data;
         search_val = 1;
         table_social_data();
-        get_count();
+        {{--get_count();--}}
     }
 
 

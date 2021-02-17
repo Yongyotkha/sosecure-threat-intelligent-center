@@ -850,7 +850,7 @@
         click_type = data;
         search_val = true;
         table_social_data();
-        get_count();
+        {{--get_count();--}}
     }
 
 
