@@ -17,7 +17,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('web.th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
-                    <li class="nav-item ml-4">
+                    <li class="nav-item ml-lg-4 ml-0">
                         <button type="button" class="btn btn-outline-secondary px-4">Login</button>
                     </li>
                 </ul>
