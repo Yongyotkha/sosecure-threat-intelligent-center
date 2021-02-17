@@ -4333,6 +4333,7 @@ class ApiGetMongoDB extends ApiController
                     $datatype = $data['data']['datatype'];
                     $level = $data['data']['level'];
                     $source = $data['data']['source'];
+                    $click_type = $data['data']['click_type'];
                     
                     $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
                     $where = ['deleted_at' => null];
@@ -4341,14 +4342,19 @@ class ApiGetMongoDB extends ApiController
                     $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
 
                     if ($search_val == 'true') {
-                        $model = DataLeakSocialRef::where('deleted_at', null)->with('get_site')->with('get_data_leak_feed_one');
+                        $model = DataLeakSocialRef::where('deleted_at', null)
+                        ->whereHas('get_data_leak_feed_one', function ($query) {
+                            $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+                        })
+                        ->with('get_site')
+                        ->with('get_data_leak_feed_one');
                         $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
 
                         if ($keywords) {
 
-                            $model = $model->where('keyword', 'LIKE', '%' . $keywords . '%')
-                            ->orWhereHas('get_data_leak_feed_one', function($q) use ($request) { 
-                                $q->where('feedcontent', 'like', '%'.$keywords.'%');
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                                $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                                    ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
                             });
 
                             $countGroupBy = $countGroupBy->where('keyword', 'LIKE', '%' . $keywords . '%')
@@ -4365,11 +4371,18 @@ class ApiGetMongoDB extends ApiController
                             $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
                         }
 
-                        if($request ->check_type) {
+                        if($check_type) {
 
-                            $model = $model-> where('feel_type', '=' ,$request -> check_type);
-                            $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
+                            $model = $model-> where('feel_type', '=' ,$check_type);
+                            $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$check_type);
 
+                        }
+
+                        if($click_type) {
+
+                            $model = $model-> where('feel_type', '=' ,$click_type);
+                            $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$click_type);
+            
                         }
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
