@@ -859,12 +859,21 @@ class DataLeakController extends Controller
 
             }
 
+            if($request ->click_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> click_type);
+
+
+            }
+
             if ($request->source) {
 
                 $source = $request->source;
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
                     $query->where('sourceid', 'LIKE', '%' . $source . '%');
                 });
+
+
 
             }
 
@@ -1275,7 +1284,12 @@ class DataLeakController extends Controller
         if ($request->search_val == 'true') {
 
             // $model = DataLeakFeed::where($where);
-            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])->with('get_site')->with('get_data_leak_feed_one');
+            $model = DataLeakSocialRef::where('deleted_at', null)
+            ->whereHas('get_data_leak_feed_one', function ($query) {
+                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+            })
+            ->with('get_site')
+            ->with('get_data_leak_feed_one');
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
 
             // if($request -> keywords){
@@ -1283,31 +1297,42 @@ class DataLeakController extends Controller
             // }
 
             if ($request->keywords) {
-
+                
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
-                $model = $model->where('keyword', 'LIKE', '%' . $request->keywords . '%')
-                ->orWhereHas('get_data_leak_feed_one', function($q) use ($request) { 
-                    $q->where('feedcontent', 'like', '%'.$request->keywords.'%');
-                });
+                    if ($request->keywords) {
+                        $keywords = $request->keywords;
+                        $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                            $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                                ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                        });
+                    }
                 // });
                 $countGroupBy = $countGroupBy->where('keyword', 'LIKE', '%' . $request->keywords . '%')
                 ->orWhereHas('get_data_leak_feed_one', function($q) use ($request) { 
                     $q->where('feedcontent', 'like', '%'.$request->keywords.'%');
                 });
+                // dd($model->get()->toArray());
             }
 
-            if ($request->source) {
-                $model = $model->where('feel_type', '=', $request->source);
-                $countGroupBy = $countGroupBy->where('feel_type', '=', $request->source);
-            } else {
-                $model = $model->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
-                $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
-            }
+            // if ($request->source) {
+            //     $model = $model->where('feel_type', '=', $request->source);
+            //     $countGroupBy = $countGroupBy->where('feel_type', '=', $request->source);
+            // } else {
+            //     $model = $model->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+            //     $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+            // }
 
             if($request ->check_type) {
 
                 $model = $model-> where('feel_type', '=' ,$request -> check_type);
                 $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
+
+            }
+
+            if($request ->click_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> click_type);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
 
             }
 

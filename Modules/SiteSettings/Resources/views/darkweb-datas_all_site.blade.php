@@ -100,7 +100,7 @@
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
                         <div class="col-md-4 nopadding">
-                            <a href="">
+                            <a href="#" onclick="dataType('compromise')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -113,7 +113,7 @@
                             </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="">
+                            <a href="#" onclick="dataType('darkweb')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -126,7 +126,7 @@
                             </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="">
+                            <a href="#" onclick="dataType('webserver')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -181,7 +181,7 @@
                                         <button id="all" class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey" value="public">
+                                        <button class="btn btn-grey" value="compromise">
                                             <span> Public </span>
                                         </button>
                                         <button class="btn btn-grey" value="darkweb">
@@ -477,7 +477,7 @@
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-
+        click_type = null;
         table_social_data();
         get_count();
     }
@@ -504,6 +504,7 @@
                 isDateSearch : isDateSearch,
                 f_search : f_search,
                 check_type : check_type,
+                click_type : click_type,
             }),
             beforeSend: function(){
                 loading('load');
@@ -563,6 +564,7 @@
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
+                        d.click_type = click_type;
                         return d;
                     }
                 },               
@@ -796,7 +798,7 @@
                 endDate =  null;
                 keywords =  null;
                 site =  null;
-
+                click_type = null;
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 cb(start, end);
@@ -842,6 +844,14 @@
                 });
         });
     });
+     var click_type = null;
+    function dataType(data){
+        
+        click_type = data;
+        search_val = true;
+        table_social_data();
+        get_count();
+    }
 
 
 </script>

@@ -696,42 +696,59 @@ class SocialController extends Controller
 
         
 
-        if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request->check_type) ){
+        if(  $request -> search_val == 1){
 
             $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
 
 
-            if($request -> type) {
-                $model = $model-> where('feel_type', '=' ,$request -> type);
-                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> type);
-            }else{
-                $model = $model->whereIn('feel_type', ['social', 'darkweb_public']);
-                $countGroupBy = $countGroupBy->whereIn('feel_type', ['social', 'darkweb_public']);
+            // if($request -> type) {
+            //     $model = $model-> where('feel_type', '=' ,$request -> type);
+            //     $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> type);
+            // }
+
+            // if($request -> social) {
+            //     $model = $model-> where('sourceid', '=' ,$request -> social);
+            //     $countGroupBy = $countGroupBy -> where('sourceid', '=' ,$request -> social);
+            // }
+
+            if ($request->keywords) {
+                $keywords = $request->keywords;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                });
+
+                $countGroupBy->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                });
             }
 
-            if($request -> social) {
-                $model = $model-> where('sourceid', '=' ,$request -> social);
-                $countGroupBy = $countGroupBy -> where('sourceid', '=' ,$request -> social);
-            }
-
-            if($request -> title){
-                $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
-                // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
-            }
+            // if($request -> keywords){
+            //     $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
+            //     // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+            //     // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+            //     $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
+            // }
 
             if($request -> check_type) {
                 $model = $model-> where('feel_type', '=' ,$request -> check_type);
                 $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
             }
 
+            if($request ->click_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> click_type);
+                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
+
+            }
+
             
 
             if($date_start) {
               
-                if($request -> isDateSearch=="true"){
+                if($request -> isDateSearch==1){
                     // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                     // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                 
