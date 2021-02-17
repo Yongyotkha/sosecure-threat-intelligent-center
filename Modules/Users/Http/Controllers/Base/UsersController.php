@@ -342,7 +342,7 @@ abstract class UsersController extends Controller
         $Roles = Roles::get()->keyBy('id')->toArray();
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('users.code','users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
                 $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
@@ -354,7 +354,7 @@ abstract class UsersController extends Controller
 
             }else{
 
-                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('code','id','email','created_at','name','site_role_id')->where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }
         
 
