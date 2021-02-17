@@ -8,6 +8,7 @@ use App\DataLeakFeedTemp;
 use App\DataLeakSocialRef;
 use App\Entities\IndicatorSummaryYear;
 use App\leak_socail_ref_temp;
+use App\Log;
 use App\R_s_s_news;
 use App\ReadCategories;
 use App\ReadNews;
@@ -642,6 +643,11 @@ class ApiGetMongoDB extends ApiController
             $data = $this -> dataFalse($header, $mode, $data_request);
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+                $dataArr =[
+                    'file'           => 'Api/asset',
+                    'error_summary'  => 'The request parameters are invalid 400 Site : ' . @$data['site']['data']['name'],
+                ];
+                Log::create($dataArr);
             }else{ 
                 $Assets_list = [];
                 $menu = $data['data']['menu'];
@@ -819,6 +825,12 @@ class ApiGetMongoDB extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+            
+            $dataArr =[
+                'file'           => 'Api/asset',
+                'error_summary'  => $e -> getMessage() .' Site : '. @$data['site']['data']['name'],
+            ];
+            Log::create($dataArr);
             return response()->json($response);
         }
     }
@@ -832,6 +844,11 @@ class ApiGetMongoDB extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
+                $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                if($auth_site['status_code'] !== '200'){
+                    return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                }
+
                 $RSSNews_count = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
                 // dd($news_all);
                 // $RSSNews_count = RSSNews::count("id");
@@ -864,21 +881,7 @@ class ApiGetMongoDB extends ApiController
                 //         }
                 //     }
                 // }
-                $get_role_custom_first = @get_role_custom();
-                $SiteSettings = '';
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                $site_id_arr = @$get_role_custom_first['site_id_arr'];
-                if(@$get_role_custom_first['superadmin'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['client'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['site_support'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['site_admin'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['site_client'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }
+                
         
         
                 // dd($RSSNews_all[0]->get_cate);
@@ -915,7 +918,6 @@ class ApiGetMongoDB extends ApiController
                 'Category' => $Category,
                 'NewsCategory' => $NewsCategory,
                 'ReadCategories' => $ReadCategories,
-                'SiteSettings' => $SiteSettings,
             ];
 
                 $data_transcation = json_encode($dataOut);
