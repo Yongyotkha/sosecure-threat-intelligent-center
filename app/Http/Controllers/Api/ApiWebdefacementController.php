@@ -281,11 +281,11 @@ class ApiWebdefacementController extends ApiController
                     }
                     ini_set('max_execution_time', '1000');
                     $webdefacment_id = $data['data']['webdefacment_id'];
-                    $command = 'app:WebDefacementUpdateOriginal';
+                    $command = 'app:WebDefacementUpdateOriginal '.$webdefacment_id;
                     $params = [
                             'webdefacment_id' => $webdefacment_id,
                     ];
-                    Artisan::call($command, $params);
+                    Artisan::call($command);
                     $result = Artisan::output();
                     
                     $response = [
@@ -373,12 +373,12 @@ class ApiWebdefacementController extends ApiController
                     }
                     ini_set('max_execution_time', '1000');
                     $webdefacment_id = $data['data']['webdefacment_id'];
-                    $command = 'app:WebDefacementProccessbyWebdefacment_id';
+                    $command = 'app:WebDefacementProccessbyWebdefacment_id '.$webdefacment_id;
                     $params = [
                         'webdefacment_id' => $webdefacment_id,
                     ];
 
-                    Artisan::call($command, $params);
+                    Artisan::call($command);
                     
                     $response = [
                         "data" => 'success',
@@ -463,7 +463,6 @@ class ApiWebdefacementController extends ApiController
                     if($auth_site['status_code'] !== '200'){
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    ini_set('max_execution_time', '1000');
                     $webdefacment_id = $data['data']['id'];
                     $webdefacement = WebdefacmentSetting::where('id', $webdefacment_id)->first();
 
@@ -478,22 +477,19 @@ class ApiWebdefacementController extends ApiController
                     $port_web = $webdefacement->port;
                     $delay_screenshot_val = $webdefacement->delay_screen_shot_val;
                
-                    $command = 'app:WebDefacementsCreenshotCheck';
-            
-                    $params = [
-                            'url' => $url_web,
-                            'port' => $port_web,
-                            'site_id' => $site_id,
-                            'url_id' => $url_id,
-                            'delay' => $delay_screenshot_val,
-                    ];
-            
-                        Artisan::call($command, $params);
-                        $result = Artisan::output();
-                    
-                    $response = [
-                        "data" => $result,
-                    ];
+                    // $command = 'app:WebDefacementsCreenshotCheck';
+                    $result = exec('/usr/bin/php /var/www/html/threat-intelligent-center/threat-intelligent-center/artisan app:WebDefacementsCreenshotCheck '.$url_web.' '.$port_web.' '.$site_id.' '.$url_id.' '.$delay_screenshot_val);
+                    // Artisan::call('app:WebDefacementsCreenshotCheck ' .$url_web, 
+                    //     [
+                    //         'url' => $url_web,
+                    //         'port' => $port_web,
+                    //         'site_id' => $site_id,
+                    //         'url_id' => $url_id,
+                    //         'delay' => $delay_screenshot_val
+                    //     ]
+                    // );
+                    // $result = Artisan::output();
+                    $response = json_decode($result);
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
