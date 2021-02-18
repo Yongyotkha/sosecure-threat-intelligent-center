@@ -137,7 +137,7 @@
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
-                                            <img src="{{asset('images/database.png')}}" alt="">
+                                            <img src="{{asset('images/icon/assets.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Assets</h3>
                                         <span class="number-card warning" id="count_assets">0</span>
@@ -150,7 +150,7 @@
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
                                         <div class="img-icon-card ice">
-                                            <img src="{{asset('images/windows.png')}}" alt="">
+                                            <img src="{{asset('images/icon/windows_a.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper">Windows</h3>
                                         <span class="number-card info" id="count_windows">0</span>
@@ -163,7 +163,7 @@
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
                                         <div class="img-icon-card ice">
-                                            <img src="{{asset('images/linux.png')}}" alt="">
+                                            <img src="{{asset('images/icon/linux_a.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
                                         <span class="number-card green" id="count_linux">0</span>

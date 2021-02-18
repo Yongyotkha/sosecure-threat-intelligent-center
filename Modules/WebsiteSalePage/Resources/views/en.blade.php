@@ -68,19 +68,19 @@
                         </h1>
                         <ul class="list-img-ioc show-mb-row">
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Ip.png')}}" alt="IP Address" style="max-width: 70px">
+                                <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Ip.png')}}" alt="IP Address">
                                 <p>IP Address</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Domain.png')}}" alt="Domain" style="max-width: 70px">
+                                <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Domain.png')}}" alt="Domain">
                                 <p>Domain</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/hash.png')}}" alt="Hash" style="max-width: 70px">
+                                <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/hash.png')}}" alt="Hash">
                                 <p>Hash</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Urls.png')}}" alt="URLs" style="max-width: 70px">
+                                <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Urls.png')}}" alt="URLs">
                                 <p>URLs</p>
                             </li>
                         </ul>
@@ -135,11 +135,11 @@
                         </span>
                         <ul class="list-img-ioc mt-3">
                             <li>
-                            <img class="img-fluid" src="{{asset('asset_salepage/images/icon/dataleak.png')}}" style="max-width: 75px" alt="Data Leak">
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/dataleak.png')}}" alt="Data Leak">
                                 <p>Data Leak</p>
                             </li>
                             <li>
-                            <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group99.png')}}" style="max-width: 75px" alt="Social Network">
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Group99.png')}}" alt="Social Network">
                                 <p>Social Network</p>
                             </li>
                         </ul>
@@ -158,19 +158,19 @@
         
                             <ul class="list-img-ice text-center">
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Credential.png')}}" style="max-width: 75px" alt="Credential">
+                                    <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Credential.png')}}" alt="Credential">
                                     <p class="text-white">Credential</p>
                                 </li>
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Creditcard.png')}}" style="max-width: 75px" alt="Credit Card">
+                                    <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Creditcard.png')}}" alt="Credit Card">
                                     <p class="text-white">Credit Card</p>
                                 </li>
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/financeinfo.png')}}" style="max-width: 75px" alt="Finance Info">
+                                    <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/financeinfo.png')}}" alt="Finance Info">
                                     <p class="text-white">Finance Info</p>
                                 </li>
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/confidential.png')}}" style="max-width: 75px" alt="Confidential Data">
+                                    <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/confidential.png')}}" alt="Confidential Data">
                                     <p class="text-white">Confidential Data</p>
                                 </li>
                             </ul>
@@ -333,15 +333,15 @@
                     <div>
                         <ul class="list-img-ioc justify-content-between">
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing" style="max-width: 100px">
+                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing">
                                 <p>Phishing</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile" style="max-width: 100px">
+                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile">
                                 <p>Fake Mobile <br> Application</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive" style="max-width: 100px">
+                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive">
                                 <p>Drive-By <br>Download</p>
                             </li>
                         </ul>
