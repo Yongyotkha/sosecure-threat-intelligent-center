@@ -84,22 +84,7 @@ class ApiNewsController extends ApiController
                 //         }
                 //     }
                 // }
-                $get_role_custom_first = @get_role_custom();
-                $SiteSettings = '';
-                $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                $site_id_arr = @$get_role_custom_first['site_id_arr'];
-                if(@$get_role_custom_first['superadmin'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['client'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['site_support'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['site_admin'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }else if(@$get_role_custom_first['site_client'] == 1) {
-                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
-                }
-        
+
         
                 // dd($RSSNews_all[0]->get_cate);
                 // dd($RSSNews_all[0]->get_cate[0]->get_cate_name->name);
@@ -135,7 +120,6 @@ class ApiNewsController extends ApiController
                 'Category' => $Category,
                 'NewsCategory' => $NewsCategory,
                 'ReadCategories' => $ReadCategories,
-                'SiteSettings' => $SiteSettings,
             ];
 
                 $data_transcation = json_encode($dataOut);
@@ -147,6 +131,13 @@ class ApiNewsController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -183,7 +174,7 @@ class ApiNewsController extends ApiController
                     $site_id = '';
         
                     if($site_code) {
-                        $site_id_m = SiteSettings::where('code',$site_code)->first();
+                        $site_id_m = SiteSettings::where('id',$site_code)->first();
                         $site_id = @$site_id_m->id;
                     }
         
@@ -249,9 +240,7 @@ class ApiNewsController extends ApiController
                             
                         }
                     
-                        if($request ->site_id) {
-        
-                            $site_id = @$request ->site_id;
+                        if($site_id) {
                             $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
                                 $q->where('site_id', $site_id)->where('deleted_at', null);
                             });
@@ -260,7 +249,6 @@ class ApiNewsController extends ApiController
         
         
                         if($related_news == 'true') {
-                            $site_id = @$request ->site_id;
                             $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
                                 $q->where('site_id', $site_id)->where('deleted_at', null);
                             });
@@ -306,23 +294,21 @@ class ApiNewsController extends ApiController
                         $news_all = $news->count();
                         // $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
                         
-                        $news = $news->orderBy('created_at','desc')->skip($page == 2 ? $page * 10 : 0)->take(PAGINATE_NUM)->get();
+                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 2 ? $page * 10 : 0)->get();
                     }else{
                         $news = RSSNews::where(function ($query) {
                             $query->where('save_draft',  0)
                                 ->orWhere('save_draft',  null);
                         })->where('status', 1)->where('public_date', '<=', Carbon::now());//->get()
         
-                        if($request ->site_id) {
-        
-                            $site_id = @$request ->site_id;
+                        if($site_id) {
                             $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
                                 $q->where('site_id', $site_id)->where('deleted_at', null);
                             });
                         }
                         $news_all = $news->count();
                         // $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
-                        $news = $news->orderBy('created_at','desc')->skip($page == 2 ? $page * 10 : 0)->take(PAGINATE_NUM)->get();
+                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 2 ? $page * 10 : 0)->get();
                     }
         
                     // dd($news);
@@ -402,12 +388,12 @@ class ApiNewsController extends ApiController
         
                         if(@$item->transaction_rss_id) {
                             if(@$item->logo) {
-                                $logo_url = config('app.URL_CENTER_PUBLISH').@$item->logo;
+                                $logo_url = @$item->logo;
                             } else {
                                 $logo_url = @$item->logo_rss;
                             }
                         } else {
-                            $logo_url = config('app.URL_CENTER_PUBLISH').@$item->logo;
+                            $logo_url = @$item->logo;
                         }
                         $html .= '
                             <!--<div class="checkbox-news-select">
@@ -455,6 +441,13 @@ class ApiNewsController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -502,6 +495,13 @@ class ApiNewsController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -628,6 +628,13 @@ class ApiNewsController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            
             return response()->json($response);
         }
     }
@@ -718,6 +725,13 @@ class ApiNewsController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }

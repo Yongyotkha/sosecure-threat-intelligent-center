@@ -40,7 +40,7 @@ class WebDefacementsCreenshotCheck extends Command
         $url= $this->argument('url');
         $port=$this->argument('port');
         $site_id =$this->argument('site_id');
-        $url_id =$this->argument('url_id');
+        $url_id = $this->argument('url_id');
         if ($url_id == 0) {
           $url_id =rand(10,100);
       }

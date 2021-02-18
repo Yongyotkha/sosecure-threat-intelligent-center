@@ -49,7 +49,7 @@
                                                         <div class="card-dash">
                                                             <div class="left-card">
                                                                 <div class="img-icon-card">
-                                                                    <img src="{{asset('images/database.png')}}" alt="">
+                                                                    <img src="{{asset('images/icon/assets.png')}}" alt="">
                                                                 </div>
                                                                 <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
                                                                 <span class="number-card info number_asset"></span>
@@ -65,7 +65,7 @@
                                                         <div class="card-dash">
                                                             <div class="left-card">
                                                                 <div class="img-icon-card">
-                                                                    <img src="{{asset('images/antivirus.png')}}" alt="">
+                                                                    <img src="{{asset('images/icon/Vulnerability.png')}}" alt="">
                                                                 </div>
                                                                 <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
                                                                 <span class="number-card green number_vulnerability"></span>
@@ -80,7 +80,7 @@
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
-                                                                <img src="{{asset('images/compromise.png')}}" alt="">
+                                                                <img src="{{asset('images/icon/compromised.png')}}" alt="">
                                                             </div>
                                                             <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
                                                             <span class="number-card warning number_compromised"></span>
@@ -95,7 +95,7 @@
                                                         <div class="card-dash">
                                                             <div class="left-card">
                                                                 <div class="img-icon-card">
-                                                                    <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                                    <img src="{{asset('images/icon/dataleak.png')}}" alt="">
                                                                 </div>
                                                                 <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
                                                                 <span class="number-card dark number_data_leak"></span>
@@ -154,7 +154,7 @@
                                                             </div>
 
                                                             <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
-                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('mon')">
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active" onclick="load_month_displayType_f('mon')">
                                                                     <i class="far fa-calendar"></i> Month
                                                                 </a>
                                                                 <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('year')">

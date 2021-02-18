@@ -9,6 +9,7 @@ use App\DeployHistory;
 use Carbon\Carbon;
 use Modules\SiteSettings\Entities\SiteSettings;
 use App\file_version;
+use App\Log;
 use Illuminate\Support\Collection;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
@@ -140,5 +141,15 @@ class ApiController extends Controller
             $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
         }
         return $output;
+    }
+
+    protected function saveLog($site_id, $error){
+        $dataArr = [
+            'site_id' => $site_id,
+            'error_summary'  => $error,
+        ];
+        Log::create($dataArr);
+
+        return true;
     }
 }

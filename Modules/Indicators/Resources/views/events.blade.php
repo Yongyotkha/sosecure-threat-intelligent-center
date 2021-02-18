@@ -186,27 +186,41 @@
             <div class="panel-body">
 
                 <div class="row m-b-12">
+                    <div class="col-md-6">
+                        <h5 class="font-weight-bold">Select Industries or Group</h5>
+                        <select name="sl_group" id="sl_group" class="form-control sl_group" placeholder="Select">
+                            <option value="0" disabled="disabled">Selected</option>
+                            <option></option>
+                            <option value="1">Industries</option>
+                            <option value="2">Group</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="industries_box" class="row" style="display: none;">
                     <div class="col-md-12">
                         <h5 class="font-weight-bold">Industries</h5>
-                        <div class="text-center">
-                            <div id="fillter_click" class="button-group">
-                                <span id="btn_industrise"></span>
-                            </div>
+                        <div id="fillter_click" class="button-group">
+                            <span id="btn_industrise"></span>
                         </div>
                     </div>
-                    {{-- <div class="col-md-6">
+                </div>
+                <div id="group_box" class="row" style="display: none;">
+                    <div class="col-md-12">
                         <h5 class="font-weight-bold">Group</h5>
-                        <select name="sl_group[]" id="sl_group" class="form-control">
-                            <option value=""></option>
-                        </select>
-                    </div> --}}
+                        <div id="fillter_click_group" class="button-group">
+                            <a class="btn btn-selector active" href="#">Event (0)</a>
+                            <a class="btn btn-selector" href="#">Attribute (0)</a>
+                            <a class="btn btn-selector" href="#">OTX (0)</a>
+                            <a class="btn btn-selector" href="#">MISP (0)</a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table table-striped" id="table_events">
                         <thead>
                             <tr>
-
                                 <th>No</th>
                                 <th>Industries</th>
                                 <th>Event Name</th>
@@ -320,6 +334,7 @@
         $(this).addClass('active');
     });
 
+    active_btn('#fillter_click_group .btn-selector');
     active_btn('#groupby-published .btn-grey');
 
     Highcharts.setOptions({
@@ -330,7 +345,27 @@
   });
 
 
-    $('.sl_group').select2();
+    $(".sl_group").select2({
+        placeholder: "Select",
+        allowClear: true
+    });
+
+    $('#industries_box').hide();
+    $('#group_box').hide();
+
+    $(".sl_group").on('change',function() {
+        if($(this).val() == '1'){
+            $('#industries_box').show();
+            $('#group_box').hide();
+        }else if($(this).val() == '2'){
+            $('#group_box').show();
+            $('#industries_box').hide();
+        }else{
+            $('#industries_box').hide();
+            $('#group_box').hide();
+        }
+    });
+
     $('.select2-option').select2();
 
     var start_date = '';

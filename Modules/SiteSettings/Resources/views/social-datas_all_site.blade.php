@@ -241,6 +241,19 @@
                             </div>
                         </header>
                         <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="font-weight-bold">Keyword</h5>
+                                    <div id="fillter_click_keyword" class="button-group">
+                                        <a class="btn btn-selector active" href="#">Event (0)</a>
+                                        <a class="btn btn-selector" href="#">Attribute (0)</a>
+                                        <a class="btn btn-selector" href="#">OTX (0)</a>
+                                        <a class="btn btn-selector" href="#">MISP (0)</a>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="table-responsive">
                                 <table  class="table table-striped" id="table_social_datas">
                                     <thead>
@@ -424,6 +437,8 @@
 @include('stacks.js.fullscreen')
 <script>
 
+
+active_btn('#fillter_click_keyword .btn-selector');
 active_btn('#groupby-type .btn-grey');
 
     var admin = '{{$admin}}';
@@ -576,6 +591,7 @@ active_btn('#groupby-type .btn-grey');
                     {
                         targets: 2,
                         width: '60px',
+                        className:'nowrap',
                         render: function (data, type, full, meta) {
                 
                             if(full.get_data_leak_feed_one.feel_type){
@@ -623,14 +639,14 @@ active_btn('#groupby-type .btn-grey');
                         render: function (data, type, full, meta) {
                           
                             if(full.get_data_leak_feed_one.feedcontent){
-                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var feedcontent =  stripHtml(full.get_data_leak_feed_one.feedcontent);
                                 var res = full.keyword.split(",");
                                 let content = '';
                                 for(let i in res){
                                     const data2 = res[i];
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                return '<div>'+content+'</div>';
+                                 return'<div>'+content+'</div>';
                             }else{
                                 return '-';
                             }
@@ -704,6 +720,12 @@ active_btn('#groupby-type .btn-grey');
                 ]
         
             });
+    }
+
+    function stripHtml(html){
+        var temporalDivElement = document.createElement("div");
+        temporalDivElement.innerHTML = html;
+        return temporalDivElement.textContent || temporalDivElement.innerText || "";
     }
 
     function social_active(id) {    

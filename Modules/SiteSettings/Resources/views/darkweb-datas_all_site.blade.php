@@ -264,7 +264,7 @@
                                         <th>Site</th>
                                         <th>Type</th>
 
-                                        <th>Keyword Ref</th>
+                                        <th>Keyword</th>
                                         <th>Content</th>
                                         <th>Remark</th>
                                         <th>Data Feed</th>
@@ -641,7 +641,7 @@
                             let content = '';
                             val = full.get_data_leak_feed_one;
                             if(val) {
-                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var feedcontent = stripHtml(full.get_data_leak_feed_one.feedcontent);
                                 var res = full.keyword.split(",");
                                 for(let i in res){
                                     var data = res[i];
@@ -726,6 +726,12 @@
 
                 ]
             });
+    }
+
+    function stripHtml(html){
+        var temporalDivElement = document.createElement("div");
+        temporalDivElement.innerHTML = html;
+        return temporalDivElement.textContent || temporalDivElement.innerText || "";
     }
 
     

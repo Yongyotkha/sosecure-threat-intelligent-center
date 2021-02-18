@@ -155,7 +155,7 @@
                                                 </label>
                                             </th>
                                             <th width="10%">Source</th>
-                                            <th width="15%">Keyword Ref</th>
+                                            <th width="15%">Keyword</th>
                                             <th>Content</th>
                                             <th width="10%">Data Feed</th>
                                             <th width="3%">View</th>
