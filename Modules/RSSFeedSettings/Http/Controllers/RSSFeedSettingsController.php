@@ -1173,7 +1173,7 @@ class RSSFeedSettingsController extends Controller
             foreach($SiteCategory as $SiteCategory_val) {
                 if($SiteCategory_val) {
 
-                    if(@$SiteCategory_val->site_email_alert->email) {
+                    if($SiteCategory_val->site_email_alert) {
                         $email_site_alert[] = @$SiteCategory_val->site_email_alert->email;
                         $site_news[] = @$SiteCategory_val->site_email_alert->site_id;
                     }
@@ -1183,7 +1183,7 @@ class RSSFeedSettingsController extends Controller
                 }
             }
 
-
+            array_unique($email_site_alert);
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // dd($email_site_alert);
         }
@@ -1719,6 +1719,7 @@ class RSSFeedSettingsController extends Controller
             }
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // dd($email_site_alert);
+            array_unique($email_site_alert);
         }
         
         if($request->formsubmit == 'formSavingAndRun'){
