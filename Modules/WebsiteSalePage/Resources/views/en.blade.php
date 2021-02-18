@@ -271,7 +271,7 @@
                             The system can detect unsafe configuration based on Security Guideline from CIS center. Also, editing configuration for safety from the system.
                         </span>
                     </div>
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group106.png')}}" alt="Mis-Configuration Detection">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/Icom.png')}}" alt="Mis-Configuration Detection">
                 </div>
             </div>
         </div>
@@ -284,7 +284,7 @@
                     <h1 class="primary-text text-center">
                         Cybersecurity News Feed
                     </h1>
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/cyber.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/cyber.png')}}" alt="">
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <div class="mb-5">
@@ -292,7 +292,8 @@
                             Update news about cybersecurity from others source around the world and getting notification via Email.
                         </span>
                     </div>
-                    <ul class="cyber-news-feed">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group106.png')}}" alt="Mis-Configuration Detection">
+                    {{-- <ul class="cyber-news-feed">
                         <li>
                             <img class="img-fluid" src="{{asset('asset_salepage/images/posttoday-v1.png')}}" alt="">
                         </li>
@@ -314,7 +315,7 @@
                         <li>
                             <img class="img-fluid" src="{{asset('asset_salepage/images/prachachat-logo.png')}}" alt="">
                         </li>
-                    </ul>
+                    </ul> --}}
                 </div>
             </div>
         </div>
