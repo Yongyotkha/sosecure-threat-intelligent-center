@@ -415,6 +415,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -451,6 +458,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -494,6 +508,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -687,6 +708,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -925,6 +953,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1129,6 +1164,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1171,6 +1213,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1217,6 +1266,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1257,6 +1313,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1339,6 +1402,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1383,6 +1453,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1594,6 +1671,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
