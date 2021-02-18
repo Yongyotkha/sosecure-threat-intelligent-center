@@ -3,6 +3,7 @@
 namespace Modules\RSSFeedSettings\Http\Controllers;
 
 use App\Entities\fx_transaction_client_news_categories;
+use App\LogEmail;
 use App\Mail\NewsMail;
 use App\siteNewsRelated;
 use App\Topic;
@@ -1167,14 +1168,14 @@ class RSSFeedSettingsController extends Controller
         $SiteCategory = SiteCategory::whereIn("category_id",$request -> category_news)->where('active',1)->get();
         // dd($SiteCategory[0]->site_email_alert);
 
-        $email_site_alert = [];
+        $email_site_a = [];
         $site_news = [];
         if($SiteCategory) {
             foreach($SiteCategory as $SiteCategory_val) {
                 if($SiteCategory_val) {
 
                     if($SiteCategory_val->site_email_alert) {
-                        $email_site_alert[] = @$SiteCategory_val->site_email_alert->email;
+                        $email_site_a[] = @$SiteCategory_val->site_email_alert->email;
                         $site_news[] = @$SiteCategory_val->site_email_alert->site_id;
                     }
                     // if(@$SiteCategory_val->site_email_alert->email) {
@@ -1183,7 +1184,7 @@ class RSSFeedSettingsController extends Controller
                 }
             }
 
-            array_unique($email_site_alert);
+            $email_site_alert = array_unique($email_site_a);
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // dd($email_site_alert);
         }
@@ -1394,7 +1395,24 @@ class RSSFeedSettingsController extends Controller
                             ];
     
                             // dd($this->news);
-                            Mail::to($data)->send(new NewsMail($news));
+                            $sent = Mail::to($data)->send(new NewsMail($news));
+                            if( count(Mail::failures()) == 0 ) {
+                                LogEmail::Create([
+                                    'to' => $data,
+                                    'status' => 'Success',
+                                    'subject' => 'News'
+                                ]);
+                            }
+                        }
+                        if( count(Mail::failures()) > 0 ) {
+                            foreach(Mail::failures() as $email_address) {
+                                LogEmail::Create([
+                                    'to' => $email_address,
+                                    'status' => 'Fail',
+                                    'subject' => 'News'
+                                ]);
+                            }
+                         
                         }
                     }
                 }
@@ -1633,8 +1651,25 @@ class RSSFeedSettingsController extends Controller
                             $news = [
                                 'news' => $RSSNews,
                             ];
-                            Mail::to($data)->send(new NewsMail($news));
+                            $sent = Mail::to($data)->send(new NewsMail($news));
+                            if( count(Mail::failures()) == 0 ) {
+                                LogEmail::Create([
+                                    'to' => $data,
+                                    'status' => 'Success',
+                                    'subject' => 'News'
+                                ]);
+                            }
                         }
+                        if( count(Mail::failures()) > 0 ) {
+                            foreach(Mail::failures() as $email_address) {
+                                LogEmail::Create([
+                                    'to' => $email_address,
+                                    'status' => 'Fail',
+                                    'subject' => 'News'
+                                ]);
+                            }
+                         
+                        } 
                     }
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1707,19 +1742,19 @@ class RSSFeedSettingsController extends Controller
         $SiteCategory = SiteCategory::whereIn("category_id",$request -> category_news)->where('active',1)->get();
         // dd($SiteCategory[0]->site_email_alert);
         $site_news = [];
-        $email_site_alert = [];
+        $email_site_a = [];
         if($SiteCategory) {
             foreach($SiteCategory as $SiteCategory_val) {
                 if($SiteCategory_val) {
                     if(@$SiteCategory_val->site_email_alert->email) {
-                        $email_site_alert[] = @$SiteCategory_val->site_email_alert->email;
+                        $email_site_a[] = @$SiteCategory_val->site_email_alert->email;
                         $site_news[] = @$SiteCategory_val->site_email_alert->site_id;
                     }
                 }
             }
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // dd($email_site_alert);
-            array_unique($email_site_alert);
+            $email_site_alert = array_unique($email_site_a);
         }
         
         if($request->formsubmit == 'formSavingAndRun'){
@@ -1892,7 +1927,20 @@ class RSSFeedSettingsController extends Controller
                                         'news' => $RSSNews_check,
                                     ];
                                     // dd($this->news);
-                                    Mail::to($data)->send(new NewsMail($news));
+                                    $sent = Mail::to($data)->send(new NewsMail($news));
+                                    if($sent){
+                                        LogEmail::Create([
+                                            'to' => $data,
+                                            'status' => 'Success',
+                                            'subject' => 'News'
+                                        ]);
+                                    }else{
+                                        LogEmail::Create([
+                                            'to' => $data,
+                                            'status' => 'Fail',
+                                            'subject' => 'News'
+                                        ]);
+                                    }
                                 }
                             }
                         }
@@ -2133,7 +2181,20 @@ class RSSFeedSettingsController extends Controller
                                         'news' => $RSSNews,
                                     ];
                                     // dd($this->news);
-                                    Mail::to($data)->send(new NewsMail($news));
+                                    $sent = Mail::to($data)->send(new NewsMail($news));
+                                    if($sent){
+                                        LogEmail::Create([
+                                            'to' => $data,
+                                            'status' => 'Success',
+                                            'subject' => 'News'
+                                        ]);
+                                    }else{
+                                        LogEmail::Create([
+                                            'to' => $data,
+                                            'status' => 'Fail',
+                                            'subject' => 'News'
+                                        ]);
+                                    }
                                 }
                             }
                         }
