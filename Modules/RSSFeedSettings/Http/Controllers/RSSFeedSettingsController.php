@@ -1201,7 +1201,7 @@ class RSSFeedSettingsController extends Controller
         if(@$RSSNews_check) {
 
             $RSSNews_check -> code = generator_uuid();
-            $RSSNews_check -> logo = $logo;
+            $RSSNews_check -> logo = config('app.URL_CENTER_PUBLISH').$logo;
             $RSSNews_check -> title_th = $request -> title_th;
             $RSSNews_check -> title_en = $request -> title_en;
             $RSSNews_check -> source = $request -> source;
@@ -1393,12 +1393,12 @@ class RSSFeedSettingsController extends Controller
                     if($email_site_alert) {
                         foreach($email_site_alert as $data){
                             // var_dump($data);
-                            $this->news = [
+                            $news = [
                                 'news' => $RSSNews_check,
                             ];
     
                             // dd($this->news);
-                            Mail::to($data)->send(new NewsMail($this->news));
+                            Mail::to($data)->send(new NewsMail($news));
                         }
                     }
                 }
@@ -1451,7 +1451,7 @@ class RSSFeedSettingsController extends Controller
 
             $RSSNews = new RSSNews();
             $RSSNews -> code = generator_uuid();
-            $RSSNews -> logo = $logo;
+            $RSSNews -> logo = config('app.URL_CENTER_PUBLISH').$logo;
             $RSSNews -> title_th = $request -> title_th;
             $RSSNews -> title_en = $request -> title_en;
             $RSSNews -> source = $request -> source;
@@ -1634,10 +1634,10 @@ class RSSFeedSettingsController extends Controller
                 if ($request->sent_mail == 1) {
                     if($email_site_alert) {
                         foreach($email_site_alert as $data){
-                            $this->news = [
+                            $news = [
                                 'news' => $RSSNews,
                             ];
-                            Mail::to($data)->send(new NewsMail($this->news));
+                            Mail::to($data)->send(new NewsMail($news));
                         }
                     }
                 }
@@ -1746,7 +1746,7 @@ class RSSFeedSettingsController extends Controller
                 $RSSNews_check = RSSNews::where("transaction_rss_id",$TransactionRssData->id)->first();
                 if($RSSNews_check) {
                     $RSSNews_check-> code = generator_uuid();
-                    $RSSNews_check -> logo_rss = $logo;
+                    $RSSNews_check -> logo_rss = config('app.URL_CENTER_PUBLISH').$logo;
                     $RSSNews_check -> title_th = $request -> title_th;
                     $RSSNews_check -> title_en = $request -> title_en;
                     $RSSNews_check -> source = $request -> source;
@@ -1768,6 +1768,17 @@ class RSSFeedSettingsController extends Controller
                             //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                             foreach($images as $k => $img){
                                 $data = $img->getattribute('src');
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                //base64
                                 $img_check_src = explode(";",$data);
                                 if(@$img_check_src[1]) {
                                     list($type, $data) = explode(';', $data);
@@ -1812,6 +1823,17 @@ class RSSFeedSettingsController extends Controller
                             //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                             foreach($images as $k => $img){
                                 $data = $img->getattribute('src');
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                //base64
                                 $img_check_src = explode(";",$data);
                                 if(@$img_check_src[1]) {
                                     list($type, $data) = explode(';', $data);
@@ -1869,11 +1891,11 @@ class RSSFeedSettingsController extends Controller
                         if ($request->sent_mail == 1) {
                             if($email_site_alert) {
                                 foreach($email_site_alert as $data){
-                                    $this->news = [
+                                    $news = [
                                         'news' => $RSSNews_check,
                                     ];
                                     // dd($this->news);
-                                    Mail::to($data)->send(new NewsMail($this->news));
+                                    Mail::to($data)->send(new NewsMail($news));
                                 }
                             }
                         }
@@ -1926,7 +1948,7 @@ class RSSFeedSettingsController extends Controller
 
                     $RSSNews = new RSSNews();
                     $RSSNews -> code = generator_uuid();
-                    $RSSNews -> logo_rss = $logo;
+                    $RSSNews -> logo_rss = config('app.URL_CENTER_PUBLISH').$logo;
                     $RSSNews -> title_th = $request -> title_th;
                     $RSSNews -> title_en = $request -> title_en;
                     $RSSNews -> source = $request -> source;
@@ -1947,6 +1969,17 @@ class RSSFeedSettingsController extends Controller
                             //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                             foreach($images as $k => $img){
                                 $data = $img->getattribute('src');
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                //base64
                                 $img_check_src = explode(";",$data);
                                 if(@$img_check_src[1]) {
                                     list($type, $data) = explode(';', $data);
@@ -1989,6 +2022,17 @@ class RSSFeedSettingsController extends Controller
                             //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                             foreach($images as $k => $img){
                                 $data = $img->getattribute('src');
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                //base64
                                 $img_check_src = explode(";",$data);
                                 if(@$img_check_src[1]) {
                                     list($type, $data) = explode(';', $data);
@@ -2088,11 +2132,11 @@ class RSSFeedSettingsController extends Controller
                         if ($request->sent_mail == 1) {
                             if($email_site_alert) {
                                 foreach($email_site_alert as $data){
-                                    $this->news = [
+                                    $news = [
                                         'news' => $RSSNews,
                                     ];
                                     // dd($this->news);
-                                    Mail::to($data)->send(new NewsMail($this->news));
+                                    Mail::to($data)->send(new NewsMail($news));
                                 }
                             }
                         }
