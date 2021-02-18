@@ -639,14 +639,14 @@ active_btn('#groupby-type .btn-grey');
                         render: function (data, type, full, meta) {
                           
                             if(full.get_data_leak_feed_one.feedcontent){
-                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var feedcontent =  stripHtml(full.get_data_leak_feed_one.feedcontent);
                                 var res = full.keyword.split(",");
                                 let content = '';
                                 for(let i in res){
                                     const data2 = res[i];
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                return '<div>'+content+'</div>';
+                                 return'<div>'+content+'</div>';
                             }else{
                                 return '-';
                             }
@@ -720,6 +720,12 @@ active_btn('#groupby-type .btn-grey');
                 ]
         
             });
+    }
+
+    function stripHtml(html){
+        var temporalDivElement = document.createElement("div");
+        temporalDivElement.innerHTML = html;
+        return temporalDivElement.textContent || temporalDivElement.innerText || "";
     }
 
     function social_active(id) {    
