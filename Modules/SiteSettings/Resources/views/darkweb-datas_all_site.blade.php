@@ -264,7 +264,7 @@
                                         <th>Site</th>
                                         <th>Type</th>
 
-                                        <th>Keyword Ref</th>
+                                        <th>Keyword</th>
                                         <th>Content</th>
                                         <th>Remark</th>
                                         <th>Data Feed</th>

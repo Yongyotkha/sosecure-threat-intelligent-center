@@ -168,7 +168,7 @@
                                             </th>
                                             <th>Site</th>
                                             <th>Type</th>
-                                            <th>Keyword Ref</th>
+                                            <th>Keyword</th>
                                             <th>Content</th>
                                             <th>Data Leak Feed</th>
                                             <th>URL</th>
