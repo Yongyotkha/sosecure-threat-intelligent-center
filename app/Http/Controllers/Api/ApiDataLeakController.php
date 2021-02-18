@@ -429,17 +429,18 @@ class ApiDataLeakController extends ApiController
                         $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
                         $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
                     }else{
-                        $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orWhere('feel_type', 'darkweb_public');
+                        $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public']);
                         $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public']);//->get()
-                        $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public'])->groupBy('feel_type');
+                        $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))
+                        ->where('deleted_at', null)
+                        ->where('status', 1)
+                        ->whereIn('feel_type', ['social', 'darkweb_public'])
+                        ->groupBy('feel_type');
                        
             
-                        // $site_id_arr = UserSite::select('site_id')->where('user_id', @$user->id)->get();
-
+                        //     $site_id_arr = UserSite::select('site_id')->where('user_id', $user -> id)->get();
                         //     if(@$user->site_role_id && @$user->site_id) {
                         //         if(@$user->site_role_id == 99 || @$user->site_role_id == 4) {//support and admin
-                        //             // dd(99);
-            
                         //             $news = $news->whereIn('site_id', $site_id_arr);
                         //             $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                             
@@ -447,13 +448,13 @@ class ApiDataLeakController extends ApiController
                         //             $news = $news->whereIn('site_id', $site_id_arr);
                         //             $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                         //         }
-                        //     }
+                        //     }           
+                        
             
                         // if($site_id) {
                         //     $news = $news->where('site_id', $site_id);
                         //     $countGroupBy = $countGroupBy->where('site_id', $site_id);
                         // }
-
                         $get_role_custom_first = $data['data']['get_role_custom_first'];
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -476,9 +477,6 @@ class ApiDataLeakController extends ApiController
                             $Data_leak_feed_all = $Data_leak_feed_all->whereIn('site_id', $site_id_arr)->where('status', 1);
             
                         }
-
-
-            
                         $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
                         $Data_leak_feed_all = $Data_leak_feed_all->count();
                         $countGroupBy = $countGroupBy->get();
@@ -488,7 +486,7 @@ class ApiDataLeakController extends ApiController
 
                     $content = [];
 
-                    $count_sub_type["darkweb"] = 0;
+                    $count_sub_type["darkweb_public"] = 0;
                     $count_sub_type["social"] = 0;
                     
                     foreach ($countGroupBy as $countGroup) {
@@ -498,8 +496,9 @@ class ApiDataLeakController extends ApiController
                     $response = [
                         "html" => $html,
                         "count" => $Data_leak_feed_all,
-                        "darkweb" => $count_sub_type["darkweb"],
+                        "darkweb" => $count_sub_type["darkweb_public"],
                         "social" => $count_sub_type["social"],
+
                     ];
 
                     $data_transcation = json_encode($response);
@@ -566,5 +565,131 @@ class ApiDataLeakController extends ApiController
             $result = '';
         }
         return $result;
+    }
+
+
+    public function data_leak_delete(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                     $code = $data['data']['code'];
+                    
+                    // $model1 = DataLeakSocialRef::select('data_leak_feed.feedcontent')
+                    // ->join('data_leak_feed', 'data_leak_feed.id', '=','data_leak_socail_ref.data_leak_feed_id')
+                    // ->where('data_leak_socail_ref.code',$code)->first();
+
+                    $response = [
+                        "code" => $code,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function data_leak_delete_select(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code = $data['data']['code'];
+                    
+                    $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
+                    if($DataLeakSocialRef){
+                        $DataLeakSocialRef->delete();
+                    }
+
+                    $response = [
+                        "code" => $code,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function data_leak_delete_change(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code = $data['data']['code'];
+                    foreach($code as $id){
+                        $DataLeakSocialRef = DataLeakSocialRef::where('id', $id)->delete();
+                    }
+
+
+                    $response = [
+                        "code" => $code,
+
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
     }
 }
