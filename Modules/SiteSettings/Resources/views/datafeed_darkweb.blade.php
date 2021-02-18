@@ -191,7 +191,7 @@
                                             <th>Site</th>
                                             <th>Type</th>
                                             <th>Source</th>
-                                            <th>Keyword Ref</th>
+                                            <th>Keyword</th>
                                             <th>Content</th>
                                             <th>Data Feed</th>
                                             <th>URL</th>
