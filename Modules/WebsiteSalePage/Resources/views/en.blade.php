@@ -50,7 +50,7 @@
         <div class="container">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 col-md-12 mb-5 text-center">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/threatpic.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/group98.png')}}" alt="Threat Sharing">
                 </div>
                 <div class="col-lg-6 col-md-12 mb-3">
                     <div class="mb-5">
@@ -66,21 +66,21 @@
                         <h1 class="primary-text text-lg-right text-center">
                             Type of IOC
                         </h1>
-                        <ul class="list-img-ioc">
+                        <ul class="list-img-ioc show-mb-row">
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group77.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Ip.png')}}" alt="IP Address" style="max-width: 70px">
                                 <p>IP Address</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group78.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Domain.png')}}" alt="Domain" style="max-width: 70px">
                                 <p>Domain</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group79.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/hash.png')}}" alt="Hash" style="max-width: 70px">
                                 <p>Hash</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group88.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Urls.png')}}" alt="URLs" style="max-width: 70px">
                                 <p>URLs</p>
                             </li>
                         </ul>
@@ -97,9 +97,9 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-8 col-lg-8">
+                <div class="col-lg-8 col-lg-8 text-lg-left text-center">
                     <div class="mb-5">
-                        <h1 class="primary-text text-md-left text-center">
+                        <h1 class="primary-text">
                             Asset Discovery
                         </h1>
                         <span class="secondary-text">
@@ -130,16 +130,16 @@
                     </div>
 
                 <div class="col-lg-4 offset-lg-4 order-lg-3 order-2">
-                        <span class="secondary-text text-blue">
+                    <span class="secondary-text text-blue text-lg-left text-center">
                             Data leak detection form dark web that bring data of organization for publishing and selling.
                         </span>
                         <ul class="list-img-ioc mt-3">
                             <li>
-                            <img class="img-fluid" src="{{asset('asset_salepage/images/Group80.png')}}" alt="">
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/icon/dataleak.png')}}" style="max-width: 75px" alt="Data Leak">
                                 <p>Data Leak</p>
                             </li>
                             <li>
-                            <img class="img-fluid" src="{{asset('asset_salepage/images/Group81.png')}}" alt="">
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group99.png')}}" style="max-width: 75px" alt="Social Network">
                                 <p>Social Network</p>
                             </li>
                         </ul>
@@ -152,25 +152,25 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-lg-4 order-lg-1 order-2 d-flex flex-column align-items-center justify-content-center">
-                            <span class="secondary-text mb-3 text-white text-md-left text-center">
+                            <span class="secondary-text mb-3 text-white text-lg-left text-center">
                                 We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
                             </span>
         
                             <ul class="list-img-ice text-center">
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/Group84.png')}}" alt="">
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Credential.png')}}" style="max-width: 75px" alt="Credential">
                                     <p class="text-white">Credential</p>
                                 </li>
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/Group83.png')}}" alt="">
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Creditcard.png')}}" style="max-width: 75px" alt="Credit Card">
                                     <p class="text-white">Credit Card</p>
                                 </li>
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/Group82.png')}}" alt="">
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/financeinfo.png')}}" style="max-width: 75px" alt="Finance Info">
                                     <p class="text-white">Finance Info</p>
                                 </li>
                                 <li>
-                                    <img class="img-fluid" src="{{asset('asset_salepage/images/Group89.png')}}" alt="">
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/confidential.png')}}" style="max-width: 75px" alt="Confidential Data">
                                     <p class="text-white">Confidential Data</p>
                                 </li>
                             </ul>
@@ -192,7 +192,7 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-lg-6 mb-3">
+                <div class="col-lg-6 col-lg-6 mb-3 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Compromised Detection
@@ -203,7 +203,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3 text-center">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/dash.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
                 </div>
             </div>
         </div>
@@ -213,9 +213,9 @@
         <div class="container">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/defaced.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/defaced.png')}}" alt="">
                 </div>
-                <div class="col-lg-6 col-lg-6 mb-3 order-lg-2 order-1">
+                <div class="col-lg-6 col-lg-6 mb-3 order-lg-2 order-1 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Web Defaced Detection
@@ -253,7 +253,7 @@
                         Threat Insight System is able to detect the gap of system. This system is based on database of the Common Vulnerabilities and Exposures (CVE) system.
                     </span>
 
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/smartmockups_kl0coiz8.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group97.png')}}" alt="">
                 </div>
             </div>
         </div>
@@ -271,7 +271,7 @@
                             The system can detect unsafe configuration based on Security Guideline from CIS center. Also, editing configuration for safety from the system.
                         </span>
                     </div>
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/Icom.png')}}" alt="">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group106.png')}}" alt="Mis-Configuration Detection">
                 </div>
             </div>
         </div>
@@ -332,15 +332,15 @@
                     <div>
                         <ul class="list-img-ioc justify-content-between">
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group87.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing" style="max-width: 100px">
                                 <p>Phishing</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group86.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile" style="max-width: 100px">
                                 <p>Fake Mobile <br> Application</p>
                             </li>
                             <li>
-                                <img class="img-fluid" src="{{asset('asset_salepage/images/Group85.png')}}" alt="">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive" style="max-width: 100px">
                                 <p>Drive-By <br>Download</p>
                             </li>
                         </ul>
@@ -382,7 +382,7 @@
                    </ul>
 
                    <div class="icon-email">
-                        <img class="img-fluid" src="{{asset('asset_salepage/images/Group25.png')}}" alt="">
+                        <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group25.png')}}" alt="" style="max-width: 130px">
                     </div>
                 </div>
             </div>
