@@ -45,6 +45,10 @@ class CategorySettingsController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
     //    $data['page'] = langapp('category_settings');
 
        $data['filter'] = $this->request->filter;
@@ -64,6 +68,10 @@ class CategorySettingsController extends Controller
      */
     public function create()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         return view('categorysettings::modal.create');
     }
 
@@ -84,6 +92,10 @@ class CategorySettingsController extends Controller
      */
     public function show($id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         return view('categorysettings::show');
     }
 
@@ -94,6 +106,10 @@ class CategorySettingsController extends Controller
      */
     public function edit(CategorySettings $id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         $data['categorySettings'] = $id;
         // dd($id);
         return view('categorysettings::modal.update')->with($data);
@@ -107,6 +123,10 @@ class CategorySettingsController extends Controller
      */
      public function update(CategorySettingsRequest $request, $id = null)
      {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         //  dd($request);
         //  exit();
          $CategorySettings = $this->categorySettings->findOrFail($id);
@@ -151,6 +171,10 @@ class CategorySettingsController extends Controller
 
     public function delete(CategorySettings $id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         $data['categorySettings'] = $id;
         // dd($id);
         return view('categorysettings::modal.delete')->with($data);
@@ -158,6 +182,10 @@ class CategorySettingsController extends Controller
 
     public function delete_process($id = null)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         $model = $this->categorySettings->find($id);
         $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();
         foreach($settings as $setting){
@@ -247,6 +275,10 @@ class CategorySettingsController extends Controller
 
     public function change_status(CategorySettingsRequest $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         // dd($request);
         // exit();
         $data['category_id'] = $this->request->category_id;
@@ -296,6 +328,10 @@ class CategorySettingsController extends Controller
      */
     public function tableData()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
         $model = $this->categorySettings->query();
         // ->with(['profile.business:id,name'])
@@ -425,6 +461,10 @@ class CategorySettingsController extends Controller
 
     public function change_delete(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['settings_categorys']) {
+            check_permission403();
+        }
 
         foreach($request->id as $categorySettings_id){
             

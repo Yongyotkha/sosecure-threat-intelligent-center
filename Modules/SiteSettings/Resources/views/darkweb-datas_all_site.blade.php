@@ -65,6 +65,10 @@
                                             </span>
                                         </span>
                                     </a>
+                                    <a href="{{route('compromise.create') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                                        <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
+                                        <span class="hide-text">@langapp('add')</span>
+                                    </a>
                                 @endif
                             @endif
                         @endif
@@ -72,6 +76,8 @@
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                             <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
+
+                 
 
                         <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                             value="bulk-delete" disabled>
@@ -94,7 +100,7 @@
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
                         <div class="col-md-4 nopadding">
-                            <a href="">
+                            <a href="#" onclick="dataType('compromise')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -107,7 +113,7 @@
                             </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="">
+                            <a href="#" onclick="dataType('darkweb')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -120,7 +126,7 @@
                             </a>
                         </div>
                         <div class="col-md-4 nopadding">
-                            <a href="">
+                            <a href="#" onclick="dataType('webserver')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
@@ -175,7 +181,7 @@
                                         <button id="all" class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey" value="public">
+                                        <button class="btn btn-grey" value="compromise">
                                             <span> Public </span>
                                         </button>
                                         <button class="btn btn-grey" value="darkweb">
@@ -388,6 +394,8 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
+@include('stacks.js.readmore')
+@include('stacks.js.fullscreen')
 
 <script>
 
@@ -401,7 +409,6 @@
         } else {
             visible_c = false;
         }
-
 
     var search_val = false;
     var keywords = null;
@@ -470,7 +477,7 @@
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-
+        click_type = null;
         table_social_data();
         get_count();
     }
@@ -497,15 +504,29 @@
                 isDateSearch : isDateSearch,
                 f_search : f_search,
                 check_type : check_type,
+                click_type : click_type,
             }),
             beforeSend: function(){
                 loading('load');
             },
             success:function(response) {
                 loading('stop_load');
-                $('#darkweb-count').text(response.darkweb);
-                $('#compromise-count').text(response.compromise);
-                $('#webserver-count').text(response.webserver);
+                if(response.darkweb){
+                    $('#darkweb-count').text(response.darkweb);
+                }else{
+                    $('#darkweb-count').text(0);
+                }
+                if(response.compromise){
+                    $('#compromise-count').text(response.compromise);
+                }else{
+                    $('#compromise-count').text(0);
+                }
+                if(response.webserver){
+                    $('#webserver-count').text(response.webserver);
+                }else{
+                    $('#webserver-count').text(0);
+                }
+
             },
             error: function (error){
                 loading('stop_load');
@@ -519,9 +540,9 @@
         
         });
     }
-
-
+  
     
+
     function table_social_data(){
 
         $('#table_social_datas').DataTable({
@@ -530,6 +551,7 @@
                 serverSide: true,
                 destroy: true,
                 autoWidth:false,
+                "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10">>>rt<"bottom"ip><"clear">',
                 ajax: {
                     type: "POST",
                     url: '{!! route('socialdatas.darkweb_all_site_tb') !!}',
@@ -542,21 +564,18 @@
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
-
+                        d.click_type = click_type;
                         return d;
-                    },
-                },
-            
+                    }
+                },               
                 initComplete : function( settings, json){
-                    $('[data-toggle="tooltip"]').tooltip();
-
+                    $('[data-rel="tooltip"]').tooltip();
                     {{--console.log(json);--}}
-                    
                 },
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-
+                "order": [ 6, 'desc' ],
                 columnDefs: [
                     {
                         targets: 0,
@@ -616,9 +635,8 @@
                     
                     {
                         targets: 4,
-                        width: '400px',
-                        render: function (data, type, full, meta) {
-                                                    
+                        width: '400px',                     
+                        render: function (data, type, full, meta) {                  
                             let val = '';
                             let content = '';
                             val = full.get_data_leak_feed_one;
@@ -628,16 +646,15 @@
                                 for(let i in res){
                                     var data = res[i];
                                     content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
-                                }
-                                
+                                } 
                             }
-                            return '<div class="scroll-ovf-content-fixh-60">'+content+'</div>';
+                            return '<div>'+content+'</div>';
                         },
                     },
 
                     {
                         targets: 5,
-                        width: '400px',
+                        width: '500px',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
@@ -647,8 +664,7 @@
                                     val = full.get_data_leak_feed_one.source_name;
                                 }
                             }
-        
-                            return '<div class="scroll-ovf-content-fixh-60">'+val+'</div>';
+                            return '<div>'+val+'</div>';
 
                         },
                     
@@ -672,10 +688,7 @@
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-        
                             return full.view;
-
                         },
                     },
                     {
@@ -701,20 +714,21 @@
                         className: 'nowrap',
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-
                             return `
                             <a href="${base_url}/darkweb_data/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
+                            <a href="${base_url}/darkweb_data/edit_darkwebdata_modal/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                            </a>
                             <a href="${base_url}/darkweb_data/delete_darkwebdata_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>`;
                             
                         },
                     },
 
                 ]
-        
             });
     }
 
+    
     function social_active(id) {
         let checkState = $("#social_active_" + id).is(":checked") ? 1 : 0;
         axios.post('{{route('DataLeakController.darkweb_data_change_status')}}', {
@@ -784,7 +798,7 @@
                 endDate =  null;
                 keywords =  null;
                 site =  null;
-
+                click_type = null;
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 cb(start, end);
@@ -814,10 +828,8 @@
                         loading('load');
                     },
                     success:function(response) {
-                        loading('stop_load');
                         toastr.success(response.message, '@langapp('response_status')');
                         window.location.href = response.redirect;
-                        $('#delete_all').modal('hide');
                     },
                     error: function (error){
                         loading('stop_load');
@@ -832,6 +844,14 @@
                 });
         });
     });
+     var click_type = null;
+    function dataType(data){
+        
+        click_type = data;
+        search_val = true;
+        table_social_data();
+        {{--get_count();--}}
+    }
 
 
 </script>

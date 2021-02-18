@@ -49,7 +49,7 @@
                                                         <div class="card-dash">
                                                             <div class="left-card">
                                                                 <div class="img-icon-card">
-                                                                    <img src="{{asset('images/database.png')}}" alt="">
+                                                                    <img src="{{asset('images/icon/assets.png')}}" alt="">
                                                                 </div>
                                                                 <h3 class="name-dash-text text-dark text-upper ">Assets</h3>
                                                                 <span class="number-card info number_asset"></span>
@@ -65,7 +65,7 @@
                                                         <div class="card-dash">
                                                             <div class="left-card">
                                                                 <div class="img-icon-card">
-                                                                    <img src="{{asset('images/antivirus.png')}}" alt="">
+                                                                    <img src="{{asset('images/icon/Vulnerability.png')}}" alt="">
                                                                 </div>
                                                                 <h3 class="name-dash-text text-dark text-upper ">Vulnerability</h3>
                                                                 <span class="number-card green number_vulnerability"></span>
@@ -80,7 +80,7 @@
                                                     <div class="card-dash">
                                                         <div class="left-card">
                                                             <div class="img-icon-card">
-                                                                <img src="{{asset('images/compromise.png')}}" alt="">
+                                                                <img src="{{asset('images/icon/compromised.png')}}" alt="">
                                                             </div>
                                                             <h3 class="name-dash-text text-dark text-upper ">Compromised</h3>
                                                             <span class="number-card warning number_compromised"></span>
@@ -95,7 +95,7 @@
                                                         <div class="card-dash">
                                                             <div class="left-card">
                                                                 <div class="img-icon-card">
-                                                                    <img src="{{asset('images/dataleak.png')}}" alt="">
+                                                                    <img src="{{asset('images/icon/dataleak.png')}}" alt="">
                                                                 </div>
                                                                 <h3 class="name-dash-text text-dark text-upper ">Data Leak</h3>
                                                                 <span class="number-card dark number_data_leak"></span>
@@ -152,25 +152,17 @@
                                                                 <img src="{{asset('images/line-chart.png')}}" alt="" height="30px">
                                                                 <h1 class="text-blue bold-500">Indicators</h1>
                                                             </div>
-                                                            <div class="btn-group pull-right" style="margin-top: -25px;">
-                                                                <button
-                                                                    class="btn btn-xs text-dark dropdown-toggle"
-                                                                    data-toggle="dropdown">View
-                                                                    <span class="caret"></span>
-                                                                </button>
-                                                                <ul class="dropdown-menu dropdown-menu-left">
-                                                                    <li>
-                                                                        <a href="javascript:void(0)" onclick="load_month_displayType_f('mon')">
-                                                                            View Month
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" onclick="load_month_displayType_f('year')">
-                                                                            View Year
-                                                                        </a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
 
+                                                            <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('mon')">
+                                                                    <i class="far fa-calendar"></i> Month
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('year')">
+                                                                    <i class="far fa-calendar"></i> Year
+                                                                </a>
+                                                            </div>
                                                         </div>
+
                                                         <div class="divider-dark"></div>
                                                         <div id="chart-show-line" class="h-chart"></div>
                                                     </div>
@@ -379,6 +371,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 @include('stacks.css.highchart')
+@include('stacks.css.multitext')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
@@ -389,8 +382,12 @@
 @include('stacks.js.chart')
 @include('stacks.js.form')
 @include('stacks.js.highchart')
+@include('stacks.js.activebutton')
+@include('stacks.js.multitext')
 
 <script>
+active_btn('#filter-chart-btn .btn-chart-fil');
+
 var id_select_site = 'site';
 Highcharts.setOptions({
     lang: {
@@ -423,9 +420,9 @@ Highcharts.setOptions({
     var start = moment().startOf('day');
     var end = moment();
 
-    var load_month_displayType = 'year';
+    var load_month_displayType = 'mon';
 
-    function load_month_displayType_f(dummyVal='year') {
+    function load_month_displayType_f(dummyVal='mon') {
         load_month_displayType = dummyVal;
         chart_indicators();
     }
@@ -459,13 +456,27 @@ Highcharts.setOptions({
         set_cookie_site($(`#${id_select_site}`).val());
         site = value;
         data_table();
+        @if($role_custom['assets'])
         count_asset();
+        @endif
+        @if($role_custom['vulnerabilities'])
         count_vulnerability();
+        @endif
+        @if($role_custom['compromised'])
         count_compromised();
+        @endif
+        @if($role_custom['data_leak'])
         count_data_leak();
+        @endif
+        @if($role_custom['vulnerabilities'])
         count_vulnerability_host();
+        @endif
+        @if($role_custom['vulnerabilities'])
         load_chart();
+        @endif
+        @if($role_custom['assets'])
         cve_assets();
+        @endif
     }
 
     function clearValue(value) {
@@ -489,26 +500,40 @@ Highcharts.setOptions({
 
     $( document ).ready(function() {
         $("#clearValue").addClass('active');
+        @if($role_custom['indicators'])
         chart_indicators();
+        @endif
         if(get_cookie_site()){
             cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
         }else{
             data_table();
-            count_asset();
-            count_vulnerability();
-            count_compromised();
-            count_data_leak();
-            count_vulnerability_host();
-            load_chart();
-            @can('assets')
+            @if($role_custom['assets'])
+                count_asset();
+            @endif
+            @if($role_custom['vulnerabilities'])
+                count_vulnerability();
+            @endif
+            @if($role_custom['compromised'])
+                count_compromised();
+            @endif
+            @if($role_custom['data_leak'])
+                count_data_leak();
+            @endif
+            @if($role_custom['vulnerabilities'])
+                count_vulnerability_host();
+            @endif
+            @if($role_custom['vulnerabilities'])
+                load_chart();
+            @endif
+            @if($role_custom['assets'])
                 cve_assets();
-            @endcan
+            @endif
         }
         
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
         
 
-        $('[data-toggle="tooltip"]').tooltip(); 
+        $('[data-rel="tooltip"]').tooltip(); 
 
 
         
@@ -566,8 +591,11 @@ Highcharts.setOptions({
                     d.sitecode = site;
                 }
             },
+            "fnDrawCallback": function( oSettings ) {
+                multi_readmore()
+            },
             initComplete : function( settings, json){
-                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-rel="tooltip"]').tooltip();
             },
             columns: [
                 {
@@ -604,6 +632,7 @@ Highcharts.setOptions({
                 {
                     targets: 1,
                     width: '10px',
+                    className:'nowrap',
                     render: function (data, type, full, meta) {
                         
                         return full.sitename;
@@ -613,6 +642,7 @@ Highcharts.setOptions({
                 {
                     targets: 2,
                     width: '10px',
+                    className:'nowrap',
                     render: function (data, type, full, meta) {
                         
                         return full.pagename;
@@ -620,16 +650,15 @@ Highcharts.setOptions({
                     },
                 },
                 {
+                    width:'400px',
                     targets: 3,
-                    width: '10px',
-                    render: function (data, type, full, meta) {
-                        
-                        return full.content;
-                            
+                    render: function (data, type, full, meta) {    
+                        return '<div class="text-trucate-ovf">'+full.content+'</div>';    
                     },
                 },
                 {
                     targets: 4,
+                    className:'nowrap',
                     width: '10px',
                     render: function (data, type, full, meta) {
                         

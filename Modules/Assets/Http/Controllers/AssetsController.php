@@ -62,6 +62,10 @@ class AssetsController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['assets']) {
+            check_permission403();
+        }
         //<><><>
         // if(Auth::check()) {
         //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
@@ -122,6 +126,10 @@ class AssetsController extends Controller
 
     public function index_all_asset()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['assets']) {
+            check_permission403();
+        }
         //<><><>
         // if(Auth::check()) {
         //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
@@ -262,6 +270,10 @@ class AssetsController extends Controller
 
     public function methot_delete_cpe(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['assets']) {
+            check_permission403();
+        }
         $CPE = CPE::where('id', $request->cpecode)->first();
         if($CPE){
             $CPE_Asset_id = $CPE->asset_id;
@@ -493,6 +505,10 @@ class AssetsController extends Controller
     
     public function table_asset(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['assets']) {
+            check_permission403();
+        }
         if(TYPE_WEB == 'center'){
             $menu = $request->menu;
             $Assets_list = [];

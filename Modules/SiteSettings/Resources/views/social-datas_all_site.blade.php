@@ -33,7 +33,7 @@
 
                         <div class="ml-2 text-right">
                      
-                            <div class="text-left max-w-select" style="margin-right:5px;display:inline-block;">
+                            <div class="text-left max-w-select" style="display:inline-block;">
                                 <select name="site" id="site" class="text-left select2-option form-control select-site">
                                     <option value="">All Site</option>
                                     @if($SiteSettings)
@@ -49,21 +49,30 @@
                                 // var_dump(get_role_custom()['site_admin']); --}}
                                 @if(TYPE_WEB == 'center')
                                     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
-                                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info  m-xs"><span> Dataleak Feed</span></a>
+                                        <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info m-l-xs"><span> Dataleak Feed</span></a>
                                     @endif
+
+                                    <a href="{{route('dataleak.create') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                                        <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
+                                        <span class="hide-text">@langapp('add')</span>
+                                    </a>
+                                    
+                                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger"
+                                        value="bulk-delete" disabled>
+                                        <span data-rel="tooltip" title="Delete" data-placement="bottom">
+                                            @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
+                                        </span>
+                                    </button>
+
                                 @endif
                             @endif
+
+                  
     
                             <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
-    
-                            <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs"
-                                value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="bottom">
-                                    @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
-                                </span>
-                            </button>
+
                         </div>
                     </div>
                 </header>
@@ -81,7 +90,7 @@
 
                             <div class="col-md-6 nopadding">
                                 <div class="card-dash-compro none-bg none-shadow ">
-                                    <a href="">
+                                    <a href="#" onclick="dataType('social')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
                                                 <img src="{{asset('images/icebergline2.png')}}" alt="">
@@ -94,7 +103,7 @@
                             </div>
                             <div class="col-md-6 nopadding">
                                 <div class="card-dash-compro none-bg none-shadow">
-                                    <a href="">
+                                    <a href="#" onclick="dataType('darkweb_public')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
                                                 <img src="{{asset('images/icebergline1.png')}}" alt="">
@@ -245,7 +254,7 @@
                                             <th>Site</th>
                                             <th>Type</th>
                                             <th>Source</th>
-                                            <th>Keyword Ref</th>
+                                            <th>Keyword</th>
                                             <th>Content</th>
                                             <th>Data Feed</th>
                                             <th>View</th>
@@ -412,7 +421,7 @@
 @include('stacks.js.hidesettings')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
-
+@include('stacks.js.fullscreen')
 <script>
 
 active_btn('#groupby-type .btn-grey');
@@ -488,6 +497,7 @@ active_btn('#groupby-type .btn-grey');
         });
 
     function search(){
+        click_type = null;
         search_val = 1;
         keywords = $('#keyword').val();
         type = $('#type option:selected').val();
@@ -508,6 +518,7 @@ active_btn('#groupby-type .btn-grey');
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10">>>rt<"bottom"ip><"clear">',
                 ajax: {
                     type: "POST",
                     url: '{!! route('socialdatas.socialdatas_all_site_tb') !!}',
@@ -521,14 +532,13 @@ active_btn('#groupby-type .btn-grey');
                         d.endDate = endDate;
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
+                        d.click_type = click_type;
 
                         return d;
-                },
                     },
-            
+                },  
                 initComplete : function( settings, json){
-                    $('[data-toggle="tooltip"]').tooltip();
-
+                    $('[data-rel="tooltip"]').tooltip();
                     {{--console.log(json);--}}
                 
                     
@@ -536,7 +546,7 @@ active_btn('#groupby-type .btn-grey');
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-
+                "order": [ 6, 'desc' ],
                 columnDefs: [
                     {
                         targets: 0,
@@ -568,10 +578,10 @@ active_btn('#groupby-type .btn-grey');
                         width: '60px',
                         render: function (data, type, full, meta) {
                 
-                            if(full.get_data_leak_feed_one){
+                            if(full.get_data_leak_feed_one.feel_type){
                                 return get_word_leak_compromise(full.get_data_leak_feed_one.feel_type,'data_leak');
                             }
-                            return '';
+                            return '-';
 
                         },
                     
@@ -580,11 +590,11 @@ active_btn('#groupby-type .btn-grey');
                         targets: 3,
                         width: '60px',
                         render: function (data, type, full, meta) {
-                
-                            if(full.get_data_leak_feed_one){
+                            
+                            if(full.get_data_leak_feed_one.source_name){
                                 return full.get_data_leak_feed_one.source_name;
                             }
-                            return '';
+                            return '-';
 
                         },
                     
@@ -596,8 +606,14 @@ active_btn('#groupby-type .btn-grey');
                 
         
                             return full.keyword;
+                            if(full.keyword){
+                                return full.keyword;
+                            }
+                            return '-';
 
                         },
+
+                     
                             
                     
                     },
@@ -606,18 +622,17 @@ active_btn('#groupby-type .btn-grey');
                         width: '10px',
                         render: function (data, type, full, meta) {
                           
-                            if(full.get_data_leak_feed_one){
+                            if(full.get_data_leak_feed_one.feedcontent){
                                 var feedcontent = full.get_data_leak_feed_one.feedcontent;
                                 var res = full.keyword.split(",");
                                 let content = '';
                                 for(let i in res){
                                     const data2 = res[i];
-                                    console.log(data2);
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                return '<div class="scroll-ovf-content-fixh-60" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                                return '<div>'+content+'</div>';
                             }else{
-                                return '';
+                                return '-';
                             }
                            
                         },
@@ -628,7 +643,7 @@ active_btn('#groupby-type .btn-grey');
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
-                            if(full.get_data_leak_feed_one){
+                            if(full.get_data_leak_feed_one.feedtimepost){
                             return full.get_data_leak_feed_one.feedtimepost;
                             }else{
                                 return '';
@@ -640,12 +655,9 @@ active_btn('#groupby-type .btn-grey');
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
-                
-                            if(full.get_data_leak_feed_one){
+
                             return full.get_data_leak_feed_one.view;
-                            }else{
-                                return '';
-                            }
+
 
                         },
                     },
@@ -675,6 +687,9 @@ active_btn('#groupby-type .btn-grey');
       
                             return `
                             <a href="${base_url}/socialdatas/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
+                            <a href="${base_url}/dataleak/edit_dataleak_modal/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                            </a>
                             <a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
                             `;
                       
@@ -748,7 +763,7 @@ active_btn('#groupby-type .btn-grey');
     cb(start, end);
 
             $("#social_reset").click(function() {
-                
+                click_type = null;
                 keywords = null;
                 type = null;
                 source = null;
@@ -789,7 +804,7 @@ active_btn('#groupby-type .btn-grey');
                     loading('load');
                 },
                 success:function(response) {
-                    loading('stop_load');
+
                     toastr.success(response.message, '@langapp('response_status')');
                     window.location.href = response.redirect;
                 },
@@ -829,6 +844,7 @@ active_btn('#groupby-type .btn-grey');
                 endDate : endDate,
                 isDateSearch : isDateSearch,
                 check_type : check_type,
+                click_type : click_type,
                 
             }),
             beforeSend: function(){
@@ -836,8 +852,18 @@ active_btn('#groupby-type .btn-grey');
             },
             success:function(response) {
                 loading('stop_load');
-                $('#darkweb-count').text(response.darkweb);
-                $('#compromise-count').text(response.social);
+                if(response.darkweb){
+                    $('#darkweb-count').text(response.darkweb);
+                }else{
+                    $('#darkweb-count').text(0);
+                }
+                if(response.social){
+                    $('#compromise-count').text(response.social);
+                }else{
+                    $('#compromise-count').text(0);
+                }
+                
+                
             },
             error: function (error){
                 loading('stop_load');
@@ -851,6 +877,15 @@ active_btn('#groupby-type .btn-grey');
 
         });
 }
+
+var click_type = null;
+    function dataType(data){
+        
+        click_type = data;
+        search_val = 1;
+        table_social_data();
+        {{--get_count();--}}
+    }
 
 
 

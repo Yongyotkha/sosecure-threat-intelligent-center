@@ -1,0 +1,1 @@
+<link rel="stylesheet" href="{{ getAsset('css/multitext.css') }}" type="text/css"/>

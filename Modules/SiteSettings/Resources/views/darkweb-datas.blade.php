@@ -35,7 +35,7 @@
                             </a>
     
                             <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal" data-target="#change_status" disabled>
-                                <span data-rel="tooltip" title="Change Status" data-placement="top"><i class="fas fa-exchange-alt"></i><span class="hide-text">Change Status</span></span>
+                                <span data-rel="tooltip" title="Change Status" data-placement="bottom"><i class="fas fa-exchange-alt"></i><span class="hide-text">Change Status</span></span>
                             </button>
 
                         </div>     
@@ -51,25 +51,24 @@
                                 </div>
                         </header>
                         <div class="panel-body" style="padding: 0 !important">
-                            <div class="container-fluid">
-                                <div class="row m-b-md">
-                                    <div class="col-lg-4">
-                                        <h5 class="font-weight-bold">Search</h5>
+                            <div class="container-fluid" style="padding: 2rem;">
+
+                                <div class="row">
+                                    <div class="col-lg-12 mb-1">
+                                        <h5 class="font-weight-bold">Content</h5>
                                         <input type="text" id="search" class="form-control">
                                     </div>
-                                    <div class="col-lg-4">
-                                        <h5 class="font-weight-bold">Source</h5>
-                                        <select id="source_select" class="form-control">
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 mb-1">
+                                        <h5 class="font-weight-bold">Type</h5>
+                                        <select id="source_select" class="form-control select-2-type">
                                             <option value="">All</option>
-                                            @if($DataLeakSocial)
-                                            @foreach($DataLeakSocial as $DataLeakSocial_val)
-                                            <option value="{{$DataLeakSocial_val->id}}">
-                                                {{$DataLeakSocial_val->source}}</option>
-                                            @endforeach
-                                            @endif
+                                            <option value="social">PUBLIC</option>
+                                            <option value="darkweb_public">DARK WEB</option> 
                                         </select>
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-6 mb-1">
                                         <h5 class="font-weight-bold">Date</h5>
                                         <div id="social_datas_date" class="text-center"
                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -77,7 +76,9 @@
                                             <span></span> <i class="fa fa-caret-down"></i>
                                         </div>
                                     </div>
-                                    <div class="col-lg-4 mb-1">
+                                </div>
+                                <div class="row">        
+                                    <div class="col-lg-12 mb-1">
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey check_status active" id="all" value="">
@@ -234,7 +235,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -255,6 +256,7 @@
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Confirm Information</h4>
                 </div>
+                <form action="">
                 <div class="modal-body">
                     <div class="form-group row">
                         <label for="" class="col-md-3">Status</label>
@@ -274,7 +276,7 @@
                 </div>
                 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -283,6 +285,7 @@
                         Yes, approve
                     </button>
                 </div>
+                </form>
             </div>
         </div>
     </div>
@@ -295,34 +298,35 @@
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Confirm Information</h4>
                 </div>
-                <div class="modal-body">
-
-                    <div class="form-group row">
-                        <label for="" class="col-md-3">Status</label>
-                        <div class="col-md-9">
-                            <select id="status_action" class="form-control select2">
-                                <option value="1">Approved</option>
-                                <option value="2">Cancle</option>
-                            </select>
+                <form action="">
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <label for="" class="col-md-3">Status</label>
+                            <div class="col-md-9">
+                                <select id="status_action" class="form-control select2">
+                                    <option value="1">Approved</option>
+                                    <option value="2">Cancle</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                        
+                        <span class="modal-title">Are you sure you want to cancel this item?</span>
+                        <br>
                     
-                    <span class="modal-title">Are you sure you want to cancel this item?</span>
-                    <br>
-                  
-                    {{-- <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label> --}}
+                        {{-- <label><input type="checkbox" name="sent_mail" class="" value="true"><span class="label-text">Sent mail to customers</span></label> --}}
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="button" class="btn btn-info btn-rounded" onclick="confirm_cancle()">
-                        <i class="fas fa-paper-plane"></i>
-                        Yes, cancel
-                    </button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-info btn-rounded" onclick="confirm_cancle()">
+                            <i class="fas fa-paper-plane"></i>
+                            Yes, cancel
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -348,7 +352,10 @@
 @include('stacks.js.activebutton')
 
 <script>
-
+$('.select-2-type').select2();
+$('select').select2({
+    minimumResultsForSearch: -1
+});
 active_btn('#groupby-status .btn-grey');
 
     var search_val = 0;
@@ -398,6 +405,12 @@ active_btn('#groupby-status .btn-grey');
                 },
                 type: "POST",
             },
+            initComplete : function( settings, json){
+                    $('[data-rel="tooltip"]').tooltip();
+
+                    {{--console.log(json);--}}
+                    
+                },
             columns: [
                 {
                     data: 'chk',
@@ -449,7 +462,7 @@ active_btn('#groupby-status .btn-grey');
                             const data = res[i];
                             content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                         }
-                        return '<div class="text-elip" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                        return '<div>'+content+'</div>';
                     },
                 },
             ]

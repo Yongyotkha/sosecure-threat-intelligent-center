@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/websitesalepage",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\WebsiteSalePage\\Providers\\WebsiteSalePageServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\WebsiteSalePage\\": ""
+        }
+    }
+}

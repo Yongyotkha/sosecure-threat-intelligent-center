@@ -7,7 +7,8 @@
                 <div class="header-flex-overflow m-t-10">
                     <div class="fwb-16">
                         <span>
-                            @langapp('assets')
+                            {{ (request()->is('asset')) ? 'Assets' : '' }}
+                            {{(request()->is('asset/all')) ? 'Settings > Assets' : ''}}
                         </span>
                     </div>
     
@@ -25,9 +26,17 @@
                         
                         @if(TYPE_WEB=='center')
                             <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
+                            
+                            <a href="{{route("scans.home")}}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span data-rel="tooltip" title="Assets Scan" data-placement="bottom"><i class="fas fa-search"></i><span class="hide-text">Assets Scan</span> </span>
+                            </a>
+
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
                             </a>
+                          
+                        
+
                             <input type="hidden" value="" id="site_code">
                         @else
                             <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
@@ -35,6 +44,7 @@
                             </a>
                             <input type="hidden" value="{{ @$SiteSettings[0]->code }}" id="site_code">
                         @endif
+                   
                         
 
                         <div class="button-control d-none">
@@ -183,7 +193,7 @@
                                             <span> Host </span>
                                         </button>
                                         <button class="btn btn-grey" onclick="selectGroupBy('ip')">
-                                            <span> IP </span>
+                                            <span> Assets </span>
                                         </button>
                                         <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
                                             <span> CPE </span>
@@ -197,7 +207,6 @@
                                             <option value="">- SELECT -</option>
                                         </select>
                                     </div>
-
                                 </div>
 
                                 <div class="col-md-4">

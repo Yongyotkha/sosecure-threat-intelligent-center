@@ -32,6 +32,10 @@ class CompromisedController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['compromised']) {
+            check_permission403();
+        }
         $data['page'] = langapp('compromised');
         return view('compromised::index')->with($data);
     }

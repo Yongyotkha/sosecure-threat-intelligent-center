@@ -12,9 +12,10 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\model_has_roles;
-
+use Session;
 use App\Menu;
 use App\Menu_sub;
+use Modules\Users\Entities\role_menu_permission;
 
 class LoginController extends Controller
 {
@@ -87,12 +88,14 @@ class LoginController extends Controller
         if ( ($this->oldLogin($request))) {//custom login
             // The user is active, not suspended, and exists.
 
-            $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
+            // $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
             // session_start();
-            $_SESSION["menu"] = $menu;
+            // $_SESSION["menu"] = $menu;
             // session('menu', $menu);
             // dd($menu);
             // dd(55);
+
+
             
             return $this->sendLoginResponse($request);
 
@@ -147,6 +150,7 @@ class LoginController extends Controller
      */
     public function oldLogin($request)
     {
+        // dd(1234);
         $role_status = 0;
         $User = User::where('email',$request->email)->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1)->first();
         // $User = User::where('email', $request->email)->first();
@@ -166,6 +170,22 @@ class LoginController extends Controller
             $passwordHasher = new PasswordHash(8, true);
             $passwordMatch  = $passwordHasher->CheckPassword($request->password, $user->password);
             if ($passwordMatch) {
+                    $menu_goto = Menu::select('id')->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get()->pluck('id')->toArray();
+                    $role_menu_permission = role_menu_permission::select('menu_id')->where('role_id',$model_has_roles->role_id)->where('deleted_at',null)->whereIn('menu_id',$menu_goto)->get()->pluck('menu_id')->toArray();
+                    if($model_has_roles->role_id != 1) {
+                        if(!$role_menu_permission) {
+                            return response()->json(['error' => 'User does not have permission to access.', 'status_code' => '400']);
+                        }
+                        $menu_goto = $role_menu_permission;
+                    }
+                    if(Session::has('check_goto_menu')){
+                        Session::forget('check_goto_menu');
+                        Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
+                    } else {
+                        if(@check_goto_menu(@$menu_goto)) {
+                            Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
+                        }
+                    }
                 return Auth::login($user, true);
             }
         }

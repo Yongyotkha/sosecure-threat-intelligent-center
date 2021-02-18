@@ -4,16 +4,21 @@
     <section class="hbox stretch">
         <section class="vbox">
             <header class="header panel-heading b-b bg-white">
-                @can('menu_users')
-                <a href="{{ route('users.index') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm">
-                    @icon('solid/user-circle') @langapp('users')
+                <a href="{{ route('users.index') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left">
+                 @icon('solid/arrow-left')
                 </a>
-                @endcan
+
                 @can('roles_create')
                 <a href="{{ route('users.perm.create') }}" data-toggle="ajaxModal" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                     @icon('solid/plus') @langapp('create')
                 </a>
                 @endcan
+                @can('menu_users')
+                <a href="{{ route('users.index') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
+                    @icon('solid/user-circle') @langapp('users')
+                </a>
+                @endcan
+             
             </header>
             <section class="scrollable wrapper">
                 <section class="panel panel-default">

@@ -83,14 +83,13 @@
                                 <span data-rel="tooltip" title="Setting" data-placement="bottom"><i class="fas fa-cog icon"></i></span>
                             </a>
         
-        
-                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
-                            </button>
-        
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
+
+                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
+                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
+                            </button>
                         </div>
                     </div>
                 </header>
@@ -267,12 +266,12 @@
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th width="20px">Source Name</th>
+                                                <th width="20px">Source</th>
                                                 <th width="20%">Title</th>
                                                 <th>Category</th>
                                                 <th width="20px">Data Status</th>
                                                 <th width="30px">Public Date</th>
-                                                <th width="30px">Modified Date</th>
+                                                {{-- <th width="30px">Modified Date</th> --}}
                                                 <th>View Count</th>
                                                 <th width="40px">Link</th>
                                                 <th>Status</th>
@@ -639,7 +638,6 @@ $(function() {
                 {
                     data: 'cate',
                     name: 'cate',
-                    className: 'w-10 text-center'
                 },
                 {
                     data: 'data_status',
@@ -649,11 +647,6 @@ $(function() {
                 {
                     data: 'public_date',
                     name: 'public_date',
-                    className: 'no-wrap'
-                },
-                {
-                    data: 'updated_at',
-                    name: 'updated_at',
                     className: 'no-wrap'
                 },
                 {
@@ -899,8 +892,7 @@ $(document).ready(function(){
                 chart: {
                     type: 'column',
                     scrollablePlotArea: {
-                    minWidth: 1200,
-                    scrollPositionX: 1
+                    minWidth: 300,
                     }
                 },
                 title: {
@@ -944,7 +936,6 @@ $(document).ready(function(){
                         background: '#fff'
                     }
                 },
-        
                 legend: {
                     enabled: false
                 },

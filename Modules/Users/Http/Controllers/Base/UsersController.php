@@ -45,9 +45,17 @@ abstract class UsersController extends Controller
      *
      * @return \Illuminate\View\View
      */
+    public function test()
+    {
+        dd(123);
+        return view('users::index')->with($data);
+    }
     public function index()
     {
-
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $SiteSettings = '';
         $get_role_custom_first = @get_role_custom();
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
@@ -78,6 +86,10 @@ abstract class UsersController extends Controller
 
     public function create()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $SiteSettings = '';
         $get_role_custom_first = @get_role_custom();
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
@@ -106,6 +118,10 @@ abstract class UsersController extends Controller
 
     public function edit_new_modal(User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $SiteSettings = '';
         $get_role_custom_first = @get_role_custom();
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
@@ -120,18 +136,30 @@ abstract class UsersController extends Controller
 
     public function delete_new_modal(User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $data['user'] = $user;
         return view('users::modal.delete_user_new')->with($data);
     }
 
     public function edit(User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $data['user'] = $user;
         return view('users::modal.update')->with($data);
     }
 
     public function suspend(User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         if (can('users_delete')) {
             $data['user'] = $user;
             return view('users::modal.suspend')->with($data);
@@ -186,6 +214,10 @@ abstract class UsersController extends Controller
 
     public function permissions(User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $data['user'] = $user;
 
         return view('users::modal.permissions')->with($data);
@@ -199,6 +231,10 @@ abstract class UsersController extends Controller
      */
     public function changePermission(Request $request, User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $request->validate(['user_id' => 'required']);
         $permissions = [];
         if ($request->has('perm')) {
@@ -215,12 +251,20 @@ abstract class UsersController extends Controller
 
     public function delete(User $user)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $data['user'] = $user;
         return view('users::modal.delete')->with($data);
     }
 
     public function bulkDelete()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         if ($this->request->has('checked')) {
             BulkDeleteUsers::dispatch($this->request->checked, Auth::id());
             $data['message'] = langapp('deleted_successfully');
@@ -260,6 +304,10 @@ abstract class UsersController extends Controller
      */
     public function view(User $user, $tab = 'overview')
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         $allowed = ['deals', 'files', 'overview', 'projects', 'tickets', 'timesheet'];
         $tab = in_array($tab, $allowed) ? $tab : 'overview';
         $data['user'] = $user;
@@ -276,6 +324,10 @@ abstract class UsersController extends Controller
      */
     public function tableData(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         // $model = $this->applyFilter()->with(['profile:user_id,job_title,mobile,city,use_gravatar,avatar']);
 
         // if($request->site){
@@ -290,7 +342,7 @@ abstract class UsersController extends Controller
         $Roles = Roles::get()->keyBy('id')->toArray();
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('users.code','users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
                 $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
@@ -302,7 +354,7 @@ abstract class UsersController extends Controller
 
             }else{
 
-                $model = User::select('id','email','created_at','name','site_role_id')->where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('code','id','email','created_at','name','site_role_id')->where('active', '1')->where('id', @Auth::user()->id)->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }
         
 
@@ -323,6 +375,12 @@ abstract class UsersController extends Controller
         $model->get();
         
         return DataTables::of($model)
+            ->editColumn(
+                'no',
+                function ($model) {
+                    return $model->id;
+                }
+            )
             ->editColumn(
                 'name',
                 function ($model) {
@@ -387,13 +445,25 @@ abstract class UsersController extends Controller
                     return dateFormatted($model->created_at);
                 }
             )->editColumn('action', function ( $model) {
-                
-                $del_button = '<span><a href="'.route("users.delete_new_modal", ["user" => $model->id]).'" class="btn btn-xs btn-danger" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a></span>';
-                $edit_button = '<span><a href="' . route("users.edit_new_modal", ["user" => $model->id]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
-                </a></span>';
-                
-                return $edit_button." ".$del_button;
+
+                $html='';
+                if(@$model->get_model_has_roles->role_id == 6){
+                    $html .= "<a href='". route('user.edit_gen_pass', ['id' => $model->code])."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                    <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                    <span>Password</span>
+                    </a>";
+                }else{
+                    if($model->id == 1){
+
+                    } else {
+                        $html .= '<span><a href="' . route("users.edit_new_modal", ["user" => $model->id]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
+                        <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                        </a></span>';
+                        $html .= '<span><a href="'.route("users.delete_new_modal", ["user" => $model->id]).'" class="btn btn-xs btn-danger" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a></span>';
+                    }
+                   
+                }            
+                return $html;
                 
             })->addColumn('rolename', function ($model) use ($Roles){
                 //humanize(--str--)
@@ -411,6 +481,10 @@ abstract class UsersController extends Controller
 
     protected function applyFilter()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
         if ($this->request->filled('filter')) {
             return $this->user->role($this->request->filter);
         }
@@ -424,6 +498,10 @@ abstract class UsersController extends Controller
 
     public function del_user(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['manage_users']) {
+            check_permission403();
+        }
 
         foreach ($request->id as $id_chang) {
 

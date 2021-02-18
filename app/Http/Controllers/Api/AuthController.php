@@ -18,6 +18,10 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Modules\Users\Entities\model_has_roles;
+use Modules\Users\Entities\user_menu_permission;
+use Modules\Users\Entities\user_menu_sub_permission;
+use Modules\SiteSettings\Entities\site_menu_permission;
+use Modules\SiteSettings\Entities\site_menu_sub_permission;
 
 class AuthController extends ApiController
 {
@@ -75,12 +79,26 @@ class AuthController extends ApiController
 
                     $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
                     $menu_sub = Menu_sub::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
-                    $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
-                    // $Menu_permission_site = Menu_permission_site::all();
-                    $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->toArray();
-                    $permission_custom = @check_permission_site_custom();
+                    if($model_has_roles->role_id == 6) {
+                        $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->pluck('menu_id')->toArray();
+                        $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->pluck('menu_sub_id')->toArray();
+                    } else {
+                        $site_id_arr = UserSite::select('site_id')->where('user_id', @$user->id)->get();
+                        $result_menu_permission = site_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+                        $result_menu_sub_permission = site_menu_sub_permission::select('menu_sub_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+                        $Menu_permission_site = user_menu_permission::select('menu_id')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_id')->toArray();
+                        $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
+                    }
+                    
 
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom]);
+                    $check_goto_menu = @check_goto_menu($Menu_permission_site);
+                    if(!$check_goto_menu) {
+                        return response()->json(['error' => 'User does not have permission to access.', 'status_code' => '400']);
+                    }
+
+                    $permission_custom = @check_permission_site_custom(@$user->id);
+
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom, 'check_goto_menu' => $check_goto_menu]);
                     // return response()->json(['message' => 'Successful', 
                     //                             'error' => '', 
                     //                             'status_code' => '200', 

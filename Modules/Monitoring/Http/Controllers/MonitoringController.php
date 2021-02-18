@@ -38,6 +38,10 @@ class MonitoringController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         
         $data['page'] = langapp('monitoring');
         return view('monitoring::index')->with($data);
@@ -45,6 +49,10 @@ class MonitoringController extends Controller
 
     public function batchjob()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         // <><><>
         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         $get_role_custom_first = @get_role_custom();
@@ -69,6 +77,10 @@ class MonitoringController extends Controller
 
     public function monitor_logs()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         // <><><>
         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         $get_role_custom_first = @get_role_custom();
@@ -154,6 +166,10 @@ class MonitoringController extends Controller
 
     public function tableMonitor(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         
         $model = '';
         $html = '';
@@ -226,6 +242,10 @@ class MonitoringController extends Controller
 
     public function table_monitor_logs(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         
         $model = '';
         $html = '';
@@ -285,6 +305,10 @@ class MonitoringController extends Controller
     // View Content DataLeak
     public function view_message_modal(Request $request , $id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         if($id) {
             $TransactionBatchjob = TransactionBatchjob::where('id',$id)->first();
         }
@@ -293,6 +317,10 @@ class MonitoringController extends Controller
     }
 
     public function delete_logs(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         if($request->id_change){
             foreach($request->id_change as $id_change){
                 MonitorLogs::where('id',$id_change)->delete();
@@ -312,6 +340,11 @@ class MonitoringController extends Controller
     }
 
     public function send_logs(){
+        $role_custom = @check_role_custom();
+        // dd($role_custom);
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         $get_role_custom_first = @get_role_custom();
         $SiteSettings = '';
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
@@ -336,6 +369,10 @@ class MonitoringController extends Controller
 
     public function table_send_logs(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         
         $model = '';
         $html = '';
@@ -406,6 +443,10 @@ class MonitoringController extends Controller
     }
 
     public function delete_send_logs(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
         if($request->id_change){
 
             foreach($request->id_change as $id_change){

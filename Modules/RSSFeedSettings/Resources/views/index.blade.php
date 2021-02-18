@@ -43,11 +43,11 @@
 <aside>
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-            @icon('solid/arrow-left')
-            </a> --}}
+            <a href="{{route('news.index')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+            </a>
             {{-- <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a> --}}
-            <div class="bc-head">@langapp('rss_feed_settings')</div>
+            <div class="bc-head">Settings > RSS</div>
             {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
             title="@langapp('export') CSV">
             @icon('solid/download') CSV

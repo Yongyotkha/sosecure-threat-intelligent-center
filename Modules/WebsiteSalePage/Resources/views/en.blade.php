@@ -1,0 +1,412 @@
+@extends('websitesalepage::layouts.master')
+
+@section('content')
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/websitesalepage">
+                <img src="{{asset('images/logo_threat/logo.png')}}" height="45px" class="d-inline-block align-top" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse ml-auto" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('web.en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('web.th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
+                    </li>
+                    <li class="nav-item ml-lg-4 ml-0">
+                        <button type="button" class="btn btn-outline-secondary px-4">Login</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+  <!--==========================
+    Intro Section
+  ============================-->
+  <section id="intro" class="clearfix" style="background-image:url('{{asset('asset_salepage/images/bg.png')}}')">
+    <div class="container">
+      <div class="intro-info">
+        <h2>Intelligence Detection</h2>
+        <h3>
+            Threat insight System is improved for helping organizations detect threats faster and also working with
+            surveillance in the same time. We have data leak detection technology to protect data 
+            of organizationson internet and dark web.
+        </h3>
+      </div>
+
+    </div>
+    <div class="move-down">
+        <a href="#start-section"><i class="fa fa-angle-down text-white fa-2x"></i></a>
+    </div>
+  </section><!-- #intro -->
+
+  <main id="main">
+    <section id="start-section" class="content-section">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-md-12 mb-5 text-center">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/group98.png')}}" alt="Threat Sharing">
+                </div>
+                <div class="col-lg-6 col-md-12 mb-3">
+                    <div class="mb-5">
+                        <h1 class="primary-text text-lg-right text-center">
+                            Threat Sharing
+                        </h1>
+                        <span class="secondary-text text-lg-right text-center">
+                            Threat data connect and indicators from data providers gathering in threat sharing and connect with Log (SIEM) system as well.
+                        </span>
+                    </div>
+
+                    <div>
+                        <h1 class="primary-text text-lg-right text-center">
+                            Type of IOC
+                        </h1>
+                        <ul class="list-img-ioc show-mb-row">
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Ip.png')}}" alt="IP Address" style="max-width: 70px">
+                                <p>IP Address</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Domain.png')}}" alt="Domain" style="max-width: 70px">
+                                <p>Domain</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/hash.png')}}" alt="Hash" style="max-width: 70px">
+                                <p>Hash</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Urls.png')}}" alt="URLs" style="max-width: 70px">
+                                <p>URLs</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-8 col-lg-8 text-lg-left text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text">
+                            Asset Discovery
+                        </h1>
+                        <span class="secondary-text">
+                            To help you finding any interesting information and gathering server and asset which service on theinternet and collecting from OSINT. In the same way, we are able to import data for gap detection and threats continuously.
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-lg-4 text-center">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="primary-text-blue text-center">Data Leak Detection</h1>
+                </div>
+            </div>
+        </div>
+
+            <div class="container-fluid px-5">
+                <div class="row">
+                    <div class="col-lg-4 order-lg-1 order-1">
+                        <h1 class="primary-text-blue text-center mt-3 fz-70 font-weight-500">Surface Web</h1>
+                    </div>
+
+                <div class="col-lg-4 offset-lg-4 order-lg-3 order-2">
+                    <span class="secondary-text text-blue text-lg-left text-center">
+                            Data leak detection form dark web that bring data of organization for publishing and selling.
+                        </span>
+                        <ul class="list-img-ioc mt-3">
+                            <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/icon/dataleak.png')}}" style="max-width: 75px" alt="Data Leak">
+                                <p>Data Leak</p>
+                            </li>
+                            <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group99.png')}}" style="max-width: 75px" alt="Social Network">
+                                <p>Social Network</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        <div class="iceberg-section">           
+            <div class="bg-blue-linear px-5">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-4 order-lg-1 order-2 d-flex flex-column align-items-center justify-content-center">
+                            <span class="secondary-text mb-3 text-white text-lg-left text-center">
+                                We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
+                            </span>
+        
+                            <ul class="list-img-ice text-center">
+                                <li>
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Credential.png')}}" style="max-width: 75px" alt="Credential">
+                                    <p class="text-white">Credential</p>
+                                </li>
+                                <li>
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Creditcard.png')}}" style="max-width: 75px" alt="Credit Card">
+                                    <p class="text-white">Credit Card</p>
+                                </li>
+                                <li>
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/financeinfo.png')}}" style="max-width: 75px" alt="Finance Info">
+                                    <p class="text-white">Finance Info</p>
+                                </li>
+                                <li>
+                                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/confidential.png')}}" style="max-width: 75px" alt="Confidential Data">
+                                    <p class="text-white">Confidential Data</p>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-lg-4 text-center order-lg-2 order-3 d-lg-block d-none translatY-50">
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/iceberg.png')}}" alt="">
+                        </div>
+
+                        <div class="order-lg-2 order-1 col-lg-4 d-flex align-items-center justify-content-lg-start justify-content-center">
+                            <h1 class="fz-70 text-white font-weight-500">Dark Web</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-lg-left text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text">
+                            Compromised Detection
+                        </h1>
+                        <span class="secondary-text">
+                            We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/defaced.png')}}" alt="">
+                </div>
+                <div class="col-lg-6 col-lg-6 mb-3 order-lg-2 order-1 text-lg-left text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text">
+                            Web Defaced Detection
+                        </h1>
+                        <span class="secondary-text">
+                            To detect attack website from attacker by using web defacement technique and the organization still maintain credibility.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="content-section py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="primary-text text-center m-0">
+                        Advanced Vulnerability Detection
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-blue">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1 class="primary-text text-center text-white">
+                        Vulnerability Detection
+                    </h1>
+                    <span class="secondary-text text-white mb-4">
+                        Threat Insight System is able to detect the gap of system. This system is based on database of the Common Vulnerabilities and Exposures (CVE) system.
+                    </span>
+
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group97.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-lg-12 text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text text-center">
+                            Mis-Configuration Detection
+                        </h1>
+                        <span class="secondary-text">
+                            The system can detect unsafe configuration based on Security Guideline from CIS center. Also, editing configuration for safety from the system.
+                        </span>
+                    </div>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group106.png')}}" alt="Mis-Configuration Detection">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
+                    <h1 class="primary-text text-center">
+                        Cybersecurity News Feed
+                    </h1>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/cyber.png')}}" alt="">
+                </div>
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
+                    <div class="mb-5">
+                        <span class="secondary-text">
+                            Update news about cybersecurity from others source around the world and getting notification via Email.
+                        </span>
+                    </div>
+                    <ul class="cyber-news-feed">
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/posttoday-v1.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/Trend-Micro-Logo.svg.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/sanook.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/krebsan.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/thairath.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/kapook.png')}}" alt="">
+                        </li>
+                        <li>
+                            <img class="img-fluid" src="{{asset('asset_salepage/images/prachachat-logo.png')}}" alt="">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
+                    <div class="mb-4">
+                        <span class="secondary-text text-left">
+                            Detection user attack by using social engineering technique such as Phishing, Fake mobile application, Drive-By-Download.
+                        </span>
+                    </div>
+                    <div>
+                        <ul class="list-img-ioc justify-content-between">
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing" style="max-width: 100px">
+                                <p>Phishing</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile" style="max-width: 100px">
+                                <p>Fake Mobile <br> Application</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive" style="max-width: 100px">
+                                <p>Drive-By <br>Download</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1">
+                    <h1 class="primary-text text-center">
+                        Social Engineering Detection
+                    </h1>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/vec.png')}}" alt="">
+                </div>
+          
+            </div>
+        </div>
+    </section>
+   
+
+
+    <!--==========================
+      Contact Section
+    ============================-->
+    <section id="contact">
+      <div class="container">
+
+        <div class="section-header">
+          <h3>Contact</h3>
+        </div>
+
+        <div class="row wow fadeInUp">
+            <div class="col-lg-6">
+                <div class="contact-container">
+                   <ul class="contact-list">
+                       <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-map-marker"></i></span> 410/ 34 Ratchadaphisek Rd, Khwaeng Samsen Nok, Khet Huai Khwang, Krung Thep Maha Nakhon 10310</p></li>
+                       <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-envelope"></i></span> Support@sosecure.co.th</p></li>
+                       <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-phone"></i></span> 061 564 5294</p></li>
+                       <li><p class="mb-3"><span class="icon-contact"><i class="fab fa-line"></i></span> @sosecure</p></li>
+                   </ul>
+
+                   <div class="icon-email">
+                        <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group25.png')}}" alt="" style="max-width: 130px">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="map mb-4 mb-lg-0">
+                    <iframe src="https://www.google.com/maps?q=410%2F%2034%20Ratchadaphisek%20Rd%2C%20Khwaeng%20Samsen%20Nok%2C%20Khet%20Huai%20Khwang%2C%20Krung%20Thep%20Maha%20Nakhon%2010310&z=14&t=&ie=UTF8&output=embed" frameborder="0" style="border:0; width: 100%; height: 293px;" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </section><!-- #contact -->
+
+  </main>
+
+  <!--==========================
+    Footer
+  ============================-->
+  <footer id="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong>Sosecure Threat inSight</strong>. All Rights Reserved
+      </div>
+    </div>
+  </footer>
+@stop

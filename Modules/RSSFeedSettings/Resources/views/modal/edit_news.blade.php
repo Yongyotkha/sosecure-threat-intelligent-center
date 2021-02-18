@@ -179,7 +179,7 @@
                                 <label class="col-lg-1 control-label" style="margin-top: 8px; display: inline-block;">Send Mail </label>
                                 <div class="col-lg-1">
                                     <label class="switch" style="margin-top: 8px; display: inline-block;">
-                                        <input type="checkbox" name="" checked value="TRUE">
+                                        <input type="checkbox" name="sent_mail" checked value="1">
                                         <span></span>
                                     </label>
                                 </div>

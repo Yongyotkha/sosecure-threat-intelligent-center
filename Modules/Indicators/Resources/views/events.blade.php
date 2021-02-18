@@ -12,55 +12,54 @@
                 </div>
 
                 <div class="ml-2 text-right">
-                     {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-                    {{-- <div class="text-left" style="min-width: 270px;display:inline-block">
-                        <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
-                            <option value="">All Site</option>
-                            @if($SiteSettings)
-                            @foreach($SiteSettings as $SiteSettings_val)
-                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                            @endforeach
-                            @endif
-                        </select>
-                    </div> --}}
-
-                    <a id="" href="" class="btn btn-sm btn-info d-none">
-                        <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
-                    </a>
-                    <a id="" href="" class="btn btn-sm btn-info">
-                        <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
-                    </a>
-
-                    <a id="advance-search" href="#area_search"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                    </a>
-                  
-               
-                </div>
-            </div>
-        </header>
-
-        <section class="scrollable wrapper">
-            <section id="hide-advance-search" class="panel panel-default" style="display: none;">
-                {{-- <div class="panel-heading">
-                    <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
-                    |
-                    <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
+                 {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
+                 {{-- <div class="text-left" style="min-width: 270px;display:inline-block">
+                    <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
+                        <option value="">All Site</option>
+                        @if($SiteSettings)
+                        @foreach($SiteSettings as $SiteSettings_val)
+                        <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                        @endforeach
+                        @endif
+                    </select>
                 </div> --}}
-                <header class="panel-heading font-bold panel-header-blue">
+
+                <a id="" href="" class="btn btn-sm btn-info d-none">
+                    <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
+                </a>
+                <a id="" href="{{url('/monitoring/send_logs')}}?type=indicator" class="btn btn-sm btn-info">
+                    <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
+                </a>
+
+                <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+            </a>
+
+
+        </div>
+    </div>
+</header>
+
+<section class="scrollable wrapper">
+    <section id="hide-advance-search" class="panel panel-default" style="display: none;">
+        {{-- <div class="panel-heading">
+            <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
+            |
+            <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
+        </div> --}}
+        <header class="panel-heading font-bold panel-header-blue">
+            <div class="row">
+                <div class="col-md-12">
+                    <i class="fas fa-filter"></i> Filter
+                </div>
+            </header>
+            <div class="panel-body" style="padding: 0 !important">
+                <div class="container-fluid" style="padding: 2rem;">
                     <div class="row">
-                        <div class="col-md-12">
-                            <i class="fas fa-filter"></i> Filter
+                        <div class="col-lg-4 mb-1">
+                            <h5 class="font-weight-bold">Event Name</h5>
+                            <input type="text" class="form-control" name="event_name" id="event_name"  placeholder="Search">
                         </div>
-                </header>
-                <div class="panel-body" style="padding: 0 !important">
-                    <div class="container-fluid" style="padding: 2rem;">
-                        <div class="row">
-                            <div class="col-lg-4 mb-1">
-                                <h5 class="font-weight-bold">Event Name</h5>
-                                <input type="text" class="form-control" name="event_name" id="event_name"  placeholder="Search">
-                            </div>
                             <!--<div class="col-md-4">
                                 <div class="form-group">
                                     <label for="" class="">Group</label>
@@ -82,197 +81,218 @@
                             <div class="col-lg-4 mb-1">
                                 <h5 class="font-weight-bold">Date</h5>
                                 <div id="event_date" class="text-center form-control"
-                                    style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                    <i class="fa fa-calendar"></i>&nbsp;
-                                    <span></span> <i class="fa fa-caret-down"></i>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 mb-1">
-                                <h5 class="font-weight-bold">Published</h5>
-                                <div id="groupby-published" class="btn-group special">
-                                    <button class="btn btn-grey check_published  active" id="all" value="">
-                                        <span>All</span>
-                                    </button>
-                                    <button class="btn btn-grey check_published" value="1">
-                                        <span>Published</span>
-                                    </button>
-                                    <button class="btn btn-grey check_published" value="2">
-                                        <span> No Published </span>
-                                    </button>
-                                </div>
+                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down"></i>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button class="btn btn-info" id="btn_search_data">
-                                <i class="fas fa-search btn-fz-13"></i>
-                                <span> @langapp('apply') </span>
-                            </button>
-                            <button class="btn btn-default btn-fz-13" id="btn_reset">
-                                <i class=" fas fa-broom"></i>
-                                <span> Clear </span>
-                            </button>
-                            <button class="btn btn-default btn-fz-13" id="close_filter">
-                                <i class=" fas fa-times"></i>
-                                <span> Close </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <div class="container-fluid" style="margin-bottom:10px;">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="row">
-                            <div class="col-md-12 nopadding">
-                                <div class="card-ev">
-                                    <div class="header-ev">
-                                        Events
-                                    </div>
-                                    <div class="card-ev-body">
-                                        <div class="ev-left">
-                                            <span>{{ @number_format( TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count'] ) }}</span>
-                                            <span class="ev-text-sec">All</span>
-                                        </div>
-                                        <div class="ev-right">
-                                            <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
-                                            <span>New Event</span>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="col-lg-4 mb-1">
+                            <h5 class="font-weight-bold">Published</h5>
+                            <div id="groupby-published" class="btn-group special">
+                                <button class="btn btn-grey check_published  active" id="all" value="">
+                                    <span>All</span>
+                                </button>
+                                <button class="btn btn-grey check_published" value="1">
+                                    <span>Published</span>
+                                </button>
+                                <button class="btn btn-grey check_published" value="2">
+                                    <span> No Published </span>
+                                </button>
                             </div>
-                            <div class="col-md-12 nopadding">
-                                <div class="card-ev">
-                                    <div class="header-ev">
-                                        Attribute
-                                    </div>
-                                    <div class="card-ev-body">
-                                        <div class="ev-left">
-                                            <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
-                                            <span class="ev-text-sec">All</span>
-                                        </div>
-                                        <div class="ev-right">
-                                            <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
-                                            <span>New Attribute</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-              
-                    <div class="col-md-8 nopadding">
-                        <div class="" style="background: #fff">
-                            <span class="header-txt-chart">Top 10 Attribute Type</span>
-                            <div id="chart-pack" style="height: 251px"></div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <section class="panel panel-default">
-                <header class="panel-heading font-bold panel-header-blue">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <i class="fas fa-table"></i> Table Event
-                        </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12 text-right">
+                        <button class="btn btn-info" id="btn_search_data">
+                            <i class="fas fa-search btn-fz-13"></i>
+                            <span> @langapp('apply') </span>
+                        </button>
+                        <button class="btn btn-default btn-fz-13" id="btn_reset">
+                            <i class=" fas fa-broom"></i>
+                            <span> Clear </span>
+                        </button>
+                        <button class="btn btn-default btn-fz-13" id="close_filter">
+                            <i class=" fas fa-times"></i>
+                            <span> Close </span>
+                        </button>
                     </div>
-                </header>
+                </div>
+            </div>
+        </section>
 
-
-                <div class="panel-body">
-                    <div class="tabbable">
-                        <ul class="nav nav-tabs nav-tabs-highlight d-none">
-                            <li class="active"><a href="#tab_event" data-toggle="tab">Event (0)</a></li>
-                            <li><a href="#tab_attr" data-toggle="tab">Attribute (0)</a></li>   
-                            <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
-                            <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>   
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="tab_event">
-                                <div class="table-responsive">
-                                    <table class="table table-striped" id="table_events">
-                                        <thead>
-                                            <tr>
-            
-                                                <th>No</th>
-                                                <th>Event Name</th>
-                                                <th>Group</th>
-                                                <th>Tags</th>
-                                                <th>Published</th>
-                                                <th>Last Status</th>
-                                                <th class="nowrap">DateTime</th>
-                                                <th>Attribute</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{-- <tr>
-                                                <td>
-                                                    <label>
-                                                        <input value="" type="checkbox" />
-                                                        <span class="label-text"></span>
-                                                    </label>
-                                                </td>
-                                                <td>1</td>
-                                                <td>Suspicious proxy agent</td>
-                                                <td>
-                                                    <a href="">MIST FEED</a>
-                                                    <a href="">Phishing,UW</a>
-                                                </td>
-                                                <td>
-                                                    <a href="">Scan,Agent,</a>
-                                                    <a href="">Proxy,Spider</a>
-                                                </td>
-                                                <td>
-                                                    <a href="">5421</a>
-                                                </td>
-                                                <td>
-                                                    <i class="fas fa-check"></i>
-                                                </td>
-                                                <td>
-                                                    Modified
-                                                </td>
-                                                <td>
-                                                    2020-12-07 11:11
-                                                </td>
-                                                <td>
-                                                    152
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
-                                            btn-info"><i class="far fa-eye"></i> View</a>
-                                            </td>
-                                            </tr> --}}
-                                        </tbody>
-                                    </table>
-                                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+        <div class="container-fluid" style="margin-bottom:10px;">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12 nopadding">
+                            <div class="card-ev">
+                                <div class="header-ev">
+                                    Events
+                                </div>
+                                <div class="card-ev-body">
+                                    <div class="ev-left">
+                                        <span>{{ @number_format( TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count'] ) }}</span>
+                                        <span class="ev-text-sec">All</span>
                                     </div>
-                                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
+                                    <div class="ev-right">
+                                        <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
+                                        <span>New Event</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="tab_attr">
-                            
-                            </div>
-                            <div class="tab-pane" id="tab_otx">
-                            
-                            </div>
-                            <div class="tab-pane" id="tab_misp">
-                            
+                        </div>
+                        <div class="col-md-12 nopadding">
+                            <div class="card-ev">
+                                <div class="header-ev">
+                                    Attribute
+                                </div>
+                                <div class="card-ev-body">
+                                    <div class="ev-left">
+                                        <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
+                                        <span class="ev-text-sec">All</span>
+                                    </div>
+                                    <div class="ev-right">
+                                        <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
+                                        <span>New Attribute</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
 
+                <div class="col-md-8 nopadding">
+                    <div class="" style="background: #fff">
+                        <span class="header-txt-chart">Top 10 Attribute Type</span>
+                        <div id="chart-pack" style="height: 251px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="panel panel-default">
+            <header class="panel-heading font-bold panel-header-blue">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <i class="fas fa-table"></i> Table Event
+                    </div>
+                </div>
+            </header>
+
+
+            <div class="panel-body">
+
+                <div class="row m-b-12">
+                    <div class="col-md-12">
+                        <h5 class="font-weight-bold">Industries</h5>
+                        <div class="text-center">
+                            <div id="fillter_click" class="button-group">
+                                <span id="btn_industrise"></span>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- <div class="col-md-6">
+                        <h5 class="font-weight-bold">Group</h5>
+                        <select name="sl_group[]" id="sl_group" class="form-control">
+                            <option value=""></option>
+                        </select>
+                    </div> --}}
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped" id="table_events">
+                        <thead>
+                            <tr>
+
+                                <th>No</th>
+                                <th>Industries</th>
+                                <th>Event Name</th>
+                                <th>Group</th>
+                                <th>Tags</th>
+                                <th>Published</th>
+                                <th>Last Status</th>
+                                <th class="nowrap">DateTime</th>
+                                <th>Attribute</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- <tr>
+                                <td>
+                                    <label>
+                                        <input value="" type="checkbox" />
+                                        <span class="label-text"></span>
+                                    </label>
+                                </td>
+                                <td>1</td>
+                                <td>Suspicious proxy agent</td>
+                                <td>
+                                    <a href="">MIST FEED</a>
+                                    <a href="">Phishing,UW</a>
+                                </td>
+                                <td>
+                                    <a href="">Scan,Agent,</a>
+                                    <a href="">Proxy,Spider</a>
+                                </td>
+                                <td>
+                                    <a href="">5421</a>
+                                </td>
+                                <td>
+                                    <i class="fas fa-check"></i>
+                                </td>
+                                <td>
+                                    Modified
+                                </td>
+                                <td>
+                                    2020-12-07 11:11
+                                </td>
+                                <td>
+                                    152
+                                </td>
+                                <td>
+                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
+                                    btn-info"><i class="far fa-eye"></i> View</a>
+                                </td>
+                            </tr> --}}
+                        </tbody>
+                    </table>
+                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+                    </div>
+                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
+                </div>
+
+                <div class="tabbable">
+                    <ul class="nav nav-tabs nav-tabs-highlight d-none">
+                        <li class="active"><a href="#tab_event" data-toggle="tab">Event (0)</a></li>
+                        <li><a href="#tab_attr" data-toggle="tab">Attribute (0)</a></li>   
+                        <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
+                        <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>   
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_event">
+
+                        </div>
+                        <div class="tab-pane" id="tab_attr">
+
+                        </div>
+                        <div class="tab-pane" id="tab_otx">
+
+                        </div>
+                        <div class="tab-pane" id="tab_misp">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
-    </section>
 
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    </section>
+</section>
+
+<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
 @push('pagestyle')
@@ -295,16 +315,22 @@
 
 <script>
 
-active_btn('#groupby-published .btn-grey');
+    $('#fillter_click .btn-selector').on('click',function(){
+        $(this).siblings().removeClass('active');
+        $(this).addClass('active');
+    });
 
-Highcharts.setOptions({
-    lang: {
-      decimalPoint: '.',
-      thousandsSep: ','
-    }
-});
+    active_btn('#groupby-published .btn-grey');
+
+    Highcharts.setOptions({
+        lang: {
+          decimalPoint: '.',
+          thousandsSep: ','
+      }
+  });
 
 
+    $('.sl_group').select2();
     $('.select2-option').select2();
 
     var start_date = '';
@@ -315,41 +341,43 @@ Highcharts.setOptions({
     var isDateSearch = 0;
     var datatable = [];
     var check_published = null;
+    var industries ="";
 
     $(".check_published").click(function() {
         check_published = $(this).val();
-   
+
     });
 
-  $(function() {
-    var chart = new Highcharts.chart('chart-pack', {
-        chart: {
-            type: 'bar',
-            height: '251px'
-        },
-        title: {
-            text: null
-        },
-        xAxis: {
-            categories: ['Attribute']
-        },
-        yAxis: {
-            min: 0,
+    $(function() {
+        load_industries();
+        var chart = new Highcharts.chart('chart-pack', {
+            chart: {
+                type: 'bar',
+                height: '251px'
+            },
             title: {
-            text: null
-            }
-        },
-        legend: {
-            reversed: true,
-            itemMarginTop: 5,
-        },
-        plotOptions: {
-            series: {
-            stacking: 'normal'
-            }
-        },
-        series: load_graph()
-    });
+                text: null
+            },
+            xAxis: {
+                categories: ['Attribute']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: null
+                }
+            },
+            legend: {
+                reversed: true,
+                itemMarginTop: 5,
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            series: load_graph()
+        });
 
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');
@@ -368,18 +396,18 @@ Highcharts.setOptions({
                 format: 'M/DD hh:mm A'
             },
             ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
         }, cb);
         $('#event_date').on('apply.daterangepicker', function(ev, picker) {
             isDateSearch = 1;
             if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
-              
+
             }
         });
 
@@ -387,14 +415,14 @@ Highcharts.setOptions({
 
         $("#btn_search_data").click(function() {
             {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-           
+
 
 
             start_date = startDate;
             end_date = endDate;
             event_name = $("#event_name").val();
             
-      
+
             search_table(1);
         });
 
@@ -423,12 +451,12 @@ Highcharts.setOptions({
             event_name = {!!json_encode($Search_Link_All)!!};
             search_table(1);
         }
-       
-  
+
+
     });
 
     function load_graph() {
-        
+
         var graph = {!!json_encode(@$attr_type)!!};
         return graph;
 
@@ -442,7 +470,7 @@ Highcharts.setOptions({
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[ 6, "desc" ]],
+            order: [[ 7, "desc" ]],
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
@@ -452,7 +480,7 @@ Highcharts.setOptions({
                     return json.data;
                 },
                 data:function(d){
-                    
+
                     d.count_page = count_page;
                 }
             },
@@ -463,87 +491,105 @@ Highcharts.setOptions({
 
             columns: [
 
-                {
-                    data: 'No',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
-                {
-                    data: 'name',
-                },
-                {
-                    data: 'groups',
-                },
-                {
-                    data: 'tags',
-                },
-                {
-                    data: 'public',
-                },
-                {
-                    data: 'is_modified',
-                },
-                {
-                    data: 'modified',
-                },
-                {
-                    data: 'attrCount',
-                },
-                {
-                    data: 'pulse_id',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
+            {
+                data: 'No',
+                orderable: false,
+                searchable: false,
+                sortable: false,
+            },
+            {
+                data: 'industries',
+            },
+            {
+                data: 'name',
+            },
+            {
+                data: 'groups',
+            },
+            {
+                data: 'tags',
+            },
+
+            {
+                data: 'public',
+            },
+            {
+                data: 'is_modified',
+            },
+            {
+                data: 'modified',
+                className : 'nowrap'
+            },
+            {
+                data: 'attrCount',
+            },
+            {
+                data: 'pulse_id',
+                orderable: false,
+                searchable: false,
+                sortable: false,
+            },
 
             ],
             columnDefs: [
-                {
-                    targets: 1,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
-                        return inner;
-                    }
-                      
-                },
-                {
-                    targets: 4,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.public==1) {
-                            inner = '<i class="fas fa-check text-success"></i>';
-                        } else {
-                            inner = '<i class="fas fa-times text-danger"></i>';
-                        }
-                        return inner;
-                    }
-                      
-                },
-                {
-                    targets: 5,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.is_modified == true) {
-                            inner = 'Modified';
-                        } else {
-                            inner = 'Created';
-                        }
-                        return inner;
-                    }
-                      
-                },
-                {
-                    targets: 8,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                        return inner;
-                    }
-                      
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    var inner = '';
+                    inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
+                    return inner;
                 }
+
+            },
+            {
+                targets: 5,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.public==1) {
+                        inner = '<i class="fas fa-check text-success"></i>';
+                    } else {
+                        inner = '<i class="fas fa-times text-danger"></i>';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.is_modified == true) {
+                        inner = 'Modified';
+                    } else {
+                        inner = 'Created';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.modified) {
+                        inner = row.modified;
+                    } else {
+                        inner = row.modified;
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 9,
+                render: function (data, type, row) {
+                    var inner = '';
+                    inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                    return inner;
+                }
+
+            }
             ]
         });
 
@@ -566,7 +612,7 @@ Highcharts.setOptions({
                 type: "POST",
                 url: '{!! route('indicators.events_table')!!}',
                 dataSrc: function ( json ) {
-                   
+
                     count_page = json.recordsTotal;
                     return json.data;
                 },
@@ -578,96 +624,100 @@ Highcharts.setOptions({
                     d.keywords = event_name;
                     d.isDateSearch = isDateSearch;
                     d.check_published = check_published;
+                    d.industries = industries;
                 }
             },
             initComplete : function( settings, json){
                 datatable = json.cursor;
-                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-rel="tooltip"]').tooltip();
             },
 
             columns: [
 
-                {
-                    data: 'No',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
-                {
-                    data: 'name',
-                },
-                {
-                    data: 'groups',
-                },
-                {
-                    data: 'tags',
-                },
-                {
-                    data: 'public',
-                },
-                {
-                    data: 'is_modified',
-                },
-                {
-                    data: 'modified',
-                    className : 'nowrap'
-                },
-                {
-                    data: 'attrCount',
-                },
-                {
-                    data: 'pulse_id',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
+            {
+                data: 'No',
+                orderable: false,
+                searchable: false,
+                sortable: false,
+            },
+            {
+                data: 'name',
+            },
+            {
+                data: 'groups',
+            },
+            {
+                data: 'tags',
+            },
+            {
+                data: 'industries',
+            },
+            {
+                data: 'public',
+            },
+            {
+                data: 'is_modified',
+            },
+            {
+                data: 'modified',
+            },
+            {
+                data: 'attrCount',
+            },
+            {
+                data: 'pulse_id',
+                orderable: false,
+                searchable: false,
+                sortable: false,
+            },
 
             ],
             columnDefs: [
-                {
-                    targets: 1,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
-                        return inner;
-                    }
-                      
-                },
-                {
-                    targets: 4,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.public==1) {
-                            inner = '<i class="fas fa-check"></i>';
-                        } else {
-                            inner = '<i class="fas fa-times"></i>';
-                        }
-                        return inner;
-                    }
-                      
-                },
-                {
-                    targets: 5,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.is_modified == true) {
-                            inner = 'Modified';
-                        } else {
-                            inner = 'Created';
-                        }
-                        return inner;
-                    }
-                      
-                },
-                {
-                    targets: 8,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                        return inner;
-                    }
-                      
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    var inner = '';
+                    inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                    return inner;
                 }
+
+            },
+            {
+                targets: 5,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.public==1) {
+                        inner = '<i class="fas fa-check text-success"></i>';
+                    } else {
+                        inner = '<i class="fas fa-times text-danger"></i>';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.is_modified == true) {
+                        inner = 'Modified';
+                    } else {
+                        inner = 'Created';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 9,
+                render: function (data, type, row) {
+                    var inner = '';
+                    inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                    return inner;
+                }
+
+            }
 
             ]
 
@@ -675,12 +725,51 @@ Highcharts.setOptions({
 
     }
 
-   
 
 
-    
 
     
+    function load_industries(){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('indicators.industries')}}",
+            type: "get",
+            data: ({
+            }),
+            {{--datatype: "html",--}}
+            beforeSend: function(){
+            },
+        }).done(function(data){
+          if (data.status_code =="00") {
+            var html ="";
+            html +='  <a class="btn btn-selector click_industries active" href="javascript:void(0);" onclick="click_industries(\''+''+'\');">'+'All'+'</a>';
+            for (var i = data.data.length - 1; i >= 0; i--) {
+                html +='  <a class="btn btn-selector click_industries" href="javascript:void(0);" onclick="click_industries(\''+data.data[i].industries_name+'\');">'+data.data[i].industries_name+'</a>';
+            }
+            $('#btn_industrise').html(html);
+
+            $('.click_industries').click(function(){
+               $('.click_industries').removeClass('active');
+               $(this).addClass('active');
+           });
+        }else{
+
+
+        }
+
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+function click_industries(industries_name){
+
+    industries = industries_name.trim();
+    search_table(1);
+}
+
+
 
 </script>
 

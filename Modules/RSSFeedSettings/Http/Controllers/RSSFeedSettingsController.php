@@ -57,6 +57,10 @@ class RSSFeedSettingsController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
        $data['page'] = langapp('rss_feed_settings');
        return view('rssfeedsettings::index')->with($data);
     }
@@ -72,11 +76,19 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_data()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['page'] = langapp('rss_data');
         return view('rssfeedsettings::rss_data')->with($data);
     }
 
     public function tableRssData(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         // $columns = array(
         //     0 => 'id',
         //     1 => 'get_rss_source',
@@ -256,6 +268,10 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function deleteChecked(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
 
         foreach($request->id as $rss_id){
 
@@ -279,6 +295,10 @@ class RSSFeedSettingsController extends Controller
 
 
     public function tableNews(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
 
         // if($request->status_news){
         //     dd($request->status_news);
@@ -440,6 +460,7 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('cate', function (RSSNews $model) {
          
                 $html = '';
+                $html .= '<div>';
                 if($model->get_cate=="[]"){
                     $html = 'None';
                 }else{
@@ -460,6 +481,7 @@ class RSSFeedSettingsController extends Controller
                     
                     $html = rtrim($html,", ");
                 }
+                $html .= '</div>';
                 return $html;
             })
             ->addColumn('data_status', function (RSSNews $model) {
@@ -523,6 +545,10 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function load_top_source(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $model = New RSSNews();
         if($request -> search_val == 1){
             
@@ -612,6 +638,10 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function load_top_category(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $model = New RSSNews();
         if($request -> search_val == 1){
             
@@ -740,6 +770,10 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function tableRssSetting(){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $model = RSSData::where('deleted_at',null)->get();
         return DataTables::of($model)
             ->editColumn('chk', function (RSSData $model) {
@@ -781,6 +815,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_data_create_news($code)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['rss'] = TransactionRssData::where('code', $code)->first();
         $data['RSSNews'] = '';
         if($data['rss']) {
@@ -793,6 +831,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_news_edit_news($code)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['RSSNews'] = RSSNews::where('code', $code)->first();
         // dd($data['RSSNews']->source);
         // $data['RSSNews'] = '';
@@ -812,6 +854,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_news_create_news()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['RSSNews'] = array();
         
         $get_source_query = "SELECT DISTINCT name FROM fx_rss UNION SELECT DISTINCT source FROM fx_r_s_s_news";
@@ -866,6 +912,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_data_delete(Request $request, $id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $model = TransactionRssData::where("code",$id)->first();
         $data['rssfeedsettings'] = $model;
         // dd($model);
@@ -874,6 +924,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_data_delete_process($id = null)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         // dd($id);
         TransactionRssData::where("code",$id)->delete();
         
@@ -893,6 +947,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_news_delete_change(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
    
         foreach($request->id_chang as $id ){
 
@@ -915,6 +973,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_feed_seting_delete(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
      
         foreach($request->id_chang as $id ){
 
@@ -938,6 +1000,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_news_delete(Request $request, $id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $model = RSSNews::where("code",$id)->first();
         $data['rssfeedsettings'] = $model;
         // dd($model);
@@ -946,6 +1012,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_news_delete_process($id = null)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
   
         $RSS_news = RSSNews::where("code",$id)->first();
         RSSNews::where("code",$id)->delete();
@@ -1036,6 +1106,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_news_delete_select(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         foreach ($request->id as $id) {
             $RSS_news = RSSNews::where("code",$id)->first();
             RSSNews::where("code",$id)->delete();
@@ -1070,6 +1144,10 @@ class RSSFeedSettingsController extends Controller
 
 
     public function rss_data_store_news_create(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
 
         $logo = '/images/image-not-found.jpg';
         if ($request->hasFile('logo')) {
@@ -1287,15 +1365,17 @@ class RSSFeedSettingsController extends Controller
             //     }
             // }
             if($request->formsubmit !== 'formDraft'){
-                if($email_site_alert) {
-                    foreach($email_site_alert as $data){
-                        // var_dump($data);
-                        $this->news = [
-                            'news' => $RSSNews_check,
-                        ];
-
-                        // dd($this->news);
-                        Mail::to($data)->send(new NewsMail($this->news));
+                if ($request->sent_mail == 1) {
+                    if($email_site_alert) {
+                        foreach($email_site_alert as $data){
+                            // var_dump($data);
+                            $this->news = [
+                                'news' => $RSSNews_check,
+                            ];
+    
+                            // dd($this->news);
+                            Mail::to($data)->send(new NewsMail($this->news));
+                        }
                     }
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1504,12 +1584,14 @@ class RSSFeedSettingsController extends Controller
             //     }
             // }
             if($request->formsubmit !== 'formDraft'){
-                if($email_site_alert) {
-                    foreach($email_site_alert as $data){
-                        $this->news = [
-                            'news' => $RSSNews,
-                        ];
-                        Mail::to($data)->send(new NewsMail($this->news));
+                if ($request->sent_mail == 1) {
+                    if($email_site_alert) {
+                        foreach($email_site_alert as $data){
+                            $this->news = [
+                                'news' => $RSSNews,
+                            ];
+                            Mail::to($data)->send(new NewsMail($this->news));
+                        }
                     }
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1572,6 +1654,10 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function rss_data_store_news(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         // dd($request);
         // return $_POST['detail_th'];
         // return '4444 '.$request -> detail_th;
@@ -1733,13 +1819,15 @@ class RSSFeedSettingsController extends Controller
 
 
                     if($request->formsubmit !== 'formDraft'){
-                        if($email_site_alert) {
-                            foreach($email_site_alert as $data){
-                                $this->news = [
-                                    'news' => $RSSNews_check,
-                                ];
-                                // dd($this->news);
-                                Mail::to($data)->send(new NewsMail($this->news));
+                        if ($request->sent_mail == 1) {
+                            if($email_site_alert) {
+                                foreach($email_site_alert as $data){
+                                    $this->news = [
+                                        'news' => $RSSNews_check,
+                                    ];
+                                    // dd($this->news);
+                                    Mail::to($data)->send(new NewsMail($this->news));
+                                }
                             }
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -1950,13 +2038,15 @@ class RSSFeedSettingsController extends Controller
                         // }
                     }
                     if($request->formsubmit !== 'formDraft'){
-                        if($email_site_alert) {
-                            foreach($email_site_alert as $data){
-                                $this->news = [
-                                    'news' => $RSSNews,
-                                ];
-                                // dd($this->news);
-                                Mail::to($data)->send(new NewsMail($this->news));
+                        if ($request->sent_mail == 1) {
+                            if($email_site_alert) {
+                                foreach($email_site_alert as $data){
+                                    $this->news = [
+                                        'news' => $RSSNews,
+                                    ];
+                                    // dd($this->news);
+                                    Mail::to($data)->send(new NewsMail($this->news));
+                                }
                             }
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
@@ -2021,18 +2111,30 @@ class RSSFeedSettingsController extends Controller
     
     public function rss_setting()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['page'] = langapp('rss_logs');
         return view('rssfeedsettings::rss_setting')->with($data);
     }
 
     public function rss_logs()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['page'] = langapp('rss_logs');
         return view('rssfeedsettings::rss_logs')->with($data);
     }
 
     public function rss_news()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         // $data['page'] = langapp('rss_logs');
         $data['page'] = langapp('news');
         // $data['Category'] = CategorySettings::where('active',1)->get();
@@ -2042,6 +2144,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_feed_all()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['page'] = langapp('rss_logs');
         return view('rssfeedsettings::rss_feed_all')->with($data);
     }
@@ -2053,6 +2159,10 @@ class RSSFeedSettingsController extends Controller
      */
     public function store(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         
 
         $RSSData = new RSSData;
@@ -2102,6 +2212,10 @@ class RSSFeedSettingsController extends Controller
      */
     public function show($id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         return view('rssfeedsettings::show');
     }
 
@@ -2112,6 +2226,10 @@ class RSSFeedSettingsController extends Controller
      */
     public function edit($id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $get_data = RSSData::where("code",$id)->first();
 
         $data['rssfeedsettings'] = $get_data;
@@ -2127,6 +2245,10 @@ class RSSFeedSettingsController extends Controller
      */
     public function update(CreateRssRequest $request, $id = null)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
        //  dd($request);
        //  exit();
         $RSSData = RSSData::where("code",$id)->first();
@@ -2181,6 +2303,10 @@ class RSSFeedSettingsController extends Controller
 
     public function change_status(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         // dd($request);
         // exit();
         $rss_code = $this->request->code;
@@ -2226,6 +2352,10 @@ class RSSFeedSettingsController extends Controller
     }
 
     public function change_status_news(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $RSSNews = RSSNews::where('code', $request -> code)->first();
         $RSSNews->status = $request->active;
         $RSSNews->save();
@@ -2242,6 +2372,10 @@ class RSSFeedSettingsController extends Controller
 
     public function delete(Request $id)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $data['rssfeedsettings'] = $id;
         return view('rssfeedsettings::modal.delete')->with($data);
     }
@@ -2250,6 +2384,10 @@ class RSSFeedSettingsController extends Controller
 
     public function delete_process($id = null)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['news']) {
+            check_permission403();
+        }
         $model = RSSData::where("code",$id)->first();
         // dd($model);
         $settings = SiteSettings::select('id')->where('start_active', '<=', date("Y-m-d H:i:s"))->where('end_active', '>=', date("Y-m-d H:i:s"))->where('active', 1)->where('deleted_at', null)->get();

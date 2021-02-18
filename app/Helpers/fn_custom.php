@@ -27,6 +27,8 @@ use Modules\Users\Entities\user_menu_permission;
 use Modules\Users\Entities\user_menu_sub_permission;
 use Modules\SiteSettings\Entities\site_menu_permission;
 use Modules\SiteSettings\Entities\site_menu_sub_permission;
+use App\Menu;
+use App\Menu_sub;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -148,6 +150,8 @@ function check_role_custom() {
         $arr['settings_general'] = 0;
         $arr['monitoring'] = 0;
         $arr['monitoring_batch'] = 0;
+        $arr['application_logs'] = 0;
+        $arr['send_logs'] = 0;
         $arr['role_center'] = 0;
         $arr['role_site'] = 0;
         if(TYPE_WEB == 'center') {
@@ -204,6 +208,12 @@ function check_role_custom() {
             if(Gate::check('monitoring_batch')) {
                 $arr['monitoring_batch'] = 1;
             }
+            if(Gate::check('application_logs')) {
+                $arr['application_logs'] = 1;
+            }
+            if(Gate::check('send_logs')) {
+                $arr['send_logs'] = 1;
+            }
             if(Gate::check('role_center')) {
                 $arr['role_center'] = 1;
             }
@@ -219,7 +229,7 @@ function check_role_custom() {
                 $result_user_menu_permission = user_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
                 $result_user_menu_sub_permission = user_menu_sub_permission::select('menu_sub_code')->where("site_id", @$site_id_arr)->where("user_id", @Auth::user()->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
 
-                if($role_id = 6) {
+                if($role_id == 6) {
                     if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_menu_permission)){$arr['dashboard'] = 1;}
                     if (in_array("556e3907-8b3f-4b32-9db4-a25ac9fbab06", $result_menu_permission)){$arr['assets'] = 1;}
                     if (in_array("0a120651-fdfd-43e6-8369-bad5a713b8d5", $result_menu_permission)){$arr['news'] = 1;}
@@ -271,6 +281,8 @@ function check_permission_site_custom($user_id) {
         $arr['settings_general'] = 0;
         $arr['monitoring'] = 0;
         $arr['monitoring_batch'] = 0;
+        $arr['application_logs'] = 0;
+        $arr['send_logs'] = 0;
         $arr['role_center'] = 0;
         $arr['role_site'] = 0;
        
@@ -282,7 +294,7 @@ function check_permission_site_custom($user_id) {
                 $result_user_menu_permission = user_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user_id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
                 $result_user_menu_sub_permission = user_menu_sub_permission::select('menu_sub_code')->where("site_id", @$site_id_arr)->where("user_id", @$user_id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
 
-                if($role_id = 6) {
+                if($role_id == 6) {
                     if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_menu_permission)){$arr['dashboard'] = 1;}
                     if (in_array("556e3907-8b3f-4b32-9db4-a25ac9fbab06", $result_menu_permission)){$arr['assets'] = 1;}
                     if (in_array("0a120651-fdfd-43e6-8369-bad5a713b8d5", $result_menu_permission)){$arr['news'] = 1;}
@@ -334,6 +346,8 @@ function check_permission_site_custom_api($user_id, $menu) {
         $arr['settings_general'] = 0;
         $arr['monitoring'] = 0;
         $arr['monitoring_batch'] = 0;
+        $arr['application_logs'] = 0;
+        $arr['send_logs'] = 0;
         $arr['role_center'] = 0;
         $arr['role_site'] = 0;
        
@@ -345,7 +359,7 @@ function check_permission_site_custom_api($user_id, $menu) {
         $result_user_menu_permission = user_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user_id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_code')->toArray();
         // $result_user_menu_sub_permission = user_menu_sub_permission::select('menu_sub_code')->where("site_id", $site_id_arr)->where("user_id", $user_id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_code')->toArray();
 
-        if($role_id = 6) {
+        if($role_id == 6) {
             if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_menu_permission)){$arr['dashboard'] = 1;}
             if (in_array("556e3907-8b3f-4b32-9db4-a25ac9fbab06", $result_menu_permission)){$arr['assets'] = 1;}
             if (in_array("0a120651-fdfd-43e6-8369-bad5a713b8d5", $result_menu_permission)){$arr['news'] = 1;}
@@ -377,6 +391,45 @@ function check_permission_site_custom_api($user_id, $menu) {
     } catch (\Exception $e) {
         return 0;
     }
+}
+
+function check_goto_menu($Menu_permission_site=null,$type='center') {
+    $url = '';
+    if(!empty($Menu_permission_site)) {
+        $menu_id = $Menu_permission_site[0];
+        // $menu_id = 3;
+        $menu = Menu::where('id',$menu_id)->where('deleted_at',null)->where('active',1)->orderBy('order','asc')->first();
+        if($menu) {
+            if($type == 'center') {
+                if($menu->type_url == 'site_url') {
+                    $url = $menu->url;
+                } else if($menu->type_url == 'route') {
+                    // $url = route($menu->url_client);
+                    // $url_arr = explode("/",$url);
+                    // $url = $url_arr[2];
+                    $url_length = strlen(url(''));
+                    $urlfull_length = strlen(route($menu->url));
+                    // $url = stripos(route($menu->url_client), "/");
+                    // $url = substr(route($menu->url_client),0,$url_arr[2]+1);
+                    $url = substr(route($menu->url),$url_length,$urlfull_length);
+                }
+            } else {
+                if($menu->type_url == 'site_url') {
+                    $url = $menu->url_client;
+                } else if($menu->type_url == 'route') {
+                    // $url = route($menu->url_client);
+                    // $url_arr = explode("/",$url);
+                    // $url = $url_arr[2];
+                    $url_length = strlen(url(''));
+                    $urlfull_length = strlen(route($menu->url_client));
+                    // $url = stripos(route($menu->url_client), "/");
+                    // $url = substr(route($menu->url_client),0,$url_arr[2]+1);
+                    $url = substr(route($menu->url_client),$url_length,$urlfull_length);
+                }
+            }
+        }
+    }
+    return $url;
 }
 
 
@@ -569,7 +622,7 @@ function explode_val($val,$type=null) {
     if($val) {
         $val_arr = explode(",",$val);
         if($val_arr) {
-            $result .= '<div class="ovf-link">';
+            $result .= '<div>';
             foreach($val_arr as $tag) {
                 if($type == 'tags') {
                     $result .=  '<a href="'.route('indicators.link_tags', ['id' => $tag]).'">'.$tag.'</a> ,';
@@ -872,6 +925,12 @@ function get_word_leak_compromise($val, $type)
     }
     
     return $html;
+}
+
+function check_permission403()
+{
+    Auth::logout();
+    abort(403, 'Unauthorized action.');
 }
 
 

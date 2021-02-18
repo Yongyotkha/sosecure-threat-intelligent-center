@@ -15,7 +15,7 @@
                         <div class="col-sm-12 m-b-xs">
 
                         @if($section == 'general')
-                        <div class="bc-head" style="margin-top: 4px">General</div>
+                        <div class="bc-head" style="margin-top: 4px">Settings > General</div>
                         <a href="{{ route('settings.index', 'clauses') }}" class="d-none btn btn-sm btn-{{ get_option('theme_color') }}">@icon('solid/file-contract') @langapp('clauses')</a>
                         @endif
 

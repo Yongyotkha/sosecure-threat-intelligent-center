@@ -40,6 +40,10 @@ class WebDefacementController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
         $data['page'] = langapp('webdefacement');
         // $data['SiteSettings'] = SiteSettings::where("active",1)->where("deleted_at",null)->get();
         // <><><>
@@ -125,6 +129,10 @@ class WebDefacementController extends Controller
 
     public function detail($code,Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
        
         $WebdefacmentSetting = WebdefacmentSetting::where("code",$code)->where('deleted_at', null)->where('active', 1)->with('get_webdefacment_data_original_detail')->with('get_webdefacment_data_check_detail')->with('get_webdefacment_data_log_detail');
         
@@ -272,9 +280,12 @@ class WebDefacementController extends Controller
 
     public function load_card(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
         $html = '';
      
-
         $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null);
 
         //<><><>
@@ -412,6 +423,10 @@ class WebDefacementController extends Controller
 
     public function change_status(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
 
         $data = WebdefacmentSetting::where('id', $request->id)->first();
         $data->webdeflacement_progress = 1;
@@ -442,6 +457,10 @@ class WebDefacementController extends Controller
 
     public function update_original(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
 
         $webdefacment_id = $request->id;
 
@@ -469,6 +488,10 @@ class WebDefacementController extends Controller
     }  
 
     public function deface_now(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
         $webdefacment_id = $request->id;
         $command = 'app:WebDefacementProccessbyWebdefacment_id';
         $params = [
@@ -480,6 +503,10 @@ class WebDefacementController extends Controller
 
     public function update_original_detail(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
         $webdefacement_original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $request->id)->orderBy('created_at', 'desc')->first();
         $html_h = $webdefacement_original->hash;
@@ -506,6 +533,10 @@ class WebDefacementController extends Controller
     }  
 
     public function deface_now_detail(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
         $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->first();
         $html_h = $webdefacement_check->hash_new;
@@ -533,6 +564,10 @@ class WebDefacementController extends Controller
 
     public function update_image(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['web_defacement']) {
+            check_permission403();
+        }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
 
         if($webdefacement->get_webdefacment_data_original_detail[0]->url_id){

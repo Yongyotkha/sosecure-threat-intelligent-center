@@ -344,6 +344,9 @@
 
 
     $('.select-2-type').select2();
+    $('select').select2({
+    minimumResultsForSearch: -1
+    });
     
     $(function() { 
         var start = moment().startOf('hour');
@@ -373,7 +376,7 @@
             search_val = 0;
             $("#search").val('');
             $("#site").val('').trigger('change');
-            $("#source_select").val('').trigger('change');
+            $("#type").val('').trigger('change');
             $(".btn-grey").removeClass("active");
             $("#all").addClass ( "active" );
             check_type = null;
@@ -434,9 +437,7 @@
                 },
                 type: "POST",
             },
-            order: [
-                [0, "desc"]
-            ],
+            "order": [ 5, 'desc' ],
             columns: [
                 {
                     data: 'chk',
@@ -489,7 +490,7 @@
                             content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                         }
                         
-                        return '<div class="scroll-ovf-content-fixh-60" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                        return '<div>'+content+'</div>';
                     },
                 },
             ]

@@ -23,13 +23,18 @@
                     </div>
 
                     <div class="ml-2 text-right">
-                    
-                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete" disabled>
-                            <span data-rel="tooltip" title="Delete" data-placement="right">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
-                        </button>
+
                         <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
                             <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
+                        <a href="{{route('dataleak.create') }}?site={{@$siteSettings->code}}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                            <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
+                            <span class="hide-text">@langapp('add')</span>
+                        </a>
+                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete" disabled>
+                            <span data-rel="tooltip" title="Delete" data-placement="right">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                        </button>
+
                     </div>     
                 </div>
             </header>
@@ -133,7 +138,7 @@
                                         <th>Site</th>
                                         <th>Type</th>
                                         <th>Source</th>
-                                        <th>Keyword Ref</th>
+                                        <th>Keyword</th>
                                         <th>Content</th>
                                         <th>Data Feed</th>
                                         <th>View</th>
@@ -346,7 +351,6 @@ function table_social_data(search_val){
             type: "POST",
         },
         order: [
-            [0, "desc"]
         ],
         columns: [
             {
@@ -375,7 +379,7 @@ function table_social_data(search_val){
             },
             {
                 data: 'content',
-                name: 'content'
+                name: 'content',
             },
             {
                 data: 'data_feed',
@@ -412,12 +416,29 @@ function table_social_data(search_val){
                             console.log(data2);
                             content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                         }
-                        return '<div class="scroll-ovf-content-fixh-60" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                        return '<div>'+content+'</div>';
                     }else{
                         return '';
                     }
                 },
             },
+            {
+                        targets: 9,
+                        width: '10px',
+                        className : 'nowrap',
+                        render: function (data, type, full, meta) {
+                            var siteCode ='';
+                            siteCode = @json($siteSettings->code);
+                            return `
+                            <a href="${base_url}/socialdatas/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
+                            <a href="${base_url}/dataleak/edit_dataleak_modal/${full.code}?site=${siteCode}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                            </a>
+                            <a href="${base_url}/sitesettings/socialdatas/delete_socialdatas/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
+                            `;
+
+                        },
+                    },
         ]
     });
 }

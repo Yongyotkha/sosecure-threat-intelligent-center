@@ -3,6 +3,10 @@
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light">
+            <a href="{{route('indicators.events')}}" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+            </a>
+
             <div class="bc-head">Tag : {{@$id}}</div>
 
             <a id="advance-search" href="#hide-advance-search"
@@ -269,12 +273,13 @@
                 },
                 {
                     targets: 4,
+                    className: 'text-center',
                     render: function (data, type, row) {
                         var inner = '';
                         if(row.public==1) {
-                            inner = '<i class="fas fa-check"></i>';
+                            inner = '<i class="fas fa-check text-success"></i>';
                         } else {
-                            inner = '<i class="fas fa-times"></i>';
+                            inner = '<i class="fas fa-times text-danger"></i>';
                         }
                         return inner;
                     }
@@ -391,12 +396,13 @@
                 },
                 {
                     targets: 4,
+                    className: 'text-center',
                     render: function (data, type, row) {
                         var inner = '';
                         if(row.public==1) {
-                            inner = '<i class="fas fa-check"></i>';
+                            inner = '<i class="fas fa-check text-success"></i>';
                         } else {
-                            inner = '<i class="fas fa-times"></i>';
+                            inner = '<i class="fas fa-times text-danger"></i>';
                         }
                         return inner;
                     }

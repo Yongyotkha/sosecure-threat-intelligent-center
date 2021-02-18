@@ -8,6 +8,7 @@
         $.fn.dataTable.moment('{{ $sort }}');
         $.fn.dataTable.moment('{{ $sort }} HH:mm');
         $.fn.DataTable.ext.pager.numbers_length = 3;
+        $.fn.dataTable.ext.errMode = 'none';
         $.extend( true, $.fn.dataTable.defaults, {
         buttons: [
             {

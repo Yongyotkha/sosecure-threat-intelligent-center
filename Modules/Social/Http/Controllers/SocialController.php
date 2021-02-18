@@ -43,6 +43,10 @@ class SocialController extends Controller
      */
     public function index()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
 
         if(Auth::check()) {
 
@@ -142,6 +146,10 @@ class SocialController extends Controller
 
 
     public function jqueryLoadMoreNews(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
 
         $date_start = $request->date_start;
         $date_end = $request->date_end;
@@ -403,6 +411,10 @@ class SocialController extends Controller
     }
 
     public function jqueryLoadMoreNewsTopic(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
         $html = '';
         $NewsTopic = NewsTopics::where('topic_id', $request->topic_id)->wherehas('news', function($q){
             $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('created_at','desc');
@@ -467,6 +479,10 @@ class SocialController extends Controller
     }
 
     public function jqueryLoadMoreNewsBookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
         $html = '';
         $Bookmark = Bookmarks_social::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();//->paginate(PAGINATE_NUM);//->get()
         // $Bookmark = Bookmarks_social::orderBy('created_at','desc')->get();
@@ -555,6 +571,10 @@ class SocialController extends Controller
     }
 
     public function bookmark(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
         $checkBookmark = Bookmarks_social::where('user_id', Auth::user()->id)->where('data_leak_feed_id', $request -> news_id)->first();
         if($checkBookmark){
             $checkBookmark -> delete();
@@ -569,6 +589,7 @@ class SocialController extends Controller
     }
 
     public function add_read(Request $request) {
+       
         $addread = $request->addread;
 
         try {
@@ -623,6 +644,10 @@ class SocialController extends Controller
 
 
     public function count_val(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['data_leak']) {
+            check_permission403();
+        }
 
         // dd($request->check_type);
 
@@ -633,8 +658,8 @@ class SocialController extends Controller
         $orwhere3 = ['deleted_at' => null, 'feel_type' => 'server'];
         
 
-        $date_start = $request->date_start;
-        $date_end = $request->date_end;
+        $date_start = $request->startDate;
+        $date_end = $request->startDate;
         $site_id = '';
         $site_code = $request ->site_id;
 
@@ -671,42 +696,59 @@ class SocialController extends Controller
 
         
 
-        if(  $request -> f_search == 1 && ($request -> title || $request -> social || $request -> date_start || $request -> date_end || $site_id || $request->check_type) ){
+        if(  $request -> search_val == 1){
 
-            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->with('get_site')->with('get_data_leak_feed_one');
-            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status', 1);
+            $model = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
 
 
-            if($request -> type) {
-                $model = $model-> where('feel_type', '=' ,$request -> type);
-                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> type);
-            }else{
-                $model = $model->whereIn('feel_type', ['social', 'darkweb_public']);
-                $countGroupBy = $countGroupBy->whereIn('feel_type', ['social', 'darkweb_public']);
+            // if($request -> type) {
+            //     $model = $model-> where('feel_type', '=' ,$request -> type);
+            //     $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> type);
+            // }
+
+            // if($request -> social) {
+            //     $model = $model-> where('sourceid', '=' ,$request -> social);
+            //     $countGroupBy = $countGroupBy -> where('sourceid', '=' ,$request -> social);
+            // }
+
+            if ($request->keywords) {
+                $keywords = $request->keywords;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                });
+
+                $countGroupBy->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
+                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                });
             }
 
-            if($request -> social) {
-                $model = $model-> where('sourceid', '=' ,$request -> social);
-                $countGroupBy = $countGroupBy -> where('sourceid', '=' ,$request -> social);
-            }
-
-            if($request -> title){
-                $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
-                // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
-                $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
-            }
+            // if($request -> keywords){
+            //     $model = $model->where('keyword', 'LIKE', '%' . $request->title . '%');
+            //     // $news = $news -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+            //     // $countGroupBy = $countGroupBy -> where('feedcontent', 'LIKE' ,'%'.$request -> title.'%');
+            //     $countGroupBy = $countGroupBy -> where('keyword', 'LIKE' ,'%'.$request -> title.'%');
+            // }
 
             if($request -> check_type) {
                 $model = $model-> where('feel_type', '=' ,$request -> check_type);
                 $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> check_type);
             }
 
+            // if($request ->click_type) {
+
+            //     $model = $model-> where('feel_type', '=' ,$request -> click_type);
+            //     $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
+
+            // }
+
             
 
-            if($date_start) {
+  
               
-                if($request -> isDateSearch=="true"){
+                if($request -> isDateSearch==1){
                     // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                     // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                 
@@ -720,11 +762,7 @@ class SocialController extends Controller
                 
                 }
 
-            }
-
-            if($date_end) {
-
-            }
+      
 
 
 
@@ -778,10 +816,10 @@ class SocialController extends Controller
             $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
             $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
         }else{
-            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->where('feel_type', 'social')->orWhere('feel_type', 'darkweb_public')->count();
+            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social','darkweb_public'])->count();
             $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public']);//->get()
             $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['social', 'darkweb_public'])->groupBy('feel_type');
-           
+  
 
             if(Auth::check()) {
 
@@ -831,8 +869,8 @@ class SocialController extends Controller
             $data = [
                 "html" => $html,
                 "count" => $Data_leak_feed_all,
-                "darkweb" => $count_sub_type["darkweb"],
-                "social" => $count_sub_type["social"],
+                "darkweb" => @$count_sub_type["darkweb_public"],
+                "social" => @$count_sub_type["social"],
             ];
             return response()->json($data); 
         }

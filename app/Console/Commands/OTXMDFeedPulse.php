@@ -71,11 +71,11 @@ class OTXMDFeedPulse extends Command
                         'source' => "otx.alienvault",
                     ]);
                 }//modified:%3C1d
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified&q=modified:%3C12h', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified&q=modified:<12h', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                 } else {
-                    
+
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
                     // $this->info("FAIL1");
@@ -173,6 +173,14 @@ class OTXMDFeedPulse extends Command
         if (!empty($pulses)) {
             foreach ($pulses as $value) {
                 try {
+
+                 $modified = $value["modified"]; 
+                 $created = $value["created"]; 
+               //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+                 if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d')) {
+                    $this->info("Insert created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+
+
                     $url_1 = "https://otx.alienvault.com/otxapi/pulses/" . $value["id"] . "/";
                     $reconCall = $this->reconnnect($url_1, $urlLimit);
                     if ($reconCall["success"]) {
@@ -180,202 +188,217 @@ class OTXMDFeedPulse extends Command
                         $groups = implode(', ', array_column(isset($otxPulseDetail["groups"])?$otxPulseDetail["groups"]:[] , 'name'));
                     } else {
                        $checkSuccess = false;
+                   }
+                   $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
+                   $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
+                   $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
+                   $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
+
+                   $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                    ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
+                    ['$set' => [
+                        'name' => isset($value["name"]) ? $value["name"] : "",
+                        'description' => isset($value["description"]) ? $value["description"] : "",
+                        'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
+                        'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
+                        'public' => isset($value["public"]) ? $value["public"] : "",
+                        'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
+
+                        'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
+
+                        'references' => isset($references) ? $references : "",
+                        'tags' => isset($tags) ? $tags : "",
+                        'industries' => isset($industries) ? $industries : "",
+                        'malware_families' => isset($malware_families) ? $malware_families : "",
+                        'groups' => isset($groups) ? $groups : "",
+                        'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
+                        'updated_at' => $date_now ,
+                        'updated_by' => "system",
+                    ],
+                    '$setOnInsert' => [
+                        'indicator_type_counts' => array(),
+                        'indicator_count' => 0,
+                        'transcation_id' => $InsertedId,
+                        'status' => 1,
+                        'created_at' => $date_now ,
+                        'created_by' => "system",
+                        'deleted_at' => null,
+                        'transaction_date' => date("Y-m-d"),
+                        'count_view' => 0,
+                        'source' => "otx.alienvault",
+                    ],
+                ],
+                ['upsert' => true]
+            );
+                   if(isset($value["id"])){
+
+
+                    echo "Indi : ".$value["id"];
+                    $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
+                    $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
+                    $this->countAttr($value["id"],$clientMD);
+                    if(!$checkSuccessDummy){
+                        $checkSuccess = false;
                     }
-                    $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
-                    $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
-                    $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
-                    $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
-
-                    $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                        ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
-                        ['$set' => [
-                            'name' => isset($value["name"]) ? $value["name"] : "",
-                            'description' => isset($value["description"]) ? $value["description"] : "",
-                            'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
-                            'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
-                            'public' => isset($value["public"]) ? $value["public"] : "",
-                            'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
-                            
-                            'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
-                            
-                            'references' => isset($references) ? $references : "",
-                            'tags' => isset($tags) ? $tags : "",
-                            'industries' => isset($industries) ? $industries : "",
-                            'malware_families' => isset($malware_families) ? $malware_families : "",
-                            'groups' => isset($groups) ? $groups : "",
-                            'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
-                            'updated_at' => $date_now ,
-                            'updated_by' => "system",
-                        ],
-                            '$setOnInsert' => [
-                                'indicator_type_counts' => array(),
-                                'indicator_count' => 0,
-                                'transcation_id' => $InsertedId,
-                                'status' => 1,
-                                'created_at' => $date_now ,
-                                'created_by' => "system",
-                                'deleted_at' => null,
-                                'transaction_date' => date("Y-m-d"),
-                                'count_view' => 0,
-                                'source' => "otx.alienvault",
-                            ],
-                        ],
-                        ['upsert' => true]
-                    );
-                    if(isset($value["id"])){
-                        
-                        
-                        echo "Indi : ".$value["id"];
-                        $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
-                        $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
-                        $this->countAttr($value["id"],$clientMD);
-                        if(!$checkSuccessDummy){
-                            $checkSuccess = false;
-                        }
-                        echo "  Pulse : ".$value["id"];
-                        $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
-                        if(!$checkSuccessDummy){
-                            $checkSuccess = false;
-                        }
-                        
-
-                        $this->info("--END--");
-
+                    echo "  Pulse : ".$value["id"];
+                    $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
+                    if(!$checkSuccessDummy){
+                        $checkSuccess = false;
                     }
-                    
-                } catch (Exception $e) {
-                    $checkSuccess = false;
+
+
+                    $this->info("--END--");
+
                 }
-            }
+            }else{
+              $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+              $checkSuccess = false;
+              break;
 
-        }
-        $dataOut["success"] = $checkSuccess;
-        return $dataOut;
+
+          }
+
+      } catch (Exception $e) {
+        $checkSuccess = false;
     }
+}
 
-    public function countAttr($pulseID_,$clientMD){
-        $pulseID = $pulseID_."";
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-        $findOne_col_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $pulseID));
-        $query2 = [
-            '$and' =>   
-                [
-                    ['pulse_id' => $pulseID],
-                    ['is_count_attr' => ['$exists' => true]],
-                ]
-        ];
-        $find_col_fx_otx_events_indicator_ref_2 = $col_fx_otx_events_indicator_ref->count($query2);
-        if($find_col_fx_otx_events_indicator_ref_2==$findOne_col_fx_otx_events["indicator_count"]){
-            
+}
+$dataOut["success"] = $checkSuccess;
+return $dataOut;
+}
+
+public function countAttr($pulseID_,$clientMD){
+    $pulseID = $pulseID_."";
+    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+    $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+    $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+    $findOne_col_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $pulseID));
+    $query2 = [
+        '$and' =>   
+        [
+            ['pulse_id' => $pulseID],
+            ['is_count_attr' => ['$exists' => true]],
+        ]
+    ];
+    $find_col_fx_otx_events_indicator_ref_2 = $col_fx_otx_events_indicator_ref->count($query2);
+    if($find_col_fx_otx_events_indicator_ref_2==$findOne_col_fx_otx_events["indicator_count"]){
+
             //count corrrect
-            $query = [
-                '$and' =>   
-                    [
-                        ['pulse_id' => $pulseID],
-                        ['is_count_attr' => ['$exists' => false]],
-                    ]
-            ];
-            $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
-            $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
-            $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
-            foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
-                $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
-                $countAttrAll++;
-                if(!empty($findOne_col_fx_otx_indicator_detail)){
-                    if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
-                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
-                    } else {
-                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
-                    }
+        $query = [
+            '$and' =>   
+            [
+                ['pulse_id' => $pulseID],
+                ['is_count_attr' => ['$exists' => false]],
+            ]
+        ];
+        $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+        $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
+        $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
+        foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
+            $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+            $countAttrAll++;
+            if(!empty($findOne_col_fx_otx_indicator_detail)){
+                if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
+                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+                } else {
+                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
                 }
             }
-
-            $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
-                ['pulse_id' => $pulseID],
-                ['$set' => 
-                    [
-                        'indicator_count' =>  $countAttrAll,
-                        'indicator_type_counts' => $countAttrArray,
-                    ],
-                ]
-            );
-            
-            $col_fx_otx_events_indicator_ref->updateMany(
-                $query,
-                array('$set' => array("is_count_attr" => 1))
-            );
-        }else{
-            //count false
-            
-            $query = [
-                'pulse_id' => $pulseID
-            ];
-            $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
-            $countAttrArray = array();
-            $countAttrAll = 0;
-            foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
-                $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
-                $countAttrAll++;
-                if(!empty($findOne_col_fx_otx_indicator_detail)){
-                    // echo $findOne_col_fx_otx_indicator_detail["type"];
-                    if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
-                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
-                    } else {
-                        $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
-                    }
-                }
-            }
-
-            $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
-                ['pulse_id' => $pulseID],
-                ['$set' => 
-                    [
-                        'indicator_count' =>  $countAttrAll,
-                        'indicator_type_counts' => $countAttrArray,
-                    ],
-                ]
-            );
-            
-            $col_fx_otx_events_indicator_ref->updateMany(
-                $query,
-                array('$set' => array("is_count_attr" => 1))
-            );
-
         }
-    }
 
-    public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
-    {
-        $allRow = (object) array();
-        $dayMoreThan = 2;
-        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
-        try {
-            $otxSuccessCheck = true;
-            $otxFeedDataCheck = true;
-            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-            $loop = 0;
-            $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1', $urlLimit);
-            if ($reconCall["success"]) {
-                $otxFeedData = json_decode($reconCall["result"], true);
-            } else {
-                $otxFeedDataCheck = false;
-                $otxSuccessCheck = false;
+        $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
+            ['pulse_id' => $pulseID],
+            ['$set' => 
+            [
+                'indicator_count' =>  $countAttrAll,
+                'indicator_type_counts' => $countAttrArray,
+            ],
+        ]
+    );
+
+        $col_fx_otx_events_indicator_ref->updateMany(
+            $query,
+            array('$set' => array("is_count_attr" => 1))
+        );
+    }else{
+            //count false
+
+        $query = [
+            'pulse_id' => $pulseID
+        ];
+        $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+        $countAttrArray = array();
+        $countAttrAll = 0;
+        foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
+            $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+            $countAttrAll++;
+            if(!empty($findOne_col_fx_otx_indicator_detail)){
+                    // echo $findOne_col_fx_otx_indicator_detail["type"];
+                if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
+                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+                } else {
+                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                }
+            }
+        }
+
+        $updateResult_col_fx_otx_events = $col_fx_otx_events->updateOne(
+            ['pulse_id' => $pulseID],
+            ['$set' => 
+            [
+                'indicator_count' =>  $countAttrAll,
+                'indicator_type_counts' => $countAttrArray,
+            ],
+        ]
+    );
+
+        $col_fx_otx_events_indicator_ref->updateMany(
+            $query,
+            array('$set' => array("is_count_attr" => 1))
+        );
+
+    }
+}
+
+public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
+{
+    $allRow = (object) array();
+    $dayMoreThan = 2;
+    $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+    try {
+        $otxSuccessCheck = true;
+        $otxFeedDataCheck = true;
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $loop = 0;
+        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1&sort=-modified&q=modified:<12h', $urlLimit);
+        if ($reconCall["success"]) {
+            $otxFeedData = json_decode($reconCall["result"], true);
+        } else {
+            $otxFeedDataCheck = false;
+            $otxSuccessCheck = false;
                 // $this->info("FAIL41");
                 // echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=5000&page=1';
-            }
-            while ($otxFeedDataCheck) {
-                $loop++;
-                if (!empty($otxFeedData["results"])) {
-                    
-                    foreach ($otxFeedData["results"] as $value) {
-                        $date1 = date_create($value["created"]);
-                        $date2 = date_create(date("Y-m-d H:i:s"));
-                        $diff = date_diff($date1, $date2);
+        }
+        while ($otxFeedDataCheck) {
+            $loop++;
+            if (!empty($otxFeedData["results"])) {
+
+                foreach ($otxFeedData["results"] as $value) {
+                    $date1 = date_create($value["created"]);
+                    $date2 = date_create(date("Y-m-d H:i:s"));
+                    $diff = date_diff($date1, $date2);
+
+                    $created = $value["created"]; 
+               //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+                    if (explode("T", $created)[0] == date('Y-m-d')) {
+                        $this->info("saveIndicator_ref-Insert created:". explode("T", $created)[0]);
+
+
+
                         if ($diff->format("%R%a") > $dayMoreThan) {
                             // echo json_encode($date1);
                             // echo json_encode($date2);
@@ -392,44 +415,44 @@ class OTXMDFeedPulse extends Command
                                     'updated_by' => "system",
                                     'updated_at' => $date_now,
                                 ],
-                                    '$setOnInsert' => [
-                                        'transcation_id' => null,
-                                        'allrow' => $allRow,
-                                        'status' => 1,
-                                        'created_at' => $date_now,
-                                        'created_by' => "system",
-                                        'deleted_at' => null,
-                                        'transaction_date' => date("Y-m-d"),
-                                        'source' => "otx.alienvault",
-                                    ],
+                                '$setOnInsert' => [
+                                    'transcation_id' => null,
+                                    'allrow' => $allRow,
+                                    'status' => 1,
+                                    'created_at' => $date_now,
+                                    'created_by' => "system",
+                                    'deleted_at' => null,
+                                    'transaction_date' => date("Y-m-d"),
+                                    'source' => "otx.alienvault",
                                 ],
-                                ['upsert' => true]
-                            );
+                            ],
+                            ['upsert' => true]
+                        );
 
                             $update_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->updateOne(
                                 ['indicator_id' => (isset($value["id"]) ? $value["id"]."" : ""),
-                                    'pulse_id' => (isset($pulseID) ? $pulseID : "")],
+                                'pulse_id' => (isset($pulseID) ? $pulseID : "")],
                                 ['$set' => [
                                     'pulse_modified' => $dateModified,
                                     'role' => (isset($value["role"]) ? $value["role"] : ""),
                                     'created' => (isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null),
                                     'expiration' => (isset($value["expiration"]) ? new UTCDateTime(strtotime($value["expiration"])*1000) : null),
                                     'is_active' => (isset($value["is_active"]) ? $value["is_active"] : ""),
-                                    
+
                                 ],
-                                    '$setOnInsert' => [
-                                        'status' => 1,
-                                        'created_at' => $date_now,
-                                        'created_by' => "system",
-                                        'deleted_at' => null,
-                                        'transaction_date' => date("Y-m-d"),
-                                        'updated_at' => $date_now,
-                                        'updated_by' => "system",
-                                        'source' => "otx.alienvault",
-                                    ],
+                                '$setOnInsert' => [
+                                    'status' => 1,
+                                    'created_at' => $date_now,
+                                    'created_by' => "system",
+                                    'deleted_at' => null,
+                                    'transaction_date' => date("Y-m-d"),
+                                    'updated_at' => $date_now,
+                                    'updated_by' => "system",
+                                    'source' => "otx.alienvault",
                                 ],
-                                ['upsert' => true]
-                            );
+                            ],
+                            ['upsert' => true]
+                        );
 
                         } catch (Exception $e) {
                             $otxFeedDataCheck = false;
@@ -440,178 +463,198 @@ class OTXMDFeedPulse extends Command
                             // echo json_encode($value);
                             break;
                         }
-                    }
-                }
 
-               
-                if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
+
+                    }else{
+                     $otxFeedDataCheck = false;
+                     break;
+                 }
+
+
+             }
+         }
+
+
+         if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
                     // echo ($otxFeedData["next"]);
-                    $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
-                    if ($reconCall["success"]) {
-                        $otxFeedData = json_decode($reconCall["result"], true);
-                    } else {
-                        $otxSuccessCheck = false;
-                        $otxFeedDataCheck = false;
-                        // $this->info("FAIL6");
-                    }
-                } else {
-                    $otxFeedDataCheck = false;
-                }
-            }
-        } catch (Exception $e) {
-            $otxSuccessCheck = false;
-        }
-        $dataOut["success"] = $otxSuccessCheck;
-        return $dataOut;
-    }
-
-    public function savePulse_related($pulseID,$urlLimit)
-    {
-        $allRow = (object) array();
-        $dayMoreThan = 2;
-        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
-        try {
-            $otxSuccessCheck = true;
-            $otxFeedDataCheck = true;
-            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-            $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
-            $loop = 0;
-            $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100', $urlLimit);
+            $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
             if ($reconCall["success"]) {
                 $otxFeedData = json_decode($reconCall["result"], true);
-                
             } else {
-                $otxFeedDataCheck = false;
                 $otxSuccessCheck = false;
+                $otxFeedDataCheck = false;
+                        // $this->info("FAIL6");
+            }
+        } else {
+            $otxFeedDataCheck = false;
+        }
+    }
+} catch (Exception $e) {
+    $otxSuccessCheck = false;
+}
+$dataOut["success"] = $otxSuccessCheck;
+return $dataOut;
+}
+
+public function savePulse_related($pulseID,$urlLimit)
+{
+    $allRow = (object) array();
+    $dayMoreThan = 2;
+    $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+    try {
+        $otxSuccessCheck = true;
+        $otxFeedDataCheck = true;
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+        $loop = 0;
+        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100&sort=-modified&q=modified:<12h', $urlLimit);
+        if ($reconCall["success"]) {
+            $otxFeedData = json_decode($reconCall["result"], true);
+
+        } else {
+            $otxFeedDataCheck = false;
+            $otxSuccessCheck = false;
                 // $this->info("FAIL42");
                 // echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100';
-            }
-            while ($otxFeedDataCheck) {
-                $loop++;
-                if (!empty($otxFeedData["results"])) {
-                    foreach ($otxFeedData["results"] as $value) {
-                        $date1 = date_create($value["modified"]);
-                        $date2 = date_create(date("Y-m-d H:i:s"));
-                        $diff = date_diff($date1, $date2);
-                        if ($diff->format("%R%a") > $dayMoreThan) {
+        }
+        while ($otxFeedDataCheck) {
+            $loop++;
+            if (!empty($otxFeedData["results"])) {
+                foreach ($otxFeedData["results"] as $value) {
+                    $date1 = date_create($value["modified"]);
+                    $date2 = date_create(date("Y-m-d H:i:s"));
+
+                    $modified = $value["modified"]; 
+               //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+                    if (explode("T", $modified)[0] == date('Y-m-d')) {
+                       $this->info("savePulse_related-Insert created:". explode("T", $created)[0]);
+
+
+                       $diff = date_diff($date1, $date2);
+                       if ($diff->format("%R%a") > $dayMoreThan) {
                             // echo json_encode($date1);
                             // echo json_encode($date2);
                             // echo "break++++++++";
-                            $otxFeedDataCheck = false;
-                            break;
-                           
-                        }
-                        try {
-                            $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
-                            $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
-                            $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
-                            $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
-                            
-                            $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                                ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
-                                ['$set' => [
-                                    'name' => isset($value["name"]) ? $value["name"] : "",
-                                    'description' => isset($value["description"]) ? $value["description"] : "",
-                                    'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
-                                    'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
-                                    'public' => isset($value["public"]) ? $value["public"] : "",
-                                    'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
-                                    
-                                    'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
-                                    
-                                    'references' => isset($references) ? $references : "",
-                                    'tags' => isset($tags) ? $tags : "",
-                                    'industries' => isset($industries) ? $industries : "",
-                                    'malware_families' => isset($malware_families) ? $malware_families : "",
-                                    'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
-                                    'updated_at' => $date_now ,
-                                    'updated_by' => "system",
-                                ],
-                                    '$setOnInsert' => [
-                                        'indicator_count' => 0,
-                                        'indicator_type_counts' => array(),
-                                        'groups' => isset($groups) ? $groups : "",
-                                        'transcation_id' => null,
-                                        'status' => 1,
-                                        'created_at' => $date_now ,
-                                        'created_by' => "system",
-                                        'deleted_at' => null,
-                                        'transaction_date' => date("Y-m-d"),
-                                        'count_view' => 0,
-                                        'source' => "otx.alienvault",
-                                    ],
-                                ],
-                                ['upsert' => true]
-                            );
+                        $otxFeedDataCheck = false;
+                        break;
 
-                            $update_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->updateOne(
-                                [   'main_pulse_id' => (isset($pulseID) ? $pulseID : ""),
-                                    'pulse_id' => (isset($value["id"]) ? $value["id"] : "")],
-                                ['$set' => [
-                                    'sub_pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
-                                    'updated_at' => $date_now,
-                                    'updated_by' => "system",
-                                ],
-                                    '$setOnInsert' => [
-                                        'status' => 1,
-                                        'created_at' => $date_now,
-                                        'created_by' => "system",
-                                        'deleted_at' => null,
-                                        'transaction_date' => date("Y-m-d"),
-                                        'source' => "otx.alienvault",
-                                    ],
-                                ],
-                                ['upsert' => true]
-                            );
+                    }
+                    try {
+                        $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
+                        $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
+                        $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
+                        $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
 
-                        } catch (Exception $e) {
-                            $otxFeedDataCheck = false;
-                            $error["Exception"] = $e->getMessage();
-                            $otxSuccessCheck = false;
+                        $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                            ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
+                            ['$set' => [
+                                'name' => isset($value["name"]) ? $value["name"] : "",
+                                'description' => isset($value["description"]) ? $value["description"] : "",
+                                'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
+                                'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
+                                'public' => isset($value["public"]) ? $value["public"] : "",
+                                'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
+
+                                'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
+
+                                'references' => isset($references) ? $references : "",
+                                'tags' => isset($tags) ? $tags : "",
+                                'industries' => isset($industries) ? $industries : "",
+                                'malware_families' => isset($malware_families) ? $malware_families : "",
+                                'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
+                                'updated_at' => $date_now ,
+                                'updated_by' => "system",
+                            ],
+                            '$setOnInsert' => [
+                                'indicator_count' => 0,
+                                'indicator_type_counts' => array(),
+                                'groups' => isset($groups) ? $groups : "",
+                                'transcation_id' => null,
+                                'status' => 1,
+                                'created_at' => $date_now ,
+                                'created_by' => "system",
+                                'deleted_at' => null,
+                                'transaction_date' => date("Y-m-d"),
+                                'count_view' => 0,
+                                'source' => "otx.alienvault",
+                            ],
+                        ],
+                        ['upsert' => true]
+                    );
+
+                        $update_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->updateOne(
+                            [   'main_pulse_id' => (isset($pulseID) ? $pulseID : ""),
+                            'pulse_id' => (isset($value["id"]) ? $value["id"] : "")],
+                            ['$set' => [
+                                'sub_pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
+                                'updated_at' => $date_now,
+                                'updated_by' => "system",
+                            ],
+                            '$setOnInsert' => [
+                                'status' => 1,
+                                'created_at' => $date_now,
+                                'created_by' => "system",
+                                'deleted_at' => null,
+                                'transaction_date' => date("Y-m-d"),
+                                'source' => "otx.alienvault",
+                            ],
+                        ],
+                        ['upsert' => true]
+                    );
+
+                    } catch (Exception $e) {
+                        $otxFeedDataCheck = false;
+                        $error["Exception"] = $e->getMessage();
+                        $otxSuccessCheck = false;
                             // $this->info("FAIL9");
                             // echo json_encode($error["Exception"]);
                             // echo json_encode($value);
-                            break;
-                        }
+                        break;
                     }
-                }
-
-               
-                if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
-                    //echo ($otxFeedData["next"]);
-                    $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
-                    if ($reconCall["success"]) {
-                        $otxFeedData = json_decode($reconCall["result"], true);
-                    } else {
-                        $otxSuccessCheck = false;
-                        $otxFeedDataCheck = false;
-                        // $this->info("FAIL10");
-                    }
-                } else {
+                }else{
                     $otxFeedDataCheck = false;
+                    break;
+
                 }
             }
-
-            $query = [
-                'main_pulse_id' => isset($pulseID) ? $pulseID : ""
-            ];
-            $find_col_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->count($query);
-            $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                [   
-                    'pulse_id' => isset($pulseID) ? $pulseID : ""
-                ],
-                [   '$set' => [
-                        'count_related_pulse' => $find_col_fx_otx_events_event_ref
-                    ],
-                ]
-            );
-        } catch (Exception $e) {
-            $otxSuccessCheck = false;
         }
-        $dataOut["success"] = $otxSuccessCheck;
-        return $dataOut;
+
+
+        if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
+                    //echo ($otxFeedData["next"]);
+            $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
+            if ($reconCall["success"]) {
+                $otxFeedData = json_decode($reconCall["result"], true);
+            } else {
+                $otxSuccessCheck = false;
+                $otxFeedDataCheck = false;
+                        // $this->info("FAIL10");
+            }
+        } else {
+            $otxFeedDataCheck = false;
+        }
     }
+
+    $query = [
+        'main_pulse_id' => isset($pulseID) ? $pulseID : ""
+    ];
+    $find_col_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->count($query);
+    $update_fx_otx_events = $col_fx_otx_events->updateOne(
+        [   
+            'pulse_id' => isset($pulseID) ? $pulseID : ""
+        ],
+        [   '$set' => [
+            'count_related_pulse' => $find_col_fx_otx_events_event_ref
+        ],
+    ]
+);
+} catch (Exception $e) {
+    $otxSuccessCheck = false;
+}
+$dataOut["success"] = $otxSuccessCheck;
+return $dataOut;
+}
 
 }

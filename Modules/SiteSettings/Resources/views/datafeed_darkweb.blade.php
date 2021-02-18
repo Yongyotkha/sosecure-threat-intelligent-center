@@ -628,9 +628,13 @@ function table_social_data(){
             },
             type: "POST",
         },
-        order: [
-            [0, "desc"]
-        ],
+        initComplete : function( settings, json){
+            $('[data-rel="tooltip"]').tooltip();
+
+            {{--console.log(json);--}}
+            
+        },
+        "order": [ 6, 'desc' ],
         columns: [
             {
                 data: 'chk',
@@ -687,7 +691,7 @@ function table_social_data(){
                         const data = res[i];
                         content += feedcontent.replace(data, '<span class="badge bg-warning">'+data+'</span>');
                     }
-                    return '<div class="scroll-ovf-content-fixh-60" data-rel="tooltip" title="'+feedcontent+'">'+content+'</div>';
+                    return '<div>'+content+'</div>';
                 },
             },
         ]
