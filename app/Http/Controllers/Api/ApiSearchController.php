@@ -13,69 +13,32 @@ use MongoDB\Client as MongoClient;
 
 class ApiSearchController extends ApiController
 {
-    public function vulnerabilitys_asset_data_detail(Request $request){
-        try{
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            if($data === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            }else{ 
-                if($data['data']['menu'] !== 'search'){
-                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
-                }else{
-                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    if($auth_site['status_code'] !== '200'){
-                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    }
-
-    
-                    $code = $data['data']['code'];
-                    $cve_asset = CVEAssets::where('active',1)->where('code',$code)->with('get_site')->first();
-                    $page = langapp('monitoring_vulnerabilitys');
-                    $response = [
-                        "cve_asset" => $cve_asset,
-                        "page" => $page,
-                    ];
-                
-                    $data_transcation = json_encode($response);
-                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-                }
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e -> getMessage(),
-            );
-            return response()->json($response);
-        }
-    }
     public function searchAll(Request $request){
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
+           
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
                 if($data['data']['menu'] !== 'search'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
-                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    if($auth_site['status_code'] !== '200'){
-                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    }
-
-                    $data['dataSearch'] = array();
+                    
+                    // $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    // if($auth_site['status_code'] !== '200'){
+                    //     return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    // }
+                    
+                    $data21['dataSearch'] = array();
                     $limit = 100;
                     $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
                     $clientMD = new MongoClient($DB_MONGO_KEY);
-
+                    $keyword = '%' . $data['data']['keyword'] . '%';
                     if(check_permission_site_custom_api($data['data']['user_id'],'news') == 1){
-                        $keyword = '%' . $this->request->keyword . '%';
+                        
                         $dataWait['queryData'] = R_s_s_news::select('id', 'title_th as name', 'detail_th as content', DB::raw('CONCAT("/public/news/detail/",code ,"/th") AS link'))->where('title_th', 'LIKE', $keyword);
                         $dataWait['count'] = $dataWait['queryData']->count();
                         $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
@@ -84,8 +47,8 @@ class ApiSearchController extends ApiController
                         if ($dataWait2['count'] > 0){
                             $dataWait2['queryData'] = $dataWait2['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
                             $dataWait2['queryData'] = array_merge($dataWait['queryData'], $dataWait2['queryData']);
-                            $dataWait2['moreDetail'] = $dataWait2['count']<101?"":$this->request->keyword;
-                            $data['dataSearch']["News"] = $dataWait2;
+                            $dataWait2['moreDetail'] = $dataWait2['count']<101?"":$data['data']['keyword'];
+                            $data21['dataSearch']["News"] = $dataWait2;
                         }
                     }
 
@@ -94,7 +57,7 @@ class ApiSearchController extends ApiController
                         $dataWait['count'] = $dataWait['queryData']->count();
                         if ($dataWait['count'] > 0) {
                             $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
-                            $data['dataSearch']["Vulnerabilities"] = $dataWait;
+                            $data21['dataSearch']["Vulnerabilities"] = $dataWait;
                         }
                     }
                     
@@ -107,7 +70,7 @@ class ApiSearchController extends ApiController
                         $dataWait["count"] = $dataWait["queryData"]->count();
                         if ($dataWait['count'] > 0) {
                             $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
-                            $data['dataSearch']["Compromised"] = $dataWait;
+                            $data21['dataSearch']["Compromised"] = $dataWait;
                         }
                     }
     
@@ -120,7 +83,7 @@ class ApiSearchController extends ApiController
                         $dataWait["count"] = $dataWait["queryData"]->count();
                         if ($dataWait['count'] > 0) {
                             $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
-                            $data['dataSearch']["Data Leak"] = $dataWait;
+                            $data21['dataSearch']["Data Leak"] = $dataWait;
                         }
                     }
                     
@@ -130,13 +93,13 @@ class ApiSearchController extends ApiController
                         $dataWait['count'] = $dataWait['queryData']->count();
                         if ($dataWait['count'] > 0) {
                             $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
-                            $data['dataSearch']["Web Defacement"] = $dataWait;
+                            $data21['dataSearch']["Web Defacement"] = $dataWait;
                         }
                     }
                     
                     if(check_permission_site_custom_api($data['data']['user_id'],'indicators') == 1){
                         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-                        $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                        $pipeLine = array('name' => ['$regex'=>$data['data']['keyword'], '$options' => 'i']);
                         $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
                         if($dataWait['count']>0){
                             $options = [
@@ -145,7 +108,7 @@ class ApiSearchController extends ApiController
                             $pipeline = [
                                 [
                                     '$match' => [
-                                        'name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                                        'name'  => ['$regex'=>$data['data']['keyword'], '$options' => 'i'],
                                     ]
                                 ],
                                 [
@@ -168,17 +131,14 @@ class ApiSearchController extends ApiController
                             ];
                             $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
                             $dataWait['queryData'] = $dataWait['queryData']->toArray();
-                            $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
-                            $data['dataSearch']["Events"] = $dataWait;
+                            $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$data['data']['keyword'];
+                            $data21['dataSearch']["Events"] = $dataWait;
                         }
                     }
                     
-
-                    
                     $page = langapp('search');
                     $response = [
-                        "cve_asset" => $cve_asset,
-                        "page" => $page,
+                        "data" => $data21,
                     ];
                 
                     $data_transcation = json_encode($response);
@@ -193,5 +153,34 @@ class ApiSearchController extends ApiController
             );
             return response()->json($response);
         }
-    } 
+    }
+
+    private function dataFalse($bearerToken, $mode, $data){
+        try {
+            $header = $bearerToken;
+            $site = $this->AuthorizationRegister($header, $mode);
+            if($site['status_code'] !== '200'){
+                return $this->AuthorizationRegister($header, $mode);
+            }
+            $value = $data;
+            $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+
+            if($data === false){
+                return $data;
+            }else{
+                $data_return = [
+                    'site' => $site,
+                    'data' => json_decode($data, true),
+                ];
+                return $data_return;
+            }
+
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => 0,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
 }
