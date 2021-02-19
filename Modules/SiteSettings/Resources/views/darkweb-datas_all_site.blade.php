@@ -250,6 +250,14 @@
                         </div>
                     </header>
                     <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="font-weight-bold">Keyword</h5>
+                                <div id="fillter_click_keyword" class="button-group">
+
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-striped" id="table_social_datas">
                                 <thead>
@@ -454,6 +462,7 @@
         }else{
             table_social_data();
             get_count();
+            count_keyword() 
         }
         
     });
@@ -468,6 +477,7 @@
         site = this.value;        
         table_social_data();
         get_count();
+        count_keyword();
         });
 
     function search(){
@@ -478,6 +488,8 @@
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         click_type = null;
+        click_key = null;
+        $('.btn-selector').removeClass('active');
         table_social_data();
         get_count();
     }
@@ -565,6 +577,7 @@
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
                         d.click_type = click_type;
+                        d.click_key = click_key;
                         return d;
                     }
                 },               
@@ -795,7 +808,7 @@
 
             $("#social_reset2").click(function() {
                 search_val = false;
-
+                click_key = null;
                 $('#keyword').val('');
 
                 $('#site').val('').trigger('change');
@@ -809,6 +822,7 @@
                 end = moment();
                 cb(start, end);
                 $('.btn-grey').removeClass('active');
+                $('.selector').removeClass('active');
                 $('#all').addClass('active');
                 check_type = null;
                 get_count();
@@ -857,6 +871,67 @@
         search_val = true;
         table_social_data();
         {{--get_count();--}}
+    }
+
+    function count_keyword() {
+
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('darkweb.count_keyword') }}",
+            data: ({
+                site_id : site,
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                
+                for (var i = 0; i < response.model.length; i++) {
+                    
+                    $('#fillter_click_keyword').append(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
+                }
+                loading('stop_load');
+                active_btn('#fillter_click_keyword .btn-selector');
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+
+        });
+    
+    }
+
+    var click_key = null;
+    function click_keyword(data){
+        click_key = data;
+        search_val = false;
+
+        $('#keyword').val('');
+
+        $('#site').val('').trigger('change');
+        $('#source').val('').trigger('change');
+        startDate =  null;
+        endDate =  null;
+        keywords =  null;
+        site =  null;
+        click_type = null;
+        start = moment().subtract(1, 'month').startOf('month');
+        end = moment();
+        cb(start, end);
+        $('.btn-grey').removeClass('active');
+        $('#all').addClass('active');
+        check_type = null;
+        get_count();
+        table_social_data();
+
+
     }
 
 

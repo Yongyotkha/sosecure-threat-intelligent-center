@@ -363,6 +363,7 @@ class ApiCompromisedController extends ApiController
                     $source = $data['data']['source'];
                     $click_type = $data['data']['click_type'];
                     $check_type = $data['data']['check_type'];
+                    $click_key = $data['data']['click_key'];
 
                     
                     $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
@@ -468,6 +469,11 @@ class ApiCompromisedController extends ApiController
                                 // $q->orwhere($orwhere3);
                             })
                             ->with('get_site')->with('get_data_leak_feed_one');
+
+                            if ($click_key) {
+                                $model = $model->where('keyword', $click_key);
+                                // });
+                            }
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -685,6 +691,69 @@ class ApiCompromisedController extends ApiController
 
                     $response = [
                         "code" => $code,
+
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function count_keyword_darkweb(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'compromised'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+
+                    $model = DataLeakSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
+                            ->where('status',1)->where('deleted_at',null)
+                            ->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])
+                            ->groupBy('keyword');
+
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                    if(@$get_role_custom_first['superadmin'] == 1) {
+        
+                    }else if(@$get_role_custom_first['client'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }else if(@$get_role_custom_first['site_support'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_admin'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_client'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }
+
+                    $model = $model->get()->toArray();
+                    
+
+                    $response = [
+                        "model" => $model,
 
                     ];
 

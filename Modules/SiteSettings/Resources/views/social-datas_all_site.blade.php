@@ -242,14 +242,12 @@
                         </header>
                         <div class="panel-body">
 
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <h5 class="font-weight-bold">Keyword</h5>
                                     <div id="fillter_click_keyword" class="button-group">
-                                        <a class="btn btn-selector active" href="#">Event (0)</a>
-                                        <a class="btn btn-selector" href="#">Attribute (0)</a>
-                                        <a class="btn btn-selector" href="#">OTX (0)</a>
-                                        <a class="btn btn-selector" href="#">MISP (0)</a>
+
                                     </div>
                                 </div>
                             </div>
@@ -495,6 +493,7 @@ active_btn('#groupby-type .btn-grey');
         }else{
             table_social_data();
             get_count();
+            count_keyword();
         }
         
     });
@@ -509,9 +508,11 @@ active_btn('#groupby-type .btn-grey');
         site = this.value;   
         table_social_data();
         get_count();
+        count_keyword();
         });
 
     function search(){
+        click_key = null;
         click_type = null;
         search_val = 1;
         keywords = $('#keyword').val();
@@ -519,6 +520,7 @@ active_btn('#groupby-type .btn-grey');
         source = $('#source option:selected').val();
         startDate =  $("#social_datas_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         endDate =  $("#social_datas_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        $('.btn-selector').removeClass('active');
       
         table_social_data();
         get_count();
@@ -548,6 +550,7 @@ active_btn('#groupby-type .btn-grey');
                         d.isDateSearch = isDateSearch;
                         d.check_type = check_type;
                         d.click_type = click_type;
+                        d.click_key = click_key;
 
                         return d;
                     },
@@ -785,6 +788,7 @@ active_btn('#groupby-type .btn-grey');
     cb(start, end);
 
             $("#social_reset").click(function() {
+                click_key = null;
                 click_type = null;
                 keywords = null;
                 type = null;
@@ -800,6 +804,7 @@ active_btn('#groupby-type .btn-grey');
                 $("#site").val('').trigger("change");
                 $("#source").val('').trigger("change");
                 $('.btn-grey').removeClass('active');
+                $('.btn-selector').removeClass('active');
                 $('#all').addClass('active');
                 check_type = null;
                 table_social_data();
@@ -907,6 +912,61 @@ var click_type = null;
         search_val = 1;
         table_social_data();
         {{--get_count();--}}
+    }
+
+    function count_keyword() {
+
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('socialdatas.count_keyword') }}",
+            data: ({
+                site_id : site,
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                
+                for (var i = 0; i < response.model.length; i++) {
+                    
+                    $('#fillter_click_keyword').append(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
+                }
+                loading('stop_load');
+                active_btn('#fillter_click_keyword .btn-selector');
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+
+        });
+    }
+    var click_key = null;
+    function click_keyword(data){
+        click_key = data;
+        click_type = null;
+        keywords = null;
+        type = null;
+        source = null;
+        startDate =  null;
+        endDate =  null;
+        site = null;
+        search_val = 0;
+        $("#keyword").val('');
+        $("#site").val('').trigger("change");
+        $("#source").val('').trigger("change");
+        $('.btn-grey').removeClass('active');
+        $('#all').addClass('active');
+        check_type = null;
+        table_social_data();
+        get_count();
+
     }
 
 

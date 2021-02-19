@@ -85,6 +85,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('compromised/delete', 'Api\ApiCompromisedController@compromised_delete');
     Route::post('compromised/delete_select', 'Api\ApiCompromisedController@compromised_delete_select');
     Route::post('compromised/delete_change', 'Api\ApiCompromisedController@compromised_delete_change');
+    Route::post('compromised/count_keyword_darkweb', 'Api\ApiCompromisedController@count_keyword_darkweb');
     
     Route::post('data_leak/table', 'Api\ApiDataLeakController@data_leak_table');
     Route::post('data_leak/view', 'Api\ApiDataLeakController@data_leak_view');
@@ -92,6 +93,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/delete', 'Api\ApiDataLeakController@data_leak_delete');
     Route::post('data_leak/delete_select', 'Api\ApiDataLeakController@data_leak_delete_select');
     Route::post('data_leak/delete_change', 'Api\ApiDataLeakController@data_leak_delete_change');
+    Route::post('data_leak/count_keyword', 'Api\ApiDataLeakController@count_keyword');
 
     Route::post('web_defacement/load_card', 'Api\ApiWebdefacementController@web_defacement_load_card');
     Route::post('web_defacement/detail', 'Api\ApiWebdefacementController@web_defacement_detail');

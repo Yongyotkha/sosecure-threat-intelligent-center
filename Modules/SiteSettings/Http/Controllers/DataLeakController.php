@@ -34,6 +34,7 @@ use Modules\Users\Entities\UserSite;
 use phpseclib\Net\SSH2;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DataLeakController extends Controller
 {
@@ -937,6 +938,11 @@ class DataLeakController extends Controller
                 // });
             }
 
+            if ($request->click_key) {
+                $model = $model->where('keyword', $request->click_key);
+                // });
+            }
+
             //<><><>
             // if (Auth::check()) {
 
@@ -1465,6 +1471,11 @@ class DataLeakController extends Controller
                     // $q->orwhere($orwhere3);
                 })
                 ->with('get_site')->with('get_data_leak_feed_one');
+
+                if ($request->click_key) {
+                    $model = $model->where('keyword', $request->click_key);
+                    // });
+                }
 
             //<><><>
             // if (Auth::check()) {
@@ -3969,6 +3980,60 @@ class DataLeakController extends Controller
             Response::HTTP_OK
         );
 
+    }
+
+    public function count_keyword(Request $request){
+        $model = DataLeakSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
+        ->where('status',1)->where('deleted_at',null)
+        ->whereIn('feel_type', ['social', 'darkweb_public'])
+        ->groupBy('keyword');
+        
+        if ($request->site) {
+                
+            $SiteSettings = SiteSettings::where('code', @$request->site)->first();
+            // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
+            $model = $model->where('site_id', $SiteSettings->id);
+            // });
+       
+        }
+
+
+        $model = $model->get()->toArray();
+
+        return ajaxResponse(
+            [
+                'model' => $model,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function count_keyword_darkweb(Request $request){
+        $model = DataLeakSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
+        ->where('status',1)->where('deleted_at',null)
+        ->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])
+        ->groupBy('keyword');
+
+        if ($request->site) {
+                
+            $SiteSettings = SiteSettings::where('code', @$request->site)->first();
+            // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
+            $model = $model->where('site_id', $SiteSettings->id);
+            // });
+       
+        }
+
+
+        $model = $model->get()->toArray();
+
+        return ajaxResponse(
+            [
+                'model' => $model,
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
     

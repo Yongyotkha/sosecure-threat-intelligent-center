@@ -121,6 +121,7 @@ class ApiDataLeakController extends ApiController
                     $check_type = $data['data']['check_type'];
                     $source = $data['data']['source'];
                     $click_type = $data['data']['click_type'];
+                    $click_key = $data['data']['click_key'];
 
 
                     $model = DataLeakSocialRef::where('deleted_at', null)
@@ -232,12 +233,10 @@ class ApiDataLeakController extends ApiController
                         $model->orderBy('created_at','desc')->get();
                     } else {
             
-                        // if ($site) {
-                        //     $SiteSettings = SiteSettings::where('code', @$site)->first();
-                        //     // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
-                        //     $model = $model->where('site_id', $SiteSettings->id);
-                        //     // });
-                        // }
+                        if ($click_key) {
+                            $model = $model->where('keyword', $click_key);
+                            // });
+                        }
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -713,4 +712,69 @@ class ApiDataLeakController extends ApiController
             return response()->json($response);
         }
     }
+
+    public function count_keyword(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+
+                    $model = DataLeakSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
+                            ->where('status',1)->where('deleted_at',null)
+                            ->whereIn('feel_type', ['social', 'darkweb_public'])
+                            ->groupBy('keyword');
+
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                    if(@$get_role_custom_first['superadmin'] == 1) {
+        
+                    }else if(@$get_role_custom_first['client'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }else if(@$get_role_custom_first['site_support'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_admin'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_client'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }
+
+                    $model = $model->get()->toArray();
+                    
+
+                    $response = [
+                        "model" => $model,
+
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    
 }

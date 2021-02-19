@@ -112,7 +112,7 @@ Route::group(
         Route::get('/socialdatas/delete_socialdatas/{code}', 'DataLeakController@delete_socialdatas')->name('socialdatas.delete');
         Route::delete('/socialdatas/delete_socialdata/{code}', 'DataLeakController@delete_socialdata')->name('socialdatas.delete_socialdata');
         Route::post('/socialdatas/socialdatas_change_delete', 'DataLeakController@socialdatas_change_delete')->name('socialdatas.socialdatas_change_delete')->middleware('can:menu_items');
-
+        Route::post('/socialdatas/count_keyword', 'DataLeakController@count_keyword')->name('socialdatas.count_keyword')->middleware('can:menu_items');
 
     }
 );
@@ -242,5 +242,6 @@ Route::get('/vulnerability_assets/detail', 'VulnerabilityController@vulassets_de
 // View Content
 Route::get('/socialdatas/view_content/{code}', 'DataLeakController@view_dataleak_modal')->name('socialdatas.view_content_dataleak')->middleware(['can:menu_items','permission:data_leak']);
 Route::get('/darkweb_data/view_content/{code}', 'DataLeakController@view_compromise_modal')->name('socialdatas.view_content_compromise')->middleware(['can:menu_items','permission:compromised']);
+Route::post('/darkweb-datas/count_keyword_darkweb', 'DataLeakController@count_keyword_darkweb')->name('darkweb.count_keyword')->middleware('can:menu_items');
 
 Route::get('/check_cookie_site', 'SystemSettingsController@check_cookie_site')->name('systemsetting.check_cookie_site')->middleware('can:menu_items');
