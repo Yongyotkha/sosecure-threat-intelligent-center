@@ -188,7 +188,7 @@
                         </div>
                         <div class="tab-pane" id="tab_lastest_news">
                             <section class="panel panel-default">
-                                <div class="row m-b-md">
+                                <div class="row">
                                     <div class="col-sm-12">
                                         <div id="list_news_book_mark"></div>
                                     </div>
