@@ -554,6 +554,61 @@ class ApiWebdefacementController extends ApiController
         }
     }
 
+    public function web_defacement_change_status(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+           
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'web_defacement'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    
+                    $webdefacment_id = $data['data']['id'];
+                    $data2 = WebdefacmentSetting::where('id', $webdefacment_id)->first();
+                    $data2->webdeflacement_progress = 1;
+                    $data2->status_val = 'Normal';
+                    
+                    $data2->save();
+
+                    $webdefacement = WebdefacmentSetting::where('id', $webdefacment_id)->first();
+
+                    $html='';
+                    if ($webdefacement->status_val != 'Normal')   {
+                        $html= '<a href="#" id="accept_risk"
+                        class="btn btn- '.get_option('theme_color').' btn-sm btn-responsive">
+                        Accept Risk
+                        </a>';
+                    }
+                    
+                    $page = langapp('search');
+                    $response = [
+                        "html" => $html,
+                    ];
+                
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
     private function dataFalse($bearerToken, $mode, $data){
         try {
             $header = $bearerToken;
