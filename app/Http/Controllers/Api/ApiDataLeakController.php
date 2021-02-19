@@ -228,8 +228,8 @@ class ApiDataLeakController extends ApiController
                             });
             
                         }
-            
-                        $model->get();
+
+                        $model->orderBy('created_at','desc')->get();
                     } else {
             
                         // if ($site) {
@@ -255,8 +255,8 @@ class ApiDataLeakController extends ApiController
                             $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
             
                         }
-            
-                        $model->get();
+
+                        $model->orderBy('created_at','desc')->get();
                     }
         
                     $res = DataTables::of($model)->toJson(); 

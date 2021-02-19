@@ -457,7 +457,7 @@ class ApiCompromisedController extends ApiController
                         }
 
 
-                        $model->orderBy('id', 'desc');
+                        $model->orderBy('created_at','desc')->get();
                     } else {
 
                         $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])
@@ -495,7 +495,7 @@ class ApiCompromisedController extends ApiController
                     
                         }
 
-                        $model->orderBy('id', 'desc')->get();
+                        $model->orderBy('created_at','desc')->get();
                     }
 
                     $res = DataTables::of($model)->toJson();
