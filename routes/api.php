@@ -82,10 +82,16 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('compromised/count_val', 'Api\ApiCompromisedController@compromised_count_val');
     Route::post('compromised/table', 'Api\ApiCompromisedController@compromised_table');
     Route::post('compromised/view', 'Api\ApiCompromisedController@compromised_view');
+    Route::post('compromised/delete', 'Api\ApiCompromisedController@compromised_delete');
+    Route::post('compromised/delete_select', 'Api\ApiCompromisedController@compromised_delete_select');
+    Route::post('compromised/delete_change', 'Api\ApiCompromisedController@compromised_delete_change');
     
     Route::post('data_leak/table', 'Api\ApiDataLeakController@data_leak_table');
     Route::post('data_leak/view', 'Api\ApiDataLeakController@data_leak_view');
     Route::post('data_leak/count_val', 'Api\ApiDataLeakController@data_leak_count_val');
+    Route::post('data_leak/delete', 'Api\ApiDataLeakController@data_leak_delete');
+    Route::post('data_leak/delete_select', 'Api\ApiDataLeakController@data_leak_delete_select');
+    Route::post('data_leak/delete_change', 'Api\ApiDataLeakController@data_leak_delete_change');
 
     Route::post('web_defacement/load_card', 'Api\ApiWebdefacementController@web_defacement_load_card');
     Route::post('web_defacement/detail', 'Api\ApiWebdefacementController@web_defacement_detail');
@@ -96,6 +102,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('web_defacement/update_image', 'Api\ApiWebdefacementController@web_defacement_update_image');
 
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
+
+    Route::post('search/searchAll', 'Api\ApiSearchController@searchAll');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {

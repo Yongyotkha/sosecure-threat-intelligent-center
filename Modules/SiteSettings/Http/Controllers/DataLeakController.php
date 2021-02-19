@@ -10,6 +10,7 @@ use App\DataLeakSocialRef;
 use App\DataLeakSocialRefTemp;
 use App\Entities\CompromisedServer;
 use App\leak_socail_ref_temp;
+use App\LogEmail;
 use App\Mail\CompromisedMail;
 use App\transaction_client_asset;
 use App\transaction_client_asset_data;
@@ -292,8 +293,29 @@ class DataLeakController extends Controller
             if ($this->request->sent_mail == 1) {
                 $site_email_alert = site_config_email_alert::where("site_id", $site_id)->get();
                 if ($site_email_alert) {
+                    $email_site_a = [];
                     foreach ($site_email_alert as $site_email_alert_val) {
-                        Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compromised'));
+                        $email_site_a[] = $site_email_alert_val->email;
+                    }
+                    $email_site_alert = array_unique($email_site_a);
+                    foreach($email_site_alert as $email){
+                        Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compromised'));
+                        if( count(Mail::failures()) == 0 ) {
+                            LogEmail::Create([
+                                'to' => $email,
+                                'status' => 'Success',
+                                'subject' => 'compromised'
+                            ]);
+                        }
+                    }
+                    if( count(Mail::failures()) > 0 ) {
+                        foreach(Mail::failures() as $email_address) {
+                            LogEmail::Create([
+                                'to' => $email_address,
+                                'status' => 'Fail',
+                                'subject' => 'compromised'
+                            ]);
+                        }
                     }
                 }
             }
@@ -2068,8 +2090,29 @@ class DataLeakController extends Controller
         if ($this->request->sent_mail == 1) {
             $site_email_alert = site_config_email_alert::where("site_id", $site_id)->get();
             if ($site_email_alert) {
+                $email_site_a = [];
                 foreach ($site_email_alert as $site_email_alert_val) {
-                    Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                    $email_site_a[] = $site_email_alert_val->email;
+                }
+                $email_site_alert = array_unique($email_site_a);
+                foreach($email_site_alert as $email){
+                    Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                    if( count(Mail::failures()) == 0 ) {
+                        LogEmail::Create([
+                            'to' => $email,
+                            'status' => 'Success',
+                            'subject' => 'data_leak'
+                        ]);
+                    }
+                }
+                if( count(Mail::failures()) > 0 ) {
+                    foreach(Mail::failures() as $email_address) {
+                        LogEmail::Create([
+                            'to' => $email_address,
+                            'status' => 'Fail',
+                            'subject' => 'data_leak'
+                        ]);
+                    }
                 }
             }
         }
@@ -3459,8 +3502,29 @@ class DataLeakController extends Controller
                     if ($request->sent_mail == true) {
                         $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                         if ($site_email_alert) {
+                            $email_site_a = [];
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                                $email_site_a[] = $site_email_alert_val->email;
+                            }
+                            $email_site_alert = array_unique($email_site_a);
+                            foreach($email_site_alert as $email){
+                                Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                                if( count(Mail::failures()) == 0 ) {
+                                    LogEmail::Create([
+                                        'to' => $email,
+                                        'status' => 'Success',
+                                        'subject' => 'compomise'
+                                    ]);
+                                }
+                            }
+                            if( count(Mail::failures()) > 0 ) {
+                                foreach(Mail::failures() as $email_address) {
+                                    LogEmail::Create([
+                                        'to' => $email_address,
+                                        'status' => 'Fail',
+                                        'subject' => 'compomise'
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -3480,8 +3544,29 @@ class DataLeakController extends Controller
                 if ($request->sent_mail == true) {
                     $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                     if ($site_email_alert) {
+                        $email_site_a = [];
                         foreach ($site_email_alert as $site_email_alert_val) {
-                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                            $email_site_a[] = $site_email_alert_val->email;
+                        }
+                        $email_site_alert = array_unique($email_site_a);
+                        foreach($email_site_alert as $email){
+                            Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                            if( count(Mail::failures()) == 0 ) {
+                                LogEmail::Create([
+                                    'to' => $email,
+                                    'status' => 'Success',
+                                    'subject' => 'compomise'
+                                ]);
+                            }
+                        }
+                        if( count(Mail::failures()) > 0 ) {
+                            foreach(Mail::failures() as $email_address) {
+                                LogEmail::Create([
+                                    'to' => $email_address,
+                                    'status' => 'Fail',
+                                    'subject' => 'compomise'
+                                ]);
+                            }
                         }
                     }
                 }
@@ -3571,8 +3656,29 @@ class DataLeakController extends Controller
                     if ($request->sent_mail == true) {
                         $site_email_alert = site_config_email_alert::where("site_id", $DataLeakSocialRefs->site_id)->get();
                         if ($site_email_alert) {
+                            $email_site_a = [];
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                                $email_site_a[] = $site_email_alert_val->email;
+                            }
+                            $email_site_alert = array_unique($email_site_a);
+                            foreach($email_site_alert as $email){
+                                Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'compomise'));
+                                if( count(Mail::failures()) == 0 ) {
+                                    LogEmail::Create([
+                                        'to' => $email,
+                                        'status' => 'Success',
+                                        'subject' => 'compomise'
+                                    ]);
+                                }
+                            }
+                            if( count(Mail::failures()) > 0 ) {
+                                foreach(Mail::failures() as $email_address) {
+                                    LogEmail::Create([
+                                        'to' => $email_address,
+                                        'status' => 'Fail',
+                                        'subject' => 'compomise'
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -3663,8 +3769,29 @@ class DataLeakController extends Controller
                     if ($request->sent_mail == true) {
                         $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                         if ($site_email_alert) {
+                            $email_site_a = [];
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                                $email_site_a[] = $site_email_alert_val->email;
+                            }
+                            $email_site_alert = array_unique($email_site_a);
+                            foreach($email_site_alert as $email){
+                                Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                                if( count(Mail::failures()) == 0 ) {
+                                    LogEmail::Create([
+                                        'to' => $email,
+                                        'status' => 'Success',
+                                        'subject' => 'data_leak'
+                                    ]);
+                                }
+                            }
+                            if( count(Mail::failures()) > 0 ) {
+                                foreach(Mail::failures() as $email_address) {
+                                    LogEmail::Create([
+                                        'to' => $email_address,
+                                        'status' => 'Fail',
+                                        'subject' => 'data_leak'
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -3684,8 +3811,29 @@ class DataLeakController extends Controller
                 if ($request->sent_mail == true) {
                     $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                     if ($site_email_alert) {
+                        $email_site_a = [];
                         foreach ($site_email_alert as $site_email_alert_val) {
-                            Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                            $email_site_a[] = $site_email_alert_val->email;
+                        }
+                        $email_site_alert = array_unique($email_site_a);
+                        foreach($email_site_alert as $email){
+                            Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                            if( count(Mail::failures()) == 0 ) {
+                                LogEmail::Create([
+                                    'to' => $email,
+                                    'status' => 'Success',
+                                    'subject' => 'data_leak'
+                                ]);
+                            }
+                        }
+                        if( count(Mail::failures()) > 0 ) {
+                            foreach(Mail::failures() as $email_address) {
+                                LogEmail::Create([
+                                    'to' => $email_address,
+                                    'status' => 'Fail',
+                                    'subject' => 'data_leak'
+                                ]);
+                            }
                         }
                     }
                 }
@@ -3775,8 +3923,29 @@ class DataLeakController extends Controller
                     if ($request->sent_mail == true) {
                         $site_email_alert = site_config_email_alert::where("site_id", $DataLeakSocialRefs->site_id)->get();
                         if ($site_email_alert) {
+                            $email_site_a = [];
                             foreach ($site_email_alert as $site_email_alert_val) {
-                                Mail::to($site_email_alert_val->email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                                $email_site_a[] = $site_email_alert_val->email;
+                            }
+                            $email_site_alert = array_unique($email_site_a);
+                            foreach($email_site_alert as $email){
+                                Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
+                                if( count(Mail::failures()) == 0 ) {
+                                    LogEmail::Create([
+                                        'to' => $email,
+                                        'status' => 'Success',
+                                        'subject' => 'data_leak'
+                                    ]);
+                                }
+                            }
+                            if( count(Mail::failures()) > 0 ) {
+                                foreach(Mail::failures() as $email_address) {
+                                    LogEmail::Create([
+                                        'to' => $email_address,
+                                        'status' => 'Fail',
+                                        'subject' => 'data_leak'
+                                    ]);
+                                }
                             }
                         }
                     }

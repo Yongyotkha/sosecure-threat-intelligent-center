@@ -98,35 +98,32 @@ class ApiCVEController extends ApiController
 
                 $site_id = null;
                 if ($search == 1) {
-                    $model = new CVEMapping;
+                    $model = CVEMapping::with('get_site')->with('get_cve_asset');;
 
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         
+        
                     }else if(@$get_role_custom_first['client'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
                     }else if(@$get_role_custom_first['site_support'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
                     }else if(@$get_role_custom_first['site_admin'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
                     }else if(@$get_role_custom_first['site_client'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
                     }
 
-                    if ($site) {
-                        $site_id = $site;
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                            $query->where('site_id', $site_id);
-                        });
-                    }
+                    // if ($site) {
+                    //     $site_id = $site;
+                    //     $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
+                    //         $query->where('site_id', $site_id);
+                    //     });
+                    // }
 
 
                     if ($assets) {
@@ -155,38 +152,32 @@ class ApiCVEController extends ApiController
                         $model = $model->whereIn('severity', $datatype);
                     }   
                 } else {
-                    $model = CVEMapping::where('is_fix', 0);
+                    $model = CVEMapping::where('is_fix', 0)->with('get_site')->with('get_cve_asset');
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         
+        
                     }else if(@$get_role_custom_first['client'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
                     }else if(@$get_role_custom_first['site_support'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
                     }else if(@$get_role_custom_first['site_admin'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
                     }else if(@$get_role_custom_first['site_client'] == 1) {
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                            $query->whereIn('site_id', $site_id_arr);
-                        });
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
                     }
 
 
-                    if ($site) {
+                    // if ($site) {
                         
-                        $site_id = $site;
-                        $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                            $query->where('site_id', $site_id);
-                        });
+                    //     $model = $model->where('site_id', $site);
 
 
-                    }
+                    // }
 
                     
                 }
@@ -345,25 +336,25 @@ class ApiCVEController extends ApiController
                         return $html;
                     })
                     ->addColumn('site', function (CVEMapping $model) {
-                        return $model -> site;
+                        return @$model->get_site->name;
                     })
                     ->addColumn('hostname', function (CVEMapping $model) {
-                        return $model -> hostname;
+                        return @$model->get_cve_asset -> Hostname?$model->get_cve_asset -> Hostname:'-';
                     })
                     ->addColumn('ip', function (CVEMapping $model) {
-                        return $model -> ip;
+                        return @$model->get_cve_asset -> IP?$model->get_cve_asset -> IP:'-';;
                     })
                     ->addColumn('vendor', function (CVEMapping $model) {
-                        return $model -> vendor;
+                        return @$model->get_cve_asset -> vendor?$model->get_cve_asset -> vendor:'-';;
                     })
                     ->addColumn('title', function (CVEMapping $model) {
-                        return $model -> title;
+                        return @$model->get_cve_asset -> title?$model->get_cve_asset -> title:'-';;
                     })
                     ->addColumn('version', function (CVEMapping $model) {
-                        return $model -> version;
+                        return @$model->get_cve_asset -> version?$model->get_cve_asset -> version:'-';;
                     })
                     ->addColumn('edition', function (CVEMapping $model) {
-                        return $model -> edition;
+                        return @$model->get_cve_asset -> edition?$model->get_cve_asset -> edition:'-';;
                     })
                     ->addColumn('cvss_severity', function (CVEMapping $model) {
                         $html = '';
@@ -415,6 +406,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -435,11 +433,71 @@ class ApiCVEController extends ApiController
                     if($auth_site['status_code'] !== '200'){
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     $response['page'] = langapp('monitoring_vulnerabilitys');
-                    $response['cve_assets'] = CVEAssets::where("active", '=', 1)->get();
-                    $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
-                    $response['count_CVEMapping'] = CVEMapping::count();
-                    $response['count_isFix'] = CVEMapping::where("is_fix", '=', 1)->count();
+
+                    $cve_assets = CVEAssets::where("active", '=', 1);
+                    if(@$get_role_custom_first['superadmin'] == 1) {
+                        
+        
+                    }else if(@$get_role_custom_first['client'] == 1) {
+                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }else if(@$get_role_custom_first['site_support'] == 1) {
+                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_admin'] == 1) {
+                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_client'] == 1) {
+                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }
+
+                    $response['count_CVEAssets'] = $cve_assets->count();
+                    $response['cve_assets'] = $cve_assets->get();
+                    
+
+
+                    $count_CVEMapping = new CVEMapping;                   
+                    if(@$get_role_custom_first['superadmin'] == 1) {
+                        
+        
+                    }else if(@$get_role_custom_first['client'] == 1) {
+                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }else if(@$get_role_custom_first['site_support'] == 1) {
+                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_admin'] == 1) {
+                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_client'] == 1) {
+                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }
+                    $response['count_CVEMapping'] = $count_CVEMapping->count();
+
+                    $count_isFix= CVEMapping::where("is_fix", '=', 1);
+                        
+                        if(@$get_role_custom_first['superadmin'] == 1) {
+                        
+        
+                        }else if(@$get_role_custom_first['client'] == 1) {
+                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr)->where('status', 1);
+            
+                        }else if(@$get_role_custom_first['site_support'] == 1) {
+                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_admin'] == 1) {
+                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_client'] == 1) {
+                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr)->where('status', 1);
+            
+                        }
+                    $response['count_isFix'] = $count_isFix->count();
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -451,6 +509,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -494,6 +559,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -687,6 +759,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -925,6 +1004,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1129,6 +1215,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1171,6 +1264,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1217,6 +1317,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1257,6 +1364,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1339,6 +1453,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1367,6 +1488,26 @@ class ApiCVEController extends ApiController
                     if($site){ 
                         $model = $model->where('site_id',$site);
                     }
+
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                    if(@$get_role_custom_first['superadmin'] == 1) {
+                        
+        
+                    }else if(@$get_role_custom_first['client'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }else if(@$get_role_custom_first['site_support'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_admin'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr);
+        
+                    }else if(@$get_role_custom_first['site_client'] == 1) {
+                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+        
+                    }
+                    
                         
 
                     $model -> get();
@@ -1383,6 +1524,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
@@ -1594,6 +1742,13 @@ class ApiCVEController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }
