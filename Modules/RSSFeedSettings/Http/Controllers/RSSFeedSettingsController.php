@@ -619,7 +619,7 @@ class RSSFeedSettingsController extends Controller
         }
 
         $model = $model         
-        ->select(DB::raw('count(source) as source_count , source as source'))
+        ->select(DB::raw('count(*) as source_count , source as source'))
         ->groupBy('source')
         ->orderBy('source_count', 'desc')
         ->limit(10)
