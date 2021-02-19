@@ -1093,13 +1093,15 @@ Highcharts.setOptions({
                             scrollbar: {
                                 enabled: true
                             },
-                            tickLength: 0
+                        allowDecimals: false,
+
                         },
                         yAxis: {
                             min: 0,
                             title: {
                             text: null
-                            }
+                            },
+                        allowDecimals: false,
                         },
                         legend: {
                             pointWidth: 30,
