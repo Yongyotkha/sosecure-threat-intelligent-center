@@ -529,7 +529,7 @@ function get_webdefacment_status($status_id,$color='') {
             $html = '<span class="dot critical"></span> Critical';
         } else if(strtolower($status_id) == strtolower("high")) {
             $html = '<span class="dot " style="background: #e64732 !important;"></span> High';
-        } else if(strtolower($status_id) == strtolower("meduim")) {
+        } else if(strtolower($status_id) == strtolower("medium")) {
             $html = '<span class="dot " style="background: #fcc838 !important;"></span> Medium';
         } else if(strtolower($status_id) == strtolower("normal")) {
             $html = '<span class="dot low"></span> Normal';
@@ -541,7 +541,7 @@ function get_webdefacment_status($status_id,$color='') {
             $html = $status_id;
         } else if(strtolower($status_id) == strtolower("high")) {
             $html = $status_id;
-        } else if(strtolower($status_id) == strtolower("meduim")) {
+        } else if(strtolower($status_id) == strtolower("medium")) {
             $html = $status_id;
         } else if(strtolower($status_id) == strtolower("normal")) {
             $html = $status_id;
