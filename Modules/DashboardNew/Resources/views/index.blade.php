@@ -954,7 +954,7 @@ Highcharts.setOptions({
                     pie: {
                         allowPointSelect: true,
                         cursor: 'pointer',
-                        color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f', '#d3d3d3'],
+                        color: ['#e64732', '#fcc838', '#00dcff', '#88ce4f', '#d3d3d3'],
                         dataLabels: {
                             enabled: true,
                             format: '<b>{point.name}</b>: {point.percentage:.1f} %'
@@ -966,7 +966,7 @@ Highcharts.setOptions({
                     data: [
                     {  name: 'Critical', y: data.count_critical, color: '#e64732'}, 
                     {  name: 'High',  y: data.count_high , color: '#fcc838'}, 
-                    {  name: 'Medium', y: data.count_medium, color: '#ffe46d'  }, 
+                    {  name: 'Medium', y: data.count_medium, color: '#00dcff'  }, 
                     {  name: 'Low',   y: data.count_low, color: '#88ce4f'  },
                     {  name: 'Information',   y: data.count_none, color: '#d3d3d3'  },
                     ]
@@ -1127,7 +1127,7 @@ Highcharts.setOptions({
                         }, {
                             name: 'Medium',
                             data: medium,
-                            color: '#ffe46d'
+                            color: '#00dcff'
                         }, {
                             name: 'Low',
                             data: low,
@@ -1167,7 +1167,7 @@ Highcharts.setOptions({
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
-                    color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f ', '#d3d3d3'],
+                    color: ['#e64732', '#fcc838', '#00dcff', '#88ce4f ', '#d3d3d3'],
                     dataLabels: {
                         enabled: true,
                         format: '<b>{point.name}</b>: {point.percentage:.1f} %'
@@ -1179,7 +1179,7 @@ Highcharts.setOptions({
                 data: [
                 {  name: 'Critical',   y: 12, color: '#e64732'  },
                 {  name: 'High',  y: 14 , color: '#fcc838'}, 
-                {  name: 'Medium', y: 12, color: '#ffe46d'  }, 
+                {  name: 'Medium', y: 12, color: '#00dcff'  }, 
                 {  name: 'Low',   y: 33, color: '#88ce4f '  },
                 {  name: 'Information',   y: 0, color: '#d3d3d3'  },
                 ],  

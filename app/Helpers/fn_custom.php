@@ -500,7 +500,7 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
         } else if(strtolower($status_id) == strtolower("HIGH")) {
             $html = '<span class="badge badge-Warning" style="background-color: #fcc838;">'.$num_val.' HIGH</span>';
         } else if(strtolower($status_id) == strtolower("MEDIUM")) {
-            $html = '<span class="badge badge-Warning" style="background-color: #ffe46d;">'.$num_val.' MEDIUM</span>';
+            $html = '<span class="badge badge-Warning" style="background-color: #00dcff;">'.$num_val.' MEDIUM</span>';
         } else if(strtolower($status_id) == strtolower("LOW")) {
             $html = '<span class="badge badge-Success" style="background-color: #88ce4f;">'.$num_val.' LOW</span>';
         } else if(strtolower($status_id) == strtolower("NONE")) {

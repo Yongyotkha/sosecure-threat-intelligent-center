@@ -1015,7 +1015,7 @@ $(document).ready(function(){
                 pie: {
                     allowPointSelect: true,
                     cursor: 'pointer',
-                    color: ['#e64732', '#fcc838', '#ffe46d', '#88ce4f', '#d3d3d3'],
+                    color: ['#e64732', '#fcc838', '#00dcff', '#88ce4f', '#d3d3d3'],
                     dataLabels: {
                         enabled: true,
                         format: '<b>{point.name}</b>: {point.percentage:.1f} %'

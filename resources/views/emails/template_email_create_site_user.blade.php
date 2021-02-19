@@ -24,7 +24,7 @@
                   <td class="miro__col-header-btn" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:26px;text-align:right;vertical-align:top;width:50%;word-wrap:break-word">
                   <a href="{{route('index')}}" class="miro-btn" target="_blank" style="Margin:0;background-color:#fff;border:1px solid #050038;border-radius:4px;box-sizing:border-box;color:#050038!important;cursor:pointer;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:16px!important;font-stretch:normal;font-style:normal;font-weight:400;height:48px;letter-spacing:normal;line-height:48px!important;margin:0;padding:0;text-align:center;text-decoration:none;white-space:nowrap;width:170px">
 						<span style="font-family:Helvetica,Arial,sans-serif">
-							GO TO Threat inSight
+							Go To Threat inSight
 						</span>
                     </a>
                   </td>
@@ -33,9 +33,9 @@
             </div>
             <div class="miro__content-body" style="font-family:Helvetica,Arial,sans-serif">
               <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:40px 40px 36px">
-              <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24;text-align:center">Complete registration</div>
-                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;text-align:center;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">Please enter this confirmation code in the window <br> where you started creating your
-                <div style="margin-top: 10px;text-align:center;color:#000;font-weight:700"> account : <span style="font-weight:700;margin-left:15px;">{{$summary['User']->email}}</span></div>
+              <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24;text-align:center">Complete Registration</div>
+                <div class="miro-title-block__subtitle font-size-20 m-top-16" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;text-align:center;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6">Please enter this confirmation code in the window <br> where you started creating your.
+                <div style="margin-top: 10px;text-align:center;color:#000;font-weight:700">Your Account : <span style="font-weight:700;margin-left:15px;">{{$summary['User']->email}}</span></div>
 				</div>
               </div>
               <div class="miro-confirmation-code-block" style="font-family:Helvetica,Arial,sans-serif;padding:0 40px">
@@ -47,7 +47,7 @@
               </div> --}}
               <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:10px 0 12px 0px;text-align:center">
                 <div class="miro-title-block__title font-size-42" style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:42px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.24"></div>
-                <div style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6;text-align:center" class="miro-title-block__subtitle font-size-20 m-top-16">Or click this button to confirm your email:</div>
+                <div style="color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:700;letter-spacing:normal;line-height:1.4;margin-top:16px;opacity:.6;text-align:center" class="miro-title-block__subtitle font-size-20 m-top-16">Or click this button to confirm your email.</div>
               </div>
               <table class="spacer" style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top;width:100%">
                 <tbody style="font-family:Helvetica,Arial,sans-serif">

@@ -516,7 +516,7 @@ function get_CVSS_Severity_status_js(num_val,status_id,badg='') {
         } else if(status_id == "HIGH") {
             html = '<span class="badge badge-Warning" style="background-color: #fcc838;">'+num_val+' HIGH</span>';
         } else if(status_id == "MEDIUM") {
-            html = '<span class="badge badge-Warning" style="background-color: #ffe46d;">'+num_val+' MEDIUM</span>';
+            html = '<span class="badge badge-Warning" style="background-color: #00dcff;">'+num_val+' MEDIUM</span>';
         } else if(status_id== "LOW") {
             html = '<span class="badge badge-Success" style="background-color: #88ce4f;">'+num_val+' LOW</span>';
         } else if(status_id == "NONE") {
