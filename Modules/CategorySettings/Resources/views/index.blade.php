@@ -7,7 +7,7 @@
             btn-sm btn-responsive pull-left m-r-5">
             @icon('solid/arrow-left')
             </a> --}}
-            <div class="bc-head">@langapp('settings') > Categorys</div>
+            <div class="bc-head">@langapp('settings') > Categories</div>
 
 
             {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }}
@@ -38,7 +38,7 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-xs-12">
-                            <i class="fas fa-table"></i> Table Categorys
+                            <i class="fas fa-table"></i> Table Categories
                         </div>
                     </div>
                 </header>
