@@ -132,7 +132,7 @@
 
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
-                        <div class="col-md-4 nopadding">
+                        <div class="col-md-3 nopadding">
                             <a href="javascript:void(0)" onclick="searchTB('','clearFilter')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
@@ -145,7 +145,7 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-4 nopadding">
+                        <div class="col-md-3 nopadding">
                             <a href="javascript:void(0)" onclick="searchTB('Windows','os_type')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
@@ -158,7 +158,7 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-4 nopadding">
+                        <div class="col-md-3 nopadding">
                             <a href="javascript:void(0)" onclick="searchTB('Linux','os_type')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
@@ -167,6 +167,19 @@
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Linux</h3>
                                         <span class="number-card green" id="count_linux">0</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 nopadding">
+                            <a href="javascript:void(0)">
+                            <div class="card-dash-compro none-bg none-shadow">
+                                <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/icon/Other.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">OTHER</h3>
+                                        <span class="number-card" id="">0</span>
                                     </div>
                                 </div>
                             </a>

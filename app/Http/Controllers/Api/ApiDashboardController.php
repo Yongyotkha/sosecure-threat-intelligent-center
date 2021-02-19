@@ -916,7 +916,7 @@ class ApiDashboardController extends ApiController
                                 }
                             }else{
                                 if(!$sitecode){
-                                    $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.last_check as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/webdefacement") AS link , "Web Defacement" AS pagename , CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active',1)->where('webdefacment_setting.status_add',1)->whereBetween('webdefacment_setting.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                                    $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.last_check as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/webdefacement/detail/",fx_webdefacment_setting.code) AS link , "Web Defacement" AS pagename , CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active',1)->where('webdefacment_setting.status_add',1)->whereBetween('webdefacment_setting.created_at',array($date_start_datetime_format,$date_end_datetime_format));
                                     $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
                                     
                                         $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id', $site_id_arr);
