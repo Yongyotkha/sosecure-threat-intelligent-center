@@ -970,8 +970,10 @@ class NewsController extends Controller
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
             if($check_read_news){
                 $html .= '<div class="list-news" style="background-color:#ececec">';
+                $font_weight = '';
             }else{
                 $html .= '<div class="list-news">';
+                $font_weight = 'font-weight: bold !important;';
             }
 
             if(@$data -> news -> transaction_rss_id) {
@@ -992,11 +994,11 @@ class NewsController extends Controller
                 </div>
                 <div class="content-news-text">
                     <a href="'.route('news.news_detail_code',['code' => $data -> news -> code]).'">
-                        <span class="head-news-text">'.$data -> news -> title_th.'</span>
+                        <span class="head-news-text" style="'.@$font_weight.'">'.$data -> news -> title_th.'</span>
                     </a>
                     <div class="entry-meta">
-                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
                         <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> news -> view.'</span>
+                        <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> news -> public_date.'</span>
                         <span>&nbsp;'.strip_tags($data -> news -> detail_th).'</span>
                     </div>
                 </div>
@@ -1036,10 +1038,10 @@ class NewsController extends Controller
                 $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
                 if($check_read_news){
                     $html .= '<div class="list-news">';
-                    $font_weight = 'font-weight: bold !important;';
+                    $font_weight = '';
                 }else{
                     $html .= '<div class="list-news" style="background-color:#ececec">';
-                    $font_weight = '';
+                    $font_weight = 'font-weight: bold !important;';
                 }
 
                 if(@$data -> news -> transaction_rss_id) {
@@ -1065,8 +1067,8 @@ class NewsController extends Controller
                             <span class="head-news-text" style="'.@$font_weight.'">'.@$data -> news -> title_th.'</span>
                         </a>
                         <div class="entry-meta">
-                            <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> news -> public_date.'</span>
                             <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> news -> view.'</span>
+                            <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> news -> public_date.'</span>
                             <span><p></p>&nbsp;'.strip_tags(@$data -> news -> detail_th).'</p></span>
                         </div>
                     </div>
