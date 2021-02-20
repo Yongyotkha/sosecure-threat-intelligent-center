@@ -1022,7 +1022,7 @@ var click_type2 = null;
     }
 
     function dataType2(data){
-        
+        click_type = '';
         click_type2 = data;
         search_val = 1;
         table_social_data();
