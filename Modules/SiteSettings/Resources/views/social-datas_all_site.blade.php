@@ -93,7 +93,7 @@
                                     <a href="#" onclick="dataType('social')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
-                                                <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                                <img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)">
                                             </div>
                                             <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
                                             <span class="number-card warning" id='compromise-count'>0</span>
@@ -106,7 +106,7 @@
                                     <a href="#" onclick="dataType('darkweb_public')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
-                                                <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                                <img src="{{asset('images/icebergline1.png')}}" alt="" onerror="setDefaultPic(this)">
                                             </div>
                                             <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
                                             <span class="number-card info"  id='darkweb-count'>0</span>
@@ -114,6 +114,102 @@
                                      </a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="container-fluid" style="margin-bottom:10px;">
+                        <div class="row">
+                            {{-- <div class="col-md-1 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="javascript:void(0)">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper "></h3>
+                                            <span class="number-card warning" id=''></span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div> --}}
+                            <div class="col-md-3 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="javascript:void(0)" onclick="dataType2('mobile')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice" style="height: 62px;">
+                                                <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 25px !important;">Mobile</h3>
+                                            <span class="number-card warning" style="font-size: 25px !important;" id='icon_mobile'>0</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="javascript:void(0)" onclick="dataType2('facebook')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice" style="height: 62px;">
+                                                <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Facebook</h3>
+                                            <span class="number-card info" style="font-size: 25px !important;"  id='icon_facebook'>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="javascript:void(0)" onclick="dataType2('twitter')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice" style="height: 62px;">
+                                                <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Twitter</h3>
+                                            <span class="number-card " style="color: #5bb984; font-size: 25px !important;" id='icon_twitter'>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="javascript:void(0)" onclick="dataType2('website')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice" style="height: 62px;">
+                                                <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Website</h3>
+                                            <span class="number-card " style="color: #8793db; font-size: 25px !important;" id='icon_website'>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-3 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="javascript:void(0)" onclick="dataType2('other')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice" style="height: 62px;">
+                                                <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Other</h3>
+                                            <span class="number-card "style="color: #565656; font-size: 25px !important;" id='icon_other'>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            {{-- <div class="col-md-1 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="javascript:void(0)">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper "></h3>
+                                            <span class="number-card warning" id=''></span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div> --}}
                         </div>
                     </div>
 
@@ -416,6 +512,11 @@
 
 </section>
 
+
+{{-- for (var i = 0; i < response.model.length; i++) {
+    $('#fillter_click_keyword').html(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
+} --}}
+
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.datepicker')
@@ -433,6 +534,7 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
 @include('stacks.js.fullscreen')
+@include('stacks.js.defaultpic')
 <script>
 
 
@@ -494,6 +596,7 @@ active_btn('#groupby-type .btn-grey');
             table_social_data();
             get_count();
             count_keyword();
+            count_icon();
         }
         
     });
@@ -513,6 +616,7 @@ active_btn('#groupby-type .btn-grey');
 
     function search(){
         click_key = null;
+        click_type2 = null;
         click_type = null;
         search_val = 1;
         keywords = $('#keyword').val();
@@ -551,6 +655,7 @@ active_btn('#groupby-type .btn-grey');
                         d.check_type = check_type;
                         d.click_type = click_type;
                         d.click_key = click_key;
+                        d.click_type2 = click_type2;
 
                         return d;
                     },
@@ -906,9 +1011,18 @@ active_btn('#groupby-type .btn-grey');
 }
 
 var click_type = null;
+var click_type2 = null;
     function dataType(data){
         
         click_type = data;
+        search_val = 1;
+        table_social_data();
+        {{--get_count();--}}
+    }
+
+    function dataType2(data){
+        
+        click_type2 = data;
         search_val = 1;
         table_social_data();
         {{--get_count();--}}
@@ -927,9 +1041,8 @@ var click_type = null;
                 loading('load');
             },
             success:function(response) {
-                
+                $('#fillter_click_keyword').html('');
                 for (var i = 0; i < response.model.length; i++) {
-                    
                     $('#fillter_click_keyword').append(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
                 }
                 loading('stop_load');
@@ -970,6 +1083,37 @@ var click_type = null;
     }
 
 
+
+    function count_icon() {
+        $.ajax({
+            type:"POST",
+            url:'{!! site_url('social/count_icon') !!}',
+            data: ({
+                site_id : site,
+            }),
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+                $("#icon_mobile").html(response.icon_mobile);
+                $("#icon_facebook").html(response.icon_facebook);
+                $("#icon_twitter").html(response.icon_twitter);
+                $("#icon_website").html(response.icon_website);
+                $("#icon_other").html(response.icon_other);
+            },
+            error: function (error){
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+
+        });
+    }
 
    
 
