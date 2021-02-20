@@ -206,10 +206,7 @@
                             <div class="col-md-12">
                                 <h5 class="font-weight-bold">Group</h5>
                                 <div id="fillter_click_group" class="button-group">
-                                    <a class="btn btn-selector active" href="#">Event (0)</a>
-                                    <a class="btn btn-selector" href="#">Attribute (0)</a>
-                                    <a class="btn btn-selector" href="#">OTX (0)</a>
-                                    <a class="btn btn-selector" href="#">MISP (0)</a>
+                                    <span id="btn_group"></span>
                                 </div>
                             </div>
                         </div>
@@ -386,6 +383,7 @@
     var datatable = [];
     var check_published = null;
     var industries ="";
+    var group ="";
 
     $(".check_published").click(function() {
         check_published = $(this).val();
@@ -394,6 +392,7 @@
 
     $(function() {
         load_industries();
+        load_group();
         var chart = new Highcharts.chart('chart-pack', {
             chart: {
                 type: 'bar',
@@ -669,6 +668,7 @@
                     d.isDateSearch = isDateSearch;
                     d.check_published = check_published;
                     d.industries = industries;
+                    d.group = group;
                 }
             },
             initComplete : function( settings, json){
@@ -807,9 +807,51 @@
         console.log("No response from server");
     });
 }
-function click_industries(industries_name){
 
+function load_group(){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('indicators.indicator_group')}}",
+            type: "get",
+            data: ({
+            }),
+            {{--datatype: "html",--}}
+            beforeSend: function(){
+            },
+        }).done(function(data){
+          if (data.status_code =="00") {
+            var html ="";
+            html +='  <a class="btn btn-selector click_group active" href="javascript:void(0);" onclick="click_group(\''+''+'\');">'+'All'+'</a>';
+            for (var i = data.data.length - 1; i >= 0; i--) {
+                html +='  <a class="btn btn-selector click_group" href="javascript:void(0);" onclick="click_group(\''+data.data[i].industries_name+'\');">'+data.data[i].industries_name+'</a>';
+            }
+            $('#btn_group').html(html);
+
+            $('.click_group').click(function(){
+               $('.click_group').removeClass('active');
+               $(this).addClass('active');
+           });
+        }else{
+
+
+        }
+
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function click_industries(industries_name){
+    group = null;
     industries = industries_name.trim();
+    search_table(1);
+}
+
+function click_group(group_name){
+    industries = null;
+    group = group_name.trim();
     search_table(1);
 }
 

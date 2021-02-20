@@ -43,5 +43,6 @@ Route::group(
         Route::get('/tags/{id}', 'IndicatorsController@link_tags')->name('indicators.link_tags')->middleware('can:menu_items');
         Route::post('/tags/table_tags', 'IndicatorsController@table_tags')->name('indicators.table_tags')->middleware('can:menu_items');
         Route::get('/industries', 'IndicatorsController@indicator_industries')->name('indicators.industries')->middleware('can:menu_items');
+        Route::get('/group', 'IndicatorsController@indicator_group')->name('indicators.indicator_group')->middleware('can:menu_items');
     }
 );

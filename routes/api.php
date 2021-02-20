@@ -43,6 +43,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/events_count_view', 'Api\ApiIndicatorController@events_count_view');
     Route::post('indicator/load_relatedPulse', 'Api\ApiIndicatorController@load_relatedPulse');
     Route::post('indicator/industries', 'Api\ApiIndicatorController@industries');
+    Route::post('indicator/group', 'Api\ApiIndicatorController@group');
     Route::post('indicator/table_tags', 'Api\ApiIndicatorController@table_tags');
     Route::post('indicator/table_groups', 'Api\ApiIndicatorController@table_groups');
     
