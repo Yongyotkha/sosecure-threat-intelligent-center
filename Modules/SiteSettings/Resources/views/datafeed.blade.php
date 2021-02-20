@@ -157,7 +157,7 @@
                         </header>
                         <div class="panel-body">
 
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-md-12">
                                     <h5 class="font-weight-bold">Keyword</h5>
                                     <div id="fillter_click_keyword" class="button-group">
@@ -167,7 +167,7 @@
                                         <a class="btn btn-selector" href="#">MISP (0)</a>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="table-responsive">
                                 <table  class="table table-striped" id="table_data_feed">
