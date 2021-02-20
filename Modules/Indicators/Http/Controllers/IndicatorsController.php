@@ -1770,8 +1770,12 @@ class IndicatorsController extends Controller
                             // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
                         } 
                         if ($request->industries) {
-                        $query['industries'] = ['$regex'=>$request->industries, '$options' => 'i'];
-                    }
+                            $query['industries'] = ['$regex'=>$request->industries, '$options' => 'i'];
+                        }
+                        if ($request->groups) {
+                            $query['groups'] = ['$regex'=>$request->groups, '$options' => 'i'];
+                        }
+
 
                     $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
 
@@ -2325,6 +2329,25 @@ class IndicatorsController extends Controller
 
         return response()->json($response_data);
 
+    }
+
+    public function indicator_group(Request $request){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['indicators']) {
+            check_permission403();
+        }
+        try {
+        $Indicatorgroup = IndicatorSummaryYear::where('type', 'groups')->where('status', 1)->orderBy('order')->select('industries_name')->get();
+        $response_data = ['message' => '', 'status_code' => '00', 'data' => $Indicatorgroup];
+
+
+
+        } catch (Exception $e) {
+                $this->error($e->getMessage());
+                $response_data = ['message' => $e->getMessage(), 'status_code' => '01', 'data' => array()];
+        }
+
+        return response()->json($response_data);
     }
 
 }
