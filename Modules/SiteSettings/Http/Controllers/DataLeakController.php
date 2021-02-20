@@ -1015,7 +1015,7 @@ class DataLeakController extends Controller
         $data["code"] = $code;
         $model = DataLeakSocialRef::select('data_leak_feed.feedcontent')->join('data_leak_feed', 'data_leak_feed.id', '=',
         'data_leak_socail_ref.data_leak_feed_id')->where('data_leak_socail_ref.code',$code)->first();
-        $data["feedcontent"] = $model->feedcontent;
+        $data["feedcontent"] = htmlspecialchars_decode($model->feedcontent);
         return view('sitesettings::modal.view_content_dataleak')->with($data);
     }
     
