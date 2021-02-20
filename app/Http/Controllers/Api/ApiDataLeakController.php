@@ -121,6 +121,7 @@ class ApiDataLeakController extends ApiController
                     $check_type = $data['data']['check_type'];
                     $source = $data['data']['source'];
                     $click_type = $data['data']['click_type'];
+                    $click_type2 = $data['data']['click_type2'];
                     $click_key = $data['data']['click_key'];
 
 
@@ -138,6 +139,17 @@ class ApiDataLeakController extends ApiController
                             $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
                                 $query->where('keyword', 'LIKE', '%' . $keywords . '%')
                                     ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                            });
+                        }
+
+                        if ($click_type2) {
+                            $keywords = $click_type2;
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                                if($keywords == 'other') {
+            
+                                } else {
+                                    $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                                }
                             });
                         }
             
