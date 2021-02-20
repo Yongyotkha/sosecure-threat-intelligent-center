@@ -95,6 +95,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/delete_select', 'Api\ApiDataLeakController@data_leak_delete_select');
     Route::post('data_leak/delete_change', 'Api\ApiDataLeakController@data_leak_delete_change');
     Route::post('data_leak/count_keyword', 'Api\ApiDataLeakController@count_keyword');
+    Route::post('data_leak/count_icon', 'Api\ApiDataLeakController@count_icon');
 
     Route::post('web_defacement/load_card', 'Api\ApiWebdefacementController@web_defacement_load_card');
     Route::post('web_defacement/detail', 'Api\ApiWebdefacementController@web_defacement_detail');
