@@ -93,7 +93,7 @@
                                     <a href="#" onclick="dataType('social')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
-                                                <img src="{{asset('images/icebergline2.png')}}" alt="">
+                                                <img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)">
                                             </div>
                                             <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
                                             <span class="number-card warning" id='compromise-count'>0</span>
@@ -106,12 +106,108 @@
                                     <a href="#" onclick="dataType('darkweb_public')">
                                         <div class="left-card">
                                             <div class="img-icon-card ice">
-                                                <img src="{{asset('images/icebergline1.png')}}" alt="">
+                                                <img src="{{asset('images/icebergline1.png')}}" alt="" onerror="setDefaultPic(this)">
                                             </div>
                                             <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
                                             <span class="number-card info"  id='darkweb-count'>0</span>
                                         </div>
                                      </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container-fluid" style="margin-bottom:10px;">
+                        <div class="row">
+                            <div class="col-md-1 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="#" onclick="dataType('social')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper "></h3>
+                                            <span class="number-card warning" id=''></span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="#" onclick="dataType('social')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper ">Mobile</h3>
+                                            <span class="number-card warning" id=''>0</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="#" onclick="dataType('darkweb_public')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Facebook</h3>
+                                            <span class="number-card info"  id=''>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="#" onclick="dataType('darkweb_public')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Twitter</h3>
+                                            <span class="number-card " style="color: #5bb984;" id=''>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="#" onclick="dataType('darkweb_public')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Website</h3>
+                                            <span class="number-card " style="color: #8793db;" id=''>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <a href="#" onclick="dataType('darkweb_public')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)">
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Other</h3>
+                                            <span class="number-card "style="color: #565656;" id=''>0</span>
+                                        </div>
+                                     </a>
+                                </div>
+                            </div>
+                            <div class="col-md-1 nopadding">
+                                <div class="card-dash-compro none-bg none-shadow ">
+                                    <a href="#" onclick="dataType('social')">
+                                        <div class="left-card">
+                                            <div class="img-icon-card ice">
+                                                
+                                            </div>
+                                            <h3 class="name-dash-text-compro text-dark text-upper "></h3>
+                                            <span class="number-card warning" id=''></span>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -433,6 +529,7 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
 @include('stacks.js.fullscreen')
+@include('stacks.js.defaultpic')
 <script>
 
 
