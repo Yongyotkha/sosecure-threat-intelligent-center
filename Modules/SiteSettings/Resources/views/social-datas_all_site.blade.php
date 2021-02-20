@@ -627,7 +627,7 @@ active_btn('#groupby-type .btn-grey');
         $('.btn-selector').removeClass('active');
       
         table_social_data();
-        get_count();
+        {{--get_count();--}}
     }
 
     function table_social_data(){
@@ -1015,6 +1015,7 @@ var click_type2 = null;
     function dataType(data){
         
         click_type = data;
+        click_type2 = '';
         search_val = 1;
         table_social_data();
         {{--get_count();--}}
