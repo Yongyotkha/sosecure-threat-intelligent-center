@@ -653,7 +653,32 @@ Highcharts.setOptions({
                     width:'400px',
                     targets: 3,
                     render: function (data, type, full, meta) {    
-                        return '<div class="text-trucate-ovf">'+full.content+'</div>';    
+                        let html = '';
+                        let val = full.content;
+                        var res = val.split("||");
+                        let status = '';
+                        if(res.length > 0) {
+                            if(res.length > 1) {
+                                if(res[2].toLowerCase() == 'normal') {
+                                    status = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class="dot low"></span> Normal</div>`;
+                                    html += `${res[0]} <br> ${res[1]} <br> ${status}`;
+                                } else if(res[2].toLowerCase() == 'medium') {
+                                    status = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class="dot " style="background: #fcc838 !important;"></span> Medium</div>`;
+                                    html += `${res[0]} <br> ${res[1]} <br> ${status}`;
+                                } else if(res[2].toLowerCase() == 'high') {
+                                    status = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class="dot " style="background: #e64732 !important;"></span> High</div>`;
+                                    html += `${res[0]} <br> ${res[1]} <br> ${status}`;
+                                } else {
+                                    html += `${full.content}`;
+                                }
+                            } else {
+                                html += `${full.content}`;
+                            }
+                            
+                        } else {
+                            html += `${full.content}`;
+                        }
+                        return '<div class="<!--text-trucate-ovf-->">'+html+'</div>';    
                     },
                 },
                 {

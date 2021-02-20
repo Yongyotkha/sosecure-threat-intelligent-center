@@ -477,14 +477,14 @@ class DashboardNewController extends Controller
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
                 if(@get_role_custom()['superadmin'] == 1) {
                     if(!$request -> site){
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                     }else{
                         $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id',$site_id_m->id)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id',$site_id_m->id)->where('status', 1)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
                     }
                 } else {
                     if(!$request -> site){
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','server','compromise','compromised'])->count();
                     }else{
                         $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
                         $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['darkweb','webserver','compromise','compromised'])->count();
@@ -510,17 +510,17 @@ class DashboardNewController extends Controller
                 // $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
                 if(@get_role_custom()['superadmin'] == 1) {
                     if(!$request -> site){
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->where('feel_type', 'social')->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->whereIn('feel_type', ['social','darkweb_public'])->count();
                     }else{
                         $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->where('feel_type', 'social')->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('feel_type', ['social','darkweb_public'])->count();
                     }
                 } else {
                     if(!$request -> site){
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social','darkweb_public'])->count();
                     }else{
                         $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->where('feel_type', 'social')->count();
+                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social','darkweb_public'])->count();
                     }
                 }
             }
@@ -802,6 +802,7 @@ class DashboardNewController extends Controller
         if($request->sitecode){
             $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->where("code",$request->sitecode)->first();
         }
+        $site_id_arr = @get_role_custom()['site_id_arr'];
 
         
         $dataCVEMapping = array();
@@ -809,14 +810,39 @@ class DashboardNewController extends Controller
         $DataLeakFeed_social = array();
         $DataLeakFeed_compromised = array();
         $data_fx_otx_events = array();
-        if (!$request->pagename||$request->pagename=='Vulnerabilities') {
+        $WebdefacmentSetting = array();
+        if (!$request->pagename||$request->pagename=='Vulnerability') {
             $role_custom = @check_role_custom();
             if($role_custom['vulnerabilities']) {
-                $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                if(isset($SiteSettings->id)){
-                    $dataCVEMapping = $dataCVEMapping->where("data_datacve_mapping.site_id",$SiteSettings->id);
+                if(@get_role_custom()['superadmin'] == 1) {
+                    if(!$request -> sitecode){
+                        $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        // if(isset($SiteSettings->id)){
+                            // $dataCVEMapping = $dataCVEMapping->whereIn("data_datacve_mapping.site_id",$site_id_arr);
+                        // }
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id')->get()->toArray();
+                    } else {
+                        $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        // if(isset($SiteSettings->id)){
+                            $dataCVEMapping = $dataCVEMapping->where("data_datacve_mapping.site_id",$SiteSettings->id);
+                        // }
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id')->get()->toArray();
+                    }
+                } else {
+                    if(!$request -> sitecode){
+                        $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        // if(isset($SiteSettings->id)){
+                            $dataCVEMapping = $dataCVEMapping->whereIn("data_datacve_mapping.site_id",$site_id_arr);
+                        // }
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id')->get()->toArray();
+                    } else {
+                        $dataCVEMapping = CVEMapping::select('namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        // if(isset($SiteSettings->id)){
+                            $dataCVEMapping = $dataCVEMapping->where("data_datacve_mapping.site_id",$SiteSettings->id);
+                        // }
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id')->get()->toArray();
+                    }
                 }
-                $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'data_datacve_mapping.site_id', '=', 'site.id')->get()->toArray();
             }
         }
 
@@ -839,46 +865,88 @@ class DashboardNewController extends Controller
             $role_custom = @check_role_custom();
             if($role_custom['data_leak']) {
                 if(@get_role_custom()['superadmin'] == 1) {//|| @get_role_custom()['site_admin'] == 1
-                    $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feed_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
-                    foreach ($DataLeakFeed_social as $key => $value) {
-                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
-                        if($leak_socail_ref_temps){
-                            if(isset($SiteSettings->id)){
-                                $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
-                                if ($pos === false) {
-                                    unset($DataLeakFeed_social[$key]);
-                                    continue;
+                    if(!$request -> sitecode){
+                        $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/datafeedsocial") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                        foreach ($DataLeakFeed_social as $key => $value) {
+                            $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->first();
+                            if($leak_socail_ref_temps){
+                                if(isset($SiteSettings->id)){
+                                    $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
+                                    if ($pos === false) {
+                                        unset($DataLeakFeed_social[$key]);
+                                        continue;
+                                    }
                                 }
+                                $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                                $name_site = '';
+                                foreach ($site as $data) {
+                                    $name_site .= $data->name . ' ,';
+                                }
+                                $name_site = rtrim($name_site, " ,");
+                                $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                            }else{
+                                unset($DataLeakFeed_social[$key]);
                             }
-                            $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
-                            $name_site = '';
-                            foreach ($site as $data) {
-                                $name_site .= $data->name . ' ,';
-                            }
-                            $name_site = rtrim($name_site, " ,");
-                            $DataLeakFeed_social[$key]["sitename"] = $name_site;
-                        }else{
-                            unset($DataLeakFeed_social[$key]);
+                            
                         }
-                        
+                    } else {
+                        $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/datafeedsocial") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                        foreach ($DataLeakFeed_social as $key => $value) {
+                            $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
+                            if($leak_socail_ref_temps){
+                                if(isset($SiteSettings->id)){
+                                    $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
+                                    if ($pos === false) {
+                                        unset($DataLeakFeed_social[$key]);
+                                        continue;
+                                    }
+                                }
+                                $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                                $name_site = '';
+                                foreach ($site as $data) {
+                                    $name_site .= $data->name . ' ,';
+                                }
+                                $name_site = rtrim($name_site, " ,");
+                                $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                            }else{
+                                unset($DataLeakFeed_social[$key]);
+                            }
+                            
+                        }
                     }
                 }else{
-                    $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('keyword', '!=', null)->where('keyword', '!=', '')->where('feel_type', 'social')->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
-                    foreach ($DataLeakFeed_social as $key => $value) {
-                        $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->first();
-                        if($leak_socail_ref_temps){
-                            $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
-                            $name_site = '';
-                            foreach ($site as $data) {
-                                $name_site .= $data->name . ' ,';
+                    if(!$request -> sitecode){
+                        $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                        foreach ($DataLeakFeed_social as $key => $value) {
+                            $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->whereIn('site_id',$site_id_arr)->first();
+                            if($leak_socail_ref_temps){
+                                $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                                $name_site = '';
+                                foreach ($site as $data) {
+                                    $name_site .= $data->name . ' ,';
+                                }
+                                $name_site = rtrim($name_site, " ,");
+                                $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                            }else{
+                                unset($DataLeakFeed_social[$key]);
                             }
-                            $name_site = rtrim($name_site, " ,");
-                            $DataLeakFeed_social[$key]["sitename"] = $name_site;
-                        }else{
-                            unset($DataLeakFeed_social[$key]);
                         }
-                        
-
+                    } else {
+                        $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                        foreach ($DataLeakFeed_social as $key => $value) {
+                            $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
+                            if($leak_socail_ref_temps){
+                                $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                                $name_site = '';
+                                foreach ($site as $data) {
+                                    $name_site .= $data->name . ' ,';
+                                }
+                                $name_site = rtrim($name_site, " ,");
+                                $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                            }else{
+                                unset($DataLeakFeed_social[$key]);
+                            }
+                        }
                     }
                 }
             }
@@ -930,15 +998,78 @@ class DashboardNewController extends Controller
             $role_custom = @check_role_custom();
             if($role_custom['compromised']) {
                 if(@get_role_custom()['superadmin'] == 1) {//|| @get_role_custom()['site_admin'] == 1
-                    $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->where('data_leak_feed.feel_type','!=', 'social')->whereBetween('data_leak_feed.created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
-                    if(isset($SiteSettings->id)){
-                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
+                    if(!$request -> sitecode){
+                        $DataLeakFeed_compromised = DataLeakFeedTemp::select('data_leak_feed_temp.feedlink as content', 'data_leak_feed_temp.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/datafeed_darkweb") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed_temp.deleted_at')->where('data_leak_socail_ref_temp.status',1)->whereIn('data_leak_feed_temp.feed_type', ['darkweb','webserver','compromise','compromised'])->whereBetween('data_leak_feed_temp.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref_temp', 'data_leak_feed_temp.id', '=', 'data_leak_socail_ref_temp.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref_temp.site_id', '=', 'site.id');
+                        // if(isset($SiteSettings->id)){
+                            // $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
+                        // }
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
+                    } else {
+                        $DataLeakFeed_compromised = DataLeakFeedTemp::select('data_leak_feed_temp.feedlink as content', 'data_leak_feed_temp.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/datafeed_darkweb") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed_temp.deleted_at')->where('data_leak_socail_ref_temp.status',1)->whereIn('data_leak_feed_temp.feed_type',['darkweb','webserver','compromise','compromised'])->whereBetween('data_leak_feed_temp.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref_temp', 'data_leak_feed_temp.id', '=', 'data_leak_socail_ref_temp.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref_temp.site_id', '=', 'site.id');
+                        // if(isset($SiteSettings->id)){
+                            $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
+                        // }
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
                     }
-                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
                 }else{
-                    $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->where('data_leak_feed.feel_type','!=', 'social')->whereBetween('data_leak_feed.created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id')->get()->toArray();
+                    if(!$request -> sitecode){
+                        $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->whereBetween('data_leak_feed.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                        // if(isset($SiteSettings->id)){
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->whereIn('site.id', $site_id_arr);
+                        // }
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
+                    } else {
+                        $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename',DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->whereBetween('data_leak_feed.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                        // if(isset($SiteSettings->id)){
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
+                        // }
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
+                    }
+                }
+            }
+        }
+
+        if (!$request->pagename||$request->pagename=='Web Defacement') {
+            $role_custom = @check_role_custom();
+            if($role_custom['web_defacement']) {
+                if(@get_role_custom()['superadmin'] == 1) {//|| @get_role_custom()['site_admin'] == 1
+                    if(!$request -> sitecode){
+                        $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.last_check as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/webdefacement/detail/",fx_webdefacment_setting.code) AS link , "Web Defacement" AS pagename , CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active',1)->where('webdefacment_setting.status_add',1)->whereBetween('webdefacment_setting.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        // $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id');
+                        $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
+                        
+                            //$WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id', $site_id_arr);
+                            $WebdefacmentSetting = $WebdefacmentSetting->get()->toArray();
+                        // }
+                    } else {
+                        $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.name as content', 'webdefacment_setting.last_check as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/webdefacement") AS link , "Web Defacement" AS pagename, CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active',1)->where('webdefacment_setting.status_add',1)->whereBetween('webdefacment_setting.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
+                        
+                            $WebdefacmentSetting = $WebdefacmentSetting->where('site.id', $SiteSettings->id);
+                            $WebdefacmentSetting = $WebdefacmentSetting->get()->toArray();
+                    }
+                }else{
+                    if(!$request -> sitecode){
+                        $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.last_check as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/webdefacement/detail/",fx_webdefacment_setting.code) AS link , "Web Defacement" AS pagename , CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active',1)->where('webdefacment_setting.status_add',1)->whereBetween('webdefacment_setting.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
+                        
+                            $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id', $site_id_arr);
+                            $WebdefacmentSetting = $WebdefacmentSetting->get()->toArray();
+                    } else {
+                        $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.name as content', 'webdefacment_setting.last_check as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/webdefacement") AS link , "Web Defacement" AS pagename, CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active',1)->where('webdefacment_setting.status_add',1)->whereBetween('webdefacment_setting.created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
+                        
+                        // if(isset($SiteSettings->id)){
+                        //     $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
+                        // } else {
+                            $WebdefacmentSetting = $WebdefacmentSetting->where('site.id', $SiteSettings->id);
+                            $WebdefacmentSetting = $WebdefacmentSetting->get()->toArray();
+                        // }
+                    }
                 }
             }
         }
@@ -978,7 +1109,7 @@ class DashboardNewController extends Controller
         // }
 
 
-            $model = array_merge($dataCVEMapping,$dataR_s_s_news,$DataLeakFeed_social,$DataLeakFeed_compromised,$data_fx_otx_events);
+            $model = array_merge(@$dataCVEMapping,@$dataR_s_s_news,@$DataLeakFeed_social,@$DataLeakFeed_compromised,@$WebdefacmentSetting);
             $dataOut = array();
             usort($model, function($a, $b) {
                 $t1 = strtotime($a['datetime']);

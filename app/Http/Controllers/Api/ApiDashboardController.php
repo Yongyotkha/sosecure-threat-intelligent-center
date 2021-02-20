@@ -277,10 +277,10 @@ class ApiDashboardController extends ApiController
 
                     if(@$get_role_custom['superadmin'] == 1) {
                         if(!$site){
-                            $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->where('feel_type', ['social','darkweb_public'])->count();
+                            $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->whereIn('feel_type', ['social','darkweb_public'])->count();
                         }else{
                             $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
-                            $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id', $site_id_m->id)->where('status', 1)->where('feel_type', ['social','darkweb_public'])->count();
+                            $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id', $site_id_m->id)->where('status', 1)->whereIn('feel_type', ['social','darkweb_public'])->count();
                         }
                     } else {
                         if(!$site){
