@@ -811,6 +811,17 @@ class DataLeakController extends Controller
                 });
             }
 
+            if ($request->click_type2) {
+                $keywords = $request->click_type2;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    if($keywords == 'other') {
+
+                    } else {
+                        $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                    }
+                });
+            }
+
             //<><><>
             // if (Auth::check()) {
 
