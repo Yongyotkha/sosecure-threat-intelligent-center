@@ -796,7 +796,7 @@ class ApiDataLeakController extends ApiController
                     $get_role_custom_first = $data['data']['get_role_custom_first'];
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
 
-                    $site_code = $data['data']['site_id'];
+                    $site_code = $data['data']['site_code'];
                     if($site_code) {
                         $SiteSettings = SiteSettings::where('code',$site_code)->first();
                     }
