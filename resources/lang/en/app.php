@@ -957,7 +957,7 @@ return [
     'update_code'                                => 'Update Code',
     'api_integration'                            => 'API Integration',
     'vm_client_settings'                         => 'VM Client Settings',
-    'category_settings'                          => 'Categorys',
+    'category_settings'                          => 'Categories',
     'site_settings'                              => 'Sites',
     'rss_feed_settings'                          => 'RSS Feed Settings',
     'rss_feed'                                   => 'RSS',
