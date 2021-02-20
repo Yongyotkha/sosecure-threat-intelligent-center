@@ -612,6 +612,7 @@ active_btn('#groupby-type .btn-grey');
         table_social_data();
         get_count();
         count_keyword();
+        count_icon();
         });
 
     function search(){
