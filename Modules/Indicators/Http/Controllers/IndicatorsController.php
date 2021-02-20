@@ -1762,7 +1762,7 @@ class IndicatorsController extends Controller
                 //         ];
 
                     
-                    if($request->keywords||$request->isDateSearch||$request->start_date||$request->end_date||$request->check_published || $request->industries)
+                    if($request->keywords||$request->isDateSearch||$request->start_date||$request->end_date||$request->check_published || $request->industries || $request->groups)
                     {
 
                         if ($request->keywords) {
@@ -1819,9 +1819,9 @@ class IndicatorsController extends Controller
                     $order_number++;
                     $nestedData['No'] = $order_number;
                     $nestedData['name'] = $document["name"];
-                    $nestedData['groups'] = explode_val($document["groups"],'groups');
+                    $nestedData['groups'] = $document["groups"] ? explode_val($document["groups"],'groups') : 'Empty';
                     $nestedData['tags'] = explode_val($document["tags"],'tags');
-                    $nestedData['industries'] = explode_val($document["industries"]);
+                    $nestedData['industries'] = $document["industries"] ? explode_val($document["industries"]) : 'Empty';
                     $nestedData['attr'] = '';
                     $nestedData['attrCount'] = $document["indicator_count"];
                     $nestedData['public'] = ($document["public"]);
@@ -2317,7 +2317,7 @@ class IndicatorsController extends Controller
             check_permission403();
         }
         try {
-        $Indicatorindustries = IndicatorSummaryYear::where('type', 'industries')->where('status', 1)->orderBy('order')->select('industries_name')->get();
+        $Indicatorindustries = IndicatorSummaryYear::where('type', 'industries')->where('status', 1)->where('industries_name', '!=', null)->where('industries_name', '!=', '')->orderBy('order')->select('industries_name')->get();
         $response_data = ['message' => '', 'status_code' => '00', 'data' => $Indicatorindustries];
 
 
@@ -2337,7 +2337,7 @@ class IndicatorsController extends Controller
             check_permission403();
         }
         try {
-        $Indicatorgroup = IndicatorSummaryYear::where('type', 'groups')->where('status', 1)->orderBy('order')->select('industries_name')->get();
+        $Indicatorgroup = IndicatorSummaryYear::where('type', 'groups')->where('status', 1)->where('industries_name', '!=', null)->where('industries_name', '!=', '')->orderBy('order')->select('industries_name')->get();
         $response_data = ['message' => '', 'status_code' => '00', 'data' => $Indicatorgroup];
 
 
