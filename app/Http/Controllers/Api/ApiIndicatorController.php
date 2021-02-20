@@ -72,7 +72,7 @@ class ApiIndicatorController extends ApiController
                 $options = [
                     'projection' => [
                         '_id' => 0,
-                        
+                        'industries' =>1,
                         'name' => 1,
                         'groups' => 1,
                         'tags' => 1,
@@ -105,7 +105,7 @@ class ApiIndicatorController extends ApiController
                 }
 
                     
-                if($data['data']['keywords']||$data['data']['isDateSearch']||$data['data']['start_date']||$data['data']['end_date']||$data['data']['check_published']){
+                if($data['data']['keywords']||$data['data']['isDateSearch']||$data['data']['start_date']||$data['data']['end_date']||$data['data']['check_published']||$industries||$groups){
                 
                     if ($data['data']['keywords']) {
                         $query['name'] = ['$regex'=>$data['data']['keywords'], '$options' => 'i'];
@@ -159,8 +159,9 @@ class ApiIndicatorController extends ApiController
                             $order_number++;
                             $nestedData['No'] = $order_number;
                             $nestedData['name'] = $document["name"];
-                            $nestedData['groups'] = $this->explode_val($document["groups"],'groups',$url);
+                            $nestedData['groups'] = $document["groups"] ? $this->explode_val($document["groups"],'groups',$url) : 'Empty';
                             $nestedData['tags'] = $this->explode_val($document["tags"],'tags',$url);
+                            $nestedData['industries'] = $document["industries"] ? $this->explode_val($document["industries"],'industries',$url) : 'Empty';
                             $nestedData['attr'] = '';
                             $nestedData['attrCount'] = $document["indicator_count"];
                             $nestedData['public'] = ($document["public"]);
@@ -563,7 +564,7 @@ class ApiIndicatorController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
                     
-                    $Indicatorindustries = IndicatorSummaryYear::where('type', 'industries')->where('status', 1)->orderBy('order')->select('industries_name')->get();
+                    $Indicatorindustries = IndicatorSummaryYear::where('type', 'industries')->where('status', 1)->where('industries_name', '!=', null)->where('industries_name', '!=', '')->orderBy('order')->select('industries_name')->get();
 
                     $data_transcation = json_encode($Indicatorindustries);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -603,7 +604,7 @@ class ApiIndicatorController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
                     
-                    $Indicatorgroups = IndicatorSummaryYear::where('type', 'groups')->where('status', 1)->orderBy('order')->select('industries_name')->get();
+                    $Indicatorgroups = IndicatorSummaryYear::where('type', 'groups')->where('status', 1)->where('industries_name', '!=', null)->where('industries_name', '!=', '')->orderBy('order')->select('industries_name')->get();
 
                     $data_transcation = json_encode($Indicatorgroups);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);

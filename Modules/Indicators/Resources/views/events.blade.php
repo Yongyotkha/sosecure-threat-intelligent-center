@@ -187,7 +187,6 @@
 
                 <div class="row m-b-12">
                     <div class="col-md-3">
-                        <h5 class="font-weight-bold">Select Industries or Group</h5>
                         <select name="sl_group" id="sl_group" class="form-control sl_group" placeholder="Select">
                             <option value="0" disabled="disabled">Selected</option>
                             <option></option>
@@ -197,14 +196,12 @@
                     </div>
                     <div class="col-md-9">
                         <div id="industries_box" style="display: none;">
-                            <h5 class="font-weight-bold">Industries</h5>
                             <div id="fillter_click" class="button-group">
                                 <span id="btn_industrise"></span>
                             </div>
                         </div>
                         <div id="group_box" class="row" style="display: none;">
                             <div class="col-md-12">
-                                <h5 class="font-weight-bold">Group</h5>
                                 <div id="fillter_click_group" class="button-group">
                                     <span id="btn_group"></span>
                                 </div>
@@ -212,7 +209,7 @@
                         </div>
                     </div>
                 </div>
-
+                <div style="margin-top:10px;"></div>
                 {{-- <div id="industries_box" class="row" style="display: none;">
                     <div class="col-md-12">
                         <h5 class="font-weight-bold">Industries</h5>
@@ -668,7 +665,7 @@
                     d.isDateSearch = isDateSearch;
                     d.check_published = check_published;
                     d.industries = industries;
-                    d.group = group;
+                    d.groups = group;
                 }
             },
             initComplete : function( settings, json){
@@ -685,6 +682,9 @@
                 sortable: false,
             },
             {
+                data: 'industries',
+            },
+            {
                 data: 'name',
             },
             {
@@ -692,9 +692,6 @@
             },
             {
                 data: 'tags',
-            },
-            {
-                data: 'industries',
             },
             {
                 data: 'public',
@@ -718,7 +715,7 @@
             ],
             columnDefs: [
             {
-                targets: 1,
+                targets: 2,
                 render: function (data, type, row) {
                     var inner = '';
                     inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
@@ -788,7 +785,7 @@
         }).done(function(data){
           if (data.status_code =="00") {
             var html ="";
-            html +='  <a class="btn btn-selector click_industries active" href="javascript:void(0);" onclick="click_industries(\''+''+'\');">'+'All'+'</a>';
+            html +='  <a class="btn btn-selector click_industries click_industries_all active" href="javascript:void(0);" onclick="click_industries(\''+''+'\');">'+'All'+'</a>';
             for (var i = data.data.length - 1; i >= 0; i--) {
                 html +='  <a class="btn btn-selector click_industries" href="javascript:void(0);" onclick="click_industries(\''+data.data[i].industries_name+'\');">'+data.data[i].industries_name+'</a>';
             }
@@ -823,7 +820,7 @@ function load_group(){
         }).done(function(data){
           if (data.status_code =="00") {
             var html ="";
-            html +='  <a class="btn btn-selector click_group active" href="javascript:void(0);" onclick="click_group(\''+''+'\');">'+'All'+'</a>';
+            html +='  <a class="btn btn-selector click_group click_group_all active" href="javascript:void(0);" onclick="click_group(\''+''+'\');">'+'All'+'</a>';
             for (var i = data.data.length - 1; i >= 0; i--) {
                 html +='  <a class="btn btn-selector click_group" href="javascript:void(0);" onclick="click_group(\''+data.data[i].industries_name+'\');">'+data.data[i].industries_name+'</a>';
             }
@@ -844,13 +841,17 @@ function load_group(){
 }
 
 function click_industries(industries_name){
-    group = null;
+    $('.click_group').removeClass('active');
+    $('.click_group_all').addClass('active');
+    group = "";
     industries = industries_name.trim();
     search_table(1);
 }
 
 function click_group(group_name){
-    industries = null;
+    $('.click_industries').removeClass('active');
+    $('.click_industries_all').addClass('active');
+    industries = "";
     group = group_name.trim();
     search_table(1);
 }
