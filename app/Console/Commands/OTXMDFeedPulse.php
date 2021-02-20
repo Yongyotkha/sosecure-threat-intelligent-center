@@ -374,7 +374,7 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
         $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
         $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
         $loop = 0;
-        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1&sort=-modified&q=modified:<12h', $urlLimit);
+        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1&sort=-modified', $urlLimit);
         if ($reconCall["success"]) {
             $otxFeedData = json_decode($reconCall["result"], true);
         } else {
@@ -509,7 +509,7 @@ public function savePulse_related($pulseID,$urlLimit)
         $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
         $loop = 0;
-        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100&sort=-modified&q=modified:<12h', $urlLimit);
+        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100&sort=-modified', $urlLimit);
         if ($reconCall["success"]) {
             $otxFeedData = json_decode($reconCall["result"], true);
 

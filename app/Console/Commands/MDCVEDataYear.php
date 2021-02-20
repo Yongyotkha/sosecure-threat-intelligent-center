@@ -153,7 +153,7 @@ class MDCVEDataYear extends Command
                         }
                     }
                 }
-                print_r($array_cpe_match);
+               // print_r($array_cpe_match);
                 print PHP_EOL . '==========================CPE=======================================';
                 foreach ($array_cpe_match as $vendorkey => $vendor) {
                     $vendor_text = @$vendor['cpe23Uri'];
@@ -255,6 +255,10 @@ class MDCVEDataYear extends Command
     }
     $description_data = htmlspecialchars($description_data, ENT_QUOTES);
 
+   // print PHP_EOL . 'CVE  :' . $CVE_Code;
+   // print PHP_EOL . 'impact-baseScore  :' . print_r($json_data['configurations']);
+    $baseScore ="";
+    $baseSeverity = "";
     try {
         $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
         $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
