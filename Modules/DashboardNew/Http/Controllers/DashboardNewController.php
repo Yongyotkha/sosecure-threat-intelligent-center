@@ -577,13 +577,23 @@ class DashboardNewController extends Controller
 
         if(Auth::check()) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+            $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
             if(@get_role_custom()['superadmin'] == 1) {
-                $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                if(!$request -> site) {
+                    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                } else {
+                    $CVEMapping = CVEMapping::select('namecve', 'severity')->where('site_id', $site_id_m->id)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                } 
             } else {
-                $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('site_id', $site_id_arr)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                if(!$request -> site) {
+                    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('site_id', $site_id_arr)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                } else {
+                    $CVEMapping = CVEMapping::select('namecve', 'severity')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
+                }
+                
             }
         }
-
+        // dd($check_total_namecve);
 
         foreach($CVEMapping as $data){
             foreach($check_total_namecve as $item){

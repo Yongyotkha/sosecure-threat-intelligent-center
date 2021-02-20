@@ -592,13 +592,13 @@ active_btn('#groupby-type .btn-grey');
     $(function() {
         if(get_cookie_site()){
             cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+            count_icon();
         }else{
             table_social_data();
             get_count();
             count_keyword();
             count_icon();
         }
-        
     });
 
     $(".btn-grey").click(function() {

@@ -9,7 +9,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <h5>
-                        {{@$feedcontent}}
+                        {!!@$feedcontent!!}
                     </h5>
                 </div>
             </div>
