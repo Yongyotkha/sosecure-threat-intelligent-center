@@ -443,7 +443,7 @@ class RSSFeedSettingsController extends Controller
             // })
             ->addColumn('source', function (RSSNews $model) {
                 if($model -> source){
-                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'"><a hreft="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
                 }else{
                     return '<div class="text-elip max-w-fit" data-rel="tooltip" title="None">None</div>';
                 }
@@ -468,7 +468,7 @@ class RSSFeedSettingsController extends Controller
 
                     foreach($model->get_cate as $cate_val) {
                         if($cate_val->get_cate_name_news){
-                            $html .= $cate_val->get_cate_name_news->name.', ';
+                            $html .= '<a hreft="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
                         }else{
                             $html .= 'None-delete0';
                         }
@@ -726,13 +726,14 @@ class RSSFeedSettingsController extends Controller
 
         $model = $model
         ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
-        ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+        ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid ,fx_r_s_s_news_categories.news_category_id as category_id, fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
         where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
         and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
         function($join)
         {
            $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
         })
+        ->addSelect('category_id')
         ->groupBy('name_cat')
         ->orderBy('categories_count', 'desc')
         ->limit(10)
@@ -758,6 +759,7 @@ class RSSFeedSettingsController extends Controller
                 'name' => empty($value->categories_name_)?'None':$value->categories_name_,
                 'y' => (int)$value->categories_count,
                 'color' => $color[$key] ,
+                'data' => $value->category_id
             );
 
             
