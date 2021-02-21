@@ -1623,7 +1623,7 @@ class ApiCVEController extends ApiController
                         }
 
                         if ($isDateSearch) {
-                            $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                            $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                         }
                         
                         if($check==2){
@@ -1695,8 +1695,8 @@ class ApiCVEController extends ApiController
                     }
                     
                     if($displayType == 'mon'){
-                        $get_month = $model->select(DB::raw('count(modified)  as count_mon'),DB::raw('DAY(modified) as mon'))
-                        ->whereRaw('MONTH(modified) = MONTH(CURDATE())')
+                        $get_month = $model->select(DB::raw('count(published)  as count_mon'),DB::raw('DAY(published) as mon'))
+                        ->whereRaw('MONTH(published) = MONTH(CURDATE())')
                         ->groupBy('mon')
                         ->get();
                         $count_month = array_fill(0, (int)date('t'), 0);
@@ -1710,8 +1710,8 @@ class ApiCVEController extends ApiController
                         $nameyAxis = 'Number (Days)';
                         $nameSeries = 'Number of Days';
                     }else{
-                        $get_month = $model->select(DB::raw('count(modified)  as count_mon'),DB::raw('MONTH(modified) as mon'))
-                        ->whereRaw('YEAR(modified) = YEAR(CURDATE())')
+                        $get_month = $model->select(DB::raw('count(published)  as count_mon'),DB::raw('MONTH(published) as mon'))
+                        ->whereRaw('YEAR(published) = YEAR(CURDATE())')
                         ->groupBy('mon')
                         ->get();
                         $count_month = [0,0,0,0,0,0,0,0,0,0,0,0];//initialize all months to 0
