@@ -250,14 +250,14 @@
                         </div>
                     </header>
                     <div class="panel-body">
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-md-12">
                                 <h5 class="font-weight-bold">Keyword</h5>
                                 <div id="fillter_click_keyword" class="button-group">
 
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="table-responsive">
                             <table class="table table-striped" id="table_social_datas">
                                 <thead>
@@ -462,7 +462,7 @@
         }else{
             table_social_data();
             get_count();
-            count_keyword() 
+            {{--count_keyword();--}}
         }
         
     });
@@ -477,7 +477,7 @@
         site = this.value;        
         table_social_data();
         get_count();
-        count_keyword();
+        {{--count_keyword();--}}
         });
 
     function search(){
@@ -873,6 +873,7 @@
         {{--get_count();--}}
     }
 
+    {{--
     function count_keyword() {
 
 
@@ -907,6 +908,7 @@
         });
     
     }
+    --}}
 
     var click_key = null;
     function click_keyword(data){
