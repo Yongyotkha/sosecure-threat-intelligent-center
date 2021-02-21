@@ -98,21 +98,28 @@ class AuthController extends ApiController
 
                     $permission_custom = @check_permission_site_custom(@$user->id);
 
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom, 'check_goto_menu' => $check_goto_menu]);
-                    // return response()->json(['message' => 'Successful', 
-                    //                             'error' => '', 
-                    //                             'status_code' => '200', 
-                    //                             'data' => $user,
-                    //                             'menu' => $menu,
-                    //                             'menu_sub' => $menu_sub,
-                    //                             'menu_permission_site' => $Menu_permission_site,
-                    //                             'menu_sub_permission_site' => $Menu_sub_permission_site]);
+                    $response = array(
+                        'data' => $user,
+                        'menu' => $menu,
+                        'menu_sub' => $menu_sub,
+                        'menu_sub_permission_site' => $Menu_sub_permission_site,
+                        'menu_permission_site' => $Menu_permission_site,
+                        'permission_custom' => $permission_custom,
+                        'check_goto_menu' => $check_goto_menu
+                    );
+        
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    // return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom, 'check_goto_menu' => $check_goto_menu]);
                 } else{
                     return response()->json(['error' => 'Username or password is incorrect', 'status_code' => '400']);
                 }
             } else {
                 return response()->json(['error' => 'Username or password is incorrect', 'status_code' => '400']);
             }
+
+
         }
     } 
 
