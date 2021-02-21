@@ -392,8 +392,8 @@
     var start_date = null;
     var end_date = null;
     var status_news = null;
-    var news_source = null;
-    var news_category = null;
+    var news_source = [];
+    var news_category = [];
     var startDate = null;
     var endDate = null;
     var isDateSearch = null;
@@ -587,6 +587,22 @@ $(function() {
                 toastr.error(errorsHtml, '@langapp('response_status') ');
             }
         });
+    }
+
+    function find_source(source){
+        search_val = 1;
+        news_source = [];
+        news_category = [];
+        news_source.push(source);
+        load_top_source();
+    }
+
+    function find_category(category){
+        search_val = 1;
+        news_category = [];
+        news_source = [];
+        news_category.push(category);
+        load_top_category();
     }
 
     function datatable(){
@@ -891,9 +907,9 @@ $(document).ready(function(){
             const chart_top_source = Highcharts.chart('chart-top-source', {
                 chart: {
                     type: 'column',
-                    scrollablePlotArea: {
-                    minWidth: 300,
-                    }
+                        scrollablePlotArea: {
+                        minWidth: 300,
+                    },
                 },
                 title: {
                     text: null
@@ -931,6 +947,14 @@ $(document).ready(function(){
                         pointWidth: 30,
                         color : '#ffc107',
                         align: 'center',
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    find_source(this.name);
+                                }
+                            }
+                        }
                     },
                     style:{
                         background: '#fff'
@@ -1022,6 +1046,15 @@ $(document).ready(function(){
                     },
                     style:{
                         background: '#fff'
+                    },
+                    align: 'center',
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                find_category(this.data);
+                            }
+                        }
                     }
                 }
             },

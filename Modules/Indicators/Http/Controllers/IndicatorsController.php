@@ -1819,9 +1819,9 @@ class IndicatorsController extends Controller
                     $order_number++;
                     $nestedData['No'] = $order_number;
                     $nestedData['name'] = $document["name"];
-                    $nestedData['groups'] = $document["groups"] ? explode_val($document["groups"],'groups') : 'Empty';
+                    $nestedData['groups'] = explode_val($document["groups"],'groups');
                     $nestedData['tags'] = explode_val($document["tags"],'tags');
-                    $nestedData['industries'] = $document["industries"] ? explode_val($document["industries"]) : 'Empty';
+                    $nestedData['industries'] = explode_val($document["industries"]);
                     $nestedData['attr'] = '';
                     $nestedData['attrCount'] = $document["indicator_count"];
                     $nestedData['public'] = ($document["public"]);
