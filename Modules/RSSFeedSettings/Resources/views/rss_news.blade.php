@@ -951,7 +951,11 @@ $(document).ready(function(){
                         point: {
                             events: {
                                 click: function () {
-                                    find_source(this.name);
+                                    search_val = 1;
+                                    news_source = [];
+                                    news_category = [];
+                                    news_source.push(this.name == 'None' ? "" : this.name);
+                                    datatable();
                                 }
                             }
                         }
@@ -1052,7 +1056,11 @@ $(document).ready(function(){
                     point: {
                         events: {
                             click: function () {
-                                find_category(this.data);
+                                search_val = 1;
+                                news_source = [];
+                                news_category = [];
+                                news_category.push(this.data);
+                                datatable();
                             }
                         }
                     }
