@@ -364,7 +364,7 @@
                                             <th>Keyword</th>
                                             <th>Content</th>
                                             <th>Data Feed</th>
-                                            <th>View</th>
+                                            {{-- <th>View</th> --}}
                                             <th>Status</th>
                                             <th>@langapp('action')</th>
                                         </tr>
@@ -776,7 +776,7 @@ active_btn('#groupby-type .btn-grey');
 
                         },
                     },
-                    {
+                    {{--{
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
@@ -785,10 +785,10 @@ active_btn('#groupby-type .btn-grey');
 
 
                         },
-                    },
+                    },--}}
                     {
                         visible: visible_c,
-                        targets: 8,
+                        targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
 
@@ -805,7 +805,7 @@ active_btn('#groupby-type .btn-grey');
 
                     },
                     {
-                        targets: 9,
+                        targets: 8,
                         width: '10px',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {

@@ -276,7 +276,7 @@
                                         <th>Content</th>
                                         <th>Remark</th>
                                         <th>Data Feed</th>
-                                        <th>View</th>
+                                        {{-- <th>View</th> --}}
                                         <th>Status</th>
                                         <th>@langapp('action')</th>
                                     </tr>
@@ -697,16 +697,16 @@
                             return val;
                         },
                     },
-                    {
+                    {{--{
                         targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
                             return full.view;
                         },
-                    },
+                    },--}}
                     {
                         visible: visible_c,
-                        targets: 8,
+                        targets: 7,
                         width: '10px',
                         render: function (data, type, full, meta) {
 
@@ -723,7 +723,7 @@
 
                     },
                     {
-                        targets: 9,
+                        targets: 8,
                         className: 'nowrap',
                         width: '10px',
                         render: function (data, type, full, meta) {
