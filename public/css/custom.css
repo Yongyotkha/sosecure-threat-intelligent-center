@@ -2311,7 +2311,7 @@ ul.topics-news-list li a:hover{
     background-color: #f3f3f3;
     /* border-radius: 25px; */
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    height: 140px;
+    height: 138.8px;
     padding: 1rem;
     display: flex;
     flex-direction: column;
@@ -3529,6 +3529,9 @@ input.input-login:focus {
 .m-t-5{
     margin-top: 3px !important;
 }
+.m-t-7{
+    margin-top: 7px !important;
+}
 @media screen and (min-width:768px) and (max-width:1024px){
     /* .show-setting{
         margin-top: -15px !important;
@@ -3823,6 +3826,19 @@ textarea.form-control{
     .hide-text{
         display: none !important;
     }
+    .btn-selector{
+        max-width: 330px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}
+
+@media screen and (max-width:400px){
+    .btn-selector {
+        max-width: 250px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 
 div.dataTables_paginate li.first > a, div.dataTables_paginate li.previous > a {
@@ -3964,4 +3980,34 @@ textarea.resize-none{
 .nopadding {
     padding: 0 !important;
     margin: 0 !important;
+}
+
+/* Input field */
+.c-dropdown-select2 + .select2 .select2-selection__rendered { 
+    background-color: #3869d4 !important;
+    border: 1px solid #3869d4 !important;
+    border-radius: 2px;
+    color: #fff !important;
+ }
+
+ .c-dropdown-select2 +  .select2 .select2-selection__placeholder{
+    color: #fff !important;
+}
+
+.c-dropdown-select2 +  .select2 .select2-selection__arrow b {
+    border-color: #fff transparent transparent transparent !important;
+    border-style: solid;
+    border-width: 5px 4px 0 4px;
+    height: 0;
+    left: 50%;
+    margin-left: -4px;
+    margin-top: -2px;
+    position: absolute;
+    top: 50%;
+    width: 0;
+}
+
+.c-dropdown-select2 + .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #88acfb !important;
+    color: #333 !important;
 }
