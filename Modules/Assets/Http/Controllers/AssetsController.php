@@ -556,6 +556,7 @@ class AssetsController extends Controller
                     $CPE_Remark = array();
                     $CPE_Ostype = array();
                     $CPE_Del = array();
+                    $CPE_OtherCheck = 0;
                     foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
                         array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
                         array_push($CPE_Vendor, '<span class="il-block">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
@@ -565,6 +566,9 @@ class AssetsController extends Controller
                         array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
                         array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
                         array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
+                        if(($CPE_Datavalue->os_type!=1)&&($CPE_Datavalue->os_type!=2)){
+                            $CPE_OtherCheck = 1;
+                        }
                     }
     
                     if (count($CPE_List) > 0) {
@@ -616,7 +620,7 @@ class AssetsController extends Controller
                         $Assets_data_list['CPE_Remark'] = $CPE_Remark;
                         $Assets_data_list['CPE_Ostype'] = $CPE_Ostype;
                         $Assets_data_list['CPE_Del'] = $CPE_Del;
-                        
+                        $Assets_data_list['CPE_OtherCheck'] = $CPE_OtherCheck;
                         array_push($Assets_list, $Assets_data_list);
     
                     } else {
@@ -649,6 +653,7 @@ class AssetsController extends Controller
                             $Assets_data_list['CPE_Remark'] = $CPE_Remark;
                             $Assets_data_list['CPE_Ostype'] = $CPE_Ostype;
                             $Assets_data_list['CPE_Del'] = $CPE_Del;
+                            $Assets_data_list['CPE_OtherCheck'] = $CPE_OtherCheck;
                             array_push($Assets_list, $Assets_data_list);
     
                         }
@@ -676,6 +681,13 @@ class AssetsController extends Controller
             // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
             $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
                 $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
+            })->count();
+
+            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q){
+                $q->whereIn('data_type_id', [5,6])->where(function ($query) {
+                    $query->whereNotIn('os_type', [1,2])
+                        ->orWhereNull('os_type')->orWhere('os_type','');
+                });
             })->count();
 
             $dataOut["data"] =  $Assets_list;
@@ -744,6 +756,14 @@ class AssetsController extends Controller
             $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
                 $q->where('os_type', 2)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
             })->count();
+
+            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
+                $q->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6])->where(function ($query) {
+                    $query->whereNotIn('os_type', [1,2])
+                        ->orWhereNull('os_type')->orWhere('os_type','');
+                });
+                
+            })->count();
         }else{
             // $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){
             //     $q->whereIn('data_type_id', [5,6]);
@@ -767,6 +787,13 @@ class AssetsController extends Controller
             // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
             $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
                 $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
+            })->count();
+
+            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q){
+                $q->whereIn('data_type_id', [5,6])->where(function ($query) {
+                    $query->whereNotIn('os_type', [1,2])
+                        ->orWhereNull('os_type')->orWhere('os_type','');
+                });
             })->count();
         }
         return response()->json($dataOut);

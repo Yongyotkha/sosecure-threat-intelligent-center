@@ -172,14 +172,14 @@
                             </a>
                         </div>
                         <div class="col-md-3 nopadding">
-                            <a href="javascript:void(0)">
+                            <a href="javascript:void(0)" onclick="searchTB('OthER','os_type')">
                             <div class="card-dash-compro none-bg none-shadow">
                                 <div class="left-card">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/icon/Other.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">OTHER</h3>
-                                        <span class="number-card" id="">0</span>
+                                        <span class="number-card" id="count_other">0</span>
                                     </div>
                                 </div>
                             </a>
@@ -296,6 +296,7 @@
                                         <th rowspan="2" class="align-middle">Action</th>
                                         <th rowspan="2" class="align-middle">CPESTRING</th>
                                         <th rowspan="2" class="align-middle">Asset ID</th>
+                                        <th rowspan="2" class="align-middle">CPE_OtherCheck</th>
                                     </tr>
                                     <tr>
                                         <th>Vendor</th>
@@ -639,6 +640,10 @@
             columnSearch = 12;
         }else if(columnSearch=='os_type'){
             columnSearch = 8;
+            if(selectedValue=='OthER'){
+                columnSearch = 14;
+                selectedValue = 1;
+            }
         }else if(columnSearch=='ip_asset_id'){
  
         }else{
@@ -677,9 +682,11 @@
                 loading('load');
             },
         }).done(function(data){
+            $('#count_other').html(data.countOther+"");
             $('#count_assets').html(data.countAssets+"");
             $('#count_windows').html(data.countWindows+"");
             $('#count_linux').html(data.countLinux+"");
+            
             loading('stop_load');
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             loading('stop_load');
@@ -713,6 +720,8 @@
                 $('#count_assets').html(json.countAssets+"");
                 $('#count_windows').html(json.countWindows+"");
                 $('#count_linux').html(json.countLinux+"");
+                $('#count_other').html(json.countOther+"");
+                
             },
             columns: [
                 {{--{
@@ -795,6 +804,11 @@
                 {
                     data: 'ip_asset_id',
                     name: 'ip_asset_id',
+                    visible:false
+                },
+                {
+                    data: 'CPE_OtherCheck',
+                    name: 'CPE_OtherCheck',
                     visible:false
                 },
             ],
