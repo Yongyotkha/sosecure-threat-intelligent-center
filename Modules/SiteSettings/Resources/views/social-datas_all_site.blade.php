@@ -19,7 +19,7 @@
         </aside>
             <section class="vbox">
                 <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-                    <div class="header-flex-overflow m-t-5">
+                    <div class="header-flex-overflow m-t-7">
                         <div class="fwb-16">
                             @if(TYPE_WEB == 'center')
                                 @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
