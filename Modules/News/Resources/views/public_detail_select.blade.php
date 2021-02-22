@@ -109,12 +109,14 @@
                                 @php
                                     if($RSSNews_last10_val->title_th) {
                                         $name_val_th = $RSSNews_last10_val->title_th;
+ 
                                     } else {
                                         $name_val_th = $RSSNews_last10_val->title_en;
+                             
                                     }
                                 @endphp
                             <li><a
-                                    href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$name_val_th}}</a>
+                                    href="{{route('news.public_detail_select',['code' => @$RSSNews_last10_val->code, 'lang' => $lang])}}">{{@$name_val_th}}</a>
                             </li>
                             @endforeach
                             @else
