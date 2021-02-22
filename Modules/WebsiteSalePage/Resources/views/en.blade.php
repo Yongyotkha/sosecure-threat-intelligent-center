@@ -47,7 +47,7 @@
 
   <main id="main">
     <section id="start-section" class="content-section">
-        <div class="container-fluid">
+        <div class="container">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-7 col-md-12 mb-5 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/group98.png')}}" alt="Threat Sharing">
@@ -123,7 +123,7 @@
             </div>
         </div>
 
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row">
                     <div class="col-lg-4 order-lg-1 order-1">
                         <h1 class="primary-text-blue text-center mt-3 fz-70 font-weight-500">Surface Web</h1>
@@ -149,7 +149,7 @@
 
         <div class="iceberg-section">           
             <div class="bg-blue-linear px-5">
-                <div class="container-fluid">
+                <div class="container">
                     <div class="row">
                         <div class="col-lg-4 order-lg-1 order-2 d-flex flex-column align-items-center justify-content-center">
                             <span class="secondary-text mb-3 text-white text-lg-left text-center">
@@ -203,7 +203,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3 text-center">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
+                    <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
                 </div>
             </div>
         </div>
@@ -325,8 +325,8 @@
         <div class="container">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
-                    <div class="mb-4">
-                        <span class="secondary-text text-left">
+                    <div class="mb-4 text-lg-left text-center">
+                        <span class="secondary-text">
                             Detection user attack by using social engineering technique such as Phishing, Fake mobile application, Drive-By-Download.
                         </span>
                     </div>
