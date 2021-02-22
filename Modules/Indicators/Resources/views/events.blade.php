@@ -186,7 +186,7 @@
             <div class="panel-body">
 
                 <div class="row m-b-12">
-                    <div class="col-md-3">
+                    <div class="col-md-3 m-b-12">
                         <select name="sl_group" id="sl_group" class="form-control sl_group" placeholder="Select">
                             <option value="0" disabled="disabled">Selected</option>
                             <option></option>
@@ -209,7 +209,6 @@
                         </div>
                     </div>
                 </div>
-                <div style="margin-top:10px;"></div>
                 {{-- <div id="industries_box" class="row" style="display: none;">
                     <div class="col-md-12">
                         <h5 class="font-weight-bold">Industries</h5>
