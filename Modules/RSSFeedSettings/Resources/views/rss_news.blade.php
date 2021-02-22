@@ -266,14 +266,14 @@
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th width="20px">Source</th>
-                                                <th width="20%">Title</th>
+                                                <th>Source</th>
+                                                <th>Title</th>
                                                 <th>Category</th>
-                                                <th width="20px">Data Status</th>
-                                                <th width="30px">Public Date</th>
+                                                <th>Data Status</th>
+                                                <th>Public Date</th>
                                                 {{-- <th width="30px">Modified Date</th> --}}
                                                 <th>View Count</th>
-                                                <th width="40px">Link</th>
+                                                <th>Link</th>
                                                 <th>Status</th>
                                                 <th width="5%">Action</th>
                                             </tr>
@@ -654,6 +654,7 @@ $(function() {
                 {
                     data: 'cate',
                     name: 'cate',
+                    className: 'w-130'
                 },
                 {
                     data: 'data_status',

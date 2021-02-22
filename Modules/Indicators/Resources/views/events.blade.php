@@ -186,15 +186,15 @@
             <div class="panel-body">
 
                 <div class="row m-b-12">
-                    <div class="col-md-3 m-b-12">
-                        <select name="sl_group" id="sl_group" class="form-control sl_group" placeholder="Select">
+                    <div class="col-md-2 m-b-12">
+                        <select name="sl_group" id="sl_group" class="form-control sl_group c-dropdown-select2" placeholder="Select">
                             <option value="0" disabled="disabled">Selected</option>
                             <option></option>
                             <option value="1">Industries</option>
                             <option value="2">Group</option>
                         </select>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-10">
                         <div id="industries_box" style="display: none;">
                             <div id="fillter_click" class="button-group">
                                 <span id="btn_industrise"></span>
@@ -349,8 +349,11 @@
 
     $(".sl_group").select2({
         placeholder: "Select",
-        allowClear: true
+        allowClear: true,
+        minimumResultsForSearch: Infinity,
+        customClass: "Myselectbox",
     });
+
 
     $('#industries_box').hide();
     $('#group_box').hide();

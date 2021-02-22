@@ -443,7 +443,7 @@ class RSSFeedSettingsController extends Controller
             // })
             ->addColumn('source', function (RSSNews $model) {
                 if($model -> source){
-                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'"><a hreft="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
                 }else{
                     return '<div class="text-elip max-w-fit" data-rel="tooltip" title="None">None</div>';
                 }
@@ -461,14 +461,14 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('cate', function (RSSNews $model) {
          
                 $html = '';
-                $html .= '<div>';
+                $html .= '<div style="width:250px;">';
                 if($model->get_cate=="[]"){
                     $html = 'None';
                 }else{
 
                     foreach($model->get_cate as $cate_val) {
                         if($cate_val->get_cate_name_news){
-                            $html .= '<a hreft="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
+                            $html .= '<a href="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
                         }else{
                             $html .= 'None-delete0';
                         }
