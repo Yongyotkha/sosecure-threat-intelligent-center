@@ -3937,3 +3937,31 @@ textarea.resize-none{
     width: fit-content;
     display: inline-block;
 }
+
+.item-fillter-social{
+    display: flex;
+    padding: 0;
+    width: 100%;
+    flex-wrap: wrap;
+    list-style: none;
+}
+
+.item-fillter-social li{
+    width: 20%;
+}
+
+@media screen and (max-width:1024px){
+    .item-fillter-social li{
+        width: 50%;
+    }
+}
+@media screen and (max-width:768px){
+    .item-fillter-social li{
+        width: 100%;
+    }
+}
+
+.nopadding {
+    padding: 0 !important;
+    margin: 0 !important;
+}
