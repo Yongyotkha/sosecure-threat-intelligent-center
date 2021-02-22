@@ -368,7 +368,7 @@
       <div class="container">
 
         <div class="section-header">
-          <h3>Contact</h3>
+            <h1  class="primary-text fontw-weight-bold text-center">Contact</h1>
         </div>
 
         <div class="row wow fadeInUp">
