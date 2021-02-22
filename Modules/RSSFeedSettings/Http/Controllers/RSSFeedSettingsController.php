@@ -1019,8 +1019,11 @@ class RSSFeedSettingsController extends Controller
         if(!$role_custom['news']) {
             check_permission403();
         }
-  
         $RSS_news = RSSNews::where("code",$id)->first();
+        if($RSS_news->logo != config('app.URL_CENTER_PUBLISH').'/images/icon/news_default.png'){
+            unlink($RSS_news->logo);
+        }
+        
         RSSNews::where("code",$id)->delete();
 
 
@@ -1114,7 +1117,11 @@ class RSSFeedSettingsController extends Controller
             check_permission403();
         }
         foreach ($request->id as $id) {
+
             $RSS_news = RSSNews::where("code",$id)->first();
+            if($RSS_news->logo != config('app.URL_CENTER_PUBLISH').'/images/icon/news_default.png'){
+                unlink($RSS_news->logo);
+            }
             RSSNews::where("code",$id)->delete();
     
     
@@ -1152,7 +1159,7 @@ class RSSFeedSettingsController extends Controller
             check_permission403();
         }
 
-        $logo = '/images/image-not-found.jpg';
+        
         if ($request->hasFile('logo')) {
                 $request->validate([
                     'logo' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
@@ -1164,6 +1171,8 @@ class RSSFeedSettingsController extends Controller
             $image->move($destinationPath, $imagename);
             // $logo = asset('images/logo_news/'.$imagename);
             $logo = '/images/logo_news/'.$imagename;
+        }else{
+            $logo = '/images/icon/news_default.png';
         }
 
 
