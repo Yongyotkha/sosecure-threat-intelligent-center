@@ -125,7 +125,7 @@
                                         <div class="img-icon-card ice" style="height: 62px;">
                                             <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                         </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 25px !important;">Mobile</h3>
+                                        <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 25px !important;">Mobile App</h3>
                                         <span class="number-card warning" style="font-size: 25px !important;" id='icon_mobile'>0</span>
                                     </div>
                                 </a>
