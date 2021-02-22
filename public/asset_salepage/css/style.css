@@ -1354,8 +1354,8 @@ h6 {
   background-color: #fff;
 }
 
-.bg-blue{
-  background-color: #3869D4 !important;
+.bg-dark{
+  background-color: #1d1d1d  !important;
 }
 
 .bg-c-muted{
@@ -1442,6 +1442,7 @@ h6 {
 
 /* Custome Text*/
 .primary-text{
+  font-weight: bold;
   font: normal normal bold 40px/61px;
   letter-spacing: 0px;
   color: #336081;
@@ -1458,10 +1459,10 @@ h6 {
 }
 @media screen and (max-width:560px){
   .mw-70{
-  max-width: 150px !important;
+  max-width: 100px !important;
   }
   .mw-100{
-    max-width: 150px !important;
+    max-width: 100px !important;
   }
 }
 
@@ -1606,6 +1607,7 @@ h6 {
   }
   .primary-text {
     color: #336081;
+    font-weight: bold;
     font-size: 22px;
   }
 
@@ -1650,11 +1652,11 @@ h6 {
       text-align: center;
   }
   #intro .intro-info h2 {
-    font-size: 27px;
-      margin-bottom: 30px;
+    font-size: 40px;
+    margin-bottom: 30px;
   }
   #intro .intro-info h3 {
-      font-size: 18px;
+    font-size: 20px;
       margin-bottom: 30px;
   }
 }

@@ -46,12 +46,12 @@
 
   <main id="main">
     <section id="start-section" class="content-section">
-        <div class="container">
+        <div class="container-fluid px-lg-5">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-md-12 mb-5 text-center">
+                <div class="col-lg-7 col-md-12 mb-5 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/group98.png')}}" alt="Threat Sharing">
                 </div>
-                <div class="col-lg-6 col-md-12 mb-3">
+                <div class="col-lg-5 col-md-12 mb-3">
                     <div class="mb-5">
                         <h1 class="primary-text text-lg-right text-center">
                             Threat Sharing
@@ -98,7 +98,7 @@
             <div class="row d-flex align-items-center">
                 <div class="col-lg-8 col-lg-8 text-lg-left text-center">
                     <div class="mb-5">
-                        <h1 class="primary-text ">
+                        <h1 class="primary-text">
                             Asset Discovery
                         </h1>
                         <span class="secondary-text">
@@ -117,7 +117,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="primary-text-blue text-center">Data Leak Detection</h1>
+                    <h1 class="primary-text-blue text-center font-weight-bold">Data Leak Detection</h1>
                 </div>
             </div>
         </div>
@@ -241,7 +241,7 @@
         </div>
     </section>
 
-    <section class="content-section bg-blue">
+    <section class="content-section bg-dark">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -330,7 +330,7 @@
                         </span>
                     </div>
                     <div>
-                        <ul class="list-img-ioc justify-content-between">
+                        <ul class="list-img-ioc justify-content-start">
                             <li>
                                 <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing">
                                 <p>Phishing</p>
