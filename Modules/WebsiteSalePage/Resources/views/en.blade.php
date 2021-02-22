@@ -47,7 +47,7 @@
 
   <main id="main">
     <section id="start-section" class="content-section">
-        <div class="container-fluid px-lg-5">
+        <div class="container-fluid">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-7 col-md-12 mb-5 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/group98.png')}}" alt="Threat Sharing">
