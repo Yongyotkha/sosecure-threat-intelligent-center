@@ -18,10 +18,10 @@
                         <a class="nav-link" href="{{route('web.index_th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
                     @if (Auth::check())
-                        <li class="nav-item ml-2 ml-0">
+                        <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
                             <a href="{{route('dashboardnew.index')}}"><button type="button" class="btn btn-outline-secondary px-4">Dashboard</button></a>
                         </li>
-                        <li class="nav-item ml-2 ml-0">
+                        <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
                             <a href="{{route('logout')}}"><button type="button" class="btn btn-outline-secondary px-4">Logout</button></a>
                         </li>
                     @else
