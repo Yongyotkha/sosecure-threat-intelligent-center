@@ -15,6 +15,13 @@
                         <div class="form-group row">
                         <label class="col-lg-12 control-label">Logo </label>
                         <div class="col-lg-12">
+                            <div id="area_preview_logo" style="width:150px; height:150px;">
+                                <img id="preview-image_logo" src="{{ @$RSSNews -> logo }}" 
+                                onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" 
+                                alt="..."><input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" 
+                                value=""></div>
+                        </div>
+                        <div class="col-lg-12">
                             <div class="">
                                 <input id="file-input" type="file" class="form-control" name="logo" value="">
                                 <input type="hidden" name="action" value="{{@$action}}">
@@ -234,6 +241,7 @@
 @include('scripts.summernote')
 @include('stacks.js.markdown')
 @include('stacks.js.hidesettings')
+@include('stacks.js.defaultpic')
 <script>
 
 $('form').each(function () {
@@ -244,6 +252,22 @@ $('form').each(function () {
 $('#source_create').select2({
             tags: true,
             tokenSeparators: [' ']
+});
+
+function readLogo(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+        $('#preview-image_logo').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$("#file-input").change(function() {
+    readLogo(this);
 });
 
 
@@ -323,6 +347,7 @@ var form_save = '.formSaving';
         });--}}
 
         $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+        $('.datetimepicker-input').val(@json($RSSNews -> public_date));
     }); 
     function copy_link(value) {
         var tempInput = document.createElement("input");
