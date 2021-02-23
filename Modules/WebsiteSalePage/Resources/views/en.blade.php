@@ -97,7 +97,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-8 col-lg-8 text-lg-left text-center">
+                <div class="col-lg-8 col-lg-8 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Asset Discovery
@@ -123,7 +123,7 @@
                     </ul>
 
                 </div>
-                <div class="col-lg-4 col-lg-4 text-center">
+                <div class="col-lg-4 col-lg-4 order-lg-2 order-1 text-center mb-lg-0 mb-5">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
                 </div>
             </div>
@@ -208,7 +208,7 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-lg-6 mb-3 text-lg-left text-center">
+                <div class="col-lg-6 mb-3 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Compromised Detection
@@ -230,7 +230,7 @@
                     </ul>
 
                 </div>
-                <div class="col-lg-6 col-lg-6 mb-3 text-center">
+                <div class="col-lg-6 mb-3 order-lg-2 order-1 text-center mb-lg-0">
                     <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
                 </div>
             </div>
