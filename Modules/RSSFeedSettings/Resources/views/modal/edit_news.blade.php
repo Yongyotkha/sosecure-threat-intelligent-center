@@ -349,8 +349,6 @@ var form_save = '.formSaving';
         $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
         if(@json($public_date)){
             $('.datetimepicker-input').val(@json($public_date));
-        }else{
-            $('.datetimepicker-input').val('');
         }
         
     }); 

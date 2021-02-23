@@ -849,6 +849,7 @@ class RSSFeedSettingsController extends Controller
         }else{
             $public_date = '';
         }
+ 
         // dd($data['RSSNews']->source);
         // $data['RSSNews'] = '';
         // if($data['rss']) {
@@ -873,6 +874,7 @@ class RSSFeedSettingsController extends Controller
         if(!$role_custom['news']) {
             check_permission403();
         }
+        $public_date = '';
         $data['RSSNews'] = array();
         
         $get_source_query = "SELECT DISTINCT name FROM fx_rss UNION SELECT DISTINCT source FROM fx_r_s_s_news";
@@ -883,6 +885,7 @@ class RSSFeedSettingsController extends Controller
         $data['action'] = 'create';
         // dd($data['get_source']);
         $data['category'] = CategorySettings::where('active',1)->get();
+        $data['public_date'] = $public_date;
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
 
