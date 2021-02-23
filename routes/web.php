@@ -14,7 +14,8 @@
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
+// Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
+// Route::get('/', 'Welcome@index')->name('index_salepage');
 
 // Route::get('/clientlogin', 'Auth\LoginController@login');
 Route::get('/clientlogin', 'Welcome@clientlogin');
