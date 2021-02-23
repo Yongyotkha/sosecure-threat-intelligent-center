@@ -12,14 +12,23 @@
             <div class="collapse navbar-collapse ml-auto" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('web.en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
+                        <a class="nav-link" href="{{route('web.index_en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('web.th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
+                        <a class="nav-link" href="{{route('web.index_th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
-                    <li class="nav-item ml-lg-4 ml-0">
-                        <button type="button" class="btn btn-outline-secondary px-4">Login</button>
-                    </li>
+                    @if (Auth::check())
+                        <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
+                            <a href="{{route('dashboardnew.index')}}"><button type="button" class="btn btn-outline-secondary px-4">Dashboard</button></a>
+                        </li>
+                        <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
+                            <a href="{{route('logout')}}"><button type="button" class="btn btn-outline-secondary px-4">Logout</button></a>
+                        </li>
+                    @else
+                        <li class="nav-item ml-lg-4 ml-0">
+                            <a href="{{route('login')}}"><button type="button" class="btn btn-outline-secondary px-4">Login</button></a>
+                        </li> 
+                    @endif          
                 </ul>
             </div>
         </div>
@@ -97,7 +106,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-8 col-lg-8 text-lg-left text-center">
+                <div class="col-lg-8 col-lg-8 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Asset Discovery
@@ -106,8 +115,24 @@
                             To help you finding any interesting information and gathering server and asset which service on theinternet and collecting from OSINT. In the same way, we are able to import data for gap detection and threats continuously.
                         </span>
                     </div>
+
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Vulnerabilities.png')}}" alt="Vulnerabilities">
+                            <p>Vulnerabilities</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Compromise_0.png')}}" alt="Compromised">
+                            <p>Compromised</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Information.png')}}" alt="Information">
+                            <p>Information</p>
+                        </li>
+                    </ul>
+
                 </div>
-                <div class="col-lg-4 col-lg-4 text-center">
+                <div class="col-lg-4 col-lg-4 order-lg-2 order-1 text-center mb-lg-0 mb-5">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
                 </div>
             </div>
@@ -192,7 +217,7 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-lg-6 mb-3 text-lg-left text-center">
+                <div class="col-lg-6 mb-3 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Compromised Detection
@@ -201,8 +226,20 @@
                             We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
                         </span>
                     </div>
+
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/data.png')}}" alt="data">
+                            <p>Data</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Server.png')}}" alt="Server">
+                            <p>Server</p>
+                        </li>
+                    </ul>
+
                 </div>
-                <div class="col-lg-6 col-lg-6 mb-3 text-center">
+                <div class="col-lg-6 mb-3 order-lg-2 order-1 text-center mb-lg-0">
                     <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
                 </div>
             </div>

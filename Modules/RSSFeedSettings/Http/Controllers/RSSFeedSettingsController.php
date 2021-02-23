@@ -624,14 +624,35 @@ class RSSFeedSettingsController extends Controller
         ->select(DB::raw('count(*) as source_count , source as source'))
         ->groupBy('source')
         ->orderBy('source_count', 'desc')
-        ->limit(10)
+        ->limit(11)
         ->get();
 
-        $host = array();
+        $host2 = array();
         foreach($model as $value){
-
-            $host[] = [empty($value->source)?'None':$value->source,(int)$value->source_count];
+            if(empty($value->source)||$value->source=='None'){
+                if(!isset($host2['None'])){
+                    $host2['None'] = 0;
+                }
+                $host2['None'] = $host2['None']+(int)$value->source_count;
+            }else{
+                $host2[$value->source] = (int)$value->source_count;
+            }
         }
+        arsort($host2);
+        $countLimit = 0;
+        $host = array();
+        foreach ($host2 as $key => $value) {
+            $countLimit++;
+            if($countLimit<11){
+                $host[] = [$key,$value];
+            }
+        }
+
+        // $host = array();
+        // foreach($model as $value){
+
+        //     $host[] = [empty($value->source)?'None':$value->source,(int)$value->source_count];
+        // }
     
         if ($request->ajax()) {
 
