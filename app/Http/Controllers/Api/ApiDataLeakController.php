@@ -146,6 +146,13 @@ class ApiDataLeakController extends ApiController
                             $keywords = $click_type2;
                             $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
                                 if($keywords == 'other') {
+
+                                    $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
+
+
             
                                 } else {
                                     $query->where('keyword', 'LIKE', '%' . $keywords . '%');
