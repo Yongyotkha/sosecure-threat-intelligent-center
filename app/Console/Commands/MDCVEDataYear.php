@@ -202,52 +202,7 @@ class MDCVEDataYear extends Command
 
     }
 
-        // foreach ($json_data['cve']['affects']['vendor']['vendor_data'] as $vendorkey => $vendor) {
-        //     $vendor_name = $vendor['vendor_name']; //microsoft
-        //     print 'vendor_name :' . $vendor_name;
-        //     foreach ($vendor['product']['product_data'] as $productkey => $productvalue) {
-        //         $product_name = $productvalue['product_name']; //windows_server_2012
-        //         print PHP_EOL . 'product_name :' . $product_name;
-        //         $array_version = array();
 
-        //         foreach ($productvalue['version']['version_data'] as $versionkey => $versionvalue) {
-        //             print PHP_EOL . 'version :' . $versionvalue['version_value'];
-        //             array_push($array_version, $versionvalue['version_value']);
-        //         }
-        //         if (count($array_version) == 0) {
-        //             array_push($array_version, '');
-        //         }
-
-        //         //insert vendor
-        //         foreach ($array_version as $versionkey => $versionvalue) {
-        //             echo PHP_EOL . 'check...';
-        //             $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $vendor_name . "' and vendor='" . $product_name . "' and version='" . $versionvalue . "'";
-        //             $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-        //             $num = mysqli_num_rows($result1);
-        //             //echo 'end check';
-        //             //$num  = 0;
-        //             if ($num == 0) {
-        //                 $created_atz = date("Y-m-d H:i:s ");
-        //                 $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-
-        //                 $edition = '';
-        //                 try {
-        //                     $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,created_at)
-        // VALUES ('" . $CVE_Code . "','" . $product_name . "','" . $vendor_name . "','" . $versionvalue . "','" . $edition . "','" . $created_at . "')";
-        //                     $result = mysqli_query($conn, $sql);
-
-        //                 } catch (Exception $e) {
-
-        //                 } finally {
-
-        //                 }
-
-        //             }
-        //         }
-        //         //--------------------------------
-
-        //     }
-        // }
 
     $description_data = "";
     foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
@@ -287,6 +242,8 @@ class MDCVEDataYear extends Command
     $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
     $num = mysqli_num_rows($result1);
 //$num = 0;
+
+
     if ($num > 0) {
 
         $add_name = $CVE_Code;
@@ -339,15 +296,15 @@ class MDCVEDataYear extends Command
 
     $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
 
-    try {
+  //  try {
 
-       $this->insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+    $this->insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
+    
+  // } catch (Exception $e) {
 
-   } catch (Exception $e) {
+  // } finally {
 
-   } finally {
-
-   }
+ //  }
 
 }
         //==========================
@@ -364,6 +321,9 @@ $TransactionBatchjob_Update->save();
 }
 
 
+
+}
+
 function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
 {
 
@@ -375,7 +335,7 @@ function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descri
     '" . $add_cvsssore . "',
     '" . $add_severity . "',
     '" . $add_pub_date . "','" . $created_at . "')";
-
+    echo $insertdata;
     $insert_data_query = mysqli_query($conn, $insertdata);
 
     if ($insert_data_query) {
@@ -413,7 +373,6 @@ function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descri
         //  echo json_encode($st);
     }
 
-}
 }
 
 }

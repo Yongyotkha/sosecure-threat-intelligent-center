@@ -207,10 +207,10 @@ class MDCountIndicator extends Command
             $pizza  = $value["_id"];
             $pieces = explode(",", $pizza);
             foreach ($pieces as $industrieskey => $industriesvalue) {
-                $Indicatorindustries = IndicatorSummaryYear::where('type', 'group')->where('industries_name', $industriesvalue)->first();
+                $Indicatorindustries = IndicatorSummaryYear::where('type', 'groups')->where('industries_name', $industriesvalue)->first();
                 if(!$Indicatorindustries){
                     $IndicatorSummaryYear = new IndicatorSummaryYear;
-                    $IndicatorSummaryYear->type =  'group';
+                    $IndicatorSummaryYear->type =  'groups';
                     $IndicatorSummaryYear->status = 1;
                     $IndicatorSummaryYear->industries_name = $industriesvalue;
                     $IndicatorSummaryYear->industries_count = $value["total"];

@@ -431,15 +431,16 @@ class MDCVEBatchJob extends Command
         //$modified ='2019-08-08';
         $sql3  = 'SELECT *
         FROM `fx_data_datacve`
-        WHERE  modified >=CURDATE() + INTERVAL -1 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        WHERE  modified >=CURDATE() + INTERVAL -90 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
         // $sql3  = 'SELECT *
         // FROM `data_datacve`
         // WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
         // $sql3 = 'SELECT *
-        //FROM `data_datacve`
-        //WHERE modified > "2020-01-01" and  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        // FROM `data_datacve`
+        // WHERE modified > "2021-01-01" and  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        // echo  $sql3;
 
         $result4 = mysqli_query($conn, $sql3) or die(mysqli_error());
         
@@ -449,7 +450,8 @@ class MDCVEBatchJob extends Command
             $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
 
 
-            $sql_samename = "SELECT namecve FROM fx_data_datacve_mapping WHERE namecve = '" . $row4['namecve'] . "' AND cveven_id = '" . $row3['id'] . "'";
+            $sql_samename = "SELECT namecve FROM fx_data_datacve_mapping WHERE namecve = '" . $row4['namecve'] . "'";
+
             $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
             $num = mysqli_num_rows($result1);
             
@@ -461,8 +463,8 @@ class MDCVEBatchJob extends Command
                 '" . $row4['description'] . "',
                 '" . $row4['cvss_score'] . "',
                 '" . $row4['severity'] . "',
-                '" . $row3['site_id'] . "',
-                '" . $row4['updated_at'] . "','" . $created_at . "','" . $row3['id'] . "')";
+                '" . '0' . "',
+                '" . $row4['updated_at'] . "','" . $created_at . "','" . '0' . "')";
 
 
 
@@ -471,20 +473,52 @@ class MDCVEBatchJob extends Command
 
 
 
-                 $sql_samename_last = "SELECT id FROM fx_data_datacve_mapping order by id desc";
-                 $result1_last = mysqli_query($conn, $sql_samename_last) or die(mysqli_error());
-                 $num_last = mysqli_fetch_assoc($result1_last);
+                // $sql_samename_last = "SELECT id FROM fx_data_datacve_mapping order by id desc";
+                // $result1_last = mysqli_query($conn, $sql_samename_last) or die(mysqli_error());
+                // $num_last = mysqli_fetch_assoc($result1_last);
                 
-                $insertdata_mapping = "INSERT INTO fx_transaction_client_data_datacve_mapping (site_id, transaction_id, transaction_mode, transaction_data_status, status, created_at)
-                VALUES  ('" . $row3['site_id'] . "',
-                '" .  $num_last['id'] . "',
-                '" . "insert". "',
-                '" . "1". "','" . "1". "','" .  date("Y-m-d H:i:s ") . "')";
-                $result = \mysqli_query($conn, $insertdata_mapping);
+                // $insertdata_mapping = "INSERT INTO fx_transaction_client_data_datacve_mapping (site_id, transaction_id, transaction_mode, transaction_data_status, status, created_at)
+                // VALUES  ('" . $row3['site_id'] . "',
+                // '" .  $num_last['id'] . "',
+                // '" . "insert". "',
+                // '" . "1". "','" . "1". "','" .  date("Y-m-d H:i:s ") . "')";
+                // $result = \mysqli_query($conn, $insertdata_mapping);
+
+            }else{
+                $sql_samename_last ="UPDATE `fx_data_datacve_mapping`
+                SET
+                `published` = '". $row4['published']."',
+                `modified` = '". $row4['modified']."',
+                `description` = '". $row4['description']."',
+                `cvss_score` = '". $row4['cvss_score']."',
+                `severity` = '". $row4['severity']."',
+                `updated_at` = '". $row4['updated_at']."',
+                WHERE `id` > 0 and  namecve = '" . $row4['namecve'] . "'";
+                $result = \mysqli_query($conn, $sql_samename_last);
 
             }
 
-            
+            // Mapping Asset
+
+            $sql_samename_asset = "SELECT namecve FROM fx_data_datacve_mapping_assets WHERE namecve = '" . $row4['namecve'] . "' and site_id='".$row3['site_id']."' and cve_asset_id='".$row3['id']."'";
+
+            $result11 = mysqli_query($conn, $sql_samename_asset) or die(mysqli_error());
+            $num = mysqli_num_rows($result11);
+            if ($num == 0) {
+                $insertdata_asset = "INSERT INTO fx_data_datacve_mapping_assets (namecve,cve_asset_id,site_id,code,updated_at, created_at)
+                VALUES  ('" . $row4['namecve'] . "',
+                '" . $row3['id'] . "',
+                '" . $row3['site_id']. "',
+                '" . $This->GUID(). "',
+                '" . $row4['updated_at'] . "','" . $created_at . "'". ")";
+
+                echo  $insertdata_asset;
+
+
+                $result = \mysqli_query($conn, $insertdata_asset);
+            }else{
+
+            }
 
 
 
@@ -647,5 +681,13 @@ function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descri
 
 }
 
+function GUID()
+{
+    if (function_exists('com_create_guid') === true)
+    {
+        return trim(com_create_guid(), '{}');
+    }
 
+    return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+}
 }
