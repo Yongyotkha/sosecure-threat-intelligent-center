@@ -563,7 +563,7 @@
                 serverSide: true,
                 destroy: true,
                 autoWidth:false,
-                "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10">>>rt<"bottom"ip><"clear">',
+                "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
                 ajax: {
                     type: "POST",
                     url: '{!! route('socialdatas.darkweb_all_site_tb') !!}',
