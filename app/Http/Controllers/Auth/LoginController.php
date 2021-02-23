@@ -186,7 +186,33 @@ class LoginController extends Controller
                             Session::put('check_goto_menu', @check_goto_menu(@$menu_goto));
                         }
                     }
-                return Auth::login($user, true);
+
+                    if(Session::has('check_login_page')){
+                        Session::forget('check_login_page');
+                        Session::put('check_login_page', 1);
+                    } else {
+                        if(@check_goto_menu(@$menu_goto)) {
+                            Session::put('check_login_page', 1);
+                        }
+                    }
+
+                    $cookie_name = "check_login_page";
+                    $cookie_value = "1";
+                    setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+
+                // return Auth::login($user, true);
+                // dd(@check_goto_menu(@$menu_goto));
+                $check_goto_menu = @check_goto_menu(@$menu_goto);
+                if($check_goto_menu) {
+                    // dd($check_goto_menu);
+                    return Auth::login($user, true);
+                    header('Location: '.site_url($check_goto_menu));
+                    dd($check_goto_menu);
+                } else {
+                    header('Location: '.site_url('/'));
+                    dd($check_goto_menu);
+                }
+                
             }
         }
     }
