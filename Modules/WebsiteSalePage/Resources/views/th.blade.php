@@ -1,5 +1,31 @@
 @extends('websitesalepage::layouts.master')
 @section('content')
+
+@php 
+    if(Auth::check()) {
+        // if(Session::has('check_login_page')){
+        //     Session::forget('check_login_page');
+        //     $check_goto_menu = session('check_goto_menu');
+        //     if($check_goto_menu) {
+        //         header('Location: '.site_url($check_goto_menu));
+        //         dd($check_goto_menu);
+        //     }
+        // } 
+
+        if(isset($_COOKIE['check_login_page'])) {
+            setcookie("check_login_page", "", time() - 3600);
+            $check_goto_menu = session('check_goto_menu');
+            header('Location: '.site_url($check_goto_menu));
+            dd($check_goto_menu);
+            
+        } else {
+            
+        }
+
+
+    }
+@endphp
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/websitesalepage">
