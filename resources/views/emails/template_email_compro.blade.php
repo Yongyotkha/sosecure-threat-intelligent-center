@@ -55,6 +55,9 @@
                           <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Content : </span> <span>{!! @$data -> feedcontent !!}</span>
                         </div>
                         <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Remark : </span> <span> - </span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
                           <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Date : </span> <span>{{ @$data -> created_at }}</span>
                         </div>
                   </div>
