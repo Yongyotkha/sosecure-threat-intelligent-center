@@ -762,7 +762,6 @@ class AssetsController extends Controller
                     $query->whereNotIn('os_type', [1,2])
                         ->orWhereNull('os_type')->orWhere('os_type','');
                 });
-                
             })->count();
         }else{
             // $dataOut["countAssets"] = @Assets::select('id')->whereHas('get_assets_data', function($q){

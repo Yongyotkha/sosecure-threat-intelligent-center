@@ -1086,7 +1086,7 @@ class DashboardNewController extends Controller
                 }
             }
         }
-
+        
         if (!$request->pagename||$request->pagename=='assets') {
             $role_custom = @check_role_custom();
             if($role_custom['assets']) {
@@ -1094,37 +1094,37 @@ class DashboardNewController extends Controller
                     if(!$request -> sitecode){
                         // $TransactionTimeStampScans = TransactionTimeStampScans::where('code', $SiteSettings->code)->first();
                         
-                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(fx_transaction_scans.data_type,"||",fx_transaction_scans.raw_data,"||",fx_transaction_scans.referent,"||",fx_transaction_scans.status) AS content'))->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
+                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(IFNULL(fx_transaction_scans.data_type,""),"||",IFNULL(fx_transaction_scans.raw_data,""),"||",IFNULL(fx_transaction_scans.referent,""),"||",IFNULL(fx_transaction_scans.status,"")) AS content'))->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
                         $TransactionScans = $TransactionScans->leftjoin('site', 'transaction_scans.site_id', '=', 'site.id');
                         $TransactionScans = $TransactionScans->leftjoin('transaction_time_stamp_scans', 'site.id', '=', 'transaction_time_stamp_scans.site_id');
                         
-                        $TransactionScans = $TransactionScans->get()->toArray();
+                        $TransactionScans = $TransactionScans->whereBetween('transaction_scans.updated_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     } else {
                         // $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $SiteSettings->id)->first();
                         
-                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(fx_transaction_scans.data_type,"||",fx_transaction_scans.raw_data,"||",fx_transaction_scans.referent,"||",fx_transaction_scans.status) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
+                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(IFNULL(fx_transaction_scans.data_type,""),"||",IFNULL(fx_transaction_scans.raw_data,""),"||",IFNULL(fx_transaction_scans.referent,""),"||",IFNULL(fx_transaction_scans.status,"")) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
                         $TransactionScans = $TransactionScans->leftjoin('site', 'transaction_scans.site_id', '=', 'site.id');
                         $TransactionScans = $TransactionScans->leftjoin('transaction_time_stamp_scans', 'site.id', '=', 'transaction_time_stamp_scans.site_id');
                         
-                        $TransactionScans = $TransactionScans->get()->toArray();
+                        $TransactionScans = $TransactionScans->whereBetween('transaction_scans.updated_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     }
                 }else{
                     if(!$request -> sitecode){
                         // $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $SiteSettings->id)->first();
                         
-                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(fx_transaction_scans.data_type,"||",fx_transaction_scans.raw_data,"||",fx_transaction_scans.referent,"||",fx_transaction_scans.status) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
+                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(IFNULL(fx_transaction_scans.data_type,""),"||",IFNULL(fx_transaction_scans.raw_data,""),"||",IFNULL(fx_transaction_scans.referent,""),"||",IFNULL(fx_transaction_scans.status,"")) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
                         $TransactionScans = $TransactionScans->leftjoin('site', 'transaction_scans.site_id', '=', 'site.id');
                         $TransactionScans = $TransactionScans->leftjoin('transaction_time_stamp_scans', 'site.id', '=', 'transaction_time_stamp_scans.site_id');
                         $TransactionScans = $TransactionScans->whereIn('site_id', $site_id_arr);
-                        $TransactionScans = $TransactionScans->get()->toArray();
+                        $TransactionScans = $TransactionScans->whereBetween('transaction_scans.updated_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     } else {
                         // $TransactionTimeStampScans = TransactionTimeStampScans::where('site_id', $SiteSettings->id)->first();
                         
-                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(fx_transaction_scans.data_type,"||",fx_transaction_scans.raw_data,"||",fx_transaction_scans.referent,"||",fx_transaction_scans.status) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
+                        $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(IFNULL(fx_transaction_scans.data_type,""),"||",IFNULL(fx_transaction_scans.raw_data,""),"||",IFNULL(fx_transaction_scans.referent,""),"||",IFNULL(fx_transaction_scans.status,"")) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',2)->orderBy('transaction_scans.status', 'desc');
                         $TransactionScans = $TransactionScans->leftjoin('site', 'transaction_scans.site_id', '=', 'site.id');
                         $TransactionScans = $TransactionScans->leftjoin('transaction_time_stamp_scans', 'site.id', '=', 'transaction_time_stamp_scans.site_id');
                         $TransactionScans = $TransactionScans->where('site.id', $SiteSettings->id)->whereIn('site_id', $site_id_arr);
-                        $TransactionScans = $TransactionScans->get()->toArray();
+                        $TransactionScans = $TransactionScans->whereBetween('transaction_scans.updated_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     }
                 }
             }
