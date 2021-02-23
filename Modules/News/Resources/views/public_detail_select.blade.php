@@ -129,7 +129,7 @@
                                     }
                                 @endphp
                             <li><a
-                                    href="{{route('news.news_detail_code',['code' => @$RSSNews_last10_val->code])}}">{{@$name_val_en}}</a>
+                                    href="{{route('news.public_detail_select',['code' => @$RSSNews_last10_val->code, 'lang' => $lang])}}">{{@$name_val_en}}</a>
                             </li>
                             @endforeach
                             @endif

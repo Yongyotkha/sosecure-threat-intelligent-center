@@ -11,6 +11,10 @@
 |
 */
 
+Route::get('/', 'WebsiteSalePageController@th')->name('web.index');
+Route::get('/th', 'WebsiteSalePageController@th')->name('web.index_th');
+Route::get('/en', 'WebsiteSalePageController@en')->name('web.index_en');
+
 Route::prefix('websitesalepage')->group(function() {
     Route::get('/', 'WebsiteSalePageController@th')->name('web.th');
     Route::get('/th', 'WebsiteSalePageController@th')->name('web.th');

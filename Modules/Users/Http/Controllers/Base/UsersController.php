@@ -391,7 +391,7 @@ abstract class UsersController extends Controller
             ->editColumn(
                 'chk',
                 function ($model) {
-                    if (@$model->get_model_has_roles->role_id == 6 || @$model->get_model_has_roles->role_id == 1) {
+                    if (@$model->id == 1) {
                         return '<label><input type="checkbox" disabled  name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';
                     } else {
                         return '<label><input type="checkbox"   name="checked[]" class="user_id" value="' . $model->id . '"><span class="label-text"></span></label>';

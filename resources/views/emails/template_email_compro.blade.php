@@ -16,12 +16,12 @@
               <table class="miro__header-content" style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top;width:100%">
                 <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
                   <td class="miro__col-header-logo" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:32px;text-align:left;vertical-align:top;width:50%;word-wrap:break-word">
-                    <a href="{{route('index')}}" target="_blank" style="Margin:0;color:#2a79ff;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.43;margin:0;padding:0;text-align:left;text-decoration:none">
+                    <a href="{{url('/')}}" target="_blank" style="Margin:0;color:#2a79ff;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.43;margin:0;padding:0;text-align:left;text-decoration:none">
 						<img src="{{asset('images/logo_threat/logo.png')}}" style="-ms-interpolation-mode:bicubic;border:none;clear:both;display:block;font-family:Helvetica,Arial,sans-serif;height:45px;max-height:100%;max-width:100%;outline:0;text-decoration:none;width:auto">
                     </a>
                   </td>
                   <td class="miro__col-header-btn" style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.43;margin:0;padding:0;padding-top:26px;text-align:right;vertical-align:top;width:50%;word-wrap:break-word">
-                  <a href="{{route('index')}}" class="miro-btn" target="_blank" style="Margin:0;background-color:#fff;border:1px solid #050038;border-radius:4px;box-sizing:border-box;color:#050038!important;cursor:pointer;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:16px!important;font-stretch:normal;font-style:normal;font-weight:400;height:48px;letter-spacing:normal;line-height:48px!important;margin:0;padding:0;text-align:center;text-decoration:none;white-space:nowrap;width:170px">
+                  <a href="{{url('/')}}" class="miro-btn" target="_blank" style="Margin:0;background-color:#fff;border:1px solid #050038;border-radius:4px;box-sizing:border-box;color:#050038!important;cursor:pointer;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:16px!important;font-stretch:normal;font-style:normal;font-weight:400;height:48px;letter-spacing:normal;line-height:48px!important;margin:0;padding:0;text-align:center;text-decoration:none;white-space:nowrap;width:170px">
 						<span style="font-family:Helvetica,Arial,sans-serif">
 							Go To Threat inSight
 						</span>
@@ -40,13 +40,17 @@
                           <h1 style="font-weight:700;color:#000;font-size: 40px;">Add Complete</h1>
                         </div>
                         <div style="margin-bottom: 10px;">
-                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Site : </span> <span> Test Site </span>
+                          <div style="display: none;">{{$get_site = App\DataLeakSocialRef::where('data_leak_feed_id',$data->id)->select('site_id')->first()}}</div> 
+                          <div style="display: none;">{{$site_name = Modules\SiteSettings\Entities\SiteSettings::where('id',$get_site->site_id)->select('name')->first()}}</div>
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Site : </span> <span> {{$site_name->name}} </span>
+                        </div>
+
+                        @if ($data->feel_type=='social'||$data->feel_type=='darkweb_public')
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Type : </span> <span> {{get_word_leak_compromise($data->feel_type,'data_leak')}}</span>
                         </div>
                         <div style="margin-bottom: 10px;">
-                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Type : </span> <span> PUBLIC</span>
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Keyword Ref : </span> Mobile <span></span>
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Keyword Ref : <span>{{@$data ->keyword}}</span></span>
                         </div>
                         <div style="margin-bottom: 10px;">
                           <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Source : </span> <span> {{ @$data -> source_name }} </span>
@@ -54,12 +58,34 @@
                         <div style="margin-bottom: 10px;">
                           <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Content : </span> <span>{!! @$data -> feedcontent !!}</span>
                         </div>
+                        {{-- <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Remark : </span> <span>{{ @$data -> source_name }} </span>
+                        </div> --}}
                         <div style="margin-bottom: 10px;">
-                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Remark : </span> <span> - </span>
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Date : </span> <span>{{ @$data -> created_at }}</span>
+                        </div>
+
+                        @elseif ($data->feel_type=='darkweb'||$data->feel_type=='compromise'||$data->feel_type=='webserver'||$data->feel_type=='server')
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Type : </span> <span> {{get_word_leak_compromise(@$data->feel_type,'compromise')}}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Keyword Ref : <span>{{@$data ->keyword}}</span></span>
+                        </div>
+                        {{-- <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Source : </span> <span> {{ @$data -> source_name }} </span>
+                        </div> --}}
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Content : </span> <span>{!! @$data -> feedcontent !!}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Remark : </span> <span>{!! @$data -> source_name !!} </span>
                         </div>
                         <div style="margin-bottom: 10px;">
                           <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Date : </span> <span>{{ @$data -> created_at }}</span>
                         </div>
+                        @endif
+
                   </div>
                   @endforeach
                 </div>   

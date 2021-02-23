@@ -12,14 +12,24 @@
             <div class="collapse navbar-collapse ml-auto" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('web.en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
+                        <a class="nav-link" href="{{route('web.index_en')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/us.png')}}" width="20px;" alt=""> EN</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('web.th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
+                        <a class="nav-link" href="{{route('web.index_th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
-                    <li class="nav-item ml-lg-4 ml-0">
-                        <button type="button" class="btn btn-outline-secondary px-4">Login</button>
-                    </li>
+                    @if (Auth::check())
+                        <li class="nav-item ml-lg-4 ml-0">
+                            <a href="{{route('dashboardnew.index')}}"><button type="button" class="btn btn-outline-secondary px-4">Dashboard</button></a>
+                        </li>
+                        <li class="nav-item ml-lg-4 ml-0">
+                            <a href="{{route('logout')}}"><button type="button" class="btn btn-outline-secondary px-4">Logout</button></a>
+                        </li>
+                    @else
+                        <li class="nav-item ml-lg-4 ml-0">
+                            <a href="{{route('login')}}"><button type="button" class="btn btn-outline-secondary px-4">Login</button></a>
+                        </li> 
+                    @endif
+                   
                 </ul>
             </div>
         </div>

@@ -840,7 +840,15 @@ class RSSFeedSettingsController extends Controller
         if(!$role_custom['news']) {
             check_permission403();
         }
-        $data['RSSNews'] = RSSNews::where('code', $code)->first();
+        
+        $public_date = '';
+        $RSSNews = RSSNews::where('code', $code)->first();
+        $data['RSSNews'] = $RSSNews;
+        if($RSSNews->public_date){
+            $public_date = $RSSNews->public_date;
+        }else{
+            $public_date = '';
+        }
         // dd($data['RSSNews']->source);
         // $data['RSSNews'] = '';
         // if($data['rss']) {
@@ -854,6 +862,8 @@ class RSSFeedSettingsController extends Controller
         $data['get_source'] = @$get_source;
         $data['action'] = 'edit';
         $data['category'] = CategorySettings::where('active',1)->get();
+        $data['public_date'] = $public_date;
+        
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
 

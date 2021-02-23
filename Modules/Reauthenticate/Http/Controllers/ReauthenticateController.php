@@ -12,6 +12,7 @@ use App\transaction_client_role_permissions;
 use App\transaction_client_users;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use Modules\Users\Entities\role_menu_permission;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -31,10 +32,24 @@ class ReauthenticateController extends Controller
 
     public function verify_site_user($token)
     {
-        $User = User::where('site_add_user_token',$token)->first();
 
+        $User = User::where('site_add_user_token',$token)->first();
+       
+        
         if($User) {
             $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
+
+
+            $role_menu_permission = role_menu_permission::where('role_id',$model_has_roles->role_id)->first();
+            
+            if($model_has_roles->role_id==1){
+                $menu[]=1;
+                $check_goto_menu = @check_goto_menu(@$menu);
+            }else{
+                $menu[]=$role_menu_permission->menu_id;
+                $check_goto_menu = @check_goto_menu(@$menu);
+            }
+
             if(@$model_has_roles) {
                 if(@$model_has_roles->role_id == 4 || @$model_has_roles->role_id == 5 || @$model_has_roles->role_id == 6) {
                     $granted_access = 'Welcome Site:';
@@ -52,10 +67,15 @@ class ReauthenticateController extends Controller
             if($verify == 0 && $last_change_pass == null) {
                 return view('reauthenticate::index',compact('User','granted_access','granted_access_val'));
             } else {
-                return redirect()->route('index');
+                if($check_goto_menu){
+                    return redirect()->check_goto_menu;
+                }
+
             }
         } else {
-            return redirect()->route('index');  
+            if($check_goto_menu){
+                return redirect()->check_goto_menu;
+            }
         }
  
     }
