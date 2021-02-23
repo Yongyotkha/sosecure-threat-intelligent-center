@@ -10,6 +10,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', 'DashboardNewController@index')->name('index');//->middleware('can:menu_items','role:admin','permission:dashboard')
+
 Route::group(
     ['middleware' => ['web', 'installed', 'permission:dashboard'], 'prefix' => 'dashboardnew'], function () {
         Route::get('/', 'DashboardNewController@index')->name('dashboardnew.index')->middleware('can:menu_items');//->middleware('can:menu_items','role:admin','permission:dashboard')
