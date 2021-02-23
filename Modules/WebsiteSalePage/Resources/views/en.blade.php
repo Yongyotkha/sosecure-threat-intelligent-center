@@ -106,6 +106,22 @@
                             To help you finding any interesting information and gathering server and asset which service on theinternet and collecting from OSINT. In the same way, we are able to import data for gap detection and threats continuously.
                         </span>
                     </div>
+
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Vulnerabilities.png')}}" alt="Vulnerabilities">
+                            <p>Vulnerabilities</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Compromise_0.png')}}" alt="Compromised">
+                            <p>Compromised</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Information.png')}}" alt="Information">
+                            <p>Information</p>
+                        </li>
+                    </ul>
+
                 </div>
                 <div class="col-lg-4 col-lg-4 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
@@ -201,6 +217,18 @@
                             We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
                         </span>
                     </div>
+
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/data.png')}}" alt="data">
+                            <p>Data</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Server.png')}}" alt="Server">
+                            <p>Server</p>
+                        </li>
+                    </ul>
+
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">

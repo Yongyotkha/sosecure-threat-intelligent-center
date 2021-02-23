@@ -105,6 +105,22 @@
                             เราช่วยมองหาสิ่งที่สนใจ และรวบรวมเครื่อง Server และ Asset ต่างๆ ที่ให้บริการบน Internet โดยการรวบรวมจาก OSINT และสามารถนำเข้าข้อมูลเพื่อตรวจจับช่องโหว่ และภัยคุกคามต่างๆ ได้ต่อเนื่อง
                         </span>
                     </div>
+
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Vulnerabilities.png')}}" alt="Vulnerabilities">
+                            <p>Vulnerabilities</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Compromise_0.png')}}" alt="Compromised">
+                            <p>Compromised</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Information.png')}}" alt="Information">
+                            <p>Information</p>
+                        </li>
+                    </ul>
+
                 </div>
                 <div class="col-lg-4 col-lg-4 text-center">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
@@ -200,6 +216,18 @@
                             ตรวจจับการถูกโจมตีจาก Hacker และการยึดเครื่องหรือฝัง Backdoor ในเครื่อง Server โดยการใช้ Indicator จากฐานข้อมูลเชิงลึก
                         </span>
                     </div>
+
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/data.png')}}" alt="data">
+                            <p>Data</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Server.png')}}" alt="Server">
+                            <p>Server</p>
+                        </li>
+                    </ul>
+
                 </div>
                 <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
