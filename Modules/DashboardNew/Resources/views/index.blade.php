@@ -665,18 +665,17 @@ Highcharts.setOptions({
                         
                         let status = '';
                         let text1 = '';
-                        if(res.length > 0) {
-                            if(res.length > 1) {
+                        
                                 if(full.pagename == 'Web Defacement') {
-                                        if(res[2].toLowerCase() == 'normal') {
+                                        if(res && res[2].toLowerCase() == 'normal') {
                                             status = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class="dot low"></span> Normal</div>`;
-                                            html += `${res[0]} <br> ${res[1]} <br> ${status}`;
-                                        } else if(res[2].toLowerCase() == 'medium') {
+                                            html += `${(res && res[0]) ? res[0] : ''} <br> ${(res && res[1]) ? res[1] : ''} <br> ${status}`;
+                                        } else if(res && res[2].toLowerCase() == 'medium') {
                                             status = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class="dot " style="background: #fcc838 !important;"></span> Medium</div>`;
-                                            html += `${res[0]} <br> ${res[1]} <br> ${status}`;
-                                        } else if(res[2].toLowerCase() == 'high') {
+                                            html += `${(res && res[0]) ? res[0] : ''} <br> ${(res && res[1]) ? res[1] : ''} <br> ${status}`;
+                                        } else if(res && res[2].toLowerCase() == 'high') {
                                             status = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class="dot " style="background: #e64732 !important;"></span> High</div>`;
-                                            html += `${res[0]} <br> ${res[1]} <br> ${status}`;
+                                            html += `${(res && res[0]) ? res[0] : ''} <br> ${(res && res[1]) ? res[1] : ''} <br> ${status}`;
                                         } else {
                                             html += `${full.content}`;
                                         }
@@ -688,23 +687,15 @@ Highcharts.setOptions({
                                             text4 = `<div class="status-flex mr-2"><strong>Status</strong> : &nbsp; <span class=""></span> ${(res && res[3]==2) ? '<span class="badge badge-primary" style="background-color: #3869d4;">New</span>' : '-'}</div>`;
                                             html += `${text1}  ${text2}  ${text3}  ${text4}`;
                                         
-                                }
-                                
-                            } else {
-                                if(full.content != null && full.content != '') {
-                                    html += `${full.content}`;
                                 } else {
-                                    html += `-`;
+                                    if(full.content != null && full.content != '') {
+                                    html += `${full.content}`;
+                                    } else {
+                                        html += `-`;
+                                    }
                                 }
-                            }
-                            
-                        } else {
-                            if(full.content != null && full.content != '') {
-                                html += `${full.content}`;
-                            } else {
-                                html += `-`;
-                            }
-                        }
+                               
+                        
                         return '<div class="<!--text-trucate-ovf-->">'+html+'</div>';    
                     },
                 },
