@@ -12,9 +12,8 @@
                 </div>
 
                 <div class="ml-2 text-right">
-
                     <div class="max-w-select">
-                            <select name="site" id="site" class="select2-option form-control select-site"
+                        <select name="site" id="site" class="select2-option form-control select-site"
                             onchange="changeSite()">
                             <option value="">All Site</option>
                             @if($SiteSettings)
@@ -24,11 +23,12 @@
                             @endif
                         </select>
                     </div>
+
                     <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"
-                    disabled>
+
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"disabled>
                     <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
                         <span class="hide-text">@langapp('delete')</span></span>
                     </button>
@@ -36,7 +36,6 @@
                 </div>
             </div>
         </header>
-
 
     <section id="scrollable_news" class="scrollable wrapper">
         <section class="panel panel-default" id="hide-advance-search" style="display: none">

@@ -192,6 +192,8 @@
                     </div>
                 </div>
 
+
+
                 <div class="form-group" id="area_select_site_multi">
                     <div class="row">
 
@@ -231,7 +233,7 @@
                             </select> --}}
 
 
-                            <select name="site" id="select-site" class="select2-option form-control select-site" disabled>
+                            <select name="site" id="select-site" class="select2-option form-control select-site" onchange="get_site(value)" disabled>
                                 {{-- <option value="">Select Site</option> --}}
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
@@ -243,6 +245,14 @@
                         </div>
                     </div>
                 </div>
+                
+
+                    
+                <div class="form-group row" id="permission">
+
+                </div>
+
+
 
                 <div class="form-group">
                     <div class="row">
@@ -343,7 +353,7 @@
 
 
         function check_role(val) {
-            console.log(val);
+     
             if(val == 1) {
                 $("#select-site_multi").val('').trigger('change').prop("disabled",true);
                 $("#area_select_site_multi").css("display","none");
@@ -365,7 +375,48 @@
             }
         }
 
+        function openrole(onck,id){
+            $('#'+id).slideToggle(150);
+        }
 
+        $(document).ready(function () {
+            $('#role').select2();
+        });
+
+        function get_site(val){
+            if(val!=''){
+
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('users.get_site') }}",
+                    data:{id: val},
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+
+                    $('#permission').html(response.data);
+                        
+                        loading('stop_load');
+
+                        
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+            
+
+        };
 
     </script>
 

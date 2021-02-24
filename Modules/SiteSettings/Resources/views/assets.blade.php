@@ -500,8 +500,7 @@
         $('#datatype').select2();
         $('#source').select2();
 
-        $('.select2').select2();
-
+        
         $('.hide-fillter').hide();
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();

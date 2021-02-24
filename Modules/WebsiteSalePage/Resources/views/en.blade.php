@@ -434,7 +434,7 @@
           <h1  class="primary-text fontw-weight-bold text-center">Contact</h1>
         </div>
 
-        <div class="row wow fadeInUp">
+        <div class="row">
             <div class="col-lg-6">
                 <div class="contact-container">
                    <ul class="contact-list">

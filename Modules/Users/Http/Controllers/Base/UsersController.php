@@ -15,6 +15,9 @@ use Modules\Users\Jobs\BulkDeleteUsers;
 use Modules\Users\Jobs\GDPRExportData;
 use Modules\Users\Entities\model_has_roles;
 use App\Entities\Roles;
+use App\Menu;
+use App\Menu_sub;
+use DB;
 
 abstract class UsersController extends Controller
 {
@@ -84,7 +87,7 @@ abstract class UsersController extends Controller
         return view('users::index')->with($data);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $role_custom = @check_role_custom();
         if(!$role_custom['manage_users']) {
@@ -110,6 +113,10 @@ abstract class UsersController extends Controller
         }else if(@$get_role_custom_first['site_client'] == 1) {
             $SiteSettings = @$get_role_custom_first['SiteSettings'];
         }
+
+
+
+
 
         $data['SiteSettings'] = @$SiteSettings;
 
@@ -527,4 +534,75 @@ abstract class UsersController extends Controller
             Response::HTTP_OK
         );
     }
+
+    public function get_manu(Request $request)
+    {
+        $html = '';
+        if($request->id){
+            // $SiteSettings = SiteSettings::where('code',$request->code)->first();
+            $result_menu_permission = DB::table("site_menu_permission")->select('menu_code')->where("site_id", @$request->id)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+            $result_menu_sub_permission = DB::table("site_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$request->id)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+    
+            $Menu = Menu::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_permission)->orderBy('order', 'asc');
+            $Menu = $Menu->get();
+            $Menu_sub = Menu_sub::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_sub_permission)->orderBy('order', 'asc')->get();
+            $html = '';
+
+            $html .='<label class="col-lg-2 control-label">Permission Menu <span class="text-danger">*</span> </label>
+                    <div class="col-lg-10">
+                    <ul class="role-group">';
+                  $i=1;
+                  foreach($Menu AS $menu){
+            $html .='  <li>
+                      <div class="role-main">
+                          <span class="role-click" onclick="openrole(this,"role-'.$i.'")">';
+                          if(count($menu->get_menu_sub) > 0){
+                            $html .= '@icon("solid/plus")';
+                          }else{
+                            $html .= '<i class="fas fa-minus icon"></i>';
+                          }
+            $html .=   '</span>
+                          <span class="checkbox chk-inline">
+                              <label>
+                                  <input type="checkbox" name="menu[]" value="'.$menu->code.'">
+                                  <span class="label-text" data-rel="tooltip" title="">'.$menu->name.'</span>
+                              </label>
+                          </span>
+                      </div>';
+                      
+            if(!empty($Menu_sub)){
+                $html .= '<ul id="role-'.$i.'" class="role-group-sub">';
+                          foreach($Menu_sub as $menu_sub){ 
+                $html .=         '<li>
+                                  <div class="role-sub">
+                                      <span class="checkbox chk-inline">
+                                          <label>
+                                              <input type="checkbox" name="menu_sub[]" value="'.$menu_sub->code.'">
+                                              <span class="label-text" data-rel="tooltip" title="">'.$menu_sub->name.'</span>
+                                          </label>
+                                      </span>
+                                  </div>
+                              </li>';
+                            }
+                $html .=  '</ul>';
+            }
+                      
+
+            $html .=  '</li>';
+                  $i++;
+            }
+                  
+            $html .=  '</ul></div>';
+        }
+
+       
+        return ajaxResponse(
+            [
+                'data' => $html,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+    
 }

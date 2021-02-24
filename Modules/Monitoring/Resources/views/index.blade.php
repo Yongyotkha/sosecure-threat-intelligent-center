@@ -2,24 +2,38 @@
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a> --}}
-            <div class="bc-head">Monitoring > Schedule Task</div>
 
-            <a href="#hide-advance-search" id="advance-search" class="pull-right btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-            </a>
-             <div class="pull-right max-w-select" style="margin-top: 8px;">
-                <select name="site" id="site" class="select2-option form-control select-site" onchange="changeSite()">
-                    <option value="">All Site</option>
-                    @if($SiteSettings)
-                        @foreach($SiteSettings as $SiteSettings_val)
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                    <span>
+                        Monitoring > Schedule Task
+                    </span>
+                </div>
+
+                <div class="ml-2 text-right">
+                    <div class="max-w-select">
+                        <select name="site" id="site" class="select2-option form-control select-site"
+                            onchange="changeSite()">
+                            <option value="">All Site</option>
+                            @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
                             <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                        @endforeach
-                    @endif
-                </select>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
+                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                    </a>
+
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"disabled>
+                    <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
+                        <span class="hide-text">@langapp('delete')</span></span>
+                    </button>
+                 
+                </div>
             </div>
         </header>
 

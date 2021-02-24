@@ -7,7 +7,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" style="font-family:Helvetica,Arial,sans-serif">
     <meta name="viewport" content="width=device-width" style="font-family:Helvetica,Arial,sans-serif">
   </head>
-
   <body style="-moz-box-sizing:border-box;-ms-text-size-adjust:100%;-webkit-box-sizing:border-box;-webkit-text-size-adjust:100%;Margin:0;background:#f5f5f5;background-color:#f3f4f8;box-sizing:border-box;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.43;margin:0;min-width:600px;padding:0;text-align:left;width:100%!important">
     <table class="miro__container" align="center" width="600" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-spacing:0;font-family:Helvetica,Arial,sans-serif;max-width:90%;min-width:90%;padding:0;text-align:left;vertical-align:top">
       <tr style="font-family:Helvetica,Arial,sans-serif;padding:0;text-align:left;vertical-align:top">
@@ -35,90 +34,60 @@
             <div class="miro__content-body" style="font-family:Helvetica,Arial,sans-serif">
                 {{-- Section TH --}}
                 <div class="miro-title-block" style="background-position:center;background-repeat:no-repeat;background-size:100% auto;font-family:Helvetica,Arial,sans-serif;padding:0px 40px 0px">
-                  <div style="margin-top: 20px">
+                  @foreach($compromised as $data)
+                  <div class="miro-title-block__subtitle font-size-20 m-top-16" style="padding:20px;background: #eeeeeea8;border-bottom:1px solid #a0a0a0;color:#050038;font-family:Helvetica,Arial,sans-serif;font-size:20px!important;font-stretch:normal;font-style:normal;font-weight:400;letter-spacing:normal;line-height:1.4;margin-top:16px"> 
+                        <div style="text-align: center;">
+                          <h1 style="font-weight:700;color:#000;font-size: 40px;">Add Complete</h1>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <div style="display: none;">{{$get_site = App\DataLeakSocialRef::where('data_leak_feed_id',$data->id)->select('site_id')->first()}}</div> 
+                          <div style="display: none;">{{$site_name = Modules\SiteSettings\Entities\SiteSettings::where('id',$get_site->site_id)->select('name')->first()}}</div>
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Site : </span> <span> {{$site_name->name}} </span>
+                        </div>
 
-                    <div style="text-align: left;">
-                      <h1 style="font-weight:700;color:#000;font-size: 40px;">Add Complete</h1>
-                    </div>
-                    @foreach($compromised as $data)
-                    <div style="overflow: auto;width:100%;">
-                      <table style="border: 1px solid #dcdcdc;width:100%;background:#f1f1f1;overflow:auto">
                         @if ($data->feel_type=='social'||$data->feel_type=='darkweb_public')
-                        <tr style="background: #3869d4;">
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Site</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Type</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Keyword Ref</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Source</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;width:300px;white-space:nowrap">Content</th>
-                        </tr>
-                        
-                        <tr style="background: #fff">
-                          <td style="color: #333;font-weight:bold;padding:10px;white-space:nowrap">
-                            <div style="display: none;">{{$get_site = App\DataLeakSocialRef::where('data_leak_feed_id',$data->id)->select('site_id')->first()}}</div> 
-                            <div style="display: none;">{{$site_name = Modules\SiteSettings\Entities\SiteSettings::where('id',$get_site->site_id)->select('name')->first()}}</div>
-                            <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Site : </span> <span> {{$site_name->name}} </span>
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;white-space:nowrap">
-                            {{get_word_leak_compromise($data->feel_type,'data_leak')}}
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;">
-                            {{@$data ->keyword}}
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;">
-                            {{ @$data -> source_name }}
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;">
-                            <div style="width: 300px">
-                              {!! @$data -> feedcontent !!}
-                            </div>
-                          </td>
-                        </tr>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Type : </span> <span> {{get_word_leak_compromise($data->feel_type,'data_leak')}}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Keyword Ref : <span>{{@$data ->keyword}}</span></span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Source : </span> <span> {{ @$data -> source_name }} </span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Content : </span> <span>{!! @$data -> feedcontent !!}</span>
+                        </div>
+                        {{-- <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Remark : </span> <span>{{ @$data -> source_name }} </span>
+                        </div> --}}
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Date : </span> <span>{{ @$data -> created_at }}</span>
+                        </div>
 
                         @elseif ($data->feel_type=='darkweb'||$data->feel_type=='compromise'||$data->feel_type=='webserver'||$data->feel_type=='server')
-                       
-                        <tr style="background: #3869d4;">
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Site</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">type</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Keyword Ref</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;width:300px;white-space:nowrap">Content</th>
-                          <th style="color: #fff;font-weight:bold;padding:10px;white-space:nowrap">Remark</th>
-                        </tr>
-
-                        <tr style="background: #fff">
-                          <td style="color: #333;font-weight:bold;padding:10px;white-space:nowrap">
-                            <div style="display: none;">{{$get_site = App\DataLeakSocialRef::where('data_leak_feed_id',$data->id)->select('site_id')->first()}}</div> 
-                            <div style="display: none;">{{$site_name = Modules\SiteSettings\Entities\SiteSettings::where('id',$get_site->site_id)->select('name')->first()}}</div>
-                            <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block"></span> <span> {{$site_name->name}} </span>
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;white-space:nowrap">
-                            {{get_word_leak_compromise(@$data->feel_type,'compromise')}}
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;">
-                            {{@$data ->keyword}}
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;">
-                            <div style="width: 300px">
-                              {!! @$data -> feedcontent !!}
-                            </div>
-                          </td>
-                          <td style="color: #333;font-weight:bold;padding:10px;">
-                            {!! @$data -> source_name !!}
-                          </td>
-                        </tr>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Type : </span> <span> {{get_word_leak_compromise(@$data->feel_type,'compromise')}}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Keyword Ref : <span>{{@$data ->keyword}}</span></span>
+                        </div>
+                        {{-- <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Source : </span> <span> {{ @$data -> source_name }} </span>
+                        </div> --}}
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Content : </span> <span>{!! @$data -> feedcontent !!}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Remark : </span> <span>{!! @$data -> source_name !!} </span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                          <span style="font-weight:500;color:#060606;font-weight:700;display:inline-block">Date : </span> <span>{{ @$data -> created_at }}</span>
+                        </div>
                         @endif
-                      </table>
-
-                      <div style="color: #333;font-weight:bold;padding:10px;white-space:nowrap">
-                        Date : {{ @$data -> created_at }}
-                      </div>
-
-                    </div>      
-                    @endforeach
-       
 
                   </div>
-        
-
+                  @endforeach
                 </div>   
               {{-- Under Line --}}
               <div style="border: 1px solid #eee;margin-top:30px;"></div>
