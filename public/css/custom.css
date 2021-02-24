@@ -3798,6 +3798,12 @@ textarea.form-control{
     .navbar-brand img {
         margin-left: 0rem !important;
     }
+    .wdfm-ft-left.flex.rw{
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        width: 100%;
+        align-items: start;
+    }
   }
 
 

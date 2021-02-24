@@ -36,7 +36,7 @@
                         <div class="ml-2 text-right">
                         
                             <a href="{{route('domain.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
-                                <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/plus')</span>
+                                <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
                                 <span class="hide-text">@langapp('add')</span>
                             </a>
     

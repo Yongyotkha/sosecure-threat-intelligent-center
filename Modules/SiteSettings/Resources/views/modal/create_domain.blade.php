@@ -255,12 +255,12 @@
         
         <div class="modal-footer">
             {{-- {!! Form::close() !!} --}}
-            {{-- <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+            <button type="button" class="btn btn-default btn-rounded m-b-12" data-dismiss="modal">
                 <i class="fas fa-times"></i>
                 Close
-            </button> --}}
-            {!! closeModalButton() !!}
-            <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit">
+            </button>
+
+            <button type="submit" class="btn btn-success btn-rounded formSavingAndRun submit m-b-12">
                 <i class="fas fa-play"></i>
                 Run Scan And Save Now
             </button>
@@ -268,7 +268,7 @@
                 <i class="fas fa-paper-plane"></i>
                 Save
             </button> --}}
-            <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
+            <button type="submit" class="btn btn-info formSaving btn-rounded m-b-12"><i class="fas fa-paper-plane"></i> Save</button>
         </div>
         {!! Form::close() !!}
     </div>
