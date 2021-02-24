@@ -421,6 +421,17 @@ class UsersSettingsController extends Controller
         $pass = '';
         if($password) {
             if($password_re) {
+                if(!preg_match("/[0-9]/",$password)) {
+                    return response()->json(['message' => 'Password must including UPPER/lowercase and numbers', 'errors' => ['missing' => ["Password must including UPPER/lowercase and numbers"]]], 500);
+                }
+                elseif(!preg_match("/[A-Z]/",$password)) {
+                    return response()->json(['message' => 'Password must including UPPER/lowercase and numbers', 'errors' => ['missing' => ["Password must including UPPER/lowercase and numbers"]]], 500);
+                }
+                elseif(!preg_match("/[a-z]/",$password)) {
+                    return response()->json(['message' => 'Password must including UPPER/lowercase and numbers', 'errors' => ['missing' => ["Password must including UPPER/lowercase and numbers"]]], 500);
+                }
+
+
                 if($password == $password_re) {
                     $pass = $password;
                 } else {
