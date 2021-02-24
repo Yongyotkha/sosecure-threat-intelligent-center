@@ -53,10 +53,10 @@ class ReauthenticateController extends Controller
             if($verify == 0 && $last_change_pass == null) {
                 return view('reauthenticate::index',compact('User','granted_access','granted_access_val'));
             } else {
-                return redirect()->route('index');
+                return redirect('/');
             }
         } else {
-            return redirect()->route('index');  
+            return redirect('/');  
         }
  
     }
