@@ -156,7 +156,7 @@ class ReauthenticateController extends Controller
                 $url_redirect = route('reauth.verify_success').'?token='.$user->site_add_user_token;
                 $UserSite = UserSite::select('site_id')->where('user_id',$user->id)->first();
             } else {
-                $url_redirect = route('index');
+                $url_redirect = url('/');
             }
         }
 
