@@ -8,12 +8,12 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12 m-b-12">
                             <h5>Create News</h5>
                         </div>
                         </div>
                         <div class="form-group row">
-                        <label class="col-lg-12 control-label">Logo </label>
+                        <label class="col-lg-12 control-label m-t-10">Logo </label>
                         <div class="col-lg-12 m-t-10 m-b-12">
                             <div id="area_preview_logo">
                                 <img id="preview-image_logo" src="{{ @$RSSNews -> logo }}"  onerror="setDefaultPic(this)" alt="...">
