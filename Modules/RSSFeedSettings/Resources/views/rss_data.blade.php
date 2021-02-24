@@ -339,6 +339,7 @@
             serverSide: true,
             destroy: true,
             "autoWidth" : false,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 5, "desc" ]],
             ajax: {
                 type: "POST",

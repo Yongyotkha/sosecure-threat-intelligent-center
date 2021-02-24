@@ -15,11 +15,10 @@
                         <div class="form-group row">
                         <label class="col-lg-12 control-label">Logo </label>
                         <div class="col-lg-12">
-                            <div id="area_preview_logo" style="width:150px; height:150px;">
-                                <img id="preview-image_logo" src="{{ @$RSSNews -> logo }}" 
-                                onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" 
-                                alt="..."><input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" 
-                                value=""></div>
+                            <div id="area_preview_logo">
+                                <img id="preview-image_logo" src="{{ @$RSSNews -> logo }}"  onerror="setDefaultPic(this)" alt="...">
+                                <input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" value="" class="m-t-10">
+                            </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="">
