@@ -50,7 +50,7 @@ class Handler extends ExceptionHandler
             'error_summary'  => 'Line '.$data['line'].' '.$data['message'],
             'log_trace'      => $data['trace']
         ];
-        Log::create($dataArr);
+        // Log::create($dataArr);
         parent::report($exception);
     }
 
