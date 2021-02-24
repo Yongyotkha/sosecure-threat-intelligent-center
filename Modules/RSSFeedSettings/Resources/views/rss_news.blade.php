@@ -909,7 +909,7 @@ $(document).ready(function(){
                 chart: {
                     type: 'column',
                         scrollablePlotArea: {
-                        minWidth: 300,
+                        minWidth: 400,
                     },
                 },
                 title: {
