@@ -331,6 +331,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('credentials.table_credentials') !!}',

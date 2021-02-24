@@ -23,7 +23,7 @@
             <section class="scrollable wrapper">
                 <section class="panel panel-default">
                     <header class="panel-heading font-bold panel-header-blue">
-                        <div class="row d-flex-center">
+                        <div class="row">
                             <div class="col-md-12">
                                 <i class="fas fa-table"></i> Table Permission
                             </div>
@@ -44,7 +44,7 @@
                                     <tr>
                                         <td>{{ humanize($permission->name) }}</td>
                                         <td class="text-muted">{{ $permission->description }}</td>
-                                        <td>
+                                        <td class="nowrap">
                                             
                                             <a href="{{ route('users.perm.edit', ['id' => $permission->id]) }}" class="btn btn-{{ get_option('theme_color') }} btn-xs" data-toggle="ajaxModal">
                                                 @icon('solid/pencil-alt')
@@ -77,6 +77,7 @@
 $(function() {
     var table = $('#permissions-table').DataTable({
     processing: true,
+    "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
     order: [[ 0, "asc" ]],
 });
 });
