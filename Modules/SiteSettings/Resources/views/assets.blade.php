@@ -1,13 +1,12 @@
 @extends('layouts.app')
 @section('content')
-<style>
-    .w-100{
-        width: 100px;
-    }
-
-</style>
 <section id="content" class="bg">
-
+    <style>
+        .w-100{
+            width: 100px;
+        }
+    
+    </style>
     <section class="hbox stretch">      
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
@@ -20,192 +19,190 @@
             </section>
         </aside>
     
-        <aside>
-            <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                    @icon('solid/arrow-left')
-                    </a> --}}
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                    <div class="bc-head">Site Setting &gt; @langapp('assets')</div>
+        <section class="vbox">
+            <header class="header panel-heading bg-white b-b b-light">
+                {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                @icon('solid/arrow-left')
+                </a> --}}
+                <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                <div class="bc-head">Site Setting &gt; @langapp('assets')</div>
 
-                    <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
-                        <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span></span>
-                    </button>
+                <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
+                    <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span></span>
+                </button>
 
-                    <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                    </a>
+                <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                    <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                </a>
 
-                    <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
-                        data-target="#asset_to_use_manual" id="asset-to-use-manual">
-                        @icon('solid/plus') @langapp('create')
-                    </a>
-                </header>
+                <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                    data-target="#asset_to_use_manual" id="asset-to-use-manual">
+                    @icon('solid/plus') @langapp('create')
+                </a>
+            </header>
 
-                <section class="scrollable wrapper">
-                    <section class="panel panel-default" id="hide-advance-search" style="display: none">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <i class="fas fa-filter"></i> Filter
+            <section class="scrollable wrapper">
+                <section class="panel panel-default" id="hide-advance-search" style="display: none">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <i class="fas fa-filter"></i> Filter
+                            </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid">
+                            <div class="row" style="display: none;">
+                                <div class="col-md-4 mb-1">
+                                    <h5 class="font-weight-bold">Keyword</h5>
+                                    <input type="text" class="form-control" name="keyword" placeholder="Search">
                                 </div>
-                        </header>
-                        <div class="panel-body" style="padding: 0 !important">
-                            <div class="container-fluid">
-                                <div class="row" style="display: none;">
-                                    <div class="col-md-4 mb-1">
-                                        <h5 class="font-weight-bold">Keyword</h5>
-                                        <input type="text" class="form-control" name="keyword" placeholder="Search">
+                                <div class="col-md-4 mb-1">
+                                    <h5 class="font-weight-bold">Data Type</h5>
+                                    <select name="" id="datatype" class="form-control" multiple="multiple">
+                                        <option value="1">All</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <h5 class="font-weight-bold">Referent</h5>
+                                    <input type="text" class="form-control" name="keyword">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h5 class="font-weight-bold">Group By</h5>
+                                    <div id="groupby-btn" class="btn-group special mb-2">
+                                        <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
+                                            <span> Host </span>
+                                        </button>
+                                        <button class="btn btn-grey" onclick="selectGroupBy('ip')">
+                                            <span> IP </span>
+                                        </button>
+                                        <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
+                                            <span> CPE </span>
+                                        </button>
+                                        <button class="btn btn-grey" onclick="selectGroupBy('os_type')">
+                                            <span> OS Type </span>
+                                        </button>
                                     </div>
-                                    <div class="col-md-4 mb-1">
-                                        <h5 class="font-weight-bold">Data Type</h5>
-                                        <select name="" id="datatype" class="form-control" multiple="multiple">
-                                            <option value="1">All</option>
+                                    <div class="form-group">
+                                        <select id="groupby-select" class="form-control">
+                                            <option value="">- SELECT -</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4 mb-1">
-                                        <h5 class="font-weight-bold">Referent</h5>
-                                        <input type="text" class="form-control" name="keyword">
-                                    </div>
+
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <h5 class="font-weight-bold">Group By</h5>
-                                        <div id="groupby-btn" class="btn-group special mb-2">
-                                            <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
-                                                <span> Host </span>
-                                            </button>
-                                            <button class="btn btn-grey" onclick="selectGroupBy('ip')">
-                                                <span> IP </span>
-                                            </button>
-                                            <button class="btn btn-grey" onclick="selectGroupBy('cpe')">
-                                                <span> CPE </span>
-                                            </button>
-                                            <button class="btn btn-grey" onclick="selectGroupBy('os_type')">
-                                                <span> OS Type </span>
-                                            </button>
-                                        </div>
-                                        <div class="form-group">
-                                            <select id="groupby-select" class="form-control">
-                                                <option value="">- SELECT -</option>
-                                            </select>
-                                        </div>
-    
-                                    </div>
-    
-                                    <div class="col-md-4">
-                                        <h5 class="font-weight-bold">Status</h5>
-                                        <div id="groupby-status" class="btn-group special mb-2">
-                                            <button class="btn btn-grey active" onclick="changeActive('')">
-                                                <span> All </span>
-                                            </button>
-                                            <button class="btn btn-grey" onclick="changeActive('Active')">
-                                                <span> Active </span>
-                                            </button>
-                                            <button class="btn btn-grey" onclick="changeActive('Inactive')">
-                                                <span> Inactive </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <select id="groupby-select2" style="display: none;" class="form-control">
-                                                <option value="">Domain All</option>
-                                                <option value="">DARK WEB</option> 
-                                            </select>
-                                        </div>
+                                <div class="col-md-4">
+                                    <h5 class="font-weight-bold">Status</h5>
+                                    <div id="groupby-status" class="btn-group special mb-2">
+                                        <button class="btn btn-grey active" onclick="changeActive('')">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey" onclick="changeActive('Active')">
+                                            <span> Active </span>
+                                        </button>
+                                        <button class="btn btn-grey" onclick="changeActive('Inactive')">
+                                            <span> Inactive </span>
+                                        </button>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <select id="groupby-select2" style="display: none;" class="form-control">
+                                            <option value="">Domain All</option>
+                                            <option value="">DARK WEB</option> 
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
 
+                        </div>
+                    </div>
+                    
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                    onclick="searchTB()">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap" onclick="clearTB()">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
                             </div>
                         </div>
-                        
-                        <div class="panel-footer">
-                            <div class="row">
-                                <div class="col-lg-12 text-right">
-                                    <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
-                                        onclick="searchTB()">
-                                        <i class="fas fa-search"></i>
-                                        @langapp('apply')
-                                    </button>
-                                    <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                        style="white-space: nowrap" onclick="clearTB()">
-                                        <i class="fas fa-broom"></i>
-                                        <span> Clear </span>
-                                    </button>
-                                    <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                        <i class="fas fa-times"></i>
-                                        <span> Close </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    </div>
+                </section>
 
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Assets
-                                </div>
-                            </div>
-                        </header>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                {{-- <table class="table table-striped" id="table-assets-data">
-                                    <thead>
-                                        <tr>
-                                            <th class="no-sort" style="width: 12px">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th>                                      
-                                            <th>Asset</th>
-                                            <th>Referent</th>
-                                            <th style="width: 20px" class="text-center">Status</th>
-                                            <th style="width: 20px" class="text-center">Action</th>
-                                        </tr>
-                                    </thead>
-                                </table> --}}
-                                <table class="table table-striped table-bordered" id="table-assets-template">
-                                    <thead>
-                                        <tr>
-                                            {{-- <th class="no-sort">
-                                                <label>
-                                                    <input name="select_all" value="1" id="select-all" type="checkbox" />
-                                                    <span class="label-text"></span>
-                                                </label>
-                                            </th> --}}
-                                            <th rowspan="2" class="align-middle">Site</th>
-                                            <th rowspan="2" class="align-middle">Host</th>
-                                            <th rowspan="2" class="align-middle">IP</th>
-                                            <th colspan="7" class="text-center">CPE</th>
-                                            <th rowspan="2" class="align-middle">Status</th>
-                                            <th rowspan="2" class="align-middle">Action</th>
-                                            <th rowspan="2" class="align-middle">CPESTRING</th>
-                                        </tr>
-                                        <tr>
-                                            <th>Vendor</th>
-                                            <th>Title</th>
-                                            <th>Versions</th>
-                                            <th>Edition</th>
-                                            <th>Remark</th>
-                                            <th>Os Type</th>
-                                            <th>Delete CPE</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                <section class="panel panel-default">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <i class="fas fa-table"></i> Table Assets
                             </div>
                         </div>
-                    </section>
+                    </header>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            {{-- <table class="table table-striped" id="table-assets-data">
+                                <thead>
+                                    <tr>
+                                        <th class="no-sort" style="width: 12px">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th>                                      
+                                        <th>Asset</th>
+                                        <th>Referent</th>
+                                        <th style="width: 20px" class="text-center">Status</th>
+                                        <th style="width: 20px" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                            </table> --}}
+                            <table class="table table-striped table-bordered" id="table-assets-template">
+                                <thead>
+                                    <tr>
+                                        {{-- <th class="no-sort">
+                                            <label>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox" />
+                                                <span class="label-text"></span>
+                                            </label>
+                                        </th> --}}
+                                        <th rowspan="2" class="align-middle">Site</th>
+                                        <th rowspan="2" class="align-middle">Host</th>
+                                        <th rowspan="2" class="align-middle">IP</th>
+                                        <th colspan="7" class="text-center">CPE</th>
+                                        <th rowspan="2" class="align-middle">Status</th>
+                                        <th rowspan="2" class="align-middle">Action</th>
+                                        <th rowspan="2" class="align-middle">CPESTRING</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Vendor</th>
+                                        <th>Title</th>
+                                        <th>Versions</th>
+                                        <th>Edition</th>
+                                        <th>Remark</th>
+                                        <th>Os Type</th>
+                                        <th>Delete CPE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
             </section>
-        </aside>
+        </section>
     </section>
     {{-- ------------------- --}}
 
