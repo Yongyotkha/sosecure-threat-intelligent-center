@@ -6,7 +6,7 @@
 /storage/framework/cache/
 /vendor
 /vendor/*
-/public/cache_log/
+/public/cache_log/*
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
