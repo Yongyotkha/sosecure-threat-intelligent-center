@@ -933,6 +933,17 @@ ul.news_related li a:hover{
     background-color: #00B900;
 }
 
+.date-style{
+    color: #333;
+    background: #efefef;
+    cursor: pointer;
+    padding: 1px 10px;
+    border: 1px solid #ddd;
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 0;
+}
+
 @media screen and (max-width:500px){
     .mobi-d-block{
         display: block;
@@ -992,6 +1003,21 @@ ul.news_related li a:hover{
     }
     .m-b-xs-5{
         margin-bottom: 5px !important;
+    }
+
+    .date-style{
+        color: #333;
+        background: #efefef;
+        cursor: pointer;
+        padding: 1px 10px;
+        border: 1px solid #ddd;
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80%;
     }
 }
 
@@ -1164,6 +1190,9 @@ ul.total-count li{
     }
     .pulse-indicator-counts{
         margin-top: .5rem;
+    }
+    .expanded-xs{
+        display: none !important;
     }
 }
 @media screen and (max-width:1184px){
@@ -4011,3 +4040,4 @@ textarea.resize-none{
     background-color: #88acfb !important;
     color: #333 !important;
 }
+
