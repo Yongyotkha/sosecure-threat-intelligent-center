@@ -46,8 +46,9 @@ return [
 
         'file' => [
             'driver' => 'file',
-            'path' => storage_path('framework/cache/data'),
+            'path' => 'public/cache_log',//storage_path('framework/cache/data')
             'permission' => 0777,
+
         ],
 
         'memcached' => [
