@@ -184,7 +184,10 @@
                             <label class="display-block">@langapp('roles')</label>
                             <select name="role_id" class="select2-option form-control" onchange="check_role(value)" ><!--multiple="multiple"-->
                                 @foreach (Role::whereNotIn('id', [3])->get() as $role)
+                                    @if ($role->id != 6)
                                     <option value="{{ $role->id }}" {{  $role->name == get_option('default_role') ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                                    @endif
+                                    
                                 @endforeach
                             </select>
 
@@ -353,12 +356,13 @@
 
 
         function check_role(val) {
-     
+            $("#permission").css("display","none");
             if(val == 1) {
                 $("#select-site_multi").val('').trigger('change').prop("disabled",true);
                 $("#area_select_site_multi").css("display","none");
                 $("#select-site").val('').trigger('change').prop("disabled",true);
                 $("#area_select_site").css("display","none");
+               
             } else if(val == 4 || val == 5 || val == 6) {
             
                 $("#select-site_multi").val('').trigger('change').prop("disabled",true);
@@ -385,7 +389,7 @@
 
         function get_site(val){
             if(val!=''){
-
+                $("#permission").css("display","block");
                 $.ajax({
                     type:"POST",
                     url:"{{ route('users.get_site') }}",
