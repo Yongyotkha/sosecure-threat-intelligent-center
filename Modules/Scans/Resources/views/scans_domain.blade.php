@@ -193,10 +193,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-3" style="padding-left: 3rem">
+                        <div class="col-xs-3" style="padding-left: 3rem">
                             <h3 class="text-dark">Assets</h3>
                         </div>
-                        <div class="col-md-9" style="padding-left: 6rem">
+                        <div class="col-xs-9" style="padding-left: 6rem">
                             <h3 class="text-dark" >Referent</h3>
                         </div>
                     </div>

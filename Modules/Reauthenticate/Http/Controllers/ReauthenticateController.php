@@ -133,7 +133,7 @@ class ReauthenticateController extends Controller
                 $UserSite = UserSite::select('site_id')->where('user_id',$user->id)->first();
                 $site_ip = @$UserSite->get_site->ip_key;
             } else {
-                $url_redirect = route('index');
+                $url_redirect = url('/');
             }
         }
         $data['site_ip'] = $site_ip;

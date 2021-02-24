@@ -1,12 +1,6 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <style>
-        .w-100{
-            width: 100px;
-        }
-    
-    </style>
     <section class="hbox stretch">      
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
