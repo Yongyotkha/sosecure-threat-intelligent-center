@@ -1044,6 +1044,7 @@ Highcharts.setOptions({
                     var infomation = [];
                     var host_name = [];
                     var data_array = [];
+
                     for(let b in result.data.host_name){
                         var data_object = {};
                         const data_b = result.data.host_name[b];
@@ -1056,19 +1057,19 @@ Highcharts.setOptions({
                         for(let i in result.data.data){
                             const data = result.data.data[i];
                             if(data_b == data.title && data.severity == 'HIGH'){
-                                total_high += data.total;
+                                total_high  =total_high+1;
                                 data_object.severity_high = data.severity;
                             }else if(data_b == data.title && data.severity == 'CRITICAL'){
-                                total_critical += data.total;
+                                total_critical =total_critical+1;
                                 data_object.severity_critical = data.severity;
                             }else if(data_b == data.title && data.severity == 'MEDIUM'){
-                                total_medium += data.total;
+                                total_medium = total_medium+1;
                                 data_object.severity_medium = data.severity;
                             }else if(data_b == data.title && data.severity == 'LOW'){
-                                total_low += data.total;
+                                total_low = total_low+1;
                                 data_object.severity_low = data.severity;
                             }else if(data_b == data.title && data.severity == 'INFOMATION'){
-                                total_infomation += data.total;
+                                total_infomation = total_infomation+1;
                                 data_object.severity_infomation = data.severity;
                             }
                         }
