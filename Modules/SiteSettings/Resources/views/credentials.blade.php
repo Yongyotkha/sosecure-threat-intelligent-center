@@ -23,12 +23,12 @@
                     </a> --}}
                     <button type="button" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right"
                         value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Are you sure?" data-placement="bottom">@icon('solid/trash-alt')
-                            @langapp('delete')</span>
+                        <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
+                            <span class="hide-text">@langapp('delete')</span></span>
                     </button>
                     <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
                         id="add_credentials" data-target="#add-credentials">
-                        <span>@icon('solid/plus') Add</span>
+                        <span  data-rel="tooltip" title="Add" data-placement="bottom">@icon('solid/plus') <span class="hide-text">Add</span></span>
                     </button>
                 </header>
                 <section class="scrollable wrapper">
