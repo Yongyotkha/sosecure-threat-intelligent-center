@@ -27,7 +27,7 @@
                     </tr>
                     @endforeach
                 </table>
-                <div class="text-center">
+                <div class="text-center m-b-xs">
                     <a href="{{ route('scans.index', ['tab' => 'datatype', 'site_code' => $site -> code]) }}" class="btn btn-default btn-rounded">
                         More
                     </a>
