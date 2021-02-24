@@ -3,7 +3,6 @@
 <section id="content" class="bg">
     <section class="vbox">
 
-
         <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
             <div class="header-flex-overflow m-t-10">
                 <div class="fwb-16">
@@ -28,17 +27,15 @@
                     <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"
-                    disabled>
+
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"disabled>
                     <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
                         <span class="hide-text">@langapp('delete')</span></span>
                     </button>
+                 
                 </div>
             </div>
         </header>
-
-  
-
 
     <section id="scrollable_news" class="scrollable wrapper">
         <section class="panel panel-default" id="hide-advance-search" style="display: none">
