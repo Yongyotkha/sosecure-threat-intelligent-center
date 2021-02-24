@@ -34,7 +34,7 @@ class VerifyUserRequest extends FormRequest
     public function messages()
     {
         return [
-            'password.regex'         => 'Password must contain at least 6 characters, including UPPER/lowercase and numbers',
+            'password.regex'         => 'Password must including UPPER/lowercase and numbers',
         ];
     }
 
