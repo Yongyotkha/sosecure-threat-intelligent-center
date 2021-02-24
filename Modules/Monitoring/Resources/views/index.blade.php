@@ -2,24 +2,38 @@
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header panel-heading bg-white b-b b-light">
-            {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-            </a> --}}
-            <div class="bc-head">Monitoring > Schedule Task</div>
 
-            <a href="#hide-advance-search" id="advance-search" class="pull-right btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-            </a>
-             <div class="pull-right max-w-select" style="margin-top: 8px;">
-                <select name="site" id="site" class="select2-option form-control select-site" onchange="changeSite()">
-                    <option value="">All Site</option>
-                    @if($SiteSettings)
-                        @foreach($SiteSettings as $SiteSettings_val)
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                    <span>
+                        Monitoring > Schedule Task
+                    </span>
+                </div>
+
+                <div class="ml-2 text-right">
+                    <div class="max-w-select">
+                        <select name="site" id="site" class="select2-option form-control select-site"
+                            onchange="changeSite()">
+                            <option value="">All Site</option>
+                            @if($SiteSettings)
+                            @foreach($SiteSettings as $SiteSettings_val)
                             <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                        @endforeach
-                    @endif
-                </select>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
+                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                    </a>
+
+                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"disabled>
+                    <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
+                        <span class="hide-text">@langapp('delete')</span></span>
+                    </button>
+                 
+                </div>
             </div>
         </header>
 
@@ -34,56 +48,44 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
-                            <div class="col-lg-12">
-                                <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-1 col-xs-12 col-form-label">Keywords</label>
-                                    <div class="col-sm-11 col-xs-12">
-                                        <input type="text" id="Keywords" class="form-control">
-                                    </div>
-                                </div>
+                            <div class="col-lg-4 col-md-6">
+                                <h5 class="font-weight-bold">Keywords</h5>
+                                <input type="text" id="Keywords" class="form-control">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="row d-flex align-items-center">
-                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Progress</label>
-                                    <div class="col-sm-9 col-xs-12">
-                                        <select id="select_val" class="select2-option form-control">
-                                            <option value="" selected>All</option>
-                                            <option value="0" >Not Working</option>
-                                            <option value="1" >Waiting</option>
-                                            <option value="2" >Progress</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            <div class="col-lg-4 col-md-6">
+                                <h5 class="font-weight-bold">Progress</h5>
+                                <select id="select_val" class="select2-option form-control">
+                                    <option value="" selected>All</option>
+                                    <option value="0" >Not Working</option>
+                                    <option value="1" >Waiting</option>
+                                    <option value="2" >Progress</option>
+                                </select>
                             </div>
-                            <div class="col-lg-4 text-center">
-                                <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                            <div class="col-lg-4 col-md-6">
+                                <h5 class="font-weight-bold">Date</h5>
+                                <div id="newsrange" class=" text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;
                                     <span></span> <i class="fa fa-caret-down"></i>
                                 </div>
                             </div>
-                            <div class="col-lg-4 text-center">
-                                <div style="margin-top: 8px;">
-                                    
-                                </div>
-                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-12 text-right mt-2">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
-                                    <i class="fas fa-search"></i>
-                                    @langapp('apply')
-                                </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                    <i class="fas fa-broom"></i>
-                                    <span> Clear </span>
-                                </button>
-                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                    <i class="fas fa-times"></i>
-                                    <span> Close </span>
-                                </button>
-                            </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13">
+                                <i class="fas fa-search"></i>
+                                @langapp('apply')
+                            </button>
+                            <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                            <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <i class="fas fa-times"></i>
+                                <span> Close </span>
+                            </button>
                         </div>
                     </div>
                 </div>

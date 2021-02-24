@@ -390,10 +390,21 @@ class UsersApiController extends Controller
         $user_code = $request->user_code;
         $user = User::where('code',$user_code)->first();
         if($password||$password_re) {
+            if(!preg_match("/[0-9]/",$password)) {
+                return response()->json(['message' => 'Password must including UPPER/lowercase and numbers', 'errors' => ['missing' => ["Password must including UPPER/lowercase and numbers"]]], 500);
+            }
+            elseif(!preg_match("/[A-Z]/",$password)) {
+                return response()->json(['message' => 'Password must including UPPER/lowercase and numbers', 'errors' => ['missing' => ["Password must including UPPER/lowercase and numbers"]]], 500);
+            }
+            elseif(!preg_match("/[a-z]/",$password)) {
+                return response()->json(['message' => 'Password must including UPPER/lowercase and numbers', 'errors' => ['missing' => ["Password must including UPPER/lowercase and numbers"]]], 500);
+            }
+
             if($password == $password_re) {
             } else {
                 return response()->json(['message' => 'Please make sure your passwords match', 'errors' => ['missing' => ["Please make sure your passwords match"]]], 500);
             }
+
         }
 
         $email = $request->email;

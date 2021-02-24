@@ -32,24 +32,10 @@ class ReauthenticateController extends Controller
 
     public function verify_site_user($token)
     {
-
         $User = User::where('site_add_user_token',$token)->first();
-       
-        
+
         if($User) {
             $model_has_roles = model_has_roles::where('model_id',$User->id)->first();
-
-
-            $role_menu_permission = role_menu_permission::where('role_id',$model_has_roles->role_id)->first();
-            
-            if($model_has_roles->role_id==1){
-                $menu[]=1;
-                $check_goto_menu = @check_goto_menu(@$menu);
-            }else{
-                $menu[]=$role_menu_permission->menu_id;
-                $check_goto_menu = @check_goto_menu(@$menu);
-            }
-
             if(@$model_has_roles) {
                 if(@$model_has_roles->role_id == 4 || @$model_has_roles->role_id == 5 || @$model_has_roles->role_id == 6) {
                     $granted_access = 'Welcome Site:';
@@ -67,15 +53,10 @@ class ReauthenticateController extends Controller
             if($verify == 0 && $last_change_pass == null) {
                 return view('reauthenticate::index',compact('User','granted_access','granted_access_val'));
             } else {
-                if($check_goto_menu){
-                    return redirect()->check_goto_menu;
-                }
-
+                return redirect('/');
             }
         } else {
-            if($check_goto_menu){
-                return redirect()->check_goto_menu;
-            }
+            return redirect('/');  
         }
  
     }
@@ -152,7 +133,7 @@ class ReauthenticateController extends Controller
                 $UserSite = UserSite::select('site_id')->where('user_id',$user->id)->first();
                 $site_ip = @$UserSite->get_site->ip_key;
             } else {
-                $url_redirect = route('index');
+                $url_redirect = url('/');
             }
         }
         $data['site_ip'] = $site_ip;
@@ -175,7 +156,7 @@ class ReauthenticateController extends Controller
                 $url_redirect = route('reauth.verify_success').'?token='.$user->site_add_user_token;
                 $UserSite = UserSite::select('site_id')->where('user_id',$user->id)->first();
             } else {
-                $url_redirect = route('index');
+                $url_redirect = url('/');
             }
         }
 
