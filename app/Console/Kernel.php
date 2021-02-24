@@ -72,9 +72,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         $delay_WebDefacementProccess = rand(1,55);
-        if (env('Server_id') =="10.104.0.11") {
-           $schedule->command('app:WebDefacementProccess')->everyMinute();
-       }else{
+        $schedule->command('app:WebDefacementProccess')->everyMinute();
         $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
         $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
         
@@ -83,8 +81,16 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
         $schedule->command('app:MDCVEBatchJob')->dailyAt('8:00')->name('lang.progress')->withoutOverlapping(5);
-    }
 
+         $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
+         $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
+          $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
+         $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
+         $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
+         $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
+          $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(5);
+          $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
+          $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(5);
 
 }
 

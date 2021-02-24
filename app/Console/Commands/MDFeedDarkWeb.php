@@ -59,22 +59,22 @@ class MDFeedDarkWeb extends Command
 
         foreach ($SiteSettings as $value) {
             try{
-                $Menu_permission_site_data =   Menu_permission_site::where('site_id',$value->id)->where(function ($query) {
-                $query->where('menu_code', '=', '854a1e60-9abf-4263-a187-60aec8cd4fb1')
-                ->orWhere('menu_code', '=', '79b362a5-3789-445a-bd6c-846393ffd19d');
-            })->get();
-              print_r($Menu_permission_site_data);
+                // $Menu_permission_site_data =   Menu_permission_site::where('site_id',$value->id)->where(function ($query) {
+                //     $query->where('menu_code', '=', '854a1e60-9abf-4263-a187-60aec8cd4fb1')
+                //     ->orWhere('menu_code', '=', '79b362a5-3789-445a-bd6c-846393ffd19d');
+                // })->get();
+            // print_r($value);
     //           if (count($Menu_permission_site_data) > 0) {
     //             echo "ok";
-    // // $response = $this->perform_query($value);
+                $response = $this->perform_query($value);
     //         }
 
 
 
-          } catch (Exception $e) {
-            echo "Fail handle : " . $e->getMessage();
+            } catch (Exception $e) {
+                echo "Fail handle : " . $e->getMessage();
+            }
         }
-    }
         //use ($site_id)
 
         // $SiteSettings->whereHas('get_keywords', function ($query) {
@@ -84,84 +84,84 @@ class MDFeedDarkWeb extends Command
         //echo(json_encode($SiteSettings->get()));
         ///$response = $this->perform_query($payload);
 
-    $this->info('END------------------------------------------------------------END');
-}
-
-public function payloadToString($payload)
-{
-
-    $search = '';
-    $count = 0;
-    foreach ($payload as $key => $value) {
-        if ($count == 0) {
-            $search .= '?' . $key . '=' . $value;
-            $count++;
-        } else {
-            $search .= '&' . $key . '=' . $value;
-        }
+        $this->info('END------------------------------------------------------------END');
     }
-    return $search;
-}
 
-public function querysToString($payload, $fromDate, $toDate)
-{
-    $search = '';
-    $count = 0;
-    foreach ($payload as $value) {
-        foreach ($value as $key => $value2) {
+    public function payloadToString($payload)
+    {
+
+        $search = '';
+        $count = 0;
+        foreach ($payload as $key => $value) {
             if ($count == 0) {
-                $count = 1;
-                $search .= '?' . $key . '=' . $value2;
+                $search .= '?' . $key . '=' . $value;
+                $count++;
             } else {
-                $search .= '&' . $key . '=' . $value2;
+                $search .= '&' . $key . '=' . $value;
             }
         }
-
+        return $search;
     }
-    $search .= '&from=' . $fromDate;
-    $search .= '&to=' . $toDate;
-    return $search;
-}
 
-public function addOffset($search, $offset)
-{
-    $search = $search;
-    $search .= '&offset=' . $offset;
-    return $search;
-}
+    public function querysToString($payload, $fromDate, $toDate)
+    {
+        $search = '';
+        $count = 0;
+        foreach ($payload as $value) {
+            foreach ($value as $key => $value2) {
+                if ($count == 0) {
+                    $count = 1;
+                    $search .= '?' . $key . '=' . $value2;
+                } else {
+                    $search .= '&' . $key . '=' . $value2;
+                }
+            }
 
-public function mapTypeDomain($typeSearch,$domain,$ip){
-    $payload = array();
-    if ($typeSearch == 'email') {
-        $payload[] = array('emailDomain' => $domain);
-        $payload[] = array('emailDomain' => '*.' . $domain);
-    } else if($typeSearch == 'ip') {
-        if(isset($ip)){
-            $payload[] = array($typeSearch => $ip);
-        }else{
-            $payload[] = array($typeSearch => "");
         }
-    }else if($typeSearch == 'q') {
-        if(isset($ip)){
-            $payload[] = array($typeSearch =>  '"'.$domain.'" OR "'.$ip.'"');
-        }else{
-            $payload[] = array($typeSearch =>  '"'.$domain.'"');
-        }
-    }else {
+        $search .= '&from=' . $fromDate;
+        $search .= '&to=' . $toDate;
+        return $search;
+    }
+
+    public function addOffset($search, $offset)
+    {
+        $search = $search;
+        $search .= '&offset=' . $offset;
+        return $search;
+    }
+
+    public function mapTypeDomain($typeSearch,$domain,$ip){
+        $payload = array();
+        if ($typeSearch == 'email') {
+            $payload[] = array('emailDomain' => $domain);
+            $payload[] = array('emailDomain' => '*.' . $domain);
+        } else if($typeSearch == 'ip') {
+            if(isset($ip)){
+                $payload[] = array($typeSearch => $ip);
+            }else{
+                $payload[] = array($typeSearch => "");
+            }
+        }else if($typeSearch == 'q') {
+            if(isset($ip)){
+                $payload[] = array($typeSearch =>  '"'.$domain.'" OR "'.$ip.'"');
+            }else{
+                $payload[] = array($typeSearch =>  '"'.$domain.'"');
+            }
+        }else {
             //q only search domain
-        $payload[] = array($typeSearch => $domain);
+            $payload[] = array($typeSearch => $domain);
+        }
+        $payload[] = array('count' => '20');
+        $payload[] = array('sort' => 'd');
+        return $payload;
     }
-    $payload[] = array('count' => '20');
-    $payload[] = array('sort' => 'd');
-    return $payload;
-}
 
-public function perform_query($Site_payload)
-{
+    public function perform_query($Site_payload)
+    {
         // $publicKey = '+x4QtLeFMejTD6kYel4aYA==';
         // $privateKey = 'L57IL/Kt7PMZFMrZXNiSD5YFZrMSc6kQUmAu6/oS9Qk=';
-    $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-    $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $col_fx_transaction_darkweb_stamp = $clientMD->sosecure_threatintelligent->fx_transaction_darkweb_stamp;//*9000
         $reconnectLimit = 3;
         if (!empty($Site_payload["get_keywords_darkweb"]) > 0) {
@@ -188,8 +188,8 @@ public function perform_query($Site_payload)
             //         // $payload[] = array('sort' => 'd');
 
 
-                $time_stamp_from = Carbon::now('UTC')->subDays(1)->format('Y-m-d\\TH:i:s\\Z');
-                $time_stamp_from = "2021-01-01T07:52:25Z";
+                $time_stamp_from = Carbon::now('UTC')->subDays(2)->format('Y-m-d\\TH:i:s\\Z');
+               // $time_stamp_from = "2021-01-01T07:52:25Z";
                 $time_stamp_to = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
                 $search = $this->querysToString($payload, $time_stamp_from, $time_stamp_to);
                 print_r($search);
