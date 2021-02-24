@@ -87,6 +87,11 @@ class Handler extends ExceptionHandler
             );
         }
 
+
+        if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
+            return redirect()->route('login');
+        }
+
         // if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
         //     if ($request->ajax()) {
         //         return response()->view('errors.modal.403');

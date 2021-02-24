@@ -20,6 +20,6 @@ class SiteCategory extends Model {
     }
 
     public function site_email_alert(){
-        return $this->hasOne(site_config_email_alert::class, 'site_id', 'site_id');
+        return $this->hasMany(site_config_email_alert::class, 'site_id', 'site_id');
     }
 }
