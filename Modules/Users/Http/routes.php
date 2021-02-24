@@ -37,6 +37,7 @@ Route::group(
         Route::get('data', 'UserCustomController@tableData')->name('users.data')->middleware('can:menu_items');
         Route::post('del_user', 'UserCustomController@del_user')->name('users.del_user')->middleware('can:menu_items');
         Route::get('create', 'UserCustomController@create')->name('users.create')->middleware('can:menu_items');
+        Route::post('get_site', 'UserCustomController@get_manu')->name('users.get_site')->middleware('can:menu_items');
         Route::get('view/{user}/{tab?}', 'UserCustomController@view')->name('users.view');
         Route::get('suspend/{user}', 'UserCustomController@suspend')->name('users.suspend')->middleware('can:menu_items');
         Route::get('delete/{user}', 'UserCustomController@delete')->name('users.delete')->middleware('can:menu_items');

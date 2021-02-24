@@ -23,6 +23,10 @@ use Modules\Users\Entities\Profile;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Emails\SiteCreateUserMail;
 use Artisan;
+use Modules\Users\Entities\user_menu_permission;
+use Modules\Users\Entities\user_menu_sub_permission;
+use App\Menu;
+use App\Menu_sub;
 class UsersApiController extends Controller
 {
     /**
@@ -203,6 +207,41 @@ class UsersApiController extends Controller
                     $UserSite->save();
                 }
             }
+        }
+
+        if ($user) {
+
+            user_menu_permission::where('user_id', @$user->id)->where('site_id',$user->site_id)->delete();
+            
+            if ($request->menu) {
+                if (count($request->menu) > 0) {
+                    foreach ($request->menu as $menu) {
+                        $tb_menu = Menu::select("id")->where("code", $menu)->first();
+                        $user_menu_permission = new user_menu_permission;
+                        $user_menu_permission->user_id = $user->id;
+                        $user_menu_permission->site_id = $user->site_id ;
+                        $user_menu_permission->menu_id = $tb_menu->id;
+                        $user_menu_permission->menu_code = $menu;
+                        $user_menu_permission->save();
+                    }
+                }
+            } 
+
+            user_menu_sub_permission::where('user_id', @$user->id)->where('site_id',$user->site_id )->delete();
+            if ($request->menu_sub) {
+                if (count($request->menu_sub) > 0) {
+                    foreach ($request->menu_sub as $menu_sub) {
+                        $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();
+                        $user_menu_sub_permission = new user_menu_sub_permission;
+                        $user_menu_sub_permission->user_id = $user->id;
+                        $user_menu_sub_permission->site_id = $user->site_id ;
+                        $user_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
+                        $user_menu_sub_permission->menu_sub_code = $menu_sub;
+                        $user_menu_sub_permission->save();
+                    }
+                }
+            }
+ 
         }
 
 
