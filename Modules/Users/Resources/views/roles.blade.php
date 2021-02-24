@@ -36,7 +36,7 @@
 
                 <section class="panel panel-default">
                     <header class="panel-heading font-bold panel-header-blue">
-                        <div class="row d-flex-center">
+                        <div class="row">
                             <div class="col-md-12">
                                 <i class="fas fa-table"></i> Table Role
                             </div>
@@ -135,6 +135,7 @@
             pageLength: 50,
             processing: true,
             destroy: true,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",
                 url: '{!! route('roles.data_table') !!}',
@@ -173,6 +174,7 @@
                 {
                     targets: 2,
                     width: '10px',
+                    className : 'nowrap',
                     render: function (data, type, full, meta) {
                         html ='';
                         html += `<a href="/users/role-permission/${full.id}" 

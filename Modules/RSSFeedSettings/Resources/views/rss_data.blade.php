@@ -13,7 +13,7 @@
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
-                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right btn-h-vis-menu">@icon('solid/bars')</a>
                     <p class="h3 text-elipse-setting">News</p>
                 </header>
                 <section class="scrollable">
@@ -43,33 +43,37 @@
     
         <aside>
             <section class="vbox">
-                <header class="header panel-heading bg-white b-b b-light">
-                    {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                    @icon('solid/arrow-left')
-                    </a> --}}
-                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;">@icon('solid/bars')</a>
-                    <a href="{{route('news.index')}}"
-                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5" style="margin-top: 0;">
-                        @icon('solid/arrow-left')
-                    </a>
-                    <div class="bc-head"> @langapp('rss_feed') Data</div>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip"
-                        title="@langapp('export') CSV">
-                        @icon('solid/download') CSV
-                    </a> --}}
-                    
-                    <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
-                    </a>
-                    
-                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger pull-right m-xs" value="bulk-delete" disabled>
-                        <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
-                           <span class="hide-text">@langapp('delete')</span> </span>
-                    </button>
-                    {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
-                        data-target="#rss_modal">
-                        @icon('solid/plus') @langapp('create')
-                    </a> --}}
+
+                <header class="header panel-heading bg-white b-b b-light" >
+                    <div class="header-flex-overflow" style="height: 48px;">
+                        <div class="fwb-16">
+                            <button class="show-setting btn btn-icon btn-default btn-sm m-r-xs">@icon('solid/bars')</button>
+                            <a href="{{route('news.index')}}"
+                                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5" style="margin-top: 0;">
+                                @icon('solid/arrow-left')
+                            </a>
+                            <span>
+                                @langapp('rss_feed') Data
+                            </span>
+                        </div>
+        
+                        <div class="ml-2 text-right">
+
+                            <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
+                            </a>
+                            
+                            <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger" value="bulk-delete" disabled>
+                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')
+                                   <span class="hide-text">@langapp('delete')</span> </span>
+                            </button>
+
+                            {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
+                                data-target="#rss_modal">
+                                @icon('solid/plus') @langapp('create')
+                            </a> --}}
+                        </div>
+                    </div>
                 </header>
 
                 <section class="scrollable wrapper">
@@ -335,6 +339,7 @@
             serverSide: true,
             destroy: true,
             "autoWidth" : false,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 5, "desc" ]],
             ajax: {
                 type: "POST",

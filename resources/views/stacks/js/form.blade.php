@@ -12,4 +12,5 @@
     });
     $('.validator').validator();
     
+    $('.select-2site').select2();
 </script>

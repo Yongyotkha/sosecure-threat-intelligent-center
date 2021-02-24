@@ -1,7 +1,7 @@
 <header class="dk header b-b" style="display: flex;align-items: center;"> 
     
     <div class="select-box-header">
-        <select name="site" id="site_in_siteSetting" class="text-left select2-option form-control select-site"style="min-width:191px">
+        <select name="site" id="site_in_siteSetting" class="text-left form-control select-2site"style="min-width:191px">
             {{-- <option value="">All Site</option> --}}
             @if(Modules\SiteSettings\Entities\SiteSettings::select('id','code','name')->where('active',1)->where('deleted_at',null)->get())
                 @foreach (Modules\SiteSettings\Entities\SiteSettings::select('id','code','name')->where('active',1)->where('deleted_at',null)->get() as $SiteSettings)
@@ -21,7 +21,6 @@
 
 @push('pagescript')
     <script>
-
         $("#site_in_siteSetting").change(function() {
             let site_in_siteSetting = $(this).val();
             {{--base_url+'/sitesettings/edit-sitesettings/'--}}

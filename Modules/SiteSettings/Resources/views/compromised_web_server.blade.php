@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
-
+<section id="content" class="bg">
+    
 <style>
     .block {
         display: block;
@@ -11,14 +12,13 @@
         text-align: center;
     }
 </style>
-<section id="content" class="bg">
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
                         data-target="#setting-nav">@icon('solid/bars')</a>
-                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right m-r-xs">@icon('solid/bars')</a>
+                        <a class="hide-setting btn btn-icon btn-default btn-sm pull-right btn-h-vis-menu">@icon('solid/bars')</a>
                     <p class="h3 text-elipse-setting">{{@$siteSettings->name}}</p>
                 </header>
                 <section class="scrollable">
@@ -232,9 +232,9 @@
                             </select>
                             <span style="color:red;"><small id="check_u_p"></small></span>
                         </div>
-                        &nbsp;<button type="button" data-toggle="collapse" href="#demo"
-                            class="btn btn-{{ get_option('theme_color')  }}"><i class="fas fa-plus"></i>&nbsp; Add
-                            New</button>
+                       <button type="button" data-toggle="collapse" href="#demo"  class="btn btn-{{ get_option('theme_color')  }} add-assets-new"><i class="fas fa-plus"></i>&nbsp; Add
+                            New
+                        </button>
                     </div>
 
                     <div id="demo" class="collapse box">
@@ -334,7 +334,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
                     </button>
@@ -865,6 +865,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 8, "desc" ]],
             ajax: {
                 type: "POST",

@@ -1,13 +1,13 @@
 @extends('layouts.app')
 @section('content')
+
 <section id="content" class="bg">
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
                 <header class="dk header b-b">
-                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show"
-                        data-target="#setting-nav">@icon('solid/bars')</a>
-                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right">@icon('solid/bars')</a>
+                    <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
+                    <a class="hide-setting btn btn-icon btn-default btn-sm pull-right btn-h-vis-menu">@icon('solid/bars')</a>
                     <p class="h3 text-elipse-setting">Sub menu</p>
                 </header>
                 <section class="scrollable">
@@ -50,7 +50,7 @@
                             </span>
                         </div>
         
-                        <div class="ml-2 text-right">
+                        <div class="ml-2 text-right news-btn">
                             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                                 {{-- <button type="button" class="btn btn-secondary">1</button>
                                 <button type="button" class="btn btn-secondary">2</button> --}}
@@ -611,6 +611,7 @@ $(function() {
             processing: true,
             serverSide: true,
             destroy: true,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 5, "desc" ]],
             ajax: {
                 {{--contentType: "application/json",
@@ -909,7 +910,7 @@ $(document).ready(function(){
                 chart: {
                     type: 'column',
                         scrollablePlotArea: {
-                        minWidth: 300,
+                        minWidth: 400,
                     },
                 },
                 title: {
