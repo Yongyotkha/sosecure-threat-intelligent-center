@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+
 <section id="content" class="bg">
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
@@ -49,7 +50,7 @@
                             </span>
                         </div>
         
-                        <div class="ml-2 text-right">
+                        <div class="ml-2 text-right news-btn">
                             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                                 {{-- <button type="button" class="btn btn-secondary">1</button>
                                 <button type="button" class="btn btn-secondary">2</button> --}}
