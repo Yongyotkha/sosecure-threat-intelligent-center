@@ -15,7 +15,7 @@
         <link href="{{ asset('asset_salepage/lib/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
 
         <!-- Libraries CSS Files -->
-        <link href="{{ asset('asset_salepage/lib/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet">
+        <link href="{{ asset('asset_salepage/lib/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet preload">
         <link href="{{ asset('asset_salepage/lib/animate/animate.min.css')}}" rel="stylesheet">
         <link href="{{ asset('asset_salepage/lib/ionicons/css/ionicons.min.css')}}" rel="stylesheet">
         <link href="{{ asset('asset_salepage/lib/owlcarousel/assets/owl.carousel.min.css')}}" rel="stylesheet">
@@ -31,15 +31,6 @@
         <script src="{{ asset('asset_salepage/lib/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('asset_salepage/lib/jquery/jquery-migrate.min.js') }}"></script>
         <script src="{{ asset('asset_salepage/lib/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/easing/easing.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/mobile-nav/mobile-nav.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/wow/wow.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/waypoints/waypoints.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/counterup/counterup.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/owlcarousel/owl.carousel.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/isotope/isotope.pkgd.min.js') }}"></script>
-        <script src="{{ asset('asset_salepage/lib/lightbox/js/lightbox.min.js') }}"></script>
-
         <!-- Template Main Javascript File -->
         <script src="{{ asset('asset_salepage/js/main.js') }}"></script>
 
