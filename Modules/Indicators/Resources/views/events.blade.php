@@ -508,7 +508,6 @@
 
     function load_table(page=1){
         $('#table_events').DataTable({
-            searching: false,
             ordering: true,
             pageLength: 25,
             processing: true,
