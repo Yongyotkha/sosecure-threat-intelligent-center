@@ -135,6 +135,7 @@ abstract class UsersController extends Controller
         $site_id_arr = @UserSite::select('site_id')->where('user_id', $user->id)->get();
 
         $data['SiteSettings'] = @$SiteSettings;
+        $data['get_site'] = @$site_id_arr[0]['site_id'];
         $data['site_id_arr'] = array_column(@$site_id_arr->toArray(), 'site_id');
         $data['user'] = $user;
         $data['role_id'] = @model_has_roles::where('model_id',$user->id)->first()->role_id;
@@ -594,6 +595,92 @@ abstract class UsersController extends Controller
                   
             $html .=  '</ul></div>';
         }
+
+       
+        return ajaxResponse(
+            [
+                'data' => $html,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function get_manu_edit(Request $request)
+    {
+        $html = '';
+
+            // $SiteSettings = SiteSettings::where('code',$request->code)->first();
+            $result_menu_permission = DB::table("site_menu_permission")->select('menu_code')->where("site_id", @$request->id)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
+            $result_menu_sub_permission = DB::table("site_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$request->id)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
+    
+            $Menu = Menu::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_permission)->orderBy('order', 'asc');
+            $Menu = $Menu->get();
+            $Menu_sub = Menu_sub::where('deleted_at', null)->where('active', 1)->whereIn('code',$result_menu_sub_permission)->orderBy('order', 'asc')->get();
+            $html = '';
+
+            $result_user_menu_permission = DB::table("user_menu_permission")->select('menu_code')->where("site_id", @$request->id)->where("user_id", @$request->user)->where("deleted_at", null)->get()->toArray();
+            $result_user_menu_sub_permission = DB::table("user_menu_sub_permission")->select('menu_sub_code')->where("site_id", @$request->id)->where("user_id", @$request->user)->where("deleted_at", null)->get()->toArray();
+
+       
+            $html .='<label class="col-lg-2 control-label">Permission Menu <span class="text-danger">*</span> </label>
+                    <div class="col-lg-10">
+                    <ul class="role-group">';
+                  $i=1;
+                  foreach($Menu AS $menu){
+            $html .='  <li>
+                      <div class="role-main">
+                          <span class="role-click" onclick="openrole(this,"role-'.$i.'")">';
+                          if(count($menu->get_menu_sub) > 0){
+                            $html .= '@icon("solid/plus")';
+                          }else{
+                            $html .= '<i class="fas fa-minus icon"></i>';
+                          }
+            $html .=   '</span>
+                          <span class="checkbox chk-inline">
+                              <label>';
+               if(in_array($menu->code,array_column($result_user_menu_permission,'menu_code'))){
+                    $checked = 'checked';
+               }else{
+                    $checked = '';
+               }
+
+            $html .=   '<input type="checkbox" name="menu[]" '.$checked.' value="'.$menu->code.'">
+                        <span class="label-text" data-rel="tooltip" title="">'.$menu->name.'</span>
+                         </label>
+                          </span>
+                      </div>';
+                      
+            if(!empty($Menu_sub)){
+                $html .= '<ul id="role-'.$i.'" class="role-group-sub">';
+                          foreach($Menu_sub as $menu_sub){ 
+                $html .=         '<li>
+                                  <div class="role-sub">
+                                      <span class="checkbox chk-inline">
+                                          <label>';
+                if(in_array($menu_sub->code,array_column($result_user_menu_sub_permission,'menu_sub_code'))){
+                    $checked = 'checked';
+                }else{
+                    $checked = '';
+                }
+                                          
+                $html .= '<input type="checkbox" name="menu_sub[]" '.$checked.' value="'.$menu_sub->code.'">
+                            <span class="label-text" data-rel="tooltip" title="">'.$menu_sub->name.'</span>
+                        </label>
+                        </span>
+                        </div>
+                        </li>';
+                }
+                $html .=  '</ul>';
+            }
+                      
+
+            $html .=  '</li>';
+                  $i++;
+            }
+                  
+            $html .=  '</ul></div>';
+        
 
        
         return ajaxResponse(

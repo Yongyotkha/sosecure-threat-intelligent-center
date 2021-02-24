@@ -43,7 +43,9 @@
                             <select name="role_id" id="role_select" class="select2-option form-control" onchange="check_role(value)" ><!--multiple="multiple"-->
                                 <option value="" selected>- SELECT ROLE -</option>
                                 @foreach (Role::whereNotIn('id', [3])->get() as $role)
-                                    <option value="{{ $role->id }}" {{  $role->id == @$role_id ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                                @if ($role->id != 6)
+                                <option value="{{ $role->id }}" {{  $role->id == @$role_id ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -78,7 +80,7 @@
                             </select> --}}
 
 
-                            <select name="site" id="select-site" class="select2-option form-control select-site" disabled>
+                            <select name="site" id="select-site" class="select2-option form-control select-site" onchange="get_manu(value)" disabled>
                                 {{-- <option value="">Select Site</option> --}}
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
@@ -89,6 +91,9 @@
 
                         </div>
                     </div>
+                </div>
+                <div class="form-group row" id="permission">
+
                 </div>
 
                 <div class="form-group">
@@ -162,7 +167,7 @@
     @push('pagescript')
     @include('stacks.js.form')
     @include('stacks.js.fullscreen')
-    {{-- @include('partial/ajaxify') --}}
+
 
     <script>
 
@@ -242,7 +247,7 @@
 
 
         function check_role(val) {
-
+            $("#permission").css("display","none");
             if(val){
                 if(val == 1) {
                     $("#select-site_multi").val('').trigger('change').prop("disabled",true);
@@ -271,6 +276,7 @@
         }
 
         function check_role_first(val) {
+            $("#permission").css("display","none");
             if(val){
                 if(val == 1) {
                     $("#select-site_multi").val('').trigger('change').prop("disabled",true);
@@ -282,6 +288,7 @@
                     $("#select-site").prop("disabled",false);
                     $("#area_select_site_multi").css("display","none");
                     $("#area_select_site").css("display","block");
+                    get_manu();
                 } else {
                     $("#select-site").val('').trigger('change').prop("disabled",true);
                     $("#select-site_multi").prop("disabled",false);
@@ -292,6 +299,57 @@
             
 
         }
+
+        var data = null;
+
+        function get_manu(val){
+           
+
+            if(val!=''){
+
+                
+
+                if(typeof val ==='undefined'){
+                    data = @json($get_site);
+                }else{
+                    data = val;
+                }
+
+                $("#permission").css("display","block");
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('users.get_manu_edit') }}",
+                    data:{
+                        user: @json($user->id),
+                        id: data,
+                    },
+                    beforeSend: function(){
+                        loading('load');
+                    },
+                    success:function(response) {
+
+                    $('#permission').html(response.data);
+                        
+                        loading('stop_load');
+
+                        
+                    },
+                    error: function (error){
+                        loading('stop_load');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                    }
+                
+                });
+
+            }
+            
+
+        };
 
     </script>
 
