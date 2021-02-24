@@ -14,10 +14,10 @@
                         </div>
                         <div class="form-group row">
                         <label class="col-lg-12 control-label">Logo </label>
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 m-t-10 m-b-12">
                             <div id="area_preview_logo">
                                 <img id="preview-image_logo" src="{{ @$RSSNews -> logo }}"  onerror="setDefaultPic(this)" alt="...">
-                                <input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" value="" class="m-t-10">
+                                <input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64" value="">
                             </div>
                         </div>
                         <div class="col-lg-12">
