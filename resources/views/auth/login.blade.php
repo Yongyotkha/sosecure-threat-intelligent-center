@@ -139,9 +139,9 @@
     </div>
 </section>
 
+@endsection
 
-
-{{-- <script src="{{ getAsset('js/app.js') }}"></script> --}}
+{{-- @section('script') --}}
 <script>
 
     document.querySelector('.formSaving').addEventListener('click', function() {
@@ -172,7 +172,6 @@
     });
     --}}
 </script>
+{{-- @endsection --}}
 
 
-
-@endsection
