@@ -174,10 +174,10 @@ class OTXMDFeedPulse extends Command
             foreach ($pulses as $value) {
                 try {
 
-                 $modified = $value["modified"]; 
-                 $created = $value["created"]; 
+                   $modified = $value["modified"]; 
+                   $created = $value["created"]; 
                //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
-                 if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d')) {
+                   if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d')) {
                     $this->info("Insert created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
 
 
@@ -187,14 +187,14 @@ class OTXMDFeedPulse extends Command
                         $otxPulseDetail = json_decode($reconCall["result"], true);
                         $groups = implode(', ', array_column(isset($otxPulseDetail["groups"])?$otxPulseDetail["groups"]:[] , 'name'));
                     } else {
-                       $checkSuccess = false;
-                   }
-                   $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
-                   $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
-                   $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
-                   $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
+                     $checkSuccess = false;
+                 }
+                 $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
+                 $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
+                 $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
+                 $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
 
-                   $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                 $update_fx_otx_events = $col_fx_otx_events->updateOne(
                     ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
                     ['$set' => [
                         'name' => isset($value["name"]) ? $value["name"] : "",
@@ -230,7 +230,7 @@ class OTXMDFeedPulse extends Command
                 ],
                 ['upsert' => true]
             );
-                   if(isset($value["id"])){
+                 if(isset($value["id"])){
 
 
                     echo "Indi : ".$value["id"];
@@ -374,7 +374,7 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
         $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
         $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
         $loop = 0;
-        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1&sort=-modified', $urlLimit);
+        $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1', $urlLimit);
         if ($reconCall["success"]) {
             $otxFeedData = json_decode($reconCall["result"], true);
         } else {
@@ -438,6 +438,8 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
                                     'created' => (isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null),
                                     'expiration' => (isset($value["expiration"]) ? new UTCDateTime(strtotime($value["expiration"])*1000) : null),
                                     'is_active' => (isset($value["is_active"]) ? $value["is_active"] : ""),
+                                    'indicator' => $value["indicator"],
+                                    'type' => $value["type"],
 
                                 ],
                                 '$setOnInsert' => [
@@ -449,6 +451,8 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
                                     'updated_at' => $date_now,
                                     'updated_by' => "system",
                                     'source' => "otx.alienvault",
+                                    'indicator' => $value["indicator"],
+                                    'type' => $value["type"],
                                 ],
                             ],
                             ['upsert' => true]
@@ -466,16 +470,16 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
 
 
                     }else{
-                     $otxFeedDataCheck = false;
-                     break;
-                 }
+                       $otxFeedDataCheck = false;
+                       break;
+                   }
 
 
-             }
-         }
+               }
+           }
 
 
-         if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
+           if (isset($otxFeedData["next"])&&$otxFeedDataCheck) {
                     // echo ($otxFeedData["next"]);
             $reconCall = $this->reconnnect($otxFeedData["next"], $urlLimit);
             if ($reconCall["success"]) {
@@ -529,11 +533,11 @@ public function savePulse_related($pulseID,$urlLimit)
                     $modified = $value["modified"]; 
                //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
                     if (explode("T", $modified)[0] == date('Y-m-d')) {
-                       $this->info("savePulse_related-Insert created:". explode("T", $created)[0]);
+                     $this->info("savePulse_related-Insert created:". explode("T", $created)[0]);
 
 
-                       $diff = date_diff($date1, $date2);
-                       if ($diff->format("%R%a") > $dayMoreThan) {
+                     $diff = date_diff($date1, $date2);
+                     if ($diff->format("%R%a") > $dayMoreThan) {
                             // echo json_encode($date1);
                             // echo json_encode($date2);
                             // echo "break++++++++";

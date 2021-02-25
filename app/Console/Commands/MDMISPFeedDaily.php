@@ -149,86 +149,86 @@ class MDMISPFeedDaily extends Command
             foreach ($responseEvents as $Events_) {
                 if ($Events_->hasChildNodes()) {
                     $EventCheck = $Events_->childNodes;
-                if ($EventCheck->length > 0) {
-                    foreach ($EventCheck as $Event) {
-                        if($Event->nodeName == 'Event'){
-                            $this->info($Event->getElementsByTagName('id')->item(0)->nodeValue);
-                            $item = array();
-                        try {
-                            $tag = array();
-                            foreach ($Event->getElementsByTagName('Tag') as $Tags) {
-                                if($Tags->nodeValue){
-                                    $tag[] = array('name' => $Tags->getElementsByTagName('name')->item(0)->nodeValue);
-                                }
-                            }
-                            $relatedevent = array();
-
-                            foreach ($Event->getElementsByTagName('RelatedEvent') as $RelatedEvents) {
-                                $RelatedEventsCheck = $RelatedEvents->getElementsByTagName('Event');
-                                if ($RelatedEventsCheck->length > 0) {
-
-                                    $RelatedEvent = $RelatedEventsCheck->item(0);
-                                    $relatedevent[] = array('Event' => array(
-                                        'id' => $RelatedEvent->getElementsByTagName('id')->item(0)->nodeValue,
-                                        'published' => $RelatedEvent->getElementsByTagName('published')->item(0)->nodeValue,
-                                        'date' => $RelatedEvent->getElementsByTagName('date')->item(0)->nodeValue,
-                                        'timestamp' => $RelatedEvent->getElementsByTagName('timestamp')->item(0)->nodeValue,
-                                        'info' => $RelatedEvent->getElementsByTagName('info')->item(0)->nodeValue,
-                                    ),
-                                    );
-
-                                }
-                            }
-
-                            $relatedattribute = array();
-
-                            foreach ($Event->getElementsByTagName('Attribute') as $RelatedAttributes) {
-                                if($RelatedAttributes->nodeValue){
-                                    $relatedattribute[] = array(
-                                        'type' => $RelatedAttributes->getElementsByTagName('type')->item(0)->nodeValue,
-                                        'value' => $RelatedAttributes->getElementsByTagName('value')->item(0)->nodeValue,
-                                        'id' => $RelatedAttributes->getElementsByTagName('id')->item(0)->nodeValue,
-                                        'category' => $RelatedAttributes->getElementsByTagName('category')->item(0)->nodeValue,
-                                    );
-                                }
-
-
-                            }
-
-                            $item = array(
-                                'id' => $Event->getElementsByTagName('id')->item(0)->nodeValue,
-                                'info' => $Event->getElementsByTagName('info')->item(0)->nodeValue,
-                                'publish_timestamp' => $Event->getElementsByTagName('publish_timestamp')->item(0)->nodeValue,
-                                'date' => $Event->getElementsByTagName('date')->item(0)->nodeValue,
-                                'published' => $Event->getElementsByTagName('published')->item(0)->nodeValue,
-                                'timestamp' => $Event->getElementsByTagName('timestamp')->item(0)->nodeValue,
-                                'Tag' => $tag,
-                                'RelatedEvent' => $relatedevent,
-                                'Attribute' => $relatedattribute,
-                            );
-
-                            if (!empty($item)) {
+                    if ($EventCheck->length > 0) {
+                        foreach ($EventCheck as $Event) {
+                            if($Event->nodeName == 'Event'){
+                                $this->info($Event->getElementsByTagName('id')->item(0)->nodeValue);
+                                $item = array();
                                 try {
-                                    $this->info(" id" . ": " . $item["id"]);
-                                    $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
-                                    $countEvent = $this->saveRelatedEvent($item, $stamp_event_id, $stamp_indicator_id);
-                                    $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent);
+                                    $tag = array();
+                                    foreach ($Event->getElementsByTagName('Tag') as $Tags) {
+                                        if($Tags->nodeValue){
+                                            $tag[] = array('name' => $Tags->getElementsByTagName('name')->item(0)->nodeValue);
+                                        }
+                                    }
+                                    $relatedevent = array();
+
+                                    foreach ($Event->getElementsByTagName('RelatedEvent') as $RelatedEvents) {
+                                        $RelatedEventsCheck = $RelatedEvents->getElementsByTagName('Event');
+                                        if ($RelatedEventsCheck->length > 0) {
+
+                                            $RelatedEvent = $RelatedEventsCheck->item(0);
+                                            $relatedevent[] = array('Event' => array(
+                                                'id' => $RelatedEvent->getElementsByTagName('id')->item(0)->nodeValue,
+                                                'published' => $RelatedEvent->getElementsByTagName('published')->item(0)->nodeValue,
+                                                'date' => $RelatedEvent->getElementsByTagName('date')->item(0)->nodeValue,
+                                                'timestamp' => $RelatedEvent->getElementsByTagName('timestamp')->item(0)->nodeValue,
+                                                'info' => $RelatedEvent->getElementsByTagName('info')->item(0)->nodeValue,
+                                            ),
+                                        );
+
+                                        }
+                                    }
+
+                                    $relatedattribute = array();
+
+                                    foreach ($Event->getElementsByTagName('Attribute') as $RelatedAttributes) {
+                                        if($RelatedAttributes->nodeValue){
+                                            $relatedattribute[] = array(
+                                                'type' => $RelatedAttributes->getElementsByTagName('type')->item(0)->nodeValue,
+                                                'value' => $RelatedAttributes->getElementsByTagName('value')->item(0)->nodeValue,
+                                                'id' => $RelatedAttributes->getElementsByTagName('id')->item(0)->nodeValue,
+                                                'category' => $RelatedAttributes->getElementsByTagName('category')->item(0)->nodeValue,
+                                            );
+                                        }
+
+
+                                    }
+
+                                    $item = array(
+                                        'id' => $Event->getElementsByTagName('id')->item(0)->nodeValue,
+                                        'info' => $Event->getElementsByTagName('info')->item(0)->nodeValue,
+                                        'publish_timestamp' => $Event->getElementsByTagName('publish_timestamp')->item(0)->nodeValue,
+                                        'date' => $Event->getElementsByTagName('date')->item(0)->nodeValue,
+                                        'published' => $Event->getElementsByTagName('published')->item(0)->nodeValue,
+                                        'timestamp' => $Event->getElementsByTagName('timestamp')->item(0)->nodeValue,
+                                        'Tag' => $tag,
+                                        'RelatedEvent' => $relatedevent,
+                                        'Attribute' => $relatedattribute,
+                                    );
+
+                                    if (!empty($item)) {
+                                        try {
+                                            $this->info(" id" . ": " . $item["id"]);
+                                            $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
+                                            $countEvent = $this->saveRelatedEvent($item, $stamp_event_id, $stamp_indicator_id);
+                                            $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent);
+                                        } catch (Exception $e) {
+                                            echo json_encode($e->getMessage());
+                                        }
+
+                                    }
+
                                 } catch (Exception $e) {
+
                                     echo json_encode($e->getMessage());
                                 }
 
                             }
-
-                        } catch (Exception $e) {
-                          
-                            echo json_encode($e->getMessage());
                         }
 
-                        }
                     }
-
                 }
-            }
             }
 
         }
@@ -271,24 +271,24 @@ class MDMISPFeedDaily extends Command
                 'updated_at' => $date_now,
                 'updated_by' => "system",
             ],
-                '$setOnInsert' => [
-                    'author_username' => null,
-                    'groups' => null,
-                    'malware_families' => null,
-                    'industries' => null,
-                    'references' => null,
-                    'transcation_id' => $stamp_event_id,
-                    'status' => 1,
-                    'created_at' => $date_now,
-                    'created_by' => "system",
-                    'deleted_at' => null,
-                    'transaction_date' => date("Y-m-d"),
-                    'count_view' => 0,
-                    'source' => "misp",
-                ],
+            '$setOnInsert' => [
+                'author_username' => null,
+                'groups' => null,
+                'malware_families' => null,
+                'industries' => null,
+                'references' => null,
+                'transcation_id' => $stamp_event_id,
+                'status' => 1,
+                'created_at' => $date_now,
+                'created_by' => "system",
+                'deleted_at' => null,
+                'transaction_date' => date("Y-m-d"),
+                'count_view' => 0,
+                'source' => "misp",
             ],
-            ['upsert' => true]
-        );
+        ],
+        ['upsert' => true]
+    );
         return 0;
     }
 
@@ -317,38 +317,38 @@ class MDMISPFeedDaily extends Command
                         'updated_at' => $date_now,
                         'updated_by' => "system",
                     ],
-                        '$setOnInsert' => [
-                            'references' => null,
-                            'tags' => null,
-                            'industries' => null,
-                            'malware_families' => null,
-                            'author_username' => null,
-                            'indicator_type_counts' => array(),
-                            'TLP' => null,
-                            'indicator_count' => 0,
-                            'groups' => null,
-                            'transcation_id' => null,
-                            'status' => 1,
-                            'created_at' => $date_now,
-                            'created_by' => "system",
-                            'deleted_at' => null,
-                            'transaction_date' => date("Y-m-d"),
-                            'count_view' => 0,
-                            'source' => "misp",
-                        ],
+                    '$setOnInsert' => [
+                        'references' => null,
+                        'tags' => null,
+                        'industries' => null,
+                        'malware_families' => null,
+                        'author_username' => null,
+                        'indicator_type_counts' => array(),
+                        'TLP' => null,
+                        'indicator_count' => 0,
+                        'groups' => null,
+                        'transcation_id' => null,
+                        'status' => 1,
+                        'created_at' => $date_now,
+                        'created_by' => "system",
+                        'deleted_at' => null,
+                        'transaction_date' => date("Y-m-d"),
+                        'count_view' => 0,
+                        'source' => "misp",
                     ],
-                    ['upsert' => true]
-                );
+                ],
+                ['upsert' => true]
+            );
 
                 $update_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->updateOne(
                     [
                         'main_pulse_id' => "misp." . @$valueEvent["id"],
                         'pulse_id' => "misp." . @$value["Event"]["id"]],
-                    ['$set' => [
-                        'sub_pulse_modified' => isset($value["Event"]["timestamp"]) ? new UTCDateTime($value["Event"]["timestamp"] * 1000) : null,
-                        'updated_at' => $date_now,
-                        'updated_by' => "system",
-                    ],
+                        ['$set' => [
+                            'sub_pulse_modified' => isset($value["Event"]["timestamp"]) ? new UTCDateTime($value["Event"]["timestamp"] * 1000) : null,
+                            'updated_at' => $date_now,
+                            'updated_by' => "system",
+                        ],
                         '$setOnInsert' => [
                             'status' => 1,
                             'created_at' => $date_now,
@@ -487,6 +487,8 @@ class MDMISPFeedDaily extends Command
                             'created' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : null,
                             'expiration' => null,
                             'is_active' => null,
+                            'indicator' => @$value["value"],
+                            'type' => @$value["type"],
                         ],
                         '$setOnInsert' => [
                             'status' => 1,
@@ -497,6 +499,8 @@ class MDMISPFeedDaily extends Command
                             'updated_at' => $date_now,
                             'updated_by' => "system",
                             'source' => "misp",
+                            'indicator' => @$value["value"],
+                            'type' => @$value["type"],
                         ],
                     ],
                     ['upsert' => true]
