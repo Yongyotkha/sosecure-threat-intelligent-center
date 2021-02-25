@@ -537,7 +537,7 @@ $(function() {
     var site = null;
     var search = null;
     var source_select = null;
-
+    var isDateSearch = null;
 $(function() { 
     var start = moment().startOf('hour');
     var end = moment().startOf('hour').add(32, 'hour');
@@ -560,6 +560,12 @@ $(function() {
            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         }
     }, cb);
+    $('#datafeed_date').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = 1;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+        }
+    });
     cb(start, end);
 
     $("#btn_darkweb_feed_reset").click(function() {
@@ -577,6 +583,8 @@ $(function() {
         source_select = null;
         start_date = null;
         end_date = null;
+        search = null;
+        isDateSearch = null;
         cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
 
         table_social_data();
@@ -595,6 +603,7 @@ $(function() {
 
 
 $("#btn_darkweb_feed_search").click(function() {
+    
     search_val = 1;
 
     start_date = $("#datafeed_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
@@ -606,7 +615,7 @@ $("#btn_darkweb_feed_search").click(function() {
 });
 
 function table_social_data(){
-
+    console.log(isDateSearch);
 
     $('#table_darkweb_feed').DataTable({
         processing: true,
@@ -622,7 +631,8 @@ function table_social_data(){
                 "start_date" : start_date,
                 "end_date" : end_date,
                 "check_type" : check_type,
-                "site" : site
+                "site" : site,
+                "isDateSearch" : isDateSearch,
             },
             type: "POST",
         },

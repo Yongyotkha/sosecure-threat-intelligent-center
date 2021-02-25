@@ -142,23 +142,7 @@ class ApiDataLeakController extends ApiController
                             });
                         }
 
-                        if ($click_type2) {
-                            $keywords = $click_type2;
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                                if($keywords == 'other') {
 
-                                    $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
-
-
-            
-                                } else {
-                                    $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                                }
-                            });
-                        }
             
             
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
@@ -205,12 +189,6 @@ class ApiDataLeakController extends ApiController
             
                         }
 
-                        if($click_type) {
-
-                            $model = $model-> where('feel_type', '=' ,$click_type);
-            
-            
-                        }
             
                         // if ($source) {
             
@@ -251,6 +229,32 @@ class ApiDataLeakController extends ApiController
 
                         $model->orderBy('created_at','desc')->get();
                     } else {
+
+                        if ($click_type2) {
+                            $keywords = $click_type2;
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                                if($keywords == 'other') {
+
+                                    $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
+
+
+            
+                                } else {
+                                    $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                                }
+                            });
+                        }
+
+                        
+                        if($click_type) {
+    
+                            $model = $model-> where('feel_type', '=' ,$click_type);
+            
+            
+                        }
             
                         if ($click_key) {
                             $model = $model->where('keyword', $click_key);

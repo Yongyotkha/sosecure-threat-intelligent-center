@@ -495,11 +495,7 @@
 
     function get_count() {
 
-        if(search_val == true) {
-            f_search = 1;
-        } else {
-            f_search = 0;
-        }
+
 
 
         $.ajax({
@@ -513,7 +509,6 @@
                 startDate : startDate,
                 endDate : endDate,
                 isDateSearch : isDateSearch,
-                f_search : f_search,
                 check_type : check_type,
                 click_type : click_type,
             }),
@@ -809,7 +804,7 @@
                 search_val = false;
                 click_key = null;
                 $('#keyword').val('');
-
+                isDateSearch = null;
                 $('#site').val('').trigger('change');
                 $('#source').val('').trigger('change');
                 startDate =  null;
@@ -867,7 +862,18 @@
     function dataType(data){
         
         click_type = data;
-        search_val = true;
+        search_val = false;
+        click_key = null;
+        $('#keyword').val('');
+        $('#source').val('').trigger('change');
+        startDate =  null;
+        endDate =  null;
+        keywords =  null;
+        isDateSearch = null;
+        $('.btn-grey').removeClass('active');
+        $('.selector').removeClass('active');
+        $('#all').addClass('active');
+        check_type = null;
         table_social_data();
         {{--get_count();--}}
     }

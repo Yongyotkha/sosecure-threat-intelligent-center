@@ -867,6 +867,7 @@ active_btn('#groupby-type .btn-grey');
             $("#social_reset").click(function() {
                 click_key = null;
                 click_type = null;
+                click_type2 = null;
                 keywords = null;
                 type = null;
                 source = null;
@@ -874,6 +875,7 @@ active_btn('#groupby-type .btn-grey');
                 endDate =  null;
                 site = null;
                 search_val = 0;
+                isDateSearch = null;
                 $("#keyword").val('');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
@@ -988,7 +990,20 @@ var click_type2 = null;
         
         click_type = data;
         click_type2 = '';
-        search_val = 1;
+        search_val = 0;
+        click_key = null;
+        keywords = null;
+        type = null;
+        source = null;
+        startDate =  null;
+        endDate =  null;
+        check_type = null;
+        isDateSearch = null;
+        $("#keyword").val('');
+        $("#source").val('').trigger("change");
+        $('.btn-grey').removeClass('active');
+        $('.btn-selector').removeClass('active');
+        $('#all').addClass('active');
         table_social_data();
         {{--get_count();--}}
     }
@@ -996,7 +1011,20 @@ var click_type2 = null;
     function dataType2(data){
         click_type = '';
         click_type2 = data;
-        search_val = 1;
+        search_val = 0;
+        click_key = null;
+        keywords = null;
+        type = null;
+        source = null;
+        startDate =  null;
+        endDate =  null;
+        check_type = null;
+        isDateSearch = null;
+        $("#keyword").val('');
+        $("#source").val('').trigger("change");
+        $('.btn-grey').removeClass('active');
+        $('.btn-selector').removeClass('active');
+        $('#all').addClass('active');
         table_social_data();
         {{--get_count();--}}
     }

@@ -397,12 +397,7 @@ class ApiCompromisedController extends ApiController
 
                         }
 
-                        if($click_type) {
 
-                            $model = $model-> where('feel_type', '=' ,$click_type);
-
-
-                        }
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -473,6 +468,13 @@ class ApiCompromisedController extends ApiController
                             if ($click_key) {
                                 $model = $model->where('keyword', $click_key);
                                 // });
+                            }
+
+                            if($click_type) {
+
+                                $model = $model-> where('feel_type', '=' ,$click_type);
+    
+    
                             }
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];

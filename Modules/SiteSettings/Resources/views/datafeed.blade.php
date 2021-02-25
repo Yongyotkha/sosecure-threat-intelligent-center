@@ -359,7 +359,7 @@
     $('select').select2({
     minimumResultsForSearch: -1
     });
-    
+    var isDateSearch = null;
     $(function() { 
         var start = moment().startOf('hour');
         var end = moment().startOf('hour').add(32, 'hour');
@@ -382,6 +382,12 @@
             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
         }, cb);
+        $('#social_datas_date').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = 1;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+            }
+        });
         cb(start, end);
 
         $("#btn_data_leak_reset").click(function() {
@@ -396,6 +402,7 @@
             type = null;
             start_date = null;
             end_date = null;
+            isDateSearch = null;
 
             cb(moment().startOf('hour'), moment().startOf('hour').add(32, 'hour'));
 
@@ -446,6 +453,7 @@
                     "end_date" : end_date,
                     "check_type" : check_type,
                     "site" : site,
+                    "isDateSearch" : isDateSearch,
                 },
                 type: "POST",
             },

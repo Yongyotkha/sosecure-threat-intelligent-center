@@ -325,6 +325,18 @@ class WebDefacementController extends Controller
 
         if ($request->search_ == 1) {
     
+            if($request->level){
+                if($request->level =='High'){
+                    $modal = $modal->where('status_val', 'High');
+                }
+                else if($request->level =='Normal'){
+                    $modal = $modal->where('status_val', 'Normal');
+                }
+                else if($request->level =='Medium'){
+                    $modal = $modal->where('status_val', 'Medium');
+                }
+                
+            }
 
             if ($request->keywords) {
                 $modal = $modal->where('name', 'LIKE', '%' . $request->keywords . '%')
@@ -337,6 +349,8 @@ class WebDefacementController extends Controller
                 $modal = $modal->whereIn('status_val', $request->datatype);
                 // dd($modal);
             }
+
+
             
             
         }
@@ -346,23 +360,10 @@ class WebDefacementController extends Controller
             
         }
 
-        if($request->level){
-            if($request->level =='High'){
-                $modal = $modal->where('status_val', 'High');
-            }
-            else if($request->level =='Normal'){
-                $modal = $modal->where('status_val', 'Normal');
-            }
-            else if($request->level =='Medium'){
-                $modal = $modal->where('status_val', 'Medium');
-            }
-            // else{
-            //     $modal = $modal;
-            // }
-        }
+
             
         $modal = $modal->get();
-
+        
 
         foreach ($modal as $key) {
             $html .= 

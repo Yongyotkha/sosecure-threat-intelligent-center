@@ -481,6 +481,7 @@
             datatype: "html",
             beforeSend: function(){
                 f_loading(null, '#data_card');
+                $("#data_card").html('');  
             },
         }).done(function(data){
             f_loading_stop(null, '#data_card');

@@ -803,28 +803,7 @@ class DataLeakController extends Controller
 
         if ($request->search_val == 1) {
 
-            if ($request->keywords) {
-                $keywords = $request->keywords;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                    $query->where('keyword', 'LIKE', '%' . $keywords . '%')
-                        ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
-                });
-            }
 
-            if ($request->click_type2) {
-                $keywords = $request->click_type2;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                    if($keywords == 'other') {
-                        $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
-
-                    } else {
-                        $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                    }
-                });
-            }
 
             //<><><>
             // if (Auth::check()) {
@@ -871,6 +850,14 @@ class DataLeakController extends Controller
 
             }
 
+            if ($request->keywords) {
+                $keywords = $request->keywords;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                });
+            }
+
+
 
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
@@ -897,12 +884,7 @@ class DataLeakController extends Controller
 
             }
 
-            if($request ->click_type) {
 
-                $model = $model-> where('feel_type', '=' ,$request -> click_type);
-
-
-            }
 
             if ($request->source) {
 
@@ -943,9 +925,9 @@ class DataLeakController extends Controller
 
             }
 
-            $model->get();
+            // $model->get();
         } else {
-
+         
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
@@ -956,6 +938,29 @@ class DataLeakController extends Controller
             if ($request->click_key) {
                 $model = $model->where('keyword', $request->click_key);
                 // });
+            }
+
+
+            if($request ->click_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> click_type);
+
+
+            }
+    
+            if ($request->click_type2) {
+                $keywords = $request->click_type2;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                    if($keywords == 'other') {
+                        $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
+    
+                    } else {
+                        $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                    }
+                });
             }
 
             //<><><>
@@ -1002,8 +1007,12 @@ class DataLeakController extends Controller
 
             }
 
-            $model->orderBy('created_at', 'desc');
+            
         }
+        
+
+
+        $model->orderBy('created_at', 'desc');
 
         return DataTables::of($model)->toJson();
 
@@ -1340,20 +1349,15 @@ class DataLeakController extends Controller
             // }
 
             if ($request->keywords) {
-                
+
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
                     if ($request->keywords) {
                         $keywords = $request->keywords;
                         $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                            $query->where('keyword', 'LIKE', '%' . $keywords . '%')
-                                ->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                            $query->where('keyword', 'LIKE', '%' . $keywords . '%');
                         });
                     }
                 // });
-                $countGroupBy = $countGroupBy->where('keyword', 'LIKE', '%' . $request->keywords . '%')
-                ->orWhereHas('get_data_leak_feed_one', function($q) use ($request) { 
-                    $q->where('feedcontent', 'like', '%'.$request->keywords.'%');
-                });
                 // dd($model->get()->toArray());
             }
 
@@ -1372,12 +1376,7 @@ class DataLeakController extends Controller
 
             }
 
-            if($request ->click_type) {
 
-                $model = $model-> where('feel_type', '=' ,$request -> click_type);
-                $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$request -> click_type);
-
-            }
 
 
             //<><><>
@@ -1544,6 +1543,13 @@ class DataLeakController extends Controller
            
             }
 
+            if($request ->click_type) {
+
+                $model = $model-> where('feel_type', '=' ,$request -> click_type);
+
+
+            }
+
             $model->orderBy('id', 'desc')->get();
         }
 
@@ -1600,7 +1606,7 @@ class DataLeakController extends Controller
             }
 
 
-            if ($request->start_date) {
+            if ($request->isDateSearch == 1) {
                 $date_start = $request->start_date;
                 $date_end = $request->end_date;
 
@@ -1798,7 +1804,7 @@ class DataLeakController extends Controller
                 //     }
                 // }
 
-                if ($request->start_date) {
+                if ($request->isDateSearch==1) {
                     $date_start = $request->start_date;
                     $date_end = $request->end_date;
 
