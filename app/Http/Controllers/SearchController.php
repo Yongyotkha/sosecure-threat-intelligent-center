@@ -63,7 +63,7 @@ class SearchController extends Controller
 
             $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->where('feel_type', '!=', 'social')->where(function ($query) use ($keyword) {
                 $query->where('keyword', 'LIKE', $keyword)
-                    ->orWhere('source_name', 'LIKE', $keyword);
+                ->orWhere('source_name', 'LIKE', $keyword);
             });
             $dataWait["count"] = $dataWait["queryData"]->count();
             if ($dataWait['count'] > 0) {
@@ -74,7 +74,7 @@ class SearchController extends Controller
 
             $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->where('feel_type', 'social')->where(function ($query) use ($keyword) {
                 $query->where('keyword', 'LIKE', $keyword)
-                    ->orWhere('source_name', 'LIKE', $keyword);
+                ->orWhere('source_name', 'LIKE', $keyword);
             });
             $dataWait["count"] = $dataWait["queryData"]->count();
             if ($dataWait['count'] > 0) {
@@ -165,7 +165,43 @@ class SearchController extends Controller
                 $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
                 $data['dataSearch']["Events"] = $dataWait;
             }
-
+            $dataWait = null;
+            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+            $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+            $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
+            if($dataWait['count']>0){
+                $options = [
+                    'allowDiskUse' => TRUE
+                ];
+                $pipeline = [
+                    [
+                        '$match' => [
+                            'indicator'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                        ]
+                    ],
+                    [
+                        '$project' => [
+                            '_id' => 0,
+                            'id' => '$indicator_id',
+                            'name' => '$indicator',
+                            'content' => [ '$concat' => ['type: ','$type']],
+                            'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
+                        ]
+                    ],
+                    [
+                        '$sort' => [
+                            'modified'  => -1,
+                        ]
+                    ],
+                    [
+                        '$limit' => $limit
+                    ]
+                ];
+                $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                $data['dataSearch']["indicators"] = $dataWait;
+            }
         } else {
 
         }
