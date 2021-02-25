@@ -79,6 +79,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('vulnerabilitys/change_status', 'Api\ApiCVEController@vulnerabilitys_change_status');
     Route::post('vulnerabilitys/cve_table', 'Api\ApiCVEController@vulnerabilitys_cve_table');
     Route::post('vulnerabilitys/load_cve', 'Api\ApiCVEController@vulnerabilitys_load_cve');
+    Route::post('vulnerabilitys/load_cve_assets', 'Api\ApiCVEController@vulnerabilitys_load_cve_assets');
 
     Route::post('compromised/count_val', 'Api\ApiCompromisedController@compromised_count_val');
     Route::post('compromised/table', 'Api\ApiCompromisedController@compromised_table');

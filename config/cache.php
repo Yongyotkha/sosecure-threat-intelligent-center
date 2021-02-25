@@ -46,7 +46,7 @@ return [
 
         'file' => [
             'driver' => 'file',
-            'path' => 'public/cache_log',//storage_path('framework/cache/data')
+            'path' => 'cache_log',//storage_path('framework/cache/data')
             'permission' => 0777,
 
         ],
