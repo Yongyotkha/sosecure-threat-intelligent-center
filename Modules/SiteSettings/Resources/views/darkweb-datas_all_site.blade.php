@@ -513,10 +513,10 @@
                 click_type : click_type,
             }),
             beforeSend: function(){
-                loading('load');
+                {{--loading('load');--}}
             },
             success:function(response) {
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 if(response.darkweb){
                     $('#darkweb-count').text(response.darkweb);
                 }else{
@@ -535,7 +535,7 @@
 
             },
             error: function (error){
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {

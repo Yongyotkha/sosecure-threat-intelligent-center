@@ -407,7 +407,7 @@ class MDCVEBatchJob extends Command
 
         $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version='" . $row3['version'] . "'";
 
-
+        print PHP_EOL . $sql2;
         $result3 = mysqli_query($conn, $sql2) or die(mysqli_error());
         $namecveList = array();
         array_push($namecveList, 'C0000');
@@ -431,7 +431,7 @@ class MDCVEBatchJob extends Command
         //$modified ='2019-08-08';
         $sql3  = 'SELECT *
         FROM `fx_data_datacve`
-        WHERE  modified >=CURDATE() + INTERVAL -90 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        WHERE  modified >=CURDATE() + INTERVAL -2 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
         // $sql3  = 'SELECT *
         // FROM `data_datacve`
@@ -509,7 +509,7 @@ class MDCVEBatchJob extends Command
                 VALUES  ('" . $row4['namecve'] . "',
                 '" . $row3['id'] . "',
                 '" . $row3['site_id']. "',
-                '" . $This->GUID(). "',
+                '" . $this->GUID(). "',
                 '" . $row4['updated_at'] . "','" . $created_at . "'". ")";
 
                 echo  $insertdata_asset;

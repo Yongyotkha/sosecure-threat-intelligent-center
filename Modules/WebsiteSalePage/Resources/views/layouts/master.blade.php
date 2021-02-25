@@ -12,15 +12,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
 
         <!-- Bootstrap CSS File -->
-        <link href="{{ asset('asset_salepage/lib/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-
+        <link href="{{ asset('asset_salepage/lib/bootstrap/css/bootstrap.min.css')}}?v=2" rel="stylesheet">
         <!-- Libraries CSS Files -->
         <link href="{{ asset('asset_salepage/lib/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet preload">
-        <link href="{{ asset('asset_salepage/lib/animate/animate.min.css')}}" rel="stylesheet">
-        <link href="{{ asset('asset_salepage/lib/ionicons/css/ionicons.min.css')}}" rel="stylesheet">
-        <link href="{{ asset('asset_salepage/lib/owlcarousel/assets/owl.carousel.min.css')}}" rel="stylesheet">
-        <link href="{{ asset('asset_salepage/lib/lightbox/css/lightbox.min.css')}}" rel="stylesheet">
-
         <!-- Main Stylesheet File -->
         <link href="{{ asset('asset_salepage/css/style.css')}}" rel="stylesheet">
     </head>

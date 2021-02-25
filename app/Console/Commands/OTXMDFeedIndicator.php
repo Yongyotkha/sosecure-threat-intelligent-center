@@ -251,7 +251,7 @@ class OTXMDFeedIndicator extends Command
                             );
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
                             if (!empty($otxBasicData["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -269,7 +269,7 @@ class OTXMDFeedIndicator extends Command
                             );
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -285,7 +285,7 @@ class OTXMDFeedIndicator extends Command
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
 
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -331,7 +331,7 @@ class OTXMDFeedIndicator extends Command
 
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -350,7 +350,7 @@ class OTXMDFeedIndicator extends Command
                             );
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -372,7 +372,7 @@ class OTXMDFeedIndicator extends Command
                             );
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -394,7 +394,7 @@ class OTXMDFeedIndicator extends Command
                             );
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -415,7 +415,7 @@ class OTXMDFeedIndicator extends Command
                             $checkSuccess = $this->saveIndicator_detail_description($indicatorID, $indicatorName, $type, $allRow, $description, 'rowDescription')["success"];
 
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -443,7 +443,7 @@ class OTXMDFeedIndicator extends Command
                             $checkSuccess = $this->saveIndicator_detail($indicatorID, $indicatorName, $type, $allRow)["success"];
 
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -459,7 +459,7 @@ class OTXMDFeedIndicator extends Command
                             $allRow = (object) array();
                             $checkSuccess = $this->saveIndicator_detail_description($indicatorID, $indicatorName, $type, $allRow, $otxBasicData_2, 'ruleRow')["success"];
                             if (!empty($otxBasicData_1["pulse_info"]["pulses"])) {
-                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit)["success"];
+                                $checkSuccess = $this->savePulseRef($otxBasicData_1["pulse_info"]["pulses"], $indicatorID, $urlLimit,$type, $indicatorName)["success"];
                             }
                         } else {
                             $checkSuccess = false;
@@ -548,7 +548,7 @@ class OTXMDFeedIndicator extends Command
             return $dataOut;
         }
 
-        public function savePulseRef($pulses, $indicatorID, $urlLimit)
+        public function savePulseRef($pulses, $indicatorID, $urlLimit,$type, $indicatorName)
         {
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
@@ -618,6 +618,8 @@ class OTXMDFeedIndicator extends Command
                                 'pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
                                 'updated_at' => $date_now ,
                                 'updated_by' => "system",
+                                'indicator' => $indicatorName,
+                                'type' => $type,
                             ],
                             '$setOnInsert' => [
                                 'role' => null,
@@ -630,6 +632,8 @@ class OTXMDFeedIndicator extends Command
                                 'deleted_at' => null,
                                 'transaction_date' => date("Y-m-d"),
                                 'source' => "otx.alienvault",
+                                'indicator' => $indicatorName,
+                                'type' => $type,
                             ],
                         ],
                         ['upsert' => true]
