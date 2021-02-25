@@ -22,6 +22,7 @@ use Modules\Assets\Entities\OSType;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\RSSFeedSettings\Entities\RSSNews;
 use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
 use Modules\Scans\Entities\Assets;
@@ -98,88 +99,101 @@ class ApiCVEController extends ApiController
 
                 $site_id = null;
                 if ($search == 1) {
-                    $model = CVEMapping::with('get_site')->with('get_cve_asset');;
+                    $model = CVEMapping::with('get_site')->with('get_cve_asset')->select('data_datacve_mapping.*')->distinct();
+
+                    $CVEMappingAssets_data = CVEMappingAssets::select('namecve');
 
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         
         
                     }else if(@$get_role_custom_first['client'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }else if(@$get_role_custom_first['site_support'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }else if(@$get_role_custom_first['site_admin'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }else if(@$get_role_custom_first['site_client'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }
 
-                    // if ($site) {
-                    //     $site_id = $site;
-                    //     $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                    //         $query->where('site_id', $site_id);
-                    //     });
-                    // }
+                    if ($site) {
+                        $site_id = $site;
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.site_id', '=',$site_id);
+                    }
 
 
                     if ($assets) {
-                        $model = $model->where('cveven_id', '=', $assets);
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->join('cve_assets','cve_assets.id', '=', 'data_datacve_mapping_assets.cve_asset_id');
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('cve_assets.title', '=', $assets);
                     } 
                     if ($keywords) {
-                        $model = $model->where('namecve', 'LIKE', '%' . $keywords . '%');
+                        $model = $model->where('data_datacve_mapping.namecve', 'LIKE', '%' . $keywords . '%');
                     }
 
                     if ($isDateSearch) {
-                        $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                        $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                     }
                     
 
                     if($check==1){
-                        $model = $model->where('is_fix', '=', $check);
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', $check);
                     } else if($check==2) {
-
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
                     }else{
-                        $model = $model->where('is_fix', '=', 0);
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
                     }
 
-
                     if ($datatype) {
-        
-                        $model = $model->whereIn('severity', $datatype);
+                        $model = $model->whereIn('severity', $request->datatype);
                     }   
+
+                    $model = $model->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_data->get());
+
+
                 } else {
-                    $model = CVEMapping::where('is_fix', 0)->with('get_site')->with('get_cve_asset');
+                    $model = CVEMapping::with('get_site')->with('get_cve_asset')->select('data_datacve_mapping.*')->distinct();
+                    $CVEMappingAssets_data = CVEMappingAssets::select('namecve');
+
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         
         
                     }else if(@$get_role_custom_first['client'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }else if(@$get_role_custom_first['site_support'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }else if(@$get_role_custom_first['site_admin'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }else if(@$get_role_custom_first['site_client'] == 1) {
-                        $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
         
                     }
 
 
-                    // if ($site) {
-                        
-                    //     $model = $model->where('site_id', $site);
+                    if ($site) {
+                        $site_id = $site;
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.site_id', '=',$site_id);
+                    }
 
+                    $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                    $model = $model->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_data->get());
 
-                    // }
-
-                    
                 }
 
                 if($level){
@@ -276,55 +290,64 @@ class ApiCVEController extends ApiController
                         $CVEAssets = CVEAssets::whereIn('vendor', $vendor)->whereIn('title', $title)->whereIn('version', $version)->whereIn('edition', $edition)->get();
                     }
 
-                    if(!empty($CVEAssets)){
-                        foreach($CVEAssets as $item){
-                            $site_setting = SiteSettings::select('name')->where('id', $item -> site_id)->first();
-                            array_push($site_asset, '<span class="il-block">&nbsp;'.$site_setting->name.'</span>');
-                            array_push($ip_asset, '<span class="il-block">&nbsp;'.$item->IP.'</span>');
-                            array_push($hostname_asset, '<span class="il-block">&nbsp;'.$item->Hostname.'</span>');
-                            array_push($vendor_asset, '<span class="il-block">&nbsp;'.$item->vendor.'</span>');
-                            array_push($title_asset, '<span class="il-block">&nbsp;'.$item->title.'</span>');
-                            array_push($version_asset, '<span class="il-block">&nbsp;'.$item->version.'</span>');
-                            array_push($edition_asset, '<span class="il-block">&nbsp;'.$item->edition.'</span>');
-                        }
+                    // if(!empty($CVEAssets)){
+                    //     foreach($CVEAssets as $item){
+                    //         $site_setting = SiteSettings::select('name')->where('id', $item -> site_id)->first();
+                    //         array_push($site_asset, '<span class="il-block">&nbsp;'.$site_setting->name.'</span>');
+                    //         array_push($ip_asset, '<span class="il-block">&nbsp;'.$item->IP.'</span>');
+                    //         array_push($hostname_asset, '<span class="il-block">&nbsp;'.$item->Hostname.'</span>');
+                    //         array_push($vendor_asset, '<span class="il-block">&nbsp;'.$item->vendor.'</span>');
+                    //         array_push($title_asset, '<span class="il-block">&nbsp;'.$item->title.'</span>');
+                    //         array_push($version_asset, '<span class="il-block">&nbsp;'.$item->version.'</span>');
+                    //         array_push($edition_asset, '<span class="il-block">&nbsp;'.$item->edition.'</span>');
+                    //     }
 
-                        $site_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $site_asset);
-                        $ip_asset = implode('<hr cdlass="m-0" style="border: 1px solid #efefef;">', (array) $ip_asset);
-                        $hostname_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $hostname_asset);
-                        $vendor_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $vendor_asset);
-                        $title_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $title_asset);
-                        $version_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $version_asset);
-                        $edition_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $edition_asset);
-                    }else{
-                        array_push($site_asset, '<span class="il-block">&nbsp; - </span>');
-                        array_push($ip_asset, '<span class="il-block">&nbsp; - </span>');
-                        array_push($hostname_asset, '<span class="il-block">&nbsp; - </span>');
-                        array_push($vendor, '<span class="il-block">&nbsp; - </span>');
-                        array_push($title_asset, '<span class="il-block">&nbsp; - </span>');
-                        array_push($version_asset, '<span class="il-block">&nbsp; - </span>');
-                        array_push($edition_asset, '<span class="il-block">&nbsp; - </span>');
+                    //     $site_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $site_asset);
+                    //     $ip_asset = implode('<hr cdlass="m-0" style="border: 1px solid #efefef;">', (array) $ip_asset);
+                    //     $hostname_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $hostname_asset);
+                    //     $vendor_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $vendor_asset);
+                    //     $title_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $title_asset);
+                    //     $version_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $version_asset);
+                    //     $edition_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $edition_asset);
+                    // }else{
+                    //     array_push($site_asset, '<span class="il-block">&nbsp; - </span>');
+                    //     array_push($ip_asset, '<span class="il-block">&nbsp; - </span>');
+                    //     array_push($hostname_asset, '<span class="il-block">&nbsp; - </span>');
+                    //     array_push($vendor, '<span class="il-block">&nbsp; - </span>');
+                    //     array_push($title_asset, '<span class="il-block">&nbsp; - </span>');
+                    //     array_push($version_asset, '<span class="il-block">&nbsp; - </span>');
+                    //     array_push($edition_asset, '<span class="il-block">&nbsp; - </span>');
 
-                        $site_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $ip_asset);
-                        $ip_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $ip_asset);
-                        $hostname_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $hostname_asset);
-                        $vendor_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $vendor_asset);
-                        $title_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $title_asset);
-                        $version_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $version_asset);
-                        $edition_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $edition_asset);
-                    }
+                    //     $site_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $ip_asset);
+                    //     $ip_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $ip_asset);
+                    //     $hostname_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $hostname_asset);
+                    //     $vendor_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $vendor_asset);
+                    //     $title_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $title_asset);
+                    //     $version_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $version_asset);
+                    //     $edition_asset = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $edition_asset);
+                    // }
 
-                    $model_data['site'] = $site_asset;
-                    $model_data['ip'] = $ip_asset;
-                    $model_data['hostname'] = $hostname_asset;
-                    $model_data['vendor'] = $vendor_asset;
-                    $model_data['title'] = $title_asset;
-                    $model_data['version'] = $version_asset;
-                    $model_data['edition'] = $edition_asset;
+                    // $model_data['site'] = $site_asset;
+                    // $model_data['ip'] = $ip_asset;
+                    // $model_data['hostname'] = $hostname_asset;
+                    // $model_data['vendor'] = $vendor_asset;
+                    // $model_data['title'] = $title_asset;
+                    // $model_data['version'] = $version_asset;
+                    // $model_data['edition'] = $edition_asset;
+
+                    $model_data['site'] = '';
+                    $model_data['ip'] = '';
+                    $model_data['hostname'] = '';
+                    $model_data['vendor'] = '<div class="loading-overlay-content">Loading...</div>';
+                    $model_data['title'] = '';
+                    $model_data['version'] = '';
+                    $model_data['edition'] = '';
                 }
 
                 $res = DataTables::of($model)
                     ->editColumn('chk', function (CVEMapping $model) {
-                        return '<label><input type="checkbox"  name="cve_id" class="cve_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                        //return '<label><input type="checkbox"  name="cve_id" class="cve_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                        return "";
                     })
                     ->addColumn('name_cve', function (CVEMapping $model) {
                         return '<span class="d-inline">'.$model->namecve.'</span>';
@@ -332,29 +355,45 @@ class ApiCVEController extends ApiController
                     ->addColumn('description', function (CVEMapping $model) {
                         $html = '';
                         $html .= '<div class="text-trucate-ovf">'.$model->description.'</div>';
-                        $html .= '<strong>Published:</strong> '.@$model->published.'&nbsp; &nbsp; <strong>Modified:</strong> '.@$model->modified.'';
+                                // $html .= '<div class="scroll-ovf-des">'.$model->description.'</div>';
+                                // $html .= '<div class="scroll-ovf-content-fixh-60">'.$model->description.'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                        $html .= '<div class="nowrap" style="margin-top:5px;"><strong>Published:</strong> '.@$model->published.'&nbsp; &nbsp; <strong>Modified:</strong> '.@$model->modified.'</div>';
                         return $html;
                     })
                     ->addColumn('site', function (CVEMapping $model) {
-                        return @$model->get_site->name;
+                        $html = '';
+                        $html .= '<div>'.@$model->get_site->name.'</div>';
+                        return $html;
                     })
                     ->addColumn('hostname', function (CVEMapping $model) {
-                        return @$model->get_cve_asset -> Hostname?$model->get_cve_asset -> Hostname:'-';
+                        $html = '';
+                        $html .= '<div>'.@$model->get_cve_asset->Hostname.'</div>';
+                        return $html;
                     })
                     ->addColumn('ip', function (CVEMapping $model) {
-                        return @$model->get_cve_asset -> IP?$model->get_cve_asset -> IP:'-';;
+                        $html = '';
+                        $html .= '<div>'.@$model ->get_cve_asset-> IP.'</div>';
+                        return $html;
                     })
                     ->addColumn('vendor', function (CVEMapping $model) {
-                        return @$model->get_cve_asset -> vendor?$model->get_cve_asset -> vendor:'-';;
+                        $html = '';
+                        $html .= '<div><div style="font-size:10px" class="loading-overlay-content">Loading...</div></div>';
+                        return $html;
                     })
                     ->addColumn('title', function (CVEMapping $model) {
-                        return @$model->get_cve_asset -> title?$model->get_cve_asset -> title:'-';;
+                        $html = '';
+                        $html .= '<div>'.@$model ->get_cve_asset-> title.'</div>';
+                        return $html;
                     })
                     ->addColumn('version', function (CVEMapping $model) {
-                        return @$model->get_cve_asset -> version?$model->get_cve_asset -> version:'-';;
+                        $html = '';
+                        $html .= '<div>'.@$model ->get_cve_asset-> version.'</div>';
+                        return $html;
                     })
                     ->addColumn('edition', function (CVEMapping $model) {
-                        return @$model->get_cve_asset -> edition?$model->get_cve_asset -> edition:'-';;
+                        $html = '';
+                        $html .= '<div>'.@$model ->get_cve_asset-> edition.'</div>';
+                        return $html;
                     })
                     ->addColumn('cvss_severity', function (CVEMapping $model) {
                         $html = '';
@@ -372,19 +411,19 @@ class ApiCVEController extends ApiController
                     ->editColumn(
                         'fixed',
                         function ($model) {
-                            if ($model->is_fix == 1) {
-                                $checked_val = 'checked';
-                            } else {
-                                $checked_val = '';
-                            }
-                            $html = '';
-
-                            $html .= '<label class="switch">
-                                            <input type="checkbox" id="cve_active_' . $model->id . '" onchange="monitoringvulnerabilitys_active(\'' . $model->id . '\')" ' . $checked_val . ' name="active" value="1">
-                                            <span></span>
-                                        </label>';
-
-                            return $html;
+                                // if ($model->is_fix == 1) {
+                                //     $checked_val = 'checked';
+                                // } else {
+                                //     $checked_val = '';
+                                // }
+                                // $html = '';
+                
+                                // $html .= '<label class="switch">
+                                // <input type="checkbox" id="cve_active_' . $model->id . '" onchange="monitoringvulnerabilitys_active(\'' . $model->id . '\')" ' . $checked_val . ' name="active" value="1">
+                                // <span></span>
+                                // </label>';
+                
+                            return "";
                         }
                     )
 
@@ -437,67 +476,29 @@ class ApiCVEController extends ApiController
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     $response['page'] = langapp('monitoring_vulnerabilitys');
 
-                    $cve_assets = CVEAssets::where("active", '=', 1);
+                    $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
+                    $response['count_CVEMapping'] = CVEMapping::count();
+                    $response['count_isFix'] = CVEMappingAssets::where("is_fix", '=', 1)->count();
+            
+                    $SiteSettings = @$get_role_custom_first['SiteSettings'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
-                        
-        
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->select('title')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['client'] == 1) {
-                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr)->where('status', 1);
-        
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['site_support'] == 1) {
-                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr);
-        
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['site_admin'] == 1) {
-                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr);
-        
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['site_client'] == 1) {
-                        $cve_assets = $cve_assets->whereIn('site_id', $site_id_arr)->where('status', 1);
-        
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
                     }
-
-                    $response['count_CVEAssets'] = $cve_assets->count();
-                    $response['cve_assets'] = $cve_assets->get();
-                    
-
-
-                    $count_CVEMapping = new CVEMapping;                   
-                    if(@$get_role_custom_first['superadmin'] == 1) {
-                        
-        
-                    }else if(@$get_role_custom_first['client'] == 1) {
-                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr)->where('status', 1);
-        
-                    }else if(@$get_role_custom_first['site_support'] == 1) {
-                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr);
-        
-                    }else if(@$get_role_custom_first['site_admin'] == 1) {
-                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr);
-        
-                    }else if(@$get_role_custom_first['site_client'] == 1) {
-                        $count_CVEMapping = $count_CVEMapping->whereIn('site_id', $site_id_arr)->where('status', 1);
-        
-                    }
-                    $response['count_CVEMapping'] = $count_CVEMapping->count();
-
-                    $count_isFix= CVEMapping::where("is_fix", '=', 1);
-                        
-                        if(@$get_role_custom_first['superadmin'] == 1) {
-                        
-        
-                        }else if(@$get_role_custom_first['client'] == 1) {
-                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr)->where('status', 1);
             
-                        }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $count_isFix = $count_isFix->whereIn('site_id', $site_id_arr)->where('status', 1);
-            
-                        }
-                    $response['count_isFix'] = $count_isFix->count();
+                 $response['site_settings'] = $SiteSettings;
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -537,17 +538,47 @@ class ApiCVEController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
                     $site = $data['data']['site'];
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                    $assets = $data['data']['assets'];
+
+                    $model_count_CVEAssets = CVEAssets::where("active", '=', 1);
+                    $model_count_CVEMapping = new CVEMapping;
+                    $model_count_isFix = CVEMappingAssets::where("is_fix", '=', 1);
+                    $model_count_isFix_all = new CVEMappingAssets;
+
                     if(empty($site)){
-                        $response['page'] = langapp('monitoring_vulnerabilitys');
-                        $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
-                        $response['count_CVEMapping'] = CVEMapping::count();
-                        $response['count_isFix'] = CVEMapping::where("is_fix", '=', 1)->count();
+                        $model_count_CVEAssets  =   $model_count_CVEAssets->whereIn('site_id', $site_id_arr);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                        $model_count_CVEMapping = $model_count_CVEMapping->whereIn('namecve', $CVEMappingAssets_name)->select('namecve')->distinct();
+                        $model_count_isFix =  $model_count_isFix->whereIn('data_datacve_mapping_assets.site_id', $site_id_arr);
+                        $model_count_isFix_all =  $model_count_isFix_all->whereIn('data_datacve_mapping_assets.site_id', $site_id_arr);
                     }else{
-                        $response['page'] = langapp('monitoring_vulnerabilitys');
-                        $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->where('site_id', $site)->count();
-                        $response['count_CVEMapping'] = CVEMapping::where('site_id', $site)->count();
-                        $response['count_isFix'] = CVEMapping::where("is_fix", '=', 1)->where('site_id', $site)->count();
+                        $model_count_CVEAssets  =   $model_count_CVEAssets->where('site_id', $site);
+                        $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site)->select('namecve')->get();
+                        $model_count_CVEMapping = $model_count_CVEMapping->whereIn('namecve', $CVEMappingAssets_name)->select('namecve')->distinct();
+                        $model_count_isFix =  $model_count_isFix->where('data_datacve_mapping_assets.site_id', $site);
+                        $model_count_isFix_all =  $model_count_isFix_all->where('data_datacve_mapping_assets.site_id', $site);
                     }
+
+                    if ($assets) {
+
+                        $model_count_CVEAssets  =   $model_count_CVEAssets->where('title', $assets);
+            
+                        $CVEMappingAssets_name = CVEMappingAssets::select('namecve')->join('cve_assets','cve_assets.id','=','data_datacve_mapping_assets.cve_asset_id')->where('cve_assets.title', '=', $assets)->get();
+                        $model_count_CVEMapping = $model_count_CVEMapping->whereIn('namecve', $CVEMappingAssets_name)->select('namecve')->distinct();
+            
+                        $model_count_isFix = $model_count_isFix->join('cve_assets','cve_assets.id','=','data_datacve_mapping_assets.cve_asset_id')->where('cve_assets.title', '=', $assets);
+            
+                        $model_count_isFix_all = $model_count_isFix_all->join('cve_assets','cve_assets.id','=','data_datacve_mapping_assets.cve_asset_id')->where('cve_assets.title', '=', $assets);
+                    }
+
+
+                    $response['page'] = langapp('monitoring_vulnerabilitys');
+                    $response['count_CVEAssets'] = $model_count_CVEAssets->count();
+                    $response['count_CVEMapping'] = $model_count_CVEMapping->count();
+                    $response['count_isFix'] = $model_count_isFix->count().'/'.$model_count_isFix_all->count();
+
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -603,40 +634,37 @@ class ApiCVEController extends ApiController
                     $html = '';
 
                     if ($count == 1) {
-                        $model = new CVEMapping;
+                        $model = CVEMapping::select('data_datacve_mapping.*')->distinct();
+                        $model =  $model->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve');
+                        $model = $model->join('cve_assets','cve_assets.id','=','data_datacve_mapping_assets.cve_asset_id');
+
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
             
             
                         if ($site) {
-                            $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
                         if ($assets) {
-                            $model = $model->where('cveven_id', '=', $assets);
+                            $model = $model->where('cve_assets.title', '=', $assets);
                         } 
                         if ($keywords) {
-                            $model = $model->where('namecve', 'LIKE', '%' . $keywords . '%');
+                            $model = $model->where('data_datacve_mapping.namecve', 'LIKE', '%' . $keywords . '%');
                         }
             
                         if ($isDateSearch) {
@@ -652,11 +680,11 @@ class ApiCVEController extends ApiController
                             $date_end_date = @$date_end_explode[0];
                             $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
             
-                            $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                            $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                         }
                         
                         if($check==1){
-                            $model = $model->where('is_fix', '=', $check);
+                            $model = $model->where('data_datacve_mapping_assets.is_fix', '=', $check);
                         }
             
             
@@ -665,34 +693,34 @@ class ApiCVEController extends ApiController
                         }           
 
                     } else {
-                        $model = new CVEMapping;
+                        $model = CVEMapping::select('data_datacve_mapping.*')->distinct();
+                        $model =  $model->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve');
+                        $model = $model->join('cve_assets','cve_assets.id','=','data_datacve_mapping_assets.cve_asset_id');
+                        
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
             
                         if ($site) {
-                            
-                            $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                        }
+
+                        if ($assets) {
+                            $model = $model->where('cve_assets.title', '=', $assets);
                         }
                     }
             
@@ -718,7 +746,7 @@ class ApiCVEController extends ApiController
                     }
             
                     $model = $model->get();
-                  
+
                     $count_assets = $model->groupBy('cveven_id')->count();
                     $count = $model->count();
                     $high = $model->where('severity', '=', 'HIGH')->count();
@@ -727,17 +755,17 @@ class ApiCVEController extends ApiController
                     $low = $model->where('severity', '=', 'LOW')->count();
                     $none = $model->where('severity', '=', 'NONE')->count();
                     $none = $none+$model->where('severity', '=', '')->count();
-            
-                    $html .= '<ul class="total-count">
-                        <li>
-                            <h1>Total Asset</h1>
-                            <span class="color-purple">' . $count_assets . '</span>
-                        </li>
-                        <li>
-                            <h1>Total CVE</h1>
-                            <span class="color-red">' . $count . '</span>
-                        </li>
-                    </ul>';
+                    
+                    $html .=    '<ul class="total-count">
+                                    <li>
+                                        <h1>Total Asset</h1>
+                                        <span class="color-purple">' . $count_assets . '</span>
+                                    </li>
+                                    <li>
+                                        <h1>Total CVE</h1>
+                                        <span class="color-red">' . $count . '</span>
+                                    </li>
+                                </ul>';
             
                     $response = [
                         "html" => $html,
@@ -824,42 +852,37 @@ class ApiCVEController extends ApiController
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
 
                         if ($site) {
-                            $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->where('data_datacve_mapping_assets.site_id',  $site);
                         }
                         if ($assets) {
-                            $model = $model->where('cveven_id', '=', $assets);
+                            $model = $model->where('cve_assets.title', '=', $assets);
                         } 
                         if ($keywords) {
-                            $model = $model->where('namecve', 'LIKE', '%' . $keywords . '%');
+                            $model = $model->where('data_datacve_mapping.namecve', 'LIKE', '%' . $keywords . '%');
                         }
 
                         if ($isDateSearch) {
-                            $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                            $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                         }
                         
                         if($check==1){
-                            $model = $model->where('is_fix', '=', $check);
+                            $model = $model->where('data_datacve_mapping_assets.is_fix', '=', $check);
                         }
 
 
@@ -875,31 +898,24 @@ class ApiCVEController extends ApiController
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
 
                         if ($site) {
-                            
                             $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
-
-
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->where('data_datacve_mapping_assets.site_id',  $site);
                         }
 
                         
@@ -928,18 +944,19 @@ class ApiCVEController extends ApiController
                     }
 
                     $get_ip = $model         
-                        ->select(DB::raw('count(*) as cveven_count, cveven_id,CONCAT(vendor," ",IP) as vendor_ip
-                        ,sum(severity = "HIGH") as HIGH
-                        ,sum(severity = "MEDIUM") as MEDIUM
-                        ,sum(severity = "LOW") as LOW
-                        ,(sum(severity = "NONE") + sum(severity = "")) as NONE
-                        ,sum(severity = "CRITICAL") as CRITICAL
-                        '
+                    ->select(DB::raw('count(*) as cveven_count,title as vendor_ip
+                            ,sum(severity = "HIGH") as HIGH
+                            ,sum(severity = "MEDIUM") as MEDIUM
+                            ,sum(severity = "LOW") as LOW
+                            ,(sum(severity = "NONE") + sum(severity = "")) as NONE
+                            ,sum(severity = "CRITICAL") as CRITICAL
+                            '
                         ))
-                        ->groupBy('cveven_id')
+                        ->groupBy('cve_assets.vendor','cve_assets.title')
                         ->orderBy('cveven_count', 'desc')
                         ->limit(5)
-                        ->join('cve_assets', 'data_datacve_mapping.cveven_id', '=', 'cve_assets.id')            
+                        ->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve','left')     
+                        ->join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id','left')   
                         ->get();
 
                         $_array = array();
@@ -950,22 +967,22 @@ class ApiCVEController extends ApiController
                         $severity_none = array();
                 
                         if($get_ip) {
-                        foreach($get_ip as $key ) {
-                            $vendor_ip = @$key->vendor_ip;
-                            $HIGH = @$key->HIGH;
-                            $MEDIUM = @$key->MEDIUM;
-                            $LOW = @$key->LOW;
-                            $NONE = @$key->NONE;
-                            $CRITICAL = @$key->CRITICAL;
-                
-                            array_push($_array, $vendor_ip);
-                            array_push($severity_high, $HIGH);
-                            array_push($severity_medium, $MEDIUM);
-                            array_push($severity_low, $LOW);
-                            array_push($severity_none, $NONE);
-                            array_push($severity_critical, $CRITICAL);
+                            foreach($get_ip as $key ) {
+                                $vendor_ip = @$key->vendor_ip;
+                                $HIGH = @$key->HIGH;
+                                $MEDIUM = @$key->MEDIUM;
+                                $LOW = @$key->LOW;
+                                $NONE = @$key->NONE;
+                                $CRITICAL = @$key->CRITICAL;
+                    
+                                array_push($_array, $vendor_ip);
+                                array_push($severity_high, $HIGH);
+                                array_push($severity_medium, $MEDIUM);
+                                array_push($severity_low, $LOW);
+                                array_push($severity_none, $NONE);
+                                array_push($severity_critical, $CRITICAL);
+                            }
                         }
-                        } 
 
                     $severity_high = array_map(function($value) {
                         return intval($value);
@@ -1064,49 +1081,47 @@ class ApiCVEController extends ApiController
                     $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
 
                     if ($count == 1) {
-                        $model = CVEMapping::where('is_fix', 1);
+                        $model = CVEMapping::select('data_datacve_mapping.*')->distinct();
+                        $CVEMappingAssets_name = CVEMappingAssets::select('namecve');
+                        $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.is_fix', '=', 1);
+
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
 
 
                         if ($site) {
                             $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.site_id',$site_id);
                         }
                         if ($assets) {
-                            $model = $model->where('cveven_id', '=', $assets);
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->join('cve_assets','cve_assets.id', '=', 'data_datacve_mapping_assets.cve_asset_id');
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->where('cve_assets.title', '=', $assets);
                         } 
                         if ($keywords) {
-                            $model = $model->where('namecve', 'LIKE', '%' . $keywords . '%');
+                            $model = $model->where('data_datacve_mapping.namecve', 'LIKE', '%' . $keywords . '%');
                         }
 
                         if ($isDateSearch) {
-                            $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                            $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                         }
                         
-                        if($check==1){
-                            $model = $model->where('is_fix', '=', $check);
-                        }
+                        // if($check==1){
+                        //     $model = $model->where('is_fix', '=', $check);
+                        // }
                         if ($datatype) {
                             $model = $model->whereIn('severity', $datatype);
                         }
@@ -1151,17 +1166,17 @@ class ApiCVEController extends ApiController
                         $isFix_none = intval($get_ip[0]->NONE);
                     }else{
             
-                        $isFix = CVEMapping::where('is_fix', 1);
+                        $isFix = CVEMapping::select('data_datacve_mapping.*')->distinct();
 
-                        if ($site) {
-                            
-                            $site_id = $site;
-                            $isFix = $isFix->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                        $CVEMappingAssets_name = CVEMappingAssets::select('namecve');
+                        $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.is_fix', '=', 1);
 
-
+                        if ($site) {        
+                            $site_id = $request->site;
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.site_id',$site_id);
                         }
+
+                        $isFix = $isFix->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name->get());
 
                         if($level){
                             if($level =='critical'){
@@ -1246,12 +1261,15 @@ class ApiCVEController extends ApiController
                     $id = $data['data']['id'];
                     $active = $data['data']['active'];
 
-                    $CVEMapping = CVEMapping::where("id", $id)->first();
-                    $CVEMapping->is_fix = $active;
-                    $CVEMapping->save();
+                    $data = CVEMappingAssets::where("id", $id)->first();
+                        // dd($data);
+                    $data->is_fix = $active;
+                    $data->save();
 
                     $response = [
                         "data" => 'success',
+                        "message" => langapp('changes_saved_successful'),
+                        'redirect' => route('monitoringvulnerabilitys.index'),
                     ];
                 
                     $data_transcation = json_encode($response);
@@ -1349,6 +1367,7 @@ class ApiCVEController extends ApiController
                     $code = $data['data']['code'];
                     $cve_asset = CVEAssets::where('active',1)->where('code',$code)->with('get_site')->first();
                     $page = langapp('monitoring_vulnerabilitys');
+
                     $response = [
                         "cve_asset" => $cve_asset,
                         "page" => $page,
@@ -1399,7 +1418,7 @@ class ApiCVEController extends ApiController
                     $date_end = $data['data']['date_end'];
 
                     if($isDateSearch||$fix){
-                        $model = CVEMapping::where('cveven_id',$id)->orderBy('modified', 'desc');
+                        $model = CVEMapping::where('cveven_id',$id)->orderBy('published', 'desc');
             
                         if ($isDateSearch) {
                        
@@ -1424,7 +1443,7 @@ class ApiCVEController extends ApiController
                             $date_end_time_time = date("H:i", strtotime($date_end_time));
                             $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
             
-                            $model = $model->whereBetween('modified', array($date_start_date_format, $date_end_date_format));
+                            $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                         }
             
                         if($fix){
@@ -1436,7 +1455,7 @@ class ApiCVEController extends ApiController
             
                         }
                     }else{
-                        $model = CVEMapping::where('cveven_id',$id)->where('is_fix',0)->orderBy('modified', 'desc');
+                        $model = CVEMapping::where('cveven_id',$id)->where('is_fix',0)->orderBy('published', 'desc');
                     }
                     
                     $model -> get();
@@ -1586,91 +1605,94 @@ class ApiCVEController extends ApiController
                     $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
 
                     if ($count == 1) {
-                        $model = new CVEMapping;
+                        $model = CVEMapping::select('data_datacve_mapping.*')->distinct();
+                        $CVEMappingAssets_data = CVEMappingAssets::select('namecve');
+
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
 
                         if ($site) {
                             $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                            $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.site_id',$site_id);
                         }
                         
                         if ($assets) {
-                            $model = $model->where('cveven_id', '=', $assets);
+                            $CVEMappingAssets_data = $CVEMappingAssets_data->join('cve_assets','cve_assets.id', '=', 'data_datacve_mapping_assets.cve_asset_id');
+                            $CVEMappingAssets_data = $CVEMappingAssets_data->where('cve_assets.title', '=', $assets);
                         } 
                         if ($keywords) {
-                            $model = $model->where('namecve', 'LIKE', '%' . $keywords . '%');
+                            $model = $model->where('data_datacve_mapping.namecve', 'LIKE', '%' . $keywords . '%');
                         }
 
                         if ($isDateSearch) {
                             $model = $model->whereBetween('published', array($date_start_date_format, $date_end_date_format));
                         }
                         
-                        if($check==2){
+                        // if($check==2){
                             
-                        }else if($check==1){
-                            $model = $model->where('is_fix', '=', $check);
-                        }
+                        // }else if($check==1){
+                        //     $model = $model->where('is_fix', '=', $check);
+                        // }
 
                         if ($datatype) {
                             $model = $model->whereIn('severity', $datatype);
                         }
 
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_data->get());
+
+                        if($check==1){
+                            $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', $check);
+                        } else if($check==2) {
+                           $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                        }else{
+                            $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                        }
                         
 
                     }else{
 
-                        $model = new CVEMapping;
+                        $model = CVEMapping::select('data_datacve_mapping.*')->distinct();
+                        $CVEMappingAssets_data = CVEMappingAssets::select('namecve');
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id_arr) {
-                                $query->whereIn('site_id', $site_id_arr);
-                            });
+                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
 
 
 
                         if ($site) {
                             $site_id = $site;
-                            $model = $model->whereHas('get_cve_asset', function ($query) use ($site_id) {
-                                $query->where('site_id', $site_id);
-                            });
+                            $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.site_id',$site_id);
                         }
+
+                        $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_data->get());
                     }
 
                     if($level){
@@ -1752,6 +1774,88 @@ class ApiCVEController extends ApiController
             return response()->json($response);
         }
     }
+
+    public function vulnerabilitys_load_cve_assets(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'vulnerabilities'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $cvename = $data['data']['cvename'];
+                    $site = $data['data']['site'];
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                    $assets = $data['data']['assets'];
+                    $check = $data['data']['check'];
+             
+
+
+                    if(empty($site)){
+                        $data['page'] = langapp('vulnerabilitys');
+                
+                        $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.id','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.is_fix','data_datacve_mapping_assets.site_id','data_datacve_mapping_assets.code','site.name as site_name','cve_assets.code as cve_assets_code','cve_assets.vendor','cve_assets.title','cve_assets.version','cve_assets.edition','cve_assets.IP','cve_assets.Hostname')
+                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
+                        ->Join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id')
+                        ->where('data_datacve_mapping_assets.namecve',$cvename)->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+                    }else{
+                        $data['page'] = langapp('vulnerabilitys');
+                
+                
+                        $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.id','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.is_fix','data_datacve_mapping_assets.site_id','data_datacve_mapping_assets.code','site.name as site_name','cve_assets.code as cve_assets_code','cve_assets.vendor','cve_assets.title','cve_assets.version','cve_assets.edition','cve_assets.IP','cve_assets.Hostname')
+                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
+                        ->Join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id')
+                        ->where('data_datacve_mapping_assets.namecve',$cvename)->where('data_datacve_mapping_assets.site_id',$site)->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+                
+                    }
+                    if ($assets) {
+                        $CVEMappingAssets_data =  $CVEMappingAssets_data->where('cve_assets.title', '=', $assets);
+                    }
+                
+                    if($check==1){
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', $check);
+                    } else if($check==2) {
+                      $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                    }else{
+                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                    }
+                
+                    
+                    $response = [
+                        'data' => $CVEMappingAssets_data->get()
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
     
     private function dataFalse($bearerToken, $mode, $data){
         try {
