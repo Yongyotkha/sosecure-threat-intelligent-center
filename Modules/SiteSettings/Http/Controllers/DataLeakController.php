@@ -2055,7 +2055,7 @@ class DataLeakController extends Controller
                 $DataLeakFeed->status = 1;
                 $DataLeakFeed->save();
 
-                $DataLeakFeed_send_mail[] = $DataLeakFeed;
+                // $DataLeakFeed_send_mail[] = $DataLeakFeed;
 
                 $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
                 if (!empty($leak_socail_ref_temp)) {
@@ -2073,6 +2073,12 @@ class DataLeakController extends Controller
                     if ($site_id == 0) {
                         $site_id = $leak_socail_ref_temp->site_id;
                     }
+                    
+                    if(!isset($DataLeakFeed_send_mail[(string)$leak_socail_ref_temp->site_id])){
+                        $DataLeakFeed_send_mail[(string)$leak_socail_ref_temp->site_id] = [];
+                    }
+                    array_push($DataLeakFeed_send_mail[(string)$leak_socail_ref_temp->site_id], $DataLeakFeed);
+
 
                     $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakFeed->id)->first();
                     if($transaction_client_leak_feed){
@@ -2112,36 +2118,45 @@ class DataLeakController extends Controller
                 $DataLeakFeedTemp->save();
             }
         }
-
+        
         if ($this->request->sent_mail == 1) {
-            $site_email_alert = site_config_email_alert::where("site_id", $site_id)->get();
-            if ($site_email_alert) {
-                $email_site_a = [];
-                foreach ($site_email_alert as $site_email_alert_val) {
-                    $email_site_a[] = $site_email_alert_val->email;
-                }
-                $email_site_alert = array_unique($email_site_a);
-                foreach($email_site_alert as $email){
-                    Mail::to($email)->send(new CompromisedMail($DataLeakFeed_send_mail, 'data_leak'));
-                    if( count(Mail::failures()) == 0 ) {
-                        LogEmail::Create([
-                            'to' => $email,
-                            'status' => 'Success',
-                            'subject' => 'data_leak'
-                        ]);
+            foreach ($DataLeakFeed_send_mail as $key => $value) {
+                $site_email_alert = site_config_email_alert::where("site_id", $key)->get();
+                if ($site_email_alert) {
+                    $email_site_a = [];
+                    foreach ($site_email_alert as $site_email_alert_val) {
+                        $email_site_a[] = $site_email_alert_val->email;
                     }
-                }
-                if( count(Mail::failures()) > 0 ) {
-                    foreach(Mail::failures() as $email_address) {
-                        LogEmail::Create([
-                            'to' => $email_address,
-                            'status' => 'Fail',
-                            'subject' => 'data_leak'
-                        ]);
+                    $email_site_alert = array_unique($email_site_a);
+                    foreach($email_site_alert as $email){
+                        Mail::to($email)->send(new CompromisedMail($value, 'data_leak'));
+                        if( count(Mail::failures()) == 0 ) {
+                            LogEmail::Create([
+                                'to' => $email,
+                                'status' => 'Success',
+                                'subject' => 'data_leak'
+                            ]);
+                        }
+                    }
+                    if( count(Mail::failures()) > 0 ) {
+                        foreach(Mail::failures() as $email_address) {
+                            LogEmail::Create([
+                                'to' => $email_address,
+                                'status' => 'Fail',
+                                'subject' => 'data_leak'
+                            ]);
+                        }
                     }
                 }
             }
+
+            
+
+
+
         }
+
+
         if($request->site){
             $site = route('darkweb_datas.index',['id'=>$request->site]);
         }else{
