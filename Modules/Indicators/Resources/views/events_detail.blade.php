@@ -189,9 +189,7 @@
             <script>
                 $('.select2-option').select2();
 
-                {{--$('#table-attributes-template').DataTable();
-                $('#table-related-event').DataTable();--}}
-                count_view_event();
+
                 var pulse_id={!! json_encode($pulse_id) !!};
                 var total_page = 0;
                 var count_page = -1;
@@ -249,7 +247,7 @@
 
                 $(function() {
 
-                    load_table_pulse();
+
                 });
 
                 function load_table_attributes(){
@@ -265,59 +263,65 @@
                         destroy: true,
                         "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
                         ajax: {
+                            async:true,
                             url: '{!! route('indicators.events_attributes_table')!!}',
                             type: "POST",
                             data:function(d){
                                 d.pulse_id = pulse_id;
-                                d.count_page = count_page;                
+                                d.count_page = count_page;    
+                                d.total_record  =  "{{@$otx_events[0]['indicator_count']}}";         
                             },
-                        },
-                        initComplete : function( settings, json){
-                            count_page = json.recordsTotal;
-                            $('[data-toggle="tooltip"]').tooltip();
-                        },
-                        columns: [
+                            complete: function (data) {
+                             load_table_pulse();
+                         },
+                     },
+                     initComplete : function( settings, json){
+                        count_page = json.recordsTotal;
+                        $('[data-toggle="tooltip"]').tooltip();
+                    },
 
-                        {
-                            data: 'TYPE',
-                        },
-                        {
-                            data: 'AttributeName',
-                        },
-                        {
-                            data: 'ROLE',
-                        },
-                        {
-                            data: 'Date',
-                        },
-                        {
-                            data: 'Action',
-                        },
+                    columns: [
 
-                        ],
-                        columnDefs: [
-                        {
-                            targets: 1,
-                            render: function (data, type, row) {
-                                var inner = '';
-                                inner =  '<a href="'+row.Action+'">'+row.AttributeName+'</a>';
-                                return inner;
-                            }
+                    {
+                        data: 'type',
+                    },
+                    {
+                        data: 'indicator',
+                    },
+                    {
+                        data: 'role',
+                    },
+                    {
+                        data: 'transaction_date',
+                    },
+                    {
+                        data: 'indicator_id',
+                    },
 
-                        },
-
-                        {
-                            targets: 4,
-                            render: function (data, type, row) {
-                                var inner = '';
-                                inner =  '<a href="'+row.Action+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                                return inner;
-                            }
-
+                    ],
+                    columnDefs: [
+                    {
+                        targets: 1,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            inner =  '<a href="'+row.indicator_id+'">'+(row.indicator?row.indicator:"")+'</a>';
+                            return inner;
                         }
 
-                        ]
-                    });
+                    },
+
+                    {
+                        targets: 4,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            inner =  '<a href="'+"{{route('indicators.detail_indicator')}}?id="+row.indicator_id+'&type='+row.type+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                            return inner;
+                        }
+
+                    }
+
+                    ]
+                });
                 }
 
 
@@ -336,107 +340,108 @@
                         order: [[ 6, "desc" ]],
                         "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
                         ajax: {
-                            type: "POST",
-                            url: '{!! route('indicators.events_pulse_table')!!}',
-                            dataSrc: function ( json ) {
-                                count_page2 = json.recordsTotal;
-                                return json.data;
-                            },
-                            data:function(d){
-                                d.pulse_id = pulse_id;
-                                d.count_page = count_page2;
-                            }
+                         async:true,
+                         type: "POST",
+                         url: '{!! route('indicators.events_pulse_table')!!}',
+                         dataSrc: function ( json ) {
+                            count_page2 = json.recordsTotal;
+                            return json.data;
                         },
-                        initComplete : function( settings, json){
-                            datatable = json.cursor;
-                            $('[data-toggle="tooltip"]').tooltip();
-                        },
+                        data:function(d){
+                            d.pulse_id = pulse_id;
+                            d.count_page = count_page2;
+                        }
+                    },
+                    initComplete : function( settings, json){
+                        datatable = json.cursor;
+                        $('[data-toggle="tooltip"]').tooltip();
+                    },
 
-                        columns: [
+                    columns: [
 
-                        {
-                            data: 'No',
-                            orderable: false,
-                            searchable: false,
-                            sortable: false,
-                        },
-                        {
-                            data: 'name',
-                        },
-                        {
-                            data: 'groups',
-                        },
-                        {
-                            data: 'tags',
-                        },
-                        {
-                            data: 'public',
-                        },
-                        {
-                            data: 'is_modified',
-                        },
-                        {
-                            data: 'modified',
-                        },
-                        {
-                            data: 'attrCount',
-                        },
-                        {
-                            data: 'pulse_id',
-                            orderable: false,
-                            searchable: false,
-                            sortable: false,
-                        },
+                    {
+                        data: 'No',
+                        orderable: false,
+                        searchable: false,
+                        sortable: false,
+                    },
+                    {
+                        data: 'name',
+                    },
+                    {
+                        data: 'groups',
+                    },
+                    {
+                        data: 'tags',
+                    },
+                    {
+                        data: 'public',
+                    },
+                    {
+                        data: 'is_modified',
+                    },
+                    {
+                        data: 'modified',
+                    },
+                    {
+                        data: 'attrCount',
+                    },
+                    {
+                        data: 'pulse_id',
+                        orderable: false,
+                        searchable: false,
+                        sortable: false,
+                    },
 
-                        ],
-                        columnDefs: [
-                        {
-                            targets: 1,
-                            render: function (data, type, row) {
-                                var inner = '';
-                                inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
-                                return inner;
-                            }
-
-                        },
-                        {
-                            targets: 4,
-                            render: function (data, type, row) {
-                                var inner = '';
-                                if(row.public==1) {
-                                    inner = '<i class="fas fa-check"></i>';
-                                } else {
-                                    inner = '<i class="fas fa-times"></i>';
-                                }
-                                return inner;
-                            }
-
-                        },
-                        {
-                            targets: 5,
-                            render: function (data, type, row) {
-                                var inner = '';
-                                if(row.is_modified == true) {
-                                    inner = 'Modified';
-                                } else {
-                                    inner = 'Created';
-                                }
-                                return inner;
-                            }
-
-                        },
-                        {
-                            targets: 8,
-                            render: function (data, type, row) {
-                                var inner = '';
-                                inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                                return inner;
-                            }
-
+                    ],
+                    columnDefs: [
+                    {
+                        targets: 1,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                            return inner;
                         }
 
-                        ]
-                    });
+                    },
+                    {
+                        targets: 4,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            if(row.public==1) {
+                                inner = '<i class="fas fa-check"></i>';
+                            } else {
+                                inner = '<i class="fas fa-times"></i>';
+                            }
+                            return inner;
+                        }
+
+                    },
+                    {
+                        targets: 5,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            if(row.is_modified == true) {
+                                inner = 'Modified';
+                            } else {
+                                inner = 'Created';
+                            }
+                            return inner;
+                        }
+
+                    },
+                    {
+                        targets: 8,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                            return inner;
+                        }
+
+                    }
+
+                    ]
+                });
 
 }
 
