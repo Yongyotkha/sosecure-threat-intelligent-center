@@ -1474,23 +1474,22 @@ public function tableEvents(Request $request)
             //         'indicator_id' => $value->indicator_id
 
             //     ];
-            //     $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
+            //     $cursor_2 = $col_fx_otx_indicator_detail->findOne($query);
 
             //     //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
             //     // $view = '<a href="'.route('indicators.detail_indicator').
             //     //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
             //     //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
             //     $data[] = array( 
-            //         "TYPE"=>@$cursor_2['type'],
-            //         "AttributeName"=>@$cursor_2['indicator_name'],
-            //         "ROLE"=>@$value['role'],
-            //         "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
-            //         "Action"=>route('indicators.detail_indicator')."?id=".@$cursor_2['indicator_id'].
-            //         '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
-
+            //         "type"=>@$cursor_2['type'],
+            //         "indicator"=>@$cursor_2['indicator_name'],
+            //         "role"=>@$value['role'],
+            //         "updated_at"=>@$value['updated_at'],
+            //         "indicator_id"=>$value->indicator_id,
+            //         "transaction_date"=>'',
             //     );
 
-            // }
+            //  }
         //     foreach ($document_all as $key => $value) {
 
         //      $query = [
@@ -1509,79 +1508,79 @@ public function tableEvents(Request $request)
         //         '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
 
         //     );
-        // }
+         
 
-            $total_record = $cursor_count;
-            $total_count_filter = $count_filter;
+                $total_record = $cursor_count;
+                $total_count_filter = $count_filter;
 
 
-            $dataOut["draw"] = $_POST['draw'];
-            $dataOut["recordsTotal"] = $cursor_count;
-            $dataOut["recordsFiltered"] = $total_count_filter;
-            $dataOut["data"] = $document_all;
+                $dataOut["draw"] = $_POST['draw'];
+                $dataOut["recordsTotal"] = $cursor_count;
+                $dataOut["recordsFiltered"] = $total_count_filter;
+                $dataOut["data"] = $document_all;
                 //dd($dataOut);
-            return response()->json($dataOut);
-            if ($request->ajax()) {
                 return response()->json($dataOut);
-            }    
+                if ($request->ajax()) {
+                    return response()->json($dataOut);
+                }    
 
-        }else{
-            $ip = $this->ip;
-            $mac = $this->mac;
-            $authorization_key = $this->header;
-            $url_indicator_load_attributes_tb = $this->url_indicator_load_attributes_tb;
-
-            $draw = $request->draw;
-            $row = (int)$request->start;
-            $rowperpage = (int)$request->length;
-            $reqId = $request->pulse_id;
-            $count_page = $request->count_page;
-
-            $request_body_complete = [
-                'draw' => $draw,
-                'row' => $row,
-                'rowperpage' => $rowperpage,
-                'count_page' => $count_page,
-                'reqId' => $reqId,
-            ];
-
-            $body_complete = json_encode($request_body_complete);
-            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
-            $response_complete = $this -> reconnnect($url_indicator_load_attributes_tb, $form_body_complete, $authorization_key);
-
-            if($response_complete['status_code'] == "200"){
-                $dataOut = $response_complete['data'];
-                return response()->json($dataOut);
             }else{
-                return response()->json($response_complete);
+                $ip = $this->ip;
+                $mac = $this->mac;
+                $authorization_key = $this->header;
+                $url_indicator_load_attributes_tb = $this->url_indicator_load_attributes_tb;
+
+                $draw = $request->draw;
+                $row = (int)$request->start;
+                $rowperpage = (int)$request->length;
+                $reqId = $request->pulse_id;
+                $count_page = $request->count_page;
+
+                $request_body_complete = [
+                    'draw' => $draw,
+                    'row' => $row,
+                    'rowperpage' => $rowperpage,
+                    'count_page' => $count_page,
+                    'reqId' => $reqId,
+                ];
+
+                $body_complete = json_encode($request_body_complete);
+                $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
+                $response_complete = $this -> reconnnect($url_indicator_load_attributes_tb, $form_body_complete, $authorization_key);
+
+                if($response_complete['status_code'] == "200"){
+                    $dataOut = $response_complete['data'];
+                    return response()->json($dataOut);
+                }else{
+                    return response()->json($response_complete);
+                }
             }
         }
-    }
 
 
-    public function load_pulse_tb(Request $request){
-        $role_custom = @check_role_custom();
-        if(!$role_custom['indicators']) {
-            check_permission403();
-        }
-        if(TYPE_WEB == 'center'){
-            $draw = $_POST['draw'];
-            $row = (int)$_POST['start'];
-            $rowperpage = (int)$_POST['length'];
-            $start =  $row;
-            $reqId = $request->pulse_id;
+        public function load_pulse_tb(Request $request){
+            $role_custom = @check_role_custom();
+            if(!$role_custom['indicators']) {
+                check_permission403();
+            }
+            if(TYPE_WEB == 'center'){
+                $draw = $_POST['draw'];
+                $row = (int)$_POST['start'];
+                $rowperpage = (int)$_POST['length'];
+                $start =  $row;
+                $reqId = $request->pulse_id;
 
-            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-            $clientMD = new MongoClient($DB_MONGO_KEY);
-            $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY);
+                $html = '';
+                $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
 
-            $query = [
-                'main_pulse_id' => $reqId,
+                $query = [
+                    'main_pulse_id' => $reqId,
 
-            ];
+                ];
 
-            $options = [
+                $options = [
                 'skip' => $start,//10
                 'limit' => $rowperpage//5
             ];

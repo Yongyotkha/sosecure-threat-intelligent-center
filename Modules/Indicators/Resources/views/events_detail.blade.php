@@ -272,10 +272,10 @@
                                 d.total_record  =  "{{@$otx_events[0]['indicator_count']}}";         
                             },
                             complete: function (data) {
-                             load_table_pulse();
-                         },
-                     },
-                     initComplete : function( settings, json){
+                               load_table_pulse();
+                           },
+                       },
+                       initComplete : function( settings, json){
                         count_page = json.recordsTotal;
                         $('[data-toggle="tooltip"]').tooltip();
                     },
@@ -304,7 +304,7 @@
                         targets: 1,
                         render: function (data, type, row) {
                             var inner = '';
-                            inner =  '<a href="'+row.indicator_id+'">'+(row.indicator?row.indicator:"")+'</a>';
+                            inner =  '<a href="'+"{{route('indicators.detail_indicator')}}?id="+row.indicator_id+'&type='+row.type+'" >'+(row.indicator?row.indicator:"")+'</a>';
                             return inner;
                         }
 
@@ -314,11 +314,31 @@
                         targets: 4,
                         render: function (data, type, row) {
                             var inner = '';
+
                             inner =  '<a href="'+"{{route('indicators.detail_indicator')}}?id="+row.indicator_id+'&type='+row.type+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                             return inner;
                         }
 
+                    },
+                    {
+                        targets: 3,
+                        render: function (data, type, row) {
+                            var inner = '';
+                            var v = parseInt(row.updated_at.$date.$numberLong);
+                            var created_date =  new Date(v);
+                            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            var year = created_date.getFullYear();
+                            var month = created_date.getMonth();
+                            var date = created_date.getDate();
+                            var hour = created_date.getHours();
+                            var min = created_date.getMinutes();
+                            var sec = created_date.getSeconds();
+                            inner =  year + '-' + (month+1) + '-' + date + ' ' + hour + ':' + min;
+                            return inner;
+                        }
+
                     }
+
 
                     ]
                 });
@@ -340,10 +360,10 @@
                         order: [[ 6, "desc" ]],
                         "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
                         ajax: {
-                         async:true,
-                         type: "POST",
-                         url: '{!! route('indicators.events_pulse_table')!!}',
-                         dataSrc: function ( json ) {
+                           async:true,
+                           type: "POST",
+                           url: '{!! route('indicators.events_pulse_table')!!}',
+                           dataSrc: function ( json ) {
                             count_page2 = json.recordsTotal;
                             return json.data;
                         },
