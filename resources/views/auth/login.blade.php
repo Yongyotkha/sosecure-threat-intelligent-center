@@ -60,7 +60,7 @@
             </div>
             @endif --}}
             
-            {!! Form::open(['route' => 'login', 'class' => '']) !!}
+            {!! Form::open(['route' => 'login', 'class' => '','id' => 'form_login']) !!}
             <div class="login-body">
                 <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                     <label for="email">@langapp('email')</label>
@@ -138,4 +138,41 @@
         </a> --}}
     </div>
 </section>
+
+
+
+{{-- <script src="{{ getAsset('js/app.js') }}"></script> --}}
+<script>
+
+    document.querySelector('.formSaving').addEventListener('click', function() {
+        document.getElementById("form_login").submit();
+        myFunction();
+    });
+
+    function myFunction() {
+        const button = document.querySelector('.formSaving');
+        button.disabled = true;
+        button.innerHTML = 'Processing..<i class="fas fa-spin fa-spinner"></i>';
+        setTimeout(reTimeout, 8000);
+    }
+
+
+    function reTimeout() {
+        const button = document.querySelector('.formSaving');
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-sync"></i> @langapp('try_again')</span>';
+    }
+
+
+
+
+    {{--
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+    });
+    --}}
+</script>
+
+
+
 @endsection
