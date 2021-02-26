@@ -768,6 +768,7 @@ ul.item-list-dash li:not(:last-child){
     color: #fff;
     padding: .5rem 1rem;
     display: inline-block;
+    margin-bottom: 3px;
 }
 .badeg-news{
     background: #e0206f;

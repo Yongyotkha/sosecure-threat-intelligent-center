@@ -30,24 +30,30 @@
                 <div class="panel-heading font-bold panel-header-blue">
                     Filter
                 </div>
-                <div class="container-fluid" style="padding: 2rem;">
+                <div class="panel-body">
+                    <div class="container-fluid" style="padding: 0rem;">
+                        <div class="row">
+                            <div class="col-lg-8 col-md-12">
+                                <div class="form-group m-b-md">
+                                    <label for="" class="">Keyword</label>
+                                    <input type="text" class="form-control" name="keyword" id="keyword"
+                                        placeholder="Search">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-12">
+                                <label for="" class="">Date</label>
+                                <div id="groups_date" class="text-center"
+                                    style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                    <i class="fa fa-calendar"></i>&nbsp;
+                                    <span></span> <i class="fa fa-caret-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
                     <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group m-b-md">
-                                <label for="" class="">Keyword</label>
-                                <input type="text" class="form-control" name="keyword" id="keyword"
-                                    placeholder="Search">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="" class="">Date</label>
-                            <div id="groups_date" class="text-center"
-                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                <i class="fa fa-calendar"></i>&nbsp;
-                                <span></span> <i class="fa fa-caret-down"></i>
-                            </div>
-                        </div>
-                        <div class="col-md-12 text-right">
+                        <div class="col-lg-12 col-md-12 text-right">
                             <button class="btn btn-info" id="btn_search_data">
                                 <i class="fas fa-search btn-fz-13"></i>
                                 <span> @langapp('apply') </span>

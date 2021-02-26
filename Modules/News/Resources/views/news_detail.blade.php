@@ -5,7 +5,8 @@
     <section class="hbox stretch">
         <section class="vbox">
             {{-- Head --}}
-            <header class="header panel-heading bg-white b-b b-light">
+
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 @php
                 $url_back = '#';
                 if(@get_role_custom()['superadmin'] == 1) {
@@ -14,39 +15,49 @@
                     $url_back = site_url('/news_client');
                 }
                 @endphp
+                <div class="header-flex-overflow m-t-10">
+                    <div class="fwb-16">
+                        <a href="{{@$url_back}}"
+                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                        @icon('solid/arrow-left')</a>
+                        <span style="display:inline-block;margin-top:3px;">
+                            @langapp('news') > {{@$RSSNews->title_th}}
+                        </span>
+                    </div>
 
-                <a href="{{@$url_back}}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                    @icon('solid/arrow-left')
-                </a>
-                <div class="bc-head">@langapp('news') > {{@$RSSNews->title_th}}</div>
+                    <div class="ml-2 text-right">
 
-                @if($RSSNews_next)
-                <a href="{{route('news.news_detail_code',['code' => @$RSSNews_next->code])}}">
-                    <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
-                        <span><i class="fas fa-arrow-right"></i></span>
-                    </button>
-                </a>
-                @else
-                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
-                    <span><i class="fas fa-arrow-right"></i></span>
-                </button>
-                @endif
+                        @if($RSSNews_prev)
+                        <a href="{{route('news.news_detail_code',['code' => @$RSSNews_prev->code])}}"><button
+                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-arrow-left"></i></span>
+                            </button></a>
+                        @else
+                        <button class="btn btn-sm btn-{{ get_option('theme_color')  }}" disabled>
+                            <span><i class="fas fa-arrow-left"></i></span>
+                        </button>
+                        @endif
 
-                @if($RSSNews_prev)
-                <a href="{{route('news.news_detail_code',['code' => @$RSSNews_prev->code])}}"><button
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" style="margin-top: 10px;">
-                        <span><i class="fas fa-arrow-left"></i></span>
-                    </button></a>
-                @else
-                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" disabled>
-                    <span><i class="fas fa-arrow-left"></i></span>
-                </button>
-                @endif
-                <button class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" onclick="printDiv()">
-                    <span><i class="fas fa-print"></i></span>
-                </button>
+                        @if($RSSNews_next)
+                        <a href="{{route('news.news_detail_code',['code' => @$RSSNews_next->code])}}">
+                            <button class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                <span><i class="fas fa-arrow-right"></i></span>
+                            </button>
+                        </a>
+                        @else
+                        <button class="btn btn-sm btn-{{ get_option('theme_color')  }}" disabled>
+                            <span><i class="fas fa-arrow-right"></i></span>
+                        </button>
+                        @endif
+        
+               
+                        <button class="btn btn-sm btn-{{ get_option('theme_color')  }}" onclick="printDiv()">
+                            <span><i class="fas fa-print"></i></span>
+                        </button>
+                    </div>
+                </div>
             </header>
+
 
             <section class="scrollable wrapper">
                 <div class="section-jumborton">

@@ -7,40 +7,28 @@
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header bg-white b-b b-light">
-            @if ($indicator)
-            <a href="{{ route('indicators.detail_indicator').'?id='.$indicator_id.'&type='.$type.'&indicator='.$indicator }}"
-            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-            @icon('solid/arrow-left')
-        </a>
-        <div class="bc-head">{{@$indicator}} > {{@$otx_events[0]['name']}}</div>
-        @else
-        <a href="{{ route('indicators.events') }}"
-        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-        @icon('solid/arrow-left')
-    </a>
-    <div class="bc-head">Events > {{@$otx_events[0]['name']}}</div>
-    @endif
 
-
-
-
-
-            <!--<button id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                <span><i class="fas fa-filter"></i> @langapp('Search_Advance')</span>
-            </button>
-            <div class="pull-right" style="margin-top: 8px; width: 300px;">
-                <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 300px">
-                    <option value="">All Site</option>
-                    {{-- @if($SiteSettings)
-                    @foreach($SiteSettings as $SiteSettings_val)
-                    <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
-                    @endforeach
-                    @endif --}}
-                </select>
-            </div>-->
-
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                        @if ($indicator)
+                            <a href="{{ route('indicators.detail_indicator').'?id='.$indicator_id.'&type='.$type.'&indicator='.$indicator }}"
+                            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                            @icon('solid/arrow-left')
+                        </a>
+                          <span>{{@$indicator}} > {{@$otx_events[0]['name']}} </span>
+                        @else
+                            <a href="{{ route('indicators.events') }}"
+                            class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                            @icon('solid/arrow-left')
+                        </a>
+                         <span>Events > {{@$otx_events[0]['name']}} </span>
+                    @endif
+                </div>
+            </div>
         </header>
+
+
         <section class="scrollable wrapper">
             <section class="panel panel-default">
                 <div class="panel-heading">
