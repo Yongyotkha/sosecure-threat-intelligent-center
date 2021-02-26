@@ -854,19 +854,23 @@ class ApiCVEController extends ApiController
                         }else if(@$get_role_custom_first['client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }
 
                         if ($site) {
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                             $model = $model->where('data_datacve_mapping_assets.site_id',  $site);
                         }
@@ -900,24 +904,27 @@ class ApiCVEController extends ApiController
                         }else if(@$get_role_custom_first['client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }
 
                         if ($site) {
                             $site_id = $site;
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                             $model = $model->where('data_datacve_mapping_assets.site_id',  $site);
                         }
-
                         
 
                     }
@@ -1080,29 +1087,30 @@ class ApiCVEController extends ApiController
                     $date_end_time_time = date("H:i", strtotime($date_end_time));
                     $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
 
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+
                     if ($count == 1) {
                         $model = CVEMapping::select('data_datacve_mapping.*')->distinct();
                         $CVEMappingAssets_name = CVEMappingAssets::select('namecve');
                         $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.is_fix', '=', 1);
 
-                        $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
                             
                         }else if(@$get_role_custom_first['client'] == 1) {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                         }
 
-
+               
                         if ($site) {
                             $site_id = $site;
                             $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.site_id',$site_id);
@@ -1171,8 +1179,26 @@ class ApiCVEController extends ApiController
                         $CVEMappingAssets_name = CVEMappingAssets::select('namecve');
                         $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.is_fix', '=', 1);
 
+                        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                        if (@$get_role_custom_first['superadmin'] == 1) {
+                              
+                        } else if (@$get_role_custom_first['client'] == 1) {
+
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+
+                        } else if (@$get_role_custom_first['site_support'] == 1) {
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+
+                        } else if (@$get_role_custom_first['site_admin'] == 1) {
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+
+                        } else if (@$get_role_custom_first['site_client'] == 1) {
+                            $CVEMappingAssets_name = $CVEMappingAssets_name->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+
+                        }
+
                         if ($site) {        
-                            $site_id = $request->site;
+                            $site_id = $site;
                             $CVEMappingAssets_name = $CVEMappingAssets_name->where('data_datacve_mapping_assets.site_id',$site_id);
                         }
 
