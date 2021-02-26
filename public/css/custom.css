@@ -4108,3 +4108,87 @@ textarea.resize-none{
 .align-top{
     vertical-align: top !important;
 }
+
+.input-group-prepend {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.input-group {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    width: 100%;
+}
+
+/* .accordion-toggle:hover,.accordion-toggle:focus{
+    color: #eee !important;
+} */
+
+.badges-search{
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
+    border-radius: 5px;
+    display: flex;
+    min-width: 70px;
+    height: 50px;
+    padding: 0 1rem;
+    user-select: none;
+}
+.badges-search.badges-indicator{
+    background: transparent;
+    color: #263042;
+    border: 1px solid #263042;
+}
+.badges-search.badges-event{
+    background: transparent;
+    color: #53ad66;
+    border: 1px solid #53ad66;
+}
+.badges-search.badges-news{
+    background: transparent;
+    color: #d8513c;
+    border: 1px solid #d8513c;
+}
+.badges-search.badges-webdefacement{
+    background: transparent;
+    color: #d8c13c;
+    border: 1px solid #d8c13c;
+}
+.badges-search.badges-vul{
+    background: transparent;
+    color: #ac3cd8;
+    border: 1px solid #ac3cd8;
+}
+.badges-search.badges-compro{
+    background: transparent;
+    color: #159c91;
+    border: 1px solid #159c91;
+}
+.badges-search.badges-dataleak{
+    background: transparent;
+    color: #d83c9c;
+    border: 1px solid #d83c9c;
+}
+.badges-search.badges-other{
+    background: transparent;
+    color: #384122;
+    border: 1px solid #384122;
+}
+
+.notfound{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    flex-direction: column;
+}

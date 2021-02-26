@@ -60,7 +60,7 @@
             </div>
             @endif --}}
             
-            {!! Form::open(['route' => 'login', 'class' => '','id' => 'form_login']) !!}
+            {!! Form::open(['route' => 'login', 'class' => 'm-0','id' => 'form_login']) !!}
             <div class="login-body">
                 <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                     <label for="email">@langapp('email')</label>

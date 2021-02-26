@@ -4,6 +4,9 @@
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('search_results_for_tag',['keyword' => $keyword])</div>
+            <span class="pull-right" style="margin-top: 1.2rem;font-size: 16px;font-weight: bold;">
+                Total Result : 0
+            </span>
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
             <div class="panel-group m-b" id="accordion2">
@@ -30,7 +33,7 @@
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
                                 <li class="panel panel-default">
-                                    <div class="panel-heading">
+                                    <div class="panel-heading fontw-weight-bold d-none">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
                                             @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
                                         </a>
@@ -39,6 +42,55 @@
 
                                         @foreach ($value["queryData"] as $key2 => $value2)
                                             <div class="panel-body clause">
+                                                @if ($key == "News")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-news">
+                                                        News
+                                                    </span>
+                                                </div>
+                                                @elseif ($key == "Events")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-event">
+                                                        Event
+                                                    </span>
+                                                </div>
+                                                @elseif ($key == "indicators")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-indicator">
+                                                        Indicator
+                                                    </span>
+                                                </div>
+                                                @elseif ($key == "Web Defacement")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-deface">
+                                                        Web Defacement
+                                                    </span>
+                                                </div>
+                                                @elseif ($key == "Vulnerabilities")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-vul">
+                                                        Vulnerabilities
+                                                    </span>
+                                                </div>
+                                                @elseif ($key == "Compromised")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-compro">
+                                                        Compromised
+                                                    </span>
+                                                </div>
+                                                @elseif ($key == "Data Leak")
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-dataleak">
+                                                        Data Leak
+                                                    </span>
+                                                </div>
+                                                @else
+                                                <div class="pull-left m-r-xs">
+                                                    <span class="badges-search badges-other">
+                                                        Other
+                                                    </span>
+                                                </div>
+                                                @endif
                                                 <a href="{{$value2["link"]}}" target="_blank">
                                                     {{$value2["name"]}}
                                                 </a>
@@ -68,7 +120,11 @@
                             @endif
                         @endforeach
                     @else
-                        Notfound
+                        <div class="notfound">
+                            <img src="{{asset('images/notfound.png')}}" alt="">
+                            <h1>Sorry. no result found</h1>
+                            <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
+                        </div>
                     @endif
                     {{-- @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
                     <li class="panel panel-default" id="clause-{{ $clause->id }}">
