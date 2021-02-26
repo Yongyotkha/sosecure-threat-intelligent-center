@@ -854,19 +854,23 @@ class ApiCVEController extends ApiController
                         }else if(@$get_role_custom_first['client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }
 
                         if ($site) {
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->select('namecve')->get();
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
                             $model = $model->where('data_datacve_mapping_assets.site_id',  $site);
                         }
@@ -900,15 +904,19 @@ class ApiCVEController extends ApiController
                         }else if(@$get_role_custom_first['client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_support'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }else if(@$get_role_custom_first['site_client'] == 1) {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
                             $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            $model = $model->whereIn('data_datacve_mapping_assets.site_id',  $site_id_arr);
                         }
 
                         if ($site) {
