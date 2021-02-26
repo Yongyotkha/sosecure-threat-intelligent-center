@@ -44,9 +44,7 @@
                     </li>
                     @if (Auth::check())
                         <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
-                            <a href="{{route('dashboardnew.index')}}"><button type="button" class="btn btn-outline-secondary px-4">Dashboard</button></a>
-                        </li>
-                        <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
+                            <a href="{{route('dashboardnew.index')}}"><button type="button" class="btn btn-outline-secondary px-4 mr-2">Dashboard</button></a>
                             <a href="{{route('logout')}}"><button type="button" class="btn btn-outline-secondary px-4">Logout</button></a>
                         </li>
                     @else
