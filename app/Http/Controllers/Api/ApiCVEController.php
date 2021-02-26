@@ -474,7 +474,7 @@ class ApiCVEController extends ApiController
                     }
                     $get_role_custom_first = $data['data']['get_role_custom_first'];
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
-                    $response['page'] = langapp('monitoring_vulnerabilitys');
+                    $response['page'] = langapp('vulnerabilitys');
 
                     $response['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
                     $response['count_CVEMapping'] = CVEMapping::count();
@@ -483,19 +483,19 @@ class ApiCVEController extends ApiController
                     $SiteSettings = @$get_role_custom_first['SiteSettings'];
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
-                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->select('title')->distinct()->orderBy('title')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->select('vendor','title','version','edition','IP')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['client'] == 1) {
                         $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('vendor','title','version','edition','IP')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['site_support'] == 1) {
                         $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('vendor','title','version','edition','IP')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['site_admin'] == 1) {
                         $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('vendor','title','version','edition','IP')->distinct()->orderBy('title')->get();
                     }else if(@$get_role_custom_first['site_client'] == 1) {
                         $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('title')->distinct()->orderBy('title')->get();
+                        $response['cve_assets'] = CVEAssets::where("active", '=', 1)->whereIn('site_id',$site_id_arr)->select('vendor','title','version','edition','IP')->distinct()->orderBy('title')->get();
                     }
             
                  $response['site_settings'] = $SiteSettings;
@@ -574,7 +574,7 @@ class ApiCVEController extends ApiController
                     }
 
 
-                    $response['page'] = langapp('monitoring_vulnerabilitys');
+                    $response['page'] = langapp('vulnerabilitys');
                     $response['count_CVEAssets'] = $model_count_CVEAssets->count();
                     $response['count_CVEMapping'] = $model_count_CVEMapping->count();
                     $response['count_isFix'] = $model_count_isFix->count().'/'.$model_count_isFix_all->count();
@@ -1287,10 +1287,10 @@ class ApiCVEController extends ApiController
                     $id = $data['data']['id'];
                     $active = $data['data']['active'];
 
-                    $data = CVEMappingAssets::where("id", $id)->first();
+                    $CVEMappingAssets = CVEMappingAssets::where("id", $id)->first();
                         // dd($data);
-                    $data->is_fix = $active;
-                    $data->save();
+                    $CVEMappingAssets->is_fix = $active;
+                    $CVEMappingAssets->save();
 
                     $response = [
                         "data" => 'success',
@@ -1392,7 +1392,7 @@ class ApiCVEController extends ApiController
     
                     $code = $data['data']['code'];
                     $cve_asset = CVEAssets::where('active',1)->where('code',$code)->with('get_site')->first();
-                    $page = langapp('monitoring_vulnerabilitys');
+                    $page = langapp('vulnerabilitys');
 
                     $response = [
                         "cve_asset" => $cve_asset,
