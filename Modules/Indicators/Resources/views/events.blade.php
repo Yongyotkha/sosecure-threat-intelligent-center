@@ -125,9 +125,9 @@
 
         <div class="container-fluid" style="margin-bottom:10px;">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-lg-4">
                     <div class="row">
-                        <div class="col-md-12 nopadding">
+                        <div class="col-lg-12 nopadding">
                             <div class="card-ev">
                                 <div class="header-ev">
                                     Events
@@ -144,7 +144,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 nopadding">
+                        <div class="col-lg-12 nopadding">
                             <div class="card-ev">
                                 <div class="header-ev">
                                     Attribute
@@ -164,7 +164,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-8 nopadding">
+                <div class="col-lg-8 nopadding">
                     <div class="" style="background: #fff">
                         <span class="header-txt-chart">Top 10 Attribute Type</span>
                         <div id="chart-pack" style="height: 251px"></div>

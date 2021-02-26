@@ -26,8 +26,8 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-lg-4 control-label">&nbsp;</label>
-                <div class="col-lg-8">
+                <label class="col-lg-4 control-label d-md-none">&nbsp;</label>
+                <div class="col-lg-12">
                     <button class="btn btn-info mb-2" type="button" id="ch_pass" data-val="0" data-toggle="collapse" data-target="#collapse_ch_pass" aria-expanded="false" aria-controls="collapse_ch_pass">
                         Edit Password
                     </button>

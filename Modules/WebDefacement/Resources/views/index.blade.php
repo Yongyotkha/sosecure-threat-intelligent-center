@@ -189,125 +189,127 @@
                 'POST']) !!}
                 <input type="hidden" name="mode" id="mode" value="create">
                 <div class="modal-body">
-                    <div id="site_id_show" class="form-group row">
-                        <label class="col-lg-3 control-label"> Site <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                            <select name="site_id" id="site_id" class="select2-option form-control" onchange="get_site(this)">
-                                <option value="">Select</option>
-                                @foreach ($SiteSettings_add as $SiteSetting)
-                                <option value="{{$SiteSetting->id}}">{{$SiteSetting->name}} </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label"> Name <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                            <input type="text" class="form-control" name="name_web" id="name_web" value="" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                            <input type="text" class="form-control" name="url_web" id="url_web" value="" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="port_web" id="port_web" value="80"
-                                    required>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-info" onclick="get_check_site()">Check</button>
-                                </span>
+                    <div class="container-fluid">
+                        <div id="site_id_show" class="form-group row">
+                            <label class="col-lg-3 control-label"> Site <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
+                                <select name="site_id" id="site_id" class="select2-option form-control" onchange="get_site(this)">
+                                    <option value="">Select</option>
+                                    @foreach ($SiteSettings_add as $SiteSetting)
+                                    <option value="{{$SiteSetting->id}}">{{$SiteSetting->name}} </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div id="area_check_message_row" class="form-group row" style="display: none;"><label
-                            class="col-lg-3 control-label"> </label>
-                        <div class="col-lg-9">
-                            <div id="area_check_message"></div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 control-label"> Name <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" name="name_web" id="name_web" value="" required>
+                            </div>
                         </div>
-                    </div>
-
-                    <div id="area_option" class="form-group row" style="display: none;">
-                        <label class="col-lg-3 control-label">Options</label>
-                        <div class="col-sm-9">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="hash" id="hash" value="true">
-                                    <span class="label-text">
-                                        Hash
+                        <div class="form-group row">
+                            <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" name="url_web" id="url_web" value="" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="port_web" id="port_web" value="80"
+                                        required>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-info" onclick="get_check_site()">Check</button>
                                     </span>
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="file_size" id="file_size" value="true">
-                                    <span class="label-text">
-                                        Filesize
-                                    </span>
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="element" id="element" value="true">
-                                    <span class="label-text">
-                                        Element
-                                    </span>
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="blacklist" id="blacklist" value="true">
-                                    <span class="label-text">
-                                        Blacklist Keyword
-                                    </span>
-                                </label>
-                            </div>
-                            <div id="example-blacklist" style="display: none">
-                                <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5"
-                                    class="form-control" placeholder="Ex: hacking,hacked,decript"></textarea>
-                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="delay_screen_shot" id="delay_screen_shot" value="true">
-                                    <span class="label-text">
-                                        Check image
-                                        {{-- Delay Screenshot --}}
-                                    </span>
-                                </label>
-                            </div>
-                            <div id="delay_screen_shot_val_div" style="display: none">
-                                Delay Screenshot <input type="text" name="delay_screenshot_val"
-                                    id="delay_screenshot_val" value="2000"> milliseconds
-                                <button type="button" class="btn btn-info" id="btn_screenshot">screen shot</button>
-                                {{-- <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
-                                <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span> --}}
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group row area_image_screen" style="display: none;">
-                        <label class="col-lg-3 control-label">&nbsp;</label>
-                        <div class="col-lg-9 review_image_screenshot" style="display: none;">
-                            <div class="review-image-capture">
-                                {{-- <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" > --}}
-
-                            </div>
-                            <div id="link_edit_image_screenshot" class="edit-capture text-center">
-                                {{-- <a href="{{route('webdefacement_website.edit_image',['site_id' => @$siteSettings->id])}}"
-                                target="_blank">
-                                Edit Image
-                                </a> --}}
+    
+                        <div id="area_check_message_row" class="form-group row" style="display: none;"><label
+                                class="col-lg-3 control-label"> </label>
+                            <div class="col-lg-9">
+                                <div id="area_check_message"></div>
                             </div>
                         </div>
+    
+                        <div id="area_option" class="form-group row" style="display: none;">
+                            <label class="col-lg-3 control-label">Options</label>
+                            <div class="col-sm-9">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="hash" id="hash" value="true">
+                                        <span class="label-text">
+                                            Hash
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="file_size" id="file_size" value="true">
+                                        <span class="label-text">
+                                            Filesize
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="element" id="element" value="true">
+                                        <span class="label-text">
+                                            Element
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="blacklist" id="blacklist" value="true">
+                                        <span class="label-text">
+                                            Blacklist Keyword
+                                        </span>
+                                    </label>
+                                </div>
+                                <div id="example-blacklist" style="display: none">
+                                    <textarea name="blacklist_text" id="blacklist_text" cols="10" rows="5"
+                                        class="form-control" placeholder="Ex: hacking,hacked,decript"></textarea>
+                                    <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="delay_screen_shot" id="delay_screen_shot" value="true">
+                                        <span class="label-text">
+                                            Check image
+                                            {{-- Delay Screenshot --}}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div id="delay_screen_shot_val_div" style="display: none">
+                                    Delay Screenshot <input type="text" name="delay_screenshot_val"
+                                        id="delay_screenshot_val" value="2000"> milliseconds
+                                    <button type="button" class="btn btn-info" id="btn_screenshot">screen shot</button>
+                                    {{-- <textarea name="blacklist_text" id="blacklist_text2" cols="10" rows="5" class="form-control"></textarea>
+                                    <strong style="margin-top: 10px">Example </strong> <span>hecker,hacker</span> --}}
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="form-group row area_image_screen" style="display: none;">
+                            <label class="col-lg-3 control-label">&nbsp;</label>
+                            <div class="col-lg-9 review_image_screenshot" style="display: none;">
+                                <div class="review-image-capture">
+                                    {{-- <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" > --}}
+    
+                                </div>
+                                <div id="link_edit_image_screenshot" class="edit-capture text-center">
+                                    {{-- <a href="{{route('webdefacement_website.edit_image',['site_id' => @$siteSettings->id])}}"
+                                    target="_blank">
+                                    Edit Image
+                                    </a> --}}
+                                </div>
+                            </div>
+                        </div>
+    
+                        <input type="hidden" name="site" id="site">
                     </div>
-
-                    <input type="hidden" name="site" id="site">
 
                 </div>
                 <div class="modal-footer">

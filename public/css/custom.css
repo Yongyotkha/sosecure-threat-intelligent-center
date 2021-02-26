@@ -3313,7 +3313,7 @@ input.input-login:focus {
     .name-dash-text{
         font-size: 15px !important;
     }
-    .bc-head {
+    /* .bc-head {
         font-size: 16px;
         color: #333;
         margin-top: 13px;
@@ -3323,6 +3323,9 @@ input.input-login:focus {
         max-width: 500px;
         overflow: hidden;
         text-overflow: ellipsis;
+    } */
+    .d-md-none{
+        display: none !important;
     }
 }
 
@@ -4039,15 +4042,16 @@ textarea.resize-none{
     .item-fillter-social li{
         width: 50%;
     }
+    .add-assets-new{
+        margin-top: 1rem;
+        margin-left: 1.5rem;
+    }
 }
 @media screen and (max-width:768px){
     .item-fillter-social li{
         width: 50%;
     }
-    .add-assets-new{
-        margin-top: 1rem;
-        margin-left: 1.5rem;
-    }
+  
 }
 
 .nopadding {
@@ -4109,13 +4113,13 @@ textarea.resize-none{
     vertical-align: top !important;
 }
 
-.input-group-prepend {
+.input-group-prepend-custom {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
 }
 
-.input-group {
+.input-group-custom {
     position: relative;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -4191,4 +4195,13 @@ textarea.resize-none{
     width: 100%;
     text-align: center;
     flex-direction: column;
+}
+
+@media screen and (max-width:1198px){
+    .mb-small-5px{
+        margin-bottom: 10px !important;
+    }
+    .mb--5px{
+        margin-bottom: 10px !important;
+    }
 }

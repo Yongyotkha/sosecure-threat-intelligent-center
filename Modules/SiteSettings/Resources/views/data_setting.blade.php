@@ -201,7 +201,7 @@
                                 </div>
                                 <hr>
 
-                                <div class="row text-right">
+                                <div class="row">
                                         <label class="col-lg-3 control-label m-b-12">Syslog Server Log</label>
                                 </div>
                              

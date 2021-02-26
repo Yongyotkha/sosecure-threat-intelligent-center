@@ -55,9 +55,9 @@
                             <span class="input-group-btn icon-search">
                                 <i class="fas fa-search"></i>
                             </span>
-                            <div class="input-group">
+                            <div class="input-group-custom">
                                 <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;margin-left: 1rem;">
-                                <div class="input-group-prepend">
+                                <div class="input-group-prepend-custom">
                                    <button class="btn btn-dark">Search</button>
                                 </div>
                             </div>

@@ -33,7 +33,7 @@
                                     <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                                         <div class="row">
                                             @if($role_custom['assets'])
-                                                <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
+                                                <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px ">
                                                     {{-- <a href="#" data-toggle="modal" data-target="#modal_asset">
                                                         <div class="card-dash">
                                                             <div class="left-card">
@@ -207,10 +207,10 @@
             <section class="panel panel-default" style="margin-top: 5rem">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
-                        <div class="col-md-6 col-xs-12 m-b-xs-5">
+                        <div class="col-md-4 col-lg-6 col-xs-12 m-b-xs-5">
                             <i class="fas fa-table"></i> Table Activities
                         </div>
-                        <div class="col-md-6 col-xs-12 text-right">
+                        <div class="col-md-8 col-lg-6 col-xs-12 text-right">
                             <div class="d-flex align-items-center" style="justify-content: flex-end;">
                                 <div id="date-rang" class="date-style">
                                     <i class="fa fa-calendar"></i>&nbsp;
