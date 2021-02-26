@@ -407,7 +407,7 @@ if($model_has_roles) {
                             </a>
                         </li>
 
-                        <li class="{{ $page === langapp('monitoring_vulnerabilitys') ? 'active' : '' }}">
+                        <li class="{{ $page === langapp('vulnerabilitys') ? 'active' : '' }}">
                             <a href="{{ route('monitoringvulnerabilitys.index') }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
                                 <span> @langapp('vulnerabilitys') </span>
