@@ -228,11 +228,31 @@
                                         <button id="all" class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey" value="social">
+                                        <button class="btn btn-grey btn-social-click" value="social">
                                             <span> Public </span>
                                         </button>
                                         <button class="btn btn-grey" value="darkweb_public">
                                             <span> Darkweb </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 hide-social" style="display: none">
+                                    <h5 class="font-weight-bold">Social</h5>
+                                    <div id="groupby-social" class="btn-group special">
+                                        <button id="all" class="btn btn-selector active" value="">
+                                            <span> Mobile App</span>
+                                        </button>
+                                        <button class="btn btn-selector" value="">
+                                            <span> Facebook </span>
+                                        </button>
+                                        <button class="btn btn-selector" value="">
+                                            <span> Twitter </span>
+                                        </button>
+                                        <button class="btn btn-selector" value="">
+                                            <span> Website </span>
+                                        </button>
+                                        <button class="btn btn-selector" value="">
+                                            <span> Other </span>
                                         </button>
                                     </div>
                                 </div>
@@ -511,6 +531,15 @@ var click_key = null;
 
 {{--active_btn('#fillter_click_keyword .btn-selector');--}}
 active_btn('#groupby-type .btn-grey');
+active_btn('#groupby-social .btn-selector');
+
+$('.btn').click(function(){
+    if($('.btn-social-click').hasClass('active')){
+        $('.hide-social').show();
+    }else{
+        $('.hide-social').hide();
+    }
+});
 
     var admin = '{{$admin}}';
         var visible_c = '';

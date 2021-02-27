@@ -135,6 +135,45 @@
                         </div>
                     </div>
                 </section>
+
+                <section class="m-b-10">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 mb-small-5px">
+                                    <div class="loadhost backdrop-loader">
+                                        <div class="loader4 centerloader"></div>
+                                        <div class="loadding-text">Loading ...</div>
+                                    </div>
+                                    <div class="box-chart-color bg-white">
+                                        <div class="d-flex align-items-center header-chart-p">
+                                            <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                            <h1 class="text-blue bold-500">Top 10 Source</h1>
+                                        </div>
+                                        <div class="divider-dark"></div>
+                                        <div id="chart-top-source" class="h-chart"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 mb-small-5px">
+                                    <div class="category backdrop-loader">
+                                        <div class="loader4 centerloader"></div>
+                                        <div class="loadding-text">Loading ...</div>
+                                    </div>
+                                    <div class="box-chart-color bg-white">
+                                        <div class="d-flex align-items-center header-chart-p">
+                                            <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
+                                            <h1 class="text-blue bold-500">Top 10 Categories</h1>
+                                        </div>
+                                        <div class="divider-dark"></div>
+                                        <div id="chart-top-category" class="h-chart"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
@@ -207,6 +246,7 @@
     @include('stacks.css.datatables')
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
+    @include('stacks.css.highchart')
     <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
@@ -217,6 +257,7 @@
 @include('stacks.js.form')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
+@include('stacks.js.highchart')
 
 <script>
 
@@ -547,9 +588,6 @@
     page_stop = true;
     load_more_search(page,f_search);
     }
-
-
-
 
 </script>
 @endpush
