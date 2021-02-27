@@ -43,6 +43,7 @@
                                 </select>
                             </div>
     
+
                             @if(!empty(get_role_custom()))
                             {{-- // var_dump(get_role_custom()['superadmin']);
                                 // var_dump(get_role_custom()['site_admin']); --}}
@@ -56,6 +57,17 @@
                                         <span class="hide-text">@langapp('add')</span>
                                     </a>
                                     
+                                @endif
+                            @endif
+
+                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                            </a>
+
+                            @if(!empty(get_role_custom()))
+
+                                @if(TYPE_WEB == 'center')
+
                                     <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger"
                                         value="bulk-delete" disabled>
                                         <span data-rel="tooltip" title="Delete" data-placement="bottom">
@@ -66,11 +78,10 @@
                                 @endif
                             @endif
 
+
                   
     
-                            <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                            </a>
+                          
 
                         </div>
                     </div>
@@ -239,19 +250,19 @@
                                 <div class="col-lg-4 hide-social" style="display: none">
                                     <h5 class="font-weight-bold">Social</h5>
                                     <div id="groupby-social" class="btn-group special">
-                                        <button id="all" class="btn btn-selector active" value="">
+                                        <button id="all" class="btn btn-grey active" value="">
                                             <span> Mobile App</span>
                                         </button>
-                                        <button class="btn btn-selector" value="">
+                                        <button class="btn btn-grey" value="">
                                             <span> Facebook </span>
                                         </button>
-                                        <button class="btn btn-selector" value="">
+                                        <button class="btn btn-grey" value="">
                                             <span> Twitter </span>
                                         </button>
-                                        <button class="btn btn-selector" value="">
+                                        <button class="btn btn-grey" value="">
                                             <span> Website </span>
                                         </button>
-                                        <button class="btn btn-selector" value="">
+                                        <button class="btn btn-grey" value="">
                                             <span> Other </span>
                                         </button>
                                     </div>
@@ -531,7 +542,7 @@ var click_key = null;
 
 {{--active_btn('#fillter_click_keyword .btn-selector');--}}
 active_btn('#groupby-type .btn-grey');
-active_btn('#groupby-social .btn-selector');
+active_btn('#groupby-social .btn btn-grey');
 
 $('.btn').click(function(){
     if($('.btn-social-click').hasClass('active')){
