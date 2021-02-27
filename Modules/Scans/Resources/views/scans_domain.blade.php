@@ -3,110 +3,118 @@
 <section id="content" class="bg">
     <section class="hbox stretch">
         <section class="vbox">
-            <header class="header bg-white b-b b-light head-d-flex-nowrap" style="white-space: nowrap;">
-                <div class="bc-head m-none" style="width:100%;">
-                    <a href="javascript:history.back()" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
-                        @icon('solid/arrow-left')
-                    </a>
-                     Site Setting > {{ $site -> get_site -> name }} | Scan Domain : {{ $site -> get_domain -> domain }}
-                </div>
-                @if($tab == 'datatype' )
-                    <div class="button-control pull-right">
-                        
-                        <div class="btn-group">
-                            <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset</button>
-                        </div>
-                        <div class="btn-group">
-                            <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></a>
-                        </div>
-                        <div class="btn-group d-none">
-                            <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-left">
-                                <li>
-                                    <a href="#">
-                                        Internet Name
-                                    </a>
-                                </li>   
-                                {{-- <li>
-                                    <a href="#">
-                                        Affiliate - Internet Name
-                                    </a>
-                                </li>   
-                                <li>
-                                    <a href="#">
-                                        Affiliate - Domain Name
-                                    </a>
-                                </li>    --}}
-                                <li>
-                                    <a href="#">
-                                        Domain Name
-                                    </a>
-                                </li>  
-                                <li>
-                                    <a href="#">
-                                        IP Address
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        IPv6 Address
-                                    </a>
-                                </li>
-                                {{-- <li>
-                                    <a href="#">
-                                        Malicious Internet Name
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Human Name
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Internet Name
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Email Address
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Domain Name (Parent)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Phone Number
-                                    </a>
-                                </li> --}}
-                            </ul>
-                        </div>
-                    </div>
-                @endif
-                @if($tab == 'asset' )
-                <div class="button-control pull-right">
-                    <div class="btn-group">
-                        <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Assets To Use</button>
-                    </div>
-                    <div class="btn-group">
-                        <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></a>
-                    </div>
-                    <div class="btn-group">
-                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
-                            <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt') @langapp('delete')</span>
-                        </button>
+
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow m-t-7">
+                    <div class="fwb-16">
+                        <a href="javascript:history.back()" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                            @icon('solid/arrow-left')
+                        </a>
+                        <span>
+                            Site Setting > {{ $site -> get_site -> name }} | Scan Domain : {{ $site -> get_domain -> domain }}
+                        </span>
                     </div>
 
+                    <div class="ml-2 text-right">
+                            @if($tab == 'datatype' )
+                            <div class="button-control pull-right">
+                                
+                                <div class="btn-group">
+                                    <button data-target="#asset_to_use" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use" disabled="disabled"> Asset</button>
+                                </div>
+                                <div class="btn-group">
+                                    <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></a>
+                                </div>
+                                <div class="btn-group d-none">
+                                    <button class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" data-toggle="dropdown">Group By
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-left">
+                                        <li>
+                                            <a href="#">
+                                                Internet Name
+                                            </a>
+                                        </li>   
+                                        {{-- <li>
+                                            <a href="#">
+                                                Affiliate - Internet Name
+                                            </a>
+                                        </li>   
+                                        <li>
+                                            <a href="#">
+                                                Affiliate - Domain Name
+                                            </a>
+                                        </li>    --}}
+                                        <li>
+                                            <a href="#">
+                                                Domain Name
+                                            </a>
+                                        </li>  
+                                        <li>
+                                            <a href="#">
+                                                IP Address
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                IPv6 Address
+                                            </a>
+                                        </li>
+                                        {{-- <li>
+                                            <a href="#">
+                                                Malicious Internet Name
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                Human Name
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                Internet Name
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                Email Address
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                Domain Name (Parent)
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                Phone Number
+                                            </a>
+                                        </li> --}}
+                                    </ul>
+                                </div>
+                            </div>
+                        @endif
+                        @if($tab == 'asset' )
+                        <div class="button-control pull-right">
+                            <div class="btn-group">
+                                <button data-target="#asset_to_use_manual" data-toggle="modal" class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="asset-to-use-manual">Add Assets To Use</button>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle" id="fillter-advance" href="#advance-search"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></a>
+                            </div>
+                            <div class="btn-group">
+                                <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
+                                    <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt') @langapp('delete')</span>
+                                </button>
+                            </div>
+        
+                        </div>
+                        @endif
+                        &nbsp;
+                    </div>
                 </div>
-                @endif
-                &nbsp;
-
             </header>
+
             <section class="scrollable wrapper" style="padding:0;">
                 <div class="sub-tab text-uc small m-b-sm">
 

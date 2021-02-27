@@ -14,25 +14,30 @@
         </aside>
     
         <section class="vbox">
-            <header class="header panel-heading bg-white b-b b-light">
-                {{-- <a href="" class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
-                @icon('solid/arrow-left')
-                </a> --}}
-                <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
-                <div class="bc-head">Site Setting &gt; @langapp('assets')</div>
 
-                <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" style="display:none;" disabled>
-                    <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span></span>
-                </button>
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow m-t-7">
+                    <div class="fwb-16">
+                        <span>
+                            Site Setting &gt; @langapp('assets')
+                        </span>
+                    </div>
 
-                <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
-                    <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-                </a>
-
-                <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="modal"
-                    data-target="#asset_to_use_manual" id="asset-to-use-manual">
-                    @icon('solid/plus') @langapp('create')
-                </a>
+                    <div class="ml-2 text-right">
+                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete" style="display:none;" disabled>
+                            <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt') <span class="hide-text">@langapp('delete')</span></span>
+                        </button>
+        
+                        <a id="advance-search" href="#hide-fillter" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
+        
+                        <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }}" data-toggle="modal"
+                            data-target="#asset_to_use_manual" id="asset-to-use-manual">
+                            @icon('solid/plus') @langapp('create')
+                        </a>
+                    </div>
+                </div>
             </header>
 
             <section class="scrollable wrapper">

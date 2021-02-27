@@ -9,6 +9,25 @@
             </span>
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
+
+            <section class="panel panel-default m-b-xs">
+                <div class="panel-body" id="table-container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="fillter_click" class="button-group">
+                                <button class="btn btn-selector active">All</button>
+                                <button class="btn btn-selector">News</button>
+                                <button class="btn btn-selector">Event</button>
+                                <button class="btn btn-selector">Compromised</button>
+                                <button class="btn btn-selector">Vulnerabilities</button>
+                                <button class="btn btn-selector">Indicators</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
 
@@ -121,7 +140,7 @@
                         @endforeach
                     @else
                         <div class="notfound">
-                            <img src="{{asset('images/notfound.png')}}" alt="">
+                            <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
                             <h1>Sorry. no result found</h1>
                             <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
                         </div>
@@ -147,7 +166,12 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 @push('pagestyle')
-
+@endpush
+@push('pagescript')
+@include('stacks.js.activebutton')
+<script>
+    active_btn('#fillter_click .btn-selector');
+</script>
 @endpush
 @endsection
 

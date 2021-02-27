@@ -171,6 +171,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </section>
 
@@ -200,6 +201,73 @@
                                         </div>
                                         <div class="content-news-text">
                                             <a href="{{route('news.news_detail')}}">
+
+                </section>
+
+                <section class="m-b-10">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 mb-small-5px">
+                                    <div class="loadhost backdrop-loader">
+                                        <div class="loader4 centerloader"></div>
+                                        <div class="loadding-text">Loading ...</div>
+                                    </div>
+                                    <div class="box-chart-color bg-white">
+                                        <div class="d-flex align-items-center header-chart-p">
+                                            <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                            <h1 class="text-blue bold-500">Top 10 Source</h1>
+                                        </div>
+                                        <div class="divider-dark"></div>
+                                        <div id="chart-top-source" class="h-chart"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 mb-small-5px">
+                                    <div class="category backdrop-loader">
+                                        <div class="loader4 centerloader"></div>
+                                        <div class="loadding-text">Loading ...</div>
+                                    </div>
+                                    <div class="box-chart-color bg-white">
+                                        <div class="d-flex align-items-center header-chart-p">
+                                            <img src="{{asset('images/pie-chart.png')}}" alt="" height="30px">
+                                            <h1 class="text-blue bold-500">Top 10 Categories</h1>
+                                        </div>
+                                        <div class="divider-dark"></div>
+                                        <div id="chart-top-category" class="h-chart"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <div class="tabbable">
+                    <ul class="nav nav-tabs nav-tabs-highlight">
+                        <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
+                        <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
+                        <li class="pull-right">
+                            {{-- <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
+                                <span>Bookmarks</span>
+                             </button> --}}
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_related_news">
+                            <section class="panel panel-default border-n">
+                                <div id="main-list" class="row m-b-md">
+                                    <div class="col-md-12">
+                                        <div id="list_news"></div>
+                                        <div class="ajax-loading loading-more" style="display: none;margin-top:15px;">Loading&nbsp;<span class="content-spinner-loading-inline"></span></div>
+                                        {{-- <div class="list-news">
+                                            <div class="checkbox-news-select">
+                                                <label class="mr-3">
+                                                    <input type="checkbox" name="" class="chk-bookmark">
+                                                    <span class="label-text checkbox-news-input"></span>
+                                                </label>
+                                            </div>
+                                            <div class="content-news-text">
+
                                                 <a href="{{route('news.news_detail')}}">
                                                     <span class="head-news-text">WhatsApp’s new fact-check feature lets users identify fake information</span>
                                                 </a>
@@ -243,11 +311,13 @@
 </section>
 
 @push('pagestyle')
-@include('stacks.css.datatables')
-@include('stacks.css.datepicker')
-@include('stacks.css.form')
-@include('stacks.css.highchart')
-<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+
+    @include('stacks.css.datatables')
+    @include('stacks.css.datepicker')
+    @include('stacks.css.form')
+    @include('stacks.css.highchart')
+    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+
 @endpush
 
 @push('pagescript')
@@ -258,6 +328,7 @@
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
 @include('stacks.js.highchart')
+
 <script>
 
     active_btn('#groupby-btn .btn-grey');
@@ -602,6 +673,7 @@
         load_more_search(page,f_search);
     }
 
+
     function load_top_source(){
         if(search_val == 1 || search_val == 0) {
             $("#chart-top-source").html('');             
@@ -806,6 +878,7 @@
         });
         
     }
+
 
 
 </script>
