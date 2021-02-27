@@ -13,7 +13,7 @@
             <section class="panel panel-default m-b-xs">
                 <div class="panel-body" id="table-container">
                     <div class="row">
-                        <div class="col-md-12 text-center">
+                        <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
                                 <button class="btn btn-selector active">All</button>
                                 <button class="btn btn-selector">News</button>
