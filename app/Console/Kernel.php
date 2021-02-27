@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
 
 
         // $schedule->command('app:FeedCompromisedServer')->cron('0 6 * * *')->withoutOverlapping(5);
-        
+      
         // $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
         // $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
         // $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
@@ -39,7 +39,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
         //$schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
         //$schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
-        
+      
         // $schedule->command('queue:work --workicedaemon --queue=default,high,normal,low --tries=3')->everyMinute()->withoutOverlapping(5);
         // $schedule->command('backup:clean')->dailyAt('02:00')->name('backup.cleaner')->withoutOverlapping(5);
         // $schedule->command('backup:run')->dailyAt('03:00')->name('backup.runner')->withoutOverlapping(5);
@@ -71,35 +71,35 @@ class Kernel extends ConsoleKernel
         // $schedule->command('app:reset-demo')->cron('0 */3 * * *')->name('demo.reset')->withoutOverlapping(5);
         // $schedule->command('inspire')
         //          ->hourly();
-        $delay_WebDefacementProccess = rand(1,55);
-        $schedule->command('app:WebDefacementProccess')->everyMinute();
-        $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
-        $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
-        
-        $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
-        $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
+      $delay_WebDefacementProccess = rand(1,55);
+      $schedule->command('app:WebDefacementProccess')->everyMinute();
+      $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
+      $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
+      
+      $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
+      $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
 
-        $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
-        $schedule->command('app:MDCVEBatchJob')->dailyAt('8:00')->name('lang.progress')->withoutOverlapping(5);
+      $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
+      $schedule->command('app:MDCVEBatchJob')->dailyAt('8:00')->name('lang.progress')->withoutOverlapping(5);
 
-         $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
-         $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
-          $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
-         $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
-         $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
-         $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
-          $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(5);
-          $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
-          $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(5);
-
-}
+      $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
+      $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
+      $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
+      $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
+      $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
+      $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
+      $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(5);
+      $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
+      $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(5);
+      $schedule->command('app:test_indicator_update_ref')->everyMinute()->withoutOverlapping(5);
+    }
 
     /**
      * Register the Closure based commands for the application.
      */
     protected function commands()
     {
-        include base_path('routes/console.php');
-        $this->load(__DIR__ . '/Commands');
+      include base_path('routes/console.php');
+      $this->load(__DIR__ . '/Commands');
     }
-}
+  }

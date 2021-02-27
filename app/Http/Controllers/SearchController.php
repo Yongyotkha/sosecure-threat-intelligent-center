@@ -184,7 +184,7 @@ class SearchController extends Controller
                             '_id' => 0,
                             'id' => '$indicator_id',
                             'name' => '$indicator',
-                            'content' => [ '$concat' => ['type: ','$type']],
+                            'content' => [ '$concat' => ['type: ', '$type' ]],
                             'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
                         ]
                     ],
