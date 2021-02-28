@@ -736,6 +736,351 @@ class ApiNewsController extends ApiController
         }
     }
 
+
+    public function news_load_top_source(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'news'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
+                    $keywords = $data['data']['keywords'];
+                    $status_news = $data['data']['status_news'];
+                    $news_source = $data['data']['news_source'];
+                    $news_category = $data['data']['news_category'];
+                    $search_val = $data['data']['search_val'];
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $site_id_arr = $data['data']['site_id_arr'];
+                    $user_id = $data['data']['user_id'];
+
+                    $site_id = '';
+        
+                    if($site) {
+                        // $site_id_m = SiteSettings::where('id',$site)->first();
+                        $site_id = @$site;
+                    }
+        
+                    $model = New RSSNews();
+                    if($search_val == 1){
+                        
+                        if($keywords){
+                            $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
+                            
+                            if($model_where) {
+                                $model = $model -> where('title_en', 'LIKE' ,'%'.$keywords.'%');
+                            } else {
+                                $model = $model -> where('title_th', 'LIKE' ,'%'.$keywords.'%');
+                            }
+                            
+                        }
+            
+                        if($isDateSearch == 1){
+                            $date_start = $startDate;
+                            $date_end = $endDate;
+            
+                            $date_start_explode = explode(" ",$date_start);
+                            $date_start_date = @$date_start_explode[0];
+                            $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                            // dd($date_start_time);
+                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                            // dd($date_start_date_format);
+                            $date_start_time_time = date("H:i", strtotime($date_start_time));
+                            $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                            // dd($date_start);
+            
+                            $date_end_explode = explode(" ",$date_end);
+                            $date_end_date = @$date_end_explode[0];
+                            $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                            // dd($date_end_time);
+                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                            $date_end_time_time = date("H:i", strtotime($date_end_time));
+                            $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                            // dd($date_end_time_time);
+            
+                            // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                            $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        }
+            
+                        // if($status_news){
+                        //     if($status_news == 1 || $status_news == 2){
+                        //         if($status_news == 1) {
+                        //             $model =  $model -> where('save_draft','=',0);
+                                    
+                        //         } else if ($status_news == 2) {
+                        //             $model =  $model -> where('save_draft',1);
+                        //             // dd($model);
+                        //         }
+                                
+                        //     }  
+                        // }
+                        if($news_source){
+            
+                            // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
+                            $model = $model -> whereIn('source', $news_source);
+                        }
+            
+                        if($news_category){
+                            $news_cate_id = $news_category;
+                            $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                                $query->whereIn('news_category_id', $news_cate_id);
+                            });
+                        }
+                        
+                    }
+            
+                    $model = $model         
+                    ->select(DB::raw('count(*) as source_count , source as source'))
+                    ->groupBy('source')
+                    ->orderBy('source_count', 'desc')
+                    ->limit(11)
+                    ->get();
+            
+                    $host2 = array();
+                    foreach($model as $value){
+                        if(empty($value->source)||$value->source=='None'){
+                            if(!isset($host2['None'])){
+                                $host2['None'] = 0;
+                            }
+                            $host2['None'] = $host2['None']+(int)$value->source_count;
+                        }else{
+                            $host2[$value->source] = (int)$value->source_count;
+                        }
+                    }
+                    arsort($host2);
+                    $countLimit = 0;
+                    $host = array();
+                    foreach ($host2 as $key => $value) {
+                        $countLimit++;
+                        if($countLimit<11){
+                            $host[] = [$key,$value];
+                        }
+                    }
+        
+       
+                    // $dataOut = [
+                    //     "html" => $html,
+                    //     "count" => $news_all
+                    // ];
+                    $data_transcation = json_encode($host);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function news_load_top_category(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'news'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
+                    $keywords = $data['data']['keywords'];
+                    $status_news = $data['data']['status_news'];
+                    $news_source = $data['data']['news_source'];
+                    $news_category = $data['data']['news_category'];
+                    $search_val = $data['data']['search_val'];
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $site_id_arr = $data['data']['site_id_arr'];
+                    $user_id = $data['data']['user_id'];
+
+                    $site_id = '';
+        
+                    if($site) {
+                        // $site_id_m = SiteSettings::where('id',$site_code)->first();
+                        $site_id = @$site;
+                    }
+        
+                    
+                    $model = New RSSNews();
+                    if($search_val == 1){
+                        
+                        if($keywords){
+                            $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
+                            
+                            if($model_where) {
+                                $model = $model -> where('title_en', 'LIKE' ,'%'.$keywords.'%');
+                            } else {
+                                $model = $model -> where('title_th', 'LIKE' ,'%'.$keywords.'%');
+                            }
+                            
+                        }
+            
+                        if($isDateSearch == 1){
+                            $date_start = $startDate;
+                            $date_end = $endDate;
+            
+                            $date_start_explode = explode(" ",$date_start);
+                            $date_start_date = @$date_start_explode[0];
+                            $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                            // dd($date_start_time);
+                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                            // dd($date_start_date_format);
+                            $date_start_time_time = date("H:i", strtotime($date_start_time));
+                            $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                            // dd($date_start);
+            
+                            $date_end_explode = explode(" ",$date_end);
+                            $date_end_date = @$date_end_explode[0];
+                            $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                            // dd($date_end_time);
+                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                            $date_end_time_time = date("H:i", strtotime($date_end_time));
+                            $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                            // dd($date_end_time_time);
+            
+                            // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                            $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                        }
+            
+                        if($status_news){
+                            if($status_news == 1 || $status_news == 2){
+                                if($status_news == 1) {
+                                    $model =  $model -> where('save_draft','=',0);
+                                    
+                                } else if ($status_news == 2) {
+                                    $model =  $model -> where('save_draft',1);
+                                    // dd($model);
+                                }
+                                
+                            }  
+                        }
+                        if($news_source){
+            
+                            // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
+                            $model = $model -> whereIn('source', $news_source);
+                        }
+            
+                        if($news_category){
+                            $news_cate_id = $news_category;
+                            $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                                $query->whereIn('news_category_id', $news_cate_id);
+                            });
+                        }
+                        
+                    }
+                   
+                    // $RSSNewsCategory = RSSNewsCategory::select('rss_news_id','categories.name')->join('categories','categories.id','=','r_s_s_news_categories.news_category_id')->where('categories.active',1);
+                    // dd($RSSNewsCategory->get());
+                    // $model = $model         
+                    // ->select('categories.name as categories_name_',DB::raw('count(*) as categories_count'))
+                    // ->leftjoin('r_s_s_news_categories','r_s_s_news.id','=','r_s_s_news_categories.rss_news_id')
+                    // ->leftjoin('categories','categories.id','=','r_s_s_news_categories.news_category_id')
+                    // ->where('categories.active',1)
+                    // ->where('categories.deleted_at',null)
+                    // ->groupBy('categories.name')
+                    // ->orderBy('categories_count', 'desc')
+                    // ->limit(10)
+                    // ->get();
+            
+                    $model = $model
+                    ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
+                    ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid ,fx_r_s_s_news_categories.news_category_id as category_id, fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+                    where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+                    and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
+                    function($join)
+                    {
+                       $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
+                    })
+                    ->addSelect('category_id')
+                    ->groupBy('name_cat')
+                    ->orderBy('categories_count', 'desc')
+                    ->limit(10)
+                    ->get();
+            
+            
+                    // $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
+                    // (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+                    // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+                    // and fx_categories.active=1) as test
+                    // on fx_r_s_s_news.id = test.rssid
+                    // group by name_cat
+                    // order by categories_count desc
+                    // limit 10" ;
+                    // $model = DB::select( DB::raw($sql));
+            
+            
+                    $host = array();
+                    $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
+                    foreach($model as $key => $value){
+            
+                        $host[] = array(
+                            'name' => empty($value->categories_name_)?'None':$value->categories_name_,
+                            'y' => (int)$value->categories_count,
+                            'color' => $color[$key] ,
+                            'data' => $value->category_id
+                        );
+            
+                        
+                    }
+            
+        
+       
+                    // $dataOut = [
+                    //     "html" => $html,
+                    //     "count" => $news_all
+                    // ];
+                    $data_transcation = json_encode($host);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
     private function dataFalse($bearerToken, $mode, $data){
         try {
             $header = $bearerToken;

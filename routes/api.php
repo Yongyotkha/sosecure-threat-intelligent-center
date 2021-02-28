@@ -66,6 +66,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('news/jqueryLoadMoreNewsBookmark', 'Api\ApiNewsController@jqueryLoadMoreNewsBookmark');
     Route::post('news/url_bookmark', 'Api\ApiNewsController@url_bookmark');
     Route::post('news/url_news_detail_code', 'Api\ApiNewsController@url_news_detail_code');
+    Route::post('news/news_load_top_source', 'Api\ApiNewsController@news_load_top_source');
+    Route::post('news/news_load_top_category', 'Api\ApiNewsController@news_load_top_category');
 
     Route::post('vulnerabilitys/vulnerabilitys_table', 'Api\ApiCVEController@vulnerabilitys_table');
     Route::post('vulnerabilitys/index', 'Api\ApiCVEController@vulnerabilitys_index');
