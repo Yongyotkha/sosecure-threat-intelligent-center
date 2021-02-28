@@ -20,15 +20,15 @@
                     {{-- <a href="#" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-rel="tooltip" title="@langapp('export') CSV">
                         @icon('solid/download') CSV
                     </a> --}}
-                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
+                    {{-- <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger m-xs  pull-right" value="bulk-delete" disabled>
                         <span data-rel="tooltip" title="Are you sure?" data-placement="left">@icon('solid/trash-alt') @langapp('delete')</span>
                     </button>
                     <a href="{{route('keyword.create', $siteSettings->code) }}" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right" data-toggle="ajaxModal">
                         @icon('solid/plus') @langapp('add')
-                    </a>
+                    </a> --}}
                 </header>
                 <section class="scrollable wrapper">
-                    <section class="panel panel-default">
+                    <section class="panel panel-default d-none">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
@@ -61,6 +61,74 @@
                             </div>
                         </div>
                     </section>
+
+                    <section class="panel panel-default">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Keywords
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <form class="form-inline">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold m-r-xs" style="font-size: 14px;">Keyword</label>
+                                                <input type="text" class="form-control" id="add-todo" placeholder="">
+                                            </div>
+                                            <button type="button" class="btn-add-keyword btn btn-info m-l-xs">@icon('solid/plus') @langapp('add')</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <hr>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Keyword</h5>
+                                        <div class="box-item-keyword">
+                                            <ul class="main-list keyword-list">
+                                                <li class="item-list item--keyword">
+                                                    <div class="left-side-item">
+                                                        <span class="drag-handle m-r-xs">@icon('solid/bars')</span>
+                                                        <span>Keyword 1</span>
+                                                    </div>
+                                                    <div class="action-keyword">
+                                                        <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                        <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Social</h5>
+                                        <div class="box-item-keyword">
+                                            <ul class="main-list social-list">
+                                                
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <h5 class="font-weight-bold">Dark Web</h5>
+                                        <div class="box-item-keyword">
+
+                                            <ul class="main-list darkweb-list">
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                 </section>
             </section>
      
@@ -162,6 +230,31 @@
         </div>
     </div>
 
+    <div class="modal" id="edit_keyword" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">Edit Keyword</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <form action="">
+                            <div class="form-group row">
+                                <h5 class="font-weight-bold">Keyword</h5>
+                                <input type="text" name="keyword" class="form-control">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete-all"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')
@@ -174,7 +267,52 @@
 @include('stacks.js.form')
 @include('stacks.js.menusub')
 @include('stacks.js.site_hidesettings')
+@include('stacks.js.sortable')
 <script>
+
+
+function delete_keyword() {
+    $('.delete-item-keyword').on("click",function(){
+        $(this).closest('li').remove();
+    });
+}
+
+delete_keyword();
+
+$('.btn-add-keyword').on("click",function (){
+    var newToDo = `
+    <li class="item-list item--keyword">
+        <div class="left-side-item">
+            <span class="drag-handle m-r-xs">@icon('solid/bars')</span>
+            <span>${$("#add-todo").val()}</span>
+        </div>
+        <div class="action-keyword">
+            <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+            <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+        </div>
+    </li>`;
+    $("ul.keyword-list").prepend(newToDo);
+    $("#add-todo").val("");
+
+    delete_keyword();
+});
+
+
+$('ul.main-list').sortable({
+    group: 'main-list',
+    containerSelector: 'ul',
+    handle: '.drag-handle',
+    revert: true,
+    itemSelector: 'li.item--keyword',
+    placeholder: '<li class="placeholder"/>',
+    afterMove: function () {
+        clearTimeout(t5);
+        t5 = setTimeout('setCron()', 500);
+    }
+});
+
+
+ 
     $(function() {
 
         $('#table_cve_assets').on('click', '.select-chk', function () {
