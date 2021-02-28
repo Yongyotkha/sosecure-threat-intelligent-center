@@ -4212,7 +4212,7 @@ textarea.resize-none{
     flex-direction: column;
     padding: 0;
     list-style: none;
-    background: #ffffff;
+    background: #f5f5f5;
     border: 2px dashed #7e7e7e;
     padding: 1rem;
     min-height: 300px;
@@ -4260,4 +4260,13 @@ li.placeholder{
 .edit-keyword:hover,
 .delete-item-keyword:hover{
     color: #eeeeee;
+}
+
+.drag-handle i.fa-arrows-alt{
+    color: #fff;
+}
+
+.text-keyword{
+    display: inline-block;
+    word-break: break-all;
 }

@@ -95,8 +95,8 @@
                                             <ul class="main-list keyword-list">
                                                 <li class="item-list item--keyword">
                                                     <div class="left-side-item">
-                                                        <span class="drag-handle m-r-xs">@icon('solid/bars')</span>
-                                                        <span>Keyword 1</span>
+                                                        <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                        <span class="text-keyword">Keyword 1</span>
                                                     </div>
                                                     <div class="action-keyword">
                                                         <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
@@ -283,8 +283,8 @@ $('.btn-add-keyword').on("click",function (){
     var newToDo = `
     <li class="item-list item--keyword">
         <div class="left-side-item">
-            <span class="drag-handle m-r-xs">@icon('solid/bars')</span>
-            <span>${$("#add-todo").val()}</span>
+            <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+            <span class="text-keyword">${$("#add-todo").val()}</span>
         </div>
         <div class="action-keyword">
             <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
