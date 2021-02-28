@@ -9,13 +9,13 @@
         <div class="panel-body">
             <div style="margin-bottom: 1rem">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-lg-6 col-md-12">
                         <div class="form-group m-b-md">
                             <h5 class="font-weight-bold">Keyword</h5>
                             <input type="text" class="form-control" name="keyword" placeholder="Search">
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-lg-6 col-md-12">
                         <div class="form-group">
                             <h5 class="font-weight-bold">Datatype Type</h5>
                             <select name="" id="datatype" class="select2-option form-control" multiple="multiple">
@@ -26,13 +26,13 @@
 
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-lg-6 col-md-12">
                         <div class="form-group m-b-md">
                             <h5 class="font-weight-bold">Referent</h5>
                             <input type="text" class="form-control" name="keyword" placeholder="">
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-lg-6 col-md-12">
                         <h5 class="font-weight-bold">Filter By</h5>
                         <div id="groupby-btn" class="btn-group special mb-2">
                             <button class="btn btn-grey active">

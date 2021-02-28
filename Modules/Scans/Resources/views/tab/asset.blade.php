@@ -9,24 +9,24 @@
         <div class="panel-body" style="padding: 0 !important">
             <div class="container-fluid">
                 <div class="row" style="display: none;">
-                    <div class="col-md-4 mb-1">
+                    <div class="col-lg-4 col-md-12 mb-1">
                         <h5 class="font-weight-bold">Keyword</h5>
                         <input type="text" class="form-control" name="keyword" placeholder="Search">
                     </div>
-                    <div class="col-md-4 mb-1">
+                    <div class="col-lg-4 col-md-12 mb-1">
                         <h5 class="font-weight-bold">Data Type</h5>
                         <select name="" id="datatype" class="form-control" multiple="multiple">
                             <option value="1">All</option>
                         </select>
                     </div>
-                    <div class="col-md-4 mb-1">
+                    <div class="col-lg-4 col-md-12 mb-1">
                         <h5 class="font-weight-bold">Referent</h5>
                         <input type="text" class="form-control" name="keyword">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-lg-4 col-md-12">
                         <h5 class="font-weight-bold">Filter By</h5>
                         <div id="groupby-btn" class="btn-group special mb-2">
                             <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
@@ -49,7 +49,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-lg-4 col-md-12">
                         <h5 class="font-weight-bold">Status</h5>
                         <div id="groupby-status" class="btn-group special mb-2">
                             <button class="btn btn-grey active" onclick="changeActive('')">
@@ -63,7 +63,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-lg-4 col-md-12">
                         <div class="form-group">
                             <select id="groupby-select2" style="display: none;" class="form-control">
                                 <option value="">Domain All</option>

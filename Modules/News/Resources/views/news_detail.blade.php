@@ -18,9 +18,9 @@
                 <div class="header-flex-overflow m-t-10">
                     <div class="fwb-16">
                         <a href="{{@$url_back}}"
-                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive pull-left m-r-5">
+                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')</a>
-                        <span style="display:inline-block;margin-top:3px;">
+                        <span style="display:inline-block;">
                             @langapp('news') > {{@$RSSNews->title_th}}
                         </span>
                     </div>

@@ -293,7 +293,7 @@
                         </div>
     
                         <div class="form-group row area_image_screen" style="display: none;">
-                            <label class="col-lg-3 control-label">&nbsp;</label>
+                            <label class="col-lg-3 control-label d-md-none">&nbsp;</label>
                             <div class="col-lg-9 review_image_screenshot" style="display: none;">
                                 <div class="review-image-capture">
                                     {{-- <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" id="preview-img-wdfm" > --}}

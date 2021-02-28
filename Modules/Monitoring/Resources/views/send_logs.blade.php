@@ -56,37 +56,27 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-lg-4">
+                            <div class="col-lg-4 col-md-12">
                                 <h5 class="font-weight-bold">Progress</h5>
-                                <div class="row d-flex align-items-center">
-
-
-                                    <div class="col-sm-9 col-xs-12">
-                                        <select id="select_val" class="select2-option form-control">
-                                            <option value="" selected>All</option>
-                                            <option value="1" >Waiting</option>
-                                            <option value="2" >Progress</option>
-                                            <option value="3" >Complete</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                <select id="select_val" class="select2-option form-control">
+                                    <option value="" selected>All</option>
+                                    <option value="1" >Waiting</option>
+                                    <option value="2" >Progress</option>
+                                    <option value="3" >Complete</option>
+                                </select>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-4 col-md-12">
                                 <h5 class="font-weight-bold">Type</h5>
-                                <div class="row d-flex align-items-center">
-                                    <div class="col-sm-9 col-xs-12">
-                                        <select id="type" class="select2-option form-control">
-                                            <option value="" selected>All</option>
-                                            @if(@$type)
-                                            @foreach($type as $type)
-                                            <option value="{{@$type->type}}">{{@$type->type}}</option>
-                                            @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
-                                </div>
+                                <select id="type" class="select2-option form-control">
+                                    <option value="" selected>All</option>
+                                    @if(@$type)
+                                    @foreach($type as $type)
+                                    <option value="{{@$type->type}}">{{@$type->type}}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
                             </div>
-                            <div class="col-lg-4 ">
+                            <div class="col-lg-4 col-md-12 ">
                                 <h5 class="font-weight-bold">Date</h5>
                                 <div id="newsrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;

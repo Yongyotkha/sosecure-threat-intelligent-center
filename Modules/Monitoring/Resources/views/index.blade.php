@@ -48,11 +48,11 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-4 col-md-12">
                                 <h5 class="font-weight-bold">Keywords</h5>
                                 <input type="text" id="Keywords" class="form-control">
                             </div>
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-4 col-md-12">
                                 <h5 class="font-weight-bold">Progress</h5>
                                 <select id="select_val" class="select2-option form-control">
                                     <option value="" selected>All</option>
@@ -61,7 +61,7 @@
                                     <option value="2" >Progress</option>
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-4 col-md-12">
                                 <h5 class="font-weight-bold">Date</h5>
                                 <div id="newsrange" class=" text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                     <i class="fa fa-calendar"></i>&nbsp;

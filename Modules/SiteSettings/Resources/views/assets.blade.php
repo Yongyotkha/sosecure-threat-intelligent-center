@@ -18,6 +18,7 @@
             <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 <div class="header-flex-overflow m-t-7">
                     <div class="fwb-16">
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                         <span>
                             Site Setting &gt; @langapp('assets')
                         </span>

@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-lg-3 control-label">&nbsp;</label>
+                    <label class="col-lg-3 control-label d-md-none">&nbsp;</label>
                     <div class="col-lg-9">
                         <button class="btn btn-info" onclick="add_row()"><i class="fas fa-plus"></i> Add</button>
                     </div>
