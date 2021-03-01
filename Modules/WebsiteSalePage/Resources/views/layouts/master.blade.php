@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Intelligence Detection</title>
 
-        <link rel="icon" href="{{ asset('images/logo_threat/logo-fav.png')}}" type="image/png">
+        <link rel="icon" href="{{ asset('favicon.ico')}}">
         <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
