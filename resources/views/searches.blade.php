@@ -9,29 +9,10 @@
             </span>
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
-
-            <section class="panel panel-default m-b-xs">
-                <div class="panel-body" id="table-container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="fillter_click" class="button-group">
-                                <button class="btn btn-selector active">All</button>
-                                <button class="btn btn-selector">News</button>
-                                <button class="btn btn-selector">Event</button>
-                                <button class="btn btn-selector">Compromised</button>
-                                <button class="btn btn-selector">Vulnerabilities</button>
-                                <button class="btn btn-selector">Indicators</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
 
-                    <li class="panel panel-default" id="clause-news">
+                    {{-- <li class="panel panel-default" id="clause-news">
                         <div class="panel-heading">
                             <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify('news') }}">
                                 @icon('solid/caret-right') {{ humanize("news") }}({{$searchNews["count"]}})
@@ -47,7 +28,7 @@
                                 </div>
                             @endforeach
                         </div>
-                    </li>
+                    </li> --}}
                     @if (!empty($dataSearch))
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
@@ -59,7 +40,7 @@
                                     </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
 
-                                        {{-- @foreach ($value["queryData"] as $key2 => $value2)
+                                        @foreach ($value["queryData"] as $key2 => $value2)
                                             <div class="panel-body clause">
                                                 @if ($key == "News")
                                                 <div class="pull-left m-r-xs">
@@ -119,7 +100,7 @@
                                                 text-overflow: ellipsis;
                                                 -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
                                             </div>
-                                        @endforeach --}}
+                                        @endforeach
                                         
                                         @if ($key == "Events" && $value["count"] > 100)
                                             <div class="panel-body clause">
@@ -140,7 +121,7 @@
                         @endforeach
                     @else
                         <div class="notfound">
-                            <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
+                            <img src="{{asset('images/notfound.png')}}" alt="">
                             <h1>Sorry. no result found</h1>
                             <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
                         </div>
@@ -166,12 +147,7 @@
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 @push('pagestyle')
-@endpush
-@push('pagescript')
-@include('stacks.js.activebutton')
-<script>
-    active_btn('#fillter_click .btn-selector');
-</script>
+
 @endpush
 @endsection
 
