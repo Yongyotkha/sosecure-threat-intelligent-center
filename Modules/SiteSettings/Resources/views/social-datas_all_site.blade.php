@@ -542,7 +542,7 @@ var click_key = null;
 
 {{--active_btn('#fillter_click_keyword .btn-selector');--}}
 active_btn('#groupby-type .btn-grey');
-active_btn('#groupby-social .btn btn-grey');
+active_btn('#groupby-social .btn-grey');
 
 $('.btn').click(function(){
     if($('.btn-social-click').hasClass('active')){
