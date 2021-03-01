@@ -31,7 +31,7 @@
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
 
-                    <li class="panel panel-default" id="clause-news">
+                    {{-- <li class="panel panel-default" id="clause-news">
                         <div class="panel-heading">
                             <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify('news') }}">
                                 @icon('solid/caret-right') {{ humanize("news") }}({{$searchNews["count"]}})
@@ -47,69 +47,19 @@
                                 </div>
                             @endforeach
                         </div>
-                    </li>
+                    </li> --}}
                     @if (!empty($dataSearch))
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
                                 <li class="panel panel-default">
-                                    <div class="panel-heading fontw-weight-bold d-none">
+                                    <div class="panel-heading fontw-weight-bold">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
                                             @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
                                         </a>
                                     </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
-
-                                        {{-- @foreach ($value["queryData"] as $key2 => $value2)
+                                        @foreach ($value["queryData"] as $key2 => $value2)
                                             <div class="panel-body clause">
-                                                @if ($key == "News")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-news">
-                                                        News
-                                                    </span>
-                                                </div>
-                                                @elseif ($key == "Events")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-event">
-                                                        Event
-                                                    </span>
-                                                </div>
-                                                @elseif ($key == "indicators")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-indicator">
-                                                        Indicator
-                                                    </span>
-                                                </div>
-                                                @elseif ($key == "Web Defacement")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-deface">
-                                                        Web Defacement
-                                                    </span>
-                                                </div>
-                                                @elseif ($key == "Vulnerabilities")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-vul">
-                                                        Vulnerabilities
-                                                    </span>
-                                                </div>
-                                                @elseif ($key == "Compromised")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-compro">
-                                                        Compromised
-                                                    </span>
-                                                </div>
-                                                @elseif ($key == "Data Leak")
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-dataleak">
-                                                        Data Leak
-                                                    </span>
-                                                </div>
-                                                @else
-                                                <div class="pull-left m-r-xs">
-                                                    <span class="badges-search badges-other">
-                                                        Other
-                                                    </span>
-                                                </div>
-                                                @endif
                                                 <a href="{{$value2["link"]}}" target="_blank">
                                                     {{$value2["name"]}}
                                                 </a>
@@ -119,7 +69,7 @@
                                                 text-overflow: ellipsis;
                                                 -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
                                             </div>
-                                        @endforeach --}}
+                                        @endforeach
                                         
                                         @if ($key == "Events" && $value["count"] > 100)
                                             <div class="panel-body clause">
@@ -132,7 +82,6 @@
                                                 text-overflow: ellipsis;
                                                 -webkit-box-orient: vertical;"></div>
                                             </div>
-
                                         @endif
                                     </div>
                                 </li>
