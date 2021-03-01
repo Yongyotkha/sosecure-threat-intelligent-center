@@ -35,9 +35,9 @@ class test_indicator_update_ref extends Command
     
     public function __construct()
     {
-       parent::__construct();
+     parent::__construct();
 
-   }
+ }
 
     /**
      * Execute the console command.
@@ -69,7 +69,7 @@ class test_indicator_update_ref extends Command
         $tz = new \DateTimeZone('Asia/Bangkok');
      //   $start = date("Y-m-d").' 00:00:00';
         $end = date("Y-m-d").' 23:59:59';
-        $start = '2021-02-19'.' 00:00:00';
+        $start =  date("Y-m-d").' 00:00:00';
       //  $end = '2021-02-25'.' 23:59:59';
         $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
         $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
