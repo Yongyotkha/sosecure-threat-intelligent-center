@@ -92,7 +92,7 @@
                                     <div class="col-lg-4">
                                         <h5 class="font-weight-bold">Keyword</h5>
                                         <div class="box-item-keyword">
-                                            <ul class="main-list keyword-list">
+                                            <ul id="keyword_main" class="main-list keyword-list">
                                                 <li class="item-list item--keyword">
                                                     <div class="left-side-item">
                                                         <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
@@ -110,7 +110,7 @@
                                     <div class="col-lg-4">
                                         <h5 class="font-weight-bold">Social</h5>
                                         <div class="box-item-keyword">
-                                            <ul class="main-list social-list">
+                                            <ul id="social_main" class="main-list social-list">
                                                 
                                             </ul>
                                         </div>
@@ -119,7 +119,7 @@
                                         <h5 class="font-weight-bold">Dark Web</h5>
                                         <div class="box-item-keyword">
 
-                                            <ul class="main-list darkweb-list">
+                                            <ul id="darkweb_main" class="main-list darkweb-list">
 
                                             </ul>
                                         </div>
@@ -267,7 +267,7 @@
 @include('stacks.js.form')
 @include('stacks.js.menusub')
 @include('stacks.js.site_hidesettings')
-@include('stacks.js.sortable')
+@include('stacks.js.sort')
 <script>
 
 
@@ -298,18 +298,24 @@ $('.btn-add-keyword').on("click",function (){
 });
 
 
-$('ul.main-list').sortable({
-    group: 'main-list',
-    containerSelector: 'ul',
-    handle: '.drag-handle',
-    revert: true,
-    itemSelector: 'li.item--keyword',
-    placeholder: '<li class="placeholder"/>',
-    afterMove: function () {
-        clearTimeout(t5);
-        t5 = setTimeout('setCron()', 500);
-    }
+var keyword_item = document.getElementById('keyword_main'),
+	social_item = document.getElementById('social_main'),
+	darkweb_item = document.getElementById('darkweb_main');
+
+new Sortable(keyword_item, {
+	group: 'shared',
+	animation: 150
 });
+
+new Sortable(social_item, {
+	group: 'shared',
+	animation: 150
+});
+new Sortable(darkweb_item, {
+	group: 'shared',
+	animation: 150
+});
+
 
 
  

@@ -1,0 +1,1 @@
+<script src="{{ getAsset('plugins/Sortable-master/Sortable.js') }}"></script>
