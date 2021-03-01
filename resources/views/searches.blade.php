@@ -31,7 +31,7 @@
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
 
-                    {{-- <li class="panel panel-default" id="clause-news">
+                    <li class="panel panel-default" id="clause-news">
                         <div class="panel-heading">
                             <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify('news') }}">
                                 @icon('solid/caret-right') {{ humanize("news") }}({{$searchNews["count"]}})
@@ -47,7 +47,7 @@
                                 </div>
                             @endforeach
                         </div>
-                    </li> --}}
+                    </li>
                     @if (!empty($dataSearch))
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
@@ -59,7 +59,7 @@
                                     </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
 
-                                        @foreach ($value["queryData"] as $key2 => $value2)
+                                        {{-- @foreach ($value["queryData"] as $key2 => $value2)
                                             <div class="panel-body clause">
                                                 @if ($key == "News")
                                                 <div class="pull-left m-r-xs">
@@ -119,7 +119,7 @@
                                                 text-overflow: ellipsis;
                                                 -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
                                             </div>
-                                        @endforeach
+                                        @endforeach --}}
                                         
                                         @if ($key == "Events" && $value["count"] > 100)
                                             <div class="panel-body clause">
