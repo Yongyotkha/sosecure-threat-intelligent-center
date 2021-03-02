@@ -37,6 +37,8 @@ class ApiSearchController extends ApiController
                     $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
                     $clientMD = new MongoClient($DB_MONGO_KEY);
                     $keyword = '%' . $data['data']['keyword'] . '%';
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site_id_arr = @$get_role_custom['site_id_arr'];
                     if(check_permission_site_custom_api($data['data']['user_id'],'news') == 1){
                         
                         $dataWait['queryData'] = R_s_s_news::select('id', 'title_th as name', 'detail_th as content', DB::raw('CONCAT("/public/news/detail/",code ,"/th") AS link'))->where('title_th', 'LIKE', $keyword);
@@ -53,7 +55,9 @@ class ApiSearchController extends ApiController
                     }
 
                     if(check_permission_site_custom_api($data['data']['user_id'],'vulnerabilities') == 1){
-                        $dataWait['queryData'] = CVEMapping::select('id', 'namecve as name', 'description as content', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link'))->where('namecve', 'LIKE', $keyword);
+                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+
+                        $dataWait['queryData'] = CVEMapping::select('id', 'namecve as name', 'description as content', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link'))->where('namecve', 'LIKE', $keyword)->whereIn('namecve', $CVEMappingAssets_name);
                         $dataWait['count'] = $dataWait['queryData']->count();
                         if ($dataWait['count'] > 0) {
                             $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
@@ -63,7 +67,7 @@ class ApiSearchController extends ApiController
                     
 
                     if(check_permission_site_custom_api($data['data']['user_id'],'compromised') == 1){
-                        $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->where('feel_type', '!=', 'social')->where(function ($query) use ($keyword) {
+                        $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereIn('feel_type', ['darkweb', 'webserver', 'server', 'compromise', 'compromised'])->where(function ($query) use ($keyword) {
                             $query->where('keyword', 'LIKE', $keyword)
                                 ->orWhere('source_name', 'LIKE', $keyword);
                         });
@@ -76,7 +80,7 @@ class ApiSearchController extends ApiController
     
 
                     if(check_permission_site_custom_api($data['data']['user_id'],'data_leak') == 1){
-                        $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->where('feel_type', 'social')->where(function ($query) use ($keyword) {
+                        $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereIn('feel_type', ['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
                             $query->where('keyword', 'LIKE', $keyword)
                                 ->orWhere('source_name', 'LIKE', $keyword);
                         });
