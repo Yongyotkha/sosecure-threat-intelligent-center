@@ -353,11 +353,23 @@ class ApiCVEController extends ApiController
                         return '<span class="d-inline">'.$model->namecve.'</span>';
                     })
                     ->addColumn('description', function (CVEMapping $model) {
-                        $html = '';
-                        $html .= '<div class="text-trucate-ovf">'.$model->description.'</div>';
-                                // $html .= '<div class="scroll-ovf-des">'.$model->description.'</div>';
-                                // $html .= '<div class="scroll-ovf-content-fixh-60">'.$model->description.'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
-                        $html .= '<div class="nowrap" style="margin-top:5px;"><strong>Published:</strong> '.@$model->published.'&nbsp; &nbsp; <strong>Modified:</strong> '.@$model->modified.'</div>';
+                        $html_status = '';
+                        if ($model->severity === "") {
+                            $dummyServerity = 'NONE';
+                        } else {
+                            $dummyServerity = $model->severity;
+                        }
+                        $html_status .= get_CVSS_Severity_status($model->cvss_score, $dummyServerity, 'badg');
+        
+        
+        
+        
+                        $html = '<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><strong>'. $model->namecve.'</strong></div>';
+                        $html .= '<div class="">' . $model->description . '</div>';
+                        // $html .= '<div class="scroll-ovf-des">'.$model->description.'</div>';
+                        // $html .= '<div class="scroll-ovf-content-fixh-60">'.$model->description.'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
+                        $html.='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 20px;color: #3869d4;font-weight: 800;"><strong>'. $html_status.'</strong></div>';
+                        $html .= '<div class="nowrap" style="margin-top:25px;"><strong>Published:</strong> ' . @$model->published . '&nbsp; &nbsp; <strong>Modified:</strong> ' . @$model->modified . '</div>';
                         return $html;
                     })
                     ->addColumn('site', function (CVEMapping $model) {
