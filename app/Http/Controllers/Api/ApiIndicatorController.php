@@ -159,9 +159,9 @@ class ApiIndicatorController extends ApiController
                             $order_number++;
                             $nestedData['No'] = $order_number;
                             $nestedData['name'] = $document["name"];
-                            $nestedData['groups'] = $document["groups"] ? $this->explode_val($document["groups"],'groups',$url) : 'Empty';
+                            $nestedData['groups'] = $document["groups"] ? $this->explode_val($document["groups"],'groups',$url) : '';
                             $nestedData['tags'] = $this->explode_val($document["tags"],'tags',$url);
-                            $nestedData['industries'] = $document["industries"] ? $this->explode_val($document["industries"],'industries',$url) : 'Empty';
+                            $nestedData['industries'] = $document["industries"] ? $this->explode_val($document["industries"],'industries',$url) : '';
                             $nestedData['attr'] = '';
                             $nestedData['attrCount'] = $document["indicator_count"];
                             $nestedData['public'] = ($document["public"]);
@@ -875,12 +875,12 @@ class ApiIndicatorController extends ApiController
                     'skip' => $start,
                     'limit' => $rowperpage,
                     'sort' => [
-                        'created' => -1,
+                        'updated_at' => -1,
                     ]
                 ];
                 
             if($count_page==-1){
-                    $cursor_count = $col_fx_otx_events_indicator_ref->count($query);
+                    $cursor_count =$data['data']['total_record'];;
                     $count_filter = $cursor_count;
             }else{
                     $cursor_count = $count_page;
@@ -889,39 +889,39 @@ class ApiIndicatorController extends ApiController
             
         
             
-                $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
-                $document_all = $cursor->toArray();
-            
-                $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-                $options = array(
-                    'typeMap' => array(
-                        'root' => 'array',
-                        'document' => 'array',
-                    ),
-                );
-                $data_result = array();
-                foreach ($document_all as  $value) {
-                    $query = [
-                        'indicator_id' => $value->indicator_id
+            $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
+            $document_all = $cursor->toArray();
+
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+             //   $data_result = array();
+              //  foreach ($document_all as  $value) {
+                //    $query = [
+                //        'indicator_id' => $value->indicator_id
                         
-                    ];
-                    $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
+                //    ];
+                 //   $cursor_2 = $col_fx_otx_indicator_detail->findOne($query,$options);
                 
                     //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
                     // $view = '<a href="'.route('indicators.detail_indicator').
                     //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
                     //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
-                    $data_result[] = array( 
-                        "TYPE"=>@$cursor_2['type'],
-                        "AttributeName"=>@$cursor_2['indicator_name'],
-                        "ROLE"=>@$value['role'],
-                        "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
-                        "Action"=>$url."?id=".@$cursor_2['indicator_id'].
-                                '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
+                  //  $data_result[] = array( 
+                   //     "TYPE"=>@$cursor_2['type'],
+                  //      "AttributeName"=>@$cursor_2['indicator_name'],
+                   //     "ROLE"=>@$value['role'],
+                  //      "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
+                  //      "Action"=>$url."?id=".@$cursor_2['indicator_id'].
+                    //            '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
                         
-                    );
+                  //  );
         
-                }
+              //  }
                 
                 $total_record = $cursor_count;
                 $total_count_filter = $count_filter;
@@ -930,7 +930,7 @@ class ApiIndicatorController extends ApiController
                 $dataOut["draw"] = $draw;
                 $dataOut["recordsTotal"] = $cursor_count;
                 $dataOut["recordsFiltered"] = $total_count_filter;
-                $dataOut["data"] = $data_result;
+                $dataOut["data"] = $document_all;
 
                 $data_transcation = json_encode($dataOut);
                 $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
