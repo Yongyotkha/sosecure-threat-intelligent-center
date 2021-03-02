@@ -12,6 +12,7 @@ use App\Entities\Data_datacve_mapping;
 use App\Entities\Logs_setting;
 use App\Entities\CVE_assets;
 use App\Entities\Logs_sent_transaction;
+use App\Entities\Data_datacve_mapping_assest;
 class test extends Command
 {
     /**
@@ -44,11 +45,15 @@ class test extends Command
     {
 
      //   echo date("M d H:i:s");
-        $created_From = date("yyyy-MM-dd 00:00:00");
-        $created_To = date("yyyy-MM-dd 23:59:59");
-        $Data_datacve_mapping_data =    Data_datacve_mapping::get();
-        foreach ($Data_datacve_mapping_data as $key => $value) {
-            print_r($value);
+        $created_From = date("yyyy-MM-dd");
+        $created_To = date("yyyy-MM-dd");
+
+        $created_From = date("2021-02-28");
+
+        $Data_datacve_mapping_data =    Data_datacve_mapping_assest::where('updated_at', '>=', $created_From)->where('updated_at', '<=', $created_To)->get();
+        foreach ($Data_datacve_mapping_data as $key => $value_ampping) {
+            print_r($value_ampping);
+            $value = Data_datacve_mapping_assest::where('namecve',$value_ampping->namecve)-first();
             $Logs_setting_data = Logs_setting::where('site_id',$value->site_id)->where('type','cve')->first();
             if ($Logs_setting_data) {
              $format_str = $Logs_setting_data->content;
@@ -85,7 +90,7 @@ class test extends Command
                 $Logs_sent_transaction_save->site_id = $value->site_id;
                 $Logs_sent_transaction_save->content = $format_str ;
                 $Logs_sent_transaction_save->type = 'cve' ;
-                $Logs_sent_transaction_save->transaction_status = 3 ;
+                $Logs_sent_transaction_save->transaction_status = 2 ;
                //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
                 $Logs_sent_transaction_save->save(); 
             }
