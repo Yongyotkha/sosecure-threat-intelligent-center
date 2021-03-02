@@ -73,6 +73,7 @@ class ApiCVEController extends ApiController
                     $level = $data['data']['level'];
                     $column = $data['data']['column'];
                     $dir = $data['data']['dir'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     
 
                     $date_start_explode = explode(" ", $date_start);
@@ -287,7 +288,7 @@ class ApiCVEController extends ApiController
                             $version[] = $DataCveven -> version;
                             $edition[] = !empty($DataCveven -> edition) ? $DataCveven -> edition : '-';
                         }
-                        $CVEAssets = CVEAssets::whereIn('vendor', $vendor)->whereIn('title', $title)->whereIn('version', $version)->whereIn('edition', $edition)->get();
+                        $CVEAssets = CVEAssets::whereIn('vendor', $vendor)->whereIn('title', $title)->whereIn('version', $version)->whereIn('edition', $edition)->whereIn('site_id', $site_id_arr)->get();
                     }
 
                     // if(!empty($CVEAssets)){
