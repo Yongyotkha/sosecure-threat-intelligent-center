@@ -48,7 +48,7 @@
         <ul class="nav navbar-nav hidden-xs navbar-center">
             
             <li class="dropdown hidden-xs">
-                <form action="{{ route('search.app') }}" method="POST" role="search">
+                <form action="{{ route('search.app') }}" method="GET" role="search">
                     {!! csrf_field() !!}
                     <div class="form-group form-custom" style="margin-bottom:0;">
                         <div class="input-group w-400px" style="width:400px;padding: .8rem;">
@@ -56,7 +56,7 @@
                                 <i class="fas fa-search"></i>
                             </span>
                             <div class="input-group-custom">
-                                <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;margin-left: 1rem;">
+                                <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;margin-left: 1rem;" value="{{@$keyword}}">
                                 <div class="input-group-prepend-custom">
                                    <button class="btn btn-dark">Search</button>
                                 </div>

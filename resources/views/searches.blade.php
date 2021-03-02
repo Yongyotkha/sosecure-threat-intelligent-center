@@ -1,11 +1,36 @@
 @extends('layouts.app')
 @section('content')
+@php 
+    $indicators_type = [];
+    $count_val = [];
+    $count_all = 0;
+ foreach (@$dataSearch as $key => $value) {
+    if (isset($value["count"])&&$value["count"] > 0) {
+        $count_all = @$count_all+@$value["count"];
+        $count_val[slugify($key)] = $value["count"];
+    }
+
+    if($key == 'indicators') {
+        foreach ($value["queryData"] as $key2 => $value2) {
+            $indicators_type[] = substr($value2["content"],6);
+        }
+    }
+
+
+ }
+
+    $indicators_type_unique = array_unique($indicators_type);
+
+//  dd($indicators_type_unique);
+                           
+@endphp
+
 <section id="content">
     <section class="vbox">
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('search_results_for_tag',['keyword' => $keyword])</div>
             <span class="pull-right" style="margin-top: 1.2rem;font-size: 16px;font-weight: bold;">
-                Total Result : 0
+                Total Result : {{@$count_all}}
             </span>
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
@@ -15,12 +40,38 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
-                                <button class="btn btn-selector active">All</button>
+                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a>
+                                <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News {{@$count_val['news'] ? '('.$count_val["news"].')':'(0)'}}</a>
+                                <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event {{@$count_val['events'] ? '('.$count_val["events"].')':'(0)'}}</a>
+                                <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak {{@$count_val['data-leak'] ? '('.$count_val["data-leak"].')':'(0)'}}</a>
+                                <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised {{@$count_val['compromised'] ? '('.$count_val["compromised"].')':'(0)'}}</a>
+                                <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities {{@$count_val['vulnerabilities'] ? '('.$count_val["vulnerabilities"].')':'(0)'}}</a>
+                                <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators {{@$count_val['indicators'] ? '('.$count_val["indicators"].')':'(0)'}}</a>
+                                {{-- <button class="btn btn-selector active">All</button>
                                 <button class="btn btn-selector">News</button>
                                 <button class="btn btn-selector">Event</button>
                                 <button class="btn btn-selector">Compromised</button>
                                 <button class="btn btn-selector">Vulnerabilities</button>
-                                <button class="btn btn-selector">Indicators</button>
+                                <button class="btn btn-selector">Indicators</button> --}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row type_indicator" style="display: none;">
+                        <div class="col-md-12">
+                            <label style="margin-top: 5px;"><b>Type</b></label>
+                        </div>
+                    </div>
+                    <div class="row type_indicator" style="display: none;">
+                        <div class="col-md-12">
+                            <div id="fillter_click" class="button-group">
+                                @if($indicators_type_unique)
+                                    <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active">All</a>
+                                    @foreach($indicators_type_unique as $indicators_type_unique_val)
+                                        <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type">{{$indicators_type_unique_val}}</a>
+                                    @endforeach
+                                @endif
+                                {{-- <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a> --}}
                             </div>
                         </div>
                     </div>
@@ -51,7 +102,7 @@
                     @if (!empty($dataSearch))
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
-                                <li class="panel panel-default">
+                                <li id="{{slugify($key)}}_head" class="panel panel-default">
                                     <div class="panel-heading fontw-weight-bold">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
                                             @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
@@ -74,7 +125,7 @@
                                         @if ($key == "Events" && $value["count"] > 100)
                                             <div class="panel-body clause">
                                                 <a href="{{$value["moreDetail"]}}" target="_blank">
-                                                    กดเพื่อดูเพิ่มเติม
+                                                    More
                                                 </a>
                                                 <div style="
                                                 max-height:100px;
@@ -120,6 +171,123 @@
 @include('stacks.js.activebutton')
 <script>
     active_btn('#fillter_click .btn-selector');
+
+    var btn_val;
+    $(".btn_filter").click(function() {
+        btn_val = $(this).data("btn");
+        if(btn_val == 'all') {
+            $("#news_head").show();
+            $("#events_head").show();
+            $("#data-leak_head").show();
+            $("#compromised_head").show();
+            $("#vulnerabilities_head").show();
+            $("#indicators_head").show();
+
+            $(".type_indicator").hide();
+        } else if (btn_val == 'news') {
+            $("#news_head").show();
+            $("#news").addClass("in");
+            $("#events_head").hide();
+            $("#data-leak_head").hide();
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").hide();
+            $("#indicators_head").hide();
+
+            $(".type_indicator").hide();
+        } else if (btn_val == 'events') {
+            $("#news_head").hide();
+            $("#events_head").show();
+            $("#events").addClass("in");
+            $("#data-leak_head").hide();
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").hide();
+            $("#indicators_head").hide();
+
+            $(".type_indicator").hide();
+        } else if (btn_val == 'data-leak') {
+            $("#news_head").hide();
+            $("#events_head").hide();
+            $("#data-leak_head").show();
+            $("#data-leak").addClass("in");
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").hide();
+            $("#indicators_head").hide();
+
+            $(".type_indicator").hide();
+        } else if (btn_val == 'compromised') {
+            $("#news_head").hide();
+            $("#events_head").hide();
+            $("#data-leak_head").hide();
+            $("#compromised_head").show();
+            $("#data-leak").addClass("in");
+            $("#vulnerabilities_head").hide();
+            $("#indicators_head").hide();
+
+            $(".type_indicator").hide();
+        } else if (btn_val == 'vulnerabilities') {
+            $("#news_head").hide();
+            $("#events_head").hide();
+            $("#data-leak_head").hide();
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").show();
+            $("#vulnerabilities").addClass("in");
+            $("#indicators_head").hide();
+
+            $(".type_indicator").hide();
+        } else if (btn_val == 'indicators') {
+            $("#news_head").hide();
+            $("#events_head").hide();
+            $("#data-leak_head").hide();
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").hide();
+            $("#indicators_head").show();
+            $("#indicators").addClass("in");
+
+            $(".type_indicator").show();
+        } 
+    });
+
+    function click_search(text_search=null,btn_val=null){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/news/jqueryLoadMoreNews?page=" + page,
+            type: "post",
+            data: ({
+                keyword:text_search,
+                type:btn_val
+            }),
+            beforeSend: function(){
+                $('.ajax-loading').show();
+                {{--loading('load');--}}
+                {{--f_loading(1);--}}
+            },
+        }).done(function(data){
+            if(data.html.length == 0){
+                $('.ajax-loading').hide();
+                {{--f_loading_stop(1);--}}
+                {{--$('#count_news').text(0);--}}
+                return;
+            } else {
+                {{--f_loading_stop(1);--}}
+                let count_n = $('#count_news').text();
+                let count_search = data.count;
+                let count_n_all = parseInt(count_n) + parseInt(count_search);
+                
+                $('#count_news').text(data.count);
+                $('.ajax-loading').hide();
+                $("#list_news").append(data.html); 
+            }
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+
+
+
 </script>
 @endpush
 @endsection
