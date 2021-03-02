@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\DataLeakFeed;
+use App\DataLeakSocialRef;
 use App\R_s_s_news;
 use App\Traits\Taggable;
 use DB;
 use Illuminate\Http\Request;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 
@@ -67,15 +69,35 @@ class ApiSearchController extends ApiController
                     
 
                     if(check_permission_site_custom_api($data['data']['user_id'],'compromised') == 1){
-                        $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereIn('feel_type', ['darkweb', 'webserver', 'server', 'compromise', 'compromised'])->where(function ($query) use ($keyword) {
-                            $query->where('keyword', 'LIKE', $keyword)
-                                ->orWhere('source_name', 'LIKE', $keyword);
+
+                      
+
+                        $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->where(function ($query) use ($keyword) {
+                            $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
+                                ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
                         });
+                        $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                            // if(isset($SiteSettings->id)){
+                        $dataWait["queryData"] = $DataLeakFeed_compromised->whereIn('site.id', $site_id_arr);
                         $dataWait["count"] = $dataWait["queryData"]->count();
                         if ($dataWait['count'] > 0) {
-                            $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
+                            $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
                             $data21['dataSearch']["Compromised"] = $dataWait;
                         }
+
+
+
+
+
+                        // $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereIn('feel_type', ['darkweb', 'webserver', 'server', 'compromise', 'compromised'])->where(function ($query) use ($keyword) {
+                        //     $query->where('keyword', 'LIKE', $keyword)
+                        //         ->orWhere('source_name', 'LIKE', $keyword);
+                        // });
+                        // $dataWait["count"] = $dataWait["queryData"]->count();
+                        // if ($dataWait['count'] > 0) {
+                        //     $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
+                        //     $data21['dataSearch']["Compromised"] = $dataWait;
+                        // }
                     }
     
 
@@ -139,6 +161,47 @@ class ApiSearchController extends ApiController
                             $data21['dataSearch']["Events"] = $dataWait;
                         }
                     }
+
+                    if(check_permission_site_custom_api($data['data']['user_id'],'indicators') == 1){
+                        $dataWait = null;
+                        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+                        $pipeLine = array('indicator' => ['$regex'=>$data['data']['keyword'], '$options' => 'i']);
+                        $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
+                        if($dataWait['count']>0){
+                            $options = [
+                                'allowDiskUse' => TRUE
+                            ];
+                            $pipeline = [
+                                [
+                                    '$match' => [
+                                        'indicator'  => ['$regex'=>$data['data']['keyword'], '$options' => 'i'],
+                                    ]
+                                ],
+                                [
+                                    '$project' => [
+                                        '_id' => 0,
+                                        'id' => '$indicator_id',
+                                        'name' => '$indicator',
+                                        'content' => [ '$concat' => ['type: ', '$type' ]],
+                                        'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
+                                    ]
+                                ],
+                                [
+                                    '$sort' => [
+                                        'modified'  => -1,
+                                    ]
+                                ],
+                                [
+                                    '$limit' => $limit
+                                ]
+                            ];
+                            $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                            $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                            $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$data['data']['keyword'];
+                            $data21['dataSearch']["indicators"] = $dataWait;
+                        }
+                    }
+
                     
                     $page = langapp('search');
                     $response = [
