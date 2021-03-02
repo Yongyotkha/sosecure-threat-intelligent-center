@@ -66,9 +66,9 @@
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
                                 @if($indicators_type_unique)
-                                    <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active">All</a>
+                                <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active" data-btn_i_type="type_all">All</a>
                                     @foreach($indicators_type_unique as $indicators_type_unique_val)
-                                        <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type">{{$indicators_type_unique_val}}</a>
+                                        <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type" data-btn_i_type="type_{{$indicators_type_unique_val}}">{{$indicators_type_unique_val}}</a>
                                     @endforeach
                                 @endif
                                 {{-- <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a> --}}
@@ -110,7 +110,12 @@
                                     </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
                                         @foreach ($value["queryData"] as $key2 => $value2)
-                                            <div class="panel-body clause">
+                                            @php
+                                                if(slugify($key) == 'indicators') {
+                                                    $slug = 'type_'.substr($value2['content'],6);
+                                                }
+                                            @endphp
+                                            <div class="panel-body clause div_i_type" data-div_i_type="{!!@$slug!!}">
                                                 <a href="{{$value2["link"]}}" target="_blank">
                                                     {{$value2["name"]}}
                                                 </a>
@@ -173,6 +178,7 @@
     active_btn('#fillter_click .btn-selector');
 
     var btn_val;
+    var btn_filter_indicators_type;
     $(".btn_filter").click(function() {
         btn_val = $(this).data("btn");
         if(btn_val == 'all') {
@@ -186,7 +192,7 @@
             $(".type_indicator").hide();
         } else if (btn_val == 'news') {
             $("#news_head").show();
-            $("#news").addClass("in");
+            $("#news").collapse("show");
             $("#events_head").hide();
             $("#data-leak_head").hide();
             $("#compromised_head").hide();
@@ -197,7 +203,7 @@
         } else if (btn_val == 'events') {
             $("#news_head").hide();
             $("#events_head").show();
-            $("#events").addClass("in");
+            $("#events").collapse("show");
             $("#data-leak_head").hide();
             $("#compromised_head").hide();
             $("#vulnerabilities_head").hide();
@@ -208,7 +214,7 @@
             $("#news_head").hide();
             $("#events_head").hide();
             $("#data-leak_head").show();
-            $("#data-leak").addClass("in");
+            $("#data-leak").collapse("show");
             $("#compromised_head").hide();
             $("#vulnerabilities_head").hide();
             $("#indicators_head").hide();
@@ -219,7 +225,7 @@
             $("#events_head").hide();
             $("#data-leak_head").hide();
             $("#compromised_head").show();
-            $("#data-leak").addClass("in");
+            $("#compromised").collapse("show");
             $("#vulnerabilities_head").hide();
             $("#indicators_head").hide();
 
@@ -230,7 +236,7 @@
             $("#data-leak_head").hide();
             $("#compromised_head").hide();
             $("#vulnerabilities_head").show();
-            $("#vulnerabilities").addClass("in");
+            $("#vulnerabilities").collapse("show");
             $("#indicators_head").hide();
 
             $(".type_indicator").hide();
@@ -241,11 +247,30 @@
             $("#compromised_head").hide();
             $("#vulnerabilities_head").hide();
             $("#indicators_head").show();
-            $("#indicators").addClass("in");
+            $("#indicators").collapse("show");
 
             $(".type_indicator").show();
         } 
     });
+
+
+    $(".btn_filter_indicators_type").click(function() {
+        $("#indicators").collapse("show");
+        btn_filter_indicators_type = $(this).data("btn_i_type");
+        $(".div_i_type").each(function() {
+            if(btn_filter_indicators_type == 'type_all') {
+                $(this).show();
+            } else {
+                if($(this).data("div_i_type") == btn_filter_indicators_type) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            }
+        });
+ 
+    });
+
 
     function click_search(text_search=null,btn_val=null){
         $.ajax({

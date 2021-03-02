@@ -8,6 +8,7 @@ use App\Traits\Taggable;
 use DB;
 use Illuminate\Http\Request;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 
@@ -32,62 +33,130 @@ class SearchController extends Controller
         $data['dataSearch'] = array();
         $limit = 100;//->take($limit)
 
+        $role_custom = @check_role_custom();
+        $site_id_arr = @get_role_custom()['site_id_arr'];
+
         if ($this->request->keyword) {
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             
-
-            $keyword = '%' . $this->request->keyword . '%';
-            $dataWait['queryData'] = R_s_s_news::select('id', 'title_th as name', 'detail_th as content', DB::raw('CONCAT("/public/news/detail/",code ,"/th") AS link'))->where('title_th', 'LIKE', $keyword);
-            $dataWait['count'] = $dataWait['queryData']->count();
-            $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
-            $dataWait2['queryData'] = R_s_s_news::select('id', 'title_en as name', 'detail_en as content', DB::raw('CONCAT("/public/news/detail/",code ,"/en" ) AS link'))->where('title_en', 'LIKE', $keyword);
-            $dataWait2['count'] = $dataWait2['queryData']->count() + $dataWait['count'];
-            if ($dataWait2['count'] > 0){
-                $dataWait2['queryData'] = $dataWait2['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
-                $dataWait2['queryData'] = array_merge($dataWait['queryData'], $dataWait2['queryData']);
-                $dataWait2['moreDetail'] = $dataWait2['count']<101?"":$this->request->keyword;
-                $data['dataSearch']["News"] = $dataWait2;
-
-            }
-
-
-            $dataWait['queryData'] = CVEMapping::select('id', 'namecve as name', 'description as content', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link'))->where('namecve', 'LIKE', $keyword);
-            $dataWait['count'] = $dataWait['queryData']->count();
-            if ($dataWait['count'] > 0) {
+            if(@$role_custom['news']) {
+                $keyword = '%' . $this->request->keyword . '%';
+                $dataWait['queryData'] = R_s_s_news::select('id', 'title_th as name', 'detail_th as content', DB::raw('CONCAT("/public/news/detail/",code ,"/th") AS link'))->where('title_th', 'LIKE', $keyword);
+                $dataWait['count'] = $dataWait['queryData']->count();
                 $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
-                $data['dataSearch']["Vulnerabilities"] = $dataWait;
+                $dataWait2['queryData'] = R_s_s_news::select('id', 'title_en as name', 'detail_en as content', DB::raw('CONCAT("/public/news/detail/",code ,"/en" ) AS link'))->where('title_en', 'LIKE', $keyword);
+                $dataWait2['count'] = $dataWait2['queryData']->count() + $dataWait['count'];
+                if ($dataWait2['count'] > 0){
+                    $dataWait2['queryData'] = $dataWait2['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
+                    $dataWait2['queryData'] = array_merge($dataWait['queryData'], $dataWait2['queryData']);
+                    $dataWait2['moreDetail'] = $dataWait2['count']<101?"":$this->request->keyword;
+                    $data['dataSearch']["News"] = $dataWait2;
+
+                }
+            }
+
+            if(@$role_custom['vulnerabilities']) {
+                if(@get_role_custom()['superadmin'] == 1) {
+                    $CVEMappingAssets_name = CVEMappingAssets::select('namecve')->get();
+
+                    $dataWait['queryData'] = CVEMapping::select('id', 'namecve as name', 'description as content', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link'))->where('namecve', 'LIKE', $keyword)->whereIn('namecve', $CVEMappingAssets_name);
+                    $dataWait['count'] = $dataWait['queryData']->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Vulnerabilities"] = $dataWait;
+                    }
+                } else {
+                    $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+
+                    $dataWait['queryData'] = CVEMapping::select('id', 'namecve as name', 'description as content', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link'))->where('namecve', 'LIKE', $keyword)->whereIn('namecve', $CVEMappingAssets_name);
+                    $dataWait['count'] = $dataWait['queryData']->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Vulnerabilities"] = $dataWait;
+                    }
+                }
             }
 
 
-            $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->where('feel_type', '!=', 'social')->where(function ($query) use ($keyword) {
-                $query->where('keyword', 'LIKE', $keyword)
-                ->orWhere('source_name', 'LIKE', $keyword);
-            });
-            $dataWait["count"] = $dataWait["queryData"]->count();
-            if ($dataWait['count'] > 0) {
-                $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
-                $data['dataSearch']["Compromised"] = $dataWait;
+            if(@$role_custom['compromised']) {
+                if(@get_role_custom()['superadmin'] == 1) {
+                    $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->where(function ($query) use ($keyword) {
+                        $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
+                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                    });
+                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                        // if(isset($SiteSettings->id)){
+                    $dataWait["queryData"] = $DataLeakFeed_compromised;
+                    $dataWait["count"] = $dataWait["queryData"]->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Compromised"] = $dataWait;
+                    }
+                } else {
+                    $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->where(function ($query) use ($keyword) {
+                        $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
+                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                    });
+                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                        // if(isset($SiteSettings->id)){
+                    $dataWait["queryData"] = $DataLeakFeed_compromised->whereIn('site.id', $site_id_arr);
+                    $dataWait["count"] = $dataWait["queryData"]->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Compromised"] = $dataWait;
+                    }
+                }
+            }
+
+            if(@$role_custom['data_leak']) {
+                if(@get_role_custom()['superadmin'] == 1) {
+                    $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
+                        $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
+                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                    });
+                    $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                    $dataWait["queryData"] = $DataLeakFeed_social;
+
+                    $dataWait["count"] = $dataWait["queryData"]->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Data Leak"] = $dataWait;
+                    }
+                } else {
+                    $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
+                        $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
+                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                    });
+                    $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                    $dataWait["queryData"] = $DataLeakFeed_social->whereIn('site.id', $site_id_arr);
+                    
+                    $dataWait["count"] = $dataWait["queryData"]->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Data Leak"] = $dataWait;
+                    }
+                }
             }
 
 
-            $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->where('feel_type', 'social')->where(function ($query) use ($keyword) {
-                $query->where('keyword', 'LIKE', $keyword)
-                ->orWhere('source_name', 'LIKE', $keyword);
-            });
-            $dataWait["count"] = $dataWait["queryData"]->count();
-            if ($dataWait['count'] > 0) {
-                $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
-                $data['dataSearch']["Data Leak"] = $dataWait;
-            }
-
-
-            $dataWait['queryData'] = WebdefacmentSetting::select('id', 'name', 'url as content', DB::raw('CONCAT("/webdefacement/detail/",code) AS link'))->where('name', 'LIKE', $keyword);
-            $dataWait['count'] = $dataWait['queryData']->count();
-            if ($dataWait['count'] > 0) {
-                $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
-                $data['dataSearch']["Web Defacement"] = $dataWait;
+            if(@$role_custom['web_defacement']) {
+                if(@get_role_custom()['superadmin'] == 1) {
+                    $dataWait['queryData'] = WebdefacmentSetting::select('id', 'name', 'url as content', DB::raw('CONCAT("/webdefacement/detail/",code) AS link'))->where('name', 'LIKE', $keyword);
+                    $dataWait['count'] = $dataWait['queryData']->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Web Defacement"] = $dataWait;
+                    }
+                } else {
+                    $dataWait['queryData'] = WebdefacmentSetting::select('id', 'name', 'url as content', DB::raw('CONCAT("/webdefacement/detail/",code) AS link'))->where('name', 'LIKE', $keyword)->whereIn('site_id',$site_id_arr);
+                    $dataWait['count'] = $dataWait['queryData']->count();
+                    if ($dataWait['count'] > 0) {
+                        $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
+                        $data['dataSearch']["Web Defacement"] = $dataWait;
+                    }
+                }
             }
 
 
@@ -128,80 +197,85 @@ class SearchController extends Controller
             //     $data['dataSearch']["Attributes"] = $dataWait;
             // }
 
+            if(@$role_custom['indicators']) {
+                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
+                if($dataWait['count']>0){
+                    $options = [
+                        'allowDiskUse' => TRUE
+                    ];
+                    $pipeline = [
+                        [
+                            '$match' => [
+                                'name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                            ]
+                        ],
+                        [
+                            '$project' => [
+                                '_id' => 0,
+                                'id' => '$pulse_id',
+                                'name' => '$name',
+                                'content' => [ '$concat' => ['source: ','$source']],
+                                'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                            ]
+                        ],
+                        [
+                            '$sort' => [
+                                'modified'  => -1,
+                            ]
+                        ],
+                        [
+                            '$limit' => $limit
+                        ]
+                    ];
+                    $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
+                    $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                    $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                    $data['dataSearch']["Events"] = $dataWait;
+                }
+            }
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-            $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
-            $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
-            if($dataWait['count']>0){
-                $options = [
-                    'allowDiskUse' => TRUE
-                ];
-                $pipeline = [
-                    [
-                        '$match' => [
-                            'name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+            if(@$role_custom['indicators']) {
+                $dataWait = null;
+                $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+                $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
+                if($dataWait['count']>0){
+                    $options = [
+                        'allowDiskUse' => TRUE
+                    ];
+                    $pipeline = [
+                        [
+                            '$match' => [
+                                'indicator'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                            ]
+                        ],
+                        [
+                            '$project' => [
+                                '_id' => 0,
+                                'id' => '$indicator_id',
+                                'name' => '$indicator',
+                                'content' => [ '$concat' => ['type: ', '$type' ]],
+                                'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
+                            ]
+                        ],
+                        [
+                            '$sort' => [
+                                'modified'  => -1,
+                            ]
+                        ],
+                        [
+                            '$limit' => $limit
                         ]
-                    ],
-                    [
-                        '$project' => [
-                            '_id' => 0,
-                            'id' => '$pulse_id',
-                            'name' => '$name',
-                            'content' => [ '$concat' => ['source: ','$source']],
-                            'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
-                        ]
-                    ],
-                    [
-                        '$sort' => [
-                            'modified'  => -1,
-                        ]
-                    ],
-                    [
-                        '$limit' => $limit
-                    ]
-                ];
-                $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
-                $dataWait['queryData'] = $dataWait['queryData']->toArray();
-                $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
-                $data['dataSearch']["Events"] = $dataWait;
+                    ];
+                    $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                    $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                    $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                    $data['dataSearch']["indicators"] = $dataWait;
+                }
             }
-            $dataWait = null;
-            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
-            $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
-            $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
-            if($dataWait['count']>0){
-                $options = [
-                    'allowDiskUse' => TRUE
-                ];
-                $pipeline = [
-                    [
-                        '$match' => [
-                            'indicator'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
-                        ]
-                    ],
-                    [
-                        '$project' => [
-                            '_id' => 0,
-                            'id' => '$indicator_id',
-                            'name' => '$indicator',
-                            'content' => [ '$concat' => ['type: ', '$type' ]],
-                            'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
-                        ]
-                    ],
-                    [
-                        '$sort' => [
-                            'modified'  => -1,
-                        ]
-                    ],
-                    [
-                        '$limit' => $limit
-                    ]
-                ];
-                $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
-                $dataWait['queryData'] = $dataWait['queryData']->toArray();
-                $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
-                $data['dataSearch']["indicators"] = $dataWait;
-            }
+
         } else {
 
         }
