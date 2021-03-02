@@ -102,20 +102,51 @@ class ApiSearchController extends ApiController
     
 
                     if(check_permission_site_custom_api($data['data']['user_id'],'data_leak') == 1){
-                        $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereIn('feel_type', ['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
-                            $query->where('keyword', 'LIKE', $keyword)
-                                ->orWhere('source_name', 'LIKE', $keyword);
+
+
+                        $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
+                            $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
+                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
                         });
+                        $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
+                        $dataWait["queryData"] = $DataLeakFeed_social->whereIn('site.id', $site_id_arr);
+                            // foreach ($DataLeakFeed_social as $key => $value) {
+                            //     $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->whereIn('site_id',$site_id_arr)->first();
+                            //     if($leak_socail_ref_temps){
+                            //         $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
+                            //         $name_site = '';
+                            //         foreach ($site as $data) {
+                            //             $name_site .= $data->name . ' ,';
+                            //         }
+                            //         $name_site = rtrim($name_site, " ,");
+                            //         $DataLeakFeed_social[$key]["sitename"] = $name_site;
+                            //     }else{
+                            //         unset($DataLeakFeed_social[$key]);
+                            //     }
+                            // }
+
                         $dataWait["count"] = $dataWait["queryData"]->count();
                         if ($dataWait['count'] > 0) {
-                            $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
+                            $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
                             $data21['dataSearch']["Data Leak"] = $dataWait;
                         }
+
+
+
+                        // $dataWait["queryData"] = DataLeakFeed::select('id', 'feedcontent as content', 'sourceid', 'keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereIn('feel_type', ['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
+                        //     $query->where('keyword', 'LIKE', $keyword)
+                        //         ->orWhere('source_name', 'LIKE', $keyword);
+                        // });
+                        // $dataWait["count"] = $dataWait["queryData"]->count();
+                        // if ($dataWait['count'] > 0) {
+                        //     $dataWait["queryData"] = $dataWait["queryData"]->orderBy('updated_at', 'desc')->get()->toArray();
+                        //     $data21['dataSearch']["Data Leak"] = $dataWait;
+                        // }
                     }
                     
 
                     if(check_permission_site_custom_api($data['data']['user_id'],'web_defacement') == 1){
-                        $dataWait['queryData'] = WebdefacmentSetting::select('id', 'name', 'url as content', DB::raw('CONCAT("/webdefacement/detail/",code) AS link'))->where('name', 'LIKE', $keyword);
+                        $dataWait['queryData'] = WebdefacmentSetting::select('id', 'name', 'url as content', DB::raw('CONCAT("/webdefacement/detail/",code) AS link'))->where('name', 'LIKE', $keyword)->whereIn('site_id',$site_id_arr);
                         $dataWait['count'] = $dataWait['queryData']->count();
                         if ($dataWait['count'] > 0) {
                             $dataWait['queryData'] = $dataWait['queryData']->orderBy('updated_at', 'desc')->get()->toArray();
