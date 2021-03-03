@@ -323,6 +323,7 @@
 @include('stacks.css.summernote')
 @include('stacks.css.highchart')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+@include('stacks.css.multitext')
 @endpush
 
 @push('pagescript')
@@ -336,6 +337,7 @@
 @include('stacks.js.activebutton')
 @include('stacks.js.advanced_search')
 @include('stacks.js.highchart')
+@include('stacks.js.multitext')
 <script>
 
     active_btn('#groupby-btn .btn-grey');
@@ -631,6 +633,9 @@ $(function() {
                     return d;
 
                 },
+            },
+            "fnDrawCallback": function( oSettings ) {
+                multi_readmore()
             },
             columns: [
                 {

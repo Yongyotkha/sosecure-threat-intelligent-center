@@ -462,7 +462,7 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('cate', function (RSSNews $model) {
          
                 $html = '';
-                $html .= '<div>';
+                $html .= '<div class="text-trucate-ovf">';
                 if($model->get_cate=="[]"){
                     $html = 'None';
                 }else{
