@@ -111,7 +111,10 @@ if($dataDecode){
     $site = SiteSettings::where('code', $dataDecode)->first();
 
     if($site){
-        $nameTable = $object_dataDecode->tbName;
+        $nameTable ="";
+        if(isset($object_dataDecode->tbName)){
+             $nameTable = $object_dataDecode->tbName;
+        }
         if ($nameTable == 'fx_transaction_client_news') {
             $model_getData = new Transaction_client_News;
             $modeInsert = 'fx_transaction_client_news';

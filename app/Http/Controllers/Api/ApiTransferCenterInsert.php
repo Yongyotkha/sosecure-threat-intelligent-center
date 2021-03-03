@@ -371,12 +371,30 @@ $mac=$Sites_get->mac_address_key;
 $data = $request->data;
 $dataDecode = encrypt_decrypt('decrypt', $data, $header, $ip, $mac);
 $object_dataDecode = json_decode($dataDecode, FALSE);
+$modeFor = "";
+if(isset($object_dataDecode->modeFor)){
+    $modeFor = $object_dataDecode->modeFor;
+}
+
+$modeInsert = "";
+if(isset($object_dataDecode->modeInsert)){
+    $modeFor = $object_dataDecode->modeInsert;
+}
 
 
-$modeFor = $object_dataDecode->modeFor;
-$modeInsert = $object_dataDecode->modeInsert;
-$nameBJ = $object_dataDecode->nameBJ;
-$message_error = $object_dataDecode->message_error;
+
+
+$nameBJ = "";
+if(isset($object_dataDecode->modeInsert)){
+    $modeFor = $object_dataDecode->modeInsert;
+}
+
+
+$message_error = "";
+if(isset($object_dataDecode->message_error)){
+    $message_error = $object_dataDecode->message_error;
+}
+
 $sitecode = $code;
 $site = $Sites_get;
 
