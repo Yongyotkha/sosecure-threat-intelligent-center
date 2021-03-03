@@ -994,10 +994,10 @@ $('.btn').click(function(){
                 
             }),
             beforeSend: function(){
-                loading('load');
+                {{--loading('load');--}}
             },
             success:function(response) {
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 if(response.darkweb){
                     $('#darkweb-count').text(response.darkweb);
                 }else{
@@ -1012,7 +1012,7 @@ $('.btn').click(function(){
                 
             },
             error: function (error){
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {
@@ -1078,18 +1078,18 @@ var click_type2 = null;
                 site_id : site,
             }),
             beforeSend: function(){
-                loading('load');
+                {{--loading('load');--}}
             },
             success:function(response) {
                 $('#fillter_click_keyword').html('');
                 for (var i = 0; i < response.model.length; i++) {
                     $('#fillter_click_keyword').append(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
                 }
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 active_btn('#fillter_click_keyword .btn-selector');
             },
             error: function (error){
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {
@@ -1133,10 +1133,10 @@ var click_type2 = null;
                 site_id : site,
             }),
             beforeSend: function(){
-                loading('load');
+                {{--loading('load');--}}
             },
             success:function(response) {
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 $("#icon_mobile").html(response.icon_mobile);
                 $("#icon_facebook").html(response.icon_facebook);
                 $("#icon_twitter").html(response.icon_twitter);
@@ -1144,7 +1144,7 @@ var click_type2 = null;
                 $("#icon_other").html(response.icon_other);
             },
             error: function (error){
-                loading('stop_load');
+                {{--loading('stop_load');--}}
                 var errors = error.response.data.errors;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {
