@@ -545,7 +545,7 @@
                 }),
                 datatype: "html",
                 beforeSend: function(){
-                    loading('load');
+                    
                 },
             }).done(function(data){
                 let groupby_select = '';
@@ -555,9 +555,9 @@
                 });
                 $('#groupby-select').html(groupby_select);
                 $('#groupby-select').select2();
-                loading('stop_load');
+                
             }).fail(function(jqXHR, ajaxOptions, thrownError){
-                loading('stop_load');
+                
                 console.log("No response from server");
             });
         }
@@ -585,7 +585,7 @@
             }),
             datatype: "html",
             beforeSend: function(){
-                loading('load');
+                
 
             },
         }).done(function(data){
@@ -596,9 +596,9 @@
             });
             $('#groupby-select').html(groupby_select);
             $('#groupby-select').select2();
-            loading('stop_load');
+            
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            loading('stop_load');
+            
             console.log("No response from server");
         });
     }
@@ -679,7 +679,7 @@
             }),
             datatype: "html",
             beforeSend: function(){
-                loading('load');
+                
             },
         }).done(function(data){
             $('#count_other').html(data.countOther+"");
@@ -687,9 +687,9 @@
             $('#count_windows').html(data.countWindows+"");
             $('#count_linux').html(data.countLinux+"");
             
-            loading('stop_load');
+            
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            loading('stop_load');
+            
             console.log("No response from server");
         });
         searchTB();
