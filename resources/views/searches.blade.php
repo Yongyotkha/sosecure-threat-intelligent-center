@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+@php $role_custom = @check_role_custom(); @endphp
 @php 
     $indicators_type = [];
     $count_val = [];
@@ -41,12 +42,36 @@
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
                                 <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a>
-                                <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News {{@$count_val['news'] ? '('.$count_val["news"].')':'(0)'}}</a>
-                                <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event {{@$count_val['events'] ? '('.$count_val["events"].')':'(0)'}}</a>
-                                <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak {{@$count_val['data-leak'] ? '('.$count_val["data-leak"].')':'(0)'}}</a>
-                                <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised {{@$count_val['compromised'] ? '('.$count_val["compromised"].')':'(0)'}}</a>
-                                <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities {{@$count_val['vulnerabilities'] ? '('.$count_val["vulnerabilities"].')':'(0)'}}</a>
-                                <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators {{@$count_val['indicators'] ? '('.$count_val["indicators"].')':'(0)'}}</a>
+                                @if($role_custom['news'])
+                                    @if(!empty($count_val['news']))
+                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News {{@$count_val['news'] ? '('.$count_val["news"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['indicators'])
+                                    @if(!empty($count_val['events']))
+                                    <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event {{@$count_val['events'] ? '('.$count_val["events"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['data_leak'])
+                                    @if(!empty($count_val['data-leak']))
+                                    <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak {{@$count_val['data-leak'] ? '('.$count_val["data-leak"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['compromised'])
+                                    @if(!empty($count_val['compromised']))
+                                    <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised {{@$count_val['compromised'] ? '('.$count_val["compromised"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['vulnerabilities'])
+                                    @if(!empty($count_val['vulnerabilities']))
+                                    <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities {{@$count_val['vulnerabilities'] ? '('.$count_val["vulnerabilities"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['indicators'])
+                                    @if(!empty($count_val['indicators']))
+                                    <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators {{@$count_val['indicators'] ? '('.$count_val["indicators"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
                                 {{-- <button class="btn btn-selector active">All</button>
                                 <button class="btn btn-selector">News</button>
                                 <button class="btn btn-selector">Event</button>
