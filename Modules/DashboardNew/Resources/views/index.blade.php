@@ -74,7 +74,7 @@
                                                     </a>
                                                 </div>
                                             @endif
-                                            @if($role_custom['vulnerabilities'])
+                                            @if($role_custom['compromised'])
                                                 <div class="col-lg-12 col-md-3 col-sm-12 col-xs-12 mb-small-5px">
                                                     <a href="{{route('darkweb.index_all_site')}}">
                                                     <div class="card-dash">
