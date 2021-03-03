@@ -138,9 +138,10 @@
                                             @php
                                                 if(slugify($key) == 'indicators') {
                                                     $slug = 'type_'.substr($value2['content'],6);
+                                                    $class_indicator = 'div_i_type';
                                                 }
                                             @endphp
-                                            <div class="panel-body clause div_i_type" data-div_i_type="{!!@$slug!!}">
+                                            <div class="panel-body clause {{@$class_indicator}}" data-div_i_type="{!!@$slug!!}">
                                                 <a href="{{$value2["link"]}}" target="_blank">
                                                     {{$value2["name"]}}
                                                 </a>

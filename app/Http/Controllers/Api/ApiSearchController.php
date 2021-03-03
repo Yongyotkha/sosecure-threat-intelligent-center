@@ -173,7 +173,7 @@ class ApiSearchController extends ApiController
                                         '_id' => 0,
                                         'id' => '$pulse_id',
                                         'name' => '$name',
-                                        'content' => [ '$concat' => ['source: ','$source']],
+                                        'content' => [ '$concat' => ['<span class="badge badge-primary">source:</span> ','$source']],
                                         'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
                                     ]
                                 ],
@@ -213,7 +213,7 @@ class ApiSearchController extends ApiController
                                         '_id' => 0,
                                         'id' => '$indicator_id',
                                         'name' => '$indicator',
-                                        'content' => [ '$concat' => ['type: ', '$type' ]],
+                                        'content' => [ '$concat' => ['<span class="badge badge-pill badge-success">type:</span> ', '$type' ]],
                                         'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
                                     ]
                                 ],
