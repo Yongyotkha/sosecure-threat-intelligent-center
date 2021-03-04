@@ -686,7 +686,7 @@ class ApiDashboardController extends ApiController
                     if (!$pagename || $pagename == 'Vulnerability') {
                         if (!$sitecode) {
                             if (@check_permission_site_custom_api($data['data']['user_id'], 'vulnerabilities')) {
-                                $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                                $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
                                 $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name)->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
                                 // if(isset($SiteSettings->id)){
                                 $dataCVEMapping = $dataCVEMapping->whereIn("cve_asset.site_id",$site_id_arr);
