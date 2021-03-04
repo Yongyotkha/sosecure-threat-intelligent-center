@@ -844,33 +844,33 @@ public function chart_indicators(Request $request){
                             // $dataCVEMapping = $dataCVEMapping->whereIn("data_datacve_mapping.site_id",$site_id_arr);
                         // }
                         $dataCVEMapping = $dataCVEMapping->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve');
-                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby('data_datacve_mapping.namecve')->get()->toArray();
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby(['cve_asset.namecve','cve_asset.site_id'])->get()->toArray();
                     } else {
                         $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $SiteSettings->id)->select('namecve')->get();
                         $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name)->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         // if(isset($SiteSettings->id)){
-                        $dataCVEMapping = $dataCVEMapping->where("data_datacve_mapping.site_id",$SiteSettings->id);
+                        $dataCVEMapping = $dataCVEMapping->where("cve_asset.site_id",$SiteSettings->id);
                         // }
                         $dataCVEMapping = $dataCVEMapping->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve');
-                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby('data_datacve_mapping.namecve')->get()->toArray();
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby(['cve_asset.namecve','cve_asset.site_id'])->get()->toArray();
                     }
                 } else {
                     if(!$request -> sitecode){
                         $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
                         $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name)->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         // if(isset($SiteSettings->id)){
-                        $dataCVEMapping = $dataCVEMapping->whereIn("data_datacve_mapping.site_id",$site_id_arr);
+                        $dataCVEMapping = $dataCVEMapping->whereIn("cve_asset.site_id",$site_id_arr);
                         // }
                         $dataCVEMapping = $dataCVEMapping->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve');
-                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby('data_datacve_mapping.namecve')->get()->toArray();
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby(['cve_asset.namecve','cve_asset.site_id'])->get()->toArray();
                     } else {
                         $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$SiteSettings->id)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
                         $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name)->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         // if(isset($SiteSettings->id)){
-                        $dataCVEMapping = $dataCVEMapping->where("data_datacve_mapping.site_id",$SiteSettings->id);
+                        $dataCVEMapping = $dataCVEMapping->where("cve_asset.site_id",$SiteSettings->id);
                         // }
                         $dataCVEMapping = $dataCVEMapping->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve');
-                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby('data_datacve_mapping.namecve')->get()->toArray();
+                        $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby(['cve_asset.namecve','cve_asset.site_id'])->get()->toArray();
                     }
                 }
             }
