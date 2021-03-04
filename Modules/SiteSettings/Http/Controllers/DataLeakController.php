@@ -2049,6 +2049,7 @@ class DataLeakController extends Controller
         $site_id = 0;
         $DataLeakFeed_send_mail = [];
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request->id)->get();
+        $type = @$DataLeakFeedTemps[0]->feed_type;
         foreach ($DataLeakFeedTemps as $DataLeakFeedTemp) {
             $check_DataLeakFeed = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->first();
             if (empty($check_DataLeakFeed)) {
@@ -2170,16 +2171,30 @@ class DataLeakController extends Controller
 
         }
 
-
-        if($request->site){
-            $site = route('darkweb_datas.index',['id'=>$request->site]);
-        }else{
-            $site = route('datafeed.index');
+        if(@$type == 'social' || @$type == 'darkweb_public') {
+            if($request->site){
+                $site = route('darkweb_datas.index',['id'=>$request->site]);
+            }else{
+                $site = route('datafeed.index');
+            }
+        } else {
+            if($request->site){
+                $site = route('compromised_feed.index',['id'=>$request->site]);
+            }else{
+                $site = route('datafeed.darkweb_index');
+            }
         }
+
+
+        // if($request->site){
+        //     $site = route('darkweb_datas.index',['id'=>$request->site]);
+        // }else{
+        //     $site = route('datafeed.index');
+        // }
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),
-                'redirect' => $site,
+                'redirect' => @$site,
             ],
             true,
             Response::HTTP_OK
@@ -2189,6 +2204,7 @@ class DataLeakController extends Controller
     public function cancle_data_feed(Request $request)
     {
         $DataLeakFeedTemps = DataLeakFeedTemp::whereIn('id', $request->id)->get();
+        $type = @$DataLeakFeedTemps[0]->feed_type;
         foreach ($DataLeakFeedTemps as $DataLeakFeedTemp) {
             $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
             foreach($DataLeakFeeds as $DataLeakFeed){
@@ -2233,16 +2249,30 @@ class DataLeakController extends Controller
             $DataLeakFeedTemp->save();
         }
 
-        if($request->site){
-            $site = route('darkweb_datas.index',['id'=>$request->site]);
-        }else{
-            $site = route('datafeed.index');
+        if(@$type == 'social' || @$type == 'darkweb_public') {
+            if($request->site){
+                $site = route('darkweb_datas.index',['id'=>$request->site]);
+            }else{
+                $site = route('datafeed.index');
+            }
+        } else {
+            if($request->site){
+                $site = route('compromised_feed.index',['id'=>$request->site]);
+            }else{
+                $site = route('datafeed.darkweb_index');
+            }
         }
+
+        // if($request->site){
+        //     $site = route('darkweb_datas.index',['id'=>$request->site]);
+        // }else{
+        //     $site = route('datafeed.index');
+        // }
         
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),
-                'redirect' => route('datafeed.index'),
+                'redirect' => @$site,
             ],
             true,
             Response::HTTP_OK
