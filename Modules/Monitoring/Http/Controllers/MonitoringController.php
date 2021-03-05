@@ -47,6 +47,17 @@ class MonitoringController extends Controller
         return view('monitoring::index')->with($data);
     }
 
+    public function dashboard()
+    {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
+        
+        $data['page'] = langapp('monitoring_dashboard');
+        return view('monitoring::dashboard')->with($data);
+    }
+
     public function batchjob()
     {
         $role_custom = @check_role_custom();

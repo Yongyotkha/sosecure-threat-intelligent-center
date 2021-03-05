@@ -14,6 +14,7 @@ Route::group(
     ['middleware' => ['web', 'permission:role_center', 'permission:monitoring'], 'prefix' => 'monitoring'],
     function () {
         Route::get('/', 'MonitoringController@index')->name('monitoring.index')->middleware('can:menu_items');
+        Route::get('/dashboard', 'MonitoringController@dashboard')->name('monitoring.dashboard')->middleware('can:menu_items');
         Route::get('/batchjob', 'MonitoringController@batchjob')->name('monitoring.batchjob')->middleware('can:menu_items');
         Route::post('/tableMonitor', 'MonitoringController@tableMonitor')->name('monitoring.tableMonitor')->middleware('can:menu_items');
 

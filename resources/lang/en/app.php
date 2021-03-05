@@ -947,6 +947,7 @@ return [
     'email_setting'                              => 'E-mail Setting',
     'webdefacement'                              => 'Web Defacement',
     'monitoring'                                 => 'Monitoring',
+    'monitoring_dashboard'                       => 'Dashboard',
     'monitoring_compromised'                     => 'Monitoring',
     'monitoring_vulnerability'                   => 'Monitoring',
     'assets_setting_compromised'                 => 'Assets Setting',
