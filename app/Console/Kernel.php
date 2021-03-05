@@ -91,6 +91,7 @@ class Kernel extends ConsoleKernel
       $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(5);
       $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
       $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(5);
+      $schedule->command('app:RemoveFileLogFromStorage')->cron('0 0 */2 * *')->withoutOverlapping(5);
       //$schedule->command('app:test_indicator_update_ref')->everyMinute()->withoutOverlapping(5);
       $schedule->command('rm -rf /var/www/html/insight.sosecure.co.th/threat-intelligent-center/public/screenshot/screen-master-v2/jobs/')->cron('0 */12 * * *')->withoutOverlapping(5);
       
