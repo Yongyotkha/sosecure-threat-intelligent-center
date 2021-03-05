@@ -3791,12 +3791,22 @@ class DataLeakController extends Controller
 
     public function add_dataleak(Request $request)
     {
+
+        $keyword = @$request->keyword;
+        $other = @$request->other;
+        if($keyword == 'Other') {
+            $keyword_i = @$other;
+        } else {
+            $keyword_i = @$keyword;
+        }
    
         $DataLeakFeed = new DataLeakFeed();
         $DataLeakFeed->code = generator_uuid();
         $DataLeakFeed->feel_type = @$request->type;
         // $DataLeakFeed->feedcontent = @$request->content;
-        $DataLeakFeed->keyword = @$request->keyword;
+
+        $DataLeakFeed->keyword = @$keyword_i;
+
         $DataLeakFeed->source_name = @$request->source;
         $DataLeakFeed->feedtimepost = Carbon::now();
         $DataLeakFeed->status = 1;

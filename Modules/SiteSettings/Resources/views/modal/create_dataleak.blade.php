@@ -34,9 +34,23 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Keyword </label>
+                <label class="col-lg-3 control-label">Keyword <span class="text-danger">*</span></label>
                 <div class="col-lg-9">
-                    <input type="text" name="keyword" class="form-control">
+                    {{-- <input type="text" name="keyword" class="form-control"> --}}
+                    <select name="keyword" id="keyword55" class="select2-option form-control" required>
+                        <option value="">Select</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Twitter">Twitter</option>
+                        <option value="Website">Website</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row" id="area_other" style="display:none;">
+                <label class="col-lg-3 control-label"> </label>
+                <div class="col-lg-9">
+                    <input type="text" name="other" placeholder="keyword etc." class="form-control">
                 </div>
             </div>
             <div class="form-group row">
@@ -88,6 +102,16 @@
 @include('stacks.js.markdown')
 <script>
 
+    $("#keyword55").change(function(){
+        if($(this).val() == 'Other') {
+            $("#area_other").show();
+            $("#area_other").prop("disabled",false);
+        } else {
+            $("#area_other").hide();
+            $("#area_other").prop("disabled",true);
+        }
+    });
+
     $('form').each(function () {
         if ($(this).data('validator'))
             $(this).data('validator').settings.ignore = ".note-editor *";
@@ -131,13 +155,10 @@
                 toastr.error( errorsHtml , '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
             }
-            
-            
         }); 
-       
-     
-         
     });
+
+
 </script>
 @endpush
 
