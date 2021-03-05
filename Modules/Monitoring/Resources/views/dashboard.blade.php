@@ -161,6 +161,7 @@
                 </div>
             </section>
 
+            <!--
             <section class="m-b-10">
                 <div class="row">
                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -197,6 +198,7 @@
                     </div>
                 </div>
             </section>
+        -->
 
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">

@@ -248,10 +248,10 @@ class MonitoringController extends Controller
 
     public function tableMonitor(Request $request)
     {
+        $role_custom = @check_role_custom();
         if(!$role_custom['monitoring']) {
             check_permission403();
         }
-        $role_custom = @check_role_custom();
         
         
         $model = '';
