@@ -582,6 +582,11 @@
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
+                "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    $('td:eq(2)', nRow).html('----'); 
+                },
+
+
                 "order": [ 6, 'desc' ],
                 columnDefs: [
                     {

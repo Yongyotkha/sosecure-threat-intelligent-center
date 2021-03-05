@@ -45,21 +45,23 @@ class test extends Command
     {
 
      //   echo date("M d H:i:s");
-        $created_From = date("yyyy-MM-dd");
-        $created_To = date("yyyy-MM-dd");
+        $created_From = date("Y-m-d");
+        $created_To = date("Y-m-d");
 
-        $created_From = date("2021-02-28");
+       // $created_From = date("2021-02-28");
 
         $Data_datacve_mapping_data =    Data_datacve_mapping_assest::where('updated_at', '>=', $created_From)->where('updated_at', '<=', $created_To)->get();
         foreach ($Data_datacve_mapping_data as $key => $value_ampping) {
-            print_r($value_ampping);
-            $value = Data_datacve_mapping_assest::where('namecve',$value_ampping->namecve)-first();
-            $Logs_setting_data = Logs_setting::where('site_id',$value->site_id)->where('type','cve')->first();
+          //  print_r($value_ampping);
+         // print PHP_EOL .print_r($value_ampping) . PHP_EOL;
+
+            $value = Data_datacve_mapping::where('namecve',$value_ampping->namecve)->first();
+            $Logs_setting_data = Logs_setting::where('site_id',$value_ampping->site_id)->where('type','cve')->first();
             if ($Logs_setting_data) {
              $format_str = $Logs_setting_data->content;
              if ($format_str) {
 
-                $CVE_assets_data = CVE_assets::where('id',$value->cveven_id)->first();
+                $CVE_assets_data = CVE_assets::where('id',$value_ampping->cve_asset_id)->where('site_id',$value_ampping->site_id)->first();
                 $format_str = str_replace("[[M]]",date("M"),$format_str);
                 $format_str = str_replace("[[m]]",date("m"),$format_str);
                 $format_str = str_replace("[[Y]]",date("Y"),$format_str);
@@ -74,7 +76,7 @@ class test extends Command
                 $format_str = str_replace("[[Version]]", $CVE_assets_data->version,$format_str);
                 $format_str = str_replace("[[Edtion]]", $CVE_assets_data->edition,$format_str);
                 if (strpos($format_str, '[[Site]]') !== false) {
-                    $Sites_data = Sites::where('id',$value->site_id)->first();
+                    $Sites_data = Sites::where('id',$value_ampping->site_id)->first();
                     $format_str = str_replace("[[Site]]", $Sites_data->name,$format_str);
                 }
                 $format_str = str_replace("[[IP]]", $CVE_assets_data->IP,$format_str);
@@ -87,12 +89,13 @@ class test extends Command
                 $format_str = str_replace("[[Transaction]]", $value->created_at->format('Y-m-d H:i:s'),$format_str);
                 $format_str = str_replace("[[Description]]", $value->description,$format_str);
                 $Logs_sent_transaction_save = new Logs_sent_transaction;
-                $Logs_sent_transaction_save->site_id = $value->site_id;
+                $Logs_sent_transaction_save->site_id = $value_ampping->site_id;
                 $Logs_sent_transaction_save->content = $format_str ;
                 $Logs_sent_transaction_save->type = 'cve' ;
-                $Logs_sent_transaction_save->transaction_status = 2 ;
+                $Logs_sent_transaction_save->transaction_status = 1 ;
                //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
                 $Logs_sent_transaction_save->save(); 
+                print PHP_EOL . $format_str ;
             }
         }
 

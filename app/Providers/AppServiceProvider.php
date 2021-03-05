@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        ini_set('memory_limit', '6000M');
         // if ($this->app->isLocal()) {
         //     $this->app->register(TelescopeServiceProvider::class);
         // }
