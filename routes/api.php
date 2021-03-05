@@ -110,8 +110,10 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('web_defacement/change_status', 'Api\ApiWebdefacementController@web_defacement_change_status');
 
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
-
+    
     Route::post('search/searchAll', 'Api\ApiSearchController@searchAll');
+
+    Route::post('transaction_send_log_error', 'Api\ReciveLogErrorController@recive_log_error');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
