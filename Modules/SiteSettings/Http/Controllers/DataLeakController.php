@@ -3371,13 +3371,13 @@ class DataLeakController extends Controller
 
     public function dark_web_datatables(Request $request)
     {
-        $model = DataLeakFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public'])->with('get_socail_ref_temp');
+        $model = DataLeakFeedTemp::whereIn('feed_type', ['social','darkweb_public'])->with('get_socail_ref_temp');
 
         $site = SiteSettings::select('id')->where('code', $request->site)->first();
 
         $model->whereHas('get_socail_ref_temp', function ($query) use ($site) {
 
-            $query->where('site_id', 'LIKE', '%' . $site->id . '%');
+            $query->where('site_id', 'LIKE', $site->id);
         });
         
         // $model->whereHas('get_socail_ref_temp', function ($query) use ($site) {
