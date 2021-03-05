@@ -395,6 +395,26 @@ class ApiNewsController extends ApiController
                         } else {
                             $logo_url = @$item->logo;
                         }
+
+                        $html_cate_all = '';
+                        if(!empty($item->get_cate)) {
+                            foreach($item->get_cate as $cate_id_val) {
+                                if(!empty($cate_id_val)) {
+                                    $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
+                                }
+                            }
+                        }
+
+                        $html_source_all_full = '';
+                        $html_source_all = '';
+                        if(!empty($item->source)) {
+                            $html_source_all .= '<span class="badge badge-info" style="background-color:#17a2b8;">'.@$item->source.'</span> &nbsp;';  
+                        }
+                        if(!empty($html_source_all)) {
+                            $html_source_all_full = '<b>Source: </b>'.$html_source_all;
+                        }
+
+
                         $html .= '
                             <!--<div class="checkbox-news-select">
                                 <label class="mr-3">
@@ -409,7 +429,9 @@ class ApiNewsController extends ApiController
                                 <div class="entry-meta">
                                 <span class="entry-view"> <i class="fas fa-eye"></i> '.$item -> view.'</span>
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
-                                <span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
+                                <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                                .@$html_source_all_full.
+                                '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
                                 </div>
                             </div>
                             <div class="content-news-image">
@@ -679,6 +701,25 @@ class ApiNewsController extends ApiController
                             } else {
                                 $url_logo = config('app.URL_CENTER_PUBLISH').@$item -> news -> logo;
                             }
+
+
+                            $html_cate_all = '';
+                            if(!empty($item->news->get_cate)) {
+                                foreach(@$item->news->get_cate as $cate_id_val) {
+                                    if(!empty($cate_id_val)) {
+                                        $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
+                                    }
+                                }
+                            }
+
+                            $html_source_all_full = '';
+                            $html_source_all = '';
+                            if(!empty($item->news->source)) {
+                                $html_source_all .= '<span class="badge badge-info" style="background-color:#17a2b8;">'.@$item->news->source.'</span> &nbsp;';  
+                            }
+                            if(!empty($html_source_all)) {
+                                $html_source_all_full = 'Source: '.$html_source_all;
+                            }
         
         
                             $html .= '
@@ -695,7 +736,9 @@ class ApiNewsController extends ApiController
                                     <div class="entry-meta">
                                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$item -> news -> public_date.'</span>
                                         <span class="entry-view"> <i class="fas fa-eye"></i> '.@$item -> news -> view.'</span>
-                                        <span><p></p>&nbsp;'.strip_tags(@$item -> news -> detail_th).'</p></span>
+                                        <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                                        .@$html_source_all_full.
+                                        '<span><p></p>&nbsp;'.strip_tags(@$item -> news -> detail_th).'</p></span>
                                     </div>
                                 </div>
                                 <div class="content-news-image">
