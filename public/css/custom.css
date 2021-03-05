@@ -2994,7 +2994,7 @@ input.input-login:focus {
 
 .mdasbord-inner{
     padding: 0 15px !important;
-    max-width: 25%;
+    /*max-width: 25%;*/
     flex-basis: 25%;
     display: flex;
 }
