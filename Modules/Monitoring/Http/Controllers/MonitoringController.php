@@ -11,6 +11,8 @@ use DB;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Monitoring\Entities\MonitorLogs;
 use Modules\Monitoring\Entities\SentLogs;
+use Carbon\Carbon;
+use App\Entities\Categories;
 
 class MonitoringController extends Controller
 {
@@ -49,14 +51,83 @@ class MonitoringController extends Controller
 
     public function dashboard()
     {
+        
+        // dd($dateNow->diffInMinutes('2021-03-05 14:00:09'));
+
         $role_custom = @check_role_custom();
         if(!$role_custom['monitoring']) {
             check_permission403();
         }
+        $tz = new \DateTimeZone('Asia/Bangkok');
+        $dateNow = Carbon::now();
+        $dateNow->setTimezone($tz);
+        $htmlCard = '';
+        $SiteSettings = SiteSettings::select('id','logo','name','code')->where('active', '1')->whereNull('deleted_at')->with('get_categorys')->get()->toArray();
         
+        if(!empty($SiteSettings)){
+           
+            foreach ($SiteSettings as $key => $value) {
+                $TransactionBatchjob = TransactionBatchjob::select('transcation_date_start')->where('site_id', $value['id'])->where('status', 1)->orderBy('transcation_date_start','desc')->first()->toArray();
+                $SiteSettings[$key] = array_merge($SiteSettings[$key], $TransactionBatchjob);
+            }
+    
+            usort($SiteSettings, function($a, $b) {
+                $t1 = strtotime($a['transcation_date_start']);
+                $t2 = strtotime($b['transcation_date_start']);
+                return $t2 - $t1;
+            });
+         
+            foreach ($SiteSettings as $key => $value) {
+                
+                if(!empty($value['transcation_date_start'])){
+                    $dateDiffMin = $dateNow->diffInMinutes($value['transcation_date_start']);
+                    if($dateDiffMin<3){
+                        $statusDotClass = 'dot low';
+                        $statusDotName = 'Online';
+                    }else{
+                        $statusDotClass = 'dot critical';
+                        $statusDotName = 'Offline';
+                    }
+        
+                    $get_categorys = '';
+                    if(!empty($value['get_categorys'])){
+                        foreach ($value['get_categorys'] as $Categorie_s) {
+                            $Categorie = Categories::select('name')->where('id',$Categorie_s['category_id'])->first();
+                            $get_categorys = $get_categorys.$Categorie->name.',';
+                        }
+                        $get_categorys = rtrim($get_categorys,",");
+                    }
+                    
+                    $htmlCard .= '
+                    <div class="item-wdfm mdasbord-inner" id="data_main_'.$value['code'].'">
+                        <div class="wdfm-card">
+                            <center > 
+                                <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/'.$value['logo'].'" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
+                            </center>
+        
+                            <div class="wdfm-footer start-top" >
+                                <div class="wdfm-ft-left flex">
+                                    <div><strong>Site:</strong> '.$value['name'].'</div>
+                                    <div class="status-flex" id="data_status_'.$value['code'].'"><strong>Status:</strong> &nbsp; <span class="dot '.$statusDotClass.'"></span> '.$statusDotName.'
+                                    </div>
+                                    <div><strong>Catagory:</strong> '.$get_categorys.'</div>
+                                    <div id="data_lastcheck_'.$value['code'].'"><strong>Last Online:</strong> '.$value['transcation_date_start'].'</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>';
+                }
+
+            }
+        }
+        
+
+
         $data['page'] = langapp('monitoring_dashboard');
+        $data['htmlCard'] = $htmlCard;
         return view('monitoring::dashboard')->with($data);
     }
+    
 
     public function batchjob()
     {
@@ -177,10 +248,11 @@ class MonitoringController extends Controller
 
     public function tableMonitor(Request $request)
     {
-        $role_custom = @check_role_custom();
         if(!$role_custom['monitoring']) {
             check_permission403();
         }
+        $role_custom = @check_role_custom();
+        
         
         $model = '';
         $html = '';
@@ -480,7 +552,36 @@ class MonitoringController extends Controller
 
     public function load_card(Request $request){
 
+        $tz = new \DateTimeZone('Asia/Bangkok');
+        $dateNow = Carbon::now();
+        $dateNow->setTimezone($tz);
+
+       
+        $SiteSettings = SiteSettings::select('id','logo','name','code')->where('active', '1')->whereNull('deleted_at')->get()->toArray();
+        
+        foreach ($SiteSettings as $key => $value) {
+            $TransactionBatchjob = TransactionBatchjob::select('transcation_date_start')->where('site_id', $value['id'])->where('status', 1)->orderBy('transcation_date_start','desc')->first()->toArray();
+            $dateDiffMin = $dateNow->diffInMinutes($TransactionBatchjob['transcation_date_start']);
+            if($dateDiffMin<3){
+                $dataStatus['statusDotClass'] = 'dot low';
+                $dataStatus['statusDotName'] = 'Online';
+            }else{
+                $dataStatus['statusDotClass'] = 'dot critical';
+                $dataStatus['statusDotName'] = 'Offline';
+            }
+            unset($SiteSettings[$key]['id']);
+            $SiteSettings[$key] = array_merge($SiteSettings[$key], $TransactionBatchjob, $dataStatus);
+
+        }
+
+        if ($request->ajax()) {
+            $data = [
+                "card_data" => @$SiteSettings,
+            ];
+            return response()->json($data);
+        }
     }
+
     public function load_status(Request $request){
 
     }

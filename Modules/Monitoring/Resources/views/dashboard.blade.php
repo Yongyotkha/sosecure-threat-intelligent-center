@@ -209,7 +209,7 @@
                 <div class="panel-body" style="background: #f2f2f2;">
                     <div class="wdfm-container" id='data_card'>
 
-                        <div class="item-wdfm mdasbord-inner">
+                        {{-- <div class="item-wdfm mdasbord-inner">
                             <div class="wdfm-card">
                                 <center > 
                                     <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
@@ -225,238 +225,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="item-wdfm mdasbord-inner">
-                            <div class="wdfm-card">
-                                <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
-                                </center>
-
-                                <div class="wdfm-footer start-top" >
-                                    <div class="wdfm-ft-left flex">
-                                        <div><strong>Site:</strong> Demo</div>
-                                        <div class="status-flex"><strong>Status:</strong> &nbsp; <span class="dot low"></span> Online
-                                        </div>
-                                        <div><strong>Catagory:</strong> Software</div>
-                                        <div><strong>Last Online:</strong> 2021-03-05 14:16:33</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                
-                        
+                        </div> --}}
+                        {!!$htmlCard!!}
                     </div>
 
                 </div>
@@ -538,6 +308,7 @@
 @include('stacks.js.lightbox')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
+@include('stacks.js.defaultpic')
 
 <script>
     $(document).ready(function(){
@@ -546,7 +317,8 @@
         }); 
         $('.wdfm-card').mouseleave(function(){
             $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
-        }); 
+        });
+        setInterval(function(){ load_card(); }, 60000);
     });
 
     Highcharts.chart('status1', {
@@ -645,8 +417,6 @@
 
 
 
-
-
     function load_card(){
         $.ajax({
             headers: {
@@ -656,202 +426,19 @@
             type: "post",
             datatype: "html",
             beforeSend: function(){
-                f_loading(null, '#data_card');
-                $("#data_card").html('');  
+                loading('load');
             },
         }).done(function(data){
-            f_loading_stop(null, '#data_card');
-                $("#data_card").html(data.html);  
-
-                $('.wdfm-card').hover(function(){
-                    $(this).find('.wdfm-header').addClass('wdfm-header-upper');
-                }); 
-                $('.wdfm-card').mouseleave(function(){
-                    $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
-                }); 
-
-          
-             
+            data.card_data.forEach(function(card_data) {
+                $(`#data_status_${card_data.code}`).html(`<strong>Status:</strong> &nbsp; <span class="${card_data.statusDotClass}"></span>${card_data.statusDotName}`);
+                $(`#data_lastcheck_${card_data.code}`).html(`<strong>Last Online:</strong> ${card_data.transcation_date_start}`);
+                loading('stop_load');
+            });
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('.ajax-loading').hide();
+            loading('stop_load');
             console.log("No response from server");
         });
     }
-
-
-    function load_status(){
-        if(search_val == 1 || search_val == 0) {
-            $("#status1").html('');             
-        }
-
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: '{!! route('monitoring.load_status') !!}',
-            type: "POST",
-            data: ({
-
-
-            }),
-            beforeSend: function(){
-                $('.status_l').show();
-
-            },
-        }).done(function(data){
-             
-            $('.status_l').hide();
-            const chart_top_category = Highcharts.chart('status1', {
-            chart: {
-                height: 223, 
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            title: {
-                text: ''
-            },
-            tooltip: {
-                pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    color: ['#e64732', '#fcc838', '#00dcff', '#88ce4f', '#d3d3d3'],
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                    },
-                    style:{
-                        background: '#fff'
-                    },
-                    align: 'center',
-                    cursor: 'pointer',
-                    point: {
-                        events: {
-                            click: function () {
-                                search_val = 1;
-                                news_source = [];
-                                news_category = [];
-                                news_category.push(this.data);
-                                datatable();
-                            }
-                        }
-                    }
-                }
-            },
-            series: [{
-                colorByPoint: false,
-                data: data,
-            }],
-        });
-
-
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('.loadhost').hide();
-            console.log("No response from server");
-        });
-        
-    }
-
-
-    function load_category(){
-        if(search_val == 1 || search_val == 0) {
-            $("#category").html('');             
-        }
-
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: '{!! route('monitoring.load_category') !!}',
-            type: "POST",
-            data: ({
-                keywords : keywords,
-                status_news : status_news,
-                news_source : news_source,
-                news_category : news_category,
-                search_val : search_val,
-                startDate : startDate,
-                endDate : endDate,
-                isDateSearch : isDateSearch,
-
-            }),
-            beforeSend: function(){
-                $('.category').show();
-
-            },
-        }).done(function(data){
-             
-            $('.category').hide();
-            const chart_top_category = Highcharts.chart('category', {
-            chart: {
-                height: 223, 
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            title: {
-                text: ''
-            },
-            tooltip: {
-                pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    color: ['#e64732', '#fcc838', '#00dcff', '#88ce4f', '#d3d3d3'],
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                    },
-                    style:{
-                        background: '#fff'
-                    },
-                    align: 'center',
-                    cursor: 'pointer',
-                    point: {
-                        events: {
-                            click: function () {
-                                search_val = 1;
-                                news_source = [];
-                                news_category = [];
-                                news_category.push(this.data);
-                                datatable();
-                            }
-                        }
-                    }
-                }
-            },
-            series: [{
-                colorByPoint: false,
-                data: data,
-            }],
-        });
-
-
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('.loadhost').hide();
-            console.log("No response from server");
-        });
-        
-    }
-
-
 
 
 </script>
