@@ -426,6 +426,9 @@
 
 <script src="{{ getAsset('js/plugins.js') }}"></script>
 <script src="{{ getAsset('js/custom.js') }}"></script>
+<script src="//dmc1acwvwny3.cloudfront.net/atatus.js"></script>
+<script type="text/javascript">atatus.config('3b8d0df7bc0a49989d0ce10e2892b6bc').install();</script>
+
 @isset($help) 
     <script src="{{ getAsset('plugins/intro/intro.min.js') }}"></script>
     <script src="{{ getAsset('plugins/intro/demo.js') }}"></script>
