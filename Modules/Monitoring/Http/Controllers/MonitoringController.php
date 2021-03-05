@@ -478,4 +478,14 @@ class MonitoringController extends Controller
         );
     }
 
+    public function load_card(Request $request){
+
+    }
+    public function load_status(Request $request){
+
+    }
+    public function load_category(Request $request){
+
+    }
+
 }

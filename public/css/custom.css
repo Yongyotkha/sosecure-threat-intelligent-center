@@ -2991,6 +2991,14 @@ input.input-login:focus {
     flex-basis: 33.33333%;
     display: flex;
 }
+
+.mdasbord-inner{
+    padding: 0 15px !important;
+    max-width: 25%;
+    flex-basis: 25%;
+    display: flex;
+}
+
 .wdfm-inner.half-two{
     padding: 0 15px !important;
     max-width: 50%;
