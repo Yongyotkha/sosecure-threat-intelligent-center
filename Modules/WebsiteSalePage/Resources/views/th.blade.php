@@ -141,16 +141,20 @@
 
                     <ul class="list-img-ioc justify-content-start">
                         <li>
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Vulnerabilities.png')}}" alt="Vulnerabilities">
-                            <p>Vulnerabilities</p>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/ad_Ip.png')}}" alt="IP Address">
+                            <p>IP Address</p>
                         </li>
                         <li>
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Compromise_0.png')}}" alt="Compromised">
-                            <p>Compromised</p>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/ad_subdomain.png')}}" alt="Sub-Domian">
+                            <p>Sub-Domian</p>
                         </li>
                         <li>
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Information.png')}}" alt="Information">
-                            <p>Information</p>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/ad_email.png')}}" alt="Email">
+                            <p>Email</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/ad_discovery.png')}}" alt="Discovery Tool">
+                            <p>Discovery Tool</p>
                         </li>
                     </ul>
 
@@ -183,8 +187,12 @@
                     </span>
                     <ul class="list-img-ioc mt-3">
                         <li>
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/dataleak.png')}}" style="max-width: 75px" alt="Data Leak">
-                            <p>Data Leak</p>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/dd_web-site.png')}}" style="max-width: 75px" alt="Web Site">
+                            <p>Web Site</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/dd_community.png')}}" style="max-width: 75px" alt="Communities">
+                            <p>Communities</p>
                         </li>
                         <li>
                             <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Group99.png')}}" style="max-width: 75px" alt="Social Network">
@@ -252,18 +260,22 @@
 
                     <ul class="list-img-ioc justify-content-start">
                         <li>
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/data.png')}}" alt="data">
-                            <p>Data</p>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Threat Hunting.png')}}" alt="Threat Hunting">
+                            <p>Threat Hunting</p>
                         </li>
                         <li>
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Server.png')}}" alt="Server">
-                            <p>Server</p>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Compromise_0.png')}}" alt="Compromised">
+                            <p>Compromised</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_backdoor.png')}}" alt="Backdoor">
+                            <p>Backdoor</p>
                         </li>
                     </ul>
 
                 </div>
                 <div class="col-lg-6 mb-3 order-lg-2 order-1 text-center mb-lg-0">
-                    <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/dash.png')}}" alt="">
+                    <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/cd_Group.png')}}" alt="">
                 </div>
             </div>
         </div>
