@@ -94,7 +94,9 @@ class DashboardNewController extends Controller
 
         
 
-        $data['page'] = langapp('dashboard');
+        $data['page'] = 'dashboard_home';
+        // $data['page'] = langapp('dashboard');
+
         if(@get_role_custom()['superadmin'] == 1) {
             $data['count_CVEAssets'] = CVEAssets::where("active", '=', 1)->count();
             $data['count_CVEMapping'] = CVEMapping::count();

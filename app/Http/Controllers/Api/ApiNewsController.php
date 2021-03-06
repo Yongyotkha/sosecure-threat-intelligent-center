@@ -412,6 +412,8 @@ class ApiNewsController extends ApiController
                         }
                         if(!empty($html_source_all)) {
                             $html_source_all_full = '<b>Source: </b>'.$html_source_all;
+                        } else {
+                            $html_source_all_full = 'Source: <span class="badge badge-info" style="background-color:#17a2b8;">None</span> &nbsp;';
                         }
 
 
@@ -719,6 +721,8 @@ class ApiNewsController extends ApiController
                             }
                             if(!empty($html_source_all)) {
                                 $html_source_all_full = 'Source: '.$html_source_all;
+                            } else {
+                                $html_source_all_full = 'Source: <span class="badge badge-info" style="background-color:#17a2b8;">None</span> &nbsp;';
                             }
         
         
