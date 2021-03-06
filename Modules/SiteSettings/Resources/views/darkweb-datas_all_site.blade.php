@@ -390,6 +390,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+
 @endpush
 
 @push('pagescript')
@@ -600,7 +601,7 @@
 
 
     
-                    html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'         <strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost+'</div>';
+                    html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost+'</div>';
 
 
 
@@ -733,6 +734,7 @@
                         visible: visible_c,
                         targets: 7,
                         width: '10px',
+                        className : 'nowrap_top',
                         render: function (data, type, full, meta) {
 
                             var checked_val = null;
@@ -749,7 +751,7 @@
                     },
                     {
                         targets: 8,
-                        className: 'nowrap',
+                        className: 'nowrap nowrap_top',
                         width: '10px',
                         render: function (data, type, full, meta) {
                             return `
@@ -974,5 +976,12 @@
 
 
 </script>
+<style>
+.nowrap_top{
+
+    vertical-align: top!important;
+    padding-top:10px!important;
+}
+</style>
 @endpush
 @endsection
