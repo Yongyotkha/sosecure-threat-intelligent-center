@@ -1,6 +1,45 @@
 @extends('websitesalepage::layouts.master')
 @section('content')
 
+<style>/* unvisited link */
+    a:link {
+      color: white;
+    }
+    
+    /* visited link */
+    a:visited {
+      color: white;
+    }
+    
+    /* mouse over link */
+    a:hover {
+      color: white;
+    }
+    
+    /* selected link */
+    a:active {
+      color: white;
+    }
+
+    #btn_c_sale:hover {
+        background: #007bff;
+        color: #fff !important;
+    }
+    .con1 {
+        border: 1px solid rgba(25, 118, 210, 0.5);
+        font-weight: 300;
+        border-radius: 2px;
+        cursor: pointer;
+        font-family: "Nunito";
+        transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        font-size: 1.7rem;
+        color: #1976d2;
+        padding: 1rem 1.5rem;
+        margin-top: 1rem;
+        text-transform: uppercase;
+    }
+</style>
+
 @php 
     if(Auth::check()) {
         // if(Session::has('check_login_page')){
@@ -337,6 +376,24 @@
                 <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
                         <h1 class="primary-text text-center">
+                            Windows Linux
+                        </h1>
+                        <span class="secondary-text">
+                          Operating System  
+                        </span>
+                    </div>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/wl_windows_linux.png')}}" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-lg-12 text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text text-center">
                             Mis-Configuration Detection
                         </h1>
                         <span class="secondary-text">
@@ -344,6 +401,49 @@
                         </span>
                     </div>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/Icom.png')}}" alt="Mis-Configuration Detection">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section bg-c-muted">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
+                    <div class="mb-4 text-lg-left text-center">
+                        <span class="secondary-text">
+                            ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
+                        </span>
+                    </div>
+                    <div>
+                        <ul class="list-img-ioc justify-content-start">
+                            <li>
+                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing">
+                                <p>Phishing</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile">
+                                <p>Fake Mobile <br> Application</p>
+                            </li>
+                            <li>
+                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive">
+                                <p>Drive-By <br>Download</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1">
+                    <h1 class="primary-text text-center">
+                        Social Engineering Detection
+                    </h1>
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/vec.png')}}" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12" style="text-align: center;">
+                    <a id="btn_c_sale" href="#contact" class="con1" style="color: #333;">Contact Sales</a>
                 </div>
             </div>
         </div>
@@ -392,45 +492,6 @@
             </div>
         </div>
     </section>
-
-    <section class="content-section bg-c-muted">
-        <div class="container">
-            <div class="row d-flex align-items-center">
-                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
-                    <div class="mb-4 text-lg-left text-center">
-                        <span class="secondary-text">
-                            ตรวจจับการโจมตีผู้ใช้งานด้วยเทคนิค Social Engineering เช่น
-                        </span>
-                    </div>
-                    <div>
-                        <ul class="list-img-ioc justify-content-start">
-                            <li>
-                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing">
-                                <p>Phishing</p>
-                            </li>
-                            <li>
-                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile">
-                                <p>Fake Mobile <br> Application</p>
-                            </li>
-                            <li>
-                                <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive">
-                                <p>Drive-By <br>Download</p>
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-
-                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1">
-                    <h1 class="primary-text text-center">
-                        Social Engineering Detection
-                    </h1>
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/vec.png')}}" alt="">
-                </div>
-          
-            </div>
-        </div>
-    </section>
    
 
 
@@ -441,7 +502,8 @@
       <div class="container">
 
         <div class="section-header">
-            <h1  class="primary-text fontw-weight-bold text-center">Contact</h1>
+            {{-- <h1  class="primary-text fontw-weight-bold text-center">Contact Sales</h1> --}}
+            <h1 class="primary-text fontw-weight-bold text-center">Contact Us</h1>
         </div>
 
         <div class="row">
@@ -451,7 +513,8 @@
                        <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-map-marker"></i></span> 410/ 34 Ratchadaphisek Rd, Khwaeng Samsen Nok, Khet Huai Khwang, Krung Thep Maha Nakhon 10310</p></li>
                        <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-envelope"></i></span> Support@sosecure.co.th</p></li>
                        <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-phone"></i></span> 061 564 5294</p></li>
-                       <li><p class="mb-3"><span class="icon-contact"><i class="fab fa-line"></i></span> @sosecure</p></li>
+                       <li><p class="mb-3"><span class="icon-contact"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="line" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-line fa-w-14 fa-2x" style="width: 22px;"><path fill="currentColor" d="M272.1 204.2v71.1c0 1.8-1.4 3.2-3.2 3.2h-11.4c-1.1 0-2.1-.6-2.6-1.3l-32.6-44v42.2c0 1.8-1.4 3.2-3.2 3.2h-11.4c-1.8 0-3.2-1.4-3.2-3.2v-71.1c0-1.8 1.4-3.2 3.2-3.2H219c1 0 2.1.5 2.6 1.4l32.6 44v-42.2c0-1.8 1.4-3.2 3.2-3.2h11.4c1.8-.1 3.3 1.4 3.3 3.1zm-82-3.2h-11.4c-1.8 0-3.2 1.4-3.2 3.2v71.1c0 1.8 1.4 3.2 3.2 3.2h11.4c1.8 0 3.2-1.4 3.2-3.2v-71.1c0-1.7-1.4-3.2-3.2-3.2zm-27.5 59.6h-31.1v-56.4c0-1.8-1.4-3.2-3.2-3.2h-11.4c-1.8 0-3.2 1.4-3.2 3.2v71.1c0 .9.3 1.6.9 2.2.6.5 1.3.9 2.2.9h45.7c1.8 0 3.2-1.4 3.2-3.2v-11.4c0-1.7-1.4-3.2-3.1-3.2zM332.1 201h-45.7c-1.7 0-3.2 1.4-3.2 3.2v71.1c0 1.7 1.4 3.2 3.2 3.2h45.7c1.8 0 3.2-1.4 3.2-3.2v-11.4c0-1.8-1.4-3.2-3.2-3.2H301v-12h31.1c1.8 0 3.2-1.4 3.2-3.2V234c0-1.8-1.4-3.2-3.2-3.2H301v-12h31.1c1.8 0 3.2-1.4 3.2-3.2v-11.4c-.1-1.7-1.5-3.2-3.2-3.2zM448 113.7V399c-.1 44.8-36.8 81.1-81.7 81H81c-44.8-.1-81.1-36.9-81-81.7V113c.1-44.8 36.9-81.1 81.7-81H367c44.8.1 81.1 36.8 81 81.7zm-61.6 122.6c0-73-73.2-132.4-163.1-132.4-89.9 0-163.1 59.4-163.1 132.4 0 65.4 58 120.2 136.4 130.6 19.1 4.1 16.9 11.1 12.6 36.8-.7 4.1-3.3 16.1 14.1 8.8 17.4-7.3 93.9-55.3 128.2-94.7 23.6-26 34.9-52.3 34.9-81.5z" class=""></path></svg></span> @sosecure</p></li>
+                       <li style="margin-top: 5px;"><p class="mb-3"><span class="icon-contact"><i class="fa fa-facebook-square" style="font-size: 22px !important;" aria-hidden="true"></i></span> <a href="https://www.facebook.com/s0secure" target="_blank">www.facebook.com/s0secure</a></p></li>
                    </ul>
 
                    <div class="icon-email">
@@ -478,7 +541,7 @@
   <footer id="footer">
     <div class="container">
       <div class="copyright">
-        &copy; Copyright <strong>SOSecure Threat inSight</strong>. All Rights Reserved
+        &copy; Copyright <strong>SOSECURE Threat inSight</strong>. All Rights Reserved
       </div>
     </div>
   </footer>
