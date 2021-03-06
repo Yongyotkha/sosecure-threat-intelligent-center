@@ -542,6 +542,7 @@
             },
             {
                 data: 'industries',
+                "visible": false,
             },
             {
                 data: 'name',
@@ -686,6 +687,7 @@
             },
             {
                 data: 'industries',
+                "visible": false,
             },
             {
                 data: 'name',
