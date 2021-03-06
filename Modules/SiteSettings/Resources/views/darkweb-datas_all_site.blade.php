@@ -583,7 +583,28 @@
                     $(row).attr('id', 'tr' + data.id);
                 },
                 "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    $('td:eq(2)', nRow).html('----'); 
+                    var html_content='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><strong>'+stripHtml(aData.get_data_leak_feed_one.feedcontent)+'</strong></div>';
+                    let val = aData.get_data_leak_feed_one;
+                            if(val) {
+                                val = aData.get_data_leak_feed_one;
+                                if(val) {
+                                    val = aData.get_data_leak_feed_one.source_name;
+                                }
+                            }
+                    html_content+='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;;">'+ val+'</div>';
+                    let val_type = aData.feel_type;
+                            if(val_type) {
+                                val_type = get_word_leak_compromise(aData.feel_type,'compromise');
+                            }
+                    html_content+='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><div class="img-icon-card"><img src="'+"{{url('/')}}"+'/images/icebergline2.png" alt=""></div><strong><span class="badge badge-Warning" style="background-color: #00dcff;    margin-top: 15px;">'+val_type+'</span></strong></div>';
+
+
+    
+                    html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'         <strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost+'</div>';
+
+
+
+                    $('td:eq(1)', nRow).html(html_content); 
                 },
 
 
@@ -621,6 +642,7 @@
                         targets: 2,
                         width: '60px',
                         className:'nowrap',
+                        "visible": false,
                         render: function (data, type, full, meta) {
                             let val = full.feel_type;
                             if(val) {
@@ -635,6 +657,7 @@
                     {
                         targets: 3,
                         width: '50px',
+                        "visible": false,
                         render: function (data, type, full, meta) {
                 
         
@@ -647,7 +670,8 @@
                     
                     {
                         targets: 4,
-                        width: '400px',                     
+                        width: '400px',     
+                        "visible": false,                
                         render: function (data, type, full, meta) {                  
                             let val = '';
                             let content = '';
@@ -668,6 +692,7 @@
                         targets: 5,
                         width: '500px',
                         className : 'nowrap',
+                        "visible": false,
                         render: function (data, type, full, meta) {
                             let val = full.get_data_leak_feed_one;
                             if(val) {
@@ -686,6 +711,7 @@
                         targets: 6,
                         width: '80px',
                         className : 'nowrap',
+                        "visible": false,
                         render: function (data, type, full, meta) {
                             let val = '';
                             val = full.get_data_leak_feed_one;
