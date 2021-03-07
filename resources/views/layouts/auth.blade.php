@@ -15,10 +15,10 @@
         <link rel="icon" type="image/jpeg" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}">
     @endif
     @if (get_option('site_appleicon') != '')
-        <link rel="apple-touch-icon" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_appleicon')) }}"/>
-        <link rel="apple-touch-icon" sizes="72x72" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_appleicon')) }}"/>
-        <link rel="apple-touch-icon" sizes="114x114" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_appleicon')) }}"/>
-        <link rel="apple-touch-icon" sizes="144x144" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_appleicon')) }}"/>
+        <link rel="apple-touch-icon" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}"/><!--get_option('site_appleicon') -->
+        <link rel="apple-touch-icon" sizes="72x72" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}"/>
+        <link rel="apple-touch-icon" sizes="114x114" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}"/>
+        <link rel="apple-touch-icon" sizes="144x144" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}"/>
     @endif
 
 

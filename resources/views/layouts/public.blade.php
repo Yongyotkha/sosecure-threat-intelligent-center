@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="{{ getAsset('plugins/cropperjs-master/dist/cropper.min.css') }}" type="text/css"/>
     
     <link rel="icon" type="image/png" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}">
-    <link rel="apple-touch-icon" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_appleicon')) }}"/>
+    <link rel="apple-touch-icon" href="{{ getStorageUrl(config('system.media_dir').'/'.get_option('site_favicon')) }}"/><!--get_option('site_appleicon') -->
     <?php
     $family = 'Sofia';
     $font = get_option('system_font');
