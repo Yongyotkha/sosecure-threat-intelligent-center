@@ -26,17 +26,17 @@
         color: #fff !important;
     }
     .con1 {
-        border: 1px solid rgba(25, 118, 210, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.5);
         font-weight: 300;
-        border-radius: 2px;
+        border-radius: 20px;
         cursor: pointer;
         font-family: "Nunito";
         transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
         font-size: 1.7rem;
         color: #1976d2;
-        padding: 1rem 1.5rem;
+        padding: 1rem 4rem;
         margin-top: 1rem;
-        text-transform: uppercase;
+        /*text-transform: uppercase;*/
     }
 </style>
 
@@ -375,9 +375,14 @@
             <div class="row">
                 <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
-                        <h1 class="primary-text text-center">
-                            Windows Linux
-                        </h1>
+                        <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
+                            <img class="img-fluid" style="max-width: 200px;" src="{{asset('asset_salepage/images/icon/windows-logo.png')}}" alt="">
+                            <h1 class="primary-text text-center"> Windows </h1>
+                        </div>
+                        <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
+                            <img class="img-fluid" style="max-width: 200px;" src="{{asset('asset_salepage/images/icon/linux-logo.png')}}" alt="">
+                            <h1 class="primary-text text-center"> Linux </h1>
+                        </div>
                         <span class="secondary-text">
                           Operating System  
                         </span>
@@ -441,11 +446,11 @@
                     <img class="img-fluid" src="{{asset('asset_salepage/images/vec.png')}}" alt="">
                 </div>
             </div>
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-lg-12" style="text-align: center;">
                     <a id="btn_c_sale" href="#contact" class="con1" style="color: #333;">Contact Sales</a>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </section>
 
