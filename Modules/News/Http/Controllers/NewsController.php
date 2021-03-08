@@ -904,6 +904,30 @@ class NewsController extends Controller
             } else {
                 $logo_url = config('app.URL_CENTER_PUBLISH').@$data->logo;
             }
+
+
+            $html_cate_all = '';
+            if(!empty($data->get_cate)) {
+                foreach($data->get_cate as $cate_id_val) {
+                    if(!empty($cate_id_val)) {
+                        $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
+                    }
+                }
+            }
+
+            $html_source_all_full = '';
+            $html_source_all = '';
+            if(!empty($data->source)) {
+                $html_source_all .= '<span class="badge badge-info" style="background-color:#17a2b8;">'.@$data->source.'</span> &nbsp;';  
+            }
+            if(!empty($html_source_all)) {
+                $html_source_all_full = '<b>Source: </b>'.$html_source_all;
+            } else {
+                $html_source_all_full = 'Source: <span class="badge badge-info" style="background-color:#17a2b8;">None</span> &nbsp;';
+            }
+
+
+
             $html .= '
                 <!--<div class="checkbox-news-select">
                     <label class="mr-3">
@@ -918,7 +942,9 @@ class NewsController extends Controller
                     <div class="entry-meta">
                     <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
-                    <span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
+                    <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                    .@$html_source_all_full.
+                    '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
                     </div>
                 </div>
                 <div class="content-news-image">
@@ -1054,6 +1080,26 @@ class NewsController extends Controller
                     $url_logo = config('app.URL_CENTER_PUBLISH').@$data -> news -> logo;
                 }
 
+                $html_cate_all = '';
+                if(!empty($data->news->get_cate)) {
+                    foreach(@$data->news->get_cate as $cate_id_val) {
+                        if(!empty($cate_id_val)) {
+                            $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
+                        }
+                    }
+                }
+
+                $html_source_all_full = '';
+                $html_source_all = '';
+                if(!empty($data->news->source)) {
+                    $html_source_all .= '<span class="badge badge-info" style="background-color:#17a2b8;">'.@$data->news->source.'</span> &nbsp;';  
+                }
+                if(!empty($html_source_all)) {
+                    $html_source_all_full = 'Source: '.$html_source_all;
+                } else {
+                    $html_source_all_full = 'Source: <span class="badge badge-info" style="background-color:#17a2b8;">None</span> &nbsp;';
+                }
+
 
                 $html .= '
                 <!--<div class="checkbox-news-select">
@@ -1067,9 +1113,11 @@ class NewsController extends Controller
                             <span class="head-news-text" style="'.@$font_weight.'">'.@$data -> news -> title_th.'</span>
                         </a>
                         <div class="entry-meta">
-                            <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> news -> view.'</span>
                             <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> news -> public_date.'</span>
-                            <span><p></p>&nbsp;'.strip_tags(@$data -> news -> detail_th).'</p></span>
+                            <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> news -> view.'</span>
+                            <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                            .@$html_source_all_full.
+                            '<span><p></p>&nbsp;'.strip_tags(@$data -> news -> detail_th).'</p></span>
                         </div>
                     </div>
                     <div class="content-news-image">
