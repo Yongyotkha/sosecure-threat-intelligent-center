@@ -428,16 +428,16 @@
             type: "post",
             datatype: "html",
             beforeSend: function(){
-                loading('load');
+                
             },
         }).done(function(data){
             data.card_data.forEach(function(card_data) {
                 $(`#data_status_${card_data.code}`).html(`<strong>Status:</strong> &nbsp; <span class="${card_data.statusDotClass}"></span>${card_data.statusDotName}`);
                 $(`#data_lastcheck_${card_data.code}`).html(`<strong>Last Online:</strong> ${card_data.transcation_date_start}`);
-                loading('stop_load');
+                
             });
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            loading('stop_load');
+            
             console.log("No response from server");
         });
     }
