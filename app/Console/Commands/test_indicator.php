@@ -48,7 +48,7 @@ class test_indicator extends Command
     {
 
 
-        $site_id = 73;
+        $site_id = 74;
         $Logs_setting_data = Logs_setting::where('site_id',$site_id)->where('type','indicator')->first();
 
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
@@ -69,8 +69,8 @@ class test_indicator extends Command
         $tz = new \DateTimeZone('Asia/Bangkok');
         $start = date("Y-m-d").' 00:00:00';
         $end = date("Y-m-d").' 23:59:59';
-       // $start = '2020-01-01'.' 00:00:00';
-      //  $end = date("Y-m-d").' 23:59:59';
+        //$start = '2021-03-06'.' 12:00:00';
+        //$end = '2021-03-06'.' 13:59:59';
         $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
         $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
 
@@ -109,7 +109,7 @@ class test_indicator extends Command
             //'feedtimepost' => ['$gt' => $time_stamp_search],
             //'feedcontent' => ['$regex'=>'PTT', '$options' => 'i'],
             'pulse_id' => $value_ref -> pulse_id,
-            'modified' => ['$gte' => $dateStart,'$lt' => $dateEnd],
+           // 'modified' => ['$gte' => $dateStart,'$lt' => $dateEnd],
            // "\$gte"=>$date1,
            // "\$lt"=>$date2
            // 'updated_at' => ['$gte' => $dateStart,'$lt' => $dateEnd],

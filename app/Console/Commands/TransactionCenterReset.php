@@ -41,7 +41,7 @@ class TransactionCenterReset extends Command
     public function handle()
     {
       //Reset Scan Domain  date("Y-m-d H:i:s ")
-      TransactionTimeStampScans::where('status', '=', 1)->where('progress', '=', 3)->update(array('progress' => 1));
+      TransactionTimeStampScans::where('status', '=', 1)->where('progress', '=', 3)->update(array('progress' => 0));
       $this->info('Reset Scan Domain successfully');
 
       Log::where('id', '>', 1)->delete();
