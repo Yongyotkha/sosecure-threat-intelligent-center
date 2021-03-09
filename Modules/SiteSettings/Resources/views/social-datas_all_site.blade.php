@@ -365,6 +365,8 @@
                                             <th>Source</th>
                                             <th>Keyword</th>
                                             <th>Content</th>
+                                            <th>Status Monitoring</th>
+                                            <th>Serverity</th>
                                             <th>Data Feed</th>
                                             {{-- <th>View</th> --}}
                                             <th>Status</th>
@@ -775,6 +777,46 @@ $('.btn').click(function(){
                     },
                     {
                         targets: 6,
+                        width: '10px',
+                        className: 'nowrap',
+                        render: function (data, type, full, meta) {
+                
+                            if(full.status_monitoring=='in_progress'){
+                                return '<span class="badge" style="background-color: #FFC107;">Progress</span>';
+                            }else if(full.status_monitoring=='reported'){
+                                return '<span class="badge" style="background-color: #28A745;">Reported</span>';
+                            }else if(full.status_monitoring=='close'){
+                                return '<span class="badge" style="background-color: #DC3545;">Close</span>';
+                            }else{
+                                return '-';
+                            }
+
+                        },
+                    }, 
+                    {
+                        targets: 7,
+                        width: '10px',
+                        className: 'nowrap',
+                        render: function (data, type, full, meta) {
+                
+                            if(full.serverity=='critical'){
+                        return '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                            }else if(full.serverity=='high'){
+                                return '<span class="badge" style="background-color: #fcc838;">High</span>';
+                            }else if(full.serverity=='medium'){
+                                return '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                            }else if(full.serverity=='low'){
+                                return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                            }else if(full.serverity=='information'){
+                                return '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                            }else{
+                                return '-';
+                            }
+
+                        },
+                    }, 
+                    {
+                        targets: 8,
                         width: '80px',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
@@ -786,20 +828,10 @@ $('.btn').click(function(){
                             }
 
                         },
-                    },
-                    {{--{
-                        targets: 7,
-                        width: '10px',
-                        render: function (data, type, full, meta) {
-
-                            return full.get_data_leak_feed_one.view;
-
-
-                        },
-                    },--}}
+                    },                   
                     {
                         visible: visible_c,
-                        targets: 7,
+                        targets: 9,
                         width: '10px',
                         render: function (data, type, full, meta) {
 
@@ -816,7 +848,7 @@ $('.btn').click(function(){
 
                     },
                     {
-                        targets: 8,
+                        targets: 10,
                         width: '10px',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {

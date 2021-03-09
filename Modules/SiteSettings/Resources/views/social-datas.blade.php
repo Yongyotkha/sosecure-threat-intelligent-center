@@ -140,6 +140,8 @@
                                         <th>Source</th>
                                         <th>Keyword</th>
                                         <th>Content</th>
+                                        <th>Status Monitoring</th>
+                                        <th>Serverity</th>
                                         <th>Data Feed</th>
                                         <th>View</th>
                                         <th>Status</th>
@@ -383,6 +385,14 @@ function table_social_data(search_val){
                 name: 'content',
             },
             {
+                data: 'status_monitoring',
+                name: 'status_monitoring',
+            },
+            {
+                data: 'serverity',
+                name: 'serverity',
+            },
+            {
                 data: 'data_feed',
                 name: 'data_feed',
                 className: 'nowrap',
@@ -409,7 +419,7 @@ function table_social_data(search_val){
                 targets: 5,
                 render: function (data, type, full, meta) {
                     if(full.get_data_leak_feed_one){
-                        var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                        var feedcontent =  stripHtml(full.get_data_leak_feed_one.feedcontent);
                         var res = full.keyword.split(",");
                         let content = '';
                         for(let i in res){
@@ -424,24 +434,72 @@ function table_social_data(search_val){
                 },
             },
             {
-                        targets: 9,
-                        width: '10px',
-                        className : 'nowrap',
-                        render: function (data, type, full, meta) {
-                            var siteCode ='';
-                            siteCode = @json($siteSettings->code);
-                            return `
-                            <a href="${base_url}/socialdatas/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
-                            <a href="${base_url}/dataleak/edit_dataleak_modal/${full.code}?site=${siteCode}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
-                                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
-                            </a>
-                            <a href="${base_url}/sitesettings/socialdatas/delete_socialdatas/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
-                            `;
+                targets: 6,
+                width: '10px',
+                className: 'nowrap',
+                render: function (data, type, full, meta) {
 
-                        },
-                    },
+                    if(full.status_monitoring=='in_progress'){
+                        return '<span class="badge" style="background-color: #FFC107;">Progress</span>';
+                    }else if(full.status_monitoring=='reported'){
+                        return '<span class="badge" style="background-color: #28A745;">Reported</span>';
+                    }else if(full.status_monitoring=='close'){
+                        return '<span class="badge" style="background-color: #DC3545;">Close</span>';
+                    }else{
+                        return '-';
+                    }
+                    
+        
+
+                },
+            }, 
+            {
+                targets: 7,
+                width: '10px',
+                className: 'nowrap',
+                render: function (data, type, full, meta) {
+        
+                    if(full.serverity=='critical'){
+                        return '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                    }else if(full.serverity=='high'){
+                        return '<span class="badge" style="background-color: #fcc838;">High</span>';
+                    }else if(full.serverity=='medium'){
+                        return '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                    }else if(full.serverity=='low'){
+                        return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                    }else if(full.serverity=='information'){
+                        return '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                    }else{
+                        return '-';
+                    }
+
+                },
+            }, 
+            {
+                targets: 9,
+                width: '10px',
+                className : 'nowrap',
+                render: function (data, type, full, meta) {
+                    var siteCode ='';
+                    siteCode = @json($siteSettings->code);
+                    return `
+                    <a href="${base_url}/socialdatas/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
+                    <a href="${base_url}/dataleak/edit_dataleak_modal/${full.code}?site=${siteCode}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                        <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                    </a>
+                    <a href="${base_url}/sitesettings/socialdatas/delete_socialdatas/${full.code}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
+                    `;
+
+                },
+            },
         ]
     });
+}
+
+function stripHtml(html){
+    var temporalDivElement = document.createElement("div");
+    temporalDivElement.innerHTML = html;
+    return temporalDivElement.textContent || temporalDivElement.innerText || "";
 }
 
 function change_status(code) {

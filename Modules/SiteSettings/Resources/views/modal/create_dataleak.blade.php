@@ -66,12 +66,30 @@
                     <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1"  ></textarea>
                 </div>
             </div>
-            {{-- <div class="form-group row">
-                <label class="col-lg-3 control-label">Remark<span class="text-danger">*</span></label>
+            <div class="form-group row">
+                <label class="col-lg-3 control-label">Status Monitoring</label>
                 <div class="col-lg-9">
-                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required></textarea>
+                    <select name="monitoring" id="monitoring" class="select2-option form-control" >
+                        <option value="">Select</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="reported">Reported</option>
+                        <option value="close">Close</option>
+                    </select>
                 </div>
-            </div> --}}
+            </div>
+            <div class="form-group row">
+                <label class="col-lg-3 control-label">Serverity</label>
+                <div class="col-lg-9">
+                    <select name="serverity" id="serverity" class="select2-option form-control" >
+                        <option value="">Select</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                        <option value="information">Information</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="form-group row">
                 <label for="" class="col-md-3">Send Mail</label>

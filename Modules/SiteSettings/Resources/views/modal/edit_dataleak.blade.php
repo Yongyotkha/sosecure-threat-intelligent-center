@@ -6,9 +6,9 @@
         </div>
     {!! Form::open(['route' => ['dataleak.edit_dataleak'], 'class' => 'ajaxifyForm_custom', 'files' => false]) !!}
         <div class="modal-body">
-            <input type="hidden" name="id_DataLeakFeed" class="form-control" value="{{$DataLeakFeed->id}}">
+            <input type="hidden" name="id_DataLeakFeed" class="form-control" value="{{@$DataLeakFeed->id}}">
             @if ($site)
-            <input type="hidden" name="site_code" class="form-control" value="{{$site}}">   
+            <input type="hidden" name="site_code" class="form-control" value="{{@$site}}">   
             @endif
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Type <span class="text-danger">*</span> </label>
@@ -20,15 +20,33 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Keyword Ref </label>
+                <label class="col-lg-3 control-label">Keyword <span class="text-danger">*</span></label>
                 <div class="col-lg-9">
-                    <input type="text" name="keyword" class="form-control" value="{{$DataLeakFeed->keyword}}">
+
+                    <select name="keyword" id="keyword55" class="select2-option form-control" required>
+                        <option value="Mobile" {{@$DataLeakFeed->keyword == 'Mobile'?'selected':''}}>Mobile</option>
+                        <option value="Facebook" {{@$DataLeakFeed->keyword == 'Facebook'?'selected':''}}>Facebook</option>
+                        <option value="Twitter" {{@$DataLeakFeed->keyword == 'Twitter'?'selected':''}}>Twitter</option>
+                        <option value="Website" {{@$DataLeakFeed->keyword == 'Website'?'selected':''}}>Website</option>
+                        <option value="Other" {{@$DataLeakFeed->keyword == 'Mobile'||@$DataLeakFeed->keyword == 'Facebook'||
+                        @$DataLeakFeed->keyword == 'Twitter'||@$DataLeakFeed->keyword == 'Website'
+                        ?'':'selected'}}>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row" id="area_other" style="{{@$DataLeakFeed->keyword == 'Mobile'||
+                @$DataLeakFeed->keyword == 'Facebook'||@$DataLeakFeed->keyword == 'Twitter'||
+                @$DataLeakFeed->keyword == 'Website'? 'display:none;':''}}">
+                <label class="col-lg-3 control-label"> </label>
+                <div class="col-lg-9">
+                    <input type="text" name="other" id="other1" placeholder="keyword etc." class="form-control" 
+                    value="{{@$DataLeakFeed->keyword}}" required>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-lg-3 control-label">Source </label>
                 <div class="col-lg-9">
-                    <input type="text" name="source" class="form-control" value="{{$DataLeakFeed->source_name}}">
+                    <input type="text" name="source" class="form-control" value="{{@$DataLeakFeed->source_name}}">
                 </div>
             </div>
             <div class="form-group row">
@@ -36,18 +54,40 @@
                 <div class="col-lg-9">
                     
                     <textarea  class="form-control htmleditor" id="content" name="content"  data-id="1"  >
-                    {{$DataLeakFeed->feedcontent}}
+                    {{@$DataLeakFeed->feedcontent}}
                     </textarea>
                 </div>
             </div>
-            {{-- <div class="form-group row">
-                <label class="col-lg-3 control-label">Remark<span class="text-danger">*</span></label>
+            <div class="form-group row">
+                <label class="col-lg-3 control-label">Status Monitoring</label>
                 <div class="col-lg-9">
-                    <textarea  class="form-control htmleditor" id="remark" name="remark" data-id="1" required>
-                        {{$DataLeakFeed->source_name}}
-                    </textarea>
+                    <select name="monitoring" id="monitoring" class="select2-option form-control" >
+                        <option value="in_progress" 
+                        {{@$DataLeakSocialRefs->status_monitoring == 'in_progress'?'selected':''}}>In Progress</option>
+                        <option value="reported" 
+                        {{@$DataLeakSocialRefs->status_monitoring == 'reported'?'selected':''}}>Reported</option>
+                        <option value="close" 
+                        {{@$DataLeakSocialRefs->status_monitoring == 'close'?'selected':''}}>Close</option>
+                    </select>
                 </div>
-            </div> --}}
+            </div>
+            <div class="form-group row">
+                <label class="col-lg-3 control-label">Serverity</label>
+                <div class="col-lg-9">
+                    <select name="serverity" id="serverity" class="select2-option form-control" >
+                        <option value="critical" {{@$DataLeakSocialRefs->serverity == 'critical'?'selected':''}}>
+                            Critical</option>
+                        <option value="high" {{@$DataLeakSocialRefs->serverity == 'high'?'selected':''}}>
+                            High</option>
+                        <option value="medium" {{@$DataLeakSocialRefs->serverity == 'medium'?'selected':''}}>
+                            Medium</option>
+                        <option value="low" {{@$DataLeakSocialRefs->serverity == 'low'?'selected':''}}>
+                            Low</option>
+                        <option value="information" {{@$DataLeakSocialRefs->serverity == 'information'?'selected':''}}>
+                            Information</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="form-group row">
                 <label for="" class="col-md-3">Send Mail</label>
@@ -79,6 +119,19 @@
 <script>
 
     $('#type').val(@json($DataLeakFeed->feel_type));
+
+    $("#keyword55").change(function(){
+        if($(this).val() == 'Other') {
+            $("#area_other").show();
+            $("#area_other").prop("disabled",false);
+            $('#other1').val('');
+        } else {
+            $("#area_other").hide();
+            $("#area_other").prop("disabled",true);
+            $('#other1').val('');
+            $('#other1').prop('required',false);
+        }
+    });
 
     $('form').each(function () {
         if ($(this).data('validator'))
