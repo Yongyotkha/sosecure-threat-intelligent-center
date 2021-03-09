@@ -245,3 +245,6 @@ Route::get('/darkweb_data/view_content/{code}', 'DataLeakController@view_comprom
 Route::post('/darkweb-datas/count_keyword_darkweb', 'DataLeakController@count_keyword_darkweb')->name('darkweb.count_keyword')->middleware('can:menu_items');
 
 Route::get('/check_cookie_site', 'SystemSettingsController@check_cookie_site')->name('systemsetting.check_cookie_site')->middleware('can:menu_items');
+
+Route::get('/socialdatas/activity_modal/{code}', 'DataLeakController@activity_dataleak_modal')->name('socialdatas.activity_dataleak_modal')->middleware(['can:menu_items','permission:data_leak']);
+Route::post('/dataleak/activity_save', 'DataLeakController@activity_save')->name('dataleak.activity_save')->middleware('can:menu_items');
