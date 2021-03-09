@@ -150,6 +150,8 @@ class DashboardNewController extends Controller
 
     public function cve_assets(Request $request){
 
+        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
+
         if(Auth::check()) {
             $role_custom = @check_role_custom();
             if($role_custom['assets']) {
@@ -159,7 +161,7 @@ class DashboardNewController extends Controller
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
-                            $AssetsData_data = AssetsData::where('site_id',$value->site_id)->where('asset_id',$value->id)->where('status',1)->get();
+                            $AssetsData_data = AssetsData::where('site_id',$value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->get();
                             $Domain_list = [];
                             $IP_List =[];
                             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -201,7 +203,7 @@ class DashboardNewController extends Controller
                             }
                         }
                     }else{
-                        $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                        $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->whereNull('deleted_at')->where('active',1)->first();
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
@@ -253,7 +255,7 @@ class DashboardNewController extends Controller
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
-                            $AssetsData_data = AssetsData::where('site_id',$value->site_id)->where('asset_id',$value->id)->where('status',1)->get();
+                            $AssetsData_data = AssetsData::where('site_id',$value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->get();
                             $Domain_list = [];
                             $IP_List =[];
                             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -295,7 +297,7 @@ class DashboardNewController extends Controller
                             }
                         }
                     }else{
-                        $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                        $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->whereNull('deleted_at')->where('active',1)->first();
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
