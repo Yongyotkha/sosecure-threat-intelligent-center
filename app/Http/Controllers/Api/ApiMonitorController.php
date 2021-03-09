@@ -45,21 +45,26 @@ use Modules\Monitoring\Entities\MonitoringSystem;
 class ApiMonitorController extends ApiController
 {
     public function monitor_system_save(Request $request){
+      
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            if($data === false){
+         
+            if(!$data){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
                 if($data['data']['menu'] !== 'monitoring'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
-                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    if($auth_site['status_code'] !== '200'){
-                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    }
+                  
+                    // $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                   
+                    // if($auth_site['status_code'] !== '200'){
+                    //     return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    // }
+                    // return response()->json(['error' =>$data['data']['menu'], 'status_code' => '400']);
 
                     $site_code = $data['data']['site_code'];
                     $SiteSettings = SiteSettings::where('code',$site_code)->first();
