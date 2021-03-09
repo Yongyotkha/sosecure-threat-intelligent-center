@@ -1073,13 +1073,14 @@ class ApiDashboardController extends ApiController
                     $site = $data['data']['site'];
                     $user_id = $data['data']['user_id'];
 
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->where('active', 1)->get();
+                    $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
+                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->whereIn('site_id',$site_id_active)->where('active', 1)->get();
                     if ($get_role_custom == 1) {
                         if (!$site) {
                             $assets = [];
                             $Assets_data = Assets::where('status', 1)->get();
                             foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->where('status', 1)->get();
+                                $AssetsData_data = AssetsData::where('site_id', $value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
                                 $Domain_list = [];
                                 $IP_List = [];
                                 foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -1125,7 +1126,7 @@ class ApiDashboardController extends ApiController
                             $assets = [];
                             $Assets_data = Assets::where('status', 1)->get();
                             foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $site_id_m->id)->where('asset_id', $value->id)->where('status', 1)->get();
+                                $AssetsData_data = AssetsData::where('site_id', $site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
                                 $Domain_list = [];
                                 $IP_List = [];
                                 foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -1174,7 +1175,7 @@ class ApiDashboardController extends ApiController
 
                             $Assets_data = Assets::whereIn('site_id', $site_id_arr)->where('status', 1)->get();
                             foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->where('status', 1)->get();
+                                $AssetsData_data = AssetsData::where('site_id', $value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
                                 $Domain_list = [];
                                 $IP_List = [];
                                 foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -1220,7 +1221,7 @@ class ApiDashboardController extends ApiController
                             $assets = [];
                             $Assets_data = Assets::whereIn('site_id', $site_id_arr)->where('site_id', $site_id_m->id)->where('status', 1)->get();
                             foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $site_id_m->id)->where('asset_id', $value->id)->where('status', 1)->get();
+                                $AssetsData_data = AssetsData::where('site_id', $site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
                                 $Domain_list = [];
                                 $IP_List = [];
                                 foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
