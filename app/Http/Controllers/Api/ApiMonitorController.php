@@ -80,7 +80,7 @@ class ApiMonitorController extends ApiController
                     }
 
                     $response = [
-             
+                        "html" => '',
                     ];
 
                     $data_transcation = json_encode($response);
