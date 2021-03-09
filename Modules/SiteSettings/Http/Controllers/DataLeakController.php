@@ -35,7 +35,7 @@ use phpseclib\Net\SSH2;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
+use Modules\SiteSettings\Entities\Activity;
 class DataLeakController extends Controller
 {
     /**
@@ -459,7 +459,6 @@ class DataLeakController extends Controller
 
         // $data['SiteSettings'] = SiteSettings::where("active", '=', 1)->where('deleted_at', null)->get();
         $data['SiteSettings'] = $SiteSettings;
-
         $data['source'] = DataLeakSocial::where("status", '=', 1)->get();
 
         $data['page'] = langapp('data_leak');
@@ -3946,6 +3945,7 @@ class DataLeakController extends Controller
             Response::HTTP_OK
         );
     }
+
     public function edit_dataleak_modal($code,Request $request){
 
         
@@ -3957,6 +3957,94 @@ class DataLeakController extends Controller
 
         
         return view('sitesettings::modal.edit_dataleak')->with($data);
+    }
+
+    public function activity_dataleak_modal($code,Request $request){
+        $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
+        $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->get();
+        // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
+        $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+        $data['site'] = @$request->site;
+        $data['ActivityHistory'] = $ActivityHistory;
+        
+        return view('sitesettings::modal.activity_dataleak_modal')->with($data);
+    }
+
+    public function activity_save(Request $request){
+        dd($request->check_active);
+        if(!$request->title&&!@$_POST['content']){
+            return response()->json(['message' => 'You have to fill Title', 'errors' => ['missing' => ["You have to fill Title"],'missing2' => ["You have to fill content"]]], 500);
+        }else if(!$request->title){
+            return response()->json(['message' => 'You have to fill Title', 'errors' => ['missing' => ["You have to fill Title"]]], 500);
+        }else if(!@$_POST['content']){
+            return response()->json(['message' => 'You have to fill content', 'errors' => ['missing' => ["You have to fill content"]]], 500);
+        }
+
+        $content = @$_POST['content']; //รับค่าจาก messageInput
+        if($content) {
+            $dom = new \domdocument();
+            if($dom->getelementsbytagname('img')){
+                $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                LIBXML_HTML_NOIMPLIED |
+                LIBXML_HTML_NODEFDTD |
+                LIBXML_NOERROR |
+                LIBXML_NOWARNING 
+            );
+                //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                $images = $dom->getelementsbytagname('img');
+                //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                foreach($images as $k => $img){
+                    $data = $img->getattribute('src');
+                    $img_check_src = explode(";",$data);
+                    if(@$img_check_src[1]) {
+                        list($type, $data) = explode(';', $data);
+                        list(, $data)= explode(',', $data);
+                        $data = base64_decode($data);
+                    //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                        $image_name= time().$k.'.png';
+                    //อัพโหลดภาพไปยัง public
+                        $path = public_path('images/file_editor') .'/'. $image_name;
+                    //ทำการอัพโหลดภาพ
+                        file_put_contents($path, $data);
+                        $img->removeattribute('src');
+                        $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                    } else {
+
+                    }
+                }
+                $content = $dom->savehtml();
+
+            }
+        }
+
+        if($request->check_active=="1"){
+            $Activity = new Activity;
+            $Activity->code = generator_uuid();
+            $Activity->data_leak_socail_ref_id = $request->id_DataLeakSocialRefs;
+            $Activity->title = $request->title;
+            $Activity->content = $content;
+            $Activity->user_id = Auth::user()->id;
+            $Activity->save();
+        }else if($request->check_active=="2"){
+
+        }else{
+
+        }
+
+        if($request->site_code){
+            $site = route('socialdatas.index', ['id' => @$request->site_code]);
+        }else{
+            $site = route('socialdatas.index_all_site');
+        }
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'redirect' => $site,
+            ],
+            true,
+            Response::HTTP_OK
+        );
+
     }
 
     public function edit_dataleak(Request $request){
