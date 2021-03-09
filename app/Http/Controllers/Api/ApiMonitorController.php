@@ -61,7 +61,9 @@ class ApiMonitorController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $site_id = $data['data']['site_id'];
+                    $site_code = $data['data']['site_code'];
+                    $SiteSettings = SiteSettings::where('code',$site_code)->first();
+                    $site_id = $SiteSettings->id;
                     $content = $data['data']['content'];
                     
                     $model1 = MonitoringSystem::where('site_id', $site_id)->orderBy("created_at","desc")->first();
