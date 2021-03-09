@@ -109,6 +109,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('web_defacement/update_image', 'Api\ApiWebdefacementController@web_defacement_update_image');
     Route::post('web_defacement/change_status', 'Api\ApiWebdefacementController@web_defacement_change_status');
 
+    Route::post('monitor/monitor_system_save', 'Api\ApiMonitorController@monitor_system_save');
+
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
     
     Route::post('search/searchAll', 'Api\ApiSearchController@searchAll');
