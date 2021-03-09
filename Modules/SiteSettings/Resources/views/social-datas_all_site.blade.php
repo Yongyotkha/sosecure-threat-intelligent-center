@@ -94,10 +94,10 @@
                     <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                         <div class="row">
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                              <a href="http://178.128.208.129:8082/asset">
+                              <a href="javascript:void(0)">
                                  <div class="card-dash" style="height: 149.5px;">
                                     <div class="left-card">
-                                       <div class="img-icon-card"><img src="http://178.128.208.129:8082/images/icon/In progress.png" alt=""></div>
+                                       <div class="img-icon-card"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">In Proggress</h3>
                                        <span class="number-card info number_in_progress">0</span>
                                     </div>
@@ -105,10 +105,10 @@
                               </a>
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                              <a href="http://178.128.208.129:8082/monitoringvulnerabilitys">
+                              <a href="javascript:void(0)">
                                  <div class="card-dash" style="height: 149.5px;">
                                     <div class="left-card">
-                                       <div class="img-icon-card"><img src="http://178.128.208.129:8082/images/icon/Reported.png" alt=""></div>
+                                       <div class="img-icon-card"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
                                        <span class="number-card green number_reported">0</span>
                                     </div>
@@ -116,10 +116,10 @@
                               </a>
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
-                              <a href="http://178.128.208.129:8082/darkweb-datas">
+                              <a href="javascript:void(0)">
                                  <div class="card-dash" style="height: 149px;">
                                     <div class="left-card">
-                                       <div class="img-icon-card"><img src="http://178.128.208.129:8082/images/icon/Close .png" alt=""></div>
+                                       <div class="img-icon-card"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">Close</h3>
                                        <span class="number-card warning number_close">0</span>
                                     </div>
@@ -190,7 +190,7 @@
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Facebook</h3>
+                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Fanpage</h3>
                                                 <span class="number-card info" style="font-size: 25px !important;"  id='icon_facebook'>0</span>
                                             </div>
                                         </a>
