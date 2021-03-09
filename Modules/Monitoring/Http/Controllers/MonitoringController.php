@@ -13,7 +13,7 @@ use Modules\Monitoring\Entities\MonitorLogs;
 use Modules\Monitoring\Entities\SentLogs;
 use Carbon\Carbon;
 use App\Entities\Categories;
-
+use Modules\Monitoring\Entities\MonitoringSystem;
 class MonitoringController extends Controller
 {
     /**
@@ -97,6 +97,7 @@ class MonitoringController extends Controller
                         }
                         $get_categorys = rtrim($get_categorys,",");
                     }
+                    $MonitoringSystem_data= MonitoringSystem::where('site_id',$value['id'])->select('content','updated_at')->first();
                     
                     $htmlCard .= '
                     <div class="item-wdfm mdasbord-inner" id="data_main_'.$value['code'].'">
@@ -110,9 +111,18 @@ class MonitoringController extends Controller
                                     <div><strong>Site:</strong> '.$value['name'].'</div>
                                     <div class="status-flex" id="data_status_'.$value['code'].'"><strong>Status:</strong> &nbsp; <span class="dot '.$statusDotClass.'"></span> '.$statusDotName.'
                                     </div>
-                                    <div><strong>Catagory:</strong> '.$get_categorys.'</div>
-                                    <div id="data_lastcheck_'.$value['code'].'"><strong>Last Online:</strong> '.$value['transcation_date_start'].'</div>
-                                </div>
+                                    <div><strong>Catagory:</strong> '.$get_categorys.'</div>';
+                                    $htmlCard .= '   <div id="data_lastcheck_'.$value['code'].'"><strong>Last Online:</strong> '.$value['transcation_date_start'].'</div>';
+                                    if($MonitoringSystem_data){
+                                        $htmlCard .= '  <div id="data_monitoring_server_'.$value['code'].'"><strong>Monitoring:</strong> '.'-'.'</div>
+                                        <div id="data_monitoring_server_date_'.$value['code'].'"><strong>Monitoring Last:</strong> '.'-'.'</div>';
+                                    }else{
+                                        $htmlCard .= '   <div id="data_monitoring_server_'.$value['code'].'"><strong>Monitoring:</strong> '.'-'.'</div>
+                                        <div id="data_monitoring_server_date_'.$value['code'].'"><strong>Monitoring Last:</strong> '.'-'.'</div>';
+
+                                    }
+                                
+                                    $htmlCard .= '     </div>
                             </div>
                         </div>
                     </div>';
@@ -569,8 +579,12 @@ class MonitoringController extends Controller
                 $dataStatus['statusDotClass'] = 'dot critical';
                 $dataStatus['statusDotName'] = 'Offline';
             }
+            $MonitoringSystem_data= MonitoringSystem::where('site_id',$value['id'])->select('content','updated_at')->first();
+            $dataStatus['MonitoringSystem'] = $MonitoringSystem_data;
             unset($SiteSettings[$key]['id']);
             $SiteSettings[$key] = array_merge($SiteSettings[$key], $TransactionBatchjob, $dataStatus);
+
+        
 
         }
 

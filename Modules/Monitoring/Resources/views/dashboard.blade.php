@@ -320,7 +320,7 @@
         $('.wdfm-card').mouseleave(function(){
             $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
         });
-        setInterval(function(){ load_card(); }, 60000);
+        setInterval(function(){ load_card(); }, 30000);
     });
 
     Highcharts.chart('status1', {
@@ -432,9 +432,13 @@
             },
         }).done(function(data){
             data.card_data.forEach(function(card_data) {
+               
                 $(`#data_status_${card_data.code}`).html(`<strong>Status:</strong> &nbsp; <span class="${card_data.statusDotClass}"></span>${card_data.statusDotName}`);
                 $(`#data_lastcheck_${card_data.code}`).html(`<strong>Last Online:</strong> ${card_data.transcation_date_start}`);
-                
+                if(card_data.MonitoringSystem){
+                $(`#data_monitoring_server_${card_data.code}`).html(`<strong>Monitoring:</strong> ${card_data.MonitoringSystem.content}`);
+                $(`#data_monitoring_server_date_${card_data.code}`).html(`<strong>Monitoring  Last:</strong> ${card_data.MonitoringSystem.updated_at}`);
+                }
             });
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             
@@ -446,3 +450,4 @@
 </script>
 @endpush
 @endsection
+
