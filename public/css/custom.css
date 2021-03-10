@@ -4278,3 +4278,8 @@ li.placeholder{
     display: inline-block;
     word-break: break-all;
 }
+
+.custom_new{
+    font-weight: bold;
+    background-color: #cecece !important;
+}

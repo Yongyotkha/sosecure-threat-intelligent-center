@@ -1,3 +1,6 @@
+@php
+use Carbon\Carbon;
+@endphp
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
@@ -95,10 +98,10 @@
                         <div class="row">
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
                               <a href="javascript:void(0)">
-                                 <div class="card-dash" style="height: 149.5px;">
+                                 <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
-                                       <div class="img-icon-card"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                       <h3 class="name-dash-text text-dark text-upper ">In Proggress</h3>
+                                       <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                       <h3 class="name-dash-text text-dark text-upper ">In Progress</h3>
                                        <span class="number-card info number_in_progress">0</span>
                                     </div>
                                  </div>
@@ -106,9 +109,9 @@
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
                               <a href="javascript:void(0)">
-                                 <div class="card-dash" style="height: 149.5px;">
+                                 <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
-                                       <div class="img-icon-card"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                       <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
                                        <span class="number-card green number_reported">0</span>
                                     </div>
@@ -117,9 +120,9 @@
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
                               <a href="javascript:void(0)">
-                                 <div class="card-dash" style="height: 149px;">
+                                 <div class="card-dash" style="height: 149px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
-                                       <div class="img-icon-card"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                       <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">Close</h3>
                                        <span class="number-card warning number_close">0</span>
                                     </div>
@@ -307,19 +310,22 @@
                                 <div class="col-lg-4 hide-social" style="display: none">
                                     <h5 class="font-weight-bold">Social</h5>
                                     <div id="groupby-social" class="btn-group special">
-                                        <button id="all" class="btn btn-grey active" value="">
+                                        <button id="all" class="btn btn-grey active" value="mobile_app">
                                             <span> Mobile App</span>
                                         </button>
-                                        <button class="btn btn-grey" value="">
+                                        <button class="btn btn-grey" value="facebook">
                                             <span> Facebook </span>
                                         </button>
-                                        <button class="btn btn-grey" value="">
+                                        <button class="btn btn-grey" value="line">
+                                            <span> Line </span>
+                                        </button>
+                                        <button class="btn btn-grey" value="twitter">
                                             <span> Twitter </span>
                                         </button>
-                                        <button class="btn btn-grey" value="">
+                                        <button class="btn btn-grey" value="website">
                                             <span> Website </span>
                                         </button>
-                                        <button class="btn btn-grey" value="">
+                                        <button class="btn btn-grey" value="other">
                                             <span> Other </span>
                                         </button>
                                     </div>
@@ -740,6 +746,37 @@ $('.btn').click(function(){
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
+                "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    var date_day = '2021-01-01';
+                    var date = aData.get_data_leak_feed_one.feedtimepost;
+                    var date_sp = date.split(" ");
+                    if(date_sp.length > 0) {
+                        date_day = date_sp[0];
+                    }
+                    {{--console.log(new Date(date));--}}
+
+                    var date_now = '{{Carbon::now()}}';
+                    let date_now_sp = date_now.split(" ");
+                    if(date_now_sp.length > 0) {
+                        var date_now_day = date_now_sp[0];
+                    }
+
+                    console.log(date_day+' now:'+date_now_day);
+                    if ((date_day) == (date_now_day)) {
+                        $('td:eq(0)', nRow).addClass("custom_new");
+                        $('td:eq(1)', nRow).addClass("custom_new");
+                        $('td:eq(2)', nRow).addClass("custom_new");
+                        $('td:eq(3)', nRow).addClass("custom_new");
+                        $('td:eq(4)', nRow).addClass("custom_new");
+                        $('td:eq(5)', nRow).addClass("custom_new");
+                        $('td:eq(6)', nRow).addClass("custom_new");
+                        $('td:eq(7)', nRow).addClass("custom_new");
+                        $('td:eq(8)', nRow).addClass("custom_new");
+                        $('td:eq(9)', nRow).addClass("custom_new");
+                        $('td:eq(10)', nRow).addClass("custom_new");
+                    }
+                },
+
                 "order": [ 6, 'desc' ],
                 columnDefs: [
                     {
@@ -1229,6 +1266,7 @@ var click_type2 = null;
                 {{--loading('stop_load');--}}
                 $("#icon_mobile").html(response.icon_mobile);
                 $("#icon_facebook").html(response.icon_facebook);
+                $("#icon_line").html(response.icon_line);
                 $("#icon_twitter").html(response.icon_twitter);
                 $("#icon_website").html(response.icon_website);
                 $("#icon_other").html(response.icon_other);

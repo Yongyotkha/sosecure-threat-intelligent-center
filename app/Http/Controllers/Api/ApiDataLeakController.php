@@ -237,6 +237,7 @@ class ApiDataLeakController extends ApiController
 
                                     $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
 
@@ -827,19 +828,23 @@ class ApiDataLeakController extends ApiController
                         if(!$site_code) {
                             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
                             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
                             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
                             $icon_website = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
                             $icon_other = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         } else {
                             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
                             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
                             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
                             $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
                             $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         }
@@ -847,19 +852,23 @@ class ApiDataLeakController extends ApiController
                         if(!$site_code) {
                             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
                             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
                             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
                             $icon_website = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
                             $icon_other = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         } else {
                             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
                             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
                             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
                             $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
                             $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         }
@@ -869,6 +878,7 @@ class ApiDataLeakController extends ApiController
                     $response = [
                         "icon_mobile" => $icon_mobile,
                         "icon_facebook" => $icon_facebook,
+                        "icon_line" => $icon_line,
                         "icon_twitter" => $icon_twitter,
                         "icon_website" => $icon_website,
                         "icon_other" => $icon_other,
