@@ -248,4 +248,6 @@ Route::get('/check_cookie_site', 'SystemSettingsController@check_cookie_site')->
 
 Route::get('/socialdatas/activity_modal/{code}', 'DataLeakController@activity_dataleak_modal')->name('socialdatas.activity_dataleak_modal')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('/dataleak/activity_save', 'DataLeakController@activity_save')->name('dataleak.activity_save')->middleware('can:menu_items');
+Route::get('/dataleak/activity_history_reload', 'DataLeakController@activity_history_reload')->name('dataleak.activity_history_reload')->middleware('can:menu_items');
+Route::get('/dataleak/activity_get_edit_data', 'DataLeakController@activity_get_edit_data')->name('dataleak.activity_get_edit_data')->middleware('can:menu_items');
 Route::delete('/dataleak/activity_delete', 'DataLeakController@activity_delete')->name('dataleak.activity_delete')->middleware('can:menu_items');
