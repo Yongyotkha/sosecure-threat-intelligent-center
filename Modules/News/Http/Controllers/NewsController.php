@@ -942,7 +942,22 @@ class NewsController extends Controller
                     <div class="entry-meta">
                     <span class="entry-view"> <i class="fas fa-eye"></i> '.$data -> view.'</span>
                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
-                    <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                     <span> <b>Serverity: </b> ';
+                    if($data->serverity=='critical'){
+                        $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                    }else if($data->serverity=='high'){
+                        $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                    }else if($data->serverity=='medium'){
+                        $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                    }else if($data->serverity=='low'){
+                        $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                    }else if($data->serverity=='information'){
+                        $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                    }else{
+                        $html .= '-';
+                    }
+
+                    $html .= '</span> &nbsp; <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
                     .@$html_source_all_full.
                     '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
                     </div>
@@ -1058,7 +1073,7 @@ class NewsController extends Controller
             check_permission403();
         }
         $html = '';
-        $Bookmark = Bookmark::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->get();
+        $Bookmark = Bookmark::where('user_id',@Auth::user()->id)->orderBy('created_at','desc')->with('news')->get();
         if($Bookmark) {
             foreach($Bookmark as $data){
                 $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> rss_news_id)->first();
@@ -1115,7 +1130,21 @@ class NewsController extends Controller
                         <div class="entry-meta">
                             <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$data -> news -> public_date.'</span>
                             <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> news -> view.'</span>
-                            <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                            <span> <b>Serverity: </b> ';
+                            if($data->news->serverity=='critical'){
+                                $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                            }else if($data->news->serverity=='high'){
+                                $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                            }else if($data->news->serverity=='medium'){
+                                $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                            }else if($data->news->serverity=='low'){
+                                $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                            }else if($data->news->serverity=='information'){
+                                $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                            }else{
+                                $html .= '-';
+                            }
+                            $html .='</span> &nbsp; <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
                             .@$html_source_all_full.
                             '<span><p></p>&nbsp;'.strip_tags(@$data -> news -> detail_th).'</p></span>
                         </div>

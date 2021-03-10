@@ -421,6 +421,7 @@ class RSSFeedSettingsController extends Controller
             }
             
         }
+        $model = $model ->orderBy('created_at', 'desc');
         $model = $model -> get();
         
 
@@ -487,6 +488,23 @@ class RSSFeedSettingsController extends Controller
                 $html .= '</div>';
                 return $html;
             })
+            ->addColumn('serverity', function (RSSNews $model) {
+                $html = '';
+                if($model->serverity=='critical'){
+                    $html = '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                }else if($model->serverity=='high'){
+                    $html = '<span class="badge" style="background-color: #fcc838;">High</span>';
+                }else if($model->serverity=='medium'){
+                    $html = '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                }else if($model->serverity=='low'){
+                    $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                }else if($model->serverity=='information'){
+                    $html = '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                }else{
+                    $html = '-';
+                }
+                return $html;
+            })
             ->addColumn('data_status', function (RSSNews $model) {
                 $html = '';
                 if($model -> save_draft == 1){
@@ -543,7 +561,7 @@ class RSSFeedSettingsController extends Controller
                 return $html;
                
             })
-            ->rawColumns(['chk','site_name','source','title','cate','data_status','link','status','action'])
+            ->rawColumns(['chk','site_name','source','title','cate','serverity','data_status','link','status','action'])
             ->toJson();
     }
 
