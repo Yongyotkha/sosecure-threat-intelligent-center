@@ -3957,8 +3957,6 @@ class DataLeakController extends Controller
     }
 
     public function edit_dataleak_modal($code,Request $request){
-
-        
         $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
         $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();;
         $data['DataLeakFeed'] = $DataLeakFeed;
@@ -3972,7 +3970,7 @@ class DataLeakController extends Controller
 
     public function activity_dataleak_modal($code,Request $request){
         $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
-        $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('updated_at','desc')->get();
+        $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
         // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
         $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
         $data['site'] = @$request->site;
@@ -3980,6 +3978,70 @@ class DataLeakController extends Controller
         
         return view('sitesettings::modal.activity_dataleak_modal')->with($data);
     }
+
+    public function activity_get_edit_data(Request $request){
+        $Activity = Activity::where('id',$request->code_activity)->first()->toArray();
+        if ($request->ajax()) {
+            $data = [
+                "ActivityHistory" => $Activity,
+            ];
+            return response()->json($data);
+        }
+    }
+
+    public function activity_history_reload(Request $request){
+        $DataLeakSocialRefs = DataLeakSocialRef::where('id',$request->code)->first();
+        $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
+        $html = '';
+        if(!empty($ActivityHistory)){
+            foreach ($ActivityHistory as $value) {
+                $html .= '
+                <li class="list-group-item" style="border-color: black;" id="list_activity_'.$value->code.'"
+                    <div>
+                        <strong>'.$value->title.'</strong>
+                    </div>
+                    <div>
+                        '.$value->content.'
+                    </div>
+                    <div>
+                        <strong>Post By</strong> '.$value->users_name.' <strong>Modified:</strong> '.$value->updated_at;
+                    if(TYPE_WEB == 'center'){
+                        $html .= '
+                        <span class="float-right">
+                            <a href="#gototop" class="btn btn-info btn-xs disable_atag" onclick="edit_activity( \''. $value->id .'\');">
+                                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-danger btn-xs disable_atag" onclick="delete_activity(\''.$value->id.'\',\''.$value->code.'\');"><i class="fas fa-trash-alt"></i></a>
+                        </span>';
+                        
+                    }else{
+                        if($value->user_id==Auth::user()->id){
+                            $html .= '
+                            <span class="float-right">
+                                <a href="#gototop" class="btn btn-info btn-xs disable_atag" onclick="edit_activity( \''. $value->id .'\');">
+                                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                </a>
+                                <a href="javascript:void(0)" class="btn btn-danger btn-xs disable_atag" onclick="delete_activity(\''.$value->id.'\',\''.$value->code.'\');"><i class="fas fa-trash-alt"></i></a>
+                            </span>';
+                        }
+                    }
+                $html .= '
+                    </div>
+                </li>';
+            }
+        }else{
+            $html .= '<li class="list-group-item"> </li>';
+        }
+
+        
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+                "ActivityHistory" => $ActivityHistory,
+            ];
+            return response()->json($data);
+        }
+    }  
 
     public function activity_save(Request $request){
         if(!$request->title&&!@$_POST['content']){
@@ -4036,7 +4098,7 @@ class DataLeakController extends Controller
             $Activity->user_id = Auth::user()->id;
             $Activity->save();
         }else if($request->check_active=="2"){
-            $Activity = Activity::where('code',$request->code_edited_activity)->first();
+            $Activity = Activity::where('id',$request->code_edited_activity)->first();
             $Activity->title = $request->title;
             $Activity->content = $content;
             $Activity->save();
@@ -4052,6 +4114,7 @@ class DataLeakController extends Controller
             [
                 'message' => langapp('changes_saved_successful'),
                 'redirect' => $site,
+                'socail_ref_id' => $Activity->data_leak_socail_ref_id,
             ],
             true,
             Response::HTTP_OK
@@ -4060,14 +4123,12 @@ class DataLeakController extends Controller
     }
 
     public function activity_delete(Request $request){
-
-        
         if($request->site_code){
             $site = route('socialdatas.index', ['id' => @$request->site_code]);
         }else{
             $site = route('socialdatas.index_all_site');
         }
-        $Activity = Activity::where('code',$request->code_activity)->first();
+        $Activity = Activity::where('id',$request->code_activity)->first();
         $Activity->delete();
         if($Activity){
             return ajaxResponse(
@@ -4084,7 +4145,6 @@ class DataLeakController extends Controller
     }
     
     public function edit_dataleak(Request $request){
-
         $DataLeakFeed = DataLeakFeed::where('id',@$request->id_DataLeakFeed)->first();
         $DataLeakFeed->feel_type = @$request->type;
         // $DataLeakFeed->feedcontent = @$request->content;
@@ -4184,8 +4244,6 @@ class DataLeakController extends Controller
             }else{
                 $site = route('socialdatas.index_all_site');
             }
-             
-        
 
         return ajaxResponse(
             [
