@@ -97,7 +97,7 @@ use Carbon\Carbon;
                     <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                         <div class="row">
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                              <a href="javascript:void(0)">
+                              <a href="javascript:void(0)" onclick="dataType2('in_progress')">
                                  <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
                                        <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
@@ -108,7 +108,7 @@ use Carbon\Carbon;
                               </a>
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                              <a href="javascript:void(0)">
+                              <a href="javascript:void(0)" onclick="dataType2('reported')">
                                  <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
                                        <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
@@ -119,7 +119,7 @@ use Carbon\Carbon;
                               </a>
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
-                              <a href="javascript:void(0)">
+                              <a href="javascript:void(0)" onclick="dataType2('close')">
                                  <div class="card-dash" style="height: 149px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
                                        <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
@@ -1270,6 +1270,9 @@ var click_type2 = null;
                 $("#icon_twitter").html(response.icon_twitter);
                 $("#icon_website").html(response.icon_website);
                 $("#icon_other").html(response.icon_other);
+                $(".number_in_progress").html(response.number_in_progress);
+                $(".number_reported").html(response.number_reported);
+                $(".number_close").html(response.number_close);
             },
             error: function (error){
                 {{--loading('stop_load');--}}

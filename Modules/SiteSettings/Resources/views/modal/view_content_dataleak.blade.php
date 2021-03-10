@@ -12,8 +12,6 @@
                         {!!@$feedcontent!!}
                     </h5>
                 </div>
-                <hr>
-                    <div>Activities</div>
             </div>
         </div>
         <div class="modal-footer">

@@ -966,7 +966,15 @@ class DataLeakController extends Controller
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
     
                     } else {
-                        $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                        if($keywords == 'in_progress') {
+                            $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+                        } else if($keywords == 'reported') {
+                            $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+                        } else if($keywords == 'close') {
+                            $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+                        } else {
+                            $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                        }
                     }
                 });
             }
