@@ -431,7 +431,22 @@ class ApiNewsController extends ApiController
                                 <div class="entry-meta">
                                 <span class="entry-view"> <i class="fas fa-eye"></i> '.$item -> view.'</span>
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
-                                <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                                <span> <b>Serverity: </b> ';
+                                if($item->serverity=='critical'){
+                                    $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                                }else if($item->serverity=='high'){
+                                    $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                                }else if($item->serverity=='medium'){
+                                    $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                }else if($item->serverity=='low'){
+                                    $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                                }else if($item->serverity=='information'){
+                                    $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                }else{
+                                    $html .= '-';
+                                }
+            
+                                $html .= '</span> &nbsp; <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
                                 .@$html_source_all_full.
                                 '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
                                 </div>
@@ -682,7 +697,7 @@ class ApiNewsController extends ApiController
                     $html = '';
                     $user_id = $data['data']['user_id'];
                     $url = $data['data']['url'];
-                    $Bookmark = Bookmark::where('user_id',@$user_id)->orderBy('created_at','desc')->get();
+                    $Bookmark = Bookmark::where('user_id',@$user_id)->orderBy('created_at','desc')->with('news')->get();
                     if($Bookmark) {
                         foreach($Bookmark as $item){
                             $check_read_news = ReadNews::where('user_id', $user_id)->where('news_id', $item -> rss_news_id)->first();
@@ -740,7 +755,21 @@ class ApiNewsController extends ApiController
                                     <div class="entry-meta">
                                         <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.@$item -> news -> public_date.'</span>
                                         <span class="entry-view"> <i class="fas fa-eye"></i> '.@$item -> news -> view.'</span>
-                                        <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
+                                        <span> <b>Serverity: </b> ';
+                                        if($item->news->serverity=='critical'){
+                                            $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                                        }else if($item->news->serverity=='high'){
+                                            $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                                        }else if($item->news->serverity=='medium'){
+                                            $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                        }else if($item->news->serverity=='low'){
+                                            $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                                        }else if($item->news->serverity=='information'){
+                                            $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                        }else{
+                                            $html .= '-';
+                                        }
+                                        $html .='</span> &nbsp; <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
                                         .@$html_source_all_full.
                                         '<span><p></p>&nbsp;'.strip_tags(@$item -> news -> detail_th).'</p></span>
                                     </div>

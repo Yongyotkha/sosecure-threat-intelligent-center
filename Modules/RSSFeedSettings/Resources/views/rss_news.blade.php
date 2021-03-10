@@ -269,6 +269,7 @@
                                                 <th>Source</th>
                                                 <th>Title</th>
                                                 <th>Category</th>
+                                                <th>Serverity</th>
                                                 <th>Data Status</th>
                                                 <th>Public Date</th>
                                                 {{-- <th width="30px">Modified Date</th> --}}
@@ -616,8 +617,7 @@ $(function() {
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 5, "desc" ]],
             ajax: {
-                {{--contentType: "application/json",
-                dataType: 'JSON',--}}
+
                 type: "POST",
                 url: '{!! route('rssfeedsettings.rss_news_table') !!}',
                 data: function ( d ) {
@@ -661,6 +661,11 @@ $(function() {
                     data: 'cate',
                     name: 'cate',
                     className: 'w-130'
+                },
+                {
+                    data: 'serverity',
+                    name: 'serverity',
+                    className: 'text-center'
                 },
                 {
                     data: 'data_status',
