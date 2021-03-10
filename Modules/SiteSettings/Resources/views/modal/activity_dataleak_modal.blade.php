@@ -8,7 +8,7 @@
         <div class="modal-body">
             <input type="hidden" name="id_DataLeakSocialRefs" class="form-control" value="{{$DataLeakSocialRefs->id}}">
             @if ($site)
-            <input type="hidden" name="site_code" class="form-control" value="{{$site}}">   
+            <input type="hidden" name="site_code" id="site_code" class="form-control" value="{{$site}}">   
             @endif
             <input type="hidden" name="check_active" id="check_active" class="form-control" value="1">
             <input type="hidden" name="code_edited_activity" id="code_edited_activity" class="form-control" value="">
@@ -168,6 +168,7 @@
     }
 
     function delete_activity(code_activity){
+        let site_code = $("#site_code").val();
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to delete this!",
@@ -184,6 +185,7 @@
                     url:"{{ route('dataleak.activity_delete') }}",
                     data:{
                         code_activity:code_activity,
+                        site_code:site_code
                     },
                     beforeSend: function(){
                         loading('load');

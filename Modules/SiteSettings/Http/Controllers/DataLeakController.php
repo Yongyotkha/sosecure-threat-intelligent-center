@@ -4053,6 +4053,8 @@ class DataLeakController extends Controller
     }
 
     public function activity_delete(Request $request){
+
+        
         if($request->site_code){
             $site = route('socialdatas.index', ['id' => @$request->site_code]);
         }else{
