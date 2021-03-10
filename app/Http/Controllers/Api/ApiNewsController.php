@@ -841,7 +841,7 @@ class ApiNewsController extends ApiController
                     $isDateSearch = $data['data']['isDateSearch'];
                     $site_id_arr = $data['data']['site_id_arr'];
                     $user_id = $data['data']['user_id'];
-                    $status_serverity = $data['data']['status_serverity'];
+     
 
                     $site_id = '';
         
@@ -1005,7 +1005,7 @@ class ApiNewsController extends ApiController
                     $isDateSearch = $data['data']['isDateSearch'];
                     $site_id_arr = $data['data']['site_id_arr'];
                     $user_id = $data['data']['user_id'];
-                    $status_serverity = $data['data']['status_serverity'];
+
 
                     $site_id = '';
         
