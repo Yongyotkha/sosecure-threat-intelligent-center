@@ -207,7 +207,7 @@ class DashboardNewController extends Controller
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
-                            $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->where('asset_id',$value->id)->where('status',1)->get();
+                            $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->get();
                             $Domain_list = [];
                             $IP_List =[];
                             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -301,7 +301,7 @@ class DashboardNewController extends Controller
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
-                            $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->where('asset_id',$value->id)->where('status',1)->get();
+                            $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->get();
                             $Domain_list = [];
                             $IP_List =[];
                             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -375,13 +375,14 @@ class DashboardNewController extends Controller
         //         }
         //     }
         // }
+        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
         if(Auth::check()) {
             if(@get_role_custom()['superadmin'] == 1) {
                 if(!$request -> site){
                     $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                     $dataOut["countAssets"] = 0;
                     foreach ($datacountAssets as $key => $value) {
-                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id',$site_id_active)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
                         $countfn = count($AssetsData_data);
                         if($countfn==0){
                             $dataOut["countAssets"]++;
@@ -394,7 +395,7 @@ class DashboardNewController extends Controller
                     $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                     $dataOut["countAssets"] = 0;
                     foreach ($datacountAssets as $key => $value) {
-                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id',$site_id_active)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
                         $countfn = count($AssetsData_data);
                         if($countfn==0){
                             $dataOut["countAssets"]++;
@@ -411,7 +412,7 @@ class DashboardNewController extends Controller
                         $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                         $dataOut["countAssets"] = 0;
                         foreach ($datacountAssets as $key => $value) {
-                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id',$site_id_active)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
                             $countfn = count($AssetsData_data);
                             if($countfn==0){
                                 $dataOut["countAssets"]++;
@@ -424,7 +425,7 @@ class DashboardNewController extends Controller
                         $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                         $dataOut["countAssets"] = 0;
                         foreach ($datacountAssets as $key => $value) {
-                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id',$site_id_active)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
                             $countfn = count($AssetsData_data);
                             if($countfn==0){
                                 $dataOut["countAssets"]++;
