@@ -248,3 +248,4 @@ Route::get('/check_cookie_site', 'SystemSettingsController@check_cookie_site')->
 
 Route::get('/socialdatas/activity_modal/{code}', 'DataLeakController@activity_dataleak_modal')->name('socialdatas.activity_dataleak_modal')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('/dataleak/activity_save', 'DataLeakController@activity_save')->name('dataleak.activity_save')->middleware('can:menu_items');
+Route::delete('/dataleak/activity_delete', 'DataLeakController@activity_delete')->name('dataleak.activity_delete')->middleware('can:menu_items');

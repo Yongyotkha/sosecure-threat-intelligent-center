@@ -3966,7 +3966,7 @@ class DataLeakController extends Controller
 
     public function activity_dataleak_modal($code,Request $request){
         $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
-        $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->get();
+        $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('updated_at','desc')->get();
         // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
         $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
         $data['site'] = @$request->site;
@@ -3976,7 +3976,6 @@ class DataLeakController extends Controller
     }
 
     public function activity_save(Request $request){
-        dd($request->check_active);
         if(!$request->title&&!@$_POST['content']){
             return response()->json(['message' => 'You have to fill Title', 'errors' => ['missing' => ["You have to fill Title"],'missing2' => ["You have to fill content"]]], 500);
         }else if(!$request->title){
@@ -3984,7 +3983,7 @@ class DataLeakController extends Controller
         }else if(!@$_POST['content']){
             return response()->json(['message' => 'You have to fill content', 'errors' => ['missing' => ["You have to fill content"]]], 500);
         }
-
+       
         $content = @$_POST['content']; //รับค่าจาก messageInput
         if($content) {
             $dom = new \domdocument();
@@ -4031,9 +4030,10 @@ class DataLeakController extends Controller
             $Activity->user_id = Auth::user()->id;
             $Activity->save();
         }else if($request->check_active=="2"){
-
-        }else{
-
+            $Activity = Activity::where('code',$request->code_edited_activity)->first();
+            $Activity->title = $request->title;
+            $Activity->content = $content;
+            $Activity->save();
         }
 
         if($request->site_code){
@@ -4041,6 +4041,7 @@ class DataLeakController extends Controller
         }else{
             $site = route('socialdatas.index_all_site');
         }
+
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),
@@ -4052,6 +4053,28 @@ class DataLeakController extends Controller
 
     }
 
+    public function activity_delete(Request $request){
+        if($request->site_code){
+            $site = route('socialdatas.index', ['id' => @$request->site_code]);
+        }else{
+            $site = route('socialdatas.index_all_site');
+        }
+        $Activity = Activity::where('code',$request->code_activity)->first();
+        $Activity->delete();
+        if($Activity){
+            return ajaxResponse(
+                [
+                    'message' => langapp('changes_saved_successful'),
+                    'redirect' => $site,
+                ],
+                true,
+                Response::HTTP_OK
+            );
+        }else{
+            return response()->json(['message' => 'Error Delete Activity Please Contact Admin', 'errors' => ['missing' => ["Error Delete Activity Please Contact Admin"]]], 500);
+        }  
+    }
+    
     public function edit_dataleak(Request $request){
 
         $DataLeakFeed = DataLeakFeed::where('id',@$request->id_DataLeakFeed)->first();
@@ -4147,6 +4170,7 @@ class DataLeakController extends Controller
                 }
                 
             }
+
             if($request->site_code){
                 $site = route('socialdatas.index', ['id' => @$request->site_code]);
             }else{
