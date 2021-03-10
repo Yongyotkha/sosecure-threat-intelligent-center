@@ -147,8 +147,8 @@
                                         <th>Keyword Ref</th>
                                         <th>Content</th>
                                         <th>Remark</th>
+                                        <th>Serverity</th>
                                         <th>Data Feed</th>
-                                        <th>View</th>
                                         <th>Status</th>
                                         <th>@langapp('action')</th>
                                     </tr>
@@ -408,7 +408,7 @@ active_btn('#groupby-type .btn-grey');
                             let content = '';
                             val = full.get_data_leak_feed_one;
                             if(val) {
-                                var feedcontent = full.get_data_leak_feed_one.feedcontent;
+                                var feedcontent = stripHtml(full.get_data_leak_feed_one.feedcontent);
                                 var res = full.keyword.split(",");
                                 for(let i in res){
                                     var data = res[i];
@@ -440,6 +440,28 @@ active_btn('#groupby-type .btn-grey');
                     },
                     {
                         targets: 6,
+                        width: '10px',
+                        className : 'nowrap_top',
+                        render: function (data, type, full, meta) {
+
+                            if(full.serverity=='critical'){
+                        return '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                            }else if(full.serverity=='high'){
+                                return '<span class="badge" style="background-color: #fcc838;">High</span>';
+                            }else if(full.serverity=='medium'){
+                                return '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                            }else if(full.serverity=='low'){
+                                return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                            }else if(full.serverity=='information'){
+                                return '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                            }else{
+                                return '-';
+                            }
+                        }
+
+                    },
+                    {
+                        targets: 7,
                         className:'nowrap',
                         render: function (data, type, full, meta) {
                             let val = '';
@@ -449,16 +471,6 @@ active_btn('#groupby-type .btn-grey');
                                 
                             }
                             return val;
-                        },
-                    },
-                    {
-                        targets: 7,
-                        width: '10px',
-                        render: function (data, type, full, meta) {
-                
-        
-                            return full.view;
-
                         },
                     },
                     {
@@ -498,6 +510,12 @@ active_btn('#groupby-type .btn-grey');
                 ]
         
             });
+    }
+
+    function stripHtml(html){
+        var temporalDivElement = document.createElement("div");
+        temporalDivElement.innerHTML = html;
+        return temporalDivElement.textContent || temporalDivElement.innerText || "";
     }
 
     function social_active(id) {

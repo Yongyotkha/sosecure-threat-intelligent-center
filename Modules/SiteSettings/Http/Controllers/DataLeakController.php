@@ -3581,6 +3581,7 @@ class DataLeakController extends Controller
                     $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
                     $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
                     $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->serverity = @$request->serverity;
                     $DataLeakSocialRefs->status = 1;
                     $DataLeakSocialRefs->save();
                     if ($request->sent_mail == true) {
@@ -3622,6 +3623,8 @@ class DataLeakController extends Controller
                 $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
                 $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
                 $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                $DataLeakSocialRefs->status_monitoring = @$request->monitoring;
+                $DataLeakSocialRefs->serverity = @$request->serverity;
                 $DataLeakSocialRefs->status = 1;
                 $DataLeakSocialRefs->save();
                 $site = route('compromised_data.index', ['code' => @$request->site_code]);
@@ -3674,6 +3677,8 @@ class DataLeakController extends Controller
         $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
         $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();;
         $data['DataLeakFeed'] = $DataLeakFeed;
+        $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+
 
         $data['site'] = @$request->site;
 
@@ -3736,6 +3741,7 @@ class DataLeakController extends Controller
                 foreach($DataLeakSocialRefs as $DataLeakSocialRefs){
                     $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
                     $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->serverity = @$request->serverity;
                     $DataLeakSocialRefs->save();
                     if ($request->sent_mail == true) {
                         $site_email_alert = site_config_email_alert::where("site_id", $DataLeakSocialRefs->site_id)->get();
