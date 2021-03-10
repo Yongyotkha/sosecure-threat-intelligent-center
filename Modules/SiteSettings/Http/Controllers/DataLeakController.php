@@ -3674,7 +3674,6 @@ class DataLeakController extends Controller
         $DataLeakSocialRefs = DataLeakSocialRef::where('code',$code)->first();
         $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();;
         $data['DataLeakFeed'] = $DataLeakFeed;
-
         $data['site'] = @$request->site;
 
         
