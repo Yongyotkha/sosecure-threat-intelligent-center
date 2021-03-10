@@ -829,8 +829,8 @@ class ApiNewsController extends ApiController
                     if($auth_site['status_code'] !== '200'){
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                  
-                 
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
                     $keywords = $data['data']['keywords'];
                     $status_news = $data['data']['status_news'];
                     $news_source = $data['data']['news_source'];
@@ -993,8 +993,8 @@ class ApiNewsController extends ApiController
                     if($auth_site['status_code'] !== '200'){
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                 
-                 
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
                     $keywords = $data['data']['keywords'];
                     $status_news = $data['data']['status_news'];
                     $news_source = $data['data']['news_source'];
