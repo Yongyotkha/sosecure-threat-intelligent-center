@@ -419,6 +419,11 @@ class RSSFeedSettingsController extends Controller
         
 
             }
+
+            if($request -> status_serverity){
+
+                $model = $model -> where('serverity', $request -> status_serverity);
+            }
             
         }
         $model = $model ->orderBy('created_at', 'desc');
@@ -635,6 +640,11 @@ class RSSFeedSettingsController extends Controller
                     $query->whereIn('news_category_id', $news_cate_id);
                 });
             }
+
+            if($request -> status_serverity){
+
+                $model = $model -> where('serverity', $request -> status_serverity);
+            }
             
         }
 
@@ -748,6 +758,11 @@ class RSSFeedSettingsController extends Controller
                 $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
                     $query->whereIn('news_category_id', $news_cate_id);
                 });
+            }
+
+            if($request -> status_serverity){
+                    
+                $model = $model -> where('serverity', $request -> status_serverity);
             }
             
         }

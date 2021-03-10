@@ -155,6 +155,27 @@
                                     </div>
 
                                     <div class="col-lg-6 col-md-6 mb-1">
+                                        <h5 class="font-weight-bold">Serverity</h5>
+                                        <div id="btngroup_status" class="btn-group special mb-2">
+                                            <button class="btn btn-grey check_serverity active" value="" id="btn_search_all">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="critical">
+                                                <span> Critical </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="high">
+                                                <span> High </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="medium">
+                                                <span> Medium </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="low">
+                                                <span> Low </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="none">
+                                                <span> Information </span>
+                                            </button>
+                                        </div>
                                         <h5 class="font-weight-bold">Status</h5>
                                         <div id="groupby-status" class="btn-group special">
                                             <button class="btn btn-grey check_status active" id="all" value="">
@@ -167,6 +188,7 @@
                                                 <span> Inactive </span>
                                             </button>
                                         </div>
+
                                     </div>
                                     
 
@@ -343,6 +365,7 @@
 
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
+    active_btn('#btngroup_status .btn-grey');
 
 
     $(function(){
@@ -387,6 +410,11 @@
         status_news = $(this).val();
    
     });
+
+    $(".check_serverity").click(function() {
+        status_serverity = $(this).val();
+   
+    });
      
 
 
@@ -395,6 +423,7 @@
     var start_date = null;
     var end_date = null;
     var status_news = null;
+    var status_serverity = null;
     var news_source = [];
     var news_category = [];
     var startDate = null;
@@ -462,6 +491,7 @@
             
             search_val = 0;
             status_news = null;
+            status_serverity = null;
             $("#keywords").val('');
             $("#start_date").val('');
             $("#end_date").val('');
@@ -471,6 +501,8 @@
             $('#source_btn').addClass('active');
             $('.check_status').removeClass('active');
             $('#all').addClass('active');
+            $('.check_serverity').removeClass('active');
+            $('#btn_search_all').addClass('active');
             $('#source_search').show();
             $('#category_search').hide();
             start = moment();
@@ -623,6 +655,7 @@ $(function() {
                 data: function ( d ) {
                     d.keywords = keywords;
                     d.status_news = status_news;
+                    d.status_serverity = status_serverity;
                     d.news_source = news_source;
                     d.news_category = news_category;
                     d.search_val = search_val;
@@ -901,6 +934,7 @@ $(document).ready(function(){
             data: ({
                 keywords : keywords,
                 status_news : status_news,
+                status_serverity : status_serverity,
                 news_source : news_source,
                 news_category : news_category,
                 search_val : search_val,
@@ -1017,6 +1051,7 @@ $(document).ready(function(){
             data: ({
                 keywords : keywords,
                 status_news : status_news,
+                status_serverity : status_serverity,
                 news_source : news_source,
                 news_category : news_category,
                 search_val : search_val,

@@ -433,7 +433,7 @@ class ApiNewsController extends ApiController
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
                                 <span> <b>Serverity: </b> ';
                                 if($item->serverity=='critical'){
-                                    $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                                    $html .=  '<span class="badge" style="background-color: #e64732;">Critical</span>';
                                 }else if($item->serverity=='high'){
                                     $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
                                 }else if($item->serverity=='medium'){
@@ -829,8 +829,8 @@ class ApiNewsController extends ApiController
                     if($auth_site['status_code'] !== '200'){
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'];
-                    $site = $data['data']['site'];
+                  
+                 
                     $keywords = $data['data']['keywords'];
                     $status_news = $data['data']['status_news'];
                     $news_source = $data['data']['news_source'];
@@ -841,6 +841,7 @@ class ApiNewsController extends ApiController
                     $isDateSearch = $data['data']['isDateSearch'];
                     $site_id_arr = $data['data']['site_id_arr'];
                     $user_id = $data['data']['user_id'];
+                    $status_serverity = $data['data']['status_serverity'];
 
                     $site_id = '';
         
@@ -913,6 +914,11 @@ class ApiNewsController extends ApiController
                             $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
                                 $query->whereIn('news_category_id', $news_cate_id);
                             });
+                        }
+
+                        if($status_serverity){
+
+                            $model = $model -> where('serverity', $status_serverity);
                         }
                         
                     }
@@ -987,8 +993,8 @@ class ApiNewsController extends ApiController
                     if($auth_site['status_code'] !== '200'){
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'];
-                    $site = $data['data']['site'];
+                 
+                 
                     $keywords = $data['data']['keywords'];
                     $status_news = $data['data']['status_news'];
                     $news_source = $data['data']['news_source'];
@@ -999,6 +1005,7 @@ class ApiNewsController extends ApiController
                     $isDateSearch = $data['data']['isDateSearch'];
                     $site_id_arr = $data['data']['site_id_arr'];
                     $user_id = $data['data']['user_id'];
+                    $status_serverity = $data['data']['status_serverity'];
 
                     $site_id = '';
         
@@ -1072,6 +1079,10 @@ class ApiNewsController extends ApiController
                             $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
                                 $query->whereIn('news_category_id', $news_cate_id);
                             });
+                        }
+                        if($status_serverity){
+
+                            $model = $model -> where('serverity', $status_serverity);
                         }
                         
                     }

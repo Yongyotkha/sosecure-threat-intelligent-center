@@ -91,6 +91,32 @@
                                             </button>
                                         </div>      
                                     </div>
+
+                                    
+                                    <div class="col-lg-12 mb-1">
+                                        <h5 class="font-weight-bold">Serverity</h5>
+                                        <div id="btngroup_status" class="btn-group special mb-2">
+                                            <button class="btn btn-grey check_serverity active" value="" id="btn_search_all">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="critical">
+                                                <span> Critical </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="high">
+                                                <span> High </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="medium">
+                                                <span> Medium </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="low">
+                                                <span> Low </span>
+                                            </button>
+                                            <button class="btn check_serverity btn-grey" value="none">
+                                                <span> Information </span>
+                                            </button>
+                                        </div>
+
+                                    </div>
                                 </div>
                             <!--
                             <div class="row">
@@ -265,6 +291,7 @@
 <script>
 
     active_btn('#groupby-btn .btn-grey');
+    active_btn('#btngroup_status .btn-grey');
 
     var search_val = 0;
     var search_val = 0;
@@ -294,6 +321,15 @@
     var related_news = null;
     var news_category = null;
     var news_title_search = null;
+    var status_serverity = null;
+
+
+    $(".check_serverity").click(function() {
+        status_serverity = $(this).val();
+   
+    });
+
+
     $('#scrollable_news').scroll(function(event) {
         let scrolltop = $('#scrollable_news').scrollTop();
         let tab_height = $('#scrollable_news').height();
@@ -398,7 +434,8 @@
                 date_start:startDate,
                 date_end:endDate,
                 f_search:f_search,
-                site_id:site
+                site_id:site,
+                status_serverity:status_serverity
             }),
             {{--datatype: "html",--}}
             beforeSend: function(){
@@ -563,6 +600,8 @@
             $('#count_news').text(0);
             page_stop = true;
             load_more_search(page,f_search);
+            load_top_source();
+            load_top_category();
 
         });
 
@@ -584,6 +623,11 @@
             related_news = null;
             news_category = null;
             news_title_search = null;
+            status_serverity = null;
+            $('.check_serverity').removeClass('active');
+            $('#btn_search_all').addClass('active');
+            $('.check_group_by').removeClass('active');
+            $('#source_btn').addClass('active');
             f_search = 0;
             page = 1;
             $('#count_news').text(0);
@@ -608,7 +652,7 @@
 
 
     function load_top_source(){
-        if(search_val == 1 || search_val == 0) {
+        if(f_search == 1 || f_search == 0) {
             $("#chart-top-source").html('');             
         }
 
@@ -616,17 +660,18 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            url: '{!! route('rssfeedsettings.load_top_source') !!}',
+            url: '{!! route('news.load_top_source') !!}',
             type: "POST",
             data: ({
                 keywords : keywords,
                 status_news : status_news,
                 news_source : news_source,
                 news_category : news_category,
-                search_val : search_val,
+                search_val : f_search,
                 startDate : startDate,
                 endDate : endDate,
                 isDateSearch : isDateSearch,
+                status_serverity:status_serverity
 
             }),
             beforeSend: function(){
@@ -724,7 +769,7 @@
     }
 
     function load_top_category(){
-        if(search_val == 1 || search_val == 0) {
+        if(f_search == 1 || f_search == 0) {
             $("#chart-top-category").html('');             
         }
 
@@ -732,17 +777,18 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            url: '{!! route('rssfeedsettings.load_top_category') !!}',
+            url: '{!! route('news.load_top_category') !!}',
             type: "POST",
             data: ({
                 keywords : keywords,
                 status_news : status_news,
                 news_source : news_source,
                 news_category : news_category,
-                search_val : search_val,
+                search_val : f_search,
                 startDate : startDate,
                 endDate : endDate,
                 isDateSearch : isDateSearch,
+                status_serverity:status_serverity
 
             }),
             beforeSend: function(){

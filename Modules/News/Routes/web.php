@@ -24,6 +24,8 @@ Route::group(
 		Route::get('/jqueryLoadMoreNewsTopic', 'NewsController@jqueryLoadMoreNewsTopic')->name('jqueryLoadMoreNewsTopic');
 		Route::get('/jqueryLoadMoreNewsBookmark', 'NewsController@jqueryLoadMoreNewsBookmark')->name('jqueryLoadMoreNewsBookmark');
 		Route::get('/bookmark', 'NewsController@bookmark')->name('bookmark');
+		Route::post('/load_top_source', 'NewsController@load_top_source')->name('news.load_top_source')->middleware('can:menu_items');
+        Route::post('/load_top_category', 'NewsController@load_top_category')->name('news.load_top_category')->middleware('can:menu_items');
 		
 	}
 );
