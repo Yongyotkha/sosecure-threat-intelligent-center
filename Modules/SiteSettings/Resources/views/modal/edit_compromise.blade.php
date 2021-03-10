@@ -44,6 +44,25 @@
                 </div>
             </div>
 
+
+            <div class="form-group row">
+                <label class="col-lg-3 control-label">Serverity</label>
+                <div class="col-lg-9">
+                    <select name="serverity" id="serverity" class="select2-option form-control" >
+                        <option value="critical" {{@$DataLeakSocialRefs->serverity == 'critical'?'selected':''}}>
+                            Critical</option>
+                        <option value="high" {{@$DataLeakSocialRefs->serverity == 'high'?'selected':''}}>
+                            High</option>
+                        <option value="medium" {{@$DataLeakSocialRefs->serverity == 'medium'?'selected':''}}>
+                            Medium</option>
+                        <option value="low" {{@$DataLeakSocialRefs->serverity == 'low'?'selected':''}}>
+                            Low</option>
+                        <option value="information" {{@$DataLeakSocialRefs->serverity == 'information'?'selected':''}}>
+                            Information</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group row">
                 <label for="" class="col-md-3">Send Mail</label>
                 <div class="col-md-9">

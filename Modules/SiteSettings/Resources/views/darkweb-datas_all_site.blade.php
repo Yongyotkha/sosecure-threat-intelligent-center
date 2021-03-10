@@ -274,8 +274,10 @@
                                         <th>Keyword</th>
                                         <th>Content</th>
                                         <th>Remark</th>
+
                                         <th>Data Feed</th>
                                         {{-- <th>View</th> --}}
+                                        <th>Serverity</th>
                                         <th>Status</th>
                                         <th>@langapp('action')</th>
                                     </tr>
@@ -730,9 +732,34 @@
                             return full.view;
                         },
                     },--}}
+
                     {
                         visible: visible_c,
                         targets: 7,
+                        width: '10px',
+                        className : 'nowrap_top',
+                        render: function (data, type, full, meta) {
+
+                            if(full.serverity=='critical'){
+                        return '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                            }else if(full.serverity=='high'){
+                                return '<span class="badge" style="background-color: #fcc838;">High</span>';
+                            }else if(full.serverity=='medium'){
+                                return '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                            }else if(full.serverity=='low'){
+                                return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                            }else if(full.serverity=='information'){
+                                return '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                            }else{
+                                return '-';
+                            }
+                        }
+
+                    },
+
+                    {
+                        visible: visible_c,
+                        targets: 8,
                         width: '10px',
                         className : 'nowrap_top',
                         render: function (data, type, full, meta) {
@@ -750,7 +777,7 @@
 
                     },
                     {
-                        targets: 8,
+                        targets: 9,
                         className: 'nowrap nowrap_top',
                         width: '10px',
                         render: function (data, type, full, meta) {

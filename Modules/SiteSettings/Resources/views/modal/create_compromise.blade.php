@@ -57,6 +57,20 @@
             </div>
 
             <div class="form-group row">
+                <label class="col-lg-3 control-label">Serverity</label>
+                <div class="col-lg-9">
+                    <select name="serverity" id="serverity" class="select2-option form-control" >
+                        <option value="">Select</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                        <option value="information">Information</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label for="" class="col-md-3">Send Mail</label>
                 <div class="col-md-9">
                     <label>

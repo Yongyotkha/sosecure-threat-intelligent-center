@@ -1215,6 +1215,7 @@ class RSSFeedSettingsController extends Controller
             $RSSNews_check -> logo = config('app.URL_CENTER_PUBLISH').$logo;
             $RSSNews_check -> title_th = $request -> title_th;
             $RSSNews_check -> title_en = $request -> title_en;
+            $RSSNews_check -> serverity = $request -> serverity;
             $RSSNews_check -> source = $request -> source;
             $RSSNews_check -> public_date = Carbon::parse($request -> public_date);
             $detail_th = @$_POST['detail_th']; //รับค่าจาก messageInput
@@ -1448,6 +1449,7 @@ class RSSFeedSettingsController extends Controller
             $RSSNews -> logo = config('app.URL_CENTER_PUBLISH').$logo;
             $RSSNews -> title_th = $request -> title_th;
             $RSSNews -> title_en = $request -> title_en;
+            $RSSNews -> serverity = $request -> serverity;
             $RSSNews -> source = $request -> source;
             $RSSNews -> public_date = Carbon::parse($request -> public_date);
             $detail_th = @$_POST['detail_th']; //รับค่าจาก messageInput

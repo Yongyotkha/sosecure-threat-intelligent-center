@@ -422,8 +422,8 @@
                                             <th>Source</th>
                                             <th>Keyword</th>
                                             <th>Content</th>
-                                            <th>Status Monitoring</th>
                                             <th>Serverity</th>
+                                            <th>Status Monitoring</th>                                        
                                             <th>Data Feed</th>
                                             {{-- <th>View</th> --}}
                                             <th>Status</th>
@@ -833,7 +833,7 @@ $('.btn').click(function(){
                         },
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         width: '10px',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
@@ -851,7 +851,7 @@ $('.btn').click(function(){
                         },
                     }, 
                     {
-                        targets: 7,
+                        targets: 6,
                         width: '10px',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
