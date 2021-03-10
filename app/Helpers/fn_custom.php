@@ -47,12 +47,15 @@ function get_role_custom() {
     $site_support = 0;
     $site_admin = 0;
     $site_client = 0;
+
+    $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
+
             if(Auth::check()) {
                 $model_has_roles = model_has_roles::where('model_id',@Auth::user()->id)->first();
                 $role_id = @$model_has_roles->role_id;
                 // dd($role_id);
 
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+                $site_id_arr = UserSite::select('site_id')->whereIn('site_id',$site_id_active)->where('user_id', @Auth::user()->id)->get();
     
                 $SiteSettings = '';
                 if(@$role_id == 1) {//if admin  | Auth::user()->hasRole('admin')

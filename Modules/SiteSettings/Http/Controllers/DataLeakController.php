@@ -961,6 +961,7 @@ class DataLeakController extends Controller
                     if($keywords == 'other') {
                         $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                             ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
     
