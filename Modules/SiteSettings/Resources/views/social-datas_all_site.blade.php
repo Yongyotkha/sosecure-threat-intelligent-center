@@ -96,6 +96,17 @@ use Carbon\Carbon;
 
                     <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                         <div class="row">
+                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
+                                <a href="javascript:void(0)" onclick="dataType2('reported')">
+                                   <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
+                                      <div class="left-card">
+                                         <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                         <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
+                                         <span class="number-card green number_reported">0</span>
+                                      </div>
+                                   </div>
+                                </a>
+                             </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
                               <a href="javascript:void(0)" onclick="dataType2('in_progress')">
                                  <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
@@ -103,17 +114,6 @@ use Carbon\Carbon;
                                        <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">In Progress</h3>
                                        <span class="number-card info number_in_progress">0</span>
-                                    </div>
-                                 </div>
-                              </a>
-                           </div>
-                           <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                              <a href="javascript:void(0)" onclick="dataType2('reported')">
-                                 <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
-                                    <div class="left-card">
-                                       <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                       <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
-                                       <span class="number-card green number_reported">0</span>
                                     </div>
                                  </div>
                               </a>

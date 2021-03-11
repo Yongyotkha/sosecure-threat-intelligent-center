@@ -2,7 +2,7 @@
     <div class="modal-content" >
         <div class="modal-header bg-blue" id="gototop">
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title text-white" ><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Edit Data Leak</h4>
+            <h4 class="modal-title text-white" ><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Activity History</h4>
         </div>
     {!! Form::open(['route' => ['dataleak.activity_save'], 'class' => 'ajaxifyForm_custom_onlythis', 'files' => false]) !!}
         <div class="modal-body">
