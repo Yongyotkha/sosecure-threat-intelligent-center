@@ -584,6 +584,37 @@ use Carbon\Carbon;
     $('#fillter_click_keyword').html(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
 } --}}
 
+
+{{-- "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+    var date_day = '2021-01-01';
+    var date = aData.get_data_leak_feed_one.feedtimepost;
+    var date_sp = date.split(" ");
+    if(date_sp.length > 0) {
+        date_day = date_sp[0];
+    }
+
+    var date_now = '{{Carbon::now()}}';
+    let date_now_sp = date_now.split(" ");
+    if(date_now_sp.length > 0) {
+        var date_now_day = date_now_sp[0];
+    }
+
+    console.log(date_day+' now:'+date_now_day);
+    if ((date_day) == (date_now_day)) {
+        $('td:eq(0)', nRow).addClass("custom_new");
+        $('td:eq(1)', nRow).addClass("custom_new");
+        $('td:eq(2)', nRow).addClass("custom_new");
+        $('td:eq(3)', nRow).addClass("custom_new");
+        $('td:eq(4)', nRow).addClass("custom_new");
+        $('td:eq(5)', nRow).addClass("custom_new");
+        $('td:eq(6)', nRow).addClass("custom_new");
+        $('td:eq(7)', nRow).addClass("custom_new");
+        $('td:eq(8)', nRow).addClass("custom_new");
+        $('td:eq(9)', nRow).addClass("custom_new");
+        $('td:eq(10)', nRow).addClass("custom_new");
+    }
+}, --}}
+
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.datepicker')
@@ -746,37 +777,6 @@ $('.btn').click(function(){
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-                "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    var date_day = '2021-01-01';
-                    var date = aData.get_data_leak_feed_one.feedtimepost;
-                    var date_sp = date.split(" ");
-                    if(date_sp.length > 0) {
-                        date_day = date_sp[0];
-                    }
-                    {{--console.log(new Date(date));--}}
-
-                    var date_now = '{{Carbon::now()}}';
-                    let date_now_sp = date_now.split(" ");
-                    if(date_now_sp.length > 0) {
-                        var date_now_day = date_now_sp[0];
-                    }
-
-                    console.log(date_day+' now:'+date_now_day);
-                    if ((date_day) == (date_now_day)) {
-                        $('td:eq(0)', nRow).addClass("custom_new");
-                        $('td:eq(1)', nRow).addClass("custom_new");
-                        $('td:eq(2)', nRow).addClass("custom_new");
-                        $('td:eq(3)', nRow).addClass("custom_new");
-                        $('td:eq(4)', nRow).addClass("custom_new");
-                        $('td:eq(5)', nRow).addClass("custom_new");
-                        $('td:eq(6)', nRow).addClass("custom_new");
-                        $('td:eq(7)', nRow).addClass("custom_new");
-                        $('td:eq(8)', nRow).addClass("custom_new");
-                        $('td:eq(9)', nRow).addClass("custom_new");
-                        $('td:eq(10)', nRow).addClass("custom_new");
-                    }
-                },
-
                 "order": [ 6, 'desc' ],
                 columnDefs: [
                     {
@@ -853,6 +853,23 @@ $('.btn').click(function(){
                         targets: 5,
                         width: '10px',
                         render: function (data, type, full, meta) {
+
+                            var new_html = '';
+                            var date_day = '2021-01-01';
+                            var date = full.get_data_leak_feed_one.feedtimepost;
+                            var date_sp = date.split(" ");
+                            if(date_sp.length > 0) {
+                                date_day = date_sp[0];
+                            }
+
+                            var date_now = '{{Carbon::now()}}';
+                            let date_now_sp = date_now.split(" ");
+                            if(date_now_sp.length > 0) {
+                                var date_now_day = date_now_sp[0];
+                            }
+                            if ((date_day) == (date_now_day)) {
+                                new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;
+                            }
                           
                             if(full.get_data_leak_feed_one.feedcontent){
                                 var feedcontent =  stripHtml(full.get_data_leak_feed_one.feedcontent);
@@ -862,7 +879,7 @@ $('.btn').click(function(){
                                     const data2 = res[i];
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                 return'<div>'+content+'</div>';
+                                 return'<div>'+new_html+content+'</div>';
                             }else{
                                 return '-';
                             }
@@ -1195,61 +1212,6 @@ var click_type2 = null;
         table_social_data();
         {{--get_count();--}}
     }
-
-    {{--
-    function count_keyword() {
-        $.ajax({
-            type:"POST",
-            url:"{{ route('socialdatas.count_keyword') }}",
-            data: ({
-                site_id : site,
-            }),
-            beforeSend: function(){
-                
-            },
-            success:function(response) {
-                $('#fillter_click_keyword').html('');
-                for (var i = 0; i < response.model.length; i++) {
-                    $('#fillter_click_keyword').append(`<a class="btn btn-selector" href="javascript:void(0)" onclick="click_keyword('${response.model[i]['keyword']}')">${response.model[i]['keyword']} (${response.model[i]['count_keyword']})</a>`);
-                }
-                
-                active_btn('#fillter_click_keyword .btn-selector');
-            },
-            error: function (error){
-               
-                var errors = error.response.data.errors;
-                var errorsHtml = '';
-                $.each(errors, function (key, value) {
-                    errorsHtml += '<li>' + value[0] + '</li>';
-                });
-                toastr.error(errorsHtml, '@langapp('response_status') ');
-            }
-
-        });
-    }
-    
-    
-    function click_keyword(data){
-        click_key = data;
-        click_type = null;
-        keywords = null;
-        type = null;
-        source = null;
-        startDate =  null;
-        endDate =  null;
-        site = null;
-        search_val = 0;
-        $("#keyword").val('');
-        $("#site").val('').trigger("change");
-        $("#source").val('').trigger("change");
-        $('.btn-grey').removeClass('active');
-        $('#all').addClass('active');
-        check_type = null;
-        table_social_data();
-        get_count();
-
-    }
-    --}}
 
 
     function count_icon() {

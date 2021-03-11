@@ -521,17 +521,17 @@ public function count_data_leak(Request $request){
                 // $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) {
                 if(!$request -> site){
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->whereIn('feel_type', ['social','darkweb_public'])->count();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status',1)->whereNull('deleted_at')->whereIn('feel_type', ['social','darkweb_public'])->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id', $site_id_m->id)->whereIn('feel_type', ['social','darkweb_public'])->count();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status',1)->whereNull('deleted_at')->where('site_id', $site_id_m->id)->whereIn('feel_type', ['social','darkweb_public'])->count();
                 }
             } else {
                 if(!$request -> site){
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social','darkweb_public'])->count();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status',1)->whereNull('deleted_at')->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social','darkweb_public'])->count();
                 }else{
                     $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social','darkweb_public'])->count();
+                    $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status',1)->whereNull('deleted_at')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social','darkweb_public'])->count();
                 }
             }
         }
@@ -903,7 +903,7 @@ public function chart_indicators(Request $request){
                 if(!$request -> sitecode){
                     $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/datafeedsocial") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
-                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->first();
+                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('status',1)->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->first();
                         if($leak_socail_ref_temps){
                             if(isset($SiteSettings->id)){
                                 $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
@@ -927,7 +927,7 @@ public function chart_indicators(Request $request){
                 } else {
                     $DataLeakFeed_social = DataLeakFeedTemp::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/datafeedsocial") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
-                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
+                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->where('status',1)->whereNull('deleted_at')->where('status',1)->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
                         if($leak_socail_ref_temps){
                             if(isset($SiteSettings->id)){
                                 $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id."");
@@ -953,7 +953,7 @@ public function chart_indicators(Request $request){
                 if(!$request -> sitecode){
                     $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
-                        $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->whereIn('site_id',$site_id_arr)->first();
+                        $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->where('status',1)->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->whereIn('site_id',$site_id_arr)->first();
                         if($leak_socail_ref_temps){
                             $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
                             $name_site = '';
@@ -969,7 +969,7 @@ public function chart_indicators(Request $request){
                 } else {
                     $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
-                        $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
+                        $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->where('status',1)->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
                         if($leak_socail_ref_temps){
                             $site = SiteSettings::select('name')->whereIn('id', explode("," , $leak_socail_ref_temps->site_id))->get();
                             $name_site = '';
