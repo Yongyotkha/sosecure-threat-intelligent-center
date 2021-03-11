@@ -25,7 +25,7 @@
 
                     <select name="keyword" id="keyword55" class="select2-option form-control" required>
                         <option value="Mobile" {{@$DataLeakFeed->keyword == 'Mobile'?'selected':''}}>Mobile</option>
-                        <option value="Facebook" {{@$DataLeakFeed->keyword == 'Facebook'?'selected':''}}>Facebook</option>
+                        <option value="Facebook" {{@$DataLeakFeed->keyword == 'Facebook'?'selected':''}}>Fanpage</option>
                         <option value="Twitter" {{@$DataLeakFeed->keyword == 'Twitter'?'selected':''}}>Twitter</option>
                         <option value="Website" {{@$DataLeakFeed->keyword == 'Website'?'selected':''}}>Website</option>
                         <option value="Other" {{@$DataLeakFeed->keyword == 'Mobile'||@$DataLeakFeed->keyword == 'Facebook'||

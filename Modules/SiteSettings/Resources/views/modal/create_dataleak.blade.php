@@ -40,7 +40,7 @@
                     <select name="keyword" id="keyword55" class="select2-option form-control" required>
                         <option value="">Select</option>
                         <option value="Mobile">Mobile</option>
-                        <option value="Facebook">Facebook</option>
+                        <option value="Facebook">Fanpage</option>
                         <option value="Twitter">Twitter</option>
                         <option value="Website">Website</option>
                         <option value="Other">Other</option>

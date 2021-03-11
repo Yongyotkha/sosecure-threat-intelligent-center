@@ -314,7 +314,7 @@ use Carbon\Carbon;
                                             <span> Mobile App</span>
                                         </button>
                                         <button class="btn btn-grey" value="facebook">
-                                            <span> Facebook </span>
+                                            <span> Fanpage </span>
                                         </button>
                                         <button class="btn btn-grey" value="line">
                                             <span> Line </span>
