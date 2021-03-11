@@ -414,7 +414,7 @@ use Carbon\Carbon;
                             </div> --}}
 
                             <div class="table-responsive">
-                                <table  class="table table-striped" id="table_social_datas">
+                                <table  class="table table-striped" style="width: 100%;" id="table_social_datas">
                                     <thead>
                                         <tr>
                                             <th class="no-sort w-10">
@@ -868,7 +868,8 @@ $('.btn').click(function(){
                                 var date_now_day = date_now_sp[0];
                             }
                             if ((date_day) == (date_now_day)) {
-                                new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;
+                                {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                                new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
                             }
                           
                             if(full.get_data_leak_feed_one.feedcontent){
@@ -888,7 +889,7 @@ $('.btn').click(function(){
                     },
                     {
                         targets: 7,
-                        width: '10px',
+                        width: '8%',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
@@ -906,7 +907,7 @@ $('.btn').click(function(){
                     }, 
                     {
                         targets: 6,
-                        width: '10px',
+                        width: '5%',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
@@ -928,7 +929,7 @@ $('.btn').click(function(){
                     }, 
                     {
                         targets: 8,
-                        width: '80px',
+                        width: '8%',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
@@ -943,7 +944,7 @@ $('.btn').click(function(){
                     {
                         visible: visible_c,
                         targets: 9,
-                        width: '10px',
+                        width: '3%',
                         render: function (data, type, full, meta) {
 
                             var checked_val = null;
@@ -960,7 +961,7 @@ $('.btn').click(function(){
                     },
                     {
                         targets: 10,
-                        width: '10px',
+                        width: '7%',
                         className : 'nowrap',
                         render: function (data, type, full, meta) {
       

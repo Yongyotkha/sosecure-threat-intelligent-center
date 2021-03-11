@@ -4003,17 +4003,22 @@ class DataLeakController extends Controller
         $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
         $html = '';
         if(!empty($ActivityHistory)){
-            foreach ($ActivityHistory as $value) {
+            foreach ($ActivityHistory as $key => $value) {
                 $html .= '
-                <li class="list-group-item" style="border-color: black;" id="list_activity_'.$value->code.'"
-                    <div>
-                        <strong>'.$value->title.'</strong>
+                <li class="work" id="list_activity_'.$value->code.'">
+                    <input class="radio" id="work_'.$key.'" name="works" type="radio">
+                    <div class="relative">
+                        <label for="work_'.$key.'" class="label_custom">'.$value->title.'</label>
+                        <span class="date_custom">'.$value->updated_at.'</span>
+                        <span class="circle_custom"></span>
+                    </div>
+                    <div class="content_custom">
+                        <p>
+                            '.$value->content.'
+                        </p>
                     </div>
                     <div>
-                        '.$value->content.'
-                    </div>
-                    <div>
-                        <strong>Post By</strong> '.$value->users_name.' <strong>Modified:</strong> '.$value->updated_at;
+                        <strong>Post By</strong> '.$value->users_name;
                     if(TYPE_WEB == 'center'){
                         $html .= '
                         <span class="float-right">
