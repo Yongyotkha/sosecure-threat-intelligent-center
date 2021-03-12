@@ -209,7 +209,12 @@ body {
             <input type="hidden" name="check_active" id="check_active" class="form-control" value="1">
             <input type="hidden" name="code_edited_activity" id="code_edited_activity" class="form-control" value="">
             <div class="form-group row">
-                <a class="float-right" href="javascript:void(0)" id='button_add_activity' data-toggle="collapse" aria-expanded="false" onclick="add_activity();">Add Activity&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <a class="float-right btn btn-default" href="javascript:void(0)" id='button_add_activity' data-toggle="collapse" aria-expanded="false" onclick="add_activity();">Add Activity&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-lg-12 control-label label_custom" style="display: inline; width: 180px;"><strong>Activity History</strong></label>
+                <a class="float-right btn btn-info" href="javascript:void(0)" id="button_add_activity" data-toggle="collapse" aria-expanded="false" onclick="add_activity();" style="margin-right: 5px;">Add Activity</a>
             </div>
 
             <div id="demo" class="collapse box">
@@ -247,11 +252,6 @@ body {
                 </div>
             </div>
             
-
-            <div class="form-group row">
-                <label class="col-lg-12 control-label label_custom"><strong>Activity History</strong></label>
-            </div>
-
 
             {{-- <h2>CSS3 group_activity</h2>
             <p>Please set the $vertical variable to false to see the horizontal version.</p> --}}
@@ -525,8 +525,7 @@ body {
                             $(`#list_activity_${code_activity}`).remove();
                         }
                         event.preventDefault();
-                        {{--$(".disable_atag").removeAttr("href");
-                        $(".disable_atag").removeAttr("onclick");--}}
+                        
                         toastr.success(response.message, '@langapp('response_status')');
                         $('.btn').attr('disabled',false);
                         loading('stop_load');
