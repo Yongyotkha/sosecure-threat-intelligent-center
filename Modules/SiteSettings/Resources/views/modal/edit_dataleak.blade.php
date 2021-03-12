@@ -62,6 +62,7 @@
                 <label class="col-lg-3 control-label">Status Monitoring</label>
                 <div class="col-lg-9">
                     <select name="monitoring" id="monitoring" class="select2-option form-control" >
+                        <option value="">Select</option>
                         <option value="in_progress" 
                         {{@$DataLeakSocialRefs->status_monitoring == 'in_progress'?'selected':''}}>In Progress</option>
                         <option value="reported" 
@@ -75,6 +76,7 @@
                 <label class="col-lg-3 control-label">Serverity</label>
                 <div class="col-lg-9">
                     <select name="serverity" id="serverity" class="select2-option form-control" >
+                        <option value="">Select</option>
                         <option value="critical" {{@$DataLeakSocialRefs->serverity == 'critical'?'selected':''}}>
                             Critical</option>
                         <option value="high" {{@$DataLeakSocialRefs->serverity == 'high'?'selected':''}}>
