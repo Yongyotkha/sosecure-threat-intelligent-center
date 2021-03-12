@@ -208,9 +208,6 @@ body {
             @endif
             <input type="hidden" name="check_active" id="check_active" class="form-control" value="1">
             <input type="hidden" name="code_edited_activity" id="code_edited_activity" class="form-control" value="">
-            <div class="form-group row">
-                <a class="float-right btn btn-default" href="javascript:void(0)" id='button_add_activity' data-toggle="collapse" aria-expanded="false" onclick="add_activity();">Add Activity&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
-            </div>
 
             <div class="form-group row">
                 <label class="col-lg-12 control-label label_custom" style="display: inline; width: 180px;"><strong>Activity History</strong></label>
