@@ -3549,6 +3549,17 @@ class DataLeakController extends Controller
                 //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                 foreach($images as $k => $img){
                     $data = $img->getattribute('src');
+
+                    //Link url
+                    $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                    if(preg_match($reg_exUrl, $data, $url_image)) {
+                        $url = $url_image[0];
+                        $image = file_get_contents($url);
+                        if ($image !== false){
+                            $data = 'data:image/jpg;base64,'.base64_encode($image);
+                        }
+                    }
+
                     $img_check_src = explode(";",$data);
                     if(@$img_check_src[1]) {
                         list($type, $data) = explode(';', $data);
@@ -3720,6 +3731,17 @@ class DataLeakController extends Controller
                 //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                 foreach($images as $k => $img){
                     $data = $img->getattribute('src');
+
+                    //Link url
+                    $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                    if(preg_match($reg_exUrl, $data, $url_image)) {
+                        $url = $url_image[0];
+                        $image = file_get_contents($url);
+                        if ($image !== false){
+                            $data = 'data:image/jpg;base64,'.base64_encode($image);
+                        }
+                    }
+
                     $img_check_src = explode(";",$data);
                     if(@$img_check_src[1]) {
                         list($type, $data) = explode(';', $data);
@@ -3839,6 +3861,17 @@ class DataLeakController extends Controller
                 //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                 foreach($images as $k => $img){
                     $data = $img->getattribute('src');
+
+                    //Link url
+                    $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                    if(preg_match($reg_exUrl, $data, $url_image)) {
+                        $url = $url_image[0];
+                        $image = file_get_contents($url);
+                        if ($image !== false){
+                            $data = 'data:image/jpg;base64,'.base64_encode($image);
+                        }
+                    }
+
                     $img_check_src = explode(";",$data);
                     if(@$img_check_src[1]) {
                         list($type, $data) = explode(';', $data);
@@ -4098,6 +4131,17 @@ class DataLeakController extends Controller
                 //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                 foreach($images as $k => $img){
                     $data = $img->getattribute('src');
+
+                    //Link url
+                    $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                    if(preg_match($reg_exUrl, $data, $url_image)) {
+                        $url = $url_image[0];
+                        $image = file_get_contents($url);
+                        if ($image !== false){
+                            $data = 'data:image/jpg;base64,'.base64_encode($image);
+                        }
+                    }
+
                     $img_check_src = explode(";",$data);
                     if(@$img_check_src[1]) {
                         list($type, $data) = explode(';', $data);
@@ -4210,6 +4254,17 @@ class DataLeakController extends Controller
                 //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
                 foreach($images as $k => $img){
                     $data = $img->getattribute('src');
+
+                    //Link url
+                    $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                    if(preg_match($reg_exUrl, $data, $url_image)) {
+                        $url = $url_image[0];
+                        $image = file_get_contents($url);
+                        if ($image !== false){
+                            $data = 'data:image/jpg;base64,'.base64_encode($image);
+                        }
+                    }
+
                     $img_check_src = explode(";",$data);
                     if(@$img_check_src[1]) {
                         list($type, $data) = explode(';', $data);
