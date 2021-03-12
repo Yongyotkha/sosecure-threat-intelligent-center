@@ -1,3 +1,6 @@
+@php
+use Carbon\Carbon;
+@endphp
 @extends('layouts.app')
 @section('content')
 
@@ -730,7 +733,34 @@ $(function() {
                     name: 'action',
                     className: 'no-wrap'
                 },
-            ]
+            ],
+                columnDefs: [
+                    {
+                        targets: 2,
+                        render: function (data, type, full, meta) {
+                            let new_html = '';
+                            let date_day = '2021-01-01';
+                            let date = full.public_date;
+                            let date_sp = date.split(" ");
+                            if(date_sp.length > 0) {
+                                date_day = date_sp[0];
+                            }
+                            let date_now = '{{Carbon::now()}}';
+                            let date_now_sp = date_now.split(" ");
+                            if(date_now_sp.length > 0) {
+                                var date_now_day = date_now_sp[0];
+                            }
+                            
+                            if ((date_day) == (date_now_day)) {
+                                {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                                new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
+                                console.log(new_html);
+                            }
+
+                            return new_html+full.title;
+                        },
+                    },
+                ]
         });
     }
 

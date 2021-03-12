@@ -828,6 +828,7 @@ class NewsController extends Controller
 
         // dd($news);
         $content = [];
+        $tz = new \DateTimeZone('Asia/Bangkok');
         foreach($news as $data){
             $related_news_site = '';
             $icon_related= '';
@@ -889,10 +890,24 @@ class NewsController extends Controller
             // dd($content);
 
             
+            $new_html = '';
+            $date_day = '1900-01-01 12:51:17';
+            if(!empty($data -> public_date)){
+                $date_day = $data -> public_date;
+            }
+            $datework = Carbon::parse($date_day)->startOfDay();
+            $datework = $datework->setTimezone($tz);
 
+            $date_now = Carbon::now()->startOfDay();
+            $date_now = $date_now->setTimezone($tz);
+            $carbondiff = $datework->diffInDays($date_now);
+            if($carbondiff === 0){
+                $new_html.= '<span class="badge" style="background-color: #2196f3;">New</span>';
+            }
 
             $check_read_news = ReadNews::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
             $checkBookmark = Bookmark::where('user_id', Auth::user()->id)->where('news_id', $data -> id)->first();
+
             if($check_read_news){
                 $html .= '<div class="list-news">';
                 $font_weight = '';
@@ -900,6 +915,8 @@ class NewsController extends Controller
                 $html .= '<div class="list-news" style="background-color:#ececec">';
                 $font_weight = 'font-weight: bold !important;';
             }
+
+            
 
             if(@$data->transaction_rss_id) {
                 if(@$data->logo) {
@@ -942,6 +959,7 @@ class NewsController extends Controller
                     </label>
                 </div>-->
                 <div class="content-news-text">
+                    '.$new_html.'
                     <a href="'.route('news.news_detail_code',['code' => $data -> code]).'">
                         <span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                     </a>

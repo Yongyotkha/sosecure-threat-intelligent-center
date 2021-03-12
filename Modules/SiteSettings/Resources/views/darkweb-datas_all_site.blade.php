@@ -1,3 +1,6 @@
+@php
+use Carbon\Carbon;
+@endphp
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
@@ -273,7 +276,7 @@
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
-                                        <th>Site</th>
+                                        <th>Content</th>
                                         <th>Type</th>
 
                                         <th>Keyword</th>
@@ -600,7 +603,25 @@
                     $(row).attr('id', 'tr' + data.id);
                 },
                 "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    var html_content='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><strong>'+stripHtml(aData.get_data_leak_feed_one.feedcontent)+'</strong></div>';
+                    let new_html = '';
+                    let date_day = '2021-01-01';
+                    let date = aData.get_data_leak_feed_one.feedtimepost;
+                    let date_sp = date.split(" ");
+                    if(date_sp.length > 0) {
+                        date_day = date_sp[0];
+                    }
+                    let date_now = '{{Carbon::now()}}';
+                    let date_now_sp = date_now.split(" ");
+                    if(date_now_sp.length > 0) {
+                        var date_now_day = date_now_sp[0];
+                    }
+                    if ((date_day) == (date_now_day)) {
+                        {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                        new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
+                    }
+
+
+                    var html_content=new_html+'<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><strong>'+stripHtml(aData.get_data_leak_feed_one.feedcontent)+'</strong></div>';
                     let val = aData.get_data_leak_feed_one;
                             if(val) {
                                 val = aData.get_data_leak_feed_one;
@@ -618,8 +639,6 @@
 
     
                     html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost+'</div>';
-
-
 
                     $('td:eq(1)', nRow).html(html_content); 
                 },
@@ -689,7 +708,25 @@
                         targets: 4,
                         width: '400px',     
                         "visible": false,                
-                        render: function (data, type, full, meta) {                  
+                        render: function (data, type, full, meta) {   
+                            let new_html = '';
+                            let date_day = '2021-01-01';
+                            let date = full.get_data_leak_feed_one.feedtimepost;
+                            let date_sp = date.split(" ");
+                            if(date_sp.length > 0) {
+                                date_day = date_sp[0];
+                            }
+                            let date_now = '{{Carbon::now()}}';
+                            let date_now_sp = date_now.split(" ");
+                            if(date_now_sp.length > 0) {
+                                var date_now_day = date_now_sp[0];
+                            }
+                            if ((date_day) == (date_now_day)) {
+                                {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                                new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
+                            }
+                            console.log(date_day);
+                            console.log(date_now_day);
                             let val = '';
                             let content = '';
                             val = full.get_data_leak_feed_one;
@@ -700,6 +737,9 @@
                                     var data = res[i];
                                     content += feedcontent.replaceAll(data, '<span class="badge bg-warning">'+data+'</span>');
                                 } 
+                            }
+                            if ((date_day) == (date_now_day)) {
+                               console.log('<div>'+new_html+content+'</div>');
                             }
                             return '<div>'+content+'</div>';
                         },
