@@ -40,6 +40,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
+use Modules\SiteSettings\Entities\Activity;
 
 class ApiDataLeakController extends ApiController
 {
@@ -923,6 +924,68 @@ class ApiDataLeakController extends ApiController
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+            return response()->json($response);
+        }
+    }
+
+
+    public function activity_dataleak_modal(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $DataLeakSocialRef_code = $data['data']['DataLeakSocialRef_code'];
+                    $site = $data['data']['site'];
+                  
+
+                    $user = User::where('id', $data['data']['user_id'])->first();
+
+                    // $site_id = '';
+            
+                    // if($site_code) {
+                    //     $site_id_m = SiteSettings::where('code',$site_code)->first();
+                    //     $site_id = @$site_id_m->id;
+                    // }
+
+
+                    $DataLeakSocialRefs = DataLeakSocialRef::where('code',$DataLeakSocialRef_code)->first();
+                    $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
+                    // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
+                    $response['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+                    $response['site'] = @$site;
+                    $response['ActivityHistory'] = $ActivityHistory;
+               
+            
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
             return response()->json($response);
         }
     }

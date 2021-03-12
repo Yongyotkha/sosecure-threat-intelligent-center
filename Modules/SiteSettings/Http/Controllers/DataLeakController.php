@@ -4004,12 +4004,28 @@ class DataLeakController extends Controller
         $html = '';
         if(!empty($ActivityHistory)){
             foreach ($ActivityHistory as $key => $value) {
+                    $html_status_activity = '';
+                    $activity_color = '';
+                    $activity_name = '';
+                    if($value->status_activity) {
+                        if($value->status_activity == 'in_progress') {
+                            $activity_color = '#FFC107';
+                            $activity_name = 'Progress';
+                        } else if ($value->status_activity == 'reported') {
+                            $activity_color = '#28A745';
+                            $activity_name = 'Reported';
+                        } else if ($value->status_activity == 'close') {
+                            $activity_color = '#DC3545';
+                            $activity_name = 'Close';
+                        }
+                        $html_status_activity = '<span class="badge" style="background-color: '.$activity_color.'; display: block;">'.$activity_name.'</span>';
+                    }
                 $html .= '
                 <li class="work" id="list_activity_'.$value->code.'">
                     <input class="radio" id="work_'.$key.'" name="works" type="radio">
                     <div class="relative">
-                        <label for="work_'.$key.'" class="label_custom">'.$value->title.'</label>
-                        <span class="date_custom">'.$value->updated_at.'</span>
+                        <label for="work_'.$key.'" class="label_custom" style="font-weight: 900;">'.$value->title.'</label>
+                        <span class="date_custom" style="text-align:center;">'.$value->updated_at.$html_status_activity.'</span>
                         <span class="circle_custom"></span>
                     </div>
                     <div class="content_custom">
@@ -4065,7 +4081,8 @@ class DataLeakController extends Controller
         }else if(!@$_POST['content']){
             return response()->json(['message' => 'You have to fill content', 'errors' => ['missing' => ["You have to fill content"]]], 500);
         }
-       
+
+        $status_activity = $request->status_activity;
         $content = @$_POST['content']; //รับค่าจาก messageInput
         if($content) {
             $dom = new \domdocument();
@@ -4110,11 +4127,17 @@ class DataLeakController extends Controller
             $Activity->title = $request->title;
             $Activity->content = $content;
             $Activity->user_id = Auth::user()->id;
+            if($status_activity) {
+                $Activity->status_activity = $status_activity;
+            }
             $Activity->save();
         }else if($request->check_active=="2"){
             $Activity = Activity::where('id',$request->code_edited_activity)->first();
             $Activity->title = $request->title;
             $Activity->content = $content;
+            if($status_activity) {
+                $Activity->status_activity = $status_activity;
+            }
             $Activity->save();
         }
 

@@ -100,6 +100,12 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/count_keyword', 'Api\ApiDataLeakController@count_keyword');
     Route::post('data_leak/count_icon', 'Api\ApiDataLeakController@count_icon');
 
+    Route::post('data_leak/activity_dataleak_modal', 'Api\ApiDataLeakController@activity_dataleak_modal');
+    Route::post('data_leak/activity_history_reload', 'Api\ApiDataLeakController@activity_history_reload');
+    Route::post('data_leak/activity_get_edit_data', 'Api\ApiDataLeakController@activity_get_edit_data');
+    Route::post('data_leak/activity_save', 'Api\ApiDataLeakController@activity_save');
+    Route::post('data_leak/activity_delete', 'Api\ApiDataLeakController@activity_delete');
+
     Route::post('web_defacement/load_card', 'Api\ApiWebdefacementController@web_defacement_load_card');
     Route::post('web_defacement/detail', 'Api\ApiWebdefacementController@web_defacement_detail');
     Route::post('web_defacement/update_original', 'Api\ApiWebdefacementController@web_defacement_update_original');

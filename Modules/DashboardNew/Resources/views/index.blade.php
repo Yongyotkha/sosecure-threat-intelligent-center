@@ -232,25 +232,25 @@
                                     <button class="btn btn-selector" id="clearValue" onclick="clearValue()">All</button>
                                 @endif
                                 @if($role_custom['news'])
-                                    <button class="btn btn-selector" onclick="select_pagename('News')">News</button>
+                                    <button class="btn btn-selector" onclick="select_pagename('News')"><i class="fas fa-newspaper icon"><b class="bg-info"></b></i> News</button>
                                 @endif
                                 {{-- @if($role_custom['indicators'])
                                     <button class="btn btn-selector" onclick="select_pagename('Indicators')">Indicators</button>
                                 @endif --}}
                                 @if($role_custom['vulnerabilities'])
-                                    <button class="btn btn-selector" onclick="select_pagename('Vulnerability')">Vulnerability</button>
+                                    <button class="btn btn-selector" onclick="select_pagename('Vulnerability')"><i class="fas fa-lock icon"><b class="bg-info"></b></i> Vulnerability</button>
                                 @endif
                                 @if($role_custom['compromised'])
-                                    <button class="btn btn-selector" onclick="select_pagename('Compromised')">Compromised</button>
+                                    <button class="btn btn-selector" onclick="select_pagename('Compromised')"><i class="fas fa-bug icon"><b class="bg-info"></b></i> Compromised</button>
                                 @endif
                                 @if($role_custom['data_leak'])
-                                    <button class="btn btn-selector" onclick="select_pagename('Data Leak')">Data Leak</button>
+                                    <button class="btn btn-selector" onclick="select_pagename('Data Leak')"><i class="fas fa-database icon"><b class="bg-info"></b></i> Data Leak</button>
                                 @endif
                                 @if($role_custom['web_defacement'])
-                                    <button class="btn btn-selector" onclick="select_pagename('Web Defacement')">Web Defacement</button>
+                                    <button class="btn btn-selector" onclick="select_pagename('Web Defacement')"><i class="fas fa-globe icon"><b class="bg-info"></b></i> Web Defacement</button>
                                 @endif
                                 @if($role_custom['assets'])
-                                    <button class="btn btn-selector" onclick="select_pagename('assets')">Assets</button>
+                                    <button class="btn btn-selector" onclick="select_pagename('assets')"><i class="fab fa-microsoft"><b class="bg-info"></b></i> Assets</button>
                                 @endif
                             </div>
                         </div>

@@ -57,7 +57,7 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-lg-3 control-label">Serverity</label>
+                <label class="col-lg-3 control-label">Severity</label>
                 <div class="col-lg-9">
                     <select name="serverity" id="serverity" class="select2-option form-control" >
                         <option value="">Select</option>

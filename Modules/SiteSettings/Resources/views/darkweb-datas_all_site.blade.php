@@ -277,7 +277,7 @@
 
                                         <th>Data Feed</th>
                                         {{-- <th>View</th> --}}
-                                        <th>Serverity</th>
+                                        <th>Severity</th>
                                         <th>Status</th>
                                         <th>@langapp('action')</th>
                                     </tr>

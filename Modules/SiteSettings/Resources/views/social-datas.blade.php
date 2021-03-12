@@ -140,7 +140,7 @@
                                         <th>Source</th>
                                         <th>Keyword</th>
                                         <th>Content</th>
-                                        <th>Serverity</th>
+                                        <th>Severity</th>
                                         <th>Status Monitoring</th>
                                         <th>Data Feed</th>
                                         <th>View</th>

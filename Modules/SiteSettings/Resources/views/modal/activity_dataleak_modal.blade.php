@@ -226,6 +226,17 @@ body {
                         </textarea>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 control-label">Status </label>
+                    <div class="col-lg-9">
+                        <select name="status_activity" id="status_activity" class="select2-option form-control" >
+                            <option value="">Select</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="reported">Reported</option>
+                            <option value="close">Close</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group row float-right">
                     <div class="col-lg-12">
                         {{-- {!! closeModalButton() !!} --}}
@@ -247,11 +258,30 @@ body {
             <ul id='group_activity'>
                 @if (!empty($ActivityHistory))
                         @foreach ($ActivityHistory as $value)
+                            @php
+                                $html_status_activity = '';
+                                $activity_color = '';
+                                $activity_name = '';
+                                if($value->status_activity) {
+                                    if($value->status_activity == 'in_progress') {
+                                        $activity_color = '#FFC107';
+                                        $activity_name = 'Progress';
+                                    } else if ($value->status_activity == 'reported') {
+                                        $activity_color = '#28A745';
+                                        $activity_name = 'Reported';
+                                    } else if ($value->status_activity == 'close') {
+                                        $activity_color = '#DC3545';
+                                        $activity_name = 'Close';
+                                    }
+                                    $html_status_activity = '<span class="badge" style="background-color: '.$activity_color.'; display: block;">'.$activity_name.'</span>';
+                                }
+                            @endphp
                             <li id="list_activity_{{$value->code}}" class='work'>
                                 <input class='radio' id='work5' name='works' type='radio' checked>
                                 <div class="relative">
-                                <label for='work5' class="label_custom">{{$value->title}}</label>
-                                <span class='date_custom'>{{$value->updated_at}}</span>
+                                <label for='work5' class="label_custom" style='font-weight: 900;'>{{$value->title}}</label>
+                                <span class='date_custom' style="text-align:center;">{{$value->updated_at}}{!!$html_status_activity!!}</span>
+                                
                                 <span class='circle_custom'></span>
                                 </div>
                                 <div class='content_custom'>
@@ -381,6 +411,7 @@ body {
                 $('#textcontent_new').summernote('code','');
                 $("#check_active").val("1");
                 $("#code_edited_activity").val('');
+                $("#status_activity").val('').trigger("change");
                 {{--$(".disable_atag").removeAttr("href");--}}
                 {{--$(".disable_atag").removeAttr("onclick");--}}
                 toastr.success(response.data.message, '@langapp('response_status') ');
@@ -412,6 +443,7 @@ body {
         $('#textcontent_new').summernote('code','');
         $("#check_active").val("1");
         $("#code_edited_activity").val('');
+        $("#status_activity").val('').trigger("change");
     }
 
     function edit_activity(code_activity=0){    
@@ -431,6 +463,7 @@ body {
             $("div.box").collapse("show");
             $("#texttitle_new").val(data.ActivityHistory.title);
             $('#textcontent_new').summernote('code',data.ActivityHistory.content);
+            $("#status_activity").val(data.ActivityHistory.status_activity).trigger("change");
             $("#check_active").val("2");
             $("#code_edited_activity").val(code_activity);
             loading('stop_load');
