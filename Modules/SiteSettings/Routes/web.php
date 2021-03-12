@@ -217,6 +217,12 @@ Route::group(
         Route::post('sitesettings/darkweb_data_change_status', 'DataLeakController@darkweb_data_change_status')->name('DataLeakController.darkweb_data_change_status')->middleware(['can:menu_items','permission:compromised']);
         Route::get('/darkweb_data/edit_darkwebdata_modal/{code}', 'DataLeakController@edit_darkwebdata_modal')->middleware(['can:menu_items','permission:compromised']);
         Route::post('/darkweb_data/edit_compromise', 'DataLeakController@edit_compromise')->name('compromise.edit_compromise')->middleware(['can:menu_items','permission:compromised']);
+    
+        Route::get('/compromise/activity_modal/{code}', 'DataLeakController@activity_dataleak_modal')->name('compromise.activity_dataleak_modal')->middleware(['can:menu_items','permission:compromised']);
+        Route::post('/compromise/activity_save', 'DataLeakController@activity_save')->name('compromise.activity_save')->middleware('can:menu_items');
+        Route::get('/compromise/activity_history_reload', 'DataLeakController@activity_history_reload')->name('compromise.activity_history_reload')->middleware('can:menu_items');
+        Route::get('/compromise/activity_get_edit_data', 'DataLeakController@activity_get_edit_data')->name('compromise.activity_get_edit_data')->middleware('can:menu_items');
+        Route::delete('/compromise/activity_delete', 'DataLeakController@activity_delete')->name('compromise.activity_delete')->middleware('can:menu_items');
     }
 );
 

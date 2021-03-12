@@ -1436,7 +1436,11 @@ public function tableEvents(Request $request)
             
             $query = [
                 'pulse_id' => $reqId,
-                
+                'type' => [
+                    '$exists' => true,
+                    '$ne' => null
+                ],
+                // 'type'=> { $exists: true, $ne: null },
             ];
 
             $options = [

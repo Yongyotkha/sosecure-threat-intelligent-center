@@ -868,7 +868,10 @@ class ApiIndicatorController extends ApiController
                 
                 $query = [
                     'pulse_id' => $reqId,
-                    
+                    'type' => [
+                        '$exists' => true,
+                        '$ne' => null
+                    ],
                 ];
         
                 $options = [
