@@ -296,13 +296,13 @@ use Carbon\Carbon;
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Type</h5>
                                     <div id="groupby-type" class="btn-group special">
-                                        <button id="all" class="btn btn-grey active" value="">
+                                        <button id="all" class="btn btn-grey check_type active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey btn-social-click" value="social">
+                                        <button class="btn btn-grey check_type btn-social-click" value="social">
                                             <span> Public </span>
                                         </button>
-                                        <button class="btn btn-grey" value="darkweb_public">
+                                        <button class="btn btn-grey check_type" value="darkweb_public">
                                             <span> Darkweb </span>
                                         </button>
                                     </div>
@@ -332,36 +332,52 @@ use Carbon\Carbon;
                                 </div>
                             </div>
                             <div class="row">
-                                {{-- <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Site</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="site" class="select2-option form-control">
-                                                <option value="" selected>All</option>
-                                                @if ($site)
-
-                                                @foreach ($site as $data)
-                                                <option value="{{$data->id}}">{{$data->name}}
-                                        </option>
-                                        @endforeach
-
-                                        @endif
-                                        </select>
-                                    </div>
+                                <div class="col-lg-6 mb-1">
+                                <h5 class="font-weight-bold">Serverity</h5>
+                                <div id="btngroup_status" class="btn-group special ">
+                                    
+                                    <button class="btn btn-grey check_serverity active" value="" id="btn_search_all">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="critical">
+                                        <span> Critical </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="high">
+                                        <span> High </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="medium">
+                                        <span> Medium </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="low">
+                                        <span> Low </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="information">
+                                        <span> Information </span>
+                                    </button>
                                 </div>
-                                </div> --}}
-
-                                <!-- ของเดิม
-                                <div class="col-lg-4">
-                                    <label for="" class="col-sm-3 col-xs-12 col-form-label">Type</label>
-                                    <select id="type" class="select2-option form-control">
-                                        <option value="">All</option>
-                                        <option value="social">PUBLIC</option>
-                                        <option value="darkweb_public">DARK WEB</option>
-                                    </select>
-                                </div>
-                                -->
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6 mb-1">
+                            <h5 class="font-weight-bold">Status Monitoring</h5>
+                            <div id="btngroup_monitoring" class="btn-group special ">
+                                
+                                <button class="btn btn-grey check_monitoring active" value="" id="btn_monitoring">
+                                    <span> All </span>
+                                </button>
+                                <button class="btn check_monitoring btn-grey" value="reported">
+                                    <span> Reported </span>
+                                </button>
+                                <button class="btn check_monitoring btn-grey" value="in_progress">
+                                    <span> In Progress </span>
+                                </button>
+                                <button class="btn check_monitoring btn-grey" value="close">
+                                    <span> Close </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                   
                         </div>
                     </div>
@@ -639,6 +655,9 @@ var click_key = null;
 {{--active_btn('#fillter_click_keyword .btn-selector');--}}
 active_btn('#groupby-type .btn-grey');
 active_btn('#groupby-social .btn-grey');
+active_btn('#btngroup_status .btn-grey');
+active_btn('#btngroup_monitoring .btn-grey');
+
 
 $('.btn').click(function(){
     if($('.btn-social-click').hasClass('active')){
@@ -668,6 +687,9 @@ $('.btn').click(function(){
     var isDateSearch = null;
     var social_id = [];
     var check_type = null;
+    var check_serverity = null;
+    var check_monitoring = null;
+    
     
 
     $('#table_social_datas').on('click', '.select-chk', function () {
@@ -708,9 +730,17 @@ $('.btn').click(function(){
         }
     });
 
-    $(".btn-grey").click(function() {
+    $(".check_type").click(function() {
         check_type = $(this).val();
    
+    });
+
+    $(".check_serverity").click(function() {
+        check_serverity = $(this).val();
+    });
+
+    $(".check_monitoring").click(function() {
+        check_monitoring = $(this).val();
     });
 
     $("#site").change(function() {
@@ -764,6 +794,8 @@ $('.btn').click(function(){
                         d.click_type = click_type;
                         d.click_key = click_key;
                         d.click_type2 = click_type2;
+                        d.check_serverity = check_serverity;
+                        d.check_monitoring = check_monitoring;
 
                         return d;
                     },
@@ -1061,16 +1093,24 @@ $('.btn').click(function(){
                 site = null;
                 search_val = 0;
                 isDateSearch = null;
+                check_serverity = null;
+
                 $("#keyword").val('');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 cb(start, end);
                 $("#site").val('').trigger("change");
                 $("#source").val('').trigger("change");
-                $('.btn-grey').removeClass('active');
-                $('.btn-selector').removeClass('active');
+                $('.check_type').removeClass('active');
+                $('.selector').removeClass('active');
                 $('#all').addClass('active');
+                $('.check_serverity').removeClass('active');
+                $('#btn_search_all').addClass('active');
+                $('.check_monitoring').removeClass('active');
+                $('#btn_monitoring').addClass('active');
+                check_monitoring = null;
                 check_type = null;
+                $('.hide-social').hide();
                 table_social_data();
                 get_count();
             
@@ -1184,11 +1224,19 @@ var click_type2 = null;
         endDate =  null;
         check_type = null;
         isDateSearch = null;
+        
         $("#keyword").val('');
         $("#source").val('').trigger("change");
-        $('.btn-grey').removeClass('active');
-        $('.btn-selector').removeClass('active');
+        $('.check_type').removeClass('active');
+        $('.selector').removeClass('active');
         $('#all').addClass('active');
+        $('.check_serverity').removeClass('active');
+        $('#btn_search_all').addClass('active');
+        check_serverity = null;
+        $('.check_monitoring').removeClass('active');
+        $('#btn_monitoring').addClass('active');
+        check_monitoring = null;
+        $('.hide-social').hide();
         table_social_data();
         {{--get_count();--}}
     }
@@ -1207,9 +1255,16 @@ var click_type2 = null;
         isDateSearch = null;
         $("#keyword").val('');
         $("#source").val('').trigger("change");
-        $('.btn-grey').removeClass('active');
-        $('.btn-selector').removeClass('active');
+        $('.check_type').removeClass('active');
+        $('.selector').removeClass('active');
         $('#all').addClass('active');
+        $('.check_serverity').removeClass('active');
+        $('#btn_search_all').addClass('active');
+        check_serverity = null;
+        $('.check_monitoring').removeClass('active');
+        $('#btn_monitoring').addClass('active');
+        check_monitoring = null;
+        $('.hide-social').hide();
         table_social_data();
         {{--get_count();--}}
     }

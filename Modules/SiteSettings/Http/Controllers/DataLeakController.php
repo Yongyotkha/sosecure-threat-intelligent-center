@@ -644,8 +644,21 @@ class DataLeakController extends Controller
                 });
 
             }
+
+            if ($request->check_serverity) {
+                
+                $model = $model->where('serverity', $request->check_serverity);
+                // });
+                
+            }
+
+            if ($request->check_monitoring) {
+                
+                $model = $model->where('status_monitoring', $request->check_monitoring);
+                // });
+            }
             
-            if ($request->start_date) {
+            if ($request->isDateSearch == 1) {
                 $date_start = $request->start_date;
                 $date_end = $request->end_date;
 
@@ -660,11 +673,14 @@ class DataLeakController extends Controller
                 $model = $model->whereBetween('created_at', array($date_start_date_format, $date_end_date_format));
             }
 
-            $source = $request->source;
-            $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
-                $query->where('sourceid', 'LIKE', '%' . $source . '%');
-            });
+            if( $request->source){
+                $source = $request->source;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
+                    $query->where('sourceid', 'LIKE', '%' . $source . '%');
+                });
+            }
 
+            // dd($model->get());
            
         }
         $model->orderBy('created_at', 'desc');
@@ -902,6 +918,16 @@ class DataLeakController extends Controller
 
 
 
+            }
+
+            if ($request->check_serverity) {
+                $model = $model->where('serverity', $request->check_serverity);
+                // });
+            }
+
+            if ($request->check_monitoring) {
+                $model = $model->where('status_monitoring', $request->check_monitoring);
+                // });
             }
 
             if ($request->isDateSearch == 1) {
@@ -1392,7 +1418,11 @@ class DataLeakController extends Controller
 
             }
 
+            if($request ->check_serverity) {
 
+                $model = $model-> where('serverity', '=' ,$request -> check_serverity);
+
+            }
 
 
             //<><><>
@@ -2728,6 +2758,12 @@ class DataLeakController extends Controller
             if($request ->check_type) {
 
                 $model = $model-> where('feel_type', '=' ,$request -> check_type);
+
+            }
+
+            if($request ->check_serverity) {
+
+                $model = $model-> where('serverity', '=' ,$request -> check_serverity);
 
             }
 

@@ -88,19 +88,46 @@
                                         <button id="all" class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey" value="public">
+                                        <button class="btn check_type btn-grey" value="public">
                                             <span> Public </span>
                                         </button>
-                                        <button class="btn btn-grey" value="darkweb">
+                                        <button class="btn check_type btn-grey" value="darkweb">
                                             <span> Darkweb </span>
                                         </button>
-                                        <button class="btn btn-grey" value="webserver">
+                                        <button class="btn check_type btn-grey" value="webserver">
                                             <span> Web Server </span>
                                         </button>
                                     </div>
                                 </div>
 
                             </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-1">
+                                <h5 class="font-weight-bold">Serverity</h5>
+                                <div id="btngroup_status" class="btn-group special ">
+                                    
+                                    <button class="btn btn-grey check_serverity active" value="" id="btn_search_all">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="critical">
+                                        <span> Critical </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="high">
+                                        <span> High </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="medium">
+                                        <span> Medium </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="low">
+                                        <span> Low </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="information">
+                                        <span> Information </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         </div>
                     </div>
                     <div class="panel-footer">
@@ -245,6 +272,7 @@
 <script>
 
 active_btn('#groupby-type .btn-grey');
+active_btn('#btngroup_status .btn-grey');
 
     var search_val = false;
     var keywords = null;
@@ -256,6 +284,7 @@ active_btn('#groupby-type .btn-grey');
     var val_id = [];
     var check_type = null;
     var siteCode = @json($siteCode);
+    var check_serverity = null;
 
 
     $('#table_social_datas').on('click', '.select-chk', function () {
@@ -284,9 +313,13 @@ active_btn('#groupby-type .btn-grey');
         }
     });
 
-    $(".btn-grey").click(function() {
+    $(".check_type").click(function() {
         check_type = $(this).val();
    
+    });
+
+    $(".check_serverity").click(function() {
+        check_serverity = $(this).val();
     });
 
     $(function() {
@@ -327,6 +360,7 @@ active_btn('#groupby-type .btn-grey');
                         d.isDateSearch = isDateSearch;
                         d.check_type =check_type;
                         d.site_id = {!!json_encode($siteID)!!};
+                        d.check_serverity = check_serverity;
 
                         return d;
                 },
@@ -591,6 +625,8 @@ active_btn('#groupby-type .btn-grey');
                 check_type = null;
                 $('.btn-grey').removeClass('active');
                 $('#all').addClass('active');
+                $('.check_serverity').removeClass('active');
+                $('#btn_search_all').addClass('active');
                 
                 table_social_data();
             });

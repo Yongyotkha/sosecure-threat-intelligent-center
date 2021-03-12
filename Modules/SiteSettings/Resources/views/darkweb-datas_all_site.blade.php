@@ -180,37 +180,42 @@
                                         <button id="all" class="btn btn-grey active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey" value="compromise">
+                                        <button class="btn check_type btn-grey" value="compromise">
                                             <span> Public </span>
                                         </button>
-                                        <button class="btn btn-grey" value="darkweb">
+                                        <button class="btn check_type btn-grey" value="darkweb">
                                             <span> Dark Web </span>
                                         </button>
-                                        <button class="btn btn-grey" value="webserver">
+                                        <button class="btn check_type btn-grey" value="webserver">
                                             <span> Web Server </span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                {{-- <div class="col-lg-4">
-                                    <div class="row d-flex align-items-center">
-                                        <label for="" class="col-sm-3 col-xs-12 col-form-label">Site</label>
-                                        <div class="col-sm-9 col-xs-12">
-                                            <select id="site" class="select2-option form-control">
-                                                <option value="" selected>All</option>
-                                                @if ($site)
-
-                                                @foreach ($site as $data)
-                                                <option value="{{$data->id}}">{{$data->name}}
-                                        </option>
-                                        @endforeach
-
-                                        @endif
-                                        </select>
-                                    </div>
-                                    </div>
-                                </div> --}}
+                                <div class="col-lg-6 mb-1">
+                                <h5 class="font-weight-bold">Serverity</h5>
+                                <div id="btngroup_status" class="btn-group special ">
+                                    
+                                    <button class="btn btn-grey check_serverity active" value="" id="btn_search_all">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="critical">
+                                        <span> Critical </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="high">
+                                        <span> High </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="medium">
+                                        <span> Medium </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="low">
+                                        <span> Low </span>
+                                    </button>
+                                    <button class="btn check_serverity btn-grey" value="information">
+                                        <span> Information </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -410,6 +415,8 @@
 <script>
 
     active_btn('#groupby-type .btn-grey');
+    active_btn('#btngroup_status .check_serverity');
+
     var id_select_site = 'site';
     var admin = '{{$admin}}';
         var visible_c = '';
@@ -430,6 +437,7 @@
     var val_id = [];
     var f_search = 0;
     check_type = null;
+    check_serverity =null;
 
     $('#table_social_datas').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
@@ -469,9 +477,13 @@
         
     });
 
-    $(".btn-grey").click(function() {
+    $(".check_type").click(function() {
         check_type = $(this).val();
    
+    });
+
+    $(".check_serverity").click(function() {
+        check_serverity = $(this).val();
     });
 
     $("#site").change(function() {
@@ -514,6 +526,7 @@
                 isDateSearch : isDateSearch,
                 check_type : check_type,
                 click_type : click_type,
+                check_serverity : check_serverity,
             }),
             beforeSend: function(){
                 {{--loading('load');--}}
@@ -575,6 +588,7 @@
                         d.check_type = check_type;
                         d.click_type = click_type;
                         d.click_key = click_key;
+                        d.check_serverity = check_serverity;
                         return d;
                     }
                 },               
@@ -874,10 +888,13 @@
                 click_type = null;
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
+                check_serverity = null;
                 cb(start, end);
-                $('.btn-grey').removeClass('active');
+                $('.check_type').removeClass('active');
                 $('.selector').removeClass('active');
                 $('#all').addClass('active');
+                $('.check_serverity').removeClass('active');
+                $('#btn_search_all').addClass('active');
                 check_type = null;
                 get_count();
                 table_social_data();
@@ -930,9 +947,12 @@
         endDate =  null;
         keywords =  null;
         isDateSearch = null;
+        check_serverity = null;
         $('.btn-grey').removeClass('active');
         $('.selector').removeClass('active');
         $('#all').addClass('active');
+        $('.check_serverity').removeClass('active');
+        $('#btn_search_all').addClass('active');
         check_type = null;
         table_social_data();
         {{--get_count();--}}
@@ -979,7 +999,7 @@
     function click_keyword(data){
         click_key = data;
         search_val = false;
-
+        check_serverity = null;
         $('#keyword').val('');
 
         $('#site').val('').trigger('change');
@@ -994,6 +1014,8 @@
         cb(start, end);
         $('.btn-grey').removeClass('active');
         $('#all').addClass('active');
+        $('.check_serverity').removeClass('active');
+        $('#btn_search_all').addClass('active');
         check_type = null;
         get_count();
         table_social_data();

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
-    <section class="hbox stretch">      
+    <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r">
             <section class="vbox">
                 @include('partial.header-select-site')
@@ -16,7 +16,8 @@
             <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
                 <div class="header-flex-overflow" style="height: 47px;">
                     <div class="fwb-16">
-                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
+                        <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs"
+                            style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                         <span style="margin-top: 2px">
                             Site Settings > Data Leak Data
                         </span>
@@ -24,18 +25,24 @@
 
                     <div class="ml-2 text-right">
 
-                        <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
-                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        <a href="#hide-advance-search" id="advance-search"
+                            class="btn btn-sm btn-{{ get_option('theme_color')  }} ">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i
+                                    class="fas fa-filter"></i><span
+                                    class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
-                        <a href="{{route('dataleak.create') }}?site={{@$siteSettings->code}}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                        <a href="{{route('dataleak.create') }}?site={{@$siteSettings->code}}"
+                            class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
                             <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
                             <span class="hide-text">@langapp('add')</span>
                         </a>
-                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete" disabled>
-                            <span data-rel="tooltip" title="Delete" data-placement="right">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                        <button type="submit" id="btn_del_select" class="btn btn-sm btn-danger" value="bulk-delete"
+                            disabled>
+                            <span data-rel="tooltip" title="Delete" data-placement="right">@icon('solid/trash-alt')<span
+                                    class="hide-text">@langapp('delete')</span></span>
                         </button>
 
-                    </div>     
+                    </div>
                 </div>
             </header>
             <section class="scrollable wrapper">
@@ -70,7 +77,8 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <h5 class="font-weight-bold">Date</h5>
-                                    <div id="social_datas_date" class="text-center" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                    <div id="social_datas_date" class="text-center"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span> <i class="fa fa-caret-down"></i>
                                     </div>
@@ -81,14 +89,64 @@
                                 <div class="col-lg-4">
                                     <h5 class="font-weight-bold">Type</h5>
                                     <div id="groupby-type" class="btn-group special">
-                                        <button id="all" class="btn btn-grey active" value="">
+                                        <button id="all" class="btn btn-grey check_type  active" value="">
                                             <span> All</span>
                                         </button>
-                                        <button class="btn btn-grey" value="social">
+                                        <button class="btn btn-grey check_type" value="social">
                                             <span> Public </span>
                                         </button>
-                                        <button class="btn btn-grey" value="darkweb_public">
+                                        <button class="btn btn-grey check_type" value="darkweb_public">
                                             <span> Darkweb </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-1">
+                                    <h5 class="font-weight-bold">Serverity</h5>
+                                    <div id="btngroup_status" class="btn-group special ">
+
+                                        <button class="btn btn-grey check_serverity active" value=""
+                                            id="btn_search_all">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn check_serverity btn-grey" value="critical">
+                                            <span> Critical </span>
+                                        </button>
+                                        <button class="btn check_serverity btn-grey" value="high">
+                                            <span> High </span>
+                                        </button>
+                                        <button class="btn check_serverity btn-grey" value="medium">
+                                            <span> Medium </span>
+                                        </button>
+                                        <button class="btn check_serverity btn-grey" value="low">
+                                            <span> Low </span>
+                                        </button>
+                                        <button class="btn check_serverity btn-grey" value="information">
+                                            <span> Information </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-1">
+                                    <h5 class="font-weight-bold">Status Monitoring</h5>
+                                    <div id="btngroup_monitoring" class="btn-group special ">
+
+                                        <button class="btn btn-grey check_monitoring active" value=""
+                                            id="btn_monitoring">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn check_monitoring btn-grey" value="reported">
+                                            <span> Reported </span>
+                                        </button>
+                                        <button class="btn check_monitoring btn-grey" value="in_progress">
+                                            <span> In Progress </span>
+                                        </button>
+                                        <button class="btn check_monitoring btn-grey" value="close">
+                                            <span> Close </span>
                                         </button>
                                     </div>
                                 </div>
@@ -98,15 +156,18 @@
                     <div class="panel-footer">
                         <div class="row">
                             <div class="col-lg-12 text-right">
-                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13" onclick="table_social_data(1)">
+                                <button type="button" id="btn_news_search" class="btn btn-info btn-responsive btn-fz-13"
+                                    onclick="table_social_data(1)">
                                     <i class="fas fa-search"></i>
                                     @langapp('apply')
                                 </button>
-                                <button type="button" id="btn_news_reset" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <button type="button" id="btn_news_reset"
+                                    class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
                                     <i class="fas fa-broom"></i>
                                     <span> Clear </span>
                                 </button>
-                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap">
                                     <i class="fas fa-times"></i>
                                     <span> Close </span>
                                 </button>
@@ -115,7 +176,7 @@
                     </div>
                 </section>
 
-                
+
                 <section class="panel panel-default">
                     <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
@@ -126,12 +187,13 @@
                     </header>
                     <div class="panel-body">
                         <div class="table-responsive">
-                            <table  class="table table-striped" id="table_social_datas">
+                            <table class="table table-striped" id="table_social_datas">
                                 <thead>
                                     <tr>
                                         <th class="no-sort w-10">
                                             <label>
-                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk"/>
+                                                <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                    class="select-chk" />
                                                 <span class="label-text"></span>
                                             </label>
                                         </th>
@@ -195,43 +257,46 @@
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     <!-- Modal create_assets_vulnerability -->
-    <div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal in fixed-left" id="change_status" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title text-white">
-                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();"
+                            datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
                         Confirm Information
                     </h4>
                 </div>
                 <form action="">
-                <div class="modal-body">
-                    <div class="form-group row">
-                        <label for="" class="col-md-3">Status</label>
-                        <div class="col-md-9">
-                            <select name="" id="" class="form-control">
-                                <option value="1">Approved</option>
-                            </select>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <label for="" class="col-md-3">Status</label>
+                            <div class="col-md-9">
+                                <select name="" id="" class="form-control">
+                                    <option value="1">Approved</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-info btn-rounded">
+                            <i class="fas fa-paper-plane"></i>
+                            Save
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="delete_socail_data_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+    <div class="modal" id="delete_socail_data_modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+        aria-hidden="true" style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
@@ -240,12 +305,14 @@
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <p class="text-danger">@langapp('delete_warning')  </p>
+                        <p class="text-danger">@langapp('delete_warning') </p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                    <button type="button" class="btn btn-info submit btn-rounded delete_com_data_submit" onclick="delete_social_data_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
+                            class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete_com_data_submit"
+                        onclick="delete_social_data_select_confirm()"><i class="fas fa-paper-plane"></i> OK</button>
                 </div>
             </div>
         </div>
@@ -254,10 +321,10 @@
 </section>
 
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+@include('stacks.css.datatables')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -272,8 +339,16 @@
 @include('stacks.js.activebutton')
 <script>
     var check_type = null;
-    active_btn('#groupby-type .btn-grey');
     
+    var check_serverity = null;
+    var check_monitoring = null;
+    var isDateSearch = null;
+
+
+    active_btn('#groupby-type .btn-grey');
+    active_btn('#btngroup_status .btn-grey');
+    active_btn('#btngroup_monitoring .btn-grey');
+
 $(function() { 
     var start = moment().startOf('hour');
     var end = moment().startOf('hour').add(32, 'hour');
@@ -296,20 +371,32 @@ $(function() {
            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         }
     }, cb);
+    $('#social_datas_date').on('apply.daterangepicker', function(ev, picker) {
+            isDateSearch = 1;
+            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+                
+        }
+    });
     cb(start, end);
 
     
     $("#btn_news_reset").click(function() {
                 
-
+                isDateSearch = null;
                 search_val = 0;
                 $("#search").val('');
                 start = moment().subtract(1, 'month').startOf('month');
                 end = moment();
                 cb(start, end);
                 $("#source").val('').trigger("change");
-                $('.btn-grey').removeClass('active');
+                $('.check_type').removeClass('active');
                 $('#all').addClass('active');
+                $('.check_serverity').removeClass('active');
+                $('#btn_search_all').addClass('active');
+                check_serverity = null;
+                $('.check_monitoring').removeClass('active');
+                $('#btn_monitoring').addClass('active');
+                check_monitoring = null;
                 check_type = null;
                 table_social_data(0);
             
@@ -322,9 +409,17 @@ $(function() {
     table_social_data(0);
 });
 
-$(".btn-grey").click(function() {
+    $(".check_type").click(function() {
         check_type = $(this).val();
    
+    });
+
+    $(".check_serverity").click(function() {
+        check_serverity = $(this).val();
+    });
+
+    $(".check_monitoring").click(function() {
+        check_monitoring = $(this).val();
     });
 
 function table_social_data(search_val){
@@ -350,6 +445,9 @@ function table_social_data(search_val){
                 "start_date" : startDate,
                 "end_date" : endDate,
                 "check_type" : check_type,
+                "check_serverity" : check_serverity,
+                "check_monitoring" : check_monitoring,
+                "isDateSearch":isDateSearch,
             },
             type: "POST",
         },
