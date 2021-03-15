@@ -409,6 +409,7 @@ body {
                 $("#check_active").val("1");
                 $("#code_edited_activity").val('');
                 $("#status_activity").val('').trigger("change");
+                $("div.box").collapse("hide");
                 {{--$(".disable_atag").removeAttr("href");--}}
                 {{--$(".disable_atag").removeAttr("onclick");--}}
                 toastr.success(response.data.message, '@langapp('response_status') ');
