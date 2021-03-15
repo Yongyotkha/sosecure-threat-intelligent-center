@@ -154,8 +154,9 @@
                                                             </div>
 
                                                             <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                                                
                                                                 <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active" onclick="load_month_displayType_f('mon')">
-                                                                    <i class="far fa-calendar"></i> Month
+                                                                    <i class="far fa-calendar"></i> Month ({{Carbon\Carbon::now()->format('M')}})
                                                                 </a>
                                                                 <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_month_displayType_f('year')">
                                                                     <i class="far fa-calendar"></i> Year
