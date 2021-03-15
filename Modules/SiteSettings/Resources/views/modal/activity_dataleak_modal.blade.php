@@ -362,7 +362,8 @@ body {
            
         </div>
         <div class="modal-footer">
-            {!! closeModalButton() !!}
+            <a href="#" id="btn_close_md_all" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+            {{-- {!! closeModalButton() !!} --}}
         </div>
     {!! Form::close() !!}
     </div>
@@ -386,6 +387,10 @@ body {
 
     $(document).ready(function () {
         $('.select2-option').select2();
+    });
+
+    $("#btn_close_md_all").click(function() {
+        location.reload();
     });
 
     $('.ajaxifyForm_custom_onlythis').submit(function (event) {
