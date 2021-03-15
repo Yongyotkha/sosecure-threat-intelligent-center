@@ -4229,10 +4229,10 @@ class DataLeakController extends Controller
                 $DataLeakSocialRef->save();
             } else if ($Activity->status_activity == 'reported') {
                 if($Activity_check) {
-                    $DataLeakSocialRef->status_monitoring = 'reported';
+                    $DataLeakSocialRef->status_monitoring = 'close';
                     $DataLeakSocialRef->save();
                 } else {
-                    $DataLeakSocialRef->status_monitoring = 'close';
+                    $DataLeakSocialRef->status_monitoring = 'reported';
                     $DataLeakSocialRef->save();
                 }
             } else if ($Activity->status_activity == 'in_progress') {
