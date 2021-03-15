@@ -1339,5 +1339,415 @@ class ApiDataLeakController extends ApiController
         }
     }
 
+    public function compromise_activity_dataleak_modal(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'compromised'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $DataLeakSocialRef_code = $data['data']['DataLeakSocialRef_code'];
+                    $site = $data['data']['site'];
+                  
+
+                    $user = User::where('id', $data['data']['user_id'])->first();
+
+                    // $site_id = '';
+            
+                    // if($site_code) {
+                    //     $site_id_m = SiteSettings::where('code',$site_code)->first();
+                    //     $site_id = @$site_id_m->id;
+                    // }
+
+
+                    $DataLeakSocialRefs = DataLeakSocialRef::where('code',$DataLeakSocialRef_code)->first();
+                    $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
+                    // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
+                    $response['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+                    $response['site'] = @$site;
+                    $response['ActivityHistory'] = $ActivityHistory;
+               
+            
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function compromise_activity_history_reload(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'compromised'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $DataLeakSocialRef_code = $data['data']['DataLeakSocialRef_code'];
+                    // $site = $data['data']['site'];
+                  
+
+                    $user = User::where('id', $data['data']['user_id'])->first();
+
+                    // $site_id = '';
+            
+                    // if($site_code) {
+                    //     $site_id_m = SiteSettings::where('code',$site_code)->first();
+                    //     $site_id = @$site_id_m->id;
+                    // }
+
+
+                    $DataLeakSocialRefs = DataLeakSocialRef::where('id',$DataLeakSocialRef_code)->first();
+                    $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
+                    $html = '';
+                    if(!empty($ActivityHistory)){
+                        foreach ($ActivityHistory as $key => $value) {
+                                $html_status_activity = '';
+                                $activity_color = '';
+                                $activity_name = '';
+                                if($value->status_activity) {
+                                    if($value->status_activity == 'in_progress') {
+                                        $activity_color = '#FFC107';
+                                        $activity_name = 'Progress';
+                                    } else if ($value->status_activity == 'reported') {
+                                        $activity_color = '#28A745';
+                                        $activity_name = 'Reported';
+                                    } else if ($value->status_activity == 'close') {
+                                        $activity_color = '#DC3545';
+                                        $activity_name = 'Close';
+                                    }
+                                    $html_status_activity = '<span class="badge" style="background-color: '.$activity_color.'; display: block;">'.$activity_name.'</span>';
+                                }
+                            $html .= '
+                            <li class="work" id="list_activity_'.$value->code.'">
+                                <input class="radio" id="work_'.$key.'" name="works" type="radio">
+                                <div class="relative">
+                                    <label for="work_'.$key.'" class="label_custom" style="font-weight: 900;">'.$value->title.'</label>
+                                    <span class="date_custom" style="text-align:center;">'.$value->updated_at.$html_status_activity.'</span>
+                                    <span class="circle_custom"></span>
+                                </div>
+                                <div class="content_custom">
+                                    <p>
+                                        '.$value->content.'
+                                    </p>
+                                </div>
+                                <div>
+                                    <strong>Post By</strong> '.$value->users_name;
+                                    if($value->user_id == $user->id){
+                                        $html .= '
+                                        <span class="float-right">
+                                            <a href="#gototop" class="btn btn-info btn-xs disable_atag" onclick="edit_activity( \''. $value->id .'\');">
+                                                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-danger btn-xs disable_atag" onclick="delete_activity(\''.$value->id.'\',\''.$value->code.'\');"><i class="fas fa-trash-alt"></i></a>
+                                        </span>';
+                                    }
+                                
+                            $html .= '
+                                </div>
+                            </li>';
+                        }
+                    }else{
+                        $html .= '<li class="list-group-item"> </li>';
+                    }
+               
+                    $response = [
+                        "html" => $html,
+                        "ActivityHistory" => $ActivityHistory,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function compromise_activity_get_edit_data(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'compromised'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code_activity = $data['data']['code_activity'];
+                    // $site = $data['data']['site'];
+                  
+
+                    $user = User::where('id', $data['data']['user_id'])->first();
+
+                    // $site_id = '';
+            
+                    // if($site_code) {
+                    //     $site_id_m = SiteSettings::where('code',$site_code)->first();
+                    //     $site_id = @$site_id_m->id;
+                    // }
+
+
+                    $Activity = Activity::where('id',$code_activity)->first()->toArray();
+   
+               
+                    $response = [
+                        "ActivityHistory" => $Activity,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function compromise_activity_save(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{
+                if($data['data']['menu'] !== 'compromised'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    // $code_activity = $data['data']['code_activity'];
+                    $code_edited_activity = $data['data']['code_edited_activity'];
+                    $status_activity = $data['data']['status_activity'];
+                    $content = $data['data']['content'];
+                    $check_active = $data['data']['check_active'];
+                    $id_DataLeakSocialRefs = $data['data']['id_DataLeakSocialRefs'];
+                    $title = $data['data']['title'];
+                    $site_code = $data['data']['site_code'];
+                    // $site = $data['data']['site'];
+                  
+                    //--------------------------------//
+                    $status_activity = $status_activity;
+                    $content = @$content; //รับค่าจาก messageInput
+                    if($content) {
+                        $dom = new \domdocument();
+                        if($dom->getelementsbytagname('img')){
+                            $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                            LIBXML_HTML_NOIMPLIED |
+                            LIBXML_HTML_NODEFDTD |
+                            LIBXML_NOERROR |
+                            LIBXML_NOWARNING 
+                        );
+                            //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                            $images = $dom->getelementsbytagname('img');
+                            //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                            foreach($images as $k => $img){
+                                $data_content = $img->getattribute('src');
+
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data_content, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data_content = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                $img_check_src = explode(";",$data_content);
+                                if(@$img_check_src[1]) {
+                                    list($type, $data_content) = explode(';', $data_content);
+                                    list(, $data_content)= explode(',', $data_content);
+                                    $data_content = base64_decode($data_content);
+                                //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                                    $image_name= time().$k.'.png';
+                                //อัพโหลดภาพไปยัง public
+                                    $path = public_path('images/file_editor') .'/'. $image_name;
+                                //ทำการอัพโหลดภาพ
+                                    file_put_contents($path, $data_content);
+                                    $img->removeattribute('src');
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                                } else {
+            
+                                }
+                            }
+                            $content = $dom->savehtml();
+            
+                        }
+                    }
+            
+                    if($check_active=="1"){
+                        $Activity = new Activity;
+                        $Activity->code = generator_uuid();
+                        $Activity->data_leak_socail_ref_id = $id_DataLeakSocialRefs;
+                        $Activity->title = $title;
+                        $Activity->content = $content;
+                        $Activity->user_id = $data['data']['user_id'];
+                        if($status_activity) {
+                            $Activity->status_activity = $status_activity;
+                        }
+                        $Activity->save();
+                    }else if($check_active=="2"){
+                        $Activity = Activity::where('id',$code_edited_activity)->first();
+                        $Activity->title = $title;
+                        $Activity->content = $content;
+                        if($status_activity) {
+                            $Activity->status_activity = $status_activity;
+                        }
+                        $Activity->save();
+                    }
+            
+
+                    //--------------------------------//
+   
+               
+                    $response = [
+                        "socail_ref_id" => $Activity->data_leak_socail_ref_id,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function compromise_activity_delete(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{
+                if($data['data']['menu'] !== 'compromised'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    // $code_activity = $data['data']['code_activity'];
+                    $code_activity = $data['data']['code_activity'];
+                    // $site = $data['data']['site'];
+                  
+                    //--------------------------------//
+                    $Activity = Activity::where('id',$code_activity)->first();
+                    $Activity->delete();
+                    //--------------------------------//
+   
+               
+                    $response = [
+                        "Activity" => $Activity,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
     
 }

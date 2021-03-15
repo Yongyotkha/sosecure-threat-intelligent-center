@@ -106,6 +106,12 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/activity_save', 'Api\ApiDataLeakController@activity_save');
     Route::post('data_leak/activity_delete', 'Api\ApiDataLeakController@activity_delete');
 
+    Route::post('data_leak/compromise_activity_dataleak_modal', 'Api\ApiDataLeakController@compromise_activity_dataleak_modal');
+    Route::post('data_leak/compromise_activity_history_reload', 'Api\ApiDataLeakController@compromise_activity_history_reload');
+    Route::post('data_leak/compromise_activity_get_edit_data', 'Api\ApiDataLeakController@compromise_activity_get_edit_data');
+    Route::post('data_leak/compromise_activity_save', 'Api\ApiDataLeakController@compromise_activity_save');
+    Route::post('data_leak/compromise_activity_delete', 'Api\ApiDataLeakController@compromise_activity_delete');
+
     Route::post('web_defacement/load_card', 'Api\ApiWebdefacementController@web_defacement_load_card');
     Route::post('web_defacement/detail', 'Api\ApiWebdefacementController@web_defacement_detail');
     Route::post('web_defacement/update_original', 'Api\ApiWebdefacementController@web_defacement_update_original');
