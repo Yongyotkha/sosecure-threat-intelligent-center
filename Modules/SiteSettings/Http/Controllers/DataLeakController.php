@@ -4273,6 +4273,34 @@ class DataLeakController extends Controller
         }
         $Activity = Activity::where('id',$request->code_activity)->first();
         $Activity->delete();
+
+        $Activity_check = Activity::where('data_leak_socail_ref_id',$Activity->data_leak_socail_ref_id)->where('status_activity','close')->first();
+
+        $DataLeakSocialRef = DataLeakSocialRef::where('id',$Activity->data_leak_socail_ref_id)->first();
+        // if($DataLeakSocialRef->status_monitoring != 'close') {
+            if($Activity->status_activity == 'close') {
+                $DataLeakSocialRef->status_monitoring = 'close';
+                $DataLeakSocialRef->save();
+            } else if ($Activity->status_activity == 'reported') {
+                if($Activity_check) {
+                    $DataLeakSocialRef->status_monitoring = 'close';
+                    $DataLeakSocialRef->save();
+                } else {
+                    $DataLeakSocialRef->status_monitoring = 'reported';
+                    $DataLeakSocialRef->save();
+                }
+            } else if ($Activity->status_activity == 'in_progress') {
+                if($Activity_check) {
+                    $DataLeakSocialRef->status_monitoring = 'close';
+                    $DataLeakSocialRef->save();
+                } else {
+                    $DataLeakSocialRef->status_monitoring = 'in_progress';
+                    $DataLeakSocialRef->save();
+                }
+            }   
+        // }
+
+
         if($Activity){
             return ajaxResponse(
                 [
