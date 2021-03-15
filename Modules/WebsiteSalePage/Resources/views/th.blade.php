@@ -154,6 +154,10 @@
                                 <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Urls.png')}}" alt="URLs">
                                 <p>URLs</p>
                             </li>
+                            <li>
+                                <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/iconOrther.png')}}" alt="URLs">
+                                <p>Other</p>
+                            </li>
                         </ul>
                     </div>
 
@@ -205,7 +209,7 @@
         </div>
     </section>
 
-    <section class="content-section">
+    <section class="content-section" style="padding-bottom: 0;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -284,9 +288,9 @@
         </div>
     </section>
 
-    <section class="content-section">
+    <section class="content-section" style="padding-top: 50px; padding-bottom: 50 px;">
         <div class="container">
-            <div class="row d-flex align-items-center">
+            <div class="row d-flex align-items-start">
                 <div class="col-lg-6 mb-3 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
@@ -314,7 +318,7 @@
 
                 </div>
                 <div class="col-lg-6 mb-3 order-lg-2 order-1 text-center mb-lg-0">
-                    <img class="img-fluid" style="max-width: 80%" src="{{asset('asset_salepage/images/icon/cd_Group.png')}}" alt="">
+                    <img class="img-fluid" style="max-width: 50%" src="{{asset('asset_salepage/images/icon/cd_Group.png')}}" alt="">
                 </div>
             </div>
         </div>
@@ -353,18 +357,18 @@
   
           <div class="row">
               <div class="col-lg-6">
-                  <div class="">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/Threat_Hunting_Flow.png')}}" alt="">
+                  <div class="" style="text-align: center;">
+                    <img class="img-fluid" style="width: 480px;" src="{{asset('asset_salepage/images/Threat_Hunting_Flow.png')}}" alt="">
                   </div>
               </div>
   
               <div class="col-lg-6">
-                  <div class="">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
+                  <div class="" style="text-align: center;">
+                    <img class="img-fluid" style="width: 430px;" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
                   </div>
                   <ul class="list-img-ioc" style="justify-content: center;">
-                      <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection"><p>Agent - Based Detection</p></li>
-                      <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/Compromised.png')}}" alt="Compromised"><p>Compromised Detection File System Registry</p></li>
+                      <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px; width: 70px;" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection"><p>Agent - Based Detection</p></li>
+                      <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px; width: 70px;" src="{{asset('asset_salepage/images/Compromised.png')}}" alt="Compromised"><p>Compromised Detection File System Registry</p></li>
                   </ul>
               </div>
           </div>
@@ -373,7 +377,7 @@
     </section><!-- #Threat Hunting -->
 
 
-    <section class="content-section py-4">
+    <section class="content-section py-4" style="background-color: #f2f2f2;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -400,10 +404,16 @@
                 </div>
                 <div class="col-lg-12 text-center" style="margin-top: 32px;">
                     <ul class="list-img-ioc" style="justify-content: center;">
-                        <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Passive Detection"><p>Passive Detection</p></li>
-                        <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Active Detection"><p>Active Detection</p></li>
-                        <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Mis-Configuration Detection"><p>Mis-Configuration Detection</p></li>
-                        <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Hardening and Remediation"><p>Hardening and Remediation</p></li>
+                        <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><!--<p>Passive Detection</p>--></li>
+                        <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><!--<p>Active Detection</p>--></li>
+                        {{-- <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Mis-Configuration Detection"><!--<p>Mis-Configuration Detection</p>--></li>
+                        <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Hardening and Remediation"><!--<p>Hardening and Remediation</p>--></li> --}}
+                    </ul>
+                </div>
+                <div class="col-lg-12 text-center" style="">
+                    <ul class="list-img-ioc" style="justify-content: center;">
+                        <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><!--<p>Mis-Configuration Detection</p>--></li>
+                        <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><!--<p>Hardening and Remediation</p>--></li>
                     </ul>
                 </div>
             </div>
@@ -423,9 +433,9 @@
                             <img class="img-fluid" style="max-width: 200px;" src="{{asset('asset_salepage/images/icon/linux-logo.png')}}" alt="">
                             <h1 class="primary-text text-center"> Linux </h1>
                         </div> --}}
-                        <span class="secondary-text">
+                        {{-- <span class="secondary-text">
                           Operating System  
-                        </span>
+                        </span> --}}
                     </div>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/wl_windows_linux.png')}}" alt="">
                 </div>
