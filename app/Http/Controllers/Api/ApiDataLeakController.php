@@ -1260,7 +1260,7 @@ class ApiDataLeakController extends ApiController
                     $Activity_check = Activity::where('data_leak_socail_ref_id',$id_DataLeakSocialRefs)->where('status_activity','close')->first();
 
                     $DataLeakSocialRef = DataLeakSocialRef::where('id',$id_DataLeakSocialRefs)->first();
-                    if($DataLeakSocialRef->status_monitoring != 'close') {
+                    // if($DataLeakSocialRef->status_monitoring != 'close') {
                         if($Activity->status_activity == 'close') {
                             $DataLeakSocialRef->status_monitoring = 'close';
                             $DataLeakSocialRef->save();
@@ -1281,7 +1281,7 @@ class ApiDataLeakController extends ApiController
                                 $DataLeakSocialRef->save();
                             }
                         }   
-                    }
+                    // }
             
 
                     //--------------------------------//

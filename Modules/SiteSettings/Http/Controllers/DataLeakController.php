@@ -4223,7 +4223,7 @@ class DataLeakController extends Controller
         $Activity_check = Activity::where('data_leak_socail_ref_id',$request->id_DataLeakSocialRefs)->where('status_activity','close')->first();
 
         $DataLeakSocialRef = DataLeakSocialRef::where('id',$request->id_DataLeakSocialRefs)->first();
-        if($DataLeakSocialRef->status_monitoring != 'close') {
+        // if($DataLeakSocialRef->status_monitoring != 'close') {
             if($Activity->status_activity == 'close') {
                 $DataLeakSocialRef->status_monitoring = 'close';
                 $DataLeakSocialRef->save();
@@ -4244,7 +4244,7 @@ class DataLeakController extends Controller
                     $DataLeakSocialRef->save();
                 }
             }   
-        }
+        // }
         
 
         if($request->site_code){
