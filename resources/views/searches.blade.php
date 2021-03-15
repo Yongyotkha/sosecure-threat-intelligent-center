@@ -8,7 +8,13 @@
  foreach (@$dataSearch as $key => $value) {
     if (isset($value["count"])&&$value["count"] > 0) {
         $count_all = @$count_all+@$value["count"];
-        $count_val[slugify($key)] = $value["count"];
+        $count_val[slugify($key)] = !empty($value["count"]) ? number_format($value["count"]) : 0;
+    }
+
+    if(!empty($count_all)) {
+        if(is_numeric($count_all)) {
+            $count_all = number_format($count_all,0);
+        }
     }
 
     if($key == 'indicators') {
@@ -31,7 +37,7 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('search_results_for_tag',['keyword' => $keyword])</div>
             <span class="pull-right" style="margin-top: 1.2rem;font-size: 16px;font-weight: bold;">
-                Total Result : {{@$count_all}}
+                Total Result : {{@$count_all}} 
             </span>
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
@@ -130,7 +136,7 @@
                                 <li id="{{slugify($key)}}_head" class="panel panel-default">
                                     <div class="panel-heading fontw-weight-bold">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
-                                            @icon('solid/caret-right') {{ humanize($key) }} ({{$value["count"]}})
+                                            @icon('solid/caret-right') {{ humanize($key) }} ({{!empty($value["count"]) ? number_format($value["count"]) : 0}})
                                         </a>
                                     </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
