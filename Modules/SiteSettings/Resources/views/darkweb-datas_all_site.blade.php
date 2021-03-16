@@ -1067,6 +1067,11 @@ use Carbon\Carbon;
     }
 
 
+    function count_icon() {
+
+    }
+
+
 </script>
 <style>
 .nowrap_top{

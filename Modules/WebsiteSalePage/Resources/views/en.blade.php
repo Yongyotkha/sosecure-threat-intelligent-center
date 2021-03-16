@@ -104,9 +104,7 @@
       <div class="intro-info">
         <h2>Intelligence Detection</h2>
         <h3>
-            Threat insight System is improved for helping organizations detect threats faster and also working with
-            surveillance in the same time. We have data leak detection technology to protect data 
-            of organizationson internet and dark web.
+            Threat inSight System is improved for helping organizations detect threats faster and also working with surveillance at the same time. We have data leak detection technology to protect the data of the organization's internet and dark web.
         </h3>
       </div>
 
