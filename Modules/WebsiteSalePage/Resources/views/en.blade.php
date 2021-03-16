@@ -176,7 +176,7 @@
                             Asset Discovery
                         </h1>
                         <span class="secondary-text">
-                            To help you finding any interesting information and gathering server and asset which service on theinternet and collecting from OSINT. In the same way, we are able to import data for gap detection and threats continuously.
+                            To help you find any interesting information and gathering servers and asset which service on the internet and collecting from OSINT. In the same way, we are able to import data for gap detection and threats continuously.
                         </span>
                     </div>
 
@@ -224,7 +224,7 @@
 
                 <div class="col-lg-4 offset-lg-4 order-lg-3 order-2">
                     <span class="secondary-text text-blue text-lg-left text-center">
-                            Data leak detection form dark web that bring data of organization for publishing and selling.
+                            Data leak detection from dark web that brings data of organization for publishing and selling.
                         </span>
                         <ul class="list-img-ioc mt-3">
                             <li>
@@ -250,7 +250,7 @@
                     <div class="row">
                         <div class="col-lg-4 order-lg-1 order-2 d-flex flex-column align-items-center justify-content-center">
                             <span class="secondary-text mb-3 text-white text-lg-left text-center">
-                                We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
+                                We use indicators from insight data to detect threats from hackers stealing data or infecting Backdoor on the server.
                             </span>
         
                             <ul class="list-img-ice text-center">
@@ -295,7 +295,7 @@
                             Compromised Detection
                         </h1>
                         <span class="secondary-text">
-                            We use indicators from insight data to detect threat from hacker stealing data or infecting Backdoor on server.
+                            We use indicators from insight data to detect threats from hackers stealing data or infecting Backdoor on the server.
                         </span>
                     </div>
 
@@ -334,7 +334,7 @@
                             Web Defaced Detection
                         </h1>
                         <span class="secondary-text">
-                            To detect attack website from attacker by using web defacement technique and the organization still maintain credibility.
+                            To detect a website from the attacker by using web defacement technique and the organization still maintain credibility.
                         </span>
                     </div>
                 </div>
@@ -396,7 +396,7 @@
                         Advanced Vulnerability Detection
                     </h1>
                     <span class="secondary-text text-white mb-4">
-                        Threat Insight System is able to detect the gap of system. This system is based on database of the Common Vulnerabilities and Exposures (CVE) system.
+                        Threat inSight System is able to detect the gap of the system. This system is based on a database of the Common Vulnerabilities and Exposures (CVE) system.
                     </span>
 
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group97.png')}}" alt="">
@@ -451,7 +451,7 @@
                             Mis-Configuration Detection
                         </h1>
                         <span class="secondary-text">
-                            The system can detect unsafe configuration based on Security Guideline from CIS center. Also, editing configuration for safety from the system.
+                            The system can detect unsafe configurations based on Security Guideline from the CIS center.<br> Also, editing configuration for safety from the system.
                         </span>
                     </div>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/Icom.png')}}" alt="Mis-Configuration Detection">
@@ -465,21 +465,21 @@
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
                     <div class="mb-4 text-lg-left text-center">
-                        <span class="secondary-text">
+                        <span class="secondary-text" style="padding-left: 50px;">
                             Detection user attack by using social engineering technique such as Phishing, Fake mobile application, Drive-By-Download.
                         </span>
                     </div>
                     <div>
-                        <ul class="list-img-ioc justify-content-start">
+                        <ul class="list-img-ioc justify-content-center">
                             <li>
                                 <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/phising.png')}}" alt="Phishing">
                                 <p>Phishing</p>
                             </li>
-                            <li>
+                            <li style="padding-left: 15px;">
                                 <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/mobile.png')}}" alt="Mobile">
                                 <p>Fake Mobile <br> Application</p>
                             </li>
-                            <li>
+                            <li style="padding-left: 15px;">
                                 <img class="img-fluid mw-100" src="{{asset('asset_salepage/images/icon/drive.png')}}" alt="Drive">
                                 <p>Drive-By <br>Download</p>
                             </li>
@@ -515,7 +515,7 @@
                 <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <div class="mb-5">
                         <span class="secondary-text">
-                            Update news about cybersecurity from others source around the world and getting notification via Email.
+                            Update news about cybersecurity from other sources around the world and getting notifications via Email.
                         </span>
                     </div>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group106.png')}}" alt="Mis-Configuration Detection">
@@ -564,7 +564,7 @@
             <div class="col-lg-6">
                 <div class="contact-container">
                    <ul class="contact-list">
-                       <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-map-marker"></i></span> 410/ 34 Ratchadaphisek Rd, Khwaeng Samsen Nok, Khet Huai Khwang, Krung Thep Maha Nakhon 10310</p></li>
+                       <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-map-marker"></i></span> 410/ 34 Soi Ratchadaphisek 24, Ratchadaphisek Rd, Samsen Nok, Huai Khwang, Bangkok 10310</p></li>
                        <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-envelope"></i></span> Support@sosecure.co.th</p></li>
                        <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-phone"></i></span> 061 564 5294</p></li>
                        <li><p class="mb-3"><span class="icon-contact"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="line" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-line fa-w-14 fa-2x" style="width: 22px;"><path fill="currentColor" d="M272.1 204.2v71.1c0 1.8-1.4 3.2-3.2 3.2h-11.4c-1.1 0-2.1-.6-2.6-1.3l-32.6-44v42.2c0 1.8-1.4 3.2-3.2 3.2h-11.4c-1.8 0-3.2-1.4-3.2-3.2v-71.1c0-1.8 1.4-3.2 3.2-3.2H219c1 0 2.1.5 2.6 1.4l32.6 44v-42.2c0-1.8 1.4-3.2 3.2-3.2h11.4c1.8-.1 3.3 1.4 3.3 3.1zm-82-3.2h-11.4c-1.8 0-3.2 1.4-3.2 3.2v71.1c0 1.8 1.4 3.2 3.2 3.2h11.4c1.8 0 3.2-1.4 3.2-3.2v-71.1c0-1.7-1.4-3.2-3.2-3.2zm-27.5 59.6h-31.1v-56.4c0-1.8-1.4-3.2-3.2-3.2h-11.4c-1.8 0-3.2 1.4-3.2 3.2v71.1c0 .9.3 1.6.9 2.2.6.5 1.3.9 2.2.9h45.7c1.8 0 3.2-1.4 3.2-3.2v-11.4c0-1.7-1.4-3.2-3.1-3.2zM332.1 201h-45.7c-1.7 0-3.2 1.4-3.2 3.2v71.1c0 1.7 1.4 3.2 3.2 3.2h45.7c1.8 0 3.2-1.4 3.2-3.2v-11.4c0-1.8-1.4-3.2-3.2-3.2H301v-12h31.1c1.8 0 3.2-1.4 3.2-3.2V234c0-1.8-1.4-3.2-3.2-3.2H301v-12h31.1c1.8 0 3.2-1.4 3.2-3.2v-11.4c-.1-1.7-1.5-3.2-3.2-3.2zM448 113.7V399c-.1 44.8-36.8 81.1-81.7 81H81c-44.8-.1-81.1-36.9-81-81.7V113c.1-44.8 36.9-81.1 81.7-81H367c44.8.1 81.1 36.8 81 81.7zm-61.6 122.6c0-73-73.2-132.4-163.1-132.4-89.9 0-163.1 59.4-163.1 132.4 0 65.4 58 120.2 136.4 130.6 19.1 4.1 16.9 11.1 12.6 36.8-.7 4.1-3.3 16.1 14.1 8.8 17.4-7.3 93.9-55.3 128.2-94.7 23.6-26 34.9-52.3 34.9-81.5z" class=""></path></svg></span> @sosecure</p></li>
@@ -579,7 +579,8 @@
 
             <div class="col-lg-6">
                 <div class="map mb-4 mb-lg-0">
-                    <iframe src="https://www.google.com/maps?q=410%2F%2034%20Ratchadaphisek%20Rd%2C%20Khwaeng%20Samsen%20Nok%2C%20Khet%20Huai%20Khwang%2C%20Krung%20Thep%20Maha%20Nakhon%2010310&z=14&t=&ie=UTF8&output=embed" frameborder="0" style="border:0; width: 100%; height: 293px;" allowfullscreen></iframe>
+                    {{-- <iframe src="https://www.google.com/maps?q=410%2F%2034%20Ratchadaphisek%20Rd%2C%20Khwaeng%20Samsen%20Nok%2C%20Khet%20Huai%20Khwang%2C%20Krung%20Thep%20Maha%20Nakhon%2010310&z=14&t=&ie=UTF8&output=embed" frameborder="0" style="border:0; width: 100%; height: 293px;" allowfullscreen></iframe> --}}
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.6832906662935!2d100.57296581477854!3d13.79795599993984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29d6ebefb4825%3A0x3098ac660f56aea5!2sSOSecure!5e0!3m2!1sth!2ssg!4v1615884002549!5m2!1sth!2ssg" width="100%" height="293px" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
