@@ -651,6 +651,7 @@ use Carbon\Carbon;
 @include('stacks.js.defaultpic')
 <script>
 var click_key = null;
+var table;
 
 {{--active_btn('#fillter_click_keyword .btn-selector');--}}
 active_btn('#groupby-type .btn-grey');
@@ -772,7 +773,7 @@ $('.btn').click(function(){
 
       
 
-        $('#table_social_datas').DataTable({
+        table = $('#table_social_datas').DataTable({
                 pageLength: 50,
                 processing: true,
                 serverSide: true,

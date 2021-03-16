@@ -390,7 +390,8 @@ body {
     });
 
     $("#btn_close_md_all").click(function() {
-        location.reload();
+        {{--location.reload();--}}
+        table.ajax.reload();
     });
 
     $('.ajaxifyForm_custom_onlythis').submit(function (event) {
@@ -420,6 +421,7 @@ body {
                 toastr.success(response.data.message, '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                 reload_activity_history(response.data.socail_ref_id);
+                table.ajax.reload();
                 {{--window.location.href = response.data.redirect;--}}
         })
         .catch(function (error) {

@@ -430,6 +430,8 @@ use Carbon\Carbon;
             visible_c = false;
         }
 
+    var table;
+
     var search_val = false;
     var keywords = null;
     var site = null;
@@ -570,7 +572,7 @@ use Carbon\Carbon;
 
     function table_social_data(){
 
-        $('#table_social_datas').DataTable({
+        table = $('#table_social_datas').DataTable({
                 pageLength: 50,
                 processing: true,
                 serverSide: true,
