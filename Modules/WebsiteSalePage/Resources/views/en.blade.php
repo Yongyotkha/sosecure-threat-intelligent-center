@@ -378,7 +378,7 @@
     </section><!-- #Threat Hunting -->
 
 
-    <section class="content-section py-4" style="background-color: #f2f2f2;">
+    {{-- <section class="content-section py-4" style="background-color: #f2f2f2;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -388,14 +388,14 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <section class="content-section bg-dark" style="padding: 80px 0 0 0;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <h1 class="primary-text text-center text-white">
-                        Vulnerability Detection
+                        Advanced Vulnerability Detection
                     </h1>
                     <span class="secondary-text text-white mb-4">
                         Threat Insight System is able to detect the gap of system. This system is based on database of the Common Vulnerabilities and Exposures (CVE) system.
