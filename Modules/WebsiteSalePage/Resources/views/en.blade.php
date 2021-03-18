@@ -425,7 +425,7 @@
                 <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
                         <div class="col-lg-12 col-lg-12 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
-                            <img class="img-fluid" style="max-width: 750px;" src="{{asset('asset_salepage/images/os_type.jpg')}}" alt="">
+                            <img class="img-fluid" style="max-width:70%;" src="{{asset('asset_salepage/images/os_type.jpg')}}" alt="">
                             {{-- <h1 class="primary-text text-center"> Windows </h1> --}}
                         </div>
                         {{-- <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
