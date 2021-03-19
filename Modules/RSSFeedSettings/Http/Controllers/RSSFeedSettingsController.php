@@ -426,7 +426,7 @@ class RSSFeedSettingsController extends Controller
             }
             
         }
-        $model = $model ->orderBy('created_at', 'desc');
+        $model = $model ->orderBy('public_date', 'desc');
         $model = $model -> get();
         
 

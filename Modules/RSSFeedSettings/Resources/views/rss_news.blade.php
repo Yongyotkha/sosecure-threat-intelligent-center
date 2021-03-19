@@ -650,7 +650,7 @@ $(function() {
             serverSide: true,
             destroy: true,
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
-            order: [[ 5, "desc" ]],
+            order: [[ 6, "desc" ]],
             ajax: {
 
                 type: "POST",
