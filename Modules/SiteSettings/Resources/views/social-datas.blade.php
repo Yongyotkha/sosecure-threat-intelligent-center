@@ -1,3 +1,6 @@
+@php
+use Carbon\Carbon;
+@endphp
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
@@ -516,6 +519,25 @@ function table_social_data(search_val){
             {
                 targets: 5,
                 render: function (data, type, full, meta) {
+
+                    var new_html = '';
+                    var date_day = '2021-01-01';
+                    var date = full.get_data_leak_feed_one.feedtimepost;
+                    var date_sp = date.split(" ");
+                    if(date_sp.length > 0) {
+                        date_day = date_sp[0];
+                    }
+
+                    var date_now = '{{Carbon::now()}}';
+                    let date_now_sp = date_now.split(" ");
+                    if(date_now_sp.length > 0) {
+                        var date_now_day = date_now_sp[0];
+                    }
+                    if ((date_day) == (date_now_day)) {
+                        {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                        new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
+                    }
+
                     if(full.get_data_leak_feed_one){
                         var feedcontent =  stripHtml(full.get_data_leak_feed_one.feedcontent);
                         var res = full.keyword.split(",");
@@ -525,7 +547,7 @@ function table_social_data(search_val){
                             console.log(data2);
                             content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                         }
-                        return '<div>'+content+'</div>';
+                        return '<div>'+new_html+content+'</div>';
                     }else{
                         return '';
                     }
@@ -574,7 +596,7 @@ function table_social_data(search_val){
                 },
             }, 
             {
-                targets: 9,
+                targets: 11,
                 width: '10px',
                 className : 'nowrap',
                 render: function (data, type, full, meta) {

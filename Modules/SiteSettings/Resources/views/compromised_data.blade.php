@@ -1,3 +1,6 @@
+@php
+use Carbon\Carbon;
+@endphp
 @extends('layouts.app')
 @section('content')
 <section id="content" class="bg">
@@ -438,6 +441,25 @@ active_btn('#btngroup_status .btn-grey');
                         targets: 4,
                         className:'nowrap',
                         render: function (data, type, full, meta) {
+
+                            var new_html = '';
+                            var date_day = '2021-01-01';
+                            var date = full.get_data_leak_feed_one.feedtimepost;
+                            var date_sp = date.split(" ");
+                            if(date_sp.length > 0) {
+                                date_day = date_sp[0];
+                            }
+
+                            var date_now = '{{Carbon::now()}}';
+                            let date_now_sp = date_now.split(" ");
+                            if(date_now_sp.length > 0) {
+                                var date_now_day = date_now_sp[0];
+                            }
+                            if ((date_day) == (date_now_day)) {
+                                {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                                new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
+                            }
+
                             let val = '';
                             let content = '';
                             val = full.get_data_leak_feed_one;
@@ -451,7 +473,7 @@ active_btn('#btngroup_status .btn-grey');
                                 
                             }
         
-                            return '<div>'+feedcontent+'</div>';
+                            return '<div>'+new_html+feedcontent+'</div>';
                         },
                     },
                     {
@@ -532,6 +554,7 @@ active_btn('#btngroup_status .btn-grey');
                 
 
                             return `
+                            <a href="${base_url}/compromise/activity_modal/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="far fa-comment-dots"></i></a>
                             <a href="${base_url}/darkweb_data/view_content/${full.code}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>
                             <a href="${base_url}/darkweb_data/edit_darkwebdata_modal/${full.code}?site=${siteCode}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
                                 <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>

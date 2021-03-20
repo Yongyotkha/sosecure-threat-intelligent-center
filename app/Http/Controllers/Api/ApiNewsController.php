@@ -313,6 +313,7 @@ class ApiNewsController extends ApiController
         
                     // dd($news);
                     $content = [];
+                    $tz = new \DateTimeZone('Asia/Bangkok');
                     foreach($news as $item){
                         $related_news_site = '';
                         $icon_related= '';
@@ -373,7 +374,20 @@ class ApiNewsController extends ApiController
                         // $content[] = $item -> detail_en;
                         // dd($content);
         
-                        
+                        $new_html = '';
+                        $date_day = '1900-01-01 12:51:17';
+                        if(!empty($item -> public_date)){
+                            $date_day = $item -> public_date;
+                        }
+                        $datework = Carbon::parse($date_day)->startOfDay();
+                        $datework = $datework->setTimezone($tz);
+            
+                        $date_now = Carbon::now()->startOfDay();
+                        $date_now = $date_now->setTimezone($tz);
+                        $carbondiff = $datework->diffInDays($date_now);
+                        if($carbondiff === 0){
+                            $new_html.= '<span class="badge" style="background-color: #2196f3;">New</span>';
+                        }
         
         
                         $check_read_news = ReadNews::where('user_id', $user_id)->where('news_id', $item -> id)->first();
@@ -425,6 +439,7 @@ class ApiNewsController extends ApiController
                                 </label>
                             </div>-->
                             <div class="content-news-text">
+                                '.$new_html.'
                                 <a href="'.$url.'/news/detail/'.$item -> code.'">
                                     <span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
                                 </a>
