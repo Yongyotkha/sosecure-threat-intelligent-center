@@ -974,7 +974,7 @@ return [
     'link'                                       => 'Link',
     'logs'                                       => 'Logs',
     'application_logs'                           => 'Application logs',
-    'send_logs'                                  => 'Send logs',
+    'send_logs'                                  => 'Syslog',//Send logs
     'delete_all'                                 => 'Delete All',
     'remark'                                     => 'Remark',
     'api_indicators'                             => 'API Indicators',

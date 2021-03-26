@@ -131,11 +131,12 @@ class data_leak_social extends Command
                 }
                 $site_id = rtrim($site_id, ",");
                 $keyword = rtrim($keyword, ",");
-                // print_r($keyword);
+                // print_r($data->feedlink);exit();
                 try {
                     if (!empty($keyword)) {
-                        $DataLeakFeedTemp = DataLeakFeedTemp::where('data_id', $data->_id)->where('sourceid', $data->sourceid)
-                            ->where('keyword', $keyword)->where('feedlink', $data->feedlink)->first();
+                        $DataLeakFeedTemp = DataLeakFeedTemp::where('feedlink', $data->feedlink)->first();
+                        // $DataLeakFeedTemp = DataLeakFeedTemp::all();
+                        // var_dump($DataLeakFeedTemp);exit();
                         if (!$DataLeakFeedTemp) {
                             $DataLeakFeedTemp = new DataLeakFeedTemp();
                             $DataLeakFeedTemp->data_id = $data->_id;

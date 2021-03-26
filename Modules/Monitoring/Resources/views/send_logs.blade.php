@@ -7,7 +7,7 @@
             <div class="header-flex-overflow m-t-10">
                 <div class="fwb-16">
                     <span>
-                        Monitoring > Send Logs
+                        Monitoring > @langapp('send_logs')
                     </span>
                 </div>
 

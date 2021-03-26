@@ -38,6 +38,100 @@
         margin-top: 1rem;
         /*text-transform: uppercase;*/
     }
+
+
+/*---section os-----------------------*/
+    .css-2u2ye4 {
+        display: grid;
+        grid-auto-flow: row;
+        grid-auto-rows: 1fr;
+        grid-gap: 32px;
+        max-width: 1168px;
+        text-align: left;
+        margin: 64px auto 0 auto;
+        -webkit-box-pack: justify;
+        -webkit-justify-content: space-between;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        -webkit-animation: animation-o23fxl 0.2s ease-in forwards;
+        animation: animation-o23fxl 0.2s ease-in forwards;
+    }
+
+    .css-4oj96i {
+        background: #fff;
+        border: 1px solid #e5e8ed;
+        border-radius: 5px;
+        padding: 24px;
+        margin-bottom: 0 !important;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgb(3 27 78 / 6%) !important;
+        -webkit-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+    }
+
+    .box {
+        background-color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 2px 3px rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 10%);
+        color: #4d4f03;
+        display: block;
+        padding: 1.25rem;
+    }
+    .css-1iww2db {
+        position: relative;
+        height: 100%;
+    }
+    .css-2u2ye4 .box {
+        padding: 30px !important;
+    }
+    .css-1iww2db {
+        position: relative;
+        height: 100%;
+    }
+
+    .css-1pq2esu.blur-up.lazyloaded {
+        -webkit-filter: blur(0);
+        -webkit-filter: blur(0);
+        filter: blur(0);
+    }
+    
+    .css-1pq2esu.blur-up.lazyloaded {
+        -webkit-filter: blur(0);
+        -webkit-filter: blur(0);
+        filter: blur(0);
+    }
+    .css-1pq2esu.blur-up {
+        /* -webkit-filter: blur(5px);
+        -webkit-filter: blur(5px);
+        filter: blur(5px); */
+        -webkit-transition: filter 100ms,-webkit-filter 100ms;
+        transition: filter 100ms,-webkit-filter 100ms;
+    }
+    .css-1iww2db img {
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+    .css-2u2ye4 img {
+        max-height: 50px;
+        min-height: 40px;
+    }
+    .css-2u2ye4 .box p {
+        margin-bottom: 0;
+    }
+    .p-os {
+        font-family: Inter-Regular,"system-ui",-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Helvetica,Arial,"sans-serif";
+        color: #5b6987;
+        font-size: 16px;
+        line-height: 160%;
+        font-weight: 400;
+        font-style: normal;
+    }
+    .zoom1:hover {
+        -ms-transform: scale(1.1); /* IE 9 */
+        -webkit-transform: scale(1.1); /* Safari 3-8 */
+        transform: scale(1.1);
+    }
+    /*--end-section os-----------------------*/
 </style>
 
 @php 
@@ -404,18 +498,18 @@
                 </div>
                 <div class="col-lg-12 text-center" style="margin-top: 32px;">
                     <ul class="list-img-ioc" style="justify-content: center;">
-                        <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><!--<p>Passive Detection</p>--></li>
-                        <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><!--<p>Active Detection</p>--></li>
-                        {{-- <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Mis-Configuration Detection"><!--<p>Mis-Configuration Detection</p>--></li>
-                        <li style="width: 200px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/cicle.png')}}" alt="Hardening and Remediation"><!--<p>Hardening and Remediation</p>--></li> --}}
+                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><p style="margin-top: 10px;">Passive Detection</p></li>
+                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><p style="margin-top: 10px;">Active Detection</p></li>
+                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><p style="margin-top: 10px;">Mis-Configuration Detection</p></li>
+                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><p style="margin-top: 10px;">Hardening and Remediation</p></li> 
                     </ul>
                 </div>
-                <div class="col-lg-12 text-center" style="">
+                {{-- <div class="col-lg-12 text-center" style="">
                     <ul class="list-img-ioc" style="justify-content: center;">
                         <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><!--<p>Mis-Configuration Detection</p>--></li>
                         <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><!--<p>Hardening and Remediation</p>--></li>
                     </ul>
-                </div>
+                </div> --}}
             </div>
         </div>
     </section>
@@ -425,10 +519,56 @@
             <div class="row">
                 <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
-                        <div class="col-lg-12 col-lg-12 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
+                        {{-- <div class="col-lg-12 col-lg-12 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
                             <img class="img-fluid" style="max-width:70%;" src="{{asset('asset_salepage/images/os_type.jpg')}}" alt="">
-                            {{-- <h1 class="primary-text text-center"> Windows </h1> --}}
-                        </div>
+                            <h1 class="primary-text text-center"> Windows </h1>
+                        </div> --}}
+
+                        <div class="column">
+                            <div class="css-nheav9">
+                               <h3 class="h3 darkblue css-1w5mdtx title">Deploy your Droplet with any of these available distributions</h3>
+                               <p class="medium darkgrey css-o8e64g subtitle">Save time by building on the OS that suits your needs.</p>
+                               <div data-testid="cards_container" class="css-2u2ye4" style="grid-template-columns: repeat(6, 1fr); text-align: center;">
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="#">
+                                        <div class="css-1iww2db">
+                                        <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                        <p class="p-os">Windows</p>
+                                        </div>
+                                    </a>
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
+                                     <div class="css-1iww2db">
+                                        <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/1f67cb07-0dde-4a71-a347-ea5af62c94c3_ubuntu.svg?auto=compress,format" src="https://images.prismic.io/www-static/1f67cb07-0dde-4a71-a347-ea5af62c94c3_ubuntu.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                        <p class="p-os">Ubuntu</p>
+                                     </div>
+                                    </a>
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
+                                        <div class="css-1iww2db">
+                                            <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/07d902e3-093f-4930-a0fc-895ed7728ebb_centOS.svg?auto=compress,format" src="https://images.prismic.io/www-static/07d902e3-093f-4930-a0fc-895ed7728ebb_centOS.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <p class="p-os">CentOS</p>
+                                        </div>
+                                    </a>
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
+                                        <div class="css-1iww2db">
+                                            <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/8e47a46d-4532-4b4c-a82e-ea54e3ce5020_Debian.svg?auto=compress,format" src="https://images.prismic.io/www-static/8e47a46d-4532-4b4c-a82e-ea54e3ce5020_Debian.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <p class="p-os">Debian</p>
+                                        </div>
+                                    </a>
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
+                                        <div class="css-1iww2db">
+                                            <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/24d38682-d39d-44d7-aff6-618ba1f63555_Fedora.svg?auto=compress,format" src="https://images.prismic.io/www-static/24d38682-d39d-44d7-aff6-618ba1f63555_Fedora.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <p class="p-os">Fedora</p>
+                                        </div>
+                                    </a>
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
+                                        <div class="css-1iww2db">
+                                            <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/orther11.svg')}}" src="{{asset('asset_salepage/images/icon/orther11.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <p class="p-os">Other</p>
+                                        </div>
+                                    </a>
+                               </div>
+                            </div>
+                         </div>
+
                         {{-- <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
                             <img class="img-fluid" style="max-width: 200px;" src="{{asset('asset_salepage/images/icon/linux-logo.png')}}" alt="">
                             <h1 class="primary-text text-center"> Linux </h1>
@@ -443,7 +583,7 @@
         </div>
     </section>
 
-    <section class="content-section bg-c-muted">
+    <section class="content-section bg-c-muted" style="background-color: #ececec !important;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 col-lg-12 text-center">
