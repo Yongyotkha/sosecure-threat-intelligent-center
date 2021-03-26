@@ -526,10 +526,10 @@
 
                         <div class="column">
                             <div class="css-nheav9">
-                               <h3 class="h3 darkblue css-1w5mdtx title">Deploy your Droplet with any of these available distributions</h3>
-                               <p class="medium darkgrey css-o8e64g subtitle">Save time by building on the OS that suits your needs.</p>
+                                <h3 class="h3 darkblue css-1w5mdtx title">Detection Support System</h3>
+                                <p class="medium darkgrey css-o8e64g subtitle"></p>
                                <div data-testid="cards_container" class="css-2u2ye4" style="grid-template-columns: repeat(6, 1fr); text-align: center;">
-                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="#">
+                                    <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
                                         <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
                                         <p class="p-os">Windows</p>
@@ -537,25 +537,25 @@
                                     </a>
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                      <div class="css-1iww2db">
-                                        <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/1f67cb07-0dde-4a71-a347-ea5af62c94c3_ubuntu.svg?auto=compress,format" src="https://images.prismic.io/www-static/1f67cb07-0dde-4a71-a347-ea5af62c94c3_ubuntu.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                        <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/ubuntu.svg')}}" src="{{asset('asset_salepage/images/icon/ubuntu.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
                                         <p class="p-os">Ubuntu</p>
                                      </div>
                                     </a>
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
-                                            <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/07d902e3-093f-4930-a0fc-895ed7728ebb_centOS.svg?auto=compress,format" src="https://images.prismic.io/www-static/07d902e3-093f-4930-a0fc-895ed7728ebb_centOS.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/centOS.svg')}}" src="{{asset('asset_salepage/images/icon/centOS.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
                                             <p class="p-os">CentOS</p>
                                         </div>
                                     </a>
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
-                                            <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/8e47a46d-4532-4b4c-a82e-ea54e3ce5020_Debian.svg?auto=compress,format" src="https://images.prismic.io/www-static/8e47a46d-4532-4b4c-a82e-ea54e3ce5020_Debian.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/Debian.svg')}}" src="{{asset('asset_salepage/images/icon/Debian.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
                                             <p class="p-os">Debian</p>
                                         </div>
                                     </a>
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
-                                            <div style="position: relative;"><img data-src="https://images.prismic.io/www-static/24d38682-d39d-44d7-aff6-618ba1f63555_Fedora.svg?auto=compress,format" src="https://images.prismic.io/www-static/24d38682-d39d-44d7-aff6-618ba1f63555_Fedora.svg?auto=compress,format" alt="card icon" class="null blur-up css-1pq2esu"></div>
+                                            <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/Fedora.svg')}}" src="{{asset('asset_salepage/images/icon/Fedora.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
                                             <p class="p-os">Fedora</p>
                                         </div>
                                     </a>
