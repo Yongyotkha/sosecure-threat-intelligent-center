@@ -133,6 +133,12 @@
         transform: scale(1.1);
     }
     /*--end-section os-----------------------*/
+
+    @media only screen and (max-width: 1000px) {
+        #area_logo_os{
+            /* overflow-y: auto; */
+        }
+    }
 </style>
 
 @php 
@@ -529,7 +535,7 @@
                             <div class="css-nheav9">
                                 <h3 class="h3 darkblue css-1w5mdtx title">Detection Support System</h3>
                                 <p class="medium darkgrey css-o8e64g subtitle"></p>
-                               <div data-testid="cards_container" class="css-2u2ye4" style="grid-template-columns: repeat(6, 1fr); text-align: center;">
+                               <div data-testid="cards_container" id="area_logo_os" class="css-2u2ye4" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); text-align: center;">
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
                                         <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
