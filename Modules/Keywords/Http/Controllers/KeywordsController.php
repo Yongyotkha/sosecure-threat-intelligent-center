@@ -3,8 +3,10 @@
 namespace Modules\Keywords\Http\Controllers;
 
 use Modules\SiteSettings\Entities\Site_keywords;
+use Modules\SiteSettings\Entities\site_keywords_main;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DataTables;
+use Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -298,7 +300,83 @@ class KeywordsController extends Controller
             true,
             Response::HTTP_OK
         );
-    }  
+    }
+
+    public function save_add_keyword_main(Request $request)
+    {
+        $message = '';
+        $status = 0;
+
+        $code_site = $request->code_site;
+        $keyword_name = $request->keyword_name;
+        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('name',$keyword_name)->where('status',1)->whereNull('deleted_at')->first();
+        if(!$site_keywords_main) {
+            $site_keywords_main_insert = new site_keywords_main;
+            $site_keywords_main_insert->code = generator_uuid();
+            $site_keywords_main_insert->site_id = $site->id;
+            $site_keywords_main_insert->name = $keyword_name;
+            $site_keywords_main_insert->status = 1;
+            $site_keywords_main_insert->created_by = Auth::user()->id;
+            $site_keywords_main_insert->save();
+
+            $message = langapp('changes_saved_successful');
+            $status = 1;
+        } else {
+            toastr()->warning('!Error Duplicate Keyword.', langapp('response_status'));
+            // return response()->json(['message' => 'Error Duplicate Keyword', 'errors' => ['missing' => ['Please new Keyword name. ']]], 500);
+            $message = '!Error Duplicate Keyword.';
+            $status = 0;
+        }
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'id'       => @$site_keywords_main_insert->id,
+                'message'  => $message,
+                'status'   => $status,
+                'redirect' => route('keyword.index',['id' => $code_site]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function get_keyword_main(Request $request)
+    {
+        $message = '';
+        $status = 0;
+
+        $code_site = $request->code_site;
+        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->get();
+        if(!$site_keywords_main) {
+
+            $message = langapp('changes_saved_successful');
+            $status = 1;
+        } else {
+            // toastr()->warning('!Error Duplicate Keyword.', langapp('response_status'));
+            // return response()->json(['message' => 'Error Duplicate Keyword', 'errors' => ['missing' => ['Please new Keyword name. ']]], 500);
+            $message = '';
+            $status = 1;
+        }
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'data'       => @$site_keywords_main,
+                'message'  => $message,
+                'status'   => $status,
+                'redirect' => route('keyword.index',['id' => $code_site]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
 
 
 }

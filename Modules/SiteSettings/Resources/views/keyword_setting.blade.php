@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+@php
+    $segments = Request::segments();
+    $last_segments  = end($segments);
+    // dd($last_segments);
+@endphp
 <section id="content" class="bg">
     <section class="hbox stretch">      
         <aside id="hide-settings" class="aside aside-md b-r">
@@ -93,7 +98,7 @@
                                         <h5 class="font-weight-bold">Keyword</h5>
                                         <div class="box-item-keyword">
                                             <ul id="keyword_main" class="main-list keyword-list">
-                                                <li class="item-list item--keyword">
+                                                {{-- <li class="item-list item--keyword">
                                                     <div class="left-side-item">
                                                         <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
                                                         <span class="text-keyword">Keyword 1</span>
@@ -102,7 +107,7 @@
                                                         <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
                                                         <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
                                                     </div>
-                                                </li>
+                                                </li> --}}
                                             </ul>
                                         </div>
 
@@ -270,6 +275,10 @@
 @include('stacks.js.sort')
 <script>
 
+$( document ).ready(function() {
+    get_keyword_main();
+});
+
 
 function delete_keyword() {
     $('.delete-item-keyword').on("click",function(){
@@ -280,22 +289,118 @@ function delete_keyword() {
 delete_keyword();
 
 $('.btn-add-keyword').on("click",function (){
-    var newToDo = `
-    <li class="item-list item--keyword">
-        <div class="left-side-item">
-            <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-            <span class="text-keyword">${$("#add-todo").val()}</span>
-        </div>
-        <div class="action-keyword">
-            <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
-            <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
-        </div>
-    </li>`;
-    $("ul.keyword-list").prepend(newToDo);
-    $("#add-todo").val("");
-
-    delete_keyword();
+    let keyword_text = $("#add-todo").val();
+    if(!keyword_text) {
+        toastr.warning('Keyword name cannot be empty!' , '@langapp('response_status') ');
+        return false;
+    } else {
+        if(save_add_keyword_main()){
+            get_keyword_main();
+        }
+    }
 });
+
+function save_add_keyword_main() {
+    let result = 0;
+    let keyword_name = $("#add-todo").val();
+    $.ajax({
+        type:"POST",
+        url:"{{ route('KeywordsController.save_add_keyword_main') }}",
+        data:{
+            code_site:'{{$last_segments}}',
+            keyword_name: keyword_name
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status == 1) {
+                console.log(response);
+                result = 1;
+                $('#add-todo').val('');
+                get_keyword_main();
+                toastr.success(response.message, '@langapp('response_status')');
+                {{--window.location.href = response.redirect;--}}
+            } else {
+                console.log(response);
+                toastr.warning(response.message, '@langapp('response_status')');
+            }
+
+        },
+        error: function (error){
+            console.log(error);
+            result = 0;
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+    return result;
+}
+
+function get_keyword_main() {
+    let result = 0;
+    $.ajax({
+        type:"POST",
+        url:"{{ route('KeywordsController.get_keyword_main') }}",
+        data:{
+            code_site:'{{$last_segments}}'
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status == 1) {
+                console.log(response);
+                result = 1;
+                if(response && response.data) {
+                    let data = response.data;
+                    let x;
+                    $("ul.keyword-list").html('');
+                    for (x in data) {
+                        var newToDo = `
+                            <li class="item-list item--keyword">
+                                <div class="left-side-item">
+                                    <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                    <span class="text-keyword">${data[x].name}</span>
+                                </div>
+                                <div class="action-keyword">
+                                    <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                    <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                </div>
+                            </li>`;
+                        $("ul.keyword-list").prepend(newToDo);
+                        delete_keyword();
+                    }
+                }
+            } else {
+                console.log(response);
+                toastr.warning(response.message, '@langapp('response_status')');
+            }
+
+        },
+        error: function (error){
+            console.log(error);
+            result = 0;
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+    return result;
+}
+
+
 
 
 var keyword_item = document.getElementById('keyword_main'),
@@ -303,18 +408,59 @@ var keyword_item = document.getElementById('keyword_main'),
 	darkweb_item = document.getElementById('darkweb_main');
 
 new Sortable(keyword_item, {
-	group: 'shared',
+	group: {
+        name: 'shared',
+        pull: 'clone',
+        put: false,
+        revertClone: true
+    },
 	animation: 150
 });
 
 new Sortable(social_item, {
-	group: 'shared',
-	animation: 150
+    group: {
+        name: 'shared'
+    },
+    animation: 150
 });
 new Sortable(darkweb_item, {
-	group: 'shared',
-	animation: 150
+    group: {
+        name: 'shared'
+    },
+    animation: 150
 });
+
+
+{{--
+    new Sortable(keyword_item, {
+	group: {
+        name: 'shared'
+    },
+	animation: 150,
+    sort: false,
+    dataIdAttr: 'data-id',
+    removeCloneOnHide: true
+});
+
+new Sortable(social_item, {
+	group: {
+        name: 'shared',
+        pull: 'true',
+        put: true
+    },
+	animation: 150,
+    dataIdAttr: 'data-id'
+});
+new Sortable(darkweb_item, {
+	group: {
+        name: 'shared',
+        pull: 'true',
+        put: true
+    },
+	animation: 150,
+    dataIdAttr: 'data-id'
+});
+    --}}
 
 
 

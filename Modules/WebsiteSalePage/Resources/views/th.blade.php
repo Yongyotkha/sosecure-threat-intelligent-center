@@ -119,7 +119,8 @@
         margin-bottom: 0;
     }
     .p-os {
-        font-family: Inter-Regular,"system-ui",-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Helvetica,Arial,"sans-serif";
+        font-family: 'Prompt', sans-serif !important;
+        /* font-family: Inter-Regular,"system-ui",-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Helvetica,Arial,"sans-serif"; */
         color: #5b6987;
         font-size: 16px;
         line-height: 160%;

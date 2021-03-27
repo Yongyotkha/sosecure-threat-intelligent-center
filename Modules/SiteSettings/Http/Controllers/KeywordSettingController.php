@@ -5,6 +5,7 @@ namespace Modules\SiteSettings\Http\Controllers;
 use Modules\Keywords\Http\Requests\KeywordsRequest;
 use Auth;
 use Modules\SiteSettings\Entities\Site_keywords;
+use Modules\SiteSettings\Entities\site_keywords_main;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -196,7 +197,7 @@ class KeywordSettingController extends Controller
             $Site_keywords->site_id = $SiteSettings->id;
             $Site_keywords->name = $request->name;
             $Site_keywords->type = $key;
-            $Site_keywords->status = $request->status ? 1 : 0;
+            $Site_keywords->status = 1;
             $Site_keywords->created_by = @Auth::user()->id;
             $Site_keywords->save();
             if($Site_keywords->type == 'social'){
@@ -254,4 +255,5 @@ class KeywordSettingController extends Controller
             Response::HTTP_OK
         );
     }
+
 }
