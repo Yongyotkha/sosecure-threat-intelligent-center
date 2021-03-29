@@ -235,6 +235,28 @@
         </div>
     </div>
 
+    <div class="modal" id="delete_select" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                    <input type="hidden" id="keywords_main_id_del" name="keywords_main_id_del">
+                    <input type="hidden" id="keywords_sub_id_del" name="keywords_sub_id_del">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" class="btn btn-info submit btn-rounded delete-select"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="edit_keyword" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
@@ -247,14 +269,15 @@
                         <form action="">
                             <div class="form-group row">
                                 <h5 class="font-weight-bold">Keyword</h5>
-                                <input type="text" name="keyword" class="form-control">
+                                <input type="hidden" id="keywords_main_id_edit" name="keywords_main_id_edit">
+                                <input type="text" id="keyword_input" name="keyword" class="form-control">
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                    <button type="button" class="btn btn-info submit btn-rounded delete-all"><i class="fas fa-paper-plane"></i> OK</button>
+                    <button type="button" class="btn btn-info submit btn-rounded"><i class="fas fa-paper-plane"></i> OK</button>
                 </div>
             </div>
         </div>
@@ -277,16 +300,45 @@
 
 $( document ).ready(function() {
     get_keyword_main();
+    get_keyword_sub('social');
+    get_keyword_sub('darkweb');
 });
 
 
-function delete_keyword() {
-    $('.delete-item-keyword').on("click",function(){
-        $(this).closest('li').remove();
+function edit_keyword() {
+    $('.edit-item-keyword').on("click",function(){
+        let keywords_main_id_edit = $(this).data('keywords_main_id');
+        let keywords_main_name_edit = $(this).data('keywords_main_name');
+        console.log(keywords_main_id_edit);
+        $('#keywords_main_id_edit').val(keywords_main_id_edit);
+        $('#keyword_input').val(keywords_main_name_edit);
+        $("#edit_keyword").modal("show");
+    });
+}
+function delete_keyword_main() {
+    $('.delete-item-keyword-main').on("click",function(){
+        let keywords_main_id = $(this).data('keywords_main_id');
+        console.log(keywords_main_id);
+        $('#keywords_main_id_del').val(keywords_main_id);
+        $('#keywords_sub_id_del').val('');
+        $("#delete_select").modal("show");
+        {{--$(this).closest('li').remove();--}}
+    });
+}
+function delete_keyword_sub() {
+    $('.delete-item-keyword-sub').on("click",function(){
+        let keywords_sub_id_del = $(this).data('keywords_sub_id');
+        console.log(keywords_sub_id_del);
+        $('#keywords_sub_id_del').val(keywords_sub_id_del);
+        $('#keywords_main_id_del').val('');
+        $("#delete_select").modal("show");
+        {{--$(this).closest('li').remove();--}}
     });
 }
 
-delete_keyword();
+edit_keyword();
+delete_keyword_main();
+delete_keyword_sub();
 
 $('.btn-add-keyword').on("click",function (){
     let keyword_text = $("#add-todo").val();
@@ -371,12 +423,70 @@ function get_keyword_main() {
                                     <span class="text-keyword">${data[x].name}</span>
                                 </div>
                                 <div class="action-keyword">
-                                    <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
-                                    <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                    <a href="#" class="text-white m-r-xs edit-item-keyword" data-keywords_main_id="${data[x].id}" data-keywords_main_name="${data[x].name}"><i class="fas fa-ellipsis-v"></i></a>
+                                    <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="${data[x].id}"><i class="fas fa-trash-alt"></i></a>
                                 </div>
                             </li>`;
                         $("ul.keyword-list").prepend(newToDo);
-                        delete_keyword();
+                        edit_keyword();
+                        delete_keyword_main();
+                    }
+                }
+            } else {
+                console.log(response);
+                toastr.warning(response.message, '@langapp('response_status')');
+            }
+
+        },
+        error: function (error){
+            console.log(error);
+            result = 0;
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        }
+    });
+    return result;
+}
+
+function get_keyword_sub(type) {
+    let result = 0;
+    $.ajax({
+        type:"POST",
+        url:"{{ route('KeywordsController.get_keyword_sub') }}",
+        data:{
+            code_site:'{{$last_segments}}',
+            type: type
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status == 1) {
+                console.log(response);
+                result = 1;
+                if(response && response.data) {
+                    let data = response.data;
+                    let x;
+                    $('ul.'+type+'-list').html('');
+                    for (x in data) {
+                        var newToDo = `
+                            <li class="item-list item--keyword">
+                                <div class="left-side-item">
+                                    <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                    <span class="text-keyword">${data[x].name}</span>
+                                </div>
+                                <div class="action-keyword">
+                                    <a href="#" class="text-white delete-item-keyword-sub" data-keywords_sub_id="${data[x].id}" data-keywords_main_id="${data[x].keywords_main_id}"><i class="fas fa-trash-alt"></i></a>
+                                </div>
+                            </li>`;
+                        $('ul.'+type+'-list').prepend(newToDo);
+                        delete_keyword_sub();
                     }
                 }
             } else {

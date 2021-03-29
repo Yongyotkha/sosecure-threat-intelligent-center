@@ -378,5 +378,40 @@ class KeywordsController extends Controller
         );
     }
 
+    public function get_keyword_sub(Request $request)
+    {
+        $message = '';
+        $status = 0;
+
+        $type = $request->type;
+        $code_site = $request->code_site;
+        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        $Site_keywords = Site_keywords::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->get();
+        if(!$Site_keywords) {
+
+            $message = langapp('changes_saved_successful');
+            $status = 1;
+        } else {
+            // toastr()->warning('!Error Duplicate Keyword.', langapp('response_status'));
+            // return response()->json(['message' => 'Error Duplicate Keyword', 'errors' => ['missing' => ['Please new Keyword name. ']]], 500);
+            $message = '';
+            $status = 1;
+        }
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'data'       => @$Site_keywords,
+                'message'  => $message,
+                'status'   => $status,
+                'redirect' => route('keyword.index',['id' => $code_site]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
 
 }

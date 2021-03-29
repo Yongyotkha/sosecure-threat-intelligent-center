@@ -23,5 +23,6 @@ Route::group(
         Route::post('/dataleak/social/delete_checked', 'KeywordsController@delete_checked')->name('KeywordsController.delete_checked');
         Route::post('/dataleak/social/save_add_keyword_main', 'KeywordsController@save_add_keyword_main')->name('KeywordsController.save_add_keyword_main');
         Route::post('/dataleak/social/get_keyword_main', 'KeywordsController@get_keyword_main')->name('KeywordsController.get_keyword_main');
+        Route::post('/dataleak/social/get_keyword_sub', 'KeywordsController@get_keyword_sub')->name('KeywordsController.get_keyword_sub');
     }
 );

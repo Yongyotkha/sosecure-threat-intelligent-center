@@ -139,6 +139,13 @@
         }
     }
 
+    @media only screen and (min-width: 600px) {
+        .logo_v_dtech{
+            /* overflow-y: auto; */
+            width:150px !important;
+        }
+    }
+
 </style>
 
 @php 
@@ -464,7 +471,7 @@
   
               <div class="col-lg-6">
                   <div class="" style="text-align: center;">
-                    <img class="img-fluid" style="width: 430px;" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
+                    <img class="img-fluid" style="max-width: 55%;" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
                   </div>
                   <ul class="list-img-ioc" style="justify-content: center;">
                       <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px; width: 70px;" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection"><p>Agent - Based Detection</p></li>
@@ -504,10 +511,10 @@
                 </div>
                 <div class="col-lg-12 text-center" style="margin-top: 32px;">
                     <ul class="list-img-ioc" style="justify-content: center;">
-                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><p style="margin-top: 10px;">Passive Detection</p></li>
-                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><p style="margin-top: 10px;">Active Detection</p></li>
-                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><p style="margin-top: 10px;">Mis-Configuration Detection</p></li>
-                        <li style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><p style="margin-top: 10px;">Hardening and Remediation</p></li> 
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><p style="margin-top: 10px;">Passive Detection</p></li>
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><p style="margin-top: 10px;">Active Detection</p></li>
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><p style="margin-top: 10px;">Mis-Configuration Detection</p></li>
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><p style="margin-top: 10px;">Hardening and Remediation</p></li> 
                     </ul>
                 </div>
                 {{-- <div class="col-lg-12 text-center" style="">
@@ -747,4 +754,19 @@
       </div>
     </div>
   </footer>
+
+  <script type="text/javascript">
+    function myFunction(x) {
+        if (x.matches) { 
+            let area_logo_os = document.getElementById("area_logo_os");
+            area_logo_os.style.gridTemplateColumns = "1fr 1fr";
+        } else {
+            area_logo_os.style.gridTemplateColumns = "1fr 1fr 1fr";
+        }
+    }
+
+    var x = window.matchMedia("(max-width: 600px)");
+    myFunction(x);
+    x.addListener(myFunction);
+</script>
 @stop
