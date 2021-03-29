@@ -120,7 +120,7 @@ use Carbon\Carbon;
                            </div>
                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
                               <a href="javascript:void(0)" onclick="dataType2('close')">
-                                 <div class="card-dash" style="height: 149px; border: 1px solid #e4e4e4;">
+                                 <div class="card-dash" style="height: 150px; border: 1px solid #e4e4e4;">
                                     <div class="left-card">
                                        <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
                                        <h3 class="name-dash-text text-dark text-upper ">Close</h3>
@@ -143,35 +143,152 @@ use Carbon\Carbon;
                                         </div>
                                     </div> --}}
 
-                                    <div class="col-md-6 nopadding">
-                                        <div class="card-dash-compro none-bg none-shadow ">
-                                            <a href="#" onclick="dataType('social')">
-                                                <div class="left-card">
-                                                    <div class="img-icon-card ice">
-                                                        <img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)">
-                                                    </div>
-                                                    <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
-                                                    <span class="number-card warning" id='compromise-count'>0</span>
+                                    <div class="col-md-9 nopadding" style="    border: 1px solid #e4e4e4;">
+
+
+                                            <div class="col-md-8 nopadding">
+                                                            <div class="col-md-6 nopadding">
+                                                                 <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                        <a href="javascript:void(0)" onclick="dataType2('mobile')">
+                                                                            <div class="left-card">
+                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                
+                                                                                    <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                
+                                                                                    <span class="number-card warning" style="font-size: 35px !important;padding: 20px;" id='icon_mobile'>0</span>
+                                                                                </div>
+                                                                                <!-- <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3> -->
+                                                                               
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                        <a href="javascript:void(0)" onclick="dataType2('line')">
+                                                                            <div class="left-card">
+                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                    <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                    <span class="number-card info" style="font-size: 35px !important;padding: 20px;"  id='icon_line'>0</span>
+                                                                                </div>
+                                                                                <!-- <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3> -->
+                                                                              
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                        <a href="javascript:void(0)" onclick="dataType2('website')">
+                                                                            <div class="left-card">
+                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                    <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                    <span class="number-card " style="color: #8793db; font-size: 35px !important;padding: 20px;" id='icon_website'>0</span>
+                                                                                </div>
+                                                                                <!-- <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3> -->
+                                                                              
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                            </div>
+                                                            <div class="col-md-6 nopadding">
+                                                                     <div class="card-dash-compro none-bg none-shadow" style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                        <a href="javascript:void(0)" onclick="dataType2('facebook')">
+                                                                            <div class="left-card">
+                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                    <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                    <span class="number-card info" style="font-size: 35px !important;padding: 20px;"  id='icon_facebook'>0</span>
+                                                                                </div>
+                                                                                <!-- <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3> -->
+                                                                             
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="card-dash-compro none-bg none-shadow"  style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                        <a href="javascript:void(0)" onclick="dataType2('twitter')">
+                                                                            <div class="left-card">
+                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                    <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                    <span class="number-card " style="color: #5bb984; font-size: 35px !important;padding: 20px;" id='icon_twitter'>0</span>
+                                                                                </div>
+                                                                                <!-- <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3> -->
+                                                                             
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="card-dash-compro none-bg none-shadow"  style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                        <a href="javascript:void(0)" onclick="dataType2('other')">
+                                                                            <div class="left-card">
+                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                    <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                    <span class="number-card "style="color: #565656; font-size: 35px !important;padding: 20px;" id='icon_other'>0</span>
+                                                                                </div>
+                                                                                <!-- <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3> -->
+                                                                             
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                            </div>
+
+                                            </div>
+                                            <div class="col-md-4 nopadding">
+                                                <div class="col-md-12 nopadding">
+                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 51px;    box-shadow: 0 0px 0px #f5f5f5; "></div>
                                                 </div>
-                                            </a>
-                                        </div>
+                                                 <div class="col-md-12 nopadding">
+
+                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                            <a href="#" onclick="dataType('social')">
+                                                                <div class="left-card">
+                                                                    <div class="img-icon-card ice" style="width: 150px;height: 150px;">
+                                                                        <img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)">
+                                                                    </div>
+                                                                    <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                                                    <span class="number-card warning" id='compromise-count'>0</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                 </div>
+                                                 <div class="col-md-12 nopadding">
+                                                     <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;"></div>
+                                                </div>
+
+
+                                            </div>
+
+                                    
+
+
+
                                     </div>
-                                    <div class="col-md-6 nopadding">
-                                        <div class="card-dash-compro none-bg none-shadow">
-                                            <a href="#" onclick="dataType('darkweb_public')">
-                                                <div class="left-card">
-                                                    <div class="img-icon-card ice">
-                                                        <img src="{{asset('images/icebergline1.png')}}" alt="" onerror="setDefaultPic(this)">
-                                                    </div>
-                                                    <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
-                                                    <span class="number-card info"  id='darkweb-count'>0</span>
+
+
+
+
+
+
+                                    <div class="col-md-3 nopadding" style="    border: 1px solid #e4e4e4;">
+
+
+                                                     <div class="col-md-12 nopadding">
+                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 51px;     box-shadow: 0 1px 1px rgb(0 0 0 / 20%);  "></div>
                                                 </div>
-                                            </a>
-                                        </div>
+                                                 <div class="col-md-12 nopadding">
+                                                        <div class="card-dash-compro none-bg none-shadow" style="    box-shadow: 0 1px 1px rgb(0 0 0 / 20%);">
+                                                            <a href="#" onclick="dataType('darkweb_public')">
+                                                                <div class="left-card">
+                                                                    <div class="img-icon-card ice" style="width: 150px;height: 150px;   ">
+                                                                        <img src="{{asset('images/icebergline1.png')}}" alt="" onerror="setDefaultPic(this)">
+                                                                    </div>
+                                                                    <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                                                    <span class="number-card info"  id='darkweb-count'>0</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        </div>
+                                                 <div class="col-md-12 nopadding">
+                                                     <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;      box-shadow: 0 1px 1px rgb(0 0 0 / 20%);  "></div>
+                                                </div>
                                     </div>
                                 </div>
                             </div>
-
+<!-- 
                             <ul class="item-fillter-social">
                                 <li>
                                     <div class="card-dash-compro none-bg none-shadow ">
@@ -180,8 +297,8 @@ use Carbon\Carbon;
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 25px !important;">Mobile App</h3>
-                                                <span class="number-card warning" style="font-size: 25px !important;" id='icon_mobile'>0</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3>
+                                                <span class="number-card warning" style="font-size: 35px !important;padding: 20px;" id='icon_mobile'>0</span>
                                             </div>
                                         </a>
                                     </div>
@@ -193,8 +310,8 @@ use Carbon\Carbon;
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Fanpage</h3>
-                                                <span class="number-card info" style="font-size: 25px !important;"  id='icon_facebook'>0</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3>
+                                                <span class="number-card info" style="font-size: 35px !important;padding: 20px;"  id='icon_facebook'>0</span>
                                             </div>
                                         </a>
                                     </div>
@@ -206,8 +323,8 @@ use Carbon\Carbon;
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit; border-radius: 8px;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Line</h3>
-                                                <span class="number-card info" style="font-size: 25px !important;"  id='icon_line'>0</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Line</h3>
+                                                <span class="number-card info" style="font-size: 35px !important;padding: 20px;"  id='icon_line'>0</span>
                                             </div>
                                         </a>
                                     </div>
@@ -219,8 +336,8 @@ use Carbon\Carbon;
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Twitter</h3>
-                                                <span class="number-card " style="color: #5bb984; font-size: 25px !important;" id='icon_twitter'>0</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Twitter</h3>
+                                                <span class="number-card " style="color: #5bb984; font-size: 35px !important;padding: 20px;" id='icon_twitter'>0</span>
                                             </div>
                                         </a>
                                     </div>
@@ -232,8 +349,8 @@ use Carbon\Carbon;
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Website</h3>
-                                                <span class="number-card " style="color: #8793db; font-size: 25px !important;" id='icon_website'>0</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Website</h3>
+                                                <span class="number-card " style="color: #8793db; font-size: 35px !important;padding: 20px;" id='icon_website'>0</span>
                                             </div>
                                         </a>
                                     </div>
@@ -245,13 +362,13 @@ use Carbon\Carbon;
                                                 <div class="img-icon-card ice" style="height: 62px;">
                                                     <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
                                                 </div>
-                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 25px !important;">Other</h3>
-                                                <span class="number-card "style="color: #565656; font-size: 25px !important;" id='icon_other'>0</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Other</h3>
+                                                <span class="number-card "style="color: #565656; font-size: 35px !important;padding: 20px;" id='icon_other'>0</span>
                                             </div>
                                         </a>
                                     </div>
                                 </li>
-                            </ul>
+                            </ul> -->
                         </div>
                     </div>
 
@@ -412,7 +529,7 @@ use Carbon\Carbon;
                     <section class="panel panel-default">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
-                                <div class="col-xs-12">
+                                <div class="col-xs-12" style="    padding-top: 10px;">
                                     <i class="fas fa-table"></i> Table Data Leak Data
                                 </div>
                             </div>
