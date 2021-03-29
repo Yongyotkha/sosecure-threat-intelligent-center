@@ -529,7 +529,8 @@ class KeywordsController extends Controller
                 if($to_id == 'social_main') {
                     $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','social')->first();
                     if($Site_keywords_check) {
-
+                        $message = '';
+                        $status = 0;
                     } else {
                         $Site_keywords_insert = new Site_keywords;
                         $Site_keywords_insert->code = generator_uuid();
@@ -540,11 +541,15 @@ class KeywordsController extends Controller
                         $Site_keywords_insert->status = 1;
                         $Site_keywords_insert->created_by = Auth::user()->id;
                         $Site_keywords_insert->save();
+
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
                     }
                 } else if ($to_id == 'darkweb_main') {
                     $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','darkweb')->first();
                     if($Site_keywords_check) {
-
+                        $message = '';
+                        $status = 0;
                     } else {
                         $Site_keywords_insert = new Site_keywords;
                         $Site_keywords_insert->code = generator_uuid();
@@ -555,6 +560,9 @@ class KeywordsController extends Controller
                         $Site_keywords_insert->status = 1;
                         $Site_keywords_insert->created_by = Auth::user()->id;
                         $Site_keywords_insert->save();
+
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
                     }
                 }
             } else if ($from_id == 'social_main') {
@@ -573,8 +581,12 @@ class KeywordsController extends Controller
                     $Site_keywords_insert->status = 1;
                     $Site_keywords_insert->created_by = Auth::user()->id;
                     $Site_keywords_insert->save();
-                } else {
 
+                    $message = langapp('changes_saved_successful');
+                    $status = 1;
+                } else {
+                    $message = '';
+                    $status = 0;
                 }
 
             } else if ($from_id == 'darkweb_main') {
@@ -589,25 +601,19 @@ class KeywordsController extends Controller
                     $Site_keywords_insert->keywords_main_id = $keywords_main_id;
                     $Site_keywords_insert->site_id = $site->id;
                     $Site_keywords_insert->name = $site_keywords_main->name;
-                    $Site_keywords_insert->type = 'darkweb';
+                    $Site_keywords_insert->type = 'social';
                     $Site_keywords_insert->status = 1;
                     $Site_keywords_insert->created_by = Auth::user()->id;
                     $Site_keywords_insert->save();
-                } else {
 
+                    $message = langapp('changes_saved_successful');
+                    $status = 1;
+                } else {
+                    $message = '';
+                    $status = 0;
                 }
             }
-
-            $Site_keywords = new Site_keywords;
-            $check = site_keywords_main::where('id',$keywords_main_id_del)->where('site_id',$site->id)->first();
-            if(!$check) {
-                $message = langapp('changes_saved_successful');
-                $status = 1;
-            } else {
-                $message = '';
-                $status = 1;
-            }
-            
+ 
         }
 
 

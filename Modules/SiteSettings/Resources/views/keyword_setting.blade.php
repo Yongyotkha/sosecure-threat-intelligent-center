@@ -745,6 +745,7 @@ new Sortable(darkweb_item, {
         let from_id = evt.from.id;
         let to_id = evt.to.id;
         let attributes_id = evt.item.attributes['data-id'].value;
+        check_insert_keyword_process(''+from_id+'',''+to_id+'',attributes_id);
 	},
 });
 
