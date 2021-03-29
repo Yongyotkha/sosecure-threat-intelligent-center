@@ -248,10 +248,11 @@
                     </div>
                     <input type="hidden" id="keywords_main_id_del" name="keywords_main_id_del">
                     <input type="hidden" id="keywords_sub_id_del" name="keywords_sub_id_del">
+                    <input type="hidden" id="keywords_type_del" name="keywords_type_del">
                 </div>
                 <div class="modal-footer">
                     <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                    <button type="button" class="btn btn-info submit btn-rounded delete-select"><i class="fas fa-paper-plane"></i> OK</button>
+                    <button type="button" id="btn_delete_keyword" class="btn btn-info submit btn-rounded delete-select"><i class="fas fa-paper-plane"></i> OK</button>
                 </div>
             </div>
         </div>
@@ -277,7 +278,7 @@
                 </div>
                 <div class="modal-footer">
                     <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
-                    <button type="button" class="btn btn-info submit btn-rounded"><i class="fas fa-paper-plane"></i> OK</button>
+                    <button type="button" id="btn_edit_keyword" class="btn btn-info submit btn-rounded"><i class="fas fa-paper-plane"></i> OK</button>
                 </div>
             </div>
         </div>
@@ -304,6 +305,13 @@ $( document ).ready(function() {
     get_keyword_sub('darkweb');
 });
 
+$("#btn_edit_keyword").click(function() {
+    edit_keyword_process();
+});
+$("#btn_delete_keyword").click(function() {
+    del_keyword_process();
+});
+
 
 function edit_keyword() {
     $('.edit-item-keyword').on("click",function(){
@@ -313,6 +321,7 @@ function edit_keyword() {
         $('#keywords_main_id_edit').val(keywords_main_id_edit);
         $('#keyword_input').val(keywords_main_name_edit);
         $("#edit_keyword").modal("show");
+
     });
 }
 function delete_keyword_main() {
@@ -321,6 +330,7 @@ function delete_keyword_main() {
         console.log(keywords_main_id);
         $('#keywords_main_id_del').val(keywords_main_id);
         $('#keywords_sub_id_del').val('');
+        $('#keywords_type_del').val('main');
         $("#delete_select").modal("show");
         {{--$(this).closest('li').remove();--}}
     });
@@ -331,6 +341,7 @@ function delete_keyword_sub() {
         console.log(keywords_sub_id_del);
         $('#keywords_sub_id_del').val(keywords_sub_id_del);
         $('#keywords_main_id_del').val('');
+        $('#keywords_type_del').val('sub');
         $("#delete_select").modal("show");
         {{--$(this).closest('li').remove();--}}
     });
@@ -417,7 +428,7 @@ function get_keyword_main() {
                     $("ul.keyword-list").html('');
                     for (x in data) {
                         var newToDo = `
-                            <li class="item-list item--keyword">
+                            <li class="item-list item--keyword" data-id="${data[x].id}">
                                 <div class="left-side-item">
                                     <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
                                     <span class="text-keyword">${data[x].name}</span>
@@ -430,6 +441,7 @@ function get_keyword_main() {
                         $("ul.keyword-list").prepend(newToDo);
                         edit_keyword();
                         delete_keyword_main();
+
                     }
                 }
             } else {
@@ -476,7 +488,7 @@ function get_keyword_sub(type) {
                     $('ul.'+type+'-list').html('');
                     for (x in data) {
                         var newToDo = `
-                            <li class="item-list item--keyword">
+                            <li class="item-list item--keyword" data-id="${data[x].id}" data-keywords_main_id="${data[x].keywords_main_id}">
                                 <div class="left-side-item">
                                     <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
                                     <span class="text-keyword">${data[x].name}</span>
@@ -510,6 +522,169 @@ function get_keyword_sub(type) {
     return result;
 }
 
+function edit_keyword_process() {
+    let result = 0;
+    let keywords_main_id_edit = $("#keywords_main_id_edit").val();
+    let keyword_input = $("#keyword_input").val();
+    if(!keyword_input) {
+        toastr.warning('Keyword name cannot be empty!' , '@langapp('response_status') ');
+        return false;
+    }
+    $.ajax({
+        type:"POST",
+        url:"{{ route('KeywordsController.edit_keyword_process') }}",
+        data:{
+            code_site:'{{$last_segments}}',
+            keywords_main_id_edit:keywords_main_id_edit,
+            keyword_input:keyword_input
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status == 1) {
+                console.log(response);
+                result = 1;
+                if(response && response.message) {
+                    $("#edit_keyword").modal("hide");
+                    get_keyword_main();
+                    get_keyword_sub('social');
+                    get_keyword_sub('darkweb');
+                    toastr.success(response.message, '@langapp('response_status')');
+                    
+                }
+            } else {
+                console.log(response);
+                toastr.error('@langapp('request_failed')', '@langapp('response_status')');
+                get_keyword_main();
+                get_keyword_sub('social');
+                get_keyword_sub('darkweb');
+            }
+        },
+        error: function (error){
+            console.log(error);
+            result = 0;
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+            {{--toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');--}}
+        }
+    });
+    return result;
+}
+function del_keyword_process() {
+    let result = 0;
+    let keywords_main_id_del = $("#keywords_main_id_del").val();
+    let keywords_sub_id_del = $("#keywords_sub_id_del").val();
+    let keywords_type_del = $("#keywords_type_del").val();
+    $.ajax({
+        type:"POST",
+        url:"{{ route('KeywordsController.del_keyword_process') }}",
+        data:{
+            code_site:'{{$last_segments}}',
+            keywords_main_id_del:keywords_main_id_del,
+            keywords_sub_id_del:keywords_sub_id_del,
+            keywords_type_del:keywords_type_del
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status == 1) {
+                console.log(response);
+                result = 1;
+                if(response && response.message) {
+                    $("#delete_select").modal("hide");
+                    get_keyword_main();
+                    get_keyword_sub('social');
+                    get_keyword_sub('darkweb');
+                    toastr.success(response.message, '@langapp('response_status')');
+                    
+                }
+            } else {
+                console.log(response);
+                toastr.error('@langapp('request_failed')', '@langapp('response_status')');
+                get_keyword_main();
+                get_keyword_sub('social');
+                get_keyword_sub('darkweb');
+            }
+        },
+        error: function (error){
+            console.log(error);
+            result = 0;
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+            {{--toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');--}}
+        }
+    });
+    return result;
+}
+
+function check_insert_keyword_process(from_id,to_id,attributes_id) {
+    let result = 0;
+
+    $.ajax({
+        type:"POST",
+        url:"{{ route('KeywordsController.check_insert_keyword_process') }}",
+        data:{
+            code_site:'{{$last_segments}}',
+            from_id:from_id,
+            to_id:to_id,
+            attributes_id:attributes_id
+        },
+        beforeSend: function(){
+            loading('load');
+        },
+        success:function(response) {
+            loading('stop_load');
+            if(response.status == 1) {
+                console.log(response);
+                result = 1;
+                if(response && response.message) {
+                    $("#delete_select").modal("hide");
+                    get_keyword_main();
+                    get_keyword_sub('social');
+                    get_keyword_sub('darkweb');
+                    toastr.success(response.message, '@langapp('response_status')');
+                    
+                }
+            } else {
+                console.log(response);
+                toastr.error('@langapp('request_failed')', '@langapp('response_status')');
+                get_keyword_main();
+                get_keyword_sub('social');
+                get_keyword_sub('darkweb');
+            }
+        },
+        error: function (error){
+            console.log(error);
+            result = 0;
+            loading('stop_load');
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+            {{--toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');--}}
+        }
+    });
+    return result;
+}
+
+
+
 
 
 
@@ -524,21 +699,58 @@ new Sortable(keyword_item, {
         put: false,
         revertClone: true
     },
-	animation: 150
+    sort: false,
+	animation: 150,
+    dataIdAttr: 'data-id',
+    fallbackClass: "sortable-fallback",
+    onSort: function (evt) {
+		{{--console.log(evt);--}}
+	},
+    onAdd: function (evt) {
+		console.log(evt);
+	},
 });
 
 new Sortable(social_item, {
     group: {
         name: 'shared'
     },
-    animation: 150
+    sort: false,
+    animation: 150,
+    onSort: reportActivity(2),
+    onAdd: function (evt) {
+        console.log(evt.from.id);
+        console.log(evt.to.id);
+        console.log(evt.item.attributes['data-id'].value);
+		console.log(evt);
+        console.log(evt);
+        let from_id = evt.from.id;
+        let to_id = evt.to.id;
+        let attributes_id = evt.item.attributes['data-id'].value;
+        check_insert_keyword_process(''+from_id+'',''+to_id+'',attributes_id);
+	},
 });
 new Sortable(darkweb_item, {
     group: {
         name: 'shared'
     },
-    animation: 150
+    sort: false,
+    animation: 150,
+    onSort: reportActivity(3),
+    onAdd: function (evt) {
+        console.log(evt.from.id);
+        console.log(evt.to.id);
+        console.log(evt.item.attributes['data-id'].value);
+		console.log(evt);
+        let from_id = evt.from.id;
+        let to_id = evt.to.id;
+        let attributes_id = evt.item.attributes['data-id'].value;
+	},
 });
+
+function reportActivity(val) {
+    console.log('The sort order has changed : '+val);
+};
 
 
 {{--

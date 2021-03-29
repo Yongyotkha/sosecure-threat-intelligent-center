@@ -24,5 +24,8 @@ Route::group(
         Route::post('/dataleak/social/save_add_keyword_main', 'KeywordsController@save_add_keyword_main')->name('KeywordsController.save_add_keyword_main');
         Route::post('/dataleak/social/get_keyword_main', 'KeywordsController@get_keyword_main')->name('KeywordsController.get_keyword_main');
         Route::post('/dataleak/social/get_keyword_sub', 'KeywordsController@get_keyword_sub')->name('KeywordsController.get_keyword_sub');
+        Route::post('/dataleak/social/edit_keyword_process', 'KeywordsController@edit_keyword_process')->name('KeywordsController.edit_keyword_process');
+        Route::post('/dataleak/social/del_keyword_process', 'KeywordsController@del_keyword_process')->name('KeywordsController.del_keyword_process');
+        Route::post('/dataleak/social/check_insert_keyword_process', 'KeywordsController@check_insert_keyword_process')->name('KeywordsController.check_insert_keyword_process');
     }
 );

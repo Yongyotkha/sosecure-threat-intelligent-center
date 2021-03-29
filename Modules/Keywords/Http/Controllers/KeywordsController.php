@@ -413,5 +413,217 @@ class KeywordsController extends Controller
         );
     }
 
+    public function edit_keyword_process(Request $request)
+    {
+        $message = '';
+        $status = 0;
+
+        $keywords_main_id_edit = $request->keywords_main_id_edit;
+        $keyword_input = $request->keyword_input;
+        $code_site = $request->code_site;
+        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        if(($site) && ($keywords_main_id_edit) && ($keyword_input)) {
+            $site_keywords_main = site_keywords_main::where('id',$keywords_main_id_edit)->where('site_id',$site->id)->first();
+            $Site_keywords = Site_keywords::where('keywords_main_id',$keywords_main_id_edit)->where('site_id',$site->id)->get();
+            // $check = site_keywords_main::where('id',$keywords_main_id_edit)->where('site_id',$site->id)->first();
+            
+            if($site_keywords_main) {
+                $site_keywords_main->name = $keyword_input;
+                $site_keywords_main->save();
+                if($site_keywords_main) {
+                    foreach($Site_keywords as $val) {
+                        $val->name = $keyword_input;
+                        $val->save();
+                    }
+                }
+                $message = langapp('changes_saved_successful');
+                $status = 1;
+            } else {
+                $message = '';
+                $status = 1;
+            }
+        }
+
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'data'       => '',
+                'message'  => $message,
+                'status'   => $status,
+                'redirect' => route('keyword.index',['id' => $code_site]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function del_keyword_process(Request $request)
+    {
+        $message = '';
+        $status = 0;
+
+        $keywords_main_id_del = $request->keywords_main_id_del;
+        $keywords_sub_id_del = $request->keywords_sub_id_del;
+        $keywords_type_del = $request->keywords_type_del;
+        $code_site = $request->code_site;
+        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        if(($keywords_type_del) && ($keywords_main_id_del || $keywords_sub_id_del)) {
+            if($keywords_type_del == 'main') {
+                $site_keywords_main = site_keywords_main::where('id',$keywords_main_id_del)->where('site_id',$site->id)->delete();
+                $keywords_sub_id_del = Site_keywords::where('keywords_main_id',$keywords_main_id_del)->where('site_id',$site->id)->delete();
+                $check = site_keywords_main::where('id',$keywords_main_id_del)->where('site_id',$site->id)->first();
+                if(!$check) {
+                    $message = langapp('changes_saved_successful');
+                    $status = 1;
+                } else {
+                    $message = '';
+                    $status = 1;
+                }
+            } else if ($keywords_type_del == 'sub') {
+                $keywords_sub_id_del = Site_keywords::where('id',$keywords_sub_id_del)->where('site_id',$site->id)->delete();
+                $check = Site_keywords::where('id',$keywords_sub_id_del)->where('site_id',$site->id)->first();
+                if(!$check) {
+                    $message = langapp('changes_saved_successful');
+                    $status = 1;
+                } else {
+                    $message = '';
+                    $status = 1;
+                }
+            }
+        }
+
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'data'       => '',
+                'message'  => $message,
+                'status'   => $status,
+                'redirect' => route('keyword.index',['id' => $code_site]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function check_insert_keyword_process(Request $request)
+    {
+        $message = '';
+        $status = 0;
+
+        $from_id = $request->from_id;
+        $to_id = $request->to_id;
+        $attributes_id = $request->attributes_id;
+        $code_site = $request->code_site;
+        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        if(($from_id) && ($to_id || $attributes_id)) {
+
+            if($from_id == 'keyword_main') {
+                $site_keywords_main = site_keywords_main::where('id',$attributes_id)->first();
+                if($to_id == 'social_main') {
+                    $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','social')->first();
+                    if($Site_keywords_check) {
+
+                    } else {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $attributes_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'social';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->save();
+                    }
+                } else if ($to_id == 'darkweb_main') {
+                    $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','darkweb')->first();
+                    if($Site_keywords_check) {
+
+                    } else {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $attributes_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'darkweb';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->save();
+                    }
+                }
+            } else if ($from_id == 'social_main') {
+                $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
+                $keywords_main_id = $Site_keywords->keywords_main_id;
+                $site_keywords_main = site_keywords_main::where('id',$keywords_main_id)->first();
+                if($Site_keywords) {
+                    $Site_keywords->delete();
+
+                    $Site_keywords_insert = new Site_keywords;
+                    $Site_keywords_insert->code = generator_uuid();
+                    $Site_keywords_insert->keywords_main_id = $keywords_main_id;
+                    $Site_keywords_insert->site_id = $site->id;
+                    $Site_keywords_insert->name = $site_keywords_main->name;
+                    $Site_keywords_insert->type = 'darkweb';
+                    $Site_keywords_insert->status = 1;
+                    $Site_keywords_insert->created_by = Auth::user()->id;
+                    $Site_keywords_insert->save();
+                } else {
+
+                }
+
+            } else if ($from_id == 'darkweb_main') {
+                $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
+                $keywords_main_id = $Site_keywords->keywords_main_id;
+                $site_keywords_main = site_keywords_main::where('id',$keywords_main_id)->first();
+                if($Site_keywords) {
+                    $Site_keywords->delete();
+
+                    $Site_keywords_insert = new Site_keywords;
+                    $Site_keywords_insert->code = generator_uuid();
+                    $Site_keywords_insert->keywords_main_id = $keywords_main_id;
+                    $Site_keywords_insert->site_id = $site->id;
+                    $Site_keywords_insert->name = $site_keywords_main->name;
+                    $Site_keywords_insert->type = 'darkweb';
+                    $Site_keywords_insert->status = 1;
+                    $Site_keywords_insert->created_by = Auth::user()->id;
+                    $Site_keywords_insert->save();
+                } else {
+
+                }
+            }
+
+            $Site_keywords = new Site_keywords;
+            $check = site_keywords_main::where('id',$keywords_main_id_del)->where('site_id',$site->id)->first();
+            if(!$check) {
+                $message = langapp('changes_saved_successful');
+                $status = 1;
+            } else {
+                $message = '';
+                $status = 1;
+            }
+            
+        }
+
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'data'       => '',
+                'message'  => $message,
+                'status'   => $status,
+                'redirect' => route('keyword.index',['id' => $code_site]),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
 
 }
