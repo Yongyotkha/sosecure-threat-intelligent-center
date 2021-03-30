@@ -725,7 +725,7 @@ class AssetsController extends Controller
     public function selectCPE_by(Request $request)
     {
         $os_id = $request->os_id;
-        if($os_id == 'other') {
+        if($os_id == 4) {
             $CPEData = data_cveven::select('rawtext as cpe')->where('rawtext','!=',null)->get();
         } else {
             $OSType = OSType::select('name')->where('id', $request->os_id)->first();
