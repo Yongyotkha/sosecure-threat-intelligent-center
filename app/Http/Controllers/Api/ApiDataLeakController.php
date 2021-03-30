@@ -14,6 +14,7 @@ use App\R_s_s_news;
 use App\ReadCategories;
 use App\ReadNews;
 use App\TransactionTimeStampScans;
+use Modules\Social\Entities\Data_leak_social;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -912,6 +913,55 @@ class ApiDataLeakController extends ApiController
                         "number_reported" => @$number_reported,
                         "number_close" => @$number_close,
 
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function getDataLeakSocial(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
+
+                    // $site_code = $data['data']['site_code'];
+                    // if($site_code) {
+                    //     $SiteSettings = SiteSettings::where('code',$site_code)->first();
+                    // }
+
+                    if(@$get_role_custom_first['superadmin'] == 1) {
+                    } else {
+                            $Data_leak_social = Data_leak_social::where('deleted_at', null)->where('status',1)->get();
+                           
+                    }
+
+                    $response = [
+                        "Data_leak_social" => $Data_leak_social,
                     ];
 
                     $data_transcation = json_encode($response);

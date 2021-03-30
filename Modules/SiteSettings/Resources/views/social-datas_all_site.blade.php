@@ -151,7 +151,7 @@ use Carbon\Carbon;
                                                                  <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('mobile')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
                                                                                 
                                                                                     <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; background: #d8d8d8;">
                                                                                 
@@ -165,7 +165,7 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('line')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
                                                                                     <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; <!--position: inherit;-->">
                                                                                     <span class="number-card info" style="font-size: 35px !important;padding: 20px; margin-left: 110px;"  id='icon_line'>0</span>
                                                                                 </div>
@@ -177,7 +177,7 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('website')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
                                                                                     <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
                                                                                     <span class="number-card " style="color: #8793db; font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_website'>0</span>
                                                                                 </div>
@@ -191,7 +191,7 @@ use Carbon\Carbon;
                                                                      <div class="card-dash-compro none-bg none-shadow" style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('facebook')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
                                                                                     <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
                                                                                     <span class="number-card info" style="font-size: 35px !important;padding: 20px; margin-left: 110px;"  id='icon_facebook'>0</span>
                                                                                 </div>
@@ -203,7 +203,7 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow"  style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('twitter')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
                                                                                     <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
                                                                                     <span class="number-card " style="color: #5bb984; font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_twitter'>0</span>
                                                                                 </div>
@@ -215,7 +215,7 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow"  style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('other')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
                                                                                     <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
                                                                                     <span class="number-card "style="color: #565656; font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_other'>0</span>
                                                                                 </div>

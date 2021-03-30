@@ -99,6 +99,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/delete_change', 'Api\ApiDataLeakController@data_leak_delete_change');
     Route::post('data_leak/count_keyword', 'Api\ApiDataLeakController@count_keyword');
     Route::post('data_leak/count_icon', 'Api\ApiDataLeakController@count_icon');
+    Route::post('data_leak/getDataLeakSocial', 'Api\ApiDataLeakController@getDataLeakSocial');
 
     Route::post('data_leak/activity_dataleak_modal', 'Api\ApiDataLeakController@activity_dataleak_modal');
     Route::post('data_leak/activity_history_reload', 'Api\ApiDataLeakController@activity_history_reload');
