@@ -438,7 +438,7 @@ function get_keyword_main() {
                                     <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="${data[x].id}"><i class="fas fa-trash-alt"></i></a>
                                 </div>
                             </li>`;
-                        $("ul.keyword-list").prepend(newToDo);
+                        $("ul.keyword-list").append(newToDo);{{--prepend--}}
                         edit_keyword();
                         delete_keyword_main();
 
@@ -497,7 +497,7 @@ function get_keyword_sub(type) {
                                     <a href="#" class="text-white delete-item-keyword-sub" data-keywords_sub_id="${data[x].id}" data-keywords_main_id="${data[x].keywords_main_id}"><i class="fas fa-trash-alt"></i></a>
                                 </div>
                             </li>`;
-                        $('ul.'+type+'-list').prepend(newToDo);
+                        $('ul.'+type+'-list').append(newToDo);{{--prepend--}}
                         delete_keyword_sub();
                     }
                 }

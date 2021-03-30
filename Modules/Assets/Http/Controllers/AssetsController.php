@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Assets\Entities\CPEData;
+use Modules\Assets\Entities\data_cveven;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Assets\Entities\OSType;
 use Auth;
@@ -723,8 +724,14 @@ class AssetsController extends Controller
 
     public function selectCPE_by(Request $request)
     {
-        $OSType = OSType::select('name')->where('id', $request->os_id)->first();
-        $CPEData = CPEData::whereRaw('LOWER(os_type) = ?', strtolower($OSType->name))->get();
+        $os_id = $request->os_id;
+        if($os_id == 'other') {
+            $CPEData = data_cveven::select('rawtext as cpe')->where('rawtext','!=',null)->get();
+        } else {
+            $OSType = OSType::select('name')->where('id', $request->os_id)->first();
+            $CPEData = CPEData::whereRaw('LOWER(os_type) = ?', strtolower($OSType->name))->get();
+        }
+
         return response()->json($CPEData);
     }
 

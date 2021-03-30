@@ -311,6 +311,7 @@ class KeywordsController extends Controller
         $keyword_name = $request->keyword_name;
         $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
+        $select_order = site_keywords_main::select('order')->orderBy('order','desc')->first();
         $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('name',$keyword_name)->where('status',1)->whereNull('deleted_at')->first();
         if(!$site_keywords_main) {
             $site_keywords_main_insert = new site_keywords_main;
@@ -319,6 +320,7 @@ class KeywordsController extends Controller
             $site_keywords_main_insert->name = $keyword_name;
             $site_keywords_main_insert->status = 1;
             $site_keywords_main_insert->created_by = Auth::user()->id;
+            $site_keywords_main_insert->order = $select_order->order+1;
             $site_keywords_main_insert->save();
 
             $message = langapp('changes_saved_successful');
@@ -352,7 +354,7 @@ class KeywordsController extends Controller
         $code_site = $request->code_site;
         $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
-        $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->get();
+        $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->get();
         if(!$site_keywords_main) {
 
             $message = langapp('changes_saved_successful');
@@ -387,7 +389,7 @@ class KeywordsController extends Controller
         $code_site = $request->code_site;
         $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
-        $Site_keywords = Site_keywords::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->get();
+        $Site_keywords = Site_keywords::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
         if(!$Site_keywords) {
 
             $message = langapp('changes_saved_successful');
@@ -523,14 +525,15 @@ class KeywordsController extends Controller
         $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
         if(($from_id) && ($to_id || $attributes_id)) {
+            $select_order = Site_keywords::select('order')->orderBy('order','desc')->first();
 
             if($from_id == 'keyword_main') {
                 $site_keywords_main = site_keywords_main::where('id',$attributes_id)->first();
                 if($to_id == 'social_main') {
                     $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','social')->first();
                     if($Site_keywords_check) {
-                        $message = '';
-                        $status = 0;
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
                     } else {
                         $Site_keywords_insert = new Site_keywords;
                         $Site_keywords_insert->code = generator_uuid();
@@ -540,6 +543,7 @@ class KeywordsController extends Controller
                         $Site_keywords_insert->type = 'social';
                         $Site_keywords_insert->status = 1;
                         $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
                         $Site_keywords_insert->save();
 
                         $message = langapp('changes_saved_successful');
@@ -548,8 +552,8 @@ class KeywordsController extends Controller
                 } else if ($to_id == 'darkweb_main') {
                     $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','darkweb')->first();
                     if($Site_keywords_check) {
-                        $message = '';
-                        $status = 0;
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
                     } else {
                         $Site_keywords_insert = new Site_keywords;
                         $Site_keywords_insert->code = generator_uuid();
@@ -559,6 +563,7 @@ class KeywordsController extends Controller
                         $Site_keywords_insert->type = 'darkweb';
                         $Site_keywords_insert->status = 1;
                         $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
                         $Site_keywords_insert->save();
 
                         $message = langapp('changes_saved_successful');
@@ -567,21 +572,26 @@ class KeywordsController extends Controller
                 }
             } else if ($from_id == 'social_main') {
                 $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
+                $Site_keywords_name = $Site_keywords->name;
+                $check_repeat = Site_keywords::where('name',$Site_keywords_name)->where('type','darkweb')->first();
+
                 $keywords_main_id = $Site_keywords->keywords_main_id;
                 $site_keywords_main = site_keywords_main::where('id',$keywords_main_id)->first();
                 if($Site_keywords) {
                     $Site_keywords->delete();
 
-                    $Site_keywords_insert = new Site_keywords;
-                    $Site_keywords_insert->code = generator_uuid();
-                    $Site_keywords_insert->keywords_main_id = $keywords_main_id;
-                    $Site_keywords_insert->site_id = $site->id;
-                    $Site_keywords_insert->name = $site_keywords_main->name;
-                    $Site_keywords_insert->type = 'darkweb';
-                    $Site_keywords_insert->status = 1;
-                    $Site_keywords_insert->created_by = Auth::user()->id;
-                    $Site_keywords_insert->save();
-
+                    if(!$check_repeat) {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $keywords_main_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'darkweb';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
+                        $Site_keywords_insert->save();
+                    }
                     $message = langapp('changes_saved_successful');
                     $status = 1;
                 } else {
@@ -591,20 +601,26 @@ class KeywordsController extends Controller
 
             } else if ($from_id == 'darkweb_main') {
                 $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
+                $Site_keywords_name = $Site_keywords->name;
+                $check_repeat = Site_keywords::where('name',$Site_keywords_name)->where('type','social')->first();
+
                 $keywords_main_id = $Site_keywords->keywords_main_id;
                 $site_keywords_main = site_keywords_main::where('id',$keywords_main_id)->first();
                 if($Site_keywords) {
                     $Site_keywords->delete();
 
-                    $Site_keywords_insert = new Site_keywords;
-                    $Site_keywords_insert->code = generator_uuid();
-                    $Site_keywords_insert->keywords_main_id = $keywords_main_id;
-                    $Site_keywords_insert->site_id = $site->id;
-                    $Site_keywords_insert->name = $site_keywords_main->name;
-                    $Site_keywords_insert->type = 'social';
-                    $Site_keywords_insert->status = 1;
-                    $Site_keywords_insert->created_by = Auth::user()->id;
-                    $Site_keywords_insert->save();
+                    if(!$check_repeat) {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $keywords_main_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'social';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
+                        $Site_keywords_insert->save();
+                    }
 
                     $message = langapp('changes_saved_successful');
                     $status = 1;
