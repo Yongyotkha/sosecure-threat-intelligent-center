@@ -151,11 +151,11 @@ use Carbon\Carbon;
                                                                  <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('mobile')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
                                                                                 
-                                                                                    <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
+                                                                                    <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; background: #d8d8d8;">
                                                                                 
-                                                                                    <span class="number-card warning" style="font-size: 35px !important;padding: 20px;" id='icon_mobile'>0</span>
+                                                                                    <span class="number-card warning" style="font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_mobile'>0</span>
                                                                                 </div>
                                                                                 <!-- <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3> -->
                                                                                
@@ -165,21 +165,21 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('line')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
-                                                                                    <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
-                                                                                    <span class="number-card info" style="font-size: 35px !important;padding: 20px;"  id='icon_line'>0</span>
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                    <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; <!--position: inherit;-->">
+                                                                                    <span class="number-card info" style="font-size: 35px !important;padding: 20px; margin-left: 110px;"  id='icon_line'>0</span>
                                                                                 </div>
                                                                                 <!-- <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3> -->
                                                                               
                                                                             </div>
                                                                         </a>
                                                                     </div>
-                                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
+                                                                    <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('website')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
-                                                                                    <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
-                                                                                    <span class="number-card " style="color: #8793db; font-size: 35px !important;padding: 20px;" id='icon_website'>0</span>
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                    <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
+                                                                                    <span class="number-card " style="color: #8793db; font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_website'>0</span>
                                                                                 </div>
                                                                                 <!-- <h3 class="name-dash-text-compro text-dark text-upper " style="font-size: 35px !important;padding: 20px;">Mobile App</h3> -->
                                                                               
@@ -191,9 +191,9 @@ use Carbon\Carbon;
                                                                      <div class="card-dash-compro none-bg none-shadow" style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('facebook')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
-                                                                                    <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
-                                                                                    <span class="number-card info" style="font-size: 35px !important;padding: 20px;"  id='icon_facebook'>0</span>
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                    <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
+                                                                                    <span class="number-card info" style="font-size: 35px !important;padding: 20px; margin-left: 110px;"  id='icon_facebook'>0</span>
                                                                                 </div>
                                                                                 <!-- <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3> -->
                                                                              
@@ -203,9 +203,9 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow"  style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('twitter')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
-                                                                                    <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
-                                                                                    <span class="number-card " style="color: #5bb984; font-size: 35px !important;padding: 20px;" id='icon_twitter'>0</span>
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                    <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
+                                                                                    <span class="number-card " style="color: #5bb984; font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_twitter'>0</span>
                                                                                 </div>
                                                                                 <!-- <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3> -->
                                                                              
@@ -215,9 +215,9 @@ use Carbon\Carbon;
                                                                     <div class="card-dash-compro none-bg none-shadow"  style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                                         <a href="javascript:void(0)" onclick="dataType2('other')">
                                                                             <div class="left-card">
-                                                                                <div class="img-icon-card ice" style="height: 100px;    width: 300px;">
-                                                                                    <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; position: inherit;">
-                                                                                    <span class="number-card "style="color: #565656; font-size: 35px !important;padding: 20px;" id='icon_other'>0</span>
+                                                                                <div class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left;">
+                                                                                    <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;">
+                                                                                    <span class="number-card "style="color: #565656; font-size: 35px !important;padding: 20px; margin-left: 110px;" id='icon_other'>0</span>
                                                                                 </div>
                                                                                 <!-- <h3 class="name-dash-text-compro text-dark text-upper" style="font-size: 35px !important;padding: 20px;">Fanpage</h3> -->
                                                                              
@@ -235,7 +235,7 @@ use Carbon\Carbon;
 
                                                     <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px;    box-shadow: 0 0px 0px #f5f5f5;">
                                                             <a href="#" onclick="dataType('social')">
-                                                                <div class="left-card">
+                                                                <div id="icon_publish" class="left-card" style="">
                                                                     <div class="img-icon-card ice" style="width: 150px;height: 150px;">
                                                                         <img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)">
                                                                     </div>
@@ -775,6 +775,22 @@ active_btn('#groupby-type .btn-grey');
 active_btn('#groupby-social .btn-grey');
 active_btn('#btngroup_status .btn-grey');
 active_btn('#btngroup_monitoring .btn-grey');
+
+
+    function myFunction(x) {
+        let area_logo_os = document.getElementById("icon_publish");
+        if (x.matches) {
+            area_logo_os.style.marginLeft = "-80px";
+        } else {
+            area_logo_os.style.marginLeft = "0px";
+        }
+    }
+
+    var x = window.matchMedia("(min-width: 1200px)");
+    myFunction(x);
+    x.addListener(myFunction);
+
+
 
 
 $('.btn').click(function(){
