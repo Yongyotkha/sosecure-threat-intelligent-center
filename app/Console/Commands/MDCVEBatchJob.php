@@ -403,11 +403,24 @@ class MDCVEBatchJob extends Command
 
     while ($row3 = $result2->fetch_array(MYSQLI_ASSOC)) {
 
-       //   echo '<br>'.$row3['vendor'].'<br>---------------------------------------/r/n';
+        //  echo '<br>'.$row3['title'].'<br>---------------------------------------/r/n';
+          print PHP_EOL .$row3['title'];
 
-        $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version='" . $row3['version'] . "'";
+         if($row3['version'] =="-" || $row3['version'] =="*" || $row3['version'] ==""){
+                    $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version in ('-','*','')";
+          }else{
+                    $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version='" . $row3['version'] . "'";
 
-        print PHP_EOL . $sql2;
+          }
+
+          if($row3['edition'] =="-" || $row3['edition'] =="*" || $row3['edition'] ==""){
+                     $sql2 =  $sql2. "  and edition in ('-','*','')";
+            }else{
+                     $sql2 =  $sql2."  and edition ='".$row3['edition']."'";
+
+          }
+
+       // print PHP_EOL . $sql2;
         $result3 = mysqli_query($conn, $sql2) or die(mysqli_error());
         $namecveList = array();
         array_push($namecveList, 'C0000');
@@ -499,7 +512,7 @@ class MDCVEBatchJob extends Command
             }
 
             // Mapping Asset
-
+           // echo $row3['title'].'-'.$row3['site_id'].'|';
             $sql_samename_asset = "SELECT namecve FROM fx_data_datacve_mapping_assets WHERE namecve = '" . $row4['namecve'] . "' and site_id='".$row3['site_id']."' and cve_asset_id='".$row3['id']."'";
 
             $result11 = mysqli_query($conn, $sql_samename_asset) or die(mysqli_error());

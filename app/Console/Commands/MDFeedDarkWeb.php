@@ -453,6 +453,7 @@ class MDFeedDarkWeb extends Command
         ];
         $data["header"] = $headers;
         $data["url"] = 'https://' . $host . $endpoint . $search;
+      //  print_r($data);
         return $data;
 
     }
