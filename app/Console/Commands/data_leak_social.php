@@ -171,14 +171,14 @@ class data_leak_social extends Command
                 }
 
                 try {
-                    // $datetime_subdays3 = Carbon::now()->subDays(3);
-                        $DataLeakFeedTemp = DataLeakFeedTemp::where('created_at', '<', now()->subDays(3))->delete();
+                         $datetime_subdays3 = Carbon::now()->subDays(3);
+                        $DataLeakFeedTemp = DataLeakFeedTemp::where('created_at', '<', $datetime_subdays3)->delete();
                         if (!$DataLeakFeedTemp) {
    
                         }
                     
                     
-                        $find_leak_socail_ref_temp = leak_socail_ref_temp::where('created_at', '<', now()->subDays(3))->delete();
+                        $find_leak_socail_ref_temp = leak_socail_ref_temp::where('created_at', '<', $datetime_subdays3)->delete();
                         if (!$find_leak_socail_ref_temp) {
 
                         }
