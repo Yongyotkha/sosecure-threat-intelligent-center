@@ -49,6 +49,9 @@ class data_leak_social extends Command
         $tz = new \DateTimeZone('Asia/Bangkok');
         $start = date("Y-m-d") . ' 00:00:00';
         $end = date("Y-m-d") . ' 23:59:59';
+
+        $time = strtotime($start);
+		$start = date("Y-m-d H:i:s", strtotime("-1 month", $time));
         // $start = '2020-01-01'.' 00:00:00';
         //  $end = date("Y-m-d").' 23:59:59';
         $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start) * 1000);
@@ -83,7 +86,7 @@ class data_leak_social extends Command
         //     'feedtimestamp' => array('$gt' => $start, '$lt' => $end),
         // );
 
-        $time_stamp_search = new \MongoDB\BSON\UTCDateTime(Carbon::now('UTC')->subDays(1));
+        $time_stamp_search = new \MongoDB\BSON\UTCDateTime(Carbon::now('UTC')->subMonths(1));
         $Site_keywords = Site_keywords::where('status', 1)->where('deleted_at', null)->where('type', 'social')->get();
         foreach ($Site_keywords as $key => $Site_keyword) {
 
@@ -171,15 +174,15 @@ class data_leak_social extends Command
                 }
 
                 try {
-                        $datetime_subdays3 = Carbon::now()->subDays(3);
-                        $datetime_subdays3 = date("Y-m-d H:i:s",strtotime($datetime_subdays3));
-                        $DataLeakFeedTemp = DataLeakFeedTemp::where('created_at', '<', $datetime_subdays3)->delete();
+                        $datetime_subdays3 = Carbon::now()->subMonths(1);
+                        $datetime_subdays3 = date("Y-m-d",strtotime($datetime_subdays3));
+                        $DataLeakFeedTemp = DataLeakFeedTemp::whereDate('created_at', '<', $datetime_subdays3)->delete();
                         if (!$DataLeakFeedTemp) {
    
                         }
                     
                     
-                        $find_leak_socail_ref_temp = leak_socail_ref_temp::where('created_at', '<', $datetime_subdays3)->delete();
+                        $find_leak_socail_ref_temp = leak_socail_ref_temp::whereDate('created_at', '<', $datetime_subdays3)->delete();
                         if (!$find_leak_socail_ref_temp) {
 
                         }
