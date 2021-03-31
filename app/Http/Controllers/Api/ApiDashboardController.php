@@ -709,11 +709,11 @@ class ApiDashboardController extends ApiController
 
                     if (!$pagename || $pagename == 'News') {
                         if (@check_permission_site_custom_api($data['data']['user_id'], 'news')) {
-                            $dataR_s_s_news_th = R_s_s_news::select('title_th as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/th") AS link , "News" AS pagename'))->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))
+                            $dataR_s_s_news_th = R_s_s_news::select('title_th as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("news/public/news/detail/",code ,"/th") AS link , "News" AS pagename'))->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))
                                 ->where(function ($query) {
                                     $query->whereNotNull('title_th')->where('title_th', '!=', ''); //detail_th
                                 })->get()->toArray();
-                            $dataR_s_s_news_en = R_s_s_news::select('title_en as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("/public/news/detail/",code ,"/en") AS link , "News" AS pagename'))->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))
+                            $dataR_s_s_news_en = R_s_s_news::select('title_en as content', 'created_at as datetime', DB::raw(' "All Site" as sitename,CONCAT("news/public/news/detail/",code ,"/en") AS link , "News" AS pagename'))->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))
                                 ->where(function ($query) {
                                     $query->whereNotNull('title_en')->where('title_en', '!=', ''); //detail_en
                                 })->get()->toArray();
