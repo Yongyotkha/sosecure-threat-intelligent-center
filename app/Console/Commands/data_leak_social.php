@@ -171,7 +171,8 @@ class data_leak_social extends Command
                 }
 
                 try {
-                         $datetime_subdays3 = Carbon::now()->subDays(3);
+                        $datetime_subdays3 = Carbon::now()->subDays(3);
+                        $datetime_subdays3 = date("Y-m-d H:i:s",strtotime($datetime_subdays3));
                         $DataLeakFeedTemp = DataLeakFeedTemp::where('created_at', '<', $datetime_subdays3)->delete();
                         if (!$DataLeakFeedTemp) {
    
