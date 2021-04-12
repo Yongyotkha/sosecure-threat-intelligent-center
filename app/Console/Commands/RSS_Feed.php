@@ -51,6 +51,9 @@ class RSS_Feed extends Command
             foreach ($RSSList as $key => $value) {
                 echo $value->url;
                 $this->output_rss_feed($value->id, $value->url, 20, true, true, 200);
+                RSS::where('id',$value->id)->update(array(
+                    'feed_last'=>date("Y-m-d H:i:s"),
+                ));
 
             }
 

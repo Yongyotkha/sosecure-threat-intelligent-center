@@ -244,7 +244,7 @@ function data_table(){
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[ 5, "desc" ], [ 0, "asc" ]],
+            order: [[ 4, "desc" ]],
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             ajax: {
                 type: "POST",

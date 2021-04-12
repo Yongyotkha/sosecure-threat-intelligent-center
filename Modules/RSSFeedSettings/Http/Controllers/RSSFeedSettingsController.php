@@ -845,6 +845,11 @@ class RSSFeedSettingsController extends Controller
                 </a>";
                 return $html;
             })
+            ->addColumn('transactionRssData_count', function (RSSData $model) {
+                $html = '';
+                $html .= TransactionRssData::where('rss_id', $model->id)->count();
+                return $html;
+            })
             ->addColumn('status', function (RSSData $model) {
                 if($model->status == '1') {
                     $checked_val = 'checked';
@@ -871,6 +876,9 @@ class RSSFeedSettingsController extends Controller
             ->rawColumns(['chk','link','status','action'])
             ->toJson();
     }
+
+    
+
 
     public function rss_data_create_news($code)
     {

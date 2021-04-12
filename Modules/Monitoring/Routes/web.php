@@ -29,5 +29,8 @@ Route::group(
         Route::post('/load_card', 'MonitoringController@load_card')->name('monitoring.load_card')->middleware('can:menu_items');
         Route::post('/load_category', 'MonitoringController@load_category')->name('monitoring.load_category')->middleware('can:menu_items');
         Route::post('/load_status', 'MonitoringController@load_status')->name('monitoring.load_status')->middleware('can:menu_items');
+        Route::post('social_setting_table', 'MonitoringController@tableSocailMonitoring')->name('socialfeedsettings.rss_setting_table')->middleware('can:menu_items');
+        Route::get('/social_feel', 'MonitoringController@social_feel')->name('monitoring.social_feel')->middleware('can:menu_items');
+        Route::post('social_feel_table', 'MonitoringController@tablesocial_feel')->name('monitoring.social_feel_table')->middleware('can:menu_items');
     }
 );
