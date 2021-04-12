@@ -32,7 +32,7 @@
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
                             <div class="col-lg-6">
-                                <h5 class="font-weight-bold">ญayload</h5>
+                                <h5 class="font-weight-bold">payload</h5>
                                 <select name="payload" id="payload" class="form-control">
                                     <option value="q" selected>Darkweb</option>
                                     <option value="domain">Domain</option>
@@ -222,12 +222,17 @@
                     html += `
                     <tr>
                         <td>${element.title}</td>
-                        <td></td>
+                        <td><span id="body_text_${index}"></span></td>
                         <td>${element.crawlDate}</td>
                     <tr>
                     `;
                 }
                 $('#body-monitoring-darkweb').prepend($(html).fadeIn('slow'));
+
+                for (let index = 0; index < jsonObj.alldata.results.length; index++) {
+                    const element = jsonObj.alldata.results[index];
+                    $('#body_text_' + index).text(element.body);
+                }
         
             },
             error: function (error){
