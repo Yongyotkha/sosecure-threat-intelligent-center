@@ -14,6 +14,21 @@ use Modules\Monitoring\Entities\SentLogs;
 use Carbon\Carbon;
 use App\Entities\Categories;
 use Modules\Monitoring\Entities\MonitoringSystem;
+
+use Modules\RSSFeedSettings\Entities\RSSData;
+use Modules\RSSFeedSettings\Entities\RSSNews;
+use Modules\RSSFeedSettings\Entities\RSSNewsCategory;
+use Modules\SiteSettings\Entities\Tags;
+use Modules\SiteSettings\Entities\site_config_email_alert;
+use Modules\SiteSettings\Entities\SiteCategory;
+use Modules\RSSFeedSettings\Entities\TransactionRssData;
+use App\DataLeakSocial;
+
+
+use MongoDB\BSON\Regex;
+use MongoDB\Client;
+use MongoDB\Client as MongoClient;
+use MongoDB\BSON\UTCDateTime;
 class MonitoringController extends Controller
 {
     /**
@@ -600,6 +615,536 @@ class MonitoringController extends Controller
 
     }
     public function load_category(Request $request){
+
+    }
+
+    public function tableSocailMonitoring(){
+        $role_custom = @check_role_custom();
+    
+        $model = DataLeakSocial::where('deleted_at',null)->get();
+        return DataTables::of($model)
+            ->editColumn('chk', function (DataLeakSocial $model) {
+                    return '<label><input type="checkbox" name="rss_id" class="rss_id" value="' . $model->code . '"><span class="label-text"></span></label>';
+            })
+            ->addColumn('link', function (DataLeakSocial $model) {
+                $html = '';
+                $html .= "<a href='". route('rssfeedsettings.rss_data_create_news', ['code' => $model->code]) ."' data-toggle='ajaxModal'>
+                    ".$model->link."
+                </a>";
+                return $html;
+            })
+            ->addColumn('transactionRssData_count', function (DataLeakSocial $model) {
+
+
+                $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                $client = new \MongoDB\Client($DB_MONGO_KEY);
+                $db_name = 'social';
+                $db = $client->$db_name;
+                $collection = $db->DailyFeed;
+                $where = array(
+                    'sourceid' => $model->id,
+                );
+        
+                $cursor = $collection->find($where);   //This is the main line
+                $document_all = $cursor->toArray();
+                $cursor_count = count($document_all);
+             
+
+
+
+                $html = '';
+                $html .= $cursor_count;
+                return $html;
+            })
+            ->addColumn('feed_last_mongodb', function (DataLeakSocial $model) {
+
+
+                $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                $client = new \MongoDB\Client($DB_MONGO_KEY);
+                $db_name = 'social';
+                $db = $client->$db_name;
+                $collection = $db->feed_source;
+                $where = array(
+                   'source_id' => $model->id,
+                  
+                );
+        
+                $cursor = $collection->find($where);   //This is the main line
+                $document_all = $cursor->toArray();
+                $cursor_count = count($document_all);
+   
+             
+
+
+
+                $html = '';
+                if($cursor_count > 0){
+                    foreach ($document_all as  $value) {
+                      
+                       
+
+                        try {
+                            if (property_exists($value, 'last_feed_date')) {
+                            $html .=  change_date_utc_to_thai($value->last_feed_date);
+                            }
+                        } catch (Exception $e) {
+                          
+                        }
+                    }
+
+                   
+                }
+             
+                return $html;
+            })
+            ->addColumn('status', function (DataLeakSocial $model) {
+                if($model->status == '1') {
+                    $checked_val = 'checked';
+                } else {
+                    $checked_val = '';
+                }
+                $html = '';
+                $html .= '<label class="switch">
+                            <input type="checkbox" id="rss-active-'.$model->code.'" onchange="change_rss_active(\''.$model->code.'\')" '.$checked_val.' value="1">
+                            <span></span>
+                        </label>';
+                return $html;
+            })
+            ->addColumn('action', function (DataLeakSocial $model) {
+                $html = '';
+                $html .= "<a href='". route('rssfeedsettings.edit', ['id' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                </a>
+                <a href='". route('rssfeedsettings.delete', ['id' => $model->code]) ."' class='btn btn-danger btn-xs' data-toggle='ajaxModal'>
+                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
+                </a></div>";
+                return $html;
+            })
+            ->rawColumns(['chk','link','status','action'])
+            ->toJson();
+    }
+
+
+    public function social_feel()
+    {
+   
+        $data['SiteSettings'] = "";
+        $data['page'] = langapp('social_feel');
+        return view('monitoring::social_feel')->with($data);
+    }
+
+
+    public function tablesocial_feel(Request $request)
+{
+    $role_custom = @check_role_custom();
+    if(!$role_custom['indicators']) {
+        check_permission403();
+    }
+
+        // $DB_MONGO_KEY = env("DB_MONGO_DEV", "mongodb://10.104.0.7:27017");
+
+        // $client = new \MongoDB\Client($DB_MONGO_KEY);
+
+    $f_search = $request->f_search;
+    $start_date = $request->start_date;
+    $end_date = $request->end_date;
+    $keyword = $request->keyword;
+
+    if($start_date) {
+        $date_start_explode = explode(" ",$start_date);
+        $date_start_date = @$date_start_explode[0];
+        $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+            // dd($date_start_time);
+        $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+            // dd($date_start_date_format);
+        $date_start_time_time = date("H:i", strtotime($date_start_time));
+        $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+            // dd($date_start_time_time);
+
+
+        $date_end_explode = explode(" ",$end_date);
+        $date_end_date = @$date_end_explode[0];
+        $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+            // dd($date_end_time);
+        $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        $date_end_time_time = date("H:i", strtotime($date_end_time));
+        $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+            // dd($date_end_time_time);
+
+
+
+        $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($date_start_datetime_format)*1000);
+        $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($date_end_datetime_format)*1000);
+            // dd($dateStart);
+    }
+
+
+
+
+
+
+    $perpage = 25;
+
+    if (isset($_POST['page'])) {
+        $page = $_POST['page'];
+    } else {
+        $page = 1;
+    }
+    $start = ($page - 1) * $perpage;
+
+    $mongo_url = DB_MONGO_01;
+    $client = new \MongoDB\Client($mongo_url);
+    $db_name = 'social';
+    $db = $client->$db_name;
+    $collection = $db->Feed;
+        // $where = array(
+        //     'status' => 1,
+        // );
+
+    if($f_search == 'true') {
+        $query = [
+            '$and' => [
+                [
+                    '$or' => [
+                        [
+                            '$and' => [
+                                [
+                                    'name' => new Regex('^.*'.$keyword.'.*$', 'i')
+                                ],
+                                [
+                                    'status' => 1
+                                ]
+                            ]
+                        ],
+                        [
+                            '$and' => [
+                                [
+                                    'tags' => new Regex('^.*'.$keyword.'.*$', 'i')
+                                ],
+                                [
+                                    'status' => 1
+                                ]
+                            ]
+                        ],
+                        [
+                            '$and' => [
+                                [
+                                    'groups' => new Regex('^.*'.$keyword.'.*$', 'i')
+                                ],
+                                [
+                                    'status' => 1
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'created_at' => [
+                            '$gte' => $dateStart//new UTCDateTime(-15644559600000)
+                        ]
+                    ],
+                    [
+                        'created_at' => [
+                            '$lte' => $dateEnd//new UTCDateTime(-15644559600000)
+                        ]
+                    ]
+                ]
+            ];
+
+
+        } else {
+            $query = [
+                'status' => 1//,
+                // 'tags' => new Regex('^.*webscanner.*$', 'i')//LIKE
+                // 'tags' => [//IN
+                //     '$in' => [
+                //         'webscanner',
+                //         'test'
+                //     ]
+                // ]
+            ];
+        }
+
+        
+        $options = [
+            'sort' => [
+                'feedtimepost' => -1
+            ],
+            'skip' => $start,//10
+            'limit' => $perpage//5
+        ];
+        
+        $cursor = $collection->find($query, $options);
+
+        $query2 = [];
+        $options2 = [
+            'projection' => [
+                '_id' => '$_id'
+            ]
+        ];
+
+        $cursor_all = $collection->find($query, $options2);
+
+        $total_record = count($cursor_all->toArray());
+        // dd($total_record);
+        // $total_record = mysqli_num_rows($query2);
+        $total_page = ceil($total_record / $perpage);
+        $second_last = $total_page - 1; // total pages minus 1
+
+        $offset = ($page-1) * $perpage;
+        $previous_page = $page - 1;
+        $next_page = $page + 1;
+        $adjacents = "2";
+
+
+        $pagination = '<nav>
+        <ul class="pagination">';
+
+        if($page > 1) {
+            $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">First Page</a></li>';
+        }
+
+        $pagination .= '<li onclick="pagination_goto('.$previous_page.')" data-page="'.@$previous_page.'"';
+        if($page <= 1) {
+            $pagination .= 'class="disabled"';
+        }
+        $pagination .= '>';
+
+        $pagination .= '<a ';
+        if($page > 1) {
+            $pagination .= 'href="#"';
+        }
+
+        $pagination .= '>Previous</a></li>';
+
+        if ($total_page <= 10){   
+            for ($counter = 1; $counter <= $total_page; $counter++){
+                if ($counter == $page) {
+                    $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                }else{
+                    $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                }
+            }
+        } elseif ($total_page > 10){
+            if($page <= 4) { 
+                for ($counter = 1; $counter < 8; $counter++){ 
+                    if ($counter == $page) {
+                        $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                    }else{
+                        $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                    }
+                }
+                $pagination .= '<li><a>...</a></li>';
+                $pagination .= '<li onclick="pagination_goto('.$second_last.')" data_page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
+                $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
+            } elseif ($page > 4 && $page < $total_page - 4) { 
+                $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
+                $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
+                $pagination .= "<li><a>...</a></li>";
+                for (
+                   $counter = $page - $adjacents;
+                   $counter <= $page + $adjacents;
+                   $counter++
+               ) { 
+                    if ($counter == $page) {
+                        $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                    }else{
+                        $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                    }                  
+                }   
+                $pagination .= "<li><a>...</a></li>";
+                $pagination .= '<li onclick="pagination_goto('.$second_last.')" data-page="'.$second_last.'"><a href="#">'.$second_last.'</a></li>';
+                $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">'.$total_page.'</a></li>';
+            } else {
+                $pagination .= '<li onclick="pagination_goto(1)" data-page="1"><a href="#">1</a></li>';
+                $pagination .= '<li onclick="pagination_goto(2)" data-page="2"><a href="#">2</a></li>';
+                $pagination .= '<li><a>...</a></li>';
+                for (
+                   $counter = $total_page - 6;
+                   $counter <= $total_page;
+                   $counter++
+               ) {
+                    if ($counter == $page) {
+                        $pagination .= '<li class="active"><a>'.$counter.'</a></li>'; 
+                    }else{
+                        $pagination .= '<li onclick="pagination_goto('.$counter.')" data-page="'.$counter.'"><a href="#">'.$counter.'</a></li>';
+                    }                   
+                }
+            }
+        }
+
+        $pagination .= '<li onclick="pagination_goto('.$next_page.')" data-page="'.@$next_page.'"';
+
+        if($page >= $total_page){
+            $pagination .= 'class="disabled"';
+        } 
+        $pagination .= ' >';
+
+        $pagination .= '<a ';
+        if($page < $total_page) {
+            $pagination .= 'href="#"';
+        }
+        $pagination .= '>Next</a></li>';
+
+        if($page < $total_page){
+            $pagination .= '<li onclick="pagination_goto('.$total_page.')" data-page="'.$total_page.'"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
+        } 
+        $pagination .= '</ul></nav>';
+
+
+
+
+
+
+        $start_first_in_page = $start+1;
+        $end_last_in_page = $start+$perpage;
+
+        $showing_amount_text = '<div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">Showing '.$start_first_in_page.' to '.$end_last_in_page.' of '.$total_record.' entries</div>';
+
+
+
+        $html = '';
+        $head_table = '';
+        $head_table .= '<table class="table table-striped" id="table_events">
+        <thead>
+        <tr>
+        <!--<th>
+        <label>
+        <input name="select_all" value="1" id="select-all" type="checkbox" />
+        <span class="label-text"></span>
+        </label>
+        </th>-->
+        <th style="width: 50px;">No</th>
+        <th style="width: 500px;">Event Name</th>
+        <th style="width: 200px;">Group</th>
+        <th style="width: 200px;">Tags</th>
+        <!--<th>Attr</th>-->
+        <th style="width: 100px;">Published</th>
+        <th style="width: 120px;">Last Status</th>
+        <th style="width: 120px;">DateTime</th>
+        <th style="width: 100px;">View</th>
+        <th style="width: 120px;">Action</th>
+        </tr>
+        </thead>
+        <tbody>';
+
+        $html .= $head_table;
+
+
+
+
+
+        $i = $start;
+        // dd($cursor->toArray());
+        foreach ($cursor as $document) {
+            $i++;
+            $html .= '
+            <tr>
+            <!--<td>
+            <label>
+            <input value="'.$document['_id'].'" type="checkbox" />
+            <span class="label-text"></span>
+            </label>
+            </td>-->
+            <td>'.$i.'</td>
+            <td style="width: 500px;">'.$document['feedcontent'].'</td>
+            <td>'.explode_val($document['feedlink'],'groups').'</td>
+            <td>'.explode_val($document['feedlink'],'tags').'</td>
+            <!--<td>
+            <a href="#"></a>
+            </td>-->
+            <td>'.check_publish($document['feedlink']).'</td>
+            <td>'.check_last_status($document['feedlink']).'</td>
+            <td>'.change_date_utc_to_thai($document['feedlink']).'</td>
+            <td>'.$document['feedlink'].'</td>
+            <td>
+           
+            </td>
+            </tr>
+            ';
+            // dd($document['_id']);
+        }
+
+        $html .= '</tbody>
+        </table>';
+
+        // dd($cursor);
+        // $cursor = $collection->find($where,['projection'=>['_id'=>0]]);
+        // $cursor = $collection->find($where);
+
+        // $model= $cursor->toArray();
+
+        // dd($model);
+        // $model = $model[0];
+        // unset($model['_id']);
+
+
+        // $collection = collect(['name', 'public']);
+        // $collection = collect([
+        //     ['product' => 'Desk', 'price' => 200],
+        //     ['product' => 'Chair', 'price' => 100],
+        // ]);
+
+        // $collection->paginate(15);
+        // dd($collection);
+
+        // $combined = $collection->combine(['George', 1]);
+        // $combined->all();
+        // dd($combined);
+        //  dd($model[0]['TLP']);
+        // $model = collect($model);
+        //dd($model[0]->TLP);
+
+        // return DataTables::of($collection->toJson())
+        // ->editColumn('chk', function ( $collection) {
+        //     return '<label><input type="checkbox"  name="events_id" class="events_id" value=""><span class="label-text"></span></label>';
+        // })
+        // ->addColumn('no', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('even_name', function ( $collection) {
+
+        //     return $collection->product;
+        // })
+
+        // ->addColumn('group', function ( $collection) {
+        
+        //     return "-";
+        // })
+        // ->addColumn('tags', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('attr', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('published', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('last_status', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('date_time', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('view', function ( $collection) {
+        //     return '-';
+        // })
+        // ->addColumn('action', function ( $collection) {
+        //     return '-';
+        // })
+
+
+        // ->rawColumns(['chk', 'no', 'even_name', 'group', 'tags', 'attr', 'published', 'last_status', 'date_time', 'view', 'action'])
+        // ->toJson();
+        // return $html;
+        if ($request->ajax()) {
+            $data = [
+                "html" => $html,
+                "pagination" => $pagination,
+                "showing_amount_text" => $showing_amount_text,
+            ];
+            return response()->json($data);
+        }
 
     }
 
