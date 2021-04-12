@@ -200,7 +200,7 @@
         endDate=  $("#newsrange").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
         Keywords = $("#Keywords").val();
         payload = $("#payload").val();
-
+        $('#body-monitoring-darkweb').html("");
         $.ajax({
              type:"POST",
             url:"{{ route('monitoring.monitor_search_darkweb') }}",
