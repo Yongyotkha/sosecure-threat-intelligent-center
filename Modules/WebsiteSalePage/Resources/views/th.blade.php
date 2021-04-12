@@ -475,8 +475,8 @@
                     <img class="img-fluid" style="max-width: 55%;" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
                   </div>
                   <ul class="list-img-ioc" style="justify-content: center;">
-                      <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px; width: 70px;" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection"><p>Agent - Based Detection</p></li>
-                      <li style="width: 200px;"><img class="img-fluid" style="max-width: 100px; width: 70px;" src="{{asset('asset_salepage/images/Compromised.png')}}" alt="Compromised"><p>Compromised Detection File System Registry</p></li>
+                      <li><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection"><p>Agent - Based Detection</p></li>
+                      <li><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/Compromised.png')}}" alt="Compromised"><p>Compromised Detection <br> File System Registry</p></li>
                   </ul>
               </div>
           </div>
