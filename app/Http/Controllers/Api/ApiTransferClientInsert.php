@@ -40,7 +40,8 @@ class ApiTransferClientInsert extends Controller
     protected function insertToRef(Request $request)
     {
         $ip =exec("hostname -I");
-        $mac = exec("cat /sys/class/net/ens33/address");
+       // $mac = exec("cat /sys/class/net/ens33/address");
+        $mac = exec('cat /sys/class/net/eth0/address');
         $header = $request->bearerToken();
         $code = $request->site_code_en;
         $dataEncode = $code;
@@ -325,7 +326,8 @@ class ApiTransferClientInsert extends Controller
     protected function insertToNoRefWithID(Request $request)
     {
      $ip =exec("hostname -I");
-     $mac = exec("cat /sys/class/net/ens33/address");
+    // $mac = exec("cat /sys/class/net/ens33/address");
+     $mac =exec('cat /sys/class/net/eth0/address');
      $header = $request->bearerToken();
      $code = $request->site_code_en;
      $dataEncode = $code;

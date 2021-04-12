@@ -47,7 +47,8 @@ class TransactionCenterToClient_v02 extends Command
         $this->header = config('app.site_key');
         $this->urlCenterData = $this->urlCenterData.'?code='.$this->site_code;
         $this->ip =exec("hostname -I");
-        $this->mac = exec("cat /sys/class/net/ens33/address");
+        //$this->mac = exec("cat /sys/class/net/ens33/address");
+        $this->mac =exec('cat /sys/class/net/eth0/address');
         $this->PATH_CENTER = config('app.PATH_CENTER');
         $this->PATH_CLIENT = config('app.PATH_CLIENT');
     }

@@ -26,7 +26,7 @@ class FeedPublicCompromised extends Command
 
     protected $description = 'FeedPublicCompromised';
     private $url = 'https://haveibeenpwned.com/api/v3/breaches';
-    private $key = '92aa5d8fe2f54692994a51a29d75356d';
+    private $key = '77703631c104451c8de82028728eea19';
     private $urlLimit = 3;
     /**
      * Create a new command instance.
