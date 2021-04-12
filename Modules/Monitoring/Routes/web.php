@@ -29,5 +29,8 @@ Route::group(
         Route::post('/load_card', 'MonitoringController@load_card')->name('monitoring.load_card')->middleware('can:menu_items');
         Route::post('/load_category', 'MonitoringController@load_category')->name('monitoring.load_category')->middleware('can:menu_items');
         Route::post('/load_status', 'MonitoringController@load_status')->name('monitoring.load_status')->middleware('can:menu_items');
+
+        Route::get('/darkweb', 'MonitoringController@monitor_darkweb')->name('monitoring.monitor_darkweb')->middleware('can:menu_items');
+        Route::post('/search_darkweb', 'MonitoringController@monitor_search_darkweb')->name('monitoring.monitor_search_darkweb')->middleware('can:menu_items');
     }
 );

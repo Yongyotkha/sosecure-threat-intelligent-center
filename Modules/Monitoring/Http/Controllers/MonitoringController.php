@@ -13,6 +13,7 @@ use Modules\Monitoring\Entities\MonitorLogs;
 use Modules\Monitoring\Entities\SentLogs;
 use Carbon\Carbon;
 use App\Entities\Categories;
+use Illuminate\Support\Facades\Artisan;
 use Modules\Monitoring\Entities\MonitoringSystem;
 class MonitoringController extends Controller
 {
@@ -601,6 +602,28 @@ class MonitoringController extends Controller
     }
     public function load_category(Request $request){
 
+    }
+
+    public function monitor_darkweb(){
+        $role_custom = @check_role_custom();
+        if(!$role_custom['monitoring']) {
+            check_permission403();
+        }
+        $data['page'] = langapp('monitoring');
+        return view('monitoring::monitor_darkweb')->with($data);
+    }
+
+    public function monitor_search_darkweb(Request $request){
+        try {
+            $data = Artisan::call("app:MDFeedDarkWeb_Token", ['q' => $request->Keywords, 'payload' => $request->payload, 'time_stamp_from' => $request->startDate, 'time_stamp_to' => $request->endDate]);
+            // $res = [
+            //     'data' => $data
+            // ];
+            // return response()->json($res);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+        
     }
 
 }
