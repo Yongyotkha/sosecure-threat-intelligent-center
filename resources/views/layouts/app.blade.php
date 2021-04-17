@@ -512,7 +512,5 @@ function get_CVSS_Severity_status_js(num_val,status_id,badg='') {
 </script>
 
 
-
-
 </body>
 </html>
