@@ -333,7 +333,7 @@
                 </div>
 
                 <div class="col-lg-4 offset-lg-4 order-lg-3 order-2">
-                    <span class="secondary-text text-blue text-lg-left text-center">
+                    <span class="secondary-text text-blue text-lg-left text-center d-block">
                         ตรวจจับการรั่วไหลของข้อมูลที่ถูก Hacker<br> นำไปเผยเแพร่บน Internet จากแหล่งข้อมูลต่างๆ
                     </span>
                     <ul class="list-img-ioc mt-3">
@@ -398,10 +398,15 @@
 
     <section class="content-section" style="padding-top: 50px; padding-bottom: 50 px;">
         <div class="container">
-            <div class="row d-flex align-items-start">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-12 text-center">
+                    <h1 class="primary-text d-lg-none d-block">
+                        Compromised Detection
+                    </h1>
+                </div>
                 <div class="col-lg-6 mb-3 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
-                        <h1 class="primary-text">
+                        <h1 class="primary-text d-lg-block d-none">
                             Compromised Detection
                         </h1>
                         <span class="secondary-text">
