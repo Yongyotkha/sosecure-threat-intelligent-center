@@ -414,7 +414,7 @@ class DomainSettingsController extends Controller
                 }
             );
         }
-
+        $model->where('status',1);
 
 
         return DataTables::eloquent($model)
@@ -445,6 +445,12 @@ class DomainSettingsController extends Controller
             ->addColumn('elements', function ($domain) {
                 $html = '';
                 $html .= @$domain->get_transaction_time_stamp_scans->elements;
+                // $html = get_name_scan_status($domain -> progress , 'badg');
+                return $html;
+            })
+            ->addColumn('completed_date', function ($domain) {
+                $html = '';
+                $html .= @$domain->get_transaction_time_stamp_scans->updated_at;
                 // $html = get_name_scan_status($domain -> progress , 'badg');
                 return $html;
             })

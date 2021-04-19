@@ -18,6 +18,10 @@
                 </div>
 
                 <div class="ml-2 text-right">
+                <a href="https://insight.sosecure.co.th/monitoring/darkweb" id="advance-"
+                    class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
+                    <span data-rel="tooltip" title="Filter" data-placement="bottom"> Search Dark Web</span></span>
+                </a>
                     {{-- <div class="text-left max-w-select" style="display:inline-block;">
                         <select name="site" id="site" class="select2-option form-control select-site">
                             <option value="">All Site</option>
@@ -29,11 +33,7 @@
                     </select>
                 </div>
 
-                <a href="#hide-advance-search" id="advance-search"
-                    class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
-                    <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span
-                            class="hide-text">@langapp('Search_Advance')</span></span>
-                </a>
+          
 
                 @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                 <a href="#" id="btn_md_create" class="btn btn-sm btn-{{ get_option('theme_color')  }}"
@@ -204,7 +204,7 @@
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-lg-12 col-sm-12">
-                            <i class="fas fa-table"></i> Site
+                            <i class="fas fa-table"></i> Site - Server
                         </div>
                     </div>
                 </header>
@@ -234,6 +234,135 @@
                 </div>
               
             </section>
+
+
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12">
+                            <i class="fas fa-table"></i> Domain -Scan
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" style="background: #f2f2f2;">
+                <div class="table-responsive">
+                                            <table  class="table table-striped" id="table-domain-template">
+                                                <thead>
+                                                    <tr>
+                                                        {{-- <th class="hide"></th> --}}
+                                                        <th class="no-sort">
+                                                            <label>
+                                                                <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
+                                                                <span class="label-text"></span>
+                                                            </label>
+                                                        </th>
+                                                        {{-- <th class="">No.</th> --}}
+                                                        <th>Name</th>
+                                                        <th>Domain</th>
+                                                        <th>Default</th>
+                                                        <th>Started</th>
+                                                        <th>Finished</th>
+                                                        <th>Elements</th>
+                                                        <th>Progress</th>
+                                                        {{-- <th>@langapp('status')</th> --}}
+                                                        <th class="no-sort" width="10%">@langapp('action')</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+              
+            </section>
+
+
+            
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12">
+                            <i class="fas fa-table"></i> RSS Feed  
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" style="background: #f2f2f2;">
+                <div class="table-responsive">
+                <table class="table table-striped" id="table-rss-setting-template-rss">
+                            <thead>
+                                <tr>
+                                    <th class="hide"></th>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                class="select-chk" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>@langapp('name')</th>
+                                    <th>URL</th>
+                                    {{-- <th>@langapp('keyword')</th>
+                                            <th>Interval (Day)</th>
+                                            <th>Start Date Feed</th>
+                                            <th>Last Date Feed</th>
+                                            <th>Data Feed</th>
+                                            <th>Data Error</th> --}}
+                                            <th>Last Feel</th>
+                                    <th>Last Count</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                                        </div>
+              
+            </section>
+
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12">
+                            <i class="fas fa-table"></i> Social  Feed  
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" style="background: #f2f2f2;">
+                <div class="table-responsive">
+                <table class="table table-striped" id="table-rss-setting-template-social">
+                            <thead>
+                                <tr>
+                                    <th class="hide"></th>
+                                    <th class="no-sort">
+                                        <label>
+                                            <input name="select_all" value="1" id="select-all" type="checkbox"
+                                                class="select-chk" />
+                                            <span class="label-text"></span>
+                                        </label>
+                                    </th>
+                                    <th>@langapp('name')</th>
+                                    <th>URL</th>
+                                    {{-- <th>@langapp('keyword')</th>
+                                            <th>Interval (Day)</th>
+                                            <th>Start Date Feed</th>
+                                            <th>Last Date Feed</th>
+                                            <th>Data Feed</th>
+                                            <th>Data Error</th> --}}
+                                            <th>Last Feel</th>
+                                    <th>Last Count</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                                        </div>
+              
+            </section>
+
+
 
         </section>
     </section>
@@ -286,6 +415,27 @@
             </div>
         </div>
     </div> --}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 </section>
 <input type="hidden" id="url_id">
@@ -445,6 +595,448 @@
             console.log("No response from server");
         });
     }
+
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#scan_interval').select2();
+    });
+    
+    $('ul.role-group-sub').hide();
+    function openrole(onck,id){
+        $('#'+id).slideToggle(150);
+    }
+
+    $('#table-domain-template').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-domain-template').on('click', '.domain_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.domain_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.domain_id').filter(':checked').length < 1){
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+
+    $(function () {
+
+        var table = $('#table-domain-template').DataTable({
+            processing: true,
+            serverSide: true,
+            
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            ajax: {
+                url: '{!! route('domainsettings.data') !!}',
+                data: {
+                    "site_code":'{{ Request::segment(3) }}'
+                },
+                type: "POST",
+            },
+            order: [
+                [0, "desc"]
+            ],
+            columns: [
+                {
+                    data: 'chk',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-10',
+                    "visible": false
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'domain',
+                    name: 'domain'
+                },
+                {
+                    data: 'domain_default',
+                    name: 'domain_default',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    className: 'text-center w100px no-wrap'
+                },
+                {
+                    data: 'completed_date',
+                    name: 'completed_date',
+                    className: 'text-center w100px no-wrap'
+                },
+                {
+                    data: 'elements',
+                    name: 'elements',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'progress',
+                    name: 'progress',
+                    className: 'w100px'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'no-wrap',
+                    "visible": false
+                },
+                
+            ]
+        });
+
+
+
+
+    });
+    let del_domain_select = [];
+    function delete_domain_select(){
+        del_domain_select = [];
+        $('#delete_domain_modal').modal('show');
+    }
+
+    function delete_domain_select_confirm(){
+        
+        $("input[type='checkbox'][name='checked']").each(function(){
+            if($(this).is(":checked")) {
+                del_domain_select.push($(this).val());
+            }
+        });
+        console.log(del_domain_select);
+        $.ajax({
+            type:"POST",
+            url:"{{ route('domainsettings.del_domain_select') }}",
+            data:{
+                id:del_domain_select
+            },
+            beforeSend: function(){
+                $('.delete_domain_submit').html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            },
+            success:function(response) {
+                $('.delete_domain_submit').html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                toastr.success(response.message, '@langapp('response_status')');
+                window.location.href = response.redirect;
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
+    function del_cate_select(id) {
+        axios.post('{{ route('domainsettings.bulk.delete') }}', {checked: id})
+        .then(function (response) {
+            toastr.warning(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        })
+        .catch(function (error) {
+            var errors = error.response.data.errors;
+            var errorsHtml = '';
+            $.each(errors, function (key, value) {
+                errorsHtml += '<li>' + value[0] + '</li>';
+            });
+            toastr.error(errorsHtml, '@langapp('response_status') ');
+        });
+    }
+
+
+    function change_category_active (id) {
+        $.ajax({
+            type:"POST",
+            url:"{{ route('domainsettings.change_status') }}",
+            data:{id:id},
+            beforeSend: function(){
+            },
+            success:function(response) {
+                console.log(response);
+
+                toastr.warning(response.data.message, '@langapp('response_status')');
+                window.location.href = response.data.redirect;
+            
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+    }
+
+
+    function change_domain_active(code) {
+        let checkState = $("#domain_active_" + code).is(":checked") ? 1 : 0;
+        axios.post('{{route('domainsettings.change_status')}}', {
+            active: checkState,
+            code: code,
+        }).then(function (response) {
+            toastr.success(response.data.message, '@langapp('response_status')');
+            window.location.href = response.data.redirect;
+        }).catch(function (error) {
+            var errors = error.response.data.errors;
+            var errorsHtml = "";
+            $.each(errors, function (key, value) {
+                errorsHtml += "<li>" + value[0] + "</li>";
+            });
+            toastr.error(errorsHtml, '@langapp('response_status')');
+        });
+    }
+
+
+
+</script>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#keywords').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+
+        $('#interval').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+
+        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+
+        $('#show_end_exp_date').hide();
+
+        $('#set_exp').on('change',function(){
+            if($(this).prop('checked')){
+                $('#show_end_exp_date').show();
+            }else{
+                $('#show_end_exp_date').hide();
+            }
+        });
+    });
+
+    
+    $('#table-rss-setting-template-rss').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-rss-setting-template-rss').on('click', '.rss_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.rss_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.rss_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    }); 
+
+    $(function () {
+        
+
+        var table = $('#table-rss-setting-template-rss').DataTable({
+            pageLength: 50,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            ajax: {
+                url: '{!! route('rssfeedsettings.rss_setting_table') !!}',
+                data: function ( d ) {
+                    {{--d.keywords = keywords;--}}
+                    {{--return JSON.stringify( d );--}}
+                    return d;
+                },
+                type: "POST",
+            },
+            order: [[ 0, "desc" ]],
+            columns: [
+                { data: 'id', name: 'id',  },
+                { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false, className: 'w-10',"visible": false  },
+                { data: 'name', name: 'name' },
+                { data: 'url', name: 'url' },
+                { data: 'feed_last', name: 'feed_last' },
+                { data: 'transactionRssData_count', name: 'transactionRssData_count' },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-25',
+                    "visible": false
+                   
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-50 no-wrap',
+                    "visible": false
+                }
+            ]
+        });
+
+
+
+    });
+
+
+    
+
+
+
+
+
+</script>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#keywords').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+
+        $('#interval').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+
+        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
+
+        $('#show_end_exp_date').hide();
+
+        $('#set_exp').on('change',function(){
+            if($(this).prop('checked')){
+                $('#show_end_exp_date').show();
+            }else{
+                $('#show_end_exp_date').hide();
+            }
+        });
+    });
+
+    
+    $('#table-rss-setting-template-social').on('click', '.select-chk', function () {
+        if ($(this).is(':checked')) {
+
+            $('#btn_del_select').prop("disabled", false);
+        } else {
+            
+            if ($('.select-chk').filter(':checked').length < 1){
+
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    });
+
+    $('#table-rss-setting-template-social').on('click', '.rss_id', function () {
+        if ($(this).is(':checked')) {
+            $('#btn_del_select').prop("disabled", false);
+            {{--if($('.rss_id').filter(':checked').length >= 5){
+                document.getElementById("select-all").checked = true;
+            }--}}
+        } else {
+            document.getElementById("select-all").checked = false;
+            if ($('.rss_id').filter(':checked').length < 1){
+                
+                $('#btn_del_select').attr('disabled',true);
+            }
+        }
+    }); 
+
+    $(function () {
+        
+
+        var table = $('#table-rss-setting-template-social').DataTable({
+            pageLength: 50,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            ajax: {
+                url: '{!! route('socialfeedsettings.rss_setting_table') !!}',
+                data: function ( d ) {
+                    {{--d.keywords = keywords;--}}
+                    {{--return JSON.stringify( d );--}}
+                    return d;
+                },
+                type: "POST",
+            },
+            order: [[ 0, "desc" ]],
+            columns: [
+                { data: 'id', name: 'id',  },
+                { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false, className: 'w-10',"visible": false  },
+                { data: 'source', name: 'source' },
+                { data: 'url', name: 'url' },
+                { data: 'feed_last_mongodb', name: 'feed_last_mongodb' },
+                { data: 'transactionRssData_count', name: 'transactionRssData_count' },
+                {
+                    data: 'status',
+                    name: 'status',
+                    className: 'w-25',
+                    "visible": false
+                   
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                    className: 'w-50 no-wrap',
+                    "visible": false
+                }
+            ]
+        });
+
+
+
+    });
+
+
+    
+
+
+
 
 
 </script>
