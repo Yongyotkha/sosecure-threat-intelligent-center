@@ -69,8 +69,11 @@ class TransactionScanSSH extends Command
                 $current_scraping_names_emails_and_phone_number = '';
                 $current_port_scanner = '';
 
+                $current_looking_for_subdomain_securitytrails = '';
+
                 $cmd = 'ssh -t root@10.104.0.12  /usr/spiderfoot/sf.py ';
-                $cmd_looking_for_subdomain = $cmd.'-m sfp_dnsbrute,sfp_dnsresolve,sfp_crobat_api -s '.$domain.' -q -F AFFILIATE_DOMAIN_NAME,AFFILIATE_INTERNET_NAME,INTERNET_NAME';
+                $cmd_looking_for_subdomain_securitytrails = $cmd.'-m sfp_securitytrails -s '.$domain.' -q -F INTERNET_NAME ';
+                $cmd_looking_for_subdomain = $cmd.'-m sfp_dnsbrute,sfp_dnsresolve,sfp_crobat_api,sfp_securitytrails -s '.$domain.' -q -F AFFILIATE_DOMAIN_NAME,AFFILIATE_INTERNET_NAME,INTERNET_NAME';
                 $cmd_looking_for_domain_name = $cmd.'-m sfp_dnsbrute,sfp_dnsresolve,sfp_crt,sfp_crobat_api -s '.$domain.' -q -F DOMAIN_NAME,DOMAIN_NAME_PARENT,DOMAIN_REGISTRAR,DOMAIN_WHOIS,INTERNET_NAME';
                 $cmd_full_DNS_recon_all_detail = $cmd.'-m sfp_dnsbrute,sfp_dnsresolve,sfp_crobat_api,sfp_crt -s '.$domain.' -q';
                 $cmd_DNS_recon_filter_for_ip_v4 = $cmd.'-m sfp_dnsbrute,sfp_dnsresolve,sfp_crobat_api,sfp_crt  -s '.$domain.' -q -r -F IP_ADDRESS';
@@ -88,6 +91,28 @@ class TransactionScanSSH extends Command
                     2 => array("pipe", "w")
                 );
                 flush();
+
+              //  for ($i=1; $i <= 3; $i++) { 
+                    try {
+                        $process_looking_for_subdomain_securitytrails  = proc_open($cmd_looking_for_subdomain_securitytrails, $descriptorspec, $pipes, realpath('./'), array());
+                        if (is_resource($process_looking_for_subdomain_securitytrails)) {
+                            while ($s = fgets($pipes[1])) {
+                                $current_looking_for_subdomain_securitytrails .= $s;
+                                echo $s;
+                                flush();
+                            }
+                        }
+                        
+                        $path = public_path().'/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
+                        File::makeDirectory($path, $mode = 0777, true, true);
+
+                        $file = $path.'/looking_for_subdomain_securitytrails.txt';
+                        file_put_contents($file, $current_looking_for_subdomain_securitytrails);
+                        break;
+                    } catch (\Throwable $th) {
+                        //throw $th;
+                    }
+               // }
 
                 for ($i=1; $i <= 3; $i++) { 
                     try {
