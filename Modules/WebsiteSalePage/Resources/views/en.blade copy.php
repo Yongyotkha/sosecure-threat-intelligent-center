@@ -39,7 +39,6 @@
         /*text-transform: uppercase;*/
     }
 
-
     /*---section os-----------------------*/
     .css-2u2ye4 {
         display: grid;
@@ -146,6 +145,7 @@
             width:150px !important;
         }
     }
+
 </style>
 
 @php 
@@ -173,7 +173,7 @@
     }
 @endphp
 
-    <nav class="navbar navbar-expand-xl navbar-dark bg-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/websitesalepage">
                 <img src="{{asset('images/logo_threat/logo.png')}}" height="45px" class="d-inline-block align-top" alt="">
@@ -190,16 +190,15 @@
                         <a class="nav-link" href="{{route('web.index_th')}}"><img class="d-inline-block" src="{{asset('asset_salepage/images/thai.png')}}" width="20px;" alt=""> TH</a>
                     </li>
                     @if (Auth::check())
-                        <li class="nav-item ml-xl-2 mb-xl-2 ml-0">
+                        <li class="nav-item ml-lg-2 mb-lg-2 ml-0">
                             <a href="{{route('dashboardnew.index')}}"><button type="button" class="btn btn-outline-secondary px-4 mr-2">Dashboard</button></a>
                             <a href="{{route('logout')}}"><button type="button" class="btn btn-outline-secondary px-4">Logout</button></a>
                         </li>
                     @else
-                        <li class="nav-item ml-xl-4 ml-0">
+                        <li class="nav-item ml-lg-4 ml-0">
                             <a href="{{route('login')}}"><button type="button" class="btn btn-outline-secondary px-4">Login</button></a>
                         </li> 
                     @endif          
-                   
                 </ul>
             </div>
         </div>
@@ -244,7 +243,7 @@
                         <h1 class="primary-text text-xl-right text-center">
                             Type of IOC
                         </h1>
-                        <ul class="list-img-ioc show-mb-row justify-content-xl-end justify-content-center">
+                        <ul class="list-img-ioc show-mb-row justify-content-xl-right justify-content-center">
                             <li>
                                 <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Ip.png')}}" alt="IP Address">
                                 <p>IP Address</p>
@@ -279,7 +278,7 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-xl-8 col-xl-8 order-xl-1 order-2 text-xl-left text-center">
+                <div class="col-lg-8 col-lg-8 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text">
                             Asset Discovery
@@ -289,7 +288,7 @@
                         </span>
                     </div>
 
-                    <ul class="list-img-ioc justify-content-xl-start justify-content-center">
+                    <ul class="list-img-ioc justify-content-start">
                         <li>
                             <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/ad_Ip.png')}}" alt="IP Address">
                             <p>IP Address</p>
@@ -309,8 +308,8 @@
                     </ul>
 
                 </div>
-                <div class="col-xl-4 col-xl-4 order-xl-2 order-1 text-center mb-xl-0 mb-5">
-                    <img class="img-fluid" style="max-width: 70%" src="{{asset('asset_salepage/images/c.png')}}" alt="">
+                <div class="col-lg-4 col-lg-4 order-lg-2 order-1 text-center mb-lg-0 mb-5">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/c.png')}}" alt="">
                 </div>
             </div>
         </div>
@@ -319,7 +318,7 @@
     <section class="content-section" style="padding-bottom: 0;">
         <div class="container">
             <div class="row">
-                <div class="col-xl-12">
+                <div class="col-lg-12">
                     <h1 class="primary-text-blue text-center font-weight-bold">Data Leak Detection</h1>
                 </div>
             </div>
@@ -327,12 +326,12 @@
 
             <div class="container">
                 <div class="row">
-                <div class="col-xl-4 order-xl-1 order-1">
+                    <div class="col-lg-4 order-lg-1 order-1">
                         <h1 class="primary-text-blue text-center mt-3 fz-70 font-weight-500">Surface Web</h1>
                     </div>
 
-                <div class="col-xl-4 offset-xl-4 order-xl-3 order-2">
-                    <span class="secondary-text text-blue text-xl-left text-center d-block">
+                <div class="col-lg-4 offset-lg-4 order-lg-3 order-2">
+                    <span class="secondary-text text-blue text-lg-left text-center d-block">
                             Data leak detection from dark web that brings data of organization for publishing and selling.
                         </span>
                         <ul class="list-img-ioc mt-3">
@@ -357,8 +356,8 @@
             <div class="bg-blue-linear px-5">
                 <div class="container">
                     <div class="row">
-                        <div class="col-xl-4 order-xl-1 order-2 d-flex flex-column align-items-center justify-content-center">
-                            <span class="secondary-text mb-3 text-white text-xl-left text-center">
+                        <div class="col-lg-4 order-lg-1 order-2 d-flex flex-column align-items-center justify-content-center">
+                            <span class="secondary-text mb-3 text-white text-lg-left text-center">
                                 We use indicators from insight data to detect threats from hackers stealing data or infecting Backdoor on the server.
                             </span>
         
@@ -382,11 +381,11 @@
                             </ul>
                         </div>
                         
-                        <div class="col-xl-4 text-center order-xl-2 order-3 d-xl-block d-none translatY-50">
+                        <div class="col-lg-4 text-center order-lg-2 order-3 d-lg-block d-none translatY-50">
                             <img class="img-fluid" src="{{asset('asset_salepage/images/iceberg.png')}}" alt="">
                         </div>
 
-                        <div class="order-xl-2 order-1 col-xl-4 d-flex align-items-center justify-content-xl-start justify-content-center">
+                        <div class="order-lg-2 order-1 col-lg-4 d-flex align-items-center justify-content-lg-start justify-content-center">
                             <h1 class="fz-70 text-white font-weight-500">Dark Web</h1>
                         </div>
                     </div>
@@ -395,64 +394,17 @@
         </div>
     </section>
 
-    
-    <!--==========================
-      Threat Hunting
-    ============================-->
-    <section id="threat_hunting" class="content-section bg-c-muted">
-        <div class="container">
-  
-            <div class="col-xl-12 text-center">
-                <h1 class="primary-text d-xl-none d-block"> Threat Hunting </h1>
-            </div>
-  
-          <div class="row">
-            <div class="col-xl-6">
-                <div class="" style="text-align: center;">
-                  <img class="img-fluid" style="max-width: 70%;" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
-                </div>
-            </div>
-
-            <div class="col-xl-6">
-                <h1 class="primary-text d-xl-block d-none"> Threat Hunting </h1>
-                <div>
-                    <span class="secondary-text text-xl-left text-center">
-                        Threat Hunting is a system that can detect proactive threats. Also, Detection threats on cyber by using
-                        proactive indicators of insight data which come from hacker and be attacked by malware.
-                    </span>
-                </div>
-                <ul class="list-img-ioc mt-4" style="justify-content: space-evenly;">
-                    <li class="mw-md-25"><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection">
-                        <p>Persistent <br> Activities</p>
-                    </li>
-                        <li class="mw-md-25"><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Threat Hunting.png')}}" alt="System Compromised">
-                        <p>System Compromised<br> 
-                            (MITRE ATTACK)<br>
-                            - File System <br>
-                            - Executable <br>
-                            - Registry 
-                        </p>
-                    </li>
-                        <li class="mw-md-25"><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Compromise_0.png')}}" alt="Malware Infected">
-                        <p>Malware Infected <br> (Indicator)</p>
-                    </li>
-                </ul>
-            </div>
-          </div>
-        </div>
-    </section><!-- #Threat Hunting -->
-
     <section class="content-section" style="padding-top: 50px; padding-bottom: 50 px;">
         <div class="container">
-            <div class="row d-flex align-items-center">
-                <div class="col-xl-12 text-center">
-                    <h1 class="primary-text d-xl-none d-block">
+            <div class="row d-flex align-items-start">
+                <div class="col-lg-12 text-center">
+                    <h1 class="primary-text d-lg-none d-block">
                         Compromised Detection
                     </h1>
                 </div>
-                <div class="col-xl-6 mb-3 order-xl-1 order-2 text-xl-left text-center">
+                <div class="col-lg-6 mb-3 order-lg-1 order-2 text-lg-left text-center">
                     <div class="mb-5">
-                        <h1 class="primary-text d-xl-block d-none">
+                        <h1 class="primary-text d-lg-block d-none">
                             Compromised Detection
                         </h1>
                         <span class="secondary-text">
@@ -460,19 +412,23 @@
                         </span>
                     </div>
 
-                    <ul class="list-img-ioc justify-content-xl-start justify-content-center">
-                        <li class="mw-md-25">
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Threat Hunting.png')}}" alt="System Compromised">
-                            <p>System <br>Compromised</p>
+                    <ul class="list-img-ioc justify-content-start">
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Threat Hunting.png')}}" alt="Threat Hunting">
+                            <p>Threat Hunting</p>
                         </li>
-                        <li class="mw-md-25">
-                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_backdoor.png')}}" alt="Web Server Compromised">
-                            <p>Web Server <br>Compromised</p>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_Compromise_0.png')}}" alt="Compromised">
+                            <p>Compromised</p>
+                        </li>
+                        <li>
+                            <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/cd_backdoor.png')}}" alt="Backdoor">
+                            <p>Backdoor</p>
                         </li>
                     </ul>
 
                 </div>
-                <div class="col-xl-6 mb-3 order-xl-2 order-1 text-center mb-xl-0">
+                <div class="col-lg-6 mb-3 order-lg-2 order-1 text-center mb-lg-0">
                     <img class="img-fluid" style="max-width: 70%" src="{{asset('asset_salepage/images/icon/cd_Group.png')}}" alt="">
                 </div>
             </div>
@@ -481,67 +437,62 @@
 
     <section class="content-section bg-c-muted">
         <div class="container">
-  
-        <div class="col-xl-12 text-center">
-            <h1 class="primary-text d-xl-none d-block">
-                Automate Update Indicator
-            </h1>
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/defaced.png')}}" alt="">
                 </div>
-
-          <div class="row align-items-center">
-            <div class="col-xl-6">
-                <div class="" style="text-align: center;">
-                    <img class="img-fluid" style="max-width: 70%" src="{{asset('asset_salepage/images/Threat_Hunting_Flow.png')}}" alt="">
-                </div>
-            </div>
-
-            <div class="col-xl-6">
-                <h1 class="primary-text d-xl-block d-none">
-                    Automate Update Indicator
+                <div class="col-lg-6 col-lg-6 mb-3 order-lg-2 order-1 text-lg-left text-center">
+                    <div class="mb-5">
+                        <h1 class="primary-text">
+                            Web Defaced Detection
                         </h1>
-                <div>
-                    <span class="secondary-text text-xl-left text-center">
-                        Threat Hunting system use indicators data and detect faster also update data for real – time
-                    </span>
+                        <span class="secondary-text">
+                            To detect a website from the attacker by using web defacement technique and the organization still maintain credibility.
+                        </span>
                     </div>
-                <ul class="list-img-ioc justify-content-xl-start justify-content-center mt-4">
-                    <li class="mw-md-25"><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/Compromised.png')}}" alt="Automate Update Indicator">
-                        <p>Automate <br> Update <br> Indicator</p>
-                    </li>
-                    <li class="mw-md-25"><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection">
-                        <p>Agent-Based <br> Detection</p>
-                    </li>
-                </ul>
                 </div>
             </div>
         </div>
-    </section><!-- #Threat Hunting -->
+    </section>
 
-    <section class="content-section bg-c-muted">
+
+    <!--==========================
+      Threat Hunting
+    ============================-->
+    <section id="threat_hunting" class="content-section">
         <div class="container">
-            <div class="col-xl-12 text-center"><h1 class="primary-text d-xl-none d-block"> Web Defaced Detection </h1></div>
-            <div class="row d-flex align-items-center">
-                <div class="col-xl-6 col-xl-6 mb-3 text-center order-xl-2 order-1">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/defaced.png')}}" alt="">
+  
+          <div class="section-header">
+              {{-- <h1  class="primary-text fontw-weight-bold text-center">Contact Sales</h1> --}}
+              <h1 class="primary-text fontw-weight-bold text-center">Threat Hunting</h1>
           </div>
-                <div class="col-xl-6 col-xl-6 mb-3 order-xl-1 order-2 text-xl-left text-center">
-                    <div class="mb-5">
-                        <h1 class="primary-text d-xl-block d-none"> Web Defaced Detection </h1>
-                        <span class="secondary-text">
-                            เฝ้าระวังการโจมตีด้วยเทคนิคการเปลี่ยนหน้าเว็บไซต์ (Web Defaced)<br> เพื่อรักษาความน่าเชื่อถือขององค์กร
-                        </span>
+  
+          <div class="row">
+              <div class="col-lg-6">
+                  <div class="" style="text-align: center;">
+                    <img class="img-fluid" style="width: 480px;" src="{{asset('asset_salepage/images/Threat_Hunting_Flow.png')}}" alt="">
                   </div>
               </div>
+  
+              <div class="col-lg-6">
+                    <div class="" style="text-align: center;">
+                        <img class="img-fluid" style="max-width: 55%;" src="{{asset('asset_salepage/images/Threat_Hunting.png')}}" alt="">
+                    </div>
+                    <ul class="list-img-ioc" style="justify-content: center;">
+                        <li><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="AgentBasedDetection"><p>Agent - Based Detection</p></li>
+                        <li><img class="img-fluid mw-70" src="{{asset('asset_salepage/images/Compromised.png')}}" alt="Compromised"><p>Compromised Detection <br> File System Registry</p></li>
+                    </ul>
               </div>
           </div>
-    </section>
   
+        </div>
+    </section><!-- #Threat Hunting -->
 
 
     {{-- <section class="content-section py-4" style="background-color: #f2f2f2;">
         <div class="container">
             <div class="row">
-                <div class="col-xl-12">
+                <div class="col-lg-12">
                     <h1 class="primary-text text-center m-0">
                         Advanced Vulnerability Detection
                     </h1>
@@ -553,7 +504,7 @@
     <section class="content-section bg-dark" style="padding: 80px 0 0 0;">
         <div class="container">
             <div class="row">
-                <div class="col-xl-12 text-center">
+                <div class="col-lg-12 text-center">
                     <h1 class="primary-text text-center text-white">
                         Advanced Vulnerability Detection
                     </h1>
@@ -563,15 +514,15 @@
 
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group97.png')}}" alt="">
                 </div>
-                <div class="col-xl-12 text-center" style="margin-top: 32px;">
+                <div class="col-lg-12 text-center" style="margin-top: 32px;">
                     <ul class="list-img-ioc" style="justify-content: center;">
-                        <li class="logo_v_dtech" style="color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><p style="margin-top: 10px;">Passive Detection</p></li>
-                        <li class="logo_v_dtech" style="color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><p style="margin-top: 10px;">Active Detection</p></li>
-                        <li class="logo_v_dtech" style="color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><p style="margin-top: 10px;">Mis-Configuration Detection</p></li>
-                        <li class="logo_v_dtech" style="color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><p style="margin-top: 10px;">Hardening and Remediation</p></li> 
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/PassiveDetection.png')}}" alt="Passive Detection"><p style="margin-top: 10px;">Passive Detection</p></li>
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/ActiveDetection.png')}}" alt="Active Detection"><p style="margin-top: 10px;">Active Detection</p></li>
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><p style="margin-top: 10px;">Mis-Configuration Detection</p></li>
+                        <li class="logo_v_dtech" style="width: 150px; color: #fff;"><img class="img-fluid" style="max-width: 90px; border-radius:50%;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><p style="margin-top: 10px;">Hardening and Remediation</p></li> 
                     </ul>
                 </div>
-                {{-- <div class="col-xl-12 text-center" style="">
+                {{-- <div class="col-lg-12 text-center" style="">
                     <ul class="list-img-ioc" style="justify-content: center;">
                         <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/MisConfigurationDetection.png')}}" alt="Mis-Configuration Detection"><!--<p>Mis-Configuration Detection</p>--></li>
                         <li style="width: 110px; color: #fff;"><img class="img-fluid" style="max-width: 100px;" src="{{asset('asset_salepage/images/icon/HardeningAndRemediation.png')}}" alt="Hardening and Remediation"><!--<p>Hardening and Remediation</p>--></li>
@@ -584,9 +535,9 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row">
-                <div class="col-xl-12 col-xl-12 text-center">
+                <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
-                        {{-- <div class="col-xl-12 col-xl-12 mb-3 text-center order-xl-2 order-1" style="display: inline-block;">
+                        {{-- <div class="col-lg-12 col-lg-12 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
                             <img class="img-fluid" style="max-width:70%;" src="{{asset('asset_salepage/images/os_type.jpg')}}" alt="">
                             <h1 class="primary-text text-center"> Windows </h1>
                         </div> --}}
@@ -595,7 +546,7 @@
                             <div class="css-nheav9">
                                 <h3 class="h3 darkblue css-1w5mdtx title">Detection Support System</h3>
                                 <p class="medium darkgrey css-o8e64g subtitle"></p>
-                               <div data-testid="cards_container" id="area_logo_os" class="css-2u2ye4" style="grid-template-columns: 1fr 1fr 1fr; text-align: center;">
+                               <div data-testid="cards_container" id="area_logo_os" class="css-2u2ye4" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); text-align: center; overflow-y: auto;">
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
                                         <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
@@ -636,7 +587,7 @@
                             </div>
                          </div>
 
-                        {{-- <div class="col-xl-6 col-xl-6 mb-3 text-center order-xl-2 order-1" style="display: inline-block;">
+                        {{-- <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1" style="display: inline-block;">
                             <img class="img-fluid" style="max-width: 200px;" src="{{asset('asset_salepage/images/icon/linux-logo.png')}}" alt="">
                             <h1 class="primary-text text-center"> Linux </h1>
                         </div> --}}
@@ -653,7 +604,7 @@
     <section class="content-section bg-c-muted" style="background-color: #ececec !important;">
         <div class="container">
             <div class="row">
-                <div class="col-xl-12 col-xl-12 text-center">
+                <div class="col-lg-12 col-lg-12 text-center">
                     <div class="mb-5">
                         <h1 class="primary-text text-center">
                             Mis-Configuration Detection
@@ -671,8 +622,8 @@
     <section class="content-section bg-c-muted">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-xl-6 col-xl-6 mb-3 text-center order-xl-1 order-2">
-                    <div class="mb-4 text-xl-left text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-1 order-2">
+                    <div class="mb-4 text-lg-left text-center">
                         <span class="secondary-text" style="padding-left: 50px;">
                             Detection user attack by using social engineering technique such as Phishing, Fake mobile application, Drive-By-Download.
                         </span>
@@ -696,7 +647,7 @@
 
                 </div>
 
-                <div class="col-xl-6 col-xl-6 mb-3 text-center order-xl-2 order-1">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center order-lg-2 order-1">
                     <h1 class="primary-text text-center">
                         Social Engineering Detection
                     </h1>
@@ -704,7 +655,7 @@
                 </div>
             </div>
             {{-- <div class="row">
-                <div class="col-xl-12" style="text-align: center;">
+                <div class="col-lg-12" style="text-align: center;">
                     <a id="btn_c_sale" href="#contact" class="con1" style="color: #333;">Contact Sales</a>
                 </div>
             </div> --}}
@@ -714,13 +665,13 @@
     <section class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-xl-6 col-xl-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <h1 class="primary-text text-center">
                         Cybersecurity News Feed
                     </h1>
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/cyber.png')}}" alt="">
                 </div>
-                <div class="col-xl-6 col-xl-6 mb-3 text-center">
+                <div class="col-lg-6 col-lg-6 mb-3 text-center">
                     <div class="mb-5">
                         <span class="secondary-text">
                             Update news about cybersecurity from other sources around the world and getting notifications via Email.
@@ -765,11 +716,11 @@
 
         <div class="section-header">
           {{-- <h1  class="primary-text fontw-weight-bold text-center">Contact Sales</h1> --}}
-            <h1 class="primary-text fontw-weight-bold text-center">Contact Us</h1>
+          <h1  class="primary-text fontw-weight-bold text-center">Contact Us</h1>
         </div>
 
         <div class="row">
-            <div class="col-xl-6">
+            <div class="col-lg-6">
                 <div class="contact-container">
                    <ul class="contact-list">
                        <li><p class="mb-3"><span class="icon-contact"><i class="fa fa-map-marker"></i></span> 410/ 34 Soi Ratchadaphisek 24, Ratchadaphisek Rd, Samsen Nok, Huai Khwang, Bangkok 10310</p></li>
@@ -785,8 +736,8 @@
                 </div>
             </div>
 
-            <div class="col-xl-6">
-                <div class="map mb-4 mb-xl-0">
+            <div class="col-lg-6">
+                <div class="map mb-4 mb-lg-0">
                     {{-- <iframe src="https://www.google.com/maps?q=410%2F%2034%20Ratchadaphisek%20Rd%2C%20Khwaeng%20Samsen%20Nok%2C%20Khet%20Huai%20Khwang%2C%20Krung%20Thep%20Maha%20Nakhon%2010310&z=14&t=&ie=UTF8&output=embed" frameborder="0" style="border:0; width: 100%; height: 293px;" allowfullscreen></iframe> --}}
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.6832906662935!2d100.57296581477854!3d13.79795599993984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29d6ebefb4825%3A0x3098ac660f56aea5!2sSOSecure!5e0!3m2!1sth!2ssg!4v1615884002549!5m2!1sth!2ssg" width="100%" height="293px" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                 </div>

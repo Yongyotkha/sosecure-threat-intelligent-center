@@ -1,1 +1,0 @@
-<script src="<?php echo e(getAsset('plugins/daterangepicker/daterangepicker.js')); ?>"></script>

@@ -590,8 +590,11 @@ h6 {
   .mw-100{
     max-width: 70px !important;
   }
+  .mw-md-25{
+    width: 25%;
+  }
 }
-@media screen and (max-width:560px){
+@media screen and (max-width:768px){
   .mw-70{
   max-width: 100px !important;
   }
@@ -652,6 +655,9 @@ h6 {
 .translatY-50{
   transform: translateY(-50%);
 }
+
+
+
 
 @media (max-width:1024px){
   .list-img-ice{
@@ -794,6 +800,7 @@ h6 {
       margin-bottom: 30px;
   }
 }
+
 
 @media screen and (max-width:500px){
   .list-img-ioc.show-mb-row{
