@@ -228,24 +228,24 @@
     <section id="start-section" class="content-section">
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-7 col-md-12 mb-5 text-center">
-                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/group98.png')}}" alt="Threat Sharing">
+                <div class="col-xl-7 col-lg-12 col-md-12 mb-5 text-center">
+                    <img class="img-fluid" src="{{asset('asset_salepage/images/icon/t4.png')}}" alt="Threat Sharing">
                 </div>
-                <div class="col-lg-5 col-md-12 mb-3">
+                <div class="col-xl-5 col-lg-12 col-md-12 mb-3">
                     <div class="mb-5">
-                        <h1 class="primary-text text-lg-right text-center">
+                        <h1 class="primary-text text-xl-right text-center">
                             Threat Sharing
                         </h1>
-                        <span class="secondary-text text-lg-right text-center">
+                        <span class="secondary-text text-xl-right text-center">
                             เชื่อมต่อข้อมูลภัยคุกคามและ Indicator ต่างๆ จาก ผู้ให้บริการข้อมูลต่างๆ มารวมอยู่ที่นี่ และเชื่อมต่อกับ ระบบวิเคราะห์ Log (SIEM) ได้เป็นอย่างดี
                         </span>
                     </div>
 
                     <div>
-                        <h1 class="primary-text text-lg-right text-center">
+                        <h1 class="primary-text text-xl-right text-center">
                             รูปแบบของ IOC
                         </h1>
-                        <ul class="list-img-ioc show-mb-row">
+                        <ul class="list-img-ioc show-mb-row justify-content-xl-right justify-content-center">
                             <li>
                                 <img class="img-fluid mw-70" src="{{asset('asset_salepage/images/icon/Ip.png')}}" alt="IP Address">
                                 <p>IP Address</p>
@@ -431,7 +431,7 @@
 
                 </div>
                 <div class="col-lg-6 mb-3 order-lg-2 order-1 text-center mb-lg-0">
-                    <img class="img-fluid" style="max-width: 50%" src="{{asset('asset_salepage/images/icon/cd_Group.png')}}" alt="">
+                    <img class="img-fluid" style="max-width: 70%" src="{{asset('asset_salepage/images/icon/cd_Group.png')}}" alt="">
                 </div>
             </div>
         </div>
