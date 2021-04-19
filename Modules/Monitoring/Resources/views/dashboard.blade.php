@@ -18,6 +18,10 @@
                 </div>
 
                 <div class="ml-2 text-right">
+                <a href="https://insight.sosecure.co.th/monitoring/darkweb" id="advance-"
+                    class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
+                    <span data-rel="tooltip" title="Filter" data-placement="bottom"> Search Dark Web</span></span>
+                </a>
                     {{-- <div class="text-left max-w-select" style="display:inline-block;">
                         <select name="site" id="site" class="select2-option form-control select-site">
                             <option value="">All Site</option>
@@ -29,11 +33,7 @@
                     </select>
                 </div>
 
-                <a href="#hide-advance-search" id="advance-search"
-                    class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
-                    <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span
-                            class="hide-text">@langapp('Search_Advance')</span></span>
-                </a>
+          
 
                 @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                 <a href="#" id="btn_md_create" class="btn btn-sm btn-{{ get_option('theme_color')  }}"
