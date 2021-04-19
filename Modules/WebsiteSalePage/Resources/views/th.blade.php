@@ -429,7 +429,7 @@
                     </li>
                         <li class="mw-md-25"><img class="img-fluid mw-70"  src="{{asset('asset_salepage/images/icon/cd_Threat Hunting.png')}}" alt="System Compromised">
                         <p>System Compromised<br> 
-                            (MITRE ATTACK)<br>
+                            (MITRE ATT&CK)<br><br>
                             - File System <br>
                             - Executable <br>
                             - Registry 
